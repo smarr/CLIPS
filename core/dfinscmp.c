@@ -41,7 +41,7 @@
    ***************************************** */
 
 static void ReadyDefinstancesForCode(void *);
-static int DefinstancesToCode(void *,char *,int,FILE *,int,int);
+static int DefinstancesToCode(void *,char *,char *,char *,int,FILE *,int,int);
 static void CloseDefinstancesFiles(void *,FILE *,FILE *,int);
 static void DefinstancesModuleToCode(void *,FILE *,struct defmodule *,int,int);
 static void SingleDefinstancesToCode(void *,FILE *,DEFINSTANCES *,int,int,int);
@@ -135,6 +135,8 @@ static void ReadyDefinstancesForCode(
 static int DefinstancesToCode(
   void *theEnv,
   char *fileName,
+  char *pathName,
+  char *fileNameBuffer,
   int fileID,
   FILE *headerFP,
   int imageID,
@@ -162,7 +164,7 @@ static int DefinstancesToCode(
      {
       EnvSetCurrentModule(theEnv,(void *) theModule);
 
-      moduleFile = OpenFileIfNeeded(theEnv,moduleFile,fileName,fileID,imageID,&fileCount,
+      moduleFile = OpenFileIfNeeded(theEnv,moduleFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
                                     moduleArrayVersion,headerFP,
                                     "DEFINSTANCES_MODULE",ModulePrefix(DefinstancesData(theEnv)->DefinstancesCodeItem),
                                     FALSE,NULL);
@@ -181,7 +183,7 @@ static int DefinstancesToCode(
 
       while (theDefinstances != NULL)
         {
-         definstancesFile = OpenFileIfNeeded(theEnv,definstancesFile,fileName,fileID,imageID,&fileCount,
+         definstancesFile = OpenFileIfNeeded(theEnv,definstancesFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
                                              definstancesArrayVersion,headerFP,
                                              "DEFINSTANCES",ConstructPrefix(DefinstancesData(theEnv)->DefinstancesCodeItem),
                                              FALSE,NULL);

@@ -46,7 +46,7 @@
 
    LOCALE void                           PrintConstraintReference(void *,FILE *,CONSTRAINT_RECORD *,int,int);
    LOCALE void                           ConstraintRecordToCode(FILE *,CONSTRAINT_RECORD *);
-   LOCALE int                            ConstraintsToCode(void *,char *,int,FILE *,int,int);
+   LOCALE int                            ConstraintsToCode(void *,char *,char *,char *,int,FILE *,int,int);
 
 #endif
 

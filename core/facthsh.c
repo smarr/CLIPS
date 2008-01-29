@@ -149,7 +149,7 @@ globle intBool RemoveHashedFact(
   void *theEnv,
   struct fact *theFact)
   {
-   unsigned long hashValue;
+   int hashValue;
    struct factHashEntry *hptr, *prev;
 
    hashValue = HashFact(theFact);

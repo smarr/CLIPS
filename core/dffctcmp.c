@@ -39,7 +39,7 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static int                     ConstructToCode(void *,char *,int,FILE *,int,int);
+   static int                     ConstructToCode(void *,char *,char *,char *,int,FILE *,int,int);
    static void                    DeffactsToCode(void *,FILE *,struct deffacts *,
                                                  int,int,int);
    static void                    DeffactsModuleToCode(void *,FILE *,struct defmodule *,int,int,int);
@@ -76,6 +76,8 @@ static void BeforeDeffactsToCode(
 static int ConstructToCode(
   void *theEnv,
   char *fileName,
+  char *pathName,
+  char *fileNameBuffer,
   int fileID,
   FILE *headerFP,
   int imageID,
@@ -105,7 +107,7 @@ static int ConstructToCode(
      {
       EnvSetCurrentModule(theEnv,(void *) theModule);
 
-      moduleFile = OpenFileIfNeeded(theEnv,moduleFile,fileName,fileID,imageID,&fileCount,
+      moduleFile = OpenFileIfNeeded(theEnv,moduleFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
                                     moduleArrayVersion,headerFP,
                                     "struct deffactsModule",ModulePrefix(DeffactsData(theEnv)->DeffactsCodeItem),
                                     FALSE,NULL);
@@ -128,7 +130,7 @@ static int ConstructToCode(
            theDeffacts != NULL;
            theDeffacts = (struct deffacts *) EnvGetNextDeffacts(theEnv,theDeffacts))
         {
-         deffactsFile = OpenFileIfNeeded(theEnv,deffactsFile,fileName,fileID,imageID,&fileCount,
+         deffactsFile = OpenFileIfNeeded(theEnv,deffactsFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
                                          deffactsArrayVersion,headerFP,
                                          "struct deffacts",ConstructPrefix(DeffactsData(theEnv)->DeffactsCodeItem),
                                          FALSE,NULL);

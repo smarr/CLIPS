@@ -45,7 +45,7 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static int                     ConstructToCode(void *,char *,int,FILE *,int,int);
+   static int                     ConstructToCode(void *,char *,char *,char *,int,FILE *,int,int);
    static void                    SlotToCode(void *,FILE *,struct templateSlot *,int,int,int);
    static void                    DeftemplateModuleToCode(void *,FILE *,struct defmodule *,int,int,int);
    static void                    DeftemplateToCode(void *,FILE *,struct deftemplate *,
@@ -70,6 +70,8 @@ globle void DeftemplateCompilerSetup(
 static int ConstructToCode(
   void *theEnv,
   char *fileName,
+  char *pathName,
+  char *fileNameBuffer,
   int fileID,
   FILE *headerFP,
   int imageID,
@@ -102,7 +104,7 @@ static int ConstructToCode(
      {
       EnvSetCurrentModule(theEnv,(void *) theModule);
 
-      moduleFile = OpenFileIfNeeded(theEnv,moduleFile,fileName,fileID,imageID,&fileCount,
+      moduleFile = OpenFileIfNeeded(theEnv,moduleFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
                                     moduleArrayVersion,headerFP,
                                     "struct deftemplateModule",ModulePrefix(DeftemplateData(theEnv)->DeftemplateCodeItem),
                                     FALSE,NULL);
@@ -125,7 +127,7 @@ static int ConstructToCode(
 
       while (theTemplate != NULL)
         {
-         templateFile = OpenFileIfNeeded(theEnv,templateFile,fileName,fileID,imageID,&fileCount,
+         templateFile = OpenFileIfNeeded(theEnv,templateFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
                                          templateArrayVersion,headerFP,
                                          "struct deftemplate",ConstructPrefix(DeftemplateData(theEnv)->DeftemplateCodeItem),
                                          FALSE,NULL);
@@ -148,7 +150,7 @@ static int ConstructToCode(
          slotPtr = theTemplate->slotList;
          while (slotPtr != NULL)
            {
-            slotFile = OpenFileIfNeeded(theEnv,slotFile,fileName,fileID,imageID,&fileCount,
+            slotFile = OpenFileIfNeeded(theEnv,slotFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
                                         slotArrayVersion,headerFP,
                                        "struct templateSlot",SlotPrefix(),FALSE,NULL);
             if (slotFile == NULL)

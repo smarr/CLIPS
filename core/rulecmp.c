@@ -44,7 +44,7 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static int                     ConstructToCode(void *,char *,int,FILE *,int,int);
+   static int                     ConstructToCode(void *,char *,char *,char *,int,FILE *,int,int);
    static void                    JoinToCode(void *,FILE *,struct joinNode *,int,int);
    static void                    LinkToCode(void *,FILE *,struct joinLink *,int,int);
    static void                    DefruleModuleToCode(void *,FILE *,struct defmodule *,int,int,int);
@@ -52,10 +52,10 @@
    static void                    CloseDefruleFiles(void *,FILE *,FILE *,FILE *,FILE*,int);
    static void                    BeforeDefrulesCode(void *);
    static void                    InitDefruleCode(void *,FILE *,int,int);
-   static int                     RuleCompilerTraverseJoins(void *,struct joinNode *,char *,int,
+   static int                     RuleCompilerTraverseJoins(void *,struct joinNode *,char *,char *,char *,int,
                                                             FILE *,int,int,FILE **,FILE **,
                                                             int *,int *,int *,int *,int *);
-   static int                     TraverseJoinLinks(void *,struct joinLink *,char *,int,FILE *,
+   static int                     TraverseJoinLinks(void *,struct joinLink *,char *,char *,char *,int,FILE *,
                                                     int,int,FILE **,int *,int *, int *);
   
 /***********************************************************/
@@ -89,6 +89,8 @@ static void BeforeDefrulesCode(
 static int ConstructToCode(
   void *theEnv,
   char *fileName,
+  char *pathName,
+  char *fileNameBuffer,
   int fileID,
   FILE *headerFP,
   int imageID,
@@ -113,14 +115,14 @@ static int ConstructToCode(
    /* Save the left and right prime links. */
    /*======================================*/
    
-   if (! TraverseJoinLinks(theEnv,DefruleData(theEnv)->LeftPrimeJoins,fileName,fileID,headerFP,imageID,
+   if (! TraverseJoinLinks(theEnv,DefruleData(theEnv)->LeftPrimeJoins,fileName,pathName,fileNameBuffer,fileID,headerFP,imageID,
                            maxIndices,&linkFile,&fileCount,&linkArrayVersion,&linkArrayCount))
      {
       CloseDefruleFiles(theEnv,moduleFile,defruleFile,joinFile,linkFile,maxIndices);
       return(0);
      }
 
-   if (! TraverseJoinLinks(theEnv,DefruleData(theEnv)->RightPrimeJoins,fileName,fileID,headerFP,imageID,
+   if (! TraverseJoinLinks(theEnv,DefruleData(theEnv)->RightPrimeJoins,fileName,pathName,fileNameBuffer,fileID,headerFP,imageID,
                            maxIndices,&linkFile,&fileCount,&linkArrayVersion,&linkArrayCount))
      {
       CloseDefruleFiles(theEnv,moduleFile,defruleFile,joinFile,linkFile,maxIndices);
@@ -147,7 +149,7 @@ static int ConstructToCode(
       /* Save the defrule module. */
       /*==========================*/
 
-      moduleFile = OpenFileIfNeeded(theEnv,moduleFile,fileName,fileID,imageID,&fileCount,
+      moduleFile = OpenFileIfNeeded(theEnv,moduleFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
                                     moduleArrayVersion,headerFP,
                                     "struct defruleModule",ModulePrefix(DefruleData(theEnv)->DefruleCodeItem),
                                     FALSE,NULL);
@@ -175,7 +177,7 @@ static int ConstructToCode(
          /* Save the defrule data structures. */
          /*===================================*/
 
-         defruleFile = OpenFileIfNeeded(theEnv,defruleFile,fileName,fileID,imageID,&fileCount,
+         defruleFile = OpenFileIfNeeded(theEnv,defruleFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
                                         defruleArrayVersion,headerFP,
                                         "struct defrule",ConstructPrefix(DefruleData(theEnv)->DefruleCodeItem),
                                         FALSE,NULL);
@@ -195,7 +197,7 @@ static int ConstructToCode(
          /* Save the join data structures. */
          /*================================*/
 
-         if (! RuleCompilerTraverseJoins(theEnv,theDefrule->lastJoin,fileName,fileID,headerFP,imageID,
+         if (! RuleCompilerTraverseJoins(theEnv,theDefrule->lastJoin,fileName,pathName,fileNameBuffer,fileID,headerFP,imageID,
                                          maxIndices,&joinFile,&linkFile,&fileCount,&joinArrayVersion,&joinArrayCount,
                                          &linkArrayVersion,&linkArrayCount))
            {
@@ -227,6 +229,8 @@ static int RuleCompilerTraverseJoins(
   void *theEnv,
   struct joinNode *joinPtr,
   char *fileName,
+  char *pathName,
+  char *fileNameBuffer,
   int fileID,
   FILE *headerFP,
   int imageID,
@@ -245,7 +249,7 @@ static int RuleCompilerTraverseJoins(
      { 
       if (joinPtr->marked)
         {
-         *joinFile = OpenFileIfNeeded(theEnv,*joinFile,fileName,fileID,imageID,fileCount,
+         *joinFile = OpenFileIfNeeded(theEnv,*joinFile,fileName,pathName,fileNameBuffer,fileID,imageID,fileCount,
                                       *joinArrayVersion,headerFP,
                                       "struct joinNode",JoinPrefix(),FALSE,NULL);
          if (*joinFile == NULL)
@@ -257,15 +261,15 @@ static int RuleCompilerTraverseJoins(
                                        maxIndices,NULL,NULL);
                       
                                        
-         if (! TraverseJoinLinks(theEnv,joinPtr->nextLinks,fileName,fileID,headerFP,imageID,
+         if (! TraverseJoinLinks(theEnv,joinPtr->nextLinks,fileName,pathName,fileNameBuffer,fileID,headerFP,imageID,
                                  maxIndices,linkFile,fileCount,linkArrayVersion,linkArrayCount))
            { return(FALSE); } 
         }
       
       if (joinPtr->joinFromTheRight)
         { 
-         if (RuleCompilerTraverseJoins(theEnv,(struct joinNode *) joinPtr->rightSideEntryStructure,fileName,
-                                       fileID,headerFP,imageID,maxIndices,joinFile,linkFile,fileCount,
+         if (RuleCompilerTraverseJoins(theEnv,(struct joinNode *) joinPtr->rightSideEntryStructure,fileName,pathName,
+                                       fileNameBuffer,fileID,headerFP,imageID,maxIndices,joinFile,linkFile,fileCount,
                                        joinArrayVersion,joinArrayCount,
                                        linkArrayVersion,linkArrayCount) == FALSE)
            { return(FALSE); }
@@ -282,6 +286,8 @@ static int TraverseJoinLinks(
   void *theEnv,
   struct joinLink *linkPtr,
   char *fileName,
+  char *pathName,
+  char *fileNameBuffer,
   int fileID,
   FILE *headerFP,
   int imageID,
@@ -295,7 +301,7 @@ static int TraverseJoinLinks(
         linkPtr != NULL;
         linkPtr = linkPtr->next)
      {
-      *linkFile = OpenFileIfNeeded(theEnv,*linkFile,fileName,fileID,imageID,fileCount,
+      *linkFile = OpenFileIfNeeded(theEnv,*linkFile,fileName,pathName,fileNameBuffer,fileID,imageID,fileCount,
                                    *linkArrayVersion,headerFP,
                                    "struct joinLink",LinkPrefix(),FALSE,NULL);
            

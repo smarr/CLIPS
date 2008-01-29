@@ -48,6 +48,8 @@
 globle int ConstraintsToCode(
   void *theEnv,
   char *fileName,
+  char *pathName,
+  char *fileNameBuffer,
   int fileID,
   FILE *headerFP,
   int imageID,
@@ -100,7 +102,7 @@ globle int ConstraintsToCode(
    /* Create the file. */
    /*==================*/
 
-   if ((fp = NewCFile(theEnv,fileName,fileID,version,FALSE)) == NULL) return(-1);
+   if ((fp = NewCFile(theEnv,fileName,pathName,fileNameBuffer,fileID,version,FALSE)) == NULL) return(-1);
 
    /*===================*/
    /* List the entries. */
@@ -186,7 +188,7 @@ globle int ConstraintsToCode(
             arrayVersion++;
             if (count < numberOfConstraints)
               {
-               if ((fp = NewCFile(theEnv,fileName,1,version,FALSE)) == NULL) return(0);
+               if ((fp = NewCFile(theEnv,fileName,pathName,fileNameBuffer,1,version,FALSE)) == NULL) return(0);
                newHeader = TRUE;
               }
            }

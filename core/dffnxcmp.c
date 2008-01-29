@@ -40,7 +40,7 @@
    ***************************************** */
 
 static void ReadyDeffunctionsForCode(void *);
-static int DeffunctionsToCode(void *,char *,int,FILE *,int,int);
+static int DeffunctionsToCode(void *,char *,char *,char *,int,FILE *,int,int);
 static void CloseDeffunctionFiles(void *,FILE *,FILE *,int);
 static void DeffunctionModuleToCode(void *,FILE *,struct defmodule *,int,int);
 static void SingleDeffunctionToCode(void *,FILE *,DEFFUNCTION *,int,int,int);
@@ -163,6 +163,8 @@ static void ReadyDeffunctionsForCode(
 static int DeffunctionsToCode(
   void *theEnv,
   char *fileName,
+  char *pathName,
+  char *fileNameBuffer,
   int fileID,
   FILE *headerFP,
   int imageID,
@@ -190,7 +192,7 @@ static int DeffunctionsToCode(
      {
       EnvSetCurrentModule(theEnv,(void *) theModule);
 
-      moduleFile = OpenFileIfNeeded(theEnv,moduleFile,fileName,fileID,imageID,&fileCount,
+      moduleFile = OpenFileIfNeeded(theEnv,moduleFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
                                     moduleArrayVersion,headerFP,
                                     "DEFFUNCTION_MODULE",ModulePrefix(DeffunctionData(theEnv)->DeffunctionCodeItem),
                                     FALSE,NULL);
@@ -209,7 +211,7 @@ static int DeffunctionsToCode(
 
       while (theDeffunction != NULL)
         {
-         deffunctionFile = OpenFileIfNeeded(theEnv,deffunctionFile,fileName,fileID,imageID,&fileCount,
+         deffunctionFile = OpenFileIfNeeded(theEnv,deffunctionFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
                                             deffunctionArrayVersion,headerFP,
                                             "DEFFUNCTION",ConstructPrefix(DeffunctionData(theEnv)->DeffunctionCodeItem),
                                             FALSE,NULL);

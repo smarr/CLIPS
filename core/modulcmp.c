@@ -49,11 +49,11 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static int                     ConstructToCode(void *,char *,int,FILE *,int,int);
+   static int                     ConstructToCode(void *,char *,char *,char *,int,FILE *,int,int);
    static void                    InitDefmoduleCode(void *,FILE *,int,int);
    static struct portItem        *GetNextPortItem(void *,struct defmodule **,struct portItem **,
                                                   int *,int *);
-   static int                     PortItemsToCode(void *,char *,int,FILE *,int,int,int *);
+   static int                     PortItemsToCode(void *,char *,char *,char *,int,FILE *,int,int,int *);
    static void                    BeforeDefmodulesToCode(void *);
 
 /***************************************************************/
@@ -131,6 +131,8 @@ static void InitDefmoduleCode(
 static int ConstructToCode(
   void *theEnv,
   char *fileName,
+  char *pathName,
+  char *fileNameBuffer,
   int fileID,
   FILE *headerFP,
   int imageID,
@@ -158,7 +160,7 @@ static int ConstructToCode(
    /* the maximum number of indices is ignored.  */
    /*============================================*/
 
-   if ((itemsFile = NewCFile(theEnv,fileName,fileID,1,FALSE)) == NULL)
+   if ((itemsFile = NewCFile(theEnv,fileName,pathName,fileNameBuffer,fileID,1,FALSE)) == NULL)
      { return(FALSE); }
    fprintf(itemsFile,"struct defmoduleItemHeader *%s%d_%d[] = {\n",ItemPrefix(),imageID,1);
    fprintf(headerFP,"extern struct defmoduleItemHeader *%s%d_%d[];\n",ItemPrefix(),imageID,1);
@@ -176,7 +178,7 @@ static int ConstructToCode(
       /* Open a new file to write to if necessary. */
       /*===========================================*/
 
-      moduleFile = OpenFileIfNeeded(theEnv,moduleFile,fileName,fileID,imageID,
+      moduleFile = OpenFileIfNeeded(theEnv,moduleFile,fileName,pathName,fileNameBuffer,fileID,imageID,
                                     &fileCount,moduleArrayVersion,headerFP,
                                     "struct defmodule",DefmodulePrefix(),
                                     FALSE,NULL);
@@ -303,7 +305,7 @@ static int ConstructToCode(
    /*=========================================*/
 
    if (portItemCount == 0) return(TRUE);
-   return(PortItemsToCode(theEnv,fileName,fileID,headerFP,imageID,maxIndices,&fileCount));
+   return(PortItemsToCode(theEnv,fileName,pathName,fileNameBuffer,fileID,headerFP,imageID,maxIndices,&fileCount));
   }
 
 /************************************************************/
@@ -313,6 +315,8 @@ static int ConstructToCode(
 static int PortItemsToCode(
   void *theEnv,
   char *fileName,
+  char *pathName,
+  char *fileNameBuffer,
   int fileID,
   FILE *headerFP,
   int imageID,
@@ -340,7 +344,7 @@ static int PortItemsToCode(
       /* Open a new file to write to if necessary. */
       /*===========================================*/
 
-      portItemsFile = OpenFileIfNeeded(theEnv,portItemsFile,fileName,fileID,imageID,
+      portItemsFile = OpenFileIfNeeded(theEnv,portItemsFile,fileName,pathName,fileNameBuffer,fileID,imageID,
                                        fileCount,portItemArrayVersion,headerFP,
                                        "struct portItem",PortPrefix(),
                                        FALSE,NULL);

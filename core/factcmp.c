@@ -41,7 +41,7 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static int                     PatternNetworkToCode(void *,char *,int,FILE *,int,int);
+   static int                     PatternNetworkToCode(void *,char *,char *,char *,int,FILE *,int,int);
    static void                    BeforePatternNetworkToCode(void *);
    static struct factPatternNode *GetNextPatternNode(struct factPatternNode *);
    static void                    CloseNetworkFiles(void *,FILE *,int);
@@ -157,6 +157,8 @@ static struct factPatternNode *GetNextPatternNode(
 static int PatternNetworkToCode(
   void *theEnv,
   char *fileName,
+  char *pathName,
+  char *fileNameBuffer,
   int fileID,
   FILE *headerFP,
   int imageID,
@@ -208,7 +210,7 @@ static int PatternNetworkToCode(
               thePatternNode != NULL;
               thePatternNode = GetNextPatternNode(thePatternNode))
            {
-            networkFile = OpenFileIfNeeded(theEnv,networkFile,fileName,fileID,imageID,&fileCount,
+            networkFile = OpenFileIfNeeded(theEnv,networkFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
                                          networkArrayVersion,headerFP,
                                          "struct factPatternNode",FactPrefix(),FALSE,NULL);
             if (networkFile == NULL)

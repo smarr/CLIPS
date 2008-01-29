@@ -48,7 +48,7 @@ struct CodeGeneratorItem
    char *name;
    void (*beforeFunction)(void *);
    void (*initFunction)(void *,FILE *,int,int);
-   int (*generateFunction)(void *,char *,int,FILE *,int,int);
+   int (*generateFunction)(void *,char *,char *,char *,int,FILE *,int,int);
    int priority;
    char **arrayNames;
    int arrayCount;
@@ -63,6 +63,8 @@ struct constructCompilerData
    FILE *ExpressionFP;
    FILE *FixupFP;
    char *FilePrefix;
+   char *PathName;
+   char *FileNameBuffer;
    intBool ExpressionHeader;
    long ExpressionCount;
    int ExpressionVersion;
@@ -84,6 +86,8 @@ struct constructCompilerData
 struct CodeGeneratorFile
  {
   char *filePrefix;
+  char *pathName;
+  char *fileNameBuffer;
   int id,version;
  };
 
@@ -95,15 +99,15 @@ struct CodeGeneratorFile
 
    LOCALE void                      InitializeConstructCompilerData(void *);
    LOCALE void                      ConstructsToCCommandDefinition(void *);
-   LOCALE FILE                     *NewCFile(void *,char *,int,int,int);
+   LOCALE FILE                     *NewCFile(void *,char *,char *,char *,int,int,int);
    LOCALE int                       ExpressionToCode(void *,FILE *,struct expr *);
    LOCALE void                      PrintFunctionReference(void *,FILE *,struct FunctionDefinition *);
    LOCALE struct CodeGeneratorItem *AddCodeGeneratorItem(void *,char *,int,
                                                          void (*)(void *),
                                                          void (*)(void *,FILE *,int,int),
-                                                         int (*)(void *,char *,int,FILE *,int,int),int);
+                                                         int (*)(void *,char *,char *,char *,int,FILE *,int,int),int);
    LOCALE FILE                     *CloseFileIfNeeded(void *,FILE *,int *,int *,int,int *,struct CodeGeneratorFile *);
-   LOCALE FILE                     *OpenFileIfNeeded(void *,FILE *,char *,int,int,int *,int,FILE *,
+   LOCALE FILE                     *OpenFileIfNeeded(void *,FILE *,char *,char *,char *,int,int,int *,int,FILE *,
                                                      char *,char *,int,struct CodeGeneratorFile *);
    LOCALE void                      MarkConstructBsaveIDs(void *,int);
    LOCALE void                      ConstructHeaderToCode(void *,FILE *,struct constructHeader *,int,int,

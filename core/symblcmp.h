@@ -47,7 +47,7 @@
    LOCALE void                     PrintFloatReference(void *,FILE *,FLOAT_HN *);
    LOCALE void                     PrintIntegerReference(void *,FILE *,INTEGER_HN *);
    LOCALE void                     PrintBitMapReference(void *,FILE *,BITMAP_HN *);
-   LOCALE void                     AtomicValuesToCode(void *,char *);
+   LOCALE void                     AtomicValuesToCode(void *,char *,char *,char *);
 
 #endif
 

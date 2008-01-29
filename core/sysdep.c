@@ -32,6 +32,8 @@
 /*                                                           */
 /*            Updated UNIX_V gentime functionality.          */
 /*                                                           */
+/*            Removed GenOpen check against FILENAME_MAX.    */
+/*                                                           */
 /*************************************************************/
 
 #define _SYSDEP_SOURCE_

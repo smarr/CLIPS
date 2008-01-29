@@ -38,7 +38,7 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static int                     ConstructToCode(void *,char *,int,FILE *,int,int);
+   static int                     ConstructToCode(void *,char *,char *,char *,int,FILE *,int,int);
    static void                    DefglobalToCode(void *,FILE *,struct defglobal *,
                                                  int,int,int);
    static void                    DefglobalModuleToCode(void *,FILE *,struct defmodule *,int,int,int);
@@ -97,6 +97,8 @@ static void InitDefglobalsCode(
 static int ConstructToCode(
   void *theEnv,
   char *fileName,
+  char *pathName,
+  char *fileNameBuffer,
   int fileID,
   FILE *headerFP,
   int imageID,
@@ -126,7 +128,7 @@ static int ConstructToCode(
      {
       EnvSetCurrentModule(theEnv,(void *) theModule);
 
-      moduleFile = OpenFileIfNeeded(theEnv,moduleFile,fileName,fileID,imageID,&fileCount,
+      moduleFile = OpenFileIfNeeded(theEnv,moduleFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
                                     moduleArrayVersion,headerFP,
                                     "struct defglobalModule",ModulePrefix(DefglobalData(theEnv)->DefglobalCodeItem),
                                     FALSE,NULL);
@@ -145,7 +147,7 @@ static int ConstructToCode(
            theDefglobal != NULL;
            theDefglobal = (struct defglobal *) EnvGetNextDefglobal(theEnv,theDefglobal))
         {
-         defglobalFile = OpenFileIfNeeded(theEnv,defglobalFile,fileName,fileID,imageID,&fileCount,
+         defglobalFile = OpenFileIfNeeded(theEnv,defglobalFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
                                          defglobalArrayVersion,headerFP,
                                          "struct defglobal",ConstructPrefix(DefglobalData(theEnv)->DefglobalCodeItem),
                                          FALSE,NULL);
