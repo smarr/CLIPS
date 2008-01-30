@@ -1,0 +1,123 @@
+FIRE    1 startup: *
+FIRE    2 hold-to-eat: f-13,f-1,*
+FIRE    3 unlock-chest-to-hold-object: f-14,f-8,*
+FIRE    4 hold-chest-to-put-on-floor: f-15,f-7,f-1,*
+FIRE    5 use-ladder-to-hold: f-16,f-7,*,*
+FIRE    6 unlock-chest-to-move-object: f-17,f-6,*
+FIRE    7 hold-chest-to-put-on-floor: f-18,f-5,f-1,*
+FIRE    8 walk-to-hold: f-19,f-5,f-1,*
+FIRE    9 get-on-floor-to-walk: f-20,f-1,*
+FIRE   10 jump-onto-floor: f-21,f-1
+Monkey jumps off the green-couch onto the floor.
+FIRE   11 walk-holding-nothing: f-20,f-22
+Monkey walks to t2-2.
+FIRE   12 climb-to-hold: f-19,f-5,f-23,*
+FIRE   13 climb-indirectly: f-24,f-4,f-23,*
+FIRE   14 climb-directly: f-25,f-3,f-23
+Monkey climbs onto the red-couch.
+FIRE   15 climb-directly: f-24,f-4,f-26
+Monkey climbs onto the big-pillow.
+FIRE   16 grab-object: f-19,f-5,f-27
+Monkey grabs the red-chest.
+FIRE   17 put-chest-on-floor: f-18,f-29,f-28
+Monkey throws the red-chest off the big-pillow onto the floor.
+FIRE   18 get-key-to-unlock: f-18,f-31,f-6,f-30,*
+FIRE   19 walk-to-hold: f-32,f-12,f-30,*
+FIRE   20 get-on-floor-to-walk: f-33,f-30,*
+FIRE   21 jump-onto-floor: f-34,f-30
+Monkey jumps off the big-pillow onto the floor.
+FIRE   22 walk-holding-nothing: f-33,f-35
+Monkey walks to t1-3.
+FIRE   23 grab-object: f-32,f-12,f-36
+Monkey grabs the red-key.
+FIRE   24 move-to-chest-with-key: f-18,f-38,f-31,f-6,*
+FIRE   25 walk-holding-object: f-39,f-38
+Monkey walks to t2-2 holding the red-key.
+FIRE   26 unlock-chest-with-key: f-18,f-6,f-31,f-40
+Monkey opens the red-chest with the red-key revealing the ladder.
+FIRE   27 hold-object-to-move: f-17,f-42,f-40,*
+FIRE   28 climb-to-hold: f-43,f-42,f-40,*
+FIRE   29 drop-to-climb: f-44,f-31,f-40,*
+FIRE   30 drop-object: f-45,f-40,f-37
+Monkey drops the red-key.
+FIRE   31 climb-directly: f-44,f-31,f-46
+Monkey climbs onto the red-chest.
+FIRE   32 grab-object: f-43,f-42,f-48
+Monkey grabs the ladder.
+FIRE   33 move-object-to-place: f-17,f-50,*
+FIRE   34 get-on-floor-to-walk: f-51,f-50,*
+FIRE   35 jump-onto-floor: f-52,f-50
+Monkey jumps off the red-chest onto the floor.
+FIRE   36 walk-holding-object: f-51,f-53
+Monkey walks to t7-7 holding the ladder.
+FIRE   37 drop-object-once-moved: f-17,f-54,f-49
+Monkey drops the ladder.
+FIRE   38 climb-ladder-to-hold: f-16,f-7,f-56,f-55,*
+FIRE   39 climb-directly: f-57,f-56,f-55
+Monkey climbs onto the ladder.
+FIRE   40 grab-object-from-ladder: f-16,f-7,f-56,f-58
+Monkey grabs the blue-chest.
+FIRE   41 put-chest-on-floor: f-15,f-60,f-59
+Monkey throws the blue-chest off the ladder onto the floor.
+FIRE   42 get-key-to-unlock: f-15,f-62,f-8,f-61,*
+FIRE   43 unlock-chest-to-hold-object: f-63,f-11,*
+FIRE   44 hold-chest-to-put-on-floor: f-64,f-10,f-61,*
+FIRE   45 use-ladder-to-hold: f-65,f-10,*,*
+FIRE   46 hold-object-to-move: f-66,f-56,f-61,*
+FIRE   47 climb-to-hold: f-67,f-56,f-61,*
+FIRE   48 jump-onto-floor: f-68,f-61
+Monkey jumps off the ladder onto the floor.
+FIRE   49 grab-object: f-67,f-56,f-69
+Monkey grabs the ladder.
+FIRE   50 move-object-to-place: f-66,f-71,*
+FIRE   51 walk-holding-object: f-72,f-71
+Monkey walks to t8-8 holding the ladder.
+FIRE   52 drop-object-once-moved: f-66,f-73,f-70
+Monkey drops the ladder.
+FIRE   53 climb-ladder-to-hold: f-65,f-10,f-75,f-74,*
+FIRE   54 climb-directly: f-76,f-75,f-74
+Monkey climbs onto the ladder.
+FIRE   55 grab-object-from-ladder: f-65,f-10,f-75,f-77
+Monkey grabs the green-chest.
+FIRE   56 put-chest-on-floor: f-64,f-79,f-78
+Monkey throws the green-chest off the ladder onto the floor.
+FIRE   57 get-key-to-unlock: f-64,f-81,f-11,f-80,*
+FIRE   58 walk-to-hold: f-82,f-47,f-80,*
+FIRE   59 get-on-floor-to-walk: f-83,f-80,*
+FIRE   60 jump-onto-floor: f-84,f-80
+Monkey jumps off the ladder onto the floor.
+FIRE   61 walk-holding-nothing: f-83,f-85
+Monkey walks to t2-2.
+FIRE   62 grab-object: f-82,f-47,f-86
+Monkey grabs the red-key.
+FIRE   63 move-to-chest-with-key: f-64,f-88,f-81,f-11,*
+FIRE   64 walk-holding-object: f-89,f-88
+Monkey walks to t8-8 holding the red-key.
+FIRE   65 unlock-chest-with-key: f-64,f-11,f-81,f-90
+Monkey opens the green-chest with the red-key revealing the blue-key.
+FIRE   66 climb-to-hold: f-63,f-92,f-90,*
+FIRE   67 drop-to-climb: f-93,f-81,f-90,*
+FIRE   68 drop-object: f-94,f-90,f-87
+Monkey drops the red-key.
+FIRE   69 climb-directly: f-93,f-81,f-95
+Monkey climbs onto the green-chest.
+FIRE   70 grab-object: f-63,f-92,f-97
+Monkey grabs the blue-key.
+FIRE   71 move-to-chest-with-key: f-15,f-99,f-62,f-8,*
+FIRE   72 get-on-floor-to-walk: f-100,f-99,*
+FIRE   73 jump-onto-floor: f-101,f-99
+Monkey jumps off the green-chest onto the floor.
+FIRE   74 walk-holding-object: f-100,f-102
+Monkey walks to t7-7 holding the blue-key.
+FIRE   75 unlock-chest-with-key: f-15,f-8,f-62,f-103
+Monkey opens the blue-chest with the blue-key revealing the bananas.
+FIRE   76 climb-to-hold: f-14,f-105,f-103,*
+FIRE   77 drop-to-climb: f-106,f-62,f-103,*
+FIRE   78 drop-object: f-107,f-103,f-98
+Monkey drops the blue-key.
+FIRE   79 climb-directly: f-106,f-62,f-108
+Monkey climbs onto the blue-chest.
+FIRE   80 grab-object: f-14,f-105,f-110
+Monkey grabs the bananas.
+FIRE   81 satisfy-hunger: f-13,f-112,f-111
+Monkey eats the bananas.

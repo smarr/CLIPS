@@ -1,0 +1,264 @@
+TRUE
+CLIPS> (batch "dftmpcmd.bat")
+TRUE
+CLIPS> (clear)
+CLIPS> (deftemplate d1)
+CLIPS> (deftemplate d2 (field x))
+CLIPS> (deftemplate d3 (field x (type STRING)))
+CLIPS> (deftemplate d4 (field x) (multifield y) (field z))
+CLIPS> (deftemplate d5 
+  (field x (type ?VARIABLE) (default 30))
+  (field y (type STRING SYMBOL) (allowed-symbols a b) (allowed-strings "a" "b"))
+  (field z (type NUMBER) (allowed-integers 1) (allowed-floats 3.5))
+  (field w (type NUMBER) (range 3.5 9))
+  (multifield q (type SYMBOL NUMBER) (allowed-symbols x) (default)))
+CLIPS> (deftemplate d6 
+  (multifield q (cardinality 2 6))
+  (field x (type ?VARIABLE) (default ?NONE))
+  (field y (type STRING SYMBOL) (allowed-symbols ?VARIABLE)))
+CLIPS> (deftemplate *)
+CLIPS> (list-deftemplates d6)
+[ARGACCES5] Function list-deftemplates expected argument #1 to be of type defmodule name
+CLIPS> (list-deftemplates)
+initial-fact
+d1
+d2
+d3
+d4
+d5
+d6
+*
+For a total of 8 deftemplates.
+CLIPS> (ppdeftemplate d1)
+(deftemplate MAIN::d1)
+CLIPS> (ppdeftemplate d2)
+(deftemplate MAIN::d2
+   (field x))
+CLIPS> (ppdeftemplate d3)
+(deftemplate MAIN::d3
+   (field x (type STRING)))
+CLIPS> (ppdeftemplate d4)
+(deftemplate MAIN::d4
+   (field x)
+   (multifield y)
+   (field z))
+CLIPS> (ppdeftemplate d5)
+(deftemplate MAIN::d5
+   (field x (type ?VARIABLE) (default 30))
+   (field y (type STRING SYMBOL) (allowed-symbols a b) (allowed-strings "a" "b"))
+   (field z (type NUMBER) (allowed-integers 1) (allowed-floats 3.5))
+   (field w (type NUMBER) (range 3.5 9))
+   (multifield q (type SYMBOL NUMBER) (allowed-symbols x) (default)))
+CLIPS> (ppdeftemplate d6)
+(deftemplate MAIN::d6
+   (multifield q (cardinality 2 6))
+   (field x (type ?VARIABLE) (default ?NONE))
+   (field y (type STRING SYMBOL) (allowed-symbols ?VARIABLE)))
+CLIPS> (get-dynamic-constraint-checking)
+FALSE
+CLIPS> (get-dynamic-constraint-checking TRUE)
+[ARGACCES4] Function get-dynamic-constraint-checking expected exactly 0 argument(s)
+CLIPS> (assert (d3 (x 7)))
+
+[CSTRNCHK1] A literal slot value found in the assert command
+does not match the allowed types for slot x.
+CLIPS> (facts)
+f-0     (initial-fact)
+For a total of 1 fact.
+CLIPS> (assert (d3 (x =(read))))
+7
+<Fact-1>
+CLIPS> (facts)
+f-0     (initial-fact)
+f-1     (d3 (x 7))
+For a total of 2 facts.
+CLIPS> (retract *)
+CLIPS> (set-dynamic-constraint-checking)
+[ARGACCES4] Function set-dynamic-constraint-checking expected exactly 1 argument(s)
+CLIPS> (set-dynamic-constraint-checking TRUE FALSE)
+[ARGACCES4] Function set-dynamic-constraint-checking expected exactly 1 argument(s)
+CLIPS> (set-dynamic-constraint-checking 10)
+FALSE
+CLIPS> (get-dynamic-constraint-checking)
+TRUE
+CLIPS> (set-dynamic-constraint-checking TRUE)
+TRUE
+CLIPS> (assert (d3 (x 8)))
+
+[CSTRNCHK1] A literal slot value found in the assert command
+does not match the allowed types for slot x.
+CLIPS> (facts)
+CLIPS> (assert (d3 (x =(read))))
+8
+
+[CSTRNCHK1] Slot value 8 found in fact f-2     
+does not match the allowed types for slot x.
+<Fact-2>
+CLIPS> (facts)
+f-2     (d3 (x 8))
+For a total of 1 fact.
+CLIPS> (retract *)
+CLIPS> (set-dynamic-constraint-checking FALSE)
+TRUE
+CLIPS> (get-dynamic-constraint-checking)
+FALSE
+CLIPS> (undeftemplate)
+[ARGACCES4] Function undeftemplate expected exactly 1 argument(s)
+CLIPS> (undeftemplate 10)
+[ARGACCES5] Function undeftemplate expected argument #1 to be of type symbol
+CLIPS> (undeftemplate bad-name)
+[PRNTUTIL1] Unable to find deftemplate bad-name.
+CLIPS> (undeftemplate d6 10)
+[ARGACCES4] Function undeftemplate expected exactly 1 argument(s)
+CLIPS> (list-deftemplates)
+initial-fact
+d1
+d2
+d3
+d4
+d5
+d6
+*
+For a total of 8 deftemplates.
+CLIPS> (undeftemplate d1)
+CLIPS> (undeftemplate d2)
+CLIPS> (undeftemplate d3)
+CLIPS> (list-deftemplates)
+initial-fact
+d4
+d5
+d6
+*
+For a total of 5 deftemplates.
+CLIPS> (undeffacts initial-fact)
+CLIPS> (undeftemplate *)
+CLIPS> (list-deftemplates)
+initial-fact
+d4
+d5
+d6
+For a total of 4 deftemplates.
+CLIPS> (undeftemplate *)
+CLIPS> (list-deftemplates)
+CLIPS> (clear) ; Some new 6.0 features
+CLIPS> (deftemplate BOGUS::d5)
+[PRNTUTIL1] Unable to find defmodule BOGUS.
+
+ERROR:
+(deftemplate BOGUS::d5
+CLIPS> (defmodule FOO)
+CLIPS> (deftemplate FOO::d1)
+CLIPS> (deftemplate FOO::d2)
+CLIPS> (defmodule BAR)
+CLIPS> (deftemplate BAR::d2)
+CLIPS> (deftemplate BAR::d3)
+CLIPS> (list-deftemplates BOGUS)
+[ARGACCES5] Function list-deftemplates expected argument #1 to be of type defmodule name
+CLIPS> (list-deftemplates FOO 7)
+[ARGACCES4] Function list-deftemplates expected no more than 1 argument(s)
+CLIPS> (list-deftemplates FOO)
+d1
+d2
+For a total of 2 deftemplates.
+CLIPS> (list-deftemplates BAR)
+d2
+d3
+For a total of 2 deftemplates.
+CLIPS> (list-deftemplates)
+d2
+d3
+For a total of 2 deftemplates.
+CLIPS> (list-deftemplates *)
+MAIN:
+   initial-fact
+FOO:
+   d1
+   d2
+BAR:
+   d2
+   d3
+For a total of 5 deftemplates.
+CLIPS> (get-deftemplate-list 7)
+[ARGACCES5] Function get-deftemplate-list expected argument #1 to be of type symbol
+CLIPS> (get-deftemplate-list BOGUS 7)
+[ARGACCES4] Function get-deftemplate-list expected no more than 1 argument(s)
+CLIPS> (get-deftemplate-list)
+(d2 d3)
+CLIPS> (get-deftemplate-list BOGUS)
+[ARGACCES5] Function get-deftemplate-list expected argument #1 to be of type defmodule name
+()
+CLIPS> (get-deftemplate-list FOO)
+(d1 d2)
+CLIPS> (get-deftemplate-list BAR)
+(d2 d3)
+CLIPS> (get-deftemplate-list *)
+(MAIN::initial-fact FOO::d1 FOO::d2 BAR::d2 BAR::d3)
+CLIPS> (ppdeftemplate d1)
+[PRNTUTIL1] Unable to find deftemplate d1.
+CLIPS> (ppdeftemplate d2)
+(deftemplate BAR::d2)
+CLIPS> (ppdeftemplate d3)
+(deftemplate BAR::d3)
+CLIPS> (ppdeftemplate BOGUS::d2)
+[PRNTUTIL1] Unable to find deftemplate BOGUS::d2.
+CLIPS> (ppdeftemplate FOO::d1)
+(deftemplate FOO::d1)
+CLIPS> (ppdeftemplate FOO::d2)
+(deftemplate FOO::d2)
+CLIPS> (ppdeftemplate FOO::d3)
+[PRNTUTIL1] Unable to find deftemplate FOO::d3.
+CLIPS> (ppdeftemplate BAR::d1)
+[PRNTUTIL1] Unable to find deftemplate BAR::d1.
+CLIPS> (ppdeftemplate BAR::d2)
+(deftemplate BAR::d2)
+CLIPS> (ppdeftemplate BAR::d3)
+(deftemplate BAR::d3)
+CLIPS> (deftemplate-module)
+[ARGACCES4] Function deftemplate-module expected exactly 1 argument(s)
+CLIPS> (deftemplate-module bogus)
+[PRNTUTIL1] Unable to find deftemplate bogus.
+FALSE
+CLIPS> (deftemplate-module d3 7)
+[ARGACCES4] Function deftemplate-module expected exactly 1 argument(s)
+CLIPS> (deftemplate-module d2)
+BAR
+CLIPS> (deftemplate-module d3)
+BAR
+CLIPS> (deftemplate-module FOO::d1)
+FOO
+CLIPS> (deftemplate-module FOO::d2)
+FOO
+CLIPS> (deftemplate-module BAR::d2)
+BAR
+CLIPS> (deftemplate-module BAR::d3)
+BAR
+CLIPS> (undeftemplate BOGUS::d2)
+[PRNTUTIL1] Unable to find deftemplate BOGUS::d2.
+CLIPS> (undeftemplate FOO::d2)
+CLIPS> (list-deftemplates *)
+MAIN:
+   initial-fact
+FOO:
+   d1
+BAR:
+   d2
+   d3
+For a total of 4 deftemplates.
+CLIPS> (undeftemplate BAR::d2)
+CLIPS> (list-deftemplates *)
+MAIN:
+   initial-fact
+FOO:
+   d1
+BAR:
+   d3
+For a total of 3 deftemplates.
+CLIPS> (undeftemplate *)
+CLIPS> (list-deftemplates *)
+MAIN:
+   initial-fact
+FOO:
+   d1
+BAR:
+For a total of 2 deftemplates.
+CLIPS> (dribble-off)

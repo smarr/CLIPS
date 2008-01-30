@@ -1,0 +1,143 @@
+TRUE
+CLIPS> (batch "drtest02.bat")
+TRUE
+CLIPS> (str-index "" "")                 ; DR0103 - 1
+1
+CLIPS> (str-index "" "a")                ; DR0103 - 2
+2
+CLIPS> (str-explode "")                  ; DR0104 - ()
+()
+CLIPS> (sub-string 1 2 "a")              ; DR0105 - "a"
+"a"
+CLIPS> (sub-string 2 2 "a")              ; DR0105 - ""
+""
+CLIPS> (subseq$ (create$ a) 2 2)     ; DR0106 - ()
+()
+CLIPS> (subseq$ (create$ a) 1 2)     ; DR0106 - (a)
+(a)
+CLIPS> (str-index "a" "aba")             ; DR0109 - 1
+1
+CLIPS> (str-implode)                     ; DR0112 - Error
+[ARGACCES4] Function str-implode expected exactly 1 argument(s)
+CLIPS> (sub-string 1 3 "abc")            ; DR0113 - memory loss
+"abc"
+CLIPS> (sub-string 1 3 "abc")            ; DR0113 - memory loss
+"abc"
+CLIPS> (setgen 1)                        ; DR0114 - Error
+1
+CLIPS> (setgen a)                        ; DR0114 - Error
+[ARGACCES5] Function setgen expected argument #1 to be of type integer
+CLIPS> (read 1 1)                        ; DR0114 - Error
+[ARGACCES4] Function read expected no more than 1 argument(s)
+CLIPS> (readline 1 1)                    ; DR0114 - Error
+[ARGACCES4] Function readline expected no more than 1 argument(s)
+CLIPS> (min)                             ; DR0114 - Error
+[ARGACCES4] Function min expected at least 2 argument(s)
+CLIPS> (max)                             ; DR0114 - Error
+[ARGACCES4] Function max expected at least 2 argument(s)
+CLIPS> (pi 1)                            ; DR0114 - Error
+[ARGACCES4] Function pi expected exactly 0 argument(s)
+CLIPS> (halt 1)                          ; DR0114 - Error
+[ARGACCES4] Function halt expected exactly 0 argument(s)
+CLIPS> (mod x y)                         ; DR0114 - Error
+[ARGACCES5] Function mod expected argument #1 to be of type integer or float
+CLIPS> (setgen 1)                        ; DR0114 - Error
+1
+CLIPS> (gensym 10)                       ; DR0114 - Error
+[ARGACCES4] Function gensym expected exactly 0 argument(s)
+CLIPS> (if (eq 1 2) then)                ; DR0115 - Syntax
+FALSE
+CLIPS> (if (eq 1 2) then else)           ; DR0115 - Syntax
+FALSE
+CLIPS> (while (eq 1 2) do)               ; DR0115 - Syntax
+FALSE
+CLIPS> (clear)                           ; DR0120
+CLIPS> (defrule a 
+   (x ?string) 
+   => 
+   (bind ?m (str-explode ?string)) 
+   (bind ?str (str-implode ?m))
+   (printout t ?m " " ?str crlf))
+CLIPS> (defrule b 
+   => 
+   (bind ?m (str-explode "a b c 1 2 3"))
+   (bind ?s (str-implode ?m))
+   (printout t ?m " " ?s crlf))
+CLIPS> (reset)                           ; DR0120
+CLIPS> (assert (x "a b c 1 2 3"))        ; DR0120
+<Fact-1>
+CLIPS> (run)                             ; DR0120
+(a b c 1 2 3) a b c 1 2 3
+(a b c 1 2 3) a b c 1 2 3
+CLIPS> (batch "a*a")                     ; DR0127
+[ARGACCES2] Function batch was unable to open file a*a.
+FALSE
+CLIPS> (open "a*a" a)                    ; DR0127
+FALSE
+CLIPS> (fetch "a*a")                     ; DR0127
+[TEXTPRO1] Could not open file "a*a".
+FALSE
+CLIPS> (clear)                           ; DR0135
+CLIPS> (defrule rule1 ""
+  (token ?level ?token-num)
+  (expert ?level|* ?token-num|*)
+  =>)
+CLIPS> (assert (token 2 4))              ; DR0135
+<Fact-1>
+CLIPS> (assert (expert 2 4))             ; DR0135
+<Fact-2>
+CLIPS> (assert (expert 2 2))             ; DR0135
+<Fact-3>
+CLIPS> (assert (expert 2 *))             ; DR0135
+<Fact-4>
+CLIPS> (assert (expert * 4))             ; DR0135
+<Fact-5>
+CLIPS> (assert (expert * *))             ; DR0135
+<Fact-6>
+CLIPS> (assert (expert 4 *))             ; DR0135
+<Fact-7>
+CLIPS> (assert (expert * 2))             ; DR0135
+<Fact-8>
+CLIPS> (agenda)                          ; DR0135
+0      rule1: f-1,f-6
+0      rule1: f-1,f-5
+0      rule1: f-1,f-4
+0      rule1: f-1,f-2
+For a total of 4 activations.
+CLIPS> (setgen 1)                        ; DR0156
+1
+CLIPS> (setgen -1)                       ; DR0156
+[ARGACCES5] Function setgen expected argument #1 to be of type number (greater than or equal to 1)
+1
+CLIPS> (gensym)                          ; DR0156
+gen1
+CLIPS> (evenp dlaj)                      ; DR0159
+[ARGACCES5] Function evenp expected argument #1 to be of type integer
+CLIPS> (evenp 2e1)                       ; DR0159
+[ARGACCES5] Function evenp expected argument #1 to be of type integer
+CLIPS> (oddp 4.3)                        ; DR0159
+[ARGACCES5] Function oddp expected argument #1 to be of type integer
+CLIPS> (oddp 5e1)                        ; DR0159
+[ARGACCES5] Function oddp expected argument #1 to be of type integer
+CLIPS> (/ d 6)                           ; DR0160
+[ARGACCES5] Function / expected argument #1 to be of type integer or float
+CLIPS> (clear)                           ; DR0198
+CLIPS> (deffacts bugfacts
+   (base-count a 2 strand_13)
+   (count-bases strand_13 [ t 3 ]))                
+CLIPS> (defrule total
+   ?accum <- (count-bases ?id $?bases-with-counts)
+   (not (increment-base ? ?id ?))
+   ?abase <- (base-count ?base ?count ?id)
+   =>
+   (retract ?accum ?abase)
+   (bind ?bases-and-counts 
+      (create$ [ ?base ?count ] ?bases-with-counts))
+   (assert (count-bases ?id ?bases-and-counts)))
+CLIPS> (reset)                           ; DR0198
+CLIPS> (run)                             ; DR0198
+CLIPS> (facts)                           ; DR0198
+f-0     (initial-fact)
+f-3     (count-bases strand_13 [ a 2 ] [ t 3 ])
+For a total of 2 facts.
+CLIPS> (dribble-off)

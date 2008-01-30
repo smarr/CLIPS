@@ -1,0 +1,166 @@
+TRUE
+CLIPS> (batch "focusexe.bat")
+TRUE
+CLIPS> (clear) ;; Test simple switching
+CLIPS> (set-strategy depth)
+depth
+CLIPS> (unwatch all)
+CLIPS> (watch rules)
+CLIPS> (watch focus)
+CLIPS> (defmodule MAIN (export ?ALL))
+CLIPS> (deffacts info (a) (b))
+CLIPS> (defrule MAIN::start => (focus A B C))
+CLIPS> (defmodule A (import MAIN ?ALL))
+CLIPS> (defrule A::arule1 (a) =>)
+CLIPS> (defrule A::arule2 (b) =>)
+CLIPS> (defmodule B (import MAIN ?ALL))
+CLIPS> (defrule B::brule1 (a) =>)
+CLIPS> (defrule B::brule2 (b) =>)
+CLIPS> (defmodule C (import MAIN ?ALL))
+CLIPS> (defrule C::crule1 (a) =>)
+CLIPS> (defrule C::crule2 (b) =>)
+CLIPS> (reset)
+<== Focus MAIN
+==> Focus MAIN
+CLIPS> (run)
+FIRE    1 start: *
+==> Focus C from MAIN
+==> Focus B from C
+==> Focus A from B
+FIRE    2 arule2: f-2
+FIRE    3 arule1: f-1
+<== Focus A to B
+FIRE    4 brule2: f-2
+FIRE    5 brule1: f-1
+<== Focus B to C
+FIRE    6 crule2: f-2
+FIRE    7 crule1: f-1
+<== Focus C to MAIN
+<== Focus MAIN
+CLIPS> (clear) ;; Test early return
+<== Focus MAIN
+==> Focus MAIN
+CLIPS> (defmodule MAIN (export ?ALL))
+CLIPS> (deffacts info (a) (b))
+CLIPS> (defrule MAIN::start => (focus A B C))
+CLIPS> (defmodule A (import MAIN ?ALL))
+CLIPS> (defrule A::arule1 (a) =>)
+CLIPS> (defrule A::arule2 (b) => (return))
+CLIPS> (defmodule B (import MAIN ?ALL))
+CLIPS> (defrule B::brule1 (a) =>)
+CLIPS> (defrule B::brule2 (b) => (return))
+CLIPS> (defmodule C (import MAIN ?ALL))
+CLIPS> (defrule C::crule1 (a) =>)
+CLIPS> (defrule C::crule2 (b) => (return))
+CLIPS> (reset)
+<== Focus MAIN
+==> Focus MAIN
+CLIPS> (run)
+FIRE    1 start: *
+==> Focus C from MAIN
+==> Focus B from C
+==> Focus A from B
+FIRE    2 arule2: f-2
+<== Focus A to B
+FIRE    3 brule2: f-2
+<== Focus B to C
+FIRE    4 crule2: f-2
+<== Focus C to MAIN
+<== Focus MAIN
+CLIPS> (clear) ;; Test nesting
+<== Focus MAIN
+==> Focus MAIN
+CLIPS> (defmodule MAIN (export ?ALL))
+CLIPS> (deffacts info (a) (b) (c))
+CLIPS> (defrule MAIN::start => (focus A))
+CLIPS> (defmodule A (import MAIN ?ALL))
+CLIPS> (defrule A::arule1 (a) =>)
+CLIPS> (defrule A::arule2 (b) => (focus B))
+CLIPS> (defrule A::arule3 (c) => (focus B))
+CLIPS> (defmodule B (import MAIN ?ALL))
+CLIPS> (defrule B::brule1 (a) =>)
+CLIPS> (defrule B::brule2 (b) => (focus C))
+CLIPS> (defrule B::brule3 (c) => (focus C))
+CLIPS> (defmodule C (import MAIN ?ALL))
+CLIPS> (defrule C::crule1 (a) =>)
+CLIPS> (defrule C::crule2 (b) => (return))
+CLIPS> (defrule C::crule3 (c) => (focus A))
+CLIPS> (reset)
+<== Focus MAIN
+==> Focus MAIN
+CLIPS> (run)
+FIRE    1 start: *
+==> Focus A from MAIN
+FIRE    2 arule3: f-3
+==> Focus B from A
+FIRE    3 brule3: f-3
+==> Focus C from B
+FIRE    4 crule3: f-3
+==> Focus A from C
+FIRE    5 arule2: f-2
+==> Focus B from A
+FIRE    6 brule2: f-2
+==> Focus C from B
+FIRE    7 crule2: f-2
+<== Focus C to B
+FIRE    8 brule1: f-1
+<== Focus B to A
+FIRE    9 arule1: f-1
+<== Focus A to C
+FIRE   10 crule1: f-1
+<== Focus C to B
+<== Focus B to A
+<== Focus A to MAIN
+<== Focus MAIN
+CLIPS> (clear) ;; Autofocus
+<== Focus MAIN
+==> Focus MAIN
+CLIPS> (defrule error (declare (auto-focus)) =>)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for auto-focus statement.
+
+ERROR:
+(defrule MAIN::error
+   (declare (auto-focus )
+CLIPS> (defrule error (declare (auto-focus TRUE FALSE)) =>)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for declare statement.
+
+ERROR:
+(defrule MAIN::error
+   (declare (auto-focus TRUE FALSE
+CLIPS> (defrule error (declare (auto-focus 6)) =>)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for auto-focus statement.
+
+ERROR:
+(defrule MAIN::error
+   (declare (auto-focus 6
+CLIPS> (clear)
+<== Focus MAIN
+==> Focus MAIN
+CLIPS> (defmodule MAIN (export ?ALL))
+CLIPS> (deffacts info (a) (b) (c))
+CLIPS> (defrule MAIN::mrule1 (c) => (assert (d)))
+CLIPS> (defrule MAIN::mrule2 (b) => (assert (e)))
+CLIPS> (defrule MAIN::mrule3 (a) =>)
+CLIPS> (defmodule A (import MAIN ?ALL))
+CLIPS> (defrule A::arule1 (declare (auto-focus TRUE)) (d) =>)
+CLIPS> (defrule A::arule2 (declare (auto-focus TRUE)) (e) => (assert (f)))
+CLIPS> (defrule A::arule3 (f) =>)
+CLIPS> (reset)
+<== Focus MAIN
+==> Focus MAIN
+CLIPS> (run)
+FIRE    1 mrule1: f-3
+==> Focus A from MAIN
+FIRE    2 arule1: f-4
+<== Focus A to MAIN
+FIRE    3 mrule2: f-2
+==> Focus A from MAIN
+FIRE    4 arule2: f-5
+FIRE    5 arule3: f-6
+<== Focus A to MAIN
+FIRE    6 mrule3: f-1
+<== Focus MAIN
+CLIPS> (dribble-off)

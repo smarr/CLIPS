@@ -1,0 +1,153 @@
+TRUE
+CLIPS> (batch "iofnx.bat")
+TRUE
+CLIPS> (clear)                            
+CLIPS> (open)                             ; 10.5.2.1
+[ARGACCES4] Function open expected at least 2 argument(s)
+CLIPS> (open "blah1.dat")                 ; 10.5.2.1
+[ARGACCES4] Function open expected at least 2 argument(s)
+CLIPS> (open "blah2.dat" blah2 "r" 10)    ; 10.5.2.1
+[ARGACCES4] Function open expected no more than 3 argument(s)
+CLIPS> (open 10 blah3 "r")                ; 10.5.2.1
+[ARGACCES5] Function open expected argument #1 to be of type symbol or string
+CLIPS> (open [blah2.dat] blah4 "r")       ; 10.5.2.1
+[ARGACCES5] Function open expected argument #1 to be of type symbol or string
+CLIPS> (open "blah4.dat" (create$) "r")   ; 10.5.2.1
+[IOFUN1] Illegal logical name used for open function.
+FALSE
+CLIPS> (open blah5.dat blah5 r)           ; 10.5.2.1
+[ARGACCES5] Function open expected argument #3 to be of type string
+FALSE
+CLIPS> (open blah6.dat blah6 "x")         ; 10.5.2.1
+[ARGACCES5] Function open expected argument #3 to be of type string with value "r", "r+", "w", "wb", or "a"
+FALSE
+CLIPS> (open blah7.dat blah7 8)           ; 10.5.2.1
+[ARGACCES5] Function open expected argument #3 to be of type string
+FALSE
+CLIPS> (open blah8.dat blah8 "r")         ; 10.5.2.1
+FALSE
+CLIPS> (close blah6 89)                   ; 10.5.2.2
+[ARGACCES4] Function close expected no more than 1 argument(s)
+CLIPS> (close (create$))                  ; 10.5.2.2
+[IOFUN1] Illegal logical name used for close function.
+FALSE
+CLIPS> (close [blah8])                    ; 10.5.2.2
+FALSE
+CLIPS> (printout)                         ; 10.5.2.3
+[ARGACCES4] Function printout expected at least 1 argument(s)
+CLIPS> (printout (create$))               ; 10.5.2.3
+[IOFUN1] Illegal logical name used for printout function.
+CLIPS> (read (create$))                   ; 10.5.2.4
+[IOFUN1] Illegal logical name used for read function.
+"*** READ ERROR ***"
+CLIPS> (read bogus)                       ; 10.5.2.4
+[ROUTER1] Logical name bogus was not recognized by any routers
+"*** READ ERROR ***"
+CLIPS> (read stdin stdout)                ; 10.5.2.4
+[ARGACCES4] Function read expected no more than 1 argument(s)
+CLIPS> (read)                             ; 10.5.2.4 - 7
+7
+7
+CLIPS> (read t)                           ; 10.5.2.4 - abc
+abc
+abc
+CLIPS> (read stdin)                       ; 10.5.2.4 - xyz
+xyz abc
+xyz
+CLIPS> (read)                             ; 10.5.2.4 - a
+
+
+    a    
+a
+CLIPS> (open "Temp//iofnx1.tmp" mydata "w")     ; 10.5.2.4
+TRUE
+CLIPS> (printout mydata "red green")      ; 10.5.2.4
+CLIPS> (close mydata)                     ; 10.5.2.4
+TRUE
+CLIPS> (open "Temp//iofnx1.tmp" mydata)   ; 10.5.2.4
+TRUE
+CLIPS> (read mydata)                      ; 10.5.2.4
+red
+CLIPS> (read mydata)                      ; 10.5.2.4
+green
+CLIPS> (read mydata)                      ; 10.5.2.4
+EOF
+CLIPS> (close mydata)                     ; 10.5.2.4
+TRUE
+CLIPS> (readline (create$))               ; 10.5.2.5
+[IOFUN1] Illegal logical name used for readline function.
+"*** READ ERROR ***"
+CLIPS> (readline bogus)                   ; 10.5.2.5
+[ROUTER1] Logical name bogus was not recognized by any routers
+"*** READ ERROR ***"
+CLIPS> (readline stdin stdout)            ; 10.5.2.5
+[ARGACCES4] Function readline expected no more than 1 argument(s)
+CLIPS> (readline)                         ; 10.5.2.5 - "7"
+7
+"7"
+CLIPS> (readline t)                       ; 10.5.2.5 - "abc"
+abc
+"abc"
+CLIPS> (readline stdin)                   ; 10.5.2.5 - "xyz abc"
+xyz abc
+"xyz abc"
+CLIPS> (readline)                         ; 10.5.2.5 - ""
+
+""
+CLIPS> (open "Temp//iofnx1.tmp" 7.8923)   ; 10.5.2.5
+TRUE
+CLIPS> (readline 7.8923)                  ; 10.5.2.5
+"red green"
+CLIPS> (readline 7.8923)                  ; 10.5.2.5
+EOF
+CLIPS> (close 7.8923)                     ; 10.5.2.5
+TRUE
+CLIPS> (format)                           ; 10.5.2.6
+[ARGACCES4] Function format expected at least 2 argument(s)
+CLIPS> (format t)                         ; 10.5.2.6
+[ARGACCES4] Function format expected at least 2 argument(s)
+CLIPS> (format (create$))                 ; 10.5.2.6
+[ARGACCES4] Function format expected at least 2 argument(s)
+CLIPS> (format t "%f%%%n")                ; 10.5.2.6
+[ARGACCES4] Function format expected exactly 3 argument(s)
+""
+CLIPS> (format nil "Integer: |%d|" 12)    ; 10.5.2.6
+"Integer: |12|"
+CLIPS> (format t "Integer: |%4d|" 12)     ; 10.5.2.6
+Integer: |  12|"Integer: |  12|"
+CLIPS> (format nil "Integer: |%-04d|" 12)
+"Integer: |12  |"
+CLIPS> (format t "Float:   |%f|" 12.01)   ; 10.5.2.6
+Float:   |12.010000|"Float:   |12.010000|"
+CLIPS> (format nil "Float:   |%7.2f| "12.01)
+"Float:   |  12.01| "
+CLIPS> (format t "Test:    |%e|" 12.01)   ; 10.5.2.6
+Test:    |1.201000e+01|"Test:    |1.201000e+01|"
+CLIPS> (format nil "Test:    |%7.2e|" 12.01)
+"Test:    |1.20e+01|"
+CLIPS> (format t "General: |%g|" 1234567890)
+General: |1.23457e+09|"General: |1.23457e+09|"
+CLIPS> (format t "Hexadecimal: |%x|" 12)  ; 10.5.2.6
+Hexadecimal: |c|"Hexadecimal: |c|"
+CLIPS> (format t "Octal:   |%o|" 12)      ; 10.5.2.6
+Octal:   |14|"Octal:   |14|"
+CLIPS> (format nil "Symbols: |%s| |%s|" value-a1 capacity)
+"Symbols: |value-a1| |capacity|"
+CLIPS> (format nil "the %% x %d x %s x %f y %%" 4 ab 3.5)
+"the % x 4 x ab x 3.500000 y %"
+CLIPS> (format nil "%d" abc)              ; 10.5.2.6
+[ARGACCES5] Function format expected argument #3 to be of type integer or float
+""
+CLIPS> (format nil "%d" 9.8)              ; 10.5.2.6
+"9"
+CLIPS> (format t "%f" 40)                 ; 10.5.2.6
+40.000000"40.000000"
+CLIPS> (format nil "%f" abc)              ; 10.5.2.6
+[ARGACCES5] Function format expected argument #3 to be of type integer or float
+""
+CLIPS> (format nil "%g" (create$))        ; 10.5.2.6
+[ARGACCES5] Function format expected argument #3 to be of type integer or float
+""
+CLIPS> (format t "%o" 9.8)                ; 10.5.2.6
+11"11"
+CLIPS> (dribble-off)

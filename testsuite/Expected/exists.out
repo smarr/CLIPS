@@ -1,0 +1,98 @@
+TRUE
+CLIPS> (batch "exists.bat")
+TRUE
+CLIPS> (clear)      ; Test exists
+CLIPS> (watch activations)
+CLIPS> (watch facts)
+CLIPS> 
+(defrule test
+   (exists (a ?))
+   =>)
+CLIPS> (reset)
+<== f-0     (initial-fact)
+==> f-0     (initial-fact)
+CLIPS> (assert (a 1))
+==> f-1     (a 1)
+==> Activation 0      test: *
+<Fact-1>
+CLIPS> (assert (a 2))
+==> f-2     (a 2)
+<Fact-2>
+CLIPS> (assert (a 3))
+==> f-3     (a 3)
+<Fact-3>
+CLIPS> (retract 1)
+<== f-1     (a 1)
+CLIPS> (retract 3)
+<== f-3     (a 3)
+CLIPS> (retract 2)
+<== f-2     (a 2)
+<== Activation 0      test: *
+CLIPS> (assert (a 4))
+==> f-4     (a 4)
+==> Activation 0      test: *
+<Fact-4>
+CLIPS> (clear)
+==> f-0     (initial-fact)
+CLIPS> 
+(defrule test
+   (a ?x)
+   (exists (b ?x ?))
+   =>)
+CLIPS> (reset)
+<== f-0     (initial-fact)
+==> f-0     (initial-fact)
+CLIPS> (assert (b 1 1))
+==> f-1     (b 1 1)
+<Fact-1>
+CLIPS> (assert (b 1 2))
+==> f-2     (b 1 2)
+<Fact-2>
+CLIPS> (assert (a 1))
+==> f-3     (a 1)
+==> Activation 0      test: f-3,*
+<Fact-3>
+CLIPS> (assert (a 2))
+==> f-4     (a 2)
+<Fact-4>
+CLIPS> (retract 1)
+<== f-1     (b 1 1)
+CLIPS> (retract 2)
+<== f-2     (b 1 2)
+<== Activation 0      test: f-3,*
+CLIPS> (assert (b 2 2))
+==> f-5     (b 2 2)
+==> Activation 0      test: f-4,*
+<Fact-5>
+CLIPS> (assert (b 1 2))
+==> f-6     (b 1 2)
+==> Activation 0      test: f-3,*
+<Fact-6>
+CLIPS> (assert (b 2 3))
+==> f-7     (b 2 3)
+<Fact-7>
+CLIPS> (assert (b 1 3))
+==> f-8     (b 1 3)
+<Fact-8>
+CLIPS> (retract 7)
+<== f-7     (b 2 3)
+CLIPS> (retract 5)
+<== f-5     (b 2 2)
+<== Activation 0      test: f-4,*
+CLIPS> (retract 3)
+<== f-3     (a 1)
+<== Activation 0      test: f-3,*
+CLIPS> (unwatch facts)
+CLIPS> (unwatch activations)
+CLIPS> (clear)
+CLIPS> (defrule foo (a) (exists (a) (a)) =>)
+CLIPS> (reset)
+CLIPS> (assert (a))
+<Fact-1>
+CLIPS> (agenda)
+0      foo: f-1,*
+For a total of 1 activation.
+CLIPS> (retract 1)
+CLIPS> (agenda)
+CLIPS> (clear)
+CLIPS> (dribble-off)

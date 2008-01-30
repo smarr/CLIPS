@@ -1,0 +1,55 @@
+TRUE
+CLIPS> (testit)
+
+OUTPUT OF TEST #1 FOLLOWS...
+
+This should be the 1st of 7 methods.
+This should be the 2nd of 7 methods.
+This should be the 3rd of 7 methods.
+This should be the 4th of 7 methods.
+This should be the 5th of 7 methods.
+This should be the 6th of 7 methods.
+This should be the 7th of 7 methods.
+
+OUTPUT OF TEST #2 FOLLOWS...
+
+This should be the 1st of 2 methods.
+This should be the 2nd of 2 methods.
+
+OUTPUT OF TEST #3 FOLLOWS...
+
+This should be the 1st of 2 methods.
+This should be the 2nd of 2 methods.
+
+OUTPUT OF TEST #4 FOLLOWS...
+
+This should be the 1st of 2 methods.
+This should be the 2nd of 2 methods.
++ #2  (INTEGER <qry>) (INTEGER <qry>)
++ #3  (INTEGER <qry>) (NUMBER)
++ #4  (INTEGER) (INTEGER)
++ #5  (INTEGER) (NUMBER)
++ #6  (NUMBER) (INTEGER <qry>)
++ #7  (NUMBER) (INTEGER)
++ #8  (NUMBER) (NUMBER)
++ #SYS1  (NUMBER) (NUMBER) ($? NUMBER)
+
+t1 #1  (INTEGER LEXEME)
+t1 #2  (NUMBER STRING)
+
+t2 #1  (LEXEME)
+t2 #2  (MULTIFIELD STRING)
+
+t3 #1  (INTEGER LEXEME)
+t3 #2  (STRING NUMBER)
+
+mv-slot-replace #2  (INSTANCE-ADDRESS)
+mv-slot-replace #SYS1  (INSTANCE SYMBOL) (SYMBOL) (INTEGER) (INTEGER) () $?
+mv-slot-replace #4  (INSTANCE SYMBOL) (SYMBOL) (NUMBER) (NUMBER) ()
+mv-slot-replace #3  (PRIMITIVE)
+
+class-slots #2  (SYMBOL) (LEXEME)
+class-slots #SYS1  (SYMBOL) ($? SYMBOL <qry>)
+class-slots #3  (SYMBOL) ($? SYMBOL)
+For a total of 21 methods.
+CLIPS> (dribble-off)

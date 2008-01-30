@@ -1,0 +1,331 @@
+TRUE
+CLIPS> (batch "msgerr.bat")
+TRUE
+CLIPS> (defclass THINGO 
+   (is-a USER)
+   (slot x (create-accessor read-write))
+   (multislot y (create-accessor read-write)))
+CLIPS> (defmessage-handler THINGO blah-1 ()
+   (bind ?self 3))
+[MSGPSR5] Active instance parameter cannot be changed.
+
+ERROR:
+(defmessage-handler MAIN::THINGO blah-1
+   ()
+   (bind ?self 3)
+   )
+CLIPS> (defclass A (is-a USER) (role concrete))
+CLIPS> (make-instance a of A)
+[a]
+CLIPS> (defmessage-handler A print-args (?a ?b $?c)
+	(printout t (instance-name ?self) " " ?a " " ?b 
+		" and " (length ?c) " extras: " ?c crlf))
+CLIPS> (send [a] print-args 1 2)
+[a] 1 2 and 0 extras: ()
+CLIPS> (send [a] print-args a b c d)
+[a] a b and 2 extras: (c d)
+CLIPS> (clear) 
+CLIPS> (defclass A (is-a USER)
+  (role concrete)
+  (slot foo (create-accessor read-write) (default 1))
+  (slot bar (create-accessor read-write) (default 2)))
+CLIPS> (defmessage-handler A print-all-slots ()
+  (printout t ?self:foo " " ?self:bar crlf))
+CLIPS> (make-instance a of A)
+[a]
+CLIPS> (send [a] print-all-slots)
+1 2
+CLIPS> (clear)
+CLIPS> (defclass A (is-a USER)
+  (role concrete)
+  (slot bar (create-accessor read-write) (default "abc")))
+CLIPS> (make-instance a of A)
+[a]
+CLIPS> (send [a] get-bar)
+"abc"
+CLIPS> (clear)
+CLIPS> (defclass A (is-a USER) (slot x (create-accessor read-write)))
+CLIPS> (defclass B (is-a A) (slot y (create-accessor read-write)))
+CLIPS> (defmessage-handler B get-y ())
+[MSGPSR3] System message-handlers may not be modified.
+
+ERROR:
+(defmessage-handler MAIN::B get-y
+   (
+CLIPS> (defmessage-handler B put-y ())
+[MSGPSR3] System message-handlers may not be modified.
+
+ERROR:
+(defmessage-handler MAIN::B put-y
+   (
+CLIPS> (defmessage-handler A get-x ())
+[MSGPSR3] System message-handlers may not be modified.
+
+ERROR:
+(defmessage-handler MAIN::A get-x
+   (
+CLIPS> (defmessage-handler A put-x ())
+[MSGPSR3] System message-handlers may not be modified.
+
+ERROR:
+(defmessage-handler MAIN::A put-x
+   (
+CLIPS> (defmessage-handler A get-y ())
+CLIPS> (defmessage-handler A put-y ())
+CLIPS> (defmessage-handler B get-x ())
+CLIPS> (defmessage-handler B put-x ())
+CLIPS> (defmessage-handler USER get-x ())
+CLIPS> (defmessage-handler USER put-x ())
+CLIPS> (defmessage-handler USER get-y ())
+CLIPS> (defmessage-handler USER put-y ())
+CLIPS> (clear)
+CLIPS> (defclass A (is-a USER) (role concrete))
+CLIPS> (defmessage-handler A init before ()
+	(printout t "Initializing a new instance of class A..." crlf))
+CLIPS> (make-instance a of A)
+Initializing a new instance of class A...
+[a]
+CLIPS> (clear)
+CLIPS> (undefmessage-handler USER init primary)
+[MSGPSR3] System message-handlers may not be modified.
+CLIPS> (undefmessage-handler USER delete primary)
+[MSGPSR3] System message-handlers may not be modified.
+CLIPS> (undefmessage-handler USER print primary)
+[MSGPSR3] System message-handlers may not be modified.
+CLIPS> (defmessage-handler USER init ())
+[MSGPSR3] System message-handlers may not be modified.
+
+ERROR:
+(defmessage-handler MAIN::USER init
+   (
+CLIPS> (defmessage-handler USER delete ())
+[MSGPSR3] System message-handlers may not be modified.
+
+ERROR:
+(defmessage-handler MAIN::USER delete
+   (
+CLIPS> (defmessage-handler USER print ())
+[MSGPSR3] System message-handlers may not be modified.
+
+ERROR:
+(defmessage-handler MAIN::USER print
+   (
+CLIPS> (clear)
+CLIPS> (defclass A (is-a USER) (role abstract))
+CLIPS> (defclass B (is-a USER) (role abstract) (slot x (create-accessor read-write)))
+CLIPS> (describe-class A)
+================================================================================
+********************************************************************************
+Abstract: direct instances of this class cannot be created.
+
+Direct Superclasses: USER
+Inheritance Precedence: A USER OBJECT
+Direct Subclasses:
+--------------------------------------------------------------------------------
+Recognized message-handlers:
+init primary in class USER
+delete primary in class USER
+create primary in class USER
+print primary in class USER
+direct-modify primary in class USER
+message-modify primary in class USER
+direct-duplicate primary in class USER
+message-duplicate primary in class USER
+********************************************************************************
+================================================================================
+CLIPS> (describe-class B)
+================================================================================
+********************************************************************************
+Abstract: direct instances of this class cannot be created.
+
+Direct Superclasses: USER
+Inheritance Precedence: B USER OBJECT
+Direct Subclasses:
+--------------------------------------------------------------------------------
+SLOTS : FLD DEF PRP ACC STO MCH SRC VIS CRT OVRD-MSG SOURCE(S)
+x     : SGL STC INH RW  LCL RCT EXC PRV RW  put-x    B
+
+Constraint information for slots:
+
+SLOTS : SYM STR INN INA EXA FTA INT FLT
+x     :  +   +   +   +   +   +   +   +  RNG:[-oo..+oo] 
+--------------------------------------------------------------------------------
+Recognized message-handlers:
+init primary in class USER
+delete primary in class USER
+create primary in class USER
+print primary in class USER
+direct-modify primary in class USER
+message-modify primary in class USER
+direct-duplicate primary in class USER
+message-duplicate primary in class USER
+get-x primary in class B
+put-x primary in class B
+********************************************************************************
+================================================================================
+CLIPS> (clear)
+CLIPS> (defclass A (is-a USER) (role concrete) (slot x (create-accessor read-write) (default 3)))
+CLIPS> (make-instance a of A)
+[a]
+CLIPS> (watch all)
+CLIPS> (send [a] init)
+MSG >> init ED:1 (<Instance-a>)
+HND >> init primary in class USER
+       ED:1 (<Instance-a>)
+[INSMNGR15] init-slots not valid in this context.
+[PRCCODE4] Execution halted during the actions of message-handler init primary in class USER
+HND << init primary in class USER
+       ED:1 (<Instance-a>)
+MSG << init ED:1 (<Instance-a>)
+FALSE
+CLIPS> (unwatch all)
+CLIPS> (clear)
+CLIPS> (defclass A (is-a USER)
+ (role concrete)
+ (slot x  (create-accessor read-write) (default 1)))
+CLIPS> (definstances A-OBJECTS 
+ (a1 of A)
+ ((gensym) of A (x 65)))
+CLIPS> (watch instances)
+CLIPS> (reset)
+<== instance [initial-object] of INITIAL-OBJECT
+==> instance [initial-object] of INITIAL-OBJECT
+==> instance [a1] of A
+==> instance [gen1] of A
+CLIPS> (reset)
+<== instance [initial-object] of INITIAL-OBJECT
+<== instance [a1] of A
+<== instance [gen1] of A
+==> instance [initial-object] of INITIAL-OBJECT
+==> instance [a1] of A
+==> instance [gen2] of A
+CLIPS> (unwatch all)
+CLIPS> (clear)
+CLIPS> (defclass A (is-a USER)
+ (role concrete)
+ (slot x (create-accessor read-write) (default 34))
+ (slot y (create-accessor read-write) (default 100))
+ (slot z (create-accessor read-write) (default ?NONE)))
+CLIPS> (make-instance a of A (z 98))
+[a]
+CLIPS> (send [a] print)
+[a] of A
+(x 34)
+(y 100)
+(z 98)
+CLIPS> (send [a] put-x 65)
+65
+CLIPS> (send [a] put-y abc)
+abc
+CLIPS> (send [a] put-z "Hello world.")
+"Hello world."
+CLIPS> (send [a] print)
+[a] of A
+(x 65)
+(y abc)
+(z "Hello world.")
+CLIPS> (initialize-instance a)
+[INSMNGR14] Override required for slot z in instance a.
+[PRCCODE4] Execution halted during the actions of message-handler init primary in class USER
+[INSMNGR8] An error occurred during the initialization of instance a.
+FALSE
+CLIPS> (send [a] print)
+[a] of A
+(x 34)
+(y 100)
+(z "Hello world.")
+CLIPS> (defclass BOGUS (is-a OBJECT) (role concrete))
+CLIPS> (make-instance bogus of BOGUS)
+[MSGFUN1] No applicable primary message-handlers found for create.
+FALSE
+CLIPS> (clear)
+CLIPS> (defmessage-handler)
+
+[CSTRCPSR2] Missing name for defmessage-handler construct
+
+ERROR:
+(defmessage-handler )
+CLIPS> (defmessage-handler BOGUS)
+[MSGPSR1] A class must be defined before its message-handlers.
+
+ERROR:
+(defmessage-handler MAIN::BOGUS)
+CLIPS> (defmessage-handler USER 5)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defmessage-handler.
+
+ERROR:
+(defmessage-handler MAIN::USER
+   5
+CLIPS> (defmessage-handler USER blah bad-comment)
+[MSGFUN7] Unrecognized message-handler type in defmessage-handler.
+
+ERROR:
+(defmessage-handler MAIN::USER blah bad-comment 
+CLIPS> (defmessage-handler USER a1 "comment")
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for parameter list.
+
+ERROR:
+(defmessage-handler MAIN::USER a1 "comment" 
+   )
+CLIPS> (defmessage-handler USER a2 primary "comment" ())
+CLIPS> (defmessage-handler USER a2 around "comment" ())
+CLIPS> (defmessage-handler USER a2 before "comment" ())
+CLIPS> (defmessage-handler USER a2 after "comment" ())
+CLIPS> (list-defmessage-handlers)
+init primary in class USER
+delete primary in class USER
+create primary in class USER
+print primary in class USER
+direct-modify primary in class USER
+message-modify primary in class USER
+direct-duplicate primary in class USER
+message-duplicate primary in class USER
+a2 primary in class USER
+a2 around in class USER
+a2 before in class USER
+a2 after in class USER
+For a total of 12 message-handlers.
+CLIPS> (clear)
+CLIPS> (defmessage-handler USER blah ($?any ?a))
+[PRCCODE8] No parameters allowed after wildcard parameter.
+
+ERROR:
+(defmessage-handler MAIN::USER blah
+   ($?any ?a
+CLIPS> (defmessage-handler USER blah (?self ?a))
+[PRCCODE7] Duplicate parameter names not allowed.
+
+ERROR:
+(defmessage-handler MAIN::USER blah
+   (?self
+CLIPS> (defmessage-handler USER blah (?self:bogus ?a))
+[MSGPSR4] Illegal slot reference in parameter list.
+
+ERROR:
+(defmessage-handler MAIN::USER blah
+   (?self:bogus
+CLIPS> (defmessage-handler USER blah (?a)
+  (bind ?self 1))
+[MSGPSR5] Active instance parameter cannot be changed.
+
+ERROR:
+(defmessage-handler MAIN::USER blah
+   (?a)
+   (bind ?self 1)
+   )
+CLIPS> (defmessage-handler USER blah (?a)
+  (dynamic-put ?a))
+CLIPS> (defclass test (is-a USER) (role concrete))
+CLIPS> (defmessage-handler test test-arg-cnt (?a ?b)
+   (printout t "Should not see this message!" crlf))
+CLIPS> (make-instance t of test)
+[t]
+CLIPS> (send [t] test-arg-cnt)
+[MSGFUN2] Message-handler test-arg-cnt primary in class test expected exactly 2 argument(s).
+FALSE
+CLIPS> (send [t] test-arg-cnt 1 2 3)
+[MSGFUN2] Message-handler test-arg-cnt primary in class test expected exactly 2 argument(s).
+FALSE
+CLIPS> (dribble-off)

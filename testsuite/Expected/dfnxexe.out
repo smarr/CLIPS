@@ -1,0 +1,60 @@
+TRUE
+CLIPS> (batch "dfnxexe.bat")
+TRUE
+CLIPS> (deffunction print-args (?a ?b $?c)
+   (printout t ?a " " ?b " and " (length ?c) " extras: " ?c crlf))
+CLIPS> (print-args 1 2)
+1 2 and 0 extras: ()
+CLIPS> (print-args 1 2 3 4)
+1 2 and 2 extras: (3 4)
+CLIPS> (print-args 1 2 (mv-append a b c) (mv-append d e f) 1 2 3 4)
+1 2 and 10 extras: (a b c d e f 1 2 3 4)
+CLIPS> (deffunction test-return ()
+   (+ (eval "(gensym)") 2)
+   TRUE)
+CLIPS> (test-return)
+[ARGACCES5] Function + expected argument #1 to be of type integer or float
+[PRCCODE4] Execution halted during the actions of deffunction test-return.
+FALSE
+CLIPS> (deffunction test-return ()
+  1 2 3 4)
+CLIPS> (test-return)
+4
+CLIPS> (deffunction factorial (?a)
+   (if (or (not (integerp ?a)) (< ?a 0)) then
+      (printout t "Factorial error!" crlf)
+    else
+      (if (= ?a 0) then
+         1
+       else
+         (* ?a (factorial (- ?a 1))))))
+CLIPS> (factorial 5)
+120
+CLIPS> (* 5 4 3 2)
+120
+CLIPS> (factorial 0)
+1
+CLIPS> (factorial 1)
+1
+CLIPS> (factorial abc)
+Factorial error!
+CLIPS> 
+(defglobal ?*cnt* = 0)
+CLIPS> 
+(deffunction foo ())
+CLIPS> (deffunction bar ()
+   (if (< ?*cnt* 10) then
+      (bind ?*cnt* (+ ?*cnt* 1))
+      (foo)))
+CLIPS> (deffunction foo ()
+  (bar))
+CLIPS> (foo)
+FALSE
+CLIPS> (deffunction wildcard-test (?a $?rest)
+  (printout t ?rest crlf)
+  (bind ?rest 34)
+  (printout t ?rest crlf))
+CLIPS> (wildcard-test 1 2 3 4 5 6)
+(2 3 4 5 6)
+34
+CLIPS> (dribble-off)

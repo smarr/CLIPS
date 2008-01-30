@@ -1,0 +1,268 @@
+TRUE
+CLIPS> (batch "misclns3.bat")
+TRUE
+CLIPS> (clear)
+CLIPS> (defrule foo (factoid $?x&:(> (length$ ?x) 3)) =>)
+CLIPS> (assert (factoid a) (factoid a b c) (factoid a b c d e))
+<Fact-3>
+CLIPS> (agenda)
+0      foo: f-3
+For a total of 1 activation.
+CLIPS> (clear)
+CLIPS> (defglobal ?*x* = 0)
+CLIPS> (bind ?*x* (assert (this)))
+<Fact-1>
+CLIPS> (assert (that ?*x*))
+<Fact-2>
+CLIPS> (bind ?*x* (assert (what)))
+<Fact-3>
+CLIPS> (assert (that ?*x*))
+<Fact-4>
+CLIPS> (defrule foo ?f <- (this) (that ?f) =>)
+CLIPS> (agenda)
+0      foo: f-1,f-2
+For a total of 1 activation.
+CLIPS> (get-dynamic-deftemplate-checking) ;; CR0191
+
+[EXPRNPSR3] Missing function declaration for get-dynamic-deftemplate-checking.
+CLIPS> (set-dynamic-deftemplate-checking)
+
+[EXPRNPSR3] Missing function declaration for set-dynamic-deftemplate-checking.
+CLIPS> (crsv-trace-on) ;; CR0207
+
+[EXPRNPSR3] Missing function declaration for crsv-trace-on.
+CLIPS> (crsv-trace-off)
+
+[EXPRNPSR3] Missing function declaration for crsv-trace-off.
+CLIPS> (defexternal) ;; CR0219
+
+[EXPRNPSR3] Missing function declaration for defexternal.
+CLIPS> (defrelation) 
+
+[EXPRNPSR3] Missing function declaration for defrelation.
+CLIPS> (defrule foo (?x ?y) =>) ;; CR0220
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for the first field of a pattern.
+
+ERROR:
+(defrule MAIN::foo
+   (?x
+CLIPS> (defrule foo (red | blue) =>)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for the first field of a pattern.
+
+ERROR:
+(defrule MAIN::foo
+   (red |
+CLIPS> (clear) ;; CR0222
+CLIPS> (remove blah.clp)
+FALSE
+CLIPS> (load blah.clp)
+[ARGACCES2] Function load was unable to open file blah.clp.
+FALSE
+CLIPS> (save blah.clp)
+TRUE
+CLIPS> (load blah.clp)
+
+TRUE
+CLIPS> (remove blah.clp)
+TRUE
+CLIPS> (remove blah.bin)
+FALSE
+CLIPS> (bload blah.bin)
+[ARGACCES2] Function bload was unable to open file blah.bin.
+FALSE
+CLIPS> (bsave blah.bin)
+TRUE
+CLIPS> (bload blah.bin)
+TRUE
+CLIPS> (remove blah.bin)
+TRUE
+CLIPS> (clear) ;; CR0223
+CLIPS> (assert (a =(+ 3 4)))
+<Fact-1>
+CLIPS> (assert (a (+ 5 6)))
+<Fact-2>
+CLIPS> (facts)
+f-0     (initial-fact)
+f-1     (a 7)
+f-2     (a 11)
+For a total of 3 facts.
+CLIPS> (remove) ;; CR0240
+[ARGACCES4] Function remove expected exactly 1 argument(s)
+CLIPS> (remove 7)
+[ARGACCES5] Function remove expected argument #1 to be of type symbol or string
+CLIPS> (remove blah.txt 7)
+[ARGACCES4] Function remove expected exactly 1 argument(s)
+CLIPS> (open "blah.txt" blah "w")
+TRUE
+CLIPS> (printout blah "(printout t Greetings from blah.txt crlf)" crlf)
+CLIPS> (close blah)
+TRUE
+CLIPS> (batch blah.txt)
+TRUE
+CLIPS> (printout t Greetings from blah.txt crlf)
+Greetingsfromblah.txt
+CLIPS> (remove blah.txt)
+TRUE
+CLIPS> (batch blah.txt)
+[ARGACCES2] Function batch was unable to open file blah.txt.
+FALSE
+CLIPS> (remove yuck.txt)
+FALSE
+CLIPS> (rename)
+[ARGACCES4] Function rename expected exactly 2 argument(s)
+CLIPS> (rename 7)
+[ARGACCES4] Function rename expected exactly 2 argument(s)
+CLIPS> (rename blah.txt 7)
+[ARGACCES5] Function rename expected argument #2 to be of type symbol or string
+CLIPS> (rename blah.txt yuck.txt 7)
+[ARGACCES4] Function rename expected exactly 2 argument(s)
+CLIPS> (open "blah.txt" blah "w")
+TRUE
+CLIPS> (printout blah "(printout t Greetings from blah.txt crlf)" crlf)
+CLIPS> (close blah)
+TRUE
+CLIPS> (rename blah.txt yuck.txt)
+TRUE
+CLIPS> (remove blah.txt)
+FALSE
+CLIPS> (batch yuck.txt)
+TRUE
+CLIPS> (printout t Greetings from blah.txt crlf)
+Greetingsfromblah.txt
+CLIPS> (remove yuck.txt)
+TRUE
+CLIPS> (apropos) ;; CR0241
+[ARGACCES4] Function apropos expected exactly 1 argument(s)
+CLIPS> (apropos 7)
+[ARGACCES5] Function apropos expected argument #1 to be of type symbol
+CLIPS> (apropos "dynamic" 7)
+[ARGACCES4] Function apropos expected exactly 1 argument(s)
+CLIPS> (apropos "dynamic")
+[ARGACCES5] Function apropos expected argument #1 to be of type symbol
+CLIPS> (apropos dynamic)
+dynamic-put
+set-dynamic-constraint-checking
+dynamic-get
+get-dynamic-constraint-checking
+CLIPS> (list-watch-items 7) ;; CR0263
+[ARGACCES5] Function list-watch-items expected argument #1 to be of type symbol
+CLIPS> (unwatch all)
+CLIPS> (list-watch-items)
+facts = off
+instances = off
+slots = off
+rules = off
+activations = off
+messages = off
+message-handlers = off
+generic-functions = off
+methods = off
+deffunctions = off
+compilations = off
+statistics = off
+globals = off
+focus = off
+CLIPS> (clear) ;; CR0264
+CLIPS> (assert (foo))
+<Fact-1>
+CLIPS> (list-deftemplates)
+initial-fact
+foo
+For a total of 2 deftemplates.
+CLIPS> (undeftemplate foo)
+[PRNTUTIL4] Unable to delete deftemplate foo.
+CLIPS> (retract 1)
+CLIPS> (undeftemplate foo)
+CLIPS> (clear) ;; CR0265
+CLIPS> (defglobal ?*x* = 3)
+CLIPS> (str-assert "(foo ?*x* (+ 3 4))")
+<Fact-1>
+CLIPS> (facts)
+f-0     (initial-fact)
+f-1     (foo 3 7)
+For a total of 2 facts.
+CLIPS> (str-assert "(foo ?*x* (+ 3 4))")
+FALSE
+CLIPS> (clear) ;; CR0269
+CLIPS> (remove blah.txt)
+FALSE
+CLIPS> (load-facts blah.txt)
+[ARGACCES2] Function load-facts was unable to open file blah.txt.
+FALSE
+CLIPS> (batch blah.txt)
+[ARGACCES2] Function batch was unable to open file blah.txt.
+FALSE
+CLIPS> (assert (foo))
+<Fact-1>
+CLIPS> (list-deftemplates)
+initial-fact
+foo
+For a total of 2 deftemplates.
+CLIPS> (ppdeftemplate foo)
+CLIPS> (trunc) ;; CR0271
+
+[EXPRNPSR3] Missing function declaration for trunc.
+CLIPS> (clear) ;; CR0272
+CLIPS> (defmodule A)
+CLIPS> (defrule A::foo (not (b)) =>)
+CLIPS> (deftemplate A::bar)
+CLIPS> (deffacts A::yak)
+CLIPS> (defglobal A ?*woz* = 3)
+CLIPS> (defrule-module)
+[ARGACCES4] Function defrule-module expected exactly 1 argument(s)
+CLIPS> (defrule-module 7)
+[ARGACCES5] Function defrule-module expected argument #1 to be of type symbol
+CLIPS> (defrule-module foo 7)
+[ARGACCES4] Function defrule-module expected exactly 1 argument(s)
+CLIPS> (defrule-module huh)
+[PRNTUTIL1] Unable to find defrule huh.
+FALSE
+CLIPS> (defrule-module foo)
+A
+CLIPS> (deftemplate-module)
+[ARGACCES4] Function deftemplate-module expected exactly 1 argument(s)
+CLIPS> (deftemplate-module 7)
+[ARGACCES5] Function deftemplate-module expected argument #1 to be of type symbol
+CLIPS> (deftemplate-module bar 7)
+[ARGACCES4] Function deftemplate-module expected exactly 1 argument(s)
+CLIPS> (deftemplate-module huh)
+[PRNTUTIL1] Unable to find deftemplate huh.
+FALSE
+CLIPS> (deftemplate-module bar)
+A
+CLIPS> (deffacts-module)
+[ARGACCES4] Function deffacts-module expected exactly 1 argument(s)
+CLIPS> (deffacts-module 7)
+[ARGACCES5] Function deffacts-module expected argument #1 to be of type symbol
+CLIPS> (deffacts-module yak 7)
+[ARGACCES4] Function deffacts-module expected exactly 1 argument(s)
+CLIPS> (deffacts-module huh)
+[PRNTUTIL1] Unable to find deffacts huh.
+FALSE
+CLIPS> (deffacts-module yak)
+A
+CLIPS> (defglobal-module)
+[ARGACCES4] Function defglobal-module expected exactly 1 argument(s)
+CLIPS> (defglobal-module 7)
+[ARGACCES5] Function defglobal-module expected argument #1 to be of type symbol
+CLIPS> (defglobal-module woz 7)
+[ARGACCES4] Function defglobal-module expected exactly 1 argument(s)
+CLIPS> (defglobal-module huh)
+[PRNTUTIL1] Unable to find defglobal huh.
+FALSE
+CLIPS> (defglobal-module woz)
+A
+CLIPS> (clear) ;; CR0280
+CLIPS> (assert-string "(a b c)")
+<Fact-1>
+CLIPS> (assert-string "d e f")
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for RHS patterns.
+FALSE
+CLIPS> (facts)
+f-0     (initial-fact)
+f-1     (a b c)
+For a total of 2 facts.
+CLIPS> (dribble-off)

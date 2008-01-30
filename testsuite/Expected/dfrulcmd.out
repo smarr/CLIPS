@@ -1,0 +1,794 @@
+TRUE
+CLIPS> (batch "dfrulcmd.bat")
+TRUE
+CLIPS> (clear)
+CLIPS> (defrule r1 =>))
+CLIPS> (defrule r2 (a) => (assert (b)))
+CLIPS> (defrule r3 ?f <- (y) ?g <- (a2) => (retract ?f) (if (> 3 4) then (retract ?g)))
+CLIPS> (defrule r4 ?f <- (x) => (retract ?f) (assert (x)))
+CLIPS> (defrule r5 (or (x) (y) (and (a) (b))) => (assert (a3)))
+CLIPS> (defrule r6 (and (a) (b)) (c) => (assert (a2)))
+CLIPS> (defrule * (not (x)) (not (y)) => (assert (x)) (assert (y)))
+CLIPS> (list-defrules d6)
+[ARGACCES5] Function list-defrules expected argument #1 to be of type defmodule name
+CLIPS> (rules)
+r1
+r2
+r3
+r4
+r5
+r6
+*
+For a total of 7 defrules.
+CLIPS> (ppdefrule r1)
+(defrule MAIN::r1
+   =>)
+CLIPS> (ppdefrule r2)
+(defrule MAIN::r2
+   (a)
+   =>
+   (assert (b)))
+CLIPS> (ppdefrule r3)
+(defrule MAIN::r3
+   ?f <- (y)
+   ?g <- (a2)
+   =>
+   (retract ?f)
+   (if (> 3 4)
+      then
+      (retract ?g)))
+CLIPS> (ppdefrule r4)
+(defrule MAIN::r4
+   ?f <- (x)
+   =>
+   (retract ?f)
+   (assert (x)))
+CLIPS> (ppdefrule r5)
+(defrule MAIN::r5
+   (or  (x)
+        (y)
+        (and (a)
+             (b)))
+   =>
+   (assert (a3)))
+CLIPS> (ppdefrule r6)
+(defrule MAIN::r6
+   (and (a)
+        (b))
+   (c)
+   =>
+   (assert (a2)))
+CLIPS> (ppdefrule *)
+(defrule MAIN::*
+   (not (x))
+   (not (y))
+   =>
+   (assert (x))
+   (assert (y)))
+CLIPS> (undefrule)
+[ARGACCES4] Function undefrule expected exactly 1 argument(s)
+CLIPS> (undefrule 10)
+[ARGACCES5] Function undefrule expected argument #1 to be of type symbol
+CLIPS> (undefrule bad-name)
+[PRNTUTIL1] Unable to find defrule bad-name.
+CLIPS> (undefrule r6 10)
+[ARGACCES4] Function undefrule expected exactly 1 argument(s)
+CLIPS> (list-defrules)
+r1
+r2
+r3
+r4
+r5
+r6
+*
+For a total of 7 defrules.
+CLIPS> (undefrule r1)
+CLIPS> (undefrule r2)
+CLIPS> (undefrule r3)
+CLIPS> (list-defrules)
+r4
+r5
+r6
+*
+For a total of 4 defrules.
+CLIPS> (undefrule *)
+CLIPS> (list-defrules)
+r4
+r5
+r6
+For a total of 3 defrules.
+CLIPS> (undefrule *)
+CLIPS> (list-defrules)
+CLIPS> (clear) ; Test deleting a rule by itself
+CLIPS> (defrule foo => (undefrule foo))
+CLIPS> (rules)
+foo
+For a total of 1 defrule.
+CLIPS> (reset)
+CLIPS> (run)
+[PRNTUTIL4] Unable to delete defrule foo.
+CLIPS> (rules)
+foo
+For a total of 1 defrule.
+CLIPS> (clear) ; Test loading another KB
+CLIPS> (defrule foo1 (a) => (assert (f)))
+CLIPS> (defrule foo2 (b) (f) => (assert (g)))
+CLIPS> (defrule foo3 (c) (g) =>)
+CLIPS> (save "Temp//foo.tmp")
+TRUE
+CLIPS> (clear)
+CLIPS> (defrule bar1 => (assert (a)))
+CLIPS> (defrule bar2 (a) => (assert (b)))
+CLIPS> (defrule bar3 (b) 
+   => 
+   (assert (c)) 
+   (rules)
+   (printout t "-------" crlf)
+   (undefrule *)
+   (rules)
+   (printout t "-------" crlf)
+   (load "Temp//foo.tmp")
+   (rules)
+   (printout t "-------" crlf))
+CLIPS> (defrule bar4 (a) (b) (c) =>)
+CLIPS> (reset)
+CLIPS> (watch rules)
+CLIPS> (watch activations)
+CLIPS> (watch facts)
+CLIPS> (run)
+FIRE    1 bar1: *
+==> f-1     (a)
+==> Activation 0      bar2: f-1
+FIRE    2 bar2: f-1
+==> f-2     (b)
+==> Activation 0      bar3: f-2
+FIRE    3 bar3: f-2
+==> f-3     (c)
+==> Activation 0      bar4: f-1,f-2,f-3
+bar1
+bar2
+bar3
+bar4
+For a total of 4 defrules.
+-------
+[PRNTUTIL4] Unable to delete defrule bar3.
+<== Activation 0      bar4: f-1,f-2,f-3
+bar3
+For a total of 1 defrule.
+-------
+*==> Activation 0      foo1: f-1
+**
+bar3
+foo1
+foo2
+foo3
+For a total of 4 defrules.
+-------
+FIRE    4 foo1: f-1
+==> f-4     (f)
+==> Activation 0      foo2: f-2,f-4
+FIRE    5 foo2: f-2,f-4
+==> f-5     (g)
+==> Activation 0      foo3: f-3,f-5
+FIRE    6 foo3: f-3,f-5
+CLIPS> (unwatch all)
+CLIPS> (clear) ; Test agenda command
+CLIPS> (agenda)
+CLIPS> (agenda 20)
+[ARGACCES5] Function agenda expected argument #1 to be of type symbol
+CLIPS> (defrule foo1 (declare (salience 2)) =>)
+CLIPS> (defrule foo2 (declare (salience 1)) =>)
+CLIPS> (defrule foo3 (declare (salience 0)) =>)
+CLIPS> (reset)
+CLIPS> (agenda)
+2      foo1: *
+1      foo2: *
+0      foo3: *
+For a total of 3 activations.
+CLIPS> (run 1)
+CLIPS> (agenda)
+1      foo2: *
+0      foo3: *
+For a total of 2 activations.
+CLIPS> (run 1)
+CLIPS> (agenda)
+0      foo3: *
+For a total of 1 activation.
+CLIPS> (run 1)
+CLIPS> (agenda)
+CLIPS> (clear) ; Test matches command
+CLIPS> (matches)
+[ARGACCES4] Function matches expected exactly 1 argument(s)
+CLIPS> (matches 10)
+[ARGACCES5] Function matches expected argument #1 to be of type symbol
+CLIPS> (matches bad-rule)
+[PRNTUTIL1] Unable to find defrule bad-rule.
+CLIPS> (defrule foo (or (a ?x) (b ?x)) (c ?) =>)
+CLIPS> (defrule bar (b ?x) (c ?x) (a ?) =>)
+CLIPS> (defrule yaz (q) (r) =>)
+CLIPS> (defrule flx (b ?x) (not (c ?x)) (a ?x) =>)
+CLIPS> (assert (a 1) (a 2) (a 3) (b 1) (b 2) (c 1))
+<Fact-6>
+CLIPS> (matches foo)
+Matches for Pattern 1
+f-1
+f-2
+f-3
+Matches for Pattern 2
+f-6
+Partial matches for CEs 1 - 2
+f-1,f-6
+f-2,f-6
+f-3,f-6
+Matches for Pattern 1
+f-4
+f-5
+Matches for Pattern 2
+f-6
+Partial matches for CEs 1 - 2
+f-4,f-6
+f-5,f-6
+Activations
+f-1,f-6
+f-2,f-6
+f-3,f-6
+f-4,f-6
+f-5,f-6
+CLIPS> (matches bar)
+Matches for Pattern 1
+f-4
+f-5
+Matches for Pattern 2
+f-6
+Matches for Pattern 3
+f-1
+f-2
+f-3
+Partial matches for CEs 1 - 2
+f-4,f-6
+Partial matches for CEs 1 - 3
+f-4,f-6,f-3
+f-4,f-6,f-2
+f-4,f-6,f-1
+Activations
+f-4,f-6,f-3
+f-4,f-6,f-2
+f-4,f-6,f-1
+CLIPS> (matches yaz)
+Matches for Pattern 1
+ None
+Matches for Pattern 2
+ None
+Partial matches for CEs 1 - 2
+ None
+Activations
+ None
+CLIPS> (matches flx)
+Matches for Pattern 1
+f-4
+f-5
+Matches for Pattern 2
+f-6
+Matches for Pattern 3
+f-1
+f-2
+f-3
+Partial matches for CEs 1 - 2
+f-5,*
+Partial matches for CEs 1 - 3
+f-5,*,f-2
+Activations
+f-5,*,f-2
+CLIPS> (clear) ; Test breakpoint stuff
+CLIPS> (set-break)
+[ARGACCES4] Function set-break expected exactly 1 argument(s)
+CLIPS> (set-break 10)
+[ARGACCES5] Function set-break expected argument #1 to be of type symbol
+CLIPS> (set-break bad-rule)
+[PRNTUTIL1] Unable to find defrule bad-rule.
+CLIPS> (show-breaks)
+CLIPS> (show-breaks 10)
+[ARGACCES5] Function show-breaks expected argument #1 to be of type symbol
+CLIPS> (remove-break)
+CLIPS> (remove-break 10)
+[ARGACCES5] Function remove-break expected argument #1 to be of type symbol
+CLIPS> (remove-break bad-rule)
+[PRNTUTIL1] Unable to find defrule bad-rule.
+CLIPS> (defrule foo1 (declare (salience 4)) =>)
+CLIPS> (defrule foo2 (declare (salience 3)) =>)
+CLIPS> (defrule foo3 (declare (salience 2)) =>)
+CLIPS> (defrule foo4 (declare (salience 1)) => (assert (a)))
+CLIPS> (defrule foo5 (declare (salience 0)) => (assert (b)))
+CLIPS> (defrule foo6 (declare (salience 5)) (or (a) (b)) =>)
+CLIPS> (set-break foo5 10)
+[ARGACCES4] Function set-break expected exactly 1 argument(s)
+CLIPS> (remove-break foo5 10)
+[ARGACCES4] Function remove-break expected no more than 1 argument(s)
+CLIPS> (show-breaks)
+CLIPS> (set-break foo2)
+CLIPS> (set-break foo4)
+CLIPS> (set-break foo6)
+CLIPS> (show-breaks)
+foo2
+foo4
+foo6
+CLIPS> (watch rules)
+CLIPS> (reset)
+CLIPS> (run)
+FIRE    1 foo1: *
+Breaking on rule foo2.
+CLIPS> (run)
+FIRE    1 foo2: *
+FIRE    2 foo3: *
+Breaking on rule foo4.
+CLIPS> (run)
+FIRE    1 foo4: *
+Breaking on rule foo6.
+CLIPS> (run)
+FIRE    1 foo6: f-1
+FIRE    2 foo5: *
+Breaking on rule foo6.
+CLIPS> (remove-break foo4)
+CLIPS> (show-breaks)
+foo2
+foo6
+CLIPS> (remove-break foo6)
+CLIPS> (reset)
+CLIPS> (run)
+FIRE    1 foo1: *
+Breaking on rule foo2.
+CLIPS> (run)
+FIRE    1 foo2: *
+FIRE    2 foo3: *
+FIRE    3 foo4: *
+FIRE    4 foo6: f-1
+FIRE    5 foo5: *
+FIRE    6 foo6: f-2
+CLIPS> (set-break foo3)
+CLIPS> (remove-break)
+CLIPS> (reset)
+CLIPS> (run)
+FIRE    1 foo1: *
+FIRE    2 foo2: *
+FIRE    3 foo3: *
+FIRE    4 foo4: *
+FIRE    5 foo6: f-1
+FIRE    6 foo5: *
+FIRE    7 foo6: f-2
+CLIPS> (unwatch all)
+CLIPS> (clear) ; Test refresh command
+CLIPS> (refresh)
+[ARGACCES4] Function refresh expected exactly 1 argument(s)
+CLIPS> (refresh 10)
+[ARGACCES5] Function refresh expected argument #1 to be of type symbol
+CLIPS> (refresh bad-rule)
+[PRNTUTIL1] Unable to find defrule bad-rule.
+CLIPS> (defrule foo (a ?) (b ?) =>)
+CLIPS> (assert (a 1) (a 2) (a 3) (b 1) (b 2))
+<Fact-5>
+CLIPS> (agenda)
+0      foo: f-1,f-5
+0      foo: f-2,f-5
+0      foo: f-3,f-5
+0      foo: f-1,f-4
+0      foo: f-2,f-4
+0      foo: f-3,f-4
+For a total of 6 activations.
+CLIPS> (run 3)
+CLIPS> (refresh foo)
+CLIPS> (agenda)
+0      foo: f-3,f-5
+0      foo: f-2,f-5
+0      foo: f-1,f-5
+0      foo: f-1,f-4
+0      foo: f-2,f-4
+0      foo: f-3,f-4
+For a total of 6 activations.
+CLIPS> (run)
+CLIPS> (refresh foo)
+CLIPS> (agenda)
+0      foo: f-3,f-4
+0      foo: f-2,f-4
+0      foo: f-1,f-4
+0      foo: f-3,f-5
+0      foo: f-2,f-5
+0      foo: f-1,f-5
+For a total of 6 activations.
+CLIPS> (refresh foo)
+CLIPS> (agenda)
+0      foo: f-3,f-4
+0      foo: f-2,f-4
+0      foo: f-1,f-4
+0      foo: f-3,f-5
+0      foo: f-2,f-5
+0      foo: f-1,f-5
+For a total of 6 activations.
+CLIPS> (clear)
+CLIPS> (defrule bar (or (a ?) (b ?)) =>)
+CLIPS> (assert (a 1) (b 1) (a 2) (b 2) (a 3) (b 3))
+<Fact-6>
+CLIPS> (run 3)
+CLIPS> (agenda)
+0      bar: f-3
+0      bar: f-2
+0      bar: f-1
+For a total of 3 activations.
+CLIPS> (refresh bar)
+CLIPS> (agenda)
+0      bar: f-4
+0      bar: f-6
+0      bar: f-5
+0      bar: f-3
+0      bar: f-2
+0      bar: f-1
+For a total of 6 activations.
+CLIPS> (clear)
+CLIPS> (defrule yak (a ?) (b ?) =>)
+CLIPS> (defrule flx (declare (salience 1)) (a ?) (b ?) =>)
+CLIPS> (assert (a 1) (b 1) (a 2) (b 2))
+<Fact-4>
+CLIPS> (agenda)
+1      flx: f-1,f-4
+1      flx: f-3,f-4
+1      flx: f-3,f-2
+1      flx: f-1,f-2
+0      yak: f-1,f-4
+0      yak: f-3,f-4
+0      yak: f-3,f-2
+0      yak: f-1,f-2
+For a total of 8 activations.
+CLIPS> (run)
+CLIPS> (refresh yak)
+CLIPS> (agenda)
+0      yak: f-1,f-2
+0      yak: f-3,f-2
+0      yak: f-3,f-4
+0      yak: f-1,f-4
+For a total of 4 activations.
+CLIPS> (clear) ; strategy commands
+CLIPS> (set-strategy depth)
+depth
+CLIPS> (get-strategy)
+depth
+CLIPS> (set-strategy)
+[ARGACCES4] Function set-strategy expected exactly 1 argument(s)
+CLIPS> (set-strategy depth 20)
+[ARGACCES4] Function set-strategy expected exactly 1 argument(s)
+CLIPS> (get-strategy 10)
+[ARGACCES4] Function get-strategy expected exactly 0 argument(s)
+CLIPS> (set-strategy breadth)
+depth
+CLIPS> (get-strategy)
+breadth
+CLIPS> (set-strategy lex)
+breadth
+CLIPS> (get-strategy)
+lex
+CLIPS> (set-strategy mea)
+lex
+CLIPS> (get-strategy)
+mea
+CLIPS> (set-strategy simplicity)
+mea
+CLIPS> (get-strategy)
+simplicity
+CLIPS> (set-strategy complexity)
+simplicity
+CLIPS> (get-strategy)
+complexity
+CLIPS> (set-strategy random)
+complexity
+CLIPS> (get-strategy)
+random
+CLIPS> (set-strategy bogus)
+[ARGACCES5] Function set-strategy expected argument #1 to be of type symbol with value depth, breadth, lex, mea, complexity, simplicity, or random
+random
+CLIPS> (get-strategy)
+random
+CLIPS> (set-strategy depth)
+random
+CLIPS> (clear) ; salience-evaluation commands
+CLIPS> (set-salience-evaluation when-defined)
+when-defined
+CLIPS> (get-salience-evaluation)
+when-defined
+CLIPS> (set-salience-evaluation)
+[ARGACCES4] Function set-salience-evaluation expected exactly 1 argument(s)
+CLIPS> (set-salience-evaluation when-defined 20)
+[ARGACCES4] Function set-salience-evaluation expected exactly 1 argument(s)
+CLIPS> (get-salience-evaluation 10)
+[ARGACCES4] Function get-salience-evaluation expected exactly 0 argument(s)
+CLIPS> (set-salience-evaluation when-activated)
+when-defined
+CLIPS> (get-salience-evaluation)
+when-activated
+CLIPS> (set-salience-evaluation every-cycle)
+when-activated
+CLIPS> (get-salience-evaluation)
+every-cycle
+CLIPS> (set-salience-evaluation bogus)
+[ARGACCES5] Function set-salience-evaluation expected argument #1 to be of type symbol with value when-defined, when-activated, or every-cycle
+every-cycle
+CLIPS> (get-salience-evaluation)
+every-cycle
+CLIPS> (set-salience-evaluation when-defined)
+every-cycle
+CLIPS> (clear) ; refresh-agenda command
+CLIPS> (refresh-agenda 10)
+[ARGACCES5] Function refresh-agenda expected argument #1 to be of type symbol
+CLIPS> (clear) ; incremental-reset command
+CLIPS> (set-incremental-reset TRUE)
+TRUE
+CLIPS> (get-incremental-reset)
+TRUE
+CLIPS> (set-incremental-reset)
+[ARGACCES4] Function set-incremental-reset expected exactly 1 argument(s)
+CLIPS> (get-incremental-reset)
+TRUE
+CLIPS> (get-incremental-reset 20)
+[ARGACCES4] Function get-incremental-reset expected exactly 0 argument(s)
+CLIPS> (set-incremental-reset 10)
+TRUE
+CLIPS> (get-incremental-reset)
+TRUE
+CLIPS> (set-incremental-reset FALSE)
+TRUE
+CLIPS> (get-incremental-reset)
+FALSE
+CLIPS> (set-incremental-reset TRUE)
+FALSE
+CLIPS> (get-incremental-reset)
+TRUE
+CLIPS> (clear) ; Some new 6.0 features
+CLIPS> (defrule BOGUS::d5 =>)
+[PRNTUTIL1] Unable to find defmodule BOGUS.
+
+ERROR:
+(defrule BOGUS::d5
+CLIPS> (defmodule FOO)
+CLIPS> (defrule FOO::d1 =>)
+CLIPS> (defrule FOO::d2 =>)
+CLIPS> (defmodule BAR)
+CLIPS> (defrule BAR::d2 =>)
+CLIPS> (defrule BAR::d3 =>)
+CLIPS> (list-defrules BOGUS)
+[ARGACCES5] Function list-defrules expected argument #1 to be of type defmodule name
+CLIPS> (list-defrules FOO 7)
+[ARGACCES4] Function list-defrules expected no more than 1 argument(s)
+CLIPS> (list-defrules FOO)
+d1
+d2
+For a total of 2 defrules.
+CLIPS> (list-defrules BAR)
+d2
+d3
+For a total of 2 defrules.
+CLIPS> (list-defrules)
+d2
+d3
+For a total of 2 defrules.
+CLIPS> (list-defrules *)
+MAIN:
+FOO:
+   d1
+   d2
+BAR:
+   d2
+   d3
+For a total of 4 defrules.
+CLIPS> (get-defrule-list 7)
+[ARGACCES5] Function get-defrule-list expected argument #1 to be of type symbol
+CLIPS> (get-defrule-list BOGUS 7)
+[ARGACCES4] Function get-defrule-list expected no more than 1 argument(s)
+CLIPS> (get-defrule-list)
+(d2 d3)
+CLIPS> (get-defrule-list BOGUS)
+[ARGACCES5] Function get-defrule-list expected argument #1 to be of type defmodule name
+()
+CLIPS> (get-defrule-list FOO)
+(d1 d2)
+CLIPS> (get-defrule-list BAR)
+(d2 d3)
+CLIPS> (get-defrule-list *)
+(FOO::d1 FOO::d2 BAR::d2 BAR::d3)
+CLIPS> (ppdefrule d1)
+[PRNTUTIL1] Unable to find defrule d1.
+CLIPS> (ppdefrule d2)
+(defrule BAR::d2
+   =>)
+CLIPS> (ppdefrule d3)
+(defrule BAR::d3
+   =>)
+CLIPS> (ppdefrule BOGUS::d2)
+[PRNTUTIL1] Unable to find defrule BOGUS::d2.
+CLIPS> (ppdefrule FOO::d1)
+(defrule FOO::d1
+   =>)
+CLIPS> (ppdefrule FOO::d2)
+(defrule FOO::d2
+   =>)
+CLIPS> (ppdefrule FOO::d3)
+[PRNTUTIL1] Unable to find defrule FOO::d3.
+CLIPS> (ppdefrule BAR::d1)
+[PRNTUTIL1] Unable to find defrule BAR::d1.
+CLIPS> (ppdefrule BAR::d2)
+(defrule BAR::d2
+   =>)
+CLIPS> (ppdefrule BAR::d3)
+(defrule BAR::d3
+   =>)
+CLIPS> (defrule-module)
+[ARGACCES4] Function defrule-module expected exactly 1 argument(s)
+CLIPS> (defrule-module bogus)
+[PRNTUTIL1] Unable to find defrule bogus.
+FALSE
+CLIPS> (defrule-module d3 7)
+[ARGACCES4] Function defrule-module expected exactly 1 argument(s)
+CLIPS> (defrule-module d2)
+BAR
+CLIPS> (defrule-module d3)
+BAR
+CLIPS> (defrule-module FOO::d1)
+FOO
+CLIPS> (defrule-module FOO::d2)
+FOO
+CLIPS> (defrule-module BAR::d2)
+BAR
+CLIPS> (defrule-module BAR::d3)
+BAR
+CLIPS> (undefrule BOGUS::d2)
+[PRNTUTIL1] Unable to find defrule BOGUS::d2.
+CLIPS> (undefrule FOO::d2)
+CLIPS> (list-defrules *)
+MAIN:
+FOO:
+   d1
+BAR:
+   d2
+   d3
+For a total of 3 defrules.
+CLIPS> (undefrule BAR::d2)
+CLIPS> (list-defrules *)
+MAIN:
+FOO:
+   d1
+BAR:
+   d3
+For a total of 2 defrules.
+CLIPS> (undefrule *)
+CLIPS> (list-defrules *)
+MAIN:
+FOO:
+   d1
+BAR:
+For a total of 1 defrule.
+CLIPS> (clear)
+CLIPS> (set-salience-evaluation when-activated)
+when-defined
+CLIPS> (defglobal ?*x* = 0)
+CLIPS> (defmodule MAIN (export ?ALL))
+CLIPS> (defrule MAIN::d0 (declare (salience ?*x*)) => (focus FOO BAR))
+CLIPS> (defmodule FOO (import MAIN ?ALL))
+CLIPS> (defrule FOO::d1 (declare (salience ?*x*)) =>)
+CLIPS> (defrule FOO::d2 (declare (salience ?*x*)) =>)
+CLIPS> (defmodule BAR (import MAIN ?ALL))
+CLIPS> (defrule BAR::d2 (declare (salience ?*x*)) =>)
+CLIPS> (defrule BAR::d3 (declare (salience ?*x*)) =>)
+CLIPS> (reset)
+CLIPS> (agenda BOGUS)
+[ARGACCES5] Function agenda expected argument #1 to be of type defmodule name
+CLIPS> (agenda 7)
+[ARGACCES5] Function agenda expected argument #1 to be of type symbol
+CLIPS> (agenda FOO 7)
+[ARGACCES4] Function agenda expected no more than 1 argument(s)
+CLIPS> (agenda)
+0      d0: *
+For a total of 1 activation.
+CLIPS> (agenda MAIN)
+0      d0: *
+For a total of 1 activation.
+CLIPS> (agenda FOO)
+0      d1: *
+0      d2: *
+For a total of 2 activations.
+CLIPS> (agenda BAR)
+0      d2: *
+0      d3: *
+For a total of 2 activations.
+CLIPS> (agenda *)
+MAIN:
+   0      d0: *
+FOO:
+   0      d1: *
+   0      d2: *
+BAR:
+   0      d2: *
+   0      d3: *
+For a total of 5 activations.
+CLIPS> (bind ?*x* 1)
+1
+CLIPS> (refresh-agenda BOGUS)
+[ARGACCES5] Function refresh-agenda expected argument #1 to be of type defmodule name
+CLIPS> (refresh-agenda 7)
+[ARGACCES5] Function refresh-agenda expected argument #1 to be of type symbol
+CLIPS> (refresh-agenda FOO 7)
+[ARGACCES4] Function refresh-agenda expected no more than 1 argument(s)
+CLIPS> (refresh-agenda)
+CLIPS> (agenda *)
+MAIN:
+   1      d0: *
+FOO:
+   0      d1: *
+   0      d2: *
+BAR:
+   0      d2: *
+   0      d3: *
+For a total of 5 activations.
+CLIPS> (refresh-agenda FOO)
+CLIPS> (agenda *)
+MAIN:
+   1      d0: *
+FOO:
+   1      d1: *
+   1      d2: *
+BAR:
+   0      d2: *
+   0      d3: *
+For a total of 5 activations.
+CLIPS> (refresh-agenda BAR)
+CLIPS> (agenda *)
+MAIN:
+   1      d0: *
+FOO:
+   1      d1: *
+   1      d2: *
+BAR:
+   1      d2: *
+   1      d3: *
+For a total of 5 activations.
+CLIPS> (bind ?*x* 2)
+2
+CLIPS> (agenda *)
+MAIN:
+   1      d0: *
+FOO:
+   1      d1: *
+   1      d2: *
+BAR:
+   1      d2: *
+   1      d3: *
+For a total of 5 activations.
+CLIPS> (refresh-agenda *)
+CLIPS> (agenda *)
+MAIN:
+   2      d0: *
+FOO:
+   2      d1: *
+   2      d2: *
+BAR:
+   2      d2: *
+   2      d3: *
+For a total of 5 activations.
+CLIPS> (set-salience-evaluation when-defined)
+when-activated
+CLIPS> (set-break FOO::d1)
+CLIPS> (set-break BAR::d3)
+CLIPS> (show-breaks BOGUS)
+[ARGACCES5] Function show-breaks expected argument #1 to be of type defmodule name
+CLIPS> (show-breaks 7)
+[ARGACCES5] Function show-breaks expected argument #1 to be of type symbol
+CLIPS> (show-breaks FOO 7)
+[ARGACCES4] Function show-breaks expected no more than 1 argument(s)
+CLIPS> (show-breaks)
+CLIPS> (show-breaks MAIN)
+CLIPS> (show-breaks FOO)
+d1
+CLIPS> (show-breaks BAR)
+d3
+CLIPS> (show-breaks *)
+MAIN:
+FOO:
+   d1
+BAR:
+   d3
+CLIPS> (dribble-off)

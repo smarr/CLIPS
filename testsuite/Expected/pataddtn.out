@@ -1,0 +1,31 @@
+TRUE
+CLIPS> (load "pataddtn.clp")
+******************************************
+TRUE
+CLIPS> (reset)
+CLIPS> (agenda)
+23     should-fire-6g: *
+22     should-fire-6f: *
+21     should-fire-6e: *
+20     should-fire-6d: *
+19     should-fire-6c: *
+18     should-fire-6b: *
+17     should-fire-6a: *
+16     should-fire-5f: f-0,*
+15     should-fire-5e: f-0,*
+14     should-fire-5d: f-0
+13     should-fire-5c: f-0
+12     should-fire-5b: *
+11     should-fire-5a: *
+10     should-fire-4e: *
+9      should-fire-4d: f-0,*
+8      should-fire-4c: *
+7      should-fire-4b: *
+6      should-fire-4a: *
+5      should-fire-3b: f-0
+4      should-fire-3a: *
+3      should-fire-2b: f-0
+2      should-fire-2a: *
+1      should-fire-1: *
+For a total of 23 activations.
+CLIPS> (dribble-off)

@@ -1,0 +1,12 @@
+(unwatch all)
+(clear)
+(set-strategy depth)
+(open "Results//predcfnx.rsl" predcfnx "w")
+(dribble-on "Actual//predcfnx.out")
+(batch "predcfnx.bat")
+(dribble-off)
+(load "compline.clp")
+(printout predcfnx "predcfnx.bat differences are as follows:" crlf)
+(compare-files "Expected//predcfnx.out" "Actual//predcfnx.out" predcfnx)
+; close result file
+(close predcfnx)

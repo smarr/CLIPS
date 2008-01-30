@@ -1,0 +1,484 @@
+TRUE
+CLIPS> (batch "gnrcerr.bat")
+TRUE
+CLIPS> (deffunction bogus ())
+CLIPS> (defgeneric bogus)
+[GENRCPSR5] Defgenerics are not allowed to replace deffunctions.
+
+ERROR:
+(defgeneric MAIN::bogus)
+CLIPS> (defmethod bogus ())
+[GENRCPSR5] Defgenerics are not allowed to replace deffunctions.
+
+ERROR:
+(defmethod MAIN::bogus
+   (
+CLIPS> (defgeneric)
+
+[CSTRCPSR2] Missing name for defgeneric construct
+
+ERROR:
+(defgeneric )
+CLIPS> (defgeneric bad bad-comment)
+[GENRCPSR1] Expected ')' to complete defgeneric.
+
+ERROR:
+(defgeneric MAIN::bad
+   bad-comment
+CLIPS> (defgeneric bad ())
+[GENRCPSR1] Expected ')' to complete defgeneric.
+
+ERROR:
+(defgeneric MAIN::bad
+   (
+CLIPS> (defgeneric bad "good-comment" extra-garbage)
+[GENRCPSR1] Expected ')' to complete defgeneric.
+
+ERROR:
+(defgeneric MAIN::bad "good-comment"
+   extra-garbage
+CLIPS> (defmethod)
+
+[CSTRCPSR2] Missing name for defgeneric construct
+
+ERROR:
+(defmethod )
+CLIPS> (defmethod ())
+
+[CSTRCPSR2] Missing name for defgeneric construct
+
+ERROR:
+(defmethod (
+CLIPS> (defmethod 1)
+
+[CSTRCPSR2] Missing name for defgeneric construct
+
+ERROR:
+(defmethod 1
+CLIPS> (defmethod 1 ())
+
+[CSTRCPSR2] Missing name for defgeneric construct
+
+ERROR:
+(defmethod 1
+CLIPS> (defmethod good ((?a NUMBER (> ?a 0)) (?b LEXEME (neq ?b "ERROR"))))
+CLIPS> (defmethod good 2 ((?a NUMBER (> ?a 0)) (?b LEXEME (neq ?b "ERROR"))))
+[GENRCPSR2] New method #2 would be indistinguishable from method #1.
+
+ERROR:
+(defmethod MAIN::good 2
+   ((?a NUMBER (> ?a 0))
+    (?b LEXEME (neq ?b "ERROR")))
+   
+CLIPS> (defmethod bad 0 ())
+[GENRCPSR6] Method index out of range.
+
+ERROR:
+(defmethod MAIN::bad 0
+CLIPS> (defmethod bad 2147483648 ())
+[GENRCPSR6] Method index out of range.
+
+ERROR:
+(defmethod MAIN::bad 2147483647 ;; Different number OK
+CLIPS> (defmethod bad (?a 34))
+[GENRCPSR9] Expected a variable or '(' for parameter specification.
+
+ERROR:
+(defmethod MAIN::bad
+   (?a
+    34
+CLIPS> (defmethod bad ($?any ?any))
+[PRCCODE8] No parameters allowed after wildcard parameter.
+
+ERROR:
+(defmethod MAIN::bad
+   ($?any
+    ?any
+CLIPS> (defmethod bad (?a ?a))
+[PRCCODE7] Duplicate parameter names not allowed.
+
+ERROR:
+(defmethod MAIN::bad
+   (?a
+    ?a
+CLIPS> (defmethod bad ((?a)))
+[GENRCPSR13] Expected a valid class name or query.
+
+ERROR:
+(defmethod MAIN::bad
+   ((?a)
+CLIPS> (defmethod bad ((?a INTEGER NUMBER)))
+[GENRCPSR15] INTEGER class is redundant.
+
+ERROR:
+(defmethod MAIN::bad
+   ((?a INTEGER NUMBER
+CLIPS> (defmethod bad ((?a JUNK)))
+[GENRCPSR14] Unknown class in method.
+
+ERROR:
+(defmethod MAIN::bad
+   ((?a JUNK
+CLIPS> (defmethod bad ((?a INTEGER 65)))
+[GENRCPSR13] Expected a valid class name or query.
+
+ERROR:
+(defmethod MAIN::bad
+   ((?a INTEGER 65
+CLIPS> (defmethod bad)
+[GENRCPSR7] Expected a '(' to begin method parameter restrictions.
+
+ERROR:
+(defmethod MAIN::bad)
+CLIPS> (defmethod bad (abc))
+[GENRCPSR9] Expected a variable or '(' for parameter specification.
+
+ERROR:
+(defmethod MAIN::bad
+   (abc
+CLIPS> (defmethod bad ((abc)))
+[GENRCPSR8] Expected a variable for parameter specification.
+
+ERROR:
+(defmethod MAIN::bad
+   ((abc
+CLIPS> (defmethod bad ((?a (< ?a 1) INTEGER)))
+[GENRCPSR10] Query must be last in parameter restriction.
+
+ERROR:
+(defmethod MAIN::bad
+   ((?a (< ?a 1) INTEGER
+CLIPS> (defmethod bad ((?a INTEGER INTEGER)))
+[GENRCPSR11] Duplicate classes not allowed in parameter restriction.
+
+ERROR:
+(defmethod MAIN::bad
+   ((?a INTEGER INTEGER
+CLIPS> (defmethod foo ((?a (bind ?b 1))))
+[GENRCPSR12] Binds are not allowed in query expressions.
+
+ERROR:
+(defmethod MAIN::foo
+   ((?a (bind ?b 1)
+CLIPS> (defgeneric defrule)
+[GENRCPSR3] Defgenerics are not allowed to replace constructs.
+
+ERROR:
+(defgeneric MAIN::defrule)
+CLIPS> (defmethod defrule ())
+[GENRCPSR3] Defgenerics are not allowed to replace constructs.
+
+ERROR:
+(defmethod MAIN::defrule
+   (
+CLIPS> (list-defgenerics)
+good
+For a total of 1 defgeneric.
+CLIPS> (list-defmethods)
+good #1  (NUMBER <qry>) (LEXEME <qry>)
+For a total of 1 method.
+CLIPS> (defmethod foo (?a)
+  (+ ?b 2)
+  (bind ?b 1))
+CLIPS> (foo (+ (eval "(gensym)") 2))
+[ARGACCES5] Function + expected argument #1 to be of type integer or float
+[PRCCODE6] This error occurred while evaluating arguments for the generic function foo.
+FALSE
+CLIPS> (foo 1)
+[PRCCODE5] Variable b unbound in generic function foo method #1.
+[ARGACCES5] Function + expected argument #1 to be of type integer or float
+[PRCCODE4] Execution halted during the actions of generic function foo method #1.
+FALSE
+CLIPS> (foo (instances))
+[initial-object] of INITIAL-OBJECT
+For a total of 1 instance.
+[PRCCODE2] Functions without a return value are illegal as generic function arguments.
+[PRCCODE6] This error occurred while evaluating arguments for the generic function foo.
+FALSE
+CLIPS> (defmethod foo ()
+  (undefmethod foo *))
+CLIPS> (foo)
+[GENRCFUN1] Defgeneric foo cannot be modified while one of its methods is executing.
+CLIPS> (foo 1 2)
+[GENRCEXE1] No applicable methods for foo.
+FALSE
+CLIPS> (call-next-method)
+[GENRCEXE2] Shadowed methods not applicable in current context.
+FALSE
+CLIPS> (defmethod bar ((?a INTEGER)))
+CLIPS> (bar [bogus-instance])
+[GENRCEXE3] Unable to determine class of [bogus-instance] in generic function bar.
+FALSE
+CLIPS> (undefmethod * 1)
+[GENRCCOM3] Incomplete method specification for deletion.
+CLIPS> (clear)
+CLIPS> (defgeneric +)
+CLIPS> (+ abc def)
+[GENRCEXE1] No applicable methods for +.
+FALSE
+CLIPS> (defmethod foo (($?any INTEGER (> ?current-argument 10)))
+   ?current-argument)
+
+[PRCCODE3] Undefined variable current-argument referenced in method.
+
+ERROR:
+(defmethod MAIN::foo
+   (($?any INTEGER (> ?current-argument 10)))
+   ?current-argument
+   )
+CLIPS> (defgeneric any-instancep)
+[GENRCPSR16] The system function any-instancep cannot be overloaded.
+
+ERROR:
+(defgeneric MAIN::any-instancep)
+CLIPS> (defmethod any-instancep ())
+[GENRCPSR16] The system function any-instancep cannot be overloaded.
+
+ERROR:
+(defmethod MAIN::any-instancep
+   (
+CLIPS> (defgeneric assert)
+[GENRCPSR16] The system function assert cannot be overloaded.
+
+ERROR:
+(defgeneric MAIN::assert)
+CLIPS> (defmethod assert ())
+[GENRCPSR16] The system function assert cannot be overloaded.
+
+ERROR:
+(defmethod MAIN::assert
+   (
+CLIPS> (defgeneric bind)
+[GENRCPSR16] The system function bind cannot be overloaded.
+
+ERROR:
+(defgeneric MAIN::bind)
+CLIPS> (defmethod bind ())
+[GENRCPSR16] The system function bind cannot be overloaded.
+
+ERROR:
+(defmethod MAIN::bind
+   (
+CLIPS> (defgeneric break)
+[GENRCPSR16] The system function break cannot be overloaded.
+
+ERROR:
+(defgeneric MAIN::break)
+CLIPS> (defmethod break ())
+[GENRCPSR16] The system function break cannot be overloaded.
+
+ERROR:
+(defmethod MAIN::break
+   (
+CLIPS> (defgeneric call-next-handler)
+[GENRCPSR16] The system function call-next-handler cannot be overloaded.
+
+ERROR:
+(defgeneric MAIN::call-next-handler)
+CLIPS> (defmethod call-next-handler ())
+[GENRCPSR16] The system function call-next-handler cannot be overloaded.
+
+ERROR:
+(defmethod MAIN::call-next-handler
+   (
+CLIPS> (defgeneric call-next-method)
+[GENRCPSR16] The system function call-next-method cannot be overloaded.
+
+ERROR:
+(defgeneric MAIN::call-next-method)
+CLIPS> (defmethod call-next-method ())
+[GENRCPSR16] The system function call-next-method cannot be overloaded.
+
+ERROR:
+(defmethod MAIN::call-next-method
+   (
+CLIPS> (defgeneric delayed-do-for-all-instances)
+[GENRCPSR16] The system function delayed-do-for-all-instances cannot be overloaded.
+
+ERROR:
+(defgeneric MAIN::delayed-do-for-all-instances)
+CLIPS> (defmethod delayed-do-for-all-instances ())
+[GENRCPSR16] The system function delayed-do-for-all-instances cannot be overloaded.
+
+ERROR:
+(defmethod MAIN::delayed-do-for-all-instances
+   (
+CLIPS> (defgeneric do-for-all-instances)
+[GENRCPSR16] The system function do-for-all-instances cannot be overloaded.
+
+ERROR:
+(defgeneric MAIN::do-for-all-instances)
+CLIPS> (defmethod do-for-all-instances ())
+[GENRCPSR16] The system function do-for-all-instances cannot be overloaded.
+
+ERROR:
+(defmethod MAIN::do-for-all-instances
+   (
+CLIPS> (defgeneric do-for-instance)
+[GENRCPSR16] The system function do-for-instance cannot be overloaded.
+
+ERROR:
+(defgeneric MAIN::do-for-instance)
+CLIPS> (defmethod do-for-instance ())
+[GENRCPSR16] The system function do-for-instance cannot be overloaded.
+
+ERROR:
+(defmethod MAIN::do-for-instance
+   (
+CLIPS> (defgeneric duplicate)
+[GENRCPSR16] The system function duplicate cannot be overloaded.
+
+ERROR:
+(defgeneric MAIN::duplicate)
+CLIPS> (defmethod duplicate ())
+[GENRCPSR16] The system function duplicate cannot be overloaded.
+
+ERROR:
+(defmethod MAIN::duplicate
+   (
+CLIPS> (defgeneric expand$)
+[GENRCPSR16] The system function expand$ cannot be overloaded.
+
+ERROR:
+(defgeneric MAIN::expand$)
+CLIPS> (defmethod expand$ ())
+[GENRCPSR16] The system function expand$ cannot be overloaded.
+
+ERROR:
+(defmethod MAIN::expand$
+   (
+CLIPS> (defgeneric find-all-instances)
+[GENRCPSR16] The system function find-all-instances cannot be overloaded.
+
+ERROR:
+(defgeneric MAIN::find-all-instances)
+CLIPS> (defmethod find-all-instances ())
+[GENRCPSR16] The system function find-all-instances cannot be overloaded.
+
+ERROR:
+(defmethod MAIN::find-all-instances
+   (
+CLIPS> (defgeneric find-instance)
+[GENRCPSR16] The system function find-instance cannot be overloaded.
+
+ERROR:
+(defgeneric MAIN::find-instance)
+CLIPS> (defmethod find-instance ())
+[GENRCPSR16] The system function find-instance cannot be overloaded.
+
+ERROR:
+(defmethod MAIN::find-instance
+   (
+CLIPS> (defgeneric if)
+[GENRCPSR16] The system function if cannot be overloaded.
+
+ERROR:
+(defgeneric MAIN::if)
+CLIPS> (defmethod if ())
+[GENRCPSR16] The system function if cannot be overloaded.
+
+ERROR:
+(defmethod MAIN::if
+   (
+CLIPS> (defgeneric initialize-instance)
+[GENRCPSR16] The system function initialize-instance cannot be overloaded.
+
+ERROR:
+(defgeneric MAIN::initialize-instance)
+CLIPS> (defmethod initialize-instance ())
+[GENRCPSR16] The system function initialize-instance cannot be overloaded.
+
+ERROR:
+(defmethod MAIN::initialize-instance
+   (
+CLIPS> (defgeneric make-instance)
+[GENRCPSR16] The system function make-instance cannot be overloaded.
+
+ERROR:
+(defgeneric MAIN::make-instance)
+CLIPS> (defmethod make-instance ())
+[GENRCPSR16] The system function make-instance cannot be overloaded.
+
+ERROR:
+(defmethod MAIN::make-instance
+   (
+CLIPS> (defgeneric modify)
+[GENRCPSR16] The system function modify cannot be overloaded.
+
+ERROR:
+(defgeneric MAIN::modify)
+CLIPS> (defmethod modify ())
+[GENRCPSR16] The system function modify cannot be overloaded.
+
+ERROR:
+(defmethod MAIN::modify
+   (
+CLIPS> (defgeneric next-handlerp)
+[GENRCPSR16] The system function next-handlerp cannot be overloaded.
+
+ERROR:
+(defgeneric MAIN::next-handlerp)
+CLIPS> (defmethod next-handlerp ())
+[GENRCPSR16] The system function next-handlerp cannot be overloaded.
+
+ERROR:
+(defmethod MAIN::next-handlerp
+   (
+CLIPS> (defgeneric next-methodp)
+[GENRCPSR16] The system function next-methodp cannot be overloaded.
+
+ERROR:
+(defgeneric MAIN::next-methodp)
+CLIPS> (defmethod next-methodp ())
+[GENRCPSR16] The system function next-methodp cannot be overloaded.
+
+ERROR:
+(defmethod MAIN::next-methodp
+   (
+CLIPS> (defgeneric override-next-handler)
+[GENRCPSR16] The system function override-next-handler cannot be overloaded.
+
+ERROR:
+(defgeneric MAIN::override-next-handler)
+CLIPS> (defmethod override-next-handler ())
+[GENRCPSR16] The system function override-next-handler cannot be overloaded.
+
+ERROR:
+(defmethod MAIN::override-next-handler
+   (
+CLIPS> (defgeneric progn)
+[GENRCPSR16] The system function progn cannot be overloaded.
+
+ERROR:
+(defgeneric MAIN::progn)
+CLIPS> (defmethod progn ())
+[GENRCPSR16] The system function progn cannot be overloaded.
+
+ERROR:
+(defmethod MAIN::progn
+   (
+CLIPS> (defgeneric retract)
+CLIPS> (defmethod retract ())
+CLIPS> (defgeneric return)
+[GENRCPSR16] The system function return cannot be overloaded.
+
+ERROR:
+(defgeneric MAIN::return)
+CLIPS> (defmethod return ())
+[GENRCPSR16] The system function return cannot be overloaded.
+
+ERROR:
+(defmethod MAIN::return
+   (
+CLIPS> (defgeneric while)
+[GENRCPSR16] The system function while cannot be overloaded.
+
+ERROR:
+(defgeneric MAIN::while)
+CLIPS> (defmethod while ())
+[GENRCPSR16] The system function while cannot be overloaded.
+
+ERROR:
+(defmethod MAIN::while
+   (
+CLIPS> (dribble-off)

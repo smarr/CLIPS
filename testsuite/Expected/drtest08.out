@@ -1,0 +1,735 @@
+TRUE
+CLIPS> (batch "drtest08.bat")
+TRUE
+CLIPS> (clear) ;; DR0705
+CLIPS> (= 5 (read))
+Whatever
+[ARGACCES5] Function = expected argument #2 to be of type integer or float
+FALSE
+CLIPS> (clear) ;; DR0707
+CLIPS> (defclass A (is-a USER) (role concrete) (slot foo (create-accessor read-write)))
+CLIPS> (make-instance a of A (foo "\"This is a string\""))
+[a]
+CLIPS> (send [a] print)
+[a] of A
+(foo ""This is a string"")
+CLIPS> (save-instances "Temp//bogus.tmp")
+2
+CLIPS> (reset)
+CLIPS> (instances)
+[initial-object] of INITIAL-OBJECT
+For a total of 1 instance.
+CLIPS> (load-instances "Temp//bogus.tmp")
+2
+CLIPS> (send [a] print)
+[a] of A
+(foo ""This is a string"")
+CLIPS> (clear) ;; DR0713
+CLIPS> 
+(defclass TEST
+  (is-a USER)
+  (role concrete)
+  (slot item (create-accessor write)))
+CLIPS> (make-instance a of TEST)
+[a]
+CLIPS> (message-modify-instance [a] (item 3))
+TRUE
+CLIPS> (clear)                   ; DR0724
+CLIPS> [x]
+[x]
+CLIPS> (clear)                   ; DRO725
+CLIPS> 
+(defrule should-be-ok
+   (message $?first)
+   (test (length$ ?first))
+   (translation $?first)
+   =>)
+CLIPS> (clear)                   ; DR0726
+CLIPS> 
+(defrule bar
+   (not (and (c ?x) (d ?y&:(> ?y 3))))
+   =>)
+CLIPS> (reset)
+CLIPS> (assert (c 1) (d a)) ; should not hang
+[ARGACCES5] Function > expected argument #1 to be of type integer or float
+
+[FACTMCH1] This error occurred in the fact pattern network
+   Currently active fact: (d a)
+   Problem resides in field #1
+      Of pattern #2 in rule bar
+
+FALSE
+CLIPS> (clear)                   ; DR0727
+CLIPS> 
+(defrule foo
+   (not (and (a) (b) (c)))
+   (d ?x&:(> ?x 3))
+   =>)
+CLIPS> (reset)
+CLIPS> (assert (d a)) ; Error should be for pattern 5
+[ARGACCES5] Function > expected argument #1 to be of type integer or float
+
+[FACTMCH1] This error occurred in the fact pattern network
+   Currently active fact: (d a)
+   Problem resides in field #1
+      Of pattern #4 in rule foo
+
+<Fact-1>
+CLIPS> (clear)                   ; DR0728
+CLIPS> 
+(deftemplate attempt
+   (multifield numbers (default 7 7 3 3))
+   (multifield rpn))
+CLIPS> 
+(deffacts initial-info
+   (attempt)
+   (operator *)
+   (operator /)
+   (operator -)
+   (operator +))
+CLIPS> 
+(defrule do-first
+   ?f <- (attempt (numbers $?b ?n1 $?m ?n2 $?e)
+                  (rpn))
+   (operator ?o)
+   =>
+   (duplicate ?f (numbers ?b ?m ?e)
+                 (rpn ?n1 ?n2 ?o)))
+CLIPS> 
+(defrule do-next
+   ?f <- (attempt (numbers $?b ?n $?e)
+                  (rpn ?f $?rest))
+   (operator ?o)
+   =>
+   (duplicate ?f (numbers ?b ?e)
+                 (rpn ?f ?rest ?n ?o)))
+CLIPS> (reset)
+CLIPS> (run) ; should not hang or crash
+CLIPS> (clear)                   ; DR0729
+CLIPS> (get-salience-evaluation)
+when-defined
+CLIPS> (set-salience-evaluation every-cycle) ; should return when-defined
+when-defined
+CLIPS> (set-salience-evaluation when-defined) ; should return every-cycle
+every-cycle
+CLIPS> (clear)                   ; DR0730
+CLIPS> (get-salience-evaluation)
+when-defined
+CLIPS> (defmodule A)
+CLIPS> (refresh-agenda *)
+CLIPS> (get-salience-evaluation) ; should be when-defined
+when-defined
+CLIPS> (clear)                   ; DR0731
+CLIPS> (unwatch all)
+CLIPS> (defrule zoiks =>)
+CLIPS> (reset)
+CLIPS> (watch rules)
+CLIPS> (defrule zoiks =>) ; activation should not be printed
+CLIPS> (unwatch all)
+CLIPS> (clear)                   ; DR0734
+CLIPS> (defmodule MAIN (export ?ALL))
+CLIPS> (defglobal MAIN ?*proximity* = 9)
+CLIPS> (defmodule SCORE (import MAIN ?ALL))
+CLIPS> 
+(defrule SCORE::should-be-ok
+   (attempt1)
+   (test (<= 3 ?*proximity*))
+   =>)
+CLIPS> (clear)                  ; DR0736
+CLIPS> 
+(deftemplate where
+   (multislot x (type SYMBOL)))
+CLIPS> 
+(defrule yak ; This should be OK
+   (where (x $?pds&:(member$ x ?pds)))
+   =>)
+CLIPS> (clear)
+CLIPS> 
+(defrule foo ; This should fail
+   (bbb ?x&:(member a ?x))
+   =>)
+
+[RULECSTR2] Previous variable bindings of ?x caused the type restrictions
+for argument #2 of the expression (member a ?x)
+found in CE #1 field #1 to be violated.
+
+ERROR:
+(defrule MAIN::foo
+   (bbb ?x&:(member a ?x))
+   =>)
+CLIPS> (clear)
+CLIPS> 
+(deftemplate this
+   (slot x)
+   (slot y (type INTEGER))
+   (multislot z (type STRING)))
+CLIPS> 
+(defrule this-1 ; This should fail
+   (this (x ?x))
+   =>
+   (member$ a ?x))
+
+[RULECSTR3] Previous variable bindings of ?x caused the type restrictions
+for argument #2 of the expression (member$ a ?x)
+found in the rule's RHS to be violated.
+
+ERROR:
+(defrule MAIN::this-1
+   (this (x ?x))
+   =>
+   (member$ a ?x))
+CLIPS> (clear)                   ; DR0737
+CLIPS> 
+(defrule fd-1 ; This should be ok
+   (a)
+   (not (and (b)
+             (or (c)
+                 (d))))
+   =>)
+CLIPS>    
+(defrule fd-2 ; this should be ok
+   (a)
+   (exists (b)
+           (or (and (c))
+               (d)))
+   =>)
+CLIPS> 
+(defrule fd-3 ; this should be ok
+   (a)
+   (not (and (b)
+             (or (and (c) (e))
+                 (d))))
+   =>)
+CLIPS> 
+(defrule fd-4 ; this should be ok
+   (a)
+   (exists (b)
+           (or (c)         
+               (d)))
+   =>)
+CLIPS> (clear)
+CLIPS> 
+(defrule foo-1
+   (not (or (a) (b)))
+   =>)
+CLIPS> 
+(defrule foo-2
+   (not (not (or (a) (b))))
+   =>)
+CLIPS> 
+(defrule foo-3
+   (not (and (not (a))
+             (not (b))))
+   =>)
+CLIPS> (reset)
+CLIPS> (agenda)
+0      foo-1: *,*
+For a total of 1 activation.
+CLIPS> (assert (a))
+<Fact-1>
+CLIPS> (agenda)
+0      foo-2: *
+0      foo-3: *
+For a total of 2 activations.
+CLIPS> (assert (b))
+<Fact-2>
+CLIPS> (agenda)
+0      foo-2: *
+0      foo-3: *
+For a total of 2 activations.
+CLIPS> (clear)                   ; DR0738
+CLIPS> 
+(deffacts f1
+   (s 1)
+   (s 2)
+   (s 3)
+   (c)
+   (a 1))
+CLIPS> 
+(defrule r1 ; SHOULD activate, but doesn't
+   (s 1)
+   (exists (or (and (a ?x)
+                    (d)
+                    (test (> 16 10)))
+               (and (a ?x)
+                    (c))))
+   =>)
+CLIPS>    
+(defrule r2 ; SHOULD activate, but doesn't
+   (s 2)
+   (not (and (not (and (a ?x)
+                       (d)
+                       (test (> 16 10))))
+              (not (and (a ?x)
+                        (c)))))
+   =>)
+CLIPS> 
+(defrule r3 ; SHOULD NOT activate, but does
+   (s 3)
+   (not (and (a ?x)
+             (d)
+             (test (> 16 10))))
+   (not (and (a ?x)
+             (c)))
+   =>)
+CLIPS> (reset)
+CLIPS> (agenda)
+0      r2: f-2,*
+0      r1: f-1,*
+For a total of 2 activations.
+CLIPS> (clear)                    ; DR0740
+CLIPS> 
+(deffunction bug (?list ?a ?b)
+   (while TRUE (return (subseq$ ?list ?a ?b))))
+CLIPS> (bug (create$ a b c) 1 2) ; Should return (a b)
+(a b)
+CLIPS> 
+(deffunction bug (?list ?a ?b)
+   (loop-for-count 1 (return (subseq$ ?list ?a ?b))))
+CLIPS> (bug (create$ a b c) 1 2) ; Should return (a b)
+(a b)
+CLIPS> (clear)                   ; DR0742 - should have no error
+CLIPS> (deftemplate TREATMENT
+   (multislot values
+   (type INTEGER)
+   (range 0 19)
+   (cardinality 0 20)))
+CLIPS> (assert (TREATMENT (values (create$))))
+<Fact-1>
+CLIPS> (clear)                  ; DR0743 - should have no error
+CLIPS> (defglobal ?*x* = 3)
+CLIPS> (bsave "Temp//mytest.bin")
+TRUE
+CLIPS> (clear)
+CLIPS> (watch all)
+CLIPS> (bload "Temp//mytest.bin")
+MSG >> delete ED:1 (<Instance-initial-object>)
+HND >> delete primary in class USER
+       ED:1 (<Instance-initial-object>)
+<== instance [initial-object] of INITIAL-OBJECT
+HND << delete primary in class USER
+       ED:1 (<Stale Instance-initial-object>)
+MSG << delete ED:1 (<Stale Instance-initial-object>)
+<== f-0     (initial-fact)
+<== Focus MAIN
+:== ?*x* ==> 3 <== 
+TRUE
+CLIPS> (unwatch all)
+CLIPS> (clear)                 ; DR0745
+CLIPS> (unwatch all)
+CLIPS> (defclass A (is-a USER)
+  (role concrete)
+  (pattern-match reactive)
+  (slot x (create-accessor write))
+  (slot y (create-accessor write)))
+CLIPS> (defrule bug
+  (object (is-a A)
+          (y 100)
+          (x 100))
+  =>)
+CLIPS> (agenda) ; should be no activations
+CLIPS> (make-instance a of A)
+[a]
+CLIPS> (watch activations)
+CLIPS> (object-pattern-match-delay ; should have only one activation arrow
+   (send [a] put-y 100)
+   (send [a] put-x 100))
+==> Activation 0      bug: [a]
+100
+CLIPS> (unwatch all)
+CLIPS> (clear)                 ; DR0747
+CLIPS> 
+(defclass A (is-a USER)
+   (slot foo (type INSTANCE-NAME)))
+CLIPS> (slot-types A foo) ; Should be just instance-name
+(INSTANCE-NAME)
+CLIPS> (clear)                ; DR0748 - Should have no error from print message
+CLIPS> (defmodule MAIN (export ?ALL))
+CLIPS> (defclass TEST (is-a USER)
+  (role concrete))
+CLIPS> (defmodule TEST (import MAIN ?ALL))
+CLIPS> (make-instance test of TEST)
+[MAIN::test]
+CLIPS> (do-for-instance ((?t TEST)) TRUE
+  (send ?t print))
+[test] of TEST
+CLIPS> (clear)                ; DR0749
+CLIPS> (defclass A (is-a USER)
+   (slot foo (access read-only) (create-accessor ?NONE)))
+CLIPS> (slot-facets A foo) ; facet should be SHR and not LCL
+(SGL STC INH R SHR RCT EXC PRV NIL NIL)
+CLIPS> (clear)                ; DR0750 - Should not crash
+CLIPS> (defclass FOO (is-a USER) (slot x))
+CLIPS> (slot-cardinality FOO x)
+()
+CLIPS> (clear)                ; DR0752 - Should return "a"
+CLIPS> (deffunction y ()
+   (progn$ (?x (create$ "a" "b" "c"))
+      (return ?x))
+   (return "hello"))
+CLIPS> (y)
+"a"
+CLIPS> (clear)                ; DR0753
+CLIPS> 
+(defmodule MAIN (export ?ALL))
+CLIPS> 
+(defrule MAIN::foo
+  =>
+  (assert (a))
+  (focus B)
+  (return))
+CLIPS> 
+(defrule MAIN::bar
+  (a)
+  =>
+  (focus B)
+  (return))
+CLIPS> 
+(defmodule B (import MAIN ?ALL))
+CLIPS> 
+(defrule B::yak
+  =>)
+CLIPS> (reset)
+CLIPS> (run 1)
+CLIPS> (list-focus-stack) ; Just B should be on stack
+B
+CLIPS> (reset)
+CLIPS> (focus MAIN B)
+TRUE
+CLIPS> (list-focus-stack) ; Should be MAIN B MAIN
+MAIN
+B
+MAIN
+CLIPS> (run 1)
+CLIPS> (list-focus-stack) ; Should be B B MAIN
+B
+B
+MAIN
+CLIPS> (clear)                ; DR0754
+CLIPS> 
+(defclass A (is-a USER)
+  (role concrete)
+  (pattern-match reactive)
+  (slot foo (create-accessor read-write)))
+CLIPS> 
+(defclass B (is-a A)
+  (pattern-match non-reactive))
+CLIPS> 
+(defrule foo
+  (i-f)
+  (test (send [b] put-foo blah))
+  =>)
+CLIPS> (make-instance b of B)
+[b]
+CLIPS> (assert (i-f)) ; Should not generate error
+<Fact-1>
+CLIPS> (clear)                ; DR0756 - Should not crash
+CLIPS> (defclass A (is-a USER) (role concrete))
+CLIPS> (make-instance a of A)
+[a]
+CLIPS> (any-instancep ((?long-var A)) ?long-var:)
+[EVALUATN1] Variable long-var: is unbound
+FALSE
+CLIPS> (clear)                ; DR0757 - Error ID should be [INSMNGR11]
+CLIPS> (defclass A (is-a USER) (role concrete))
+CLIPS> (make-instance BOGUS::A of A)
+
+[INSMNGR11] Invalid module specifier in new instance name.
+FALSE
+CLIPS> (clear)                ; DR0758
+CLIPS> 
+(defclass A (is-a USER)
+  (role concrete))
+CLIPS> 
+(defglobal ?*x* = (assert (foo))
+           ?*y* = (make-instance [a] of A))
+CLIPS> (reset)
+CLIPS> (facts)
+f-0     (foo)
+f-1     (initial-fact)
+For a total of 2 facts.
+CLIPS> (instances)
+[a] of A
+[initial-object] of INITIAL-OBJECT
+For a total of 2 instances.
+CLIPS> (clear)                ; DR0759
+CLIPS> 
+(deftemplate A
+   (slot foo (type INTEGER)
+             (allowed-instance-names [a])))
+
+[CSTRNPSR1] The type attribute conflicts with the allowed-instance-names attribute.
+
+ERROR:
+(deftemplate MAIN::A
+   (slot foo (type INTEGER) (allowed-instance-names [a]))
+CLIPS> (clear)                ; DR0763
+CLIPS> 
+(deffunction bug (?state)
+   (switch ?state
+     (case instance then TRUE)
+     (case logical then TRUE)
+     (default (return error))))
+CLIPS> (bsave "Temp//foo.bin")
+TRUE
+CLIPS> (clear)                ; DR0765
+CLIPS> 
+(deftemplate bar
+   (slot foo (type INTEGER)
+             (allowed-values abc def)))
+
+[CSTRNPSR1] The type attribute conflicts with the allowed-values attribute.
+
+ERROR:
+(deftemplate MAIN::bar
+   (slot foo (type INTEGER) (allowed-values abc def))
+CLIPS> (clear)                ; DR0766
+CLIPS> 
+(deftemplate temp
+   (multislot foofoo (type INTEGER LEXEME))
+   (slot after-foo (type STRING)))
+CLIPS> (set-dynamic-constraint-checking TRUE)
+FALSE
+CLIPS> (assert (temp (foofoo 11)))
+<Fact-1>
+CLIPS> 
+(deftemplate temp2
+   (multislot foofoo (type INTEGER LEXEME)))
+CLIPS> (assert (temp2 (foofoo (progn 3.4))))
+
+[CSTRNCHK1] Slot value (3.4) found in fact f-2     
+does not match the allowed types for slot foofoo.
+<Fact-2>
+CLIPS> (set-dynamic-constraint-checking FALSE)
+TRUE
+CLIPS> (clear)                ; DR0770
+CLIPS> 
+(defclass A (is-a USER)
+  (role concrete)
+  (pattern-match reactive)
+  (multislot foo (default x)))
+CLIPS> 
+(defrule bomb
+  (object (foo $? x $?))
+  (object (foo $? ? $?))
+=>)
+CLIPS> (make-instance a of A)
+[a]
+CLIPS> (clear)                ; DR0778
+CLIPS> 
+(deffacts example
+   (a b c d e d c b a a a a a a a a a a a a))
+CLIPS> 
+(defrule foo
+   (a ?x $?y d $?z ?x)
+   =>
+   (printout t "x = " ?x " y = " ?y " z = " ?z crlf))
+CLIPS> (reset)
+CLIPS> (agenda)
+CLIPS> (clear)               ; DR0782
+CLIPS> (set-strategy breadth)
+depth
+CLIPS> (set-strategy depth)
+breadth
+CLIPS> (deftemplate t1       ; DR0783
+  (field code)
+  (field a))
+CLIPS> (deftemplate t2
+  (field code)
+  (field a))
+CLIPS> (deftemplate t1
+  (field code)
+  (field a))
+CLIPS> (deftemplate t2
+  (field code)
+  (field b))
+CLIPS> (clear)
+CLIPS> 
+(defclass fifty (is-a USER)     
+  (role   concrete)       
+  (pattern-match  reactive)
+  (slot   s1      (type   SYMBOL))
+  (slot   s2      (type   INTEGER))
+  (slot   s3      (type   SYMBOL))
+  (slot   s4      (type   INTEGER))
+  (slot   s5      (type   SYMBOL))
+  (slot   s6      (type   INTEGER))
+  (slot   s7      (type   SYMBOL))
+  (slot   s8      (type   INTEGER))
+  (slot   s9      (type   SYMBOL))
+  (slot   s10     (type   INTEGER))
+  (slot   s11     (type   SYMBOL))
+  (slot   s12     (type   INTEGER))
+  (slot   s13     (type   SYMBOL))
+  (slot   s14     (type   INTEGER))
+  (slot   s15     (type   SYMBOL))
+  (slot   s16     (type   INTEGER))
+  (slot   s17     (type   SYMBOL))
+  (slot   s18     (type   INTEGER))
+  (slot   s19     (type   SYMBOL))
+  (slot   s20     (type   INTEGER))
+  (slot   s21     (type   SYMBOL))
+  (slot   s22     (type   INTEGER))
+  (slot   s23     (type   SYMBOL))
+  (slot   s24     (type   INTEGER))
+  (slot   s25     (type   SYMBOL))
+  (slot   s26     (type   INTEGER))
+  (slot   s27     (type   SYMBOL))
+  (slot   s28     (type   INTEGER))
+  (slot   s29     (type   SYMBOL))
+  (slot   s30     (type   INTEGER))
+  (slot   s31     (type   SYMBOL))
+  (slot   s32     (type   INTEGER))
+  (slot   s33     (type   SYMBOL))
+  (slot   s34     (type   INTEGER))
+  (slot   s35     (type   SYMBOL))
+  (slot   s36     (type   INTEGER))
+  (slot   s37     (type   SYMBOL))
+  (slot   s38     (type   INTEGER))
+  (slot   s39     (type   SYMBOL))
+  (slot   s40     (type   INTEGER))
+  (slot   s41     (type   SYMBOL))
+  (slot   s42     (type   INTEGER))
+  (slot   s43     (type   SYMBOL))
+  (slot   s44     (type   INTEGER))
+  (slot   s45     (type   SYMBOL))
+  (slot   s46     (type   INTEGER))
+  (slot   s47     (type   SYMBOL))
+  (slot   s48     (type   INTEGER))
+  (slot   s49     (type   SYMBOL))
+  (slot   s50     (type   INTEGER)))
+CLIPS> 
+(deffunction f(?limit ?class)
+   (reset)
+   (loop-for-count (?i 1 ?limit)
+      (bind ?t (time))
+      (loop-for-count (?j 1 500) (make-instance of ?class))
+      (printout t ?i crlf)))
+CLIPS> (f 3 fifty)
+1
+2
+3
+FALSE
+CLIPS> (clear)               ; DR0784
+CLIPS> 
+(defrule testing
+   ?f1<-(orders $?first&:(> (length$ ?first) 0))
+   ?f2<-(orders $?others&:(subsetp ?first ?others))
+   =>)
+CLIPS> 
+(defrule testing
+   (orders $?first&:(implode$ ?first)
+                   :(implode$ ?first))
+   =>)
+CLIPS> (clear)               ; DR0785
+CLIPS> (defglobal ?*x* = 0)
+CLIPS> (defmodule MAIN (export ?ALL))
+CLIPS> (defmodule FOO (import MAIN ?ALL))
+CLIPS> (defclass FOO (is-a USER) (role concrete))
+CLIPS> (bind ?*x* (instance-address (make-instance foo of FOO)))
+<Instance-foo>
+CLIPS> (focus MAIN)
+TRUE
+CLIPS> (send [FOO::foo] print)
+[MSGPASS2] No such instance FOO::foo in function send.
+FALSE
+CLIPS> (send ?*x* print)
+[INSFUN2] No such instance foo in function send.
+FALSE
+CLIPS> (clear)               ; DR0786
+CLIPS> 
+(deftemplate nanu
+   (slot a (type INTEGER))
+   (slot b (type FLOAT)))
+CLIPS> (assert (nanu))
+<Fact-1>
+CLIPS> (modify 1 (c 4))
+
+[TMPLTDEF1] Invalid slot c not defined in corresponding deftemplate nanu.
+FALSE
+CLIPS> (clear)               ; DR0788
+CLIPS> 
+(defrule r1 
+   (or (P1 p1) (P2 p2)) 
+   =>)
+CLIPS> (reset)
+CLIPS> (bsave "Temp//r1.bin")
+TRUE
+CLIPS> (clear)
+CLIPS> (bload "Temp//r1.bin")
+TRUE
+CLIPS> (reset)
+CLIPS> (watch all)
+CLIPS> (unwatch all)
+CLIPS> (clear)               ; DR0789
+CLIPS> (deffacts MAIN:: the-suit-list)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for construct name.
+
+ERROR:
+(deffacts MAIN::
+CLIPS> (clear)               ; DR0790
+CLIPS> 
+(defrule init
+   =>
+  (assert (p 1)))
+CLIPS> 
+(defrule crash
+  (p ?X)
+  (not (test (eq ?X 1)))
+  (p ?Y)
+  (not (and (test (neq ?Y 20))(test (neq ?Y 30))))
+  =>)
+CLIPS> (reset)
+CLIPS> (run)
+CLIPS> (clear)               ; DR0791
+CLIPS> 
+(defrule autorule2_B2
+  (or (foo ?st_B1)
+      (bpc-newdata))
+  =>
+  ?st_B1)
+
+[PRCCODE3] Undefined variable st_B1 referenced in RHS of defrule.
+
+ERROR:
+(defrule MAIN::autorule2_B2
+   (or  (foo ?st_B1)
+        (bpc-newdata))
+   =>
+   ?st_B1)
+CLIPS> (clear)                   ; DR0793
+CLIPS> (load bug793.clp)
+###!!
+TRUE
+CLIPS> (BEeditInit streamout)
+TRUE
+CLIPS> (BECPMIn bug793.ins)
+24
+CLIPS> (clear)                   ; DR0795
+CLIPS> 
+(defrule rule-1
+  (blah $?y)
+  =>
+  (progn$ (?x ?y) (printout t ?x)))
+CLIPS> (ppdefrule rule-1)
+(defrule MAIN::rule-1
+   (blah $?y)
+   =>
+   (progn$ (?x ?y) 
+      (printout t ?x)))
+CLIPS> (clear)                   ; DR0798
+CLIPS> (reset)
+CLIPS> (assert (a))
+<Fact-1>
+CLIPS> (assert (b))
+<Fact-2>
+CLIPS> (defrule t1 (b) (a) =>)
+CLIPS> (defrule t2 (a) (or (b) (b)) =>)
+CLIPS> (agenda)
+0      t2: f-1,f-2
+0      t2: f-1,f-2
+0      t1: f-2,f-1
+For a total of 3 activations.
+CLIPS> (clear)
+CLIPS> (dribble-off)

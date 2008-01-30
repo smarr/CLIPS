@@ -1,0 +1,765 @@
+TRUE
+CLIPS> (batch "jnftrght.bat")
+TRUE
+CLIPS> (clear)      ; Test logicals
+CLIPS> (watch activations)
+CLIPS> (watch facts)
+CLIPS> 
+(defrule r1
+   (logical (exists (a ?) (b ?)))
+   (c ?)
+   =>
+   (assert (yaba)))
+CLIPS> 
+(defrule r2
+   (exists (a ?) (b ?))
+   (c ?)
+   =>
+   (assert (daba)))
+CLIPS> 
+(defrule r3
+   (logical (forall (a ?) (b ?)))
+   (c ?)
+   =>
+   (assert (doo)))
+CLIPS> (reset)
+<== f-0     (initial-fact)
+==> f-0     (initial-fact)
+CLIPS> (assert (a 1) (b 1) (a 2) (b 2) (c 1))
+==> f-1     (a 1)
+==> f-2     (b 1)
+==> f-3     (a 2)
+==> f-4     (b 2)
+==> f-5     (c 1)
+==> Activation 0      r3: *,f-5
+==> Activation 0      r2: *,f-5
+==> Activation 0      r1: *,f-5
+<Fact-5>
+CLIPS> (run)
+==> f-6     (yaba)
+==> f-7     (daba)
+==> f-8     (doo)
+CLIPS> (retract 5)  ; (c 1)
+<== f-5     (c 1)
+CLIPS> (retract 1)  ; (a 1)
+<== f-1     (a 1)
+CLIPS> (retract 3)  ; (a 2)
+<== f-3     (a 2)
+<== f-6     (yaba)
+CLIPS> (retract 2)  ; (b 1)
+<== f-2     (b 1)
+CLIPS> (retract 4)  ; (b 2)
+<== f-4     (b 2)
+CLIPS> (assert (a 3))
+==> f-9     (a 3)
+<== f-8     (doo)
+<Fact-9>
+CLIPS> (unwatch all)
+CLIPS> (clear)      ; Test logical CE within not CE error
+CLIPS> (defrule r1 "error" (exists (logical (a ?) (b ?))) =>)
+
+[RULELHS1] The logical CE cannot be used within a not/exists/forall CE.
+
+ERROR:
+(defrule MAIN::r1 "error"
+   (exists
+        (logical
+             
+CLIPS> (defrule r2 "error" (forall (logical (a ?)) (b ?) (c ?)) =>)
+
+[RULELHS1] The logical CE cannot be used within a not/exists/forall CE.
+
+ERROR:
+(defrule MAIN::r2 "error"
+   (forall
+        (logical
+             
+CLIPS> (defrule r3 "error" (not (logical (a ?) (b ?))) =>) 
+
+[RULELHS1] The logical CE cannot be used within a not/exists/forall CE.
+
+ERROR:
+(defrule MAIN::r3 "error"
+   (not (logical
+             
+CLIPS> (clear)      ; Test forall CE
+CLIPS> 
+(defrule all-trained
+   (forall (player ?x)
+           (batted ?x)
+           (pitched ?x))
+   =>)
+CLIPS> (unwatch all)
+CLIPS> (watch activations)
+CLIPS> (watch facts)
+CLIPS> (reset)
+<== Activation 0      all-trained: *
+<== f-0     (initial-fact)
+==> Activation 0      all-trained: *
+==> f-0     (initial-fact)
+CLIPS> (agenda)
+0      all-trained: *
+For a total of 1 activation.
+CLIPS> (assert (player Gary))
+==> f-1     (player Gary)
+<== Activation 0      all-trained: *
+<Fact-1>
+CLIPS> (assert (pitched Gary))
+==> f-2     (pitched Gary)
+<Fact-2>
+CLIPS> (assert (batted Gary))
+==> f-3     (batted Gary)
+==> Activation 0      all-trained: *
+<Fact-3>
+CLIPS> (assert (player Brian))
+==> f-4     (player Brian)
+<== Activation 0      all-trained: *
+<Fact-4>
+CLIPS> (assert (player Tom))
+==> f-5     (player Tom)
+<Fact-5>
+CLIPS> (assert (pitched Tom))
+==> f-6     (pitched Tom)
+<Fact-6>
+CLIPS> (assert (pitched Brian))
+==> f-7     (pitched Brian)
+<Fact-7>
+CLIPS> (assert (batted Tom))
+==> f-8     (batted Tom)
+<Fact-8>
+CLIPS> (assert (batted Brian))
+==> f-9     (batted Brian)
+==> Activation 0      all-trained: *
+<Fact-9>
+CLIPS> (retract 8)
+<== f-8     (batted Tom)
+<== Activation 0      all-trained: *
+CLIPS> (retract 5)
+<== f-5     (player Tom)
+==> Activation 0      all-trained: *
+CLIPS> (reset)
+<== Activation 0      all-trained: *
+<== f-0     (initial-fact)
+<== f-1     (player Gary)
+<== f-2     (pitched Gary)
+<== f-3     (batted Gary)
+<== f-4     (player Brian)
+<== f-6     (pitched Tom)
+<== f-7     (pitched Brian)
+<== f-9     (batted Brian)
+==> Activation 0      all-trained: *
+==> f-0     (initial-fact)
+CLIPS> (agenda)
+0      all-trained: *
+For a total of 1 activation.
+CLIPS> (assert (player Gary))   ;1
+==> f-1     (player Gary)
+<== Activation 0      all-trained: *
+<Fact-1>
+CLIPS> (assert (pitched Gary))  ;2
+==> f-2     (pitched Gary)
+<Fact-2>
+CLIPS> (assert (batted Gary))   ;3
+==> f-3     (batted Gary)
+==> Activation 0      all-trained: *
+<Fact-3>
+CLIPS> (assert (player Tom))    ;4
+==> f-4     (player Tom)
+<== Activation 0      all-trained: *
+<Fact-4>
+CLIPS> (assert (pitched Tom))   ;5
+==> f-5     (pitched Tom)
+<Fact-5>
+CLIPS> (assert (batted Tom))    ;6
+==> f-6     (batted Tom)
+==> Activation 0      all-trained: *
+<Fact-6>
+CLIPS> (retract 6)
+<== f-6     (batted Tom)
+<== Activation 0      all-trained: *
+CLIPS> (retract 4)
+<== f-4     (player Tom)
+==> Activation 0      all-trained: *
+CLIPS> (reset)
+<== Activation 0      all-trained: *
+<== f-0     (initial-fact)
+<== f-1     (player Gary)
+<== f-2     (pitched Gary)
+<== f-3     (batted Gary)
+<== f-5     (pitched Tom)
+==> Activation 0      all-trained: *
+==> f-0     (initial-fact)
+CLIPS> (agenda)
+0      all-trained: *
+For a total of 1 activation.
+CLIPS> (assert (player Gary))   ;1
+==> f-1     (player Gary)
+<== Activation 0      all-trained: *
+<Fact-1>
+CLIPS> (assert (pitched Gary))  ;2
+==> f-2     (pitched Gary)
+<Fact-2>
+CLIPS> (assert (batted Gary))   ;3
+==> f-3     (batted Gary)
+==> Activation 0      all-trained: *
+<Fact-3>
+CLIPS> (retract 3)
+<== f-3     (batted Gary)
+<== Activation 0      all-trained: *
+CLIPS> (retract 1)
+<== f-1     (player Gary)
+==> Activation 0      all-trained: *
+CLIPS> (clear)
+==> f-0     (initial-fact)
+CLIPS> (unwatch all)
+CLIPS> 
+(defrule rule-1
+  (declare (salience 5))
+  (forall (a ?x) (b ?x) (c ?x))
+  =>)
+CLIPS> 
+(defrule rule-2
+  (declare (salience 4))
+  (exists (a ?x) (b ?x) (c ?x))
+  =>)
+CLIPS> 
+(defrule rule-3
+  (declare (salience 3))
+  (not (and (a ?x) (b ?x)))
+  =>)
+CLIPS> 
+(defrule rule-4
+  (declare (salience 2))
+  (not (and (b ?x) (d ?x)))
+  =>)
+CLIPS> 
+(defrule rule-5
+  (declare (salience 1))
+  (forall (d ?x) (e ?x) (f ?x))
+  =>)
+CLIPS> (reset)
+CLIPS> (agenda)
+5      rule-1: *
+3      rule-3: *
+2      rule-4: *
+1      rule-5: *
+For a total of 4 activations.
+CLIPS> (assert (a 1) (a 2) (a 3))
+<Fact-3>
+CLIPS> (agenda)
+3      rule-3: *
+2      rule-4: *
+1      rule-5: *
+For a total of 3 activations.
+CLIPS> (assert (b 1) (b 2))
+<Fact-5>
+CLIPS> (agenda)
+2      rule-4: *
+1      rule-5: *
+For a total of 2 activations.
+CLIPS> (assert (c 2) (c 3) (c 4) (c 5))
+<Fact-9>
+CLIPS> (agenda)
+4      rule-2: *
+2      rule-4: *
+1      rule-5: *
+For a total of 3 activations.
+CLIPS> (assert (d 3) (d 4))
+<Fact-11>
+CLIPS> (agenda)
+4      rule-2: *
+2      rule-4: *
+For a total of 2 activations.
+CLIPS> (assert (e 3) (e 4))
+<Fact-13>
+CLIPS> (agenda)
+4      rule-2: *
+2      rule-4: *
+For a total of 2 activations.
+CLIPS> (assert (f 3) (f 4))
+<Fact-15>
+CLIPS> (agenda)
+4      rule-2: *
+2      rule-4: *
+1      rule-5: *
+For a total of 3 activations.
+CLIPS> (assert (b 3) (c 1))
+<Fact-17>
+CLIPS> (agenda)
+5      rule-1: *
+4      rule-2: *
+1      rule-5: *
+For a total of 3 activations.
+CLIPS> (retract 2 3 4)
+CLIPS> (agenda)
+3      rule-3: *
+1      rule-5: *
+For a total of 2 activations.
+CLIPS> (assert (d 2))
+<Fact-18>
+CLIPS> (agenda)
+3      rule-3: *
+For a total of 1 activation.
+CLIPS> (retract 10)
+CLIPS> (agenda)
+3      rule-3: *
+For a total of 1 activation.
+CLIPS> (retract 1)
+CLIPS> (agenda)
+5      rule-1: *
+3      rule-3: *
+For a total of 2 activations.
+CLIPS> (retract 5 6 7 8 9)
+CLIPS> (agenda)
+5      rule-1: *
+3      rule-3: *
+2      rule-4: *
+For a total of 3 activations.
+CLIPS> (retract 11 13 15)
+CLIPS> (agenda)
+5      rule-1: *
+3      rule-3: *
+2      rule-4: *
+For a total of 3 activations.
+CLIPS> (retract 18)
+CLIPS> (agenda)
+5      rule-1: *
+3      rule-3: *
+2      rule-4: *
+1      rule-5: *
+For a total of 4 activations.
+CLIPS> (retract 12 14 16 17)
+CLIPS> (agenda)
+5      rule-1: *
+3      rule-3: *
+2      rule-4: *
+1      rule-5: *
+For a total of 4 activations.
+CLIPS> (clear) ; Test combinations of variable use
+CLIPS> 
+(defrule foo-1
+  (a ?x)
+  (not (and (b ?x) (c ?x) (d ?x)))
+  (e ?x)
+  (f ?x)
+  =>)
+CLIPS> (reset)
+CLIPS> (assert (a 3) (e 3) (f 3))
+<Fact-3>
+CLIPS> (agenda) ;; Should have activations
+0      foo-1: f-1,*,f-2,f-3
+For a total of 1 activation.
+CLIPS> (assert (b 4) (c 4) (d 4))
+<Fact-6>
+CLIPS> (agenda) ;; Should have activations
+0      foo-1: f-1,*,f-2,f-3
+For a total of 1 activation.
+CLIPS> (assert (b 3) (c 3) (d 3))
+<Fact-9>
+CLIPS> (agenda) ;; Should have no activations
+CLIPS> (retract 1 2 3)
+CLIPS> (agenda) ;; Should have no activations
+CLIPS> (clear)
+CLIPS> 
+(defrule foo-2
+  (a ?x)
+  (not (and (b ?x) (c ?x) (d ?x)))
+  (not (and (e ?x) (f ?x) (g ?x)))
+  (h ?x)
+  (i ?x)
+  =>)
+CLIPS> (reset)
+CLIPS> (assert (a 3) (h 3) (i 3))
+<Fact-3>
+CLIPS> (agenda) ;; Should have activations
+0      foo-2: f-1,*,*,f-2,f-3
+For a total of 1 activation.
+CLIPS> (assert (b 4) (c 4) (d 4))
+<Fact-6>
+CLIPS> (agenda) ;; Should have activations
+0      foo-2: f-1,*,*,f-2,f-3
+For a total of 1 activation.
+CLIPS> (assert (e 5) (f 5) (g 5))
+<Fact-9>
+CLIPS> (agenda) ;; Should have activations
+0      foo-2: f-1,*,*,f-2,f-3
+For a total of 1 activation.
+CLIPS> (assert (b 3) (c 3) (d 3))
+<Fact-12>
+CLIPS> (agenda) ;; Should have no activations
+CLIPS> (assert (e 3) (f 3) (g 3))
+<Fact-15>
+CLIPS> (agenda) ;; Should have no activations
+CLIPS> (retract 10 11 12)
+CLIPS> (agenda) ;; Should have no activations
+CLIPS> (clear)
+CLIPS> 
+(defrule foo-3
+  (a ?x)
+  (b ?x)
+  (not (and (c ?x) (d ?x)))
+  (e ?x)
+  =>)
+CLIPS> (reset)
+CLIPS> (assert (a 3) (b 3) (e 3))
+<Fact-3>
+CLIPS> (agenda) ;; Should have activations
+0      foo-3: f-1,f-2,*,f-3
+For a total of 1 activation.
+CLIPS> (assert (c 4) (d 4))
+<Fact-5>
+CLIPS> (agenda) ;; Should have activations
+0      foo-3: f-1,f-2,*,f-3
+For a total of 1 activation.
+CLIPS> (assert (c 3) (d 3))
+<Fact-7>
+CLIPS> (agenda) ;; Should have no activations
+CLIPS> (retract 1 2 3)
+CLIPS> (agenda) ;; Should have no activations
+CLIPS> (clear)
+CLIPS> 
+(defrule foo-4
+  (a ?x)
+  (not (and (b ?x) 
+            (c ?x)
+            (not (and (e ?x) (f ?x) (g ?x)))
+            (h ?x)))
+  (i ?x)
+  =>)
+CLIPS> (reset)
+CLIPS> (assert (a 3) (i 3))
+<Fact-2>
+CLIPS> (agenda) ;; Should have activations
+0      foo-4: f-1,*,f-2
+For a total of 1 activation.
+CLIPS> (assert (b 4) (c 4) (h 4))
+<Fact-5>
+CLIPS> (agenda) ;; Should have activations
+0      foo-4: f-1,*,f-2
+For a total of 1 activation.
+CLIPS> (assert (e 4) (f 4) (g 4))
+<Fact-8>
+CLIPS> (agenda) ;; Should have activations
+0      foo-4: f-1,*,f-2
+For a total of 1 activation.
+CLIPS> (assert (b 3) (c 3) (h 3))
+<Fact-11>
+CLIPS> (agenda) ;; Should have no activations
+CLIPS> (assert (e 3) (f 3) (g 3))
+<Fact-14>
+CLIPS> (agenda) ;; Should have activations
+0      foo-4: f-1,*,f-2
+For a total of 1 activation.
+CLIPS> (retract 9 10 11)
+CLIPS> (agenda) ;; Should have activations
+0      foo-4: f-1,*,f-2
+For a total of 1 activation.
+CLIPS> (clear)
+CLIPS> 
+(defrule foo-5
+  (a ?x)
+  (not (and (b ?) 
+            (c ?x)
+            (not (and (d ?) (e ?) (f ?)))
+            (g ?x)))
+  (h ?x)
+  =>)
+CLIPS> (reset)
+CLIPS> (assert (a 3) (h 3))
+<Fact-2>
+CLIPS> (agenda) ;; Should have activations
+0      foo-5: f-1,*,f-2
+For a total of 1 activation.
+CLIPS> (assert (b 4) (c 4) (g 4))
+<Fact-5>
+CLIPS> (agenda) ;; Should have activations
+0      foo-5: f-1,*,f-2
+For a total of 1 activation.
+CLIPS> (assert (b 3) (c 3) (g 3))
+<Fact-8>
+CLIPS> (agenda) ;; Should have no activations
+CLIPS> (assert (d 1) (e 2) (f 3))
+<Fact-11>
+CLIPS> (agenda) ;; Should have activations
+0      foo-5: f-1,*,f-2
+For a total of 1 activation.
+CLIPS> (retract 3 4 5)
+CLIPS> (agenda) ;; Should have activations
+0      foo-5: f-1,*,f-2
+For a total of 1 activation.
+CLIPS> (clear)
+CLIPS> 
+(defrule foo-6
+  (a ?)
+  (not (and (b ?) 
+            (c ?)
+            (not (and (d ?) 
+                      (e ?x)))
+            (f ?x)))
+  (g ?)
+  =>)
+CLIPS> (reset)
+CLIPS> (assert (a 3) (g 3))
+<Fact-2>
+CLIPS> (agenda) ;; Should have activations
+0      foo-6: f-1,*,f-2
+For a total of 1 activation.
+CLIPS> (assert (b 4) (c 4) (f 4))
+<Fact-5>
+CLIPS> (agenda) ;; Should have no activations
+CLIPS> (assert (d 1) (e 3))
+<Fact-7>
+CLIPS> (agenda) ;; Should have activations
+0      foo-6: f-1,*,f-2
+For a total of 1 activation.
+CLIPS> (assert (e 4))
+<Fact-8>
+CLIPS> (agenda) ;; Should have activations
+0      foo-6: f-1,*,f-2
+For a total of 1 activation.
+CLIPS> (clear) ;; Test not/or
+CLIPS> (defrule foo (not (or (a) (b))) =>)
+CLIPS> (reset)
+CLIPS> (agenda)
+0      foo: *,*
+For a total of 1 activation.
+CLIPS> (assert (a))
+<Fact-1>
+CLIPS> (agenda)
+CLIPS> (assert (b))
+<Fact-2>
+CLIPS> (agenda)
+CLIPS> (retract 1)
+CLIPS> (agenda)
+CLIPS> (retract 2)
+CLIPS> (agenda)
+0      foo: *,*
+For a total of 1 activation.
+CLIPS> (clear) ; New Indexing Code
+CLIPS> (watch activations)
+CLIPS> 
+(defrule foo
+   (a ?x ?y ?z)
+   (not (and (b ?x) (c ?y) (d ?z)))
+   =>)
+CLIPS> (assert (a 1 2 3))
+==> Activation 0      foo: f-1,*
+<Fact-1>
+CLIPS> (assert (b 1))
+<Fact-2>
+CLIPS> (assert (c 2))
+<Fact-3>
+CLIPS> (assert (d 3))
+<== Activation 0      foo: f-1,*
+<Fact-4>
+CLIPS> (clear)
+CLIPS> (deftemplate a (slot x) (slot y) (slot z))
+CLIPS> (deftemplate b (slot x))
+CLIPS> (deftemplate c (slot y)) 
+CLIPS> (deftemplate d (slot z))
+CLIPS> 
+(defrule foo 
+   (a (x ?x) (y ?y) (z ?z))
+   (not (and (b (x ?x))
+             (c (y ?y))
+             (d (z ?z))))
+   =>)
+CLIPS> (assert (a (x 1) (y 2) (z 3)))
+==> Activation 0      foo: f-1,*
+<Fact-1>
+CLIPS> (assert (b (x 1)))
+<Fact-2>
+CLIPS> (assert (c (y 2)))
+<Fact-3>
+CLIPS> (assert (d (z 3)))
+<== Activation 0      foo: f-1,*
+<Fact-4>
+CLIPS> (clear)
+CLIPS> (deftemplate a (multislot x) (multislot y) (multislot z))
+CLIPS> (deftemplate b (multislot x))
+CLIPS> (deftemplate c (multislot y)) 
+CLIPS> (deftemplate d (multislot z))
+CLIPS> 
+(defrule foo 
+   (a (x $? $? ?x) (y $? $? ?y) (z $? $? ?z))
+   (not (and (b (x $? $? ?x))
+             (c (y $? $? ?y))
+             (d (z $? $? ?z))))
+   =>)
+CLIPS> (assert (a (x 1) (y 2) (z 3)))
+==> Activation 0      foo: f-1,*
+<Fact-1>
+CLIPS> (assert (b (x 1)))
+<Fact-2>
+CLIPS> (assert (c (y 2)))
+<Fact-3>
+CLIPS> (assert (d (z 3)))
+<== Activation 0      foo: f-1,*
+<Fact-4>
+CLIPS> (clear)
+CLIPS> 
+(defrule foo
+   (a ?x)
+   (b ?y)
+   (not (and (c ?z)
+             (d ?w)
+             (test (and (> ?x ?z) (< ?y ?w)))))
+   =>)
+CLIPS> (assert (a 3) (b 5))
+==> Activation 0      foo: f-1,f-2,*
+<Fact-2>
+CLIPS> (assert (c 1))
+<Fact-3>
+CLIPS> (assert (d 6))
+<== Activation 0      foo: f-1,f-2,*
+<Fact-4>
+CLIPS> (clear)
+CLIPS> 
+(defrule problem-rule-1
+   (A)
+   (not (and (B)
+             (not (and (C) (D)))))
+   (not (E))
+   =>)
+CLIPS> (clear)
+CLIPS> 
+(defrule problem-rule-2
+   (A)  
+   (not (and (B)
+             (not (and (C) (D)))))
+
+   (not  (and (E)   
+              (F)))
+   =>)
+CLIPS> (clear)
+CLIPS> 
+(defrule problem-rule-3
+   (A)  
+   (exists (or (and (B) 
+                    (C))  
+               (and (D)
+                    (E))
+               (and (F)
+                    (G)
+                    (exists (H)
+                            (I)
+                            (J))
+                    (K)
+                    (L)
+                    (exists (M)
+                            (N)
+                            (O)))
+               (and (P)
+                    (Q)
+                    (R))
+               (and (S)   
+                    (T))))
+   (not (U))
+   =>)
+CLIPS> (clear)
+CLIPS> 
+(defrule problem-rule-4
+   (A ?td2)  
+   (not (and (not (and (B) 
+                       (C ?td2)))
+             (not (D))))
+   =>)
+CLIPS> (clear)
+CLIPS> 
+(defrule buggy-rule
+   (A ?td2)
+   (not (and (B) 
+             (not (and (C ?x)
+                       (exists (D ?td2)
+                               (E))))))
+   =>)
+CLIPS> (reset)
+CLIPS> (assert (B))
+<Fact-1>
+CLIPS> (assert (A 3))
+==> Activation 0      buggy-rule: f-2,*
+<== Activation 0      buggy-rule: f-2,*
+<Fact-2>
+CLIPS> (agenda)
+CLIPS> (clear)
+CLIPS> 
+(defrule problem-rule-5
+   (A ?td2)  
+   (not (and (not (and (B) 
+                       (C ?td2)))  
+             (not (and (D)
+                       (not (E ?td2))))))
+   =>)
+CLIPS> 
+(clear)
+CLIPS> (deftemplate select-GCSS-TAG2100 
+   (slot tag-id) 
+   (slot process-order))
+CLIPS> 
+(defrule TAG2100-New-2.5.2.6.2
+   
+   (X)
+   
+   (exists (and (select-GCSS-TAG2100 (tag-id ?tag-id))
+   
+                (exists (select-GCSS-TAG2100 (tag-id ~?tag-id)))))   
+
+   =>)
+CLIPS>    
+(defrule  TAG2100-Use-2.5.2.6.3
+      
+   (Y)
+      
+  (select-GCSS-TAG2100 (tag-id ?tag-id))
+            
+  (exists (select-GCSS-TAG2100 (tag-id ~?tag-id))) 
+                                        
+  =>)
+CLIPS> (assert (select-GCSS-TAG2100 (tag-id 2) (process-order 2)))
+<Fact-1>
+CLIPS> (assert (select-GCSS-TAG2100 (tag-id 2) (process-order 3)))
+<Fact-2>
+CLIPS> (assert (select-GCSS-TAG2100 (tag-id 1) (process-order 5)))
+<Fact-3>
+CLIPS> (clear)
+CLIPS> 
+(deftemplate TAG2300
+   (slot matched)
+   (slot action)
+   (slot tag-id))
+CLIPS> 
+(deftemplate TAG2370
+   (slot parent))
+CLIPS> 
+(deftemplate TAG2400
+   (slot action))
+CLIPS> 
+(defrule rule-3
+   (TAG2400 (action ?))      
+   (exists (and (TAG2370 (parent ?equipment))
+            
+                (TAG2300 (tag-id ?equipment)
+                         (matched ~no))))
+   =>)
+CLIPS> (reset)
+CLIPS> (assert (TAG2370 (parent "GCSS-E2")))
+<Fact-1>
+CLIPS> (assert (TAG2370 (parent "GCSS-E3")))
+<Fact-2>
+CLIPS> (assert (TAG2400 (action none)))
+<Fact-3>
+CLIPS> (assert (TAG2300 (matched yes) (action none) (tag-id "GCSS-E2")))
+==> Activation 0      rule-3: f-3,*
+<Fact-4>
+CLIPS> (assert (TAG2300 (matched maybe) (action none) (tag-id "GCSS-E3")))
+<Fact-5>
+CLIPS> (retract 4)
+CLIPS> (assert (TAG2300 (matched yes) (action update) (tag-id "GCSS-E2")))
+<Fact-6>
+CLIPS> (retract 3)
+<== Activation 0      rule-3: f-3,*
+CLIPS> (assert (TAG2400 (action delete)))
+==> Activation 0      rule-3: f-7,*
+<Fact-7>
+CLIPS> (clear)
+CLIPS> (dribble-off)

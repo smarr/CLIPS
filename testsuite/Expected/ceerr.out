@@ -1,0 +1,103 @@
+TRUE
+CLIPS> (load "ceerr.clp")
+*
+[ANALYSIS4] Variable ?x found in the expression (> ?x ?y)
+was referenced in CE #2 before being defined.
+
+ERROR:
+(defrule MAIN::error-1
+   (a)
+   (test (> ?x ?y))
+   =>)
+*
+[ANALYSIS4] Variable ?x found in the expression (> ?x ?y)
+was referenced in CE #2 before being defined.
+
+ERROR:
+(defrule MAIN::error-2 ""
+   (not (a))
+   (test (> ?x ?y))
+   =>)
+*
+[ANALYSIS4] Variable ?x found in the expression (> ?x ?y)
+was referenced in CE #3 field #1 before being defined.
+
+ERROR:
+(defrule MAIN::error-3
+   (not (a))
+   (test (> 5 3))
+   (foo :(> ?x ?y))
+   =>)
+*
+[ANALYSIS4] Variable ?x found in the expression (> ?x ?y)
+was referenced in CE #4 before being defined.
+
+ERROR:
+(defrule MAIN::error-4
+   (not (a))
+   (test (> 5 3))
+   (foo)
+   (test (> ?x ?y))
+   =>)
+*
+[ANALYSIS4] Variable ?x found in the expression (> ?x ?y)
+was referenced in CE #1 field #1 before being defined.
+
+ERROR:
+(defrule MAIN::error-5 ""
+   (not (a b&:(> ?x ?y)))
+   =>)
+*
+[ANALYSIS4] Variable ?x found in the expression (> ?x ?y)
+was referenced in CE #1 before being defined.
+
+ERROR:
+(defrule MAIN::error-6 ""
+   (not (and (test (> 5 3))
+             (not (and (test (> 5 3))
+                       (not (and (test (> ?x ?y))))))))
+   =>)
+*
+[ANALYSIS4] Variable ?x was referenced in CE #4 field #1 before being defined.
+
+ERROR:
+(defrule MAIN::error-7 ""
+   (not (and (test (> 5 3))
+             (not (and (test (> 5 3))
+                       (not (and (test (> 5 4))
+                                 (a ~?x)))))))
+   =>)
+*
+[ANALYSIS4] Variable ?x found in the expression (> ?x ?y)
+was referenced in CE #5 field #1 before being defined.
+
+ERROR:
+(defrule MAIN::error-8
+   (not (a))
+   (test (> 5 3))
+   (foo)
+   (test (> 5 3))
+   (foo :(> ?x ?y))
+   =>)
+*
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for the exists conditional element.
+
+ERROR:
+(defrule MAIN::error-9
+   (exists)
+*
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for the forall conditional element.
+
+ERROR:
+(defrule MAIN::error-10
+   (forall)
+*
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for the forall conditional element.
+
+ERROR:
+(defrule MAIN::error-11
+   (forall
+        (a))
+
+FALSE
+CLIPS> (dribble-off)

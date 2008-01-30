@@ -1,0 +1,33 @@
+TRUE
+CLIPS> (batch "dfnxcmd.bat")
+TRUE
+CLIPS> (deffunction bogus (?a ?b $?c)
+   (printout t "Random action" crlf))
+CLIPS> (deffunction bogus2 ())
+CLIPS> (ppdeffunction bogus)
+(deffunction MAIN::bogus
+   (?a ?b $?c)
+   (printout t "Random action" crlf))
+CLIPS> (ppdeffunction bad)
+[PRNTUTIL1] Unable to find deffunction bad.
+CLIPS> (ppdeffunction 1)
+[ARGACCES5] Function ppdeffunction expected argument #1 to be of type symbol
+CLIPS> (ppdeffunction)
+[ARGACCES4] Function ppdeffunction expected exactly 1 argument(s)
+CLIPS> (list-deffunctions)
+bogus
+bogus2
+For a total of 2 deffunctions.
+CLIPS> (undeffunction bogus)
+CLIPS> (list-deffunctions)
+bogus2
+For a total of 1 deffunction.
+CLIPS> (undeffunction bad)
+[PRNTUTIL1] Unable to find deffunction bad.
+CLIPS> (undeffunction 1)
+[ARGACCES5] Function undeffunction expected argument #1 to be of type symbol
+CLIPS> (undeffunction)
+[ARGACCES4] Function undeffunction expected exactly 1 argument(s)
+CLIPS> (undeffunction *)
+CLIPS> (list-deffunctions)
+CLIPS> (dribble-off)

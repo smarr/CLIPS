@@ -1,0 +1,346 @@
+TRUE
+CLIPS> (batch "modlmisc.bat")
+TRUE
+CLIPS> (clear) ;; import/export coordination
+CLIPS> (defmodule A)
+CLIPS> (deftemplate A::foo (slot x))
+CLIPS> (defmodule B (import A ?ALL))
+
+[MODULPSR1] Module A does not export any constructs.
+
+ERROR:
+(defmodule B
+   (import A
+CLIPS> (defrule B::rule1 (foo (x 3)) =>)
+[PRNTUTIL1] Unable to find defmodule B.
+
+ERROR:
+(defrule B::rule1
+CLIPS> (clear)
+CLIPS> (defmodule A (export ?ALL))
+CLIPS> (deftemplate A::foo (slot x))
+CLIPS> (defmodule B (import A ?ALL))
+CLIPS> (defrule B::rule1 (foo (x 3)) =>)
+CLIPS> (clear)
+CLIPS> (defmodule A (export deftemplate foo))
+CLIPS> (deftemplate A::foo (slot x))
+CLIPS> (defmodule B (import A ?ALL))
+CLIPS> (defrule B::rule1 (foo (x 3)) =>)
+CLIPS> (clear)
+CLIPS> (defmodule A (export deftemplate bar))
+CLIPS> (deftemplate A::foo (slot x))
+CLIPS> (defmodule B (import A ?ALL))
+CLIPS> (defrule B::rule1 (foo (x 3)) =>)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defrule.
+
+ERROR:
+(defrule B::rule1
+   (foo (
+CLIPS> (clear) ;; one level of importation
+CLIPS> (defmodule A (export ?ALL))
+CLIPS> (deftemplate A::foo (slot x))
+CLIPS> (deftemplate A::bar (slot x))
+CLIPS> (defmodule B)
+CLIPS> (defrule B::rule1 (foo (x 3)) =>)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defrule.
+
+ERROR:
+(defrule B::rule1
+   (foo (
+CLIPS> (defrule B::rule2 (bar (x 3)) =>)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defrule.
+
+ERROR:
+(defrule B::rule2
+   (bar (
+CLIPS> (defmodule C (import A ?ALL))
+CLIPS> (defrule C::rule1 (foo (x 3)) =>)
+CLIPS> (defrule C::rule2 (bar (x 3)) =>)
+CLIPS> (defmodule D (import A deftemplate ?ALL))
+CLIPS> (defrule D::rule1 (foo (x 3)) =>)
+CLIPS> (defrule D::rule2 (bar (x 3)) =>)
+CLIPS> (defmodule E (import A deftemplate foo bar))
+CLIPS> (defrule E::rule1 (foo (x 3)) =>)
+CLIPS> (defrule E::rule2 (bar (x 3)) =>)
+CLIPS> (defmodule F (import A deftemplate bar))
+CLIPS> (defrule F::rule1 (foo (x 3)) =>)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defrule.
+
+ERROR:
+(defrule F::rule1
+   (foo (
+CLIPS> (defrule F::rule2 (bar (x 3)) =>)
+CLIPS> (defmodule G (import A deftemplate foo))
+CLIPS> (defrule G::rule1 (foo (x 3)) =>)
+CLIPS> (defrule G::rule2 (bar (x 3)) =>)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defrule.
+
+ERROR:
+(defrule G::rule2
+   (bar (
+CLIPS> (clear) ;; two levels of importation
+CLIPS> (defmodule A (export ?ALL))
+CLIPS> (deftemplate A::foo (slot x))
+CLIPS> (deftemplate A::bar (slot x))
+CLIPS> (defmodule B1 (export ?ALL))
+CLIPS> (defmodule B2 (import B1 ?ALL))
+CLIPS> (defrule B2::rule1 (foo (x 3)) =>)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defrule.
+
+ERROR:
+(defrule B2::rule1
+   (foo (
+CLIPS> (defrule B2::rule2 (bar (x 3)) =>)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defrule.
+
+ERROR:
+(defrule B2::rule2
+   (bar (
+CLIPS> (defmodule C1 (import A ?ALL) (export ?ALL))
+CLIPS> (defmodule C2 (import C1 deftemplate ?ALL))
+CLIPS> (defrule C2::rule1 (foo (x 3)) =>)
+CLIPS> (defrule C2::rule2 (bar (x 3)) =>)
+CLIPS> (defmodule D1 (import A deftemplate ?ALL) (export ?ALL))
+CLIPS> (defmodule D2 (import D1 deftemplate ?NONE))
+CLIPS> (defrule D2::rule1 (foo (x 3)) =>)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defrule.
+
+ERROR:
+(defrule D2::rule1
+   (foo (
+CLIPS> (defrule D2::rule2 (bar (x 3)) =>)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defrule.
+
+ERROR:
+(defrule D2::rule2
+   (bar (
+CLIPS> (defmodule E1 (import A deftemplate foo bar) (export ?ALL))
+CLIPS> (defmodule E2 (import E1 deftemplate foo bar))
+CLIPS> (defrule E2::rule1 (foo (x 3)) =>)
+CLIPS> (defrule E2::rule2 (bar (x 3)) =>)
+CLIPS> (defmodule F1 (import A deftemplate bar) (export ?ALL))
+CLIPS> (defmodule F2 (import F1 deftemplate foo))
+
+[MODULPSR1] Module F1 does not export the deftemplate foo.
+
+ERROR:
+(defmodule F2
+   (import F1 deftemplate foo)
+CLIPS> (defrule F2::rule1 (foo (x 3)) =>)
+[PRNTUTIL1] Unable to find defmodule F2.
+
+ERROR:
+(defrule F2::rule1
+CLIPS> (defrule F2::rule2 (bar (x 3)) =>)
+[PRNTUTIL1] Unable to find defmodule F2.
+
+ERROR:
+(defrule F2::rule2
+CLIPS> (defmodule G1 (import A deftemplate foo) (export ?ALL))
+CLIPS> (defmodule G2 (import G1 deftemplate foo))
+CLIPS> (defrule G2::rule1 (foo (x 3)) =>)
+CLIPS> (defrule G2::rule2 (bar (x 3)) =>)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defrule.
+
+ERROR:
+(defrule G2::rule2
+   (bar (
+CLIPS> (clear) ;; Redefining module
+CLIPS> (deftemplate A::a)
+[PRNTUTIL1] Unable to find defmodule A.
+
+ERROR:
+(deftemplate A::a
+CLIPS> (defmodule A)
+CLIPS> (deftemplate A::a)
+CLIPS> (clear) ;; Bad defmodule name
+CLIPS> (defmodule)
+
+[CSTRCPSR2] Missing name for defmodule construct
+
+ERROR:
+(defmodule )
+CLIPS> (defmodule ::)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for module specifier.
+
+ERROR:
+(defmodule ::
+CLIPS> (defmodule ::xy)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for module specifier.
+
+ERROR:
+(defmodule ::xy
+CLIPS> (defmodule zw::)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for module specifier.
+
+ERROR:
+(defmodule zw::
+CLIPS> (defmodule qrs::tu)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for module specifier.
+
+ERROR:
+(defmodule qrs::tu
+CLIPS> (clear)
+CLIPS> (defmodule X)
+CLIPS> (list-defmodules)
+MAIN
+X
+For a total of 2 defmodules.
+CLIPS> (clear) ;; Use of imported deftemplates on the LHS
+CLIPS> (defmodule A (export ?ALL))
+CLIPS> (deftemplate A::foo (slot x))
+CLIPS> (defmodule B (import A ?ALL))
+CLIPS> (deftemplate B::bar (slot y))
+CLIPS> (defmodule C (import A ?ALL))
+CLIPS> (deftemplate C::yak (slot z))
+CLIPS> (defrule C::bad (bar (y 3)) =>)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defrule.
+
+ERROR:
+(defrule C::bad
+   (bar (
+CLIPS> (defrule C::good (foo (x 2)) (yak (z 4)) =>)
+CLIPS> (defrule B::bad (yak (z 4)) =>)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defrule.
+
+ERROR:
+(defrule B::bad
+   (yak (
+CLIPS> (defrule B::good (foo (x 2)) (bar (y 3)) =>)
+CLIPS> (defrule A::bad1 (yak (z 4)) =>)
+
+[CSTRCPSR3] Cannot define implied deftemplate yak because of an import/export conflict.
+
+ERROR:
+(defrule A::bad1
+   (yak
+CLIPS> (defrule A::bad2 (bar (y 3)) =>)
+
+[CSTRCPSR3] Cannot define implied deftemplate bar because of an import/export conflict.
+
+ERROR:
+(defrule A::bad2
+   (bar
+CLIPS> (defrule A::good (foo (x 2)) =>)
+CLIPS> (clear) ;; Conflicting Definitions
+CLIPS> (defmodule A (export ?ALL))
+CLIPS> (deftemplate A::foo)
+CLIPS> (defmodule B (export ?ALL))
+CLIPS> (deftemplate B::foo)
+CLIPS> (defmodule C
+   (import A ?ALL)
+   (import B ?ALL))
+
+[CSTRCPSR3] Cannot define defmodule C because of an import/export conflict caused by the deftemplate foo.
+
+ERROR:
+(defmodule C
+   (import A ?ALL)
+   (import B ?ALL))
+CLIPS> (defrule C::bar (foo) =>)
+[PRNTUTIL1] Unable to find defmodule C.
+
+ERROR:
+(defrule C::bar
+CLIPS> (clear)
+CLIPS> (defmodule MAIN (export ?ALL))
+CLIPS> (deftemplate MAIN::foo)
+CLIPS> (defmodule A (import MAIN ?ALL) (export ?ALL))
+CLIPS> (defmodule B (import MAIN ?ALL) (export ?ALL))
+CLIPS> (defmodule C
+   (import A ?ALL)
+   (import B ?ALL))
+CLIPS> (defrule C::bar (foo) =>)
+CLIPS> (clear)
+CLIPS> (defmodule A (export ?ALL))
+CLIPS> (deftemplate A::foo)
+CLIPS> (defmodule B (import A ?ALL))
+CLIPS> (deftemplate B::foo)
+
+[CSTRCPSR3] Cannot define deftemplate foo because of an import/export conflict.
+
+ERROR:
+(deftemplate B::foo
+CLIPS> (clear) ;; Port items bad syntax
+CLIPS> (defmodule A)
+CLIPS> (defmodule B import)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defmodule.
+
+ERROR:
+(defmodule B
+   import
+CLIPS> (defmodule B (import))
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defmodule import specification.
+
+ERROR:
+(defmodule B
+   (import )
+CLIPS> (defmodule B (import C))
+[PRNTUTIL1] Unable to find defmodule C.
+
+ERROR:
+(defmodule B
+   (import C
+CLIPS> (defmodule B (import A))
+
+[MODULPSR1] Module A does not export any constructs.
+
+ERROR:
+(defmodule B
+   (import A
+CLIPS> (ppdefmodule B)
+[PRNTUTIL1] Unable to find defmodule B.
+CLIPS> (defmodule B (import A C))
+
+[MODULPSR1] Module A does not export any constructs.
+
+ERROR:
+(defmodule B
+   (import A
+CLIPS> (defmodule B (import A) (import MAIN))
+
+[MODULPSR1] Module A does not export any constructs.
+
+ERROR:
+(defmodule B
+   (import A
+CLIPS> (ppdefmodule A)
+(defmodule A)
+CLIPS> (ppdefmodule B)
+[PRNTUTIL1] Unable to find defmodule B.
+CLIPS> (clear) ;; auto-focus
+CLIPS> (defmodule MAIN (export ?ALL))
+CLIPS> (defrule MAIN::bar 
+  (declare (auto-focus TRUE))
+  =>)
+CLIPS> (defmodule A (import MAIN ?ALL))
+CLIPS> (defrule A::foo 
+  (declare (auto-focus TRUE))
+  =>)
+CLIPS> (watch focus)
+CLIPS> (reset)
+<== Focus A to MAIN
+<== Focus MAIN
+==> Focus MAIN
+==> Focus A from MAIN
+==> Focus MAIN from A
+CLIPS> (unwatch focus)
+CLIPS> (dribble-off)

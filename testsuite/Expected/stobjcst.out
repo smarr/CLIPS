@@ -1,0 +1,483 @@
+TRUE
+CLIPS> (batch "stobjcst.bat")
+TRUE
+CLIPS> (load "stobjcst.clp")
+##*
+[RULECSTR1] Variable ?x in CE #1 slot y
+has constraint conflicts which make the pattern unmatchable.
+
+ERROR:
+(defrule MAIN::error-1
+   (object (is-a FOO)
+           (x ?x)
+           (y ?x))
+   =>)
+*
+[RULECSTR1] Variable ?x in CE #2 slot y
+has constraint conflicts which make the pattern unmatchable.
+
+ERROR:
+(defrule MAIN::error-2
+   (object (is-a FOO)
+           (x ?x))
+   (object (is-a FOO)
+           (y ?x))
+   =>)
+*
+[RULECSTR1] Variable ?x in CE #1 slot c
+has constraint conflicts which make the pattern unmatchable.
+
+ERROR:
+(defrule MAIN::error-3
+   (object (is-a BAR)
+           (a ?x)
+           (b ?x)
+           (c ?x))
+   =>)
+*
+[RULECSTR1] Variable ?x in CE #3 slot c
+has constraint conflicts which make the pattern unmatchable.
+
+ERROR:
+(defrule MAIN::error-4
+   (object (is-a BAR)
+           (a ?x))
+   (object (is-a BAR)
+           (b ?x))
+   (object (is-a BAR)
+           (c ?x))
+   =>)
+*####*
+[RULECSTR1] Variable ?x in CE #2 slot a
+has constraint conflicts which make the pattern unmatchable.
+
+ERROR:
+(defrule MAIN::error-5
+   (object (is-a YAK)
+           (a ?x))
+   (object (is-a OBO)
+           (a ?x))
+   =>)
+*
+[RULECSTR1] Variable ?x in CE #3 slot a
+has constraint conflicts which make the pattern unmatchable.
+
+ERROR:
+(defrule MAIN::error-6
+   (object (is-a YAK)
+           (a ?x))
+   (object (is-a LOK)
+           (a ?x))
+   (object (is-a OBO)
+           (a ?x))
+   =>)
+*
+[RULECSTR1] Pattern #3 slot a
+has constraint conflicts which make the pattern unmatchable.
+
+ERROR:
+(defrule MAIN::error-7
+   (object (is-a YAK)
+           (a ?x))
+   (object (is-a OBO)
+           (a ?y))
+   (object (is-a VOD)
+           (a ?x|?y))
+   =>)
+*#*
+[RULECSTR1] Variable ?x in CE #1 slot y
+has constraint conflicts which make the pattern unmatchable.
+
+ERROR:
+(defrule MAIN::error-8
+   (object (is-a KJI)
+           (x ?x)
+           (y ?x&~on))
+   =>)
+###**
+[RULECSTR1] Variable ?x in CE #3 slot x
+has constraint conflicts which make the pattern unmatchable.
+
+ERROR:
+(defrule MAIN::error-9
+   (object (is-a FOO7)
+           (x ?x))
+   (object (is-a BAR7)
+           (x ?x))
+   (object (is-a YAK7)
+           (x ?x))
+   =>)
+##**##*
+[RULECSTR1] Variable ?x in CE #2 slot q
+has constraint conflicts which make the pattern unmatchable.
+
+ERROR:
+(defrule MAIN::error-10
+   (object (is-a XOO)
+           (x $?x))
+   (object (is-a YXK)
+           (q $?x))
+   =>)
+###*
+[CSTRNCHK1] The group of restrictions found in CE #3
+does not satisfy the cardinality restrictions for slot z.
+
+ERROR:
+(defrule MAIN::error-11
+   (object (is-a FOW)
+           (x $?x))
+   (object (is-a BWW)
+           (y $?y))
+   (object (is-a WAK)
+           (z $?x $?y))
+   =>)
+####*
+[CSTRNCHK1] The group of restrictions found in CE #4
+does not satisfy the cardinality restrictions for slot q.
+
+ERROR:
+(defrule MAIN::error-12
+   (object (is-a FLL)
+           (x $?x))
+   (object (is-a BLR)
+           (y $?y))
+   (object (is-a QLZ)
+           (z $?z))
+   (object (is-a YLK)
+           (q $?x ? $?y ? b $?z))
+   =>)
+*
+[CSTRNCHK1] The group of restrictions found in CE #1
+does not satisfy the cardinality restrictions for slot x.
+
+ERROR:
+(defrule MAIN::error-13
+   (object (is-a FLL)
+           (x ?))
+   =>)
+*#*#*
+[RULECSTR1] Pattern #1 slot x
+has constraint conflicts which make the pattern unmatchable.
+
+ERROR:
+(defrule MAIN::error-14
+   (object (is-a KBP)
+           (y ?y)
+           (x =(+ ?y 3)))
+   =>)
+#*
+[RULECSTR2] Previous variable bindings of ?x caused the type restrictions
+for argument #2 of the expression (> ?y ?x)
+found in CE #1 slot y to be violated.
+
+ERROR:
+(defrule MAIN::error-15 "Type Violation to LHS function call"
+   (object (is-a ZC8)
+           (x ?x)
+           (y ?y&:(> ?y ?x)))
+   =>)
+*
+[RULECSTR2] Previous variable bindings of ?x caused the type restrictions
+for argument #2 of the expression (> ?y ?x)
+found in CE #2 to be violated.
+
+ERROR:
+(defrule MAIN::error-16 "Type Violation to LHS function call"
+   (object (is-a ZC8)
+           (x ?x)
+           (y ?y))
+   (test (> ?y ?x))
+   =>)
+#*
+[RULECSTR3] Previous variable bindings of ?q caused the type restrictions
+for argument #3 of the expression (+ 3 5 ?q)
+found in the rule's RHS to be violated.
+
+ERROR:
+(defrule MAIN::error-17
+   (object (is-a RTY)
+           (x ?q))
+   =>
+   (+ 3 5 ?q))
+**
+[RULECSTR3] Previous variable bindings of ?q caused the type restrictions
+for argument #3 of the expression (+ 3 5 ?q)
+found in the rule's RHS to be violated.
+
+ERROR:
+(defrule MAIN::error-18
+   (object (is-a RTY))
+   =>
+   (bind ?q (gensym))
+   (+ 3 5 ?q))
+*#*
+[RULECSTR1] Variable ?x in CE #1 slot y
+has constraint conflicts which make the pattern unmatchable.
+
+ERROR:
+(defrule MAIN::error-19
+   (object (is-a JHJ)
+           (x ?x&2)
+           (y ?x))
+   =>)
+#*
+[RULECSTR1] Variable ?x in CE #2 slot foo
+has constraint conflicts which make the pattern unmatchable.
+
+ERROR:
+(defrule MAIN::error-20
+   (blah ?x&:(> ?x 5))
+   (object (is-a YUCK)
+           (foo ?x))
+   =>)
+*
+[RULECSTR2] Previous variable bindings of ?x caused the type restrictions
+for argument #1 of the expression (> ?x 5)
+found in CE #2 to be violated.
+
+ERROR:
+(defrule MAIN::error-21
+   (object (is-a YUCK)
+           (foo ?x))
+   (test (> ?x 5))
+   =>)
+*
+[RULECSTR1] Variable ?x in CE #3 slot foo
+has constraint conflicts which make the pattern unmatchable.
+
+ERROR:
+(defrule MAIN::error-22
+   (blah ?x)
+   (test (> ?x 5))
+   (object (is-a YUCK)
+           (foo ?x))
+   =>)
+###
+[CSTRNPSR1] The type attribute conflicts with the allowed-integers/numbers attribute.
+
+ERROR:
+(defclass MAIN::DERIVE2
+   (is-a DERIVE1)
+   (slot foo
+      (type SYMBOL)
+      (source composite)
+      (create-accessor ?NONE))
+##
+FALSE
+CLIPS> (list-defrules)
+okay!-1
+okay!-2
+okay!-3
+okay!-4
+okay!-5
+okay!-6
+okay!-7
+okay!-8
+okay!-9
+For a total of 9 defrules.
+CLIPS> (describe-class BASE)
+================================================================================
+********************************************************************************
+Abstract: direct instances of this class cannot be created.
+
+Direct Superclasses: USER
+Inheritance Precedence: BASE USER OBJECT
+Direct Subclasses: DERIVE1
+--------------------------------------------------------------------------------
+SLOTS : FLD DEF PRP ACC STO MCH SRC VIS CRT OVRD-MSG SOURCE(S)
+foo   : MLT STC INH RW  LCL RCT EXC PRV NIL put-foo  BASE
+
+Constraint information for slots:
+
+SLOTS : SYM STR INN INA EXA FTA INT FLT
+foo   :                          #      RNG:[-oo..+oo] CRD:[3..4]
+--------------------------------------------------------------------------------
+Recognized message-handlers:
+init primary in class USER
+delete primary in class USER
+create primary in class USER
+print primary in class USER
+direct-modify primary in class USER
+message-modify primary in class USER
+direct-duplicate primary in class USER
+message-duplicate primary in class USER
+********************************************************************************
+================================================================================
+CLIPS> (describe-class DERIVE1)
+================================================================================
+********************************************************************************
+Abstract: direct instances of this class cannot be created.
+
+Direct Superclasses: BASE
+Inheritance Precedence: DERIVE1 BASE USER OBJECT
+Direct Subclasses: DERIVE2
+--------------------------------------------------------------------------------
+SLOTS : FLD DEF PRP ACC STO MCH SRC VIS CRT OVRD-MSG SOURCE(S)
+foo   : SGL STC NIL RW  LCL RCT CMP PRV NIL put-foo  BASE DERIVE1
+
+Constraint information for slots:
+
+SLOTS : SYM STR INN INA EXA FTA INT FLT
+foo   :                          #      RNG:[-oo..+oo] 
+--------------------------------------------------------------------------------
+Recognized message-handlers:
+init primary in class USER
+delete primary in class USER
+create primary in class USER
+print primary in class USER
+direct-modify primary in class USER
+message-modify primary in class USER
+direct-duplicate primary in class USER
+message-duplicate primary in class USER
+********************************************************************************
+================================================================================
+CLIPS> (describe-class DERIVE2)
+================================================================================
+********************************************************************************
+Abstract: direct instances of this class cannot be created.
+
+Direct Superclasses: DERIVE1
+Inheritance Precedence: DERIVE2 DERIVE1 BASE USER OBJECT
+Direct Subclasses: DERIVE3
+--------------------------------------------------------------------------------
+SLOTS : FLD DEF PRP ACC STO MCH SRC VIS CRT OVRD-MSG SOURCE(S)
+foo   : MLT STC INH RW  LCL RCT CMP PRV NIL put-foo  BASE DERIVE2
+
+Constraint information for slots:
+
+SLOTS : SYM STR INN INA EXA FTA INT FLT
+foo   :  +                       #      RNG:[-oo..+oo] CRD:[3..4]
+--------------------------------------------------------------------------------
+Recognized message-handlers:
+init primary in class USER
+delete primary in class USER
+create primary in class USER
+print primary in class USER
+direct-modify primary in class USER
+message-modify primary in class USER
+direct-duplicate primary in class USER
+message-duplicate primary in class USER
+********************************************************************************
+================================================================================
+CLIPS> (describe-class DERIVE3)
+================================================================================
+********************************************************************************
+Abstract: direct instances of this class cannot be created.
+
+Direct Superclasses: DERIVE2
+Inheritance Precedence: DERIVE3 DERIVE2 DERIVE1 BASE USER OBJECT
+Direct Subclasses:
+--------------------------------------------------------------------------------
+SLOTS : FLD DEF PRP ACC STO MCH SRC VIS CRT OVRD-MSG SOURCE(S)
+foo   : MLT STC INH RW  LCL RCT CMP PRV NIL put-foo  BASE DERIVE2 DERIVE3
+
+Constraint information for slots:
+
+SLOTS : SYM STR INN INA EXA FTA INT FLT
+foo   :  +                       #      RNG:[-oo..+oo] CRD:[5..6]
+--------------------------------------------------------------------------------
+Recognized message-handlers:
+init primary in class USER
+delete primary in class USER
+create primary in class USER
+print primary in class USER
+direct-modify primary in class USER
+message-modify primary in class USER
+direct-duplicate primary in class USER
+message-duplicate primary in class USER
+********************************************************************************
+================================================================================
+CLIPS> (clear)
+CLIPS> (defclass A (is-a USER)
+  (slot foo (cardinality 3 4)))
+
+[CLSLTPSR3] Cardinality facet can only be used with multifield slots
+
+ERROR:
+(defclass MAIN::A
+   (is-a USER)
+   (slot foo
+      (cardinality 3 4))
+CLIPS> (defclass A (is-a USER)
+  (slot foo (type SYMBOL) (range 3 4)))
+
+[CSTRNPSR1] The type attribute conflicts with the range attribute.
+
+ERROR:
+(defclass MAIN::A
+   (is-a USER)
+   (slot foo
+      (type SYMBOL)
+      (range 3 4))
+CLIPS> (defclass A (is-a USER)
+  (slot foo (min-number-of-elements 3)))
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defclass slot.
+
+ERROR:
+(defclass MAIN::A
+   (is-a USER)
+   (slot foo
+      (min-number-of-elements
+CLIPS> (defclass A (is-a USER)
+  (slot foo (allowed-words abc)))
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defclass slot.
+
+ERROR:
+(defclass MAIN::A
+   (is-a USER)
+   (slot foo
+      (allowed-words
+CLIPS> (defclass A (is-a USER)
+  (slot foo (allowed-values)))
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for allowed-values attribute.
+
+ERROR:
+(defclass MAIN::A
+   (is-a USER)
+   (slot foo
+      (allowed-values )
+CLIPS> (defclass A (is-a USER)
+  (slot foo (allowed-integers abc)))
+
+[CSTRNPSR4] Value does not match the expected type for the allowed-integers attribute
+
+ERROR:
+(defclass MAIN::A
+   (is-a USER)
+   (slot foo
+      (allowed-integers abc 
+CLIPS> (defclass A (is-a USER)
+   (slot foo (type INTEGER) (default abc)))
+[CSTRNCHK1] abc for slot foo found in slot default value
+does not match the allowed types.
+
+ERROR:
+(defclass MAIN::A
+   (is-a USER)
+   (slot foo
+      (type INTEGER)
+      (default abc))
+CLIPS> (defclass A (is-a USER)
+   (slot foo (type INTEGER) (default-dynamic abc)))
+[CSTRNCHK1] Expression for slot foo found in dynamic default value
+does not match the allowed types.
+
+ERROR:
+(defclass MAIN::A
+   (is-a USER)
+   (slot foo
+      (type INTEGER)
+      (default-dynamic abc))
+CLIPS> (set-static-constraint-checking FALSE)
+TRUE
+CLIPS> (defclass A (is-a USER)
+   (slot foo (type INTEGER) (default abc)))
+CLIPS> (defclass B (is-a USER)
+   (slot foo (type INTEGER) (default-dynamic abc)))
+CLIPS> (set-static-constraint-checking TRUE)
+FALSE
+CLIPS> (clear)
+CLIPS> (dribble-off)

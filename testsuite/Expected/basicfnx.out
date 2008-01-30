@@ -1,0 +1,93 @@
+TRUE
+CLIPS> (batch "basicfnx.bat")
+TRUE
+CLIPS> (clear)                            ; 10.1.1
+CLIPS> (watch facts)                      ; 10.1.1
+CLIPS> (assert)                           ; 10.1.1
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for assert command.
+CLIPS> (assert ())                        ; 10.1.1
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for first field of a RHS pattern.
+CLIPS> (assert (a) ())                    ; 10.1.1
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for first field of a RHS pattern.
+CLIPS> (assert () (b))                    ; 10.1.1
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for first field of a RHS pattern.
+CLIPS> (assert (c) () (d))                ; 10.1.1
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for first field of a RHS pattern.
+CLIPS> (assert (a ~b))                    ; 10.1.1
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for RHS patterns.
+CLIPS> (assert (a &c))                    ; 10.1.1
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for RHS patterns.
+CLIPS> (assert (a |d))                    ; 10.1.1
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for RHS patterns.
+CLIPS> (assert (a ?x))                    ; 10.1.1
+[EVALUATN1] Variable x is unbound
+==> f-1     (a)
+<Fact-1>
+CLIPS> (assert (e))                       ; 10.1.1
+==> f-2     (e)
+<Fact-2>
+CLIPS> (assert (f) (g) (h))               ; 10.1.1 
+==> f-3     (f)
+==> f-4     (g)
+==> f-5     (h)
+<Fact-5>
+CLIPS> (assert (i =(+ 3 4)))              ; 10.1.1
+==> f-6     (i 7)
+<Fact-6>
+CLIPS> (retract)                          ; 10.1.2
+[ARGACCES4] Function retract expected at least 1 argument(s)
+CLIPS> (retract 1)                        ; 10.1.2
+<== f-1     (a)
+CLIPS> (retract 2 4)                      ; 10.1.2
+<== f-2     (e)
+<== f-4     (g)
+CLIPS> (retract 8 9)                      ; 10.1.2
+[PRNTUTIL1] Unable to find fact f-8.
+[PRNTUTIL1] Unable to find fact f-9.
+CLIPS> (retract *)                        ; 10.1.2
+<== f-0     (initial-fact)
+<== f-3     (f)
+<== f-5     (h)
+<== f-6     (i 7)
+CLIPS> (unwatch facts)                    ; 10.1.2
+CLIPS> (clear)                            ; 10.1.5
+CLIPS> (deftemplate foo (slot x) (slot y))
+CLIPS> (assert-string)                    ; 10.1.5
+[ARGACCES4] Function assert-string expected exactly 1 argument(s)
+CLIPS> (assert-string "a b c" "d e f")    ; 10.1.5
+[ARGACCES4] Function assert-string expected exactly 1 argument(s)
+CLIPS> (assert-string 7)                  ; 10.1.5
+[ARGACCES5] Function assert-string expected argument #1 to be of type string
+CLIPS> (assert-string hello)              ; 10.1.5
+[ARGACCES5] Function assert-string expected argument #1 to be of type string
+CLIPS> (assert-string "(x y z)")          ; 10.1.5
+<Fact-1>
+CLIPS> (assert-string "(foo (y 3))")      ; 10.1.5
+<Fact-2>
+CLIPS> (facts)                            ; 10.1.5
+f-0     (initial-fact)
+f-1     (x y z)
+f-2     (foo (x nil) (y 3))
+For a total of 3 facts.
+CLIPS> (clear)                            ; 10.1.5
+CLIPS> (bind)                             ; 10.1.6
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for bind function.
+CLIPS> (bind ?x)                          ; 10.1.6
+FALSE
+CLIPS> (bind ?x 3)                        ; 10.1.6
+3
+CLIPS> (bind ?x 3 4)                      ; 10.1.6
+(3 4)
+CLIPS> (halt)                             ; 10.1.7
+CLIPS> (halt 3)                           ; 10.1.7
+[ARGACCES4] Function halt expected exactly 0 argument(s)
+CLIPS> (dribble-off)

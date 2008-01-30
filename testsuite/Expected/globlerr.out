@@ -1,0 +1,77 @@
+TRUE
+CLIPS> (load "globlerr.clp")
+:
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defglobal.
+
+ERROR:
+(defglobal MAIN ?*x* )
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defglobal.
+
+ERROR:
+(defglobal MAIN ?x
+[PRNTUTIL1] Unable to find defmodule =.
+
+ERROR:
+(defglobal =
+:
+[EXPRNPSR2] Expected a constant, variable, or expression.
+
+ERROR:
+(defglobal MAIN ?*x* = )
+:[ARGACCES5] Function + expected argument #1 to be of type integer or float
+
+ERROR:
+(defglobal MAIN ?*x* = (+ a b)
+:[GLOBLDEF1] Global variable ?*r* is unbound.
+
+ERROR:
+(defglobal MAIN ?*x* = ?*r*
+:[EVALUATN1] Variable x is unbound
+
+ERROR:
+(defglobal MAIN ?*x* = ?x
+::
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defglobal.
+
+ERROR:
+(defglobal MAIN ?*x* )
+:
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defglobal.
+
+ERROR:
+(defglobal MAIN ?x
+:
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defglobal.
+
+ERROR:
+(defglobal MAIN =
+::
+[EXPRNPSR2] Expected a constant, variable, or expression.
+
+ERROR:
+(defglobal MAIN ?*x* = )
+::[ARGACCES5] Function + expected argument #1 to be of type integer or float
+
+ERROR:
+(defglobal MAIN ?*x* = (+ a b)
+::[GLOBLDEF1] Global variable ?*r* is unbound.
+
+ERROR:
+(defglobal MAIN ?*x* = ?*r*
+::[EVALUATN1] Variable x is unbound
+
+ERROR:
+(defglobal MAIN ?*x* = ?x
+::[EVALUATN1] Variable x is unbound
+
+ERROR:
+(defglobal MAIN ?*x* = ?x
+
+FALSE
+CLIPS> (show-defglobals)
+?*y* = (g h)
+?*z* = 8
+?*w* = 4
+?*q* = (i j k)
+CLIPS> (dribble-off)

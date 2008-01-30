@@ -1,0 +1,207 @@
+TRUE
+CLIPS> (batch "cnstrsn.bat")
+TRUE
+CLIPS> (list-defrules)
+foo
+bar
+woz
+For a total of 3 defrules.
+CLIPS> (get-defrule-list)
+(foo bar woz)
+CLIPS> (list-deffacts)
+initial-fact
+foo
+bar
+woz
+For a total of 4 deffacts.
+CLIPS> (get-deffacts-list)
+(initial-fact foo bar woz)
+CLIPS> (list-deftemplates)
+initial-fact
+foo
+bar
+woz
+For a total of 4 deftemplates.
+CLIPS> (get-deftemplate-list)
+(initial-fact foo bar woz)
+CLIPS> (list-defglobals)
+foo
+bar
+woz
+For a total of 3 defglobals.
+CLIPS> (get-defglobal-list)
+(foo bar woz)
+CLIPS> (list-deffunctions)
+foo
+bar
+woz
+For a total of 3 deffunctions.
+CLIPS> (get-deffunction-list)
+(foo bar woz)
+CLIPS> (list-defgenerics)
+zow
+oof
+rab
+ziggle
+For a total of 4 defgenerics.
+CLIPS> (get-defgeneric-list)
+(zow oof rab ziggle)
+CLIPS> (list-defmethods)
+
+oof #51 
+oof #50 (INTEGER SYMBOL) (<qry>) $?
+
+rab #1  
+
+ziggle #1  
+For a total of 4 methods.
+CLIPS> (get-defmethod-list)
+(oof 51 oof 50 rab 1 ziggle 1)
+CLIPS> (list-defmethods (nth 1 (get-defmethod-list)))
+oof #51 
+oof #50 (INTEGER SYMBOL) (<qry>) $?
+For a total of 2 methods.
+CLIPS> (get-defmethod-list (nth 1 (get-defmethod-list)))
+(oof 51 oof 50)
+CLIPS> (get-method-restrictions oof 50)
+(2 -1 3 7 11 13 FALSE 2 INTEGER SYMBOL TRUE 0 FALSE 0)
+CLIPS> (get-method-restrictions rab 1)
+(0 0 0)
+CLIPS> (list-defclasses)
+FLOAT
+INTEGER
+SYMBOL
+STRING
+MULTIFIELD
+EXTERNAL-ADDRESS
+FACT-ADDRESS
+INSTANCE-ADDRESS
+INSTANCE-NAME
+OBJECT
+PRIMITIVE
+NUMBER
+LEXEME
+ADDRESS
+INSTANCE
+USER
+INITIAL-OBJECT
+foo
+bar
+woz
+For a total of 20 defclasses.
+CLIPS> (get-defclass-list)
+(FLOAT INTEGER SYMBOL STRING MULTIFIELD EXTERNAL-ADDRESS FACT-ADDRESS INSTANCE-ADDRESS INSTANCE-NAME OBJECT PRIMITIVE NUMBER LEXEME ADDRESS INSTANCE USER INITIAL-OBJECT foo bar woz)
+CLIPS> (describe-class woz)
+================================================================================
+********************************************************************************
+Abstract: direct instances of this class cannot be created.
+
+Direct Superclasses: bar
+Inheritance Precedence: woz bar foo USER OBJECT
+Direct Subclasses:
+--------------------------------------------------------------------------------
+SLOTS : FLD DEF PRP ACC STO MCH SRC VIS CRT OVRD-MSG SOURCE(S)
+x     : SGL STC INH RW  LCL RCT CMP PRV NIL put-x    foo bar
+y     : SGL STC INH RW  LCL RCT EXC PRV NIL put-y    bar
+z     : SGL STC INH RW  LCL RCT EXC PRV NIL put-z    woz
+
+Constraint information for slots:
+
+SLOTS : SYM STR INN INA EXA FTA INT FLT
+x     :  +   +   +   +   +   +   +   +  RNG:[-oo..+oo] 
+y     :  +   +   +   +   +   +   +   +  RNG:[-oo..+oo] 
+z     :  +   +   +   +   +   +   +   +  RNG:[-oo..+oo] 
+--------------------------------------------------------------------------------
+Recognized message-handlers:
+init primary in class USER
+delete primary in class USER
+create primary in class USER
+print primary in class USER
+direct-modify primary in class USER
+message-modify primary in class USER
+direct-duplicate primary in class USER
+message-duplicate primary in class USER
+foo primary in class foo
+bar primary in class bar
+woz primary in class woz
+********************************************************************************
+================================================================================
+CLIPS> (class-slots woz)
+(z)
+CLIPS> (class-slots woz inherit)
+(x y z)
+CLIPS> (class-abstractp woz)
+TRUE
+CLIPS> (class-superclasses woz)
+(bar)
+CLIPS> (class-superclasses woz inherit)
+(bar foo USER OBJECT)
+CLIPS> (class-subclasses foo)
+(bar)
+CLIPS> (class-subclasses foo inherit)
+(bar woz)
+CLIPS> (slot-facets woz x)
+(SGL STC INH RW LCL RCT CMP PRV NIL put-x)
+CLIPS> (slot-sources woz x)
+(foo bar)
+CLIPS> (list-defmessage-handlers)
+init primary in class USER
+delete primary in class USER
+create primary in class USER
+print primary in class USER
+direct-modify primary in class USER
+message-modify primary in class USER
+direct-duplicate primary in class USER
+message-duplicate primary in class USER
+foo primary in class foo
+bar primary in class bar
+woz primary in class woz
+For a total of 11 message-handlers.
+CLIPS> (get-defmessage-handler-list)
+(USER init primary USER delete primary USER create primary USER print primary USER direct-modify primary USER message-modify primary USER direct-duplicate primary USER message-duplicate primary foo foo primary bar bar primary woz woz primary)
+CLIPS> (list-defmessage-handlers woz)
+woz primary in class woz
+For a total of 1 message-handler.
+CLIPS> (get-defmessage-handler-list woz)
+(woz woz primary)
+CLIPS> (list-defmessage-handlers woz inherit)
+init primary in class USER
+delete primary in class USER
+create primary in class USER
+print primary in class USER
+direct-modify primary in class USER
+message-modify primary in class USER
+direct-duplicate primary in class USER
+message-duplicate primary in class USER
+foo primary in class foo
+bar primary in class bar
+woz primary in class woz
+For a total of 11 message-handlers.
+CLIPS> (get-defmessage-handler-list woz inherit)
+(USER init primary USER delete primary USER create primary USER print primary USER direct-modify primary USER message-modify primary USER direct-duplicate primary USER message-duplicate primary foo foo primary bar bar primary woz woz primary)
+CLIPS> (list-definstances)
+initial-object
+foo
+bar
+woz
+For a total of 4 definstances.
+CLIPS> (get-definstances-list)
+(initial-object foo bar woz)
+CLIPS> (get-defrule-list abc)
+[ARGACCES5] Function get-defrule-list expected argument #1 to be of type defmodule name
+()
+CLIPS> (get-defmessage-handler-list no-exist)
+[CLASSFUN1] Unable to find class no-exist in function get-defmessage-handler-list.
+()
+CLIPS> (get-defmethod-list no-exist)
+[GENRCFUN3] Unable to find generic function no-exist in function get-defmethod-list.
+()
+CLIPS> (get-defmessage-handler-list USER junk)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for get-defmessage-handler-list.
+()
+CLIPS> (get-defmessage-handler-list USER inherit abc)
+[ARGACCES4] Function get-defmessage-handler-list expected no more than 2 argument(s)
+CLIPS> (get-defmethod-list oof abc)
+[ARGACCES4] Function get-defmethod-list expected no more than 1 argument(s)
+CLIPS> (dribble-off)

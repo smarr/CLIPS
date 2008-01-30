@@ -1,0 +1,88 @@
+TRUE
+CLIPS> (batch "modulcmd.bat")
+TRUE
+CLIPS> (clear)
+CLIPS> (defmodule d1 (export ?ALL))
+CLIPS> (defmodule d2 (import d1 ?ALL))
+CLIPS> (defmodule d3 (export ?ALL))
+CLIPS> (deftemplate t1)
+CLIPS> (deftemplate t2)
+CLIPS> (defmodule d4 (export deftemplate t3 t4) (import d3 deftemplate t1))
+CLIPS> (deftemplate t3)
+CLIPS> (deftemplate t4)
+CLIPS> (defmodule d5 (import d3 deftemplate t1 t2) (import d4 deftemplate ?ALL))
+CLIPS> (defmodule d6 (import d1 ?NONE) (import d3 deftemplate ?NONE))
+CLIPS> (defmodule *)
+CLIPS> (list-defmodules d6)
+[ARGACCES4] Function list-defmodules expected exactly 0 argument(s)
+CLIPS> (list-defmodules *)
+[ARGACCES4] Function list-defmodules expected exactly 0 argument(s)
+CLIPS> (list-defmodules)
+MAIN
+d1
+d2
+d3
+d4
+d5
+d6
+*
+For a total of 8 defmodules.
+CLIPS> (ppdefmodule MAIN::d6)
+[PRNTUTIL1] Unable to find defmodule MAIN::d6.
+CLIPS> (ppdefmodule d6 d5)
+[ARGACCES4] Function ppdefmodule expected exactly 1 argument(s)
+CLIPS> (ppdefmodule *)
+(defmodule *)
+CLIPS> (ppdefmodule d1)
+(defmodule d1
+   (export ?ALL))
+CLIPS> (ppdefmodule d2)
+(defmodule d2
+   (import d1 ?ALL))
+CLIPS> (ppdefmodule d3)
+(defmodule d3
+   (export ?ALL))
+CLIPS> (ppdefmodule d4)
+(defmodule d4
+   (export deftemplate t3 t4)
+   (import d3 deftemplate t1))
+CLIPS> (ppdefmodule d5)
+(defmodule d5
+   (import d3 deftemplate t1 t2)
+   (import d4 deftemplate ?ALL))
+CLIPS> (ppdefmodule d6)
+(defmodule d6
+   (import d1 ?NONE)
+   (import d3 deftemplate ?NONE))
+CLIPS> (get-defmodule-list MAIN)
+[ARGACCES4] Function get-defmodule-list expected exactly 0 argument(s)
+CLIPS> (get-defmodule-list)
+(MAIN d1 d2 d3 d4 d5 d6 *)
+CLIPS> (get-current-module A)
+[ARGACCES4] Function get-current-module expected exactly 0 argument(s)
+CLIPS> (get-current-module)
+*
+CLIPS> (set-current-module)
+[ARGACCES4] Function set-current-module expected exactly 1 argument(s)
+CLIPS> (set-current-module d1 d2)
+[ARGACCES4] Function set-current-module expected exactly 1 argument(s)
+CLIPS> (set-current-module A)
+[PRNTUTIL1] Unable to find defmodule A.
+*
+CLIPS> (set-current-module d3)
+*
+CLIPS> (get-current-module)
+d3
+CLIPS> (set-current-module d3)
+d3
+CLIPS> (get-current-module)
+d3
+CLIPS> (set-current-module d6)
+d3
+CLIPS> (get-current-module)
+d6
+CLIPS> (clear)
+CLIPS> (list-defmodules)
+MAIN
+For a total of 1 defmodule.
+CLIPS> (dribble-off)

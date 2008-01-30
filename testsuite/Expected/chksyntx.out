@@ -1,0 +1,533 @@
+TRUE
+CLIPS> (batch "chksyntx.bat")
+TRUE
+CLIPS> (clear)                          
+CLIPS> (check-syntax)                           
+[ARGACCES4] Function check-syntax expected exactly 1 argument(s)
+CLIPS> (check-syntax "cat" "dog")                 
+[ARGACCES4] Function check-syntax expected exactly 1 argument(s)
+CLIPS> (check-syntax 7.8)                        
+[ARGACCES5] Function check-syntax expected argument #1 to be of type string
+CLIPS> (check-syntax 900)                        
+[ARGACCES5] Function check-syntax expected argument #1 to be of type string
+CLIPS> (check-syntax [abc])                      
+[ARGACCES5] Function check-syntax expected argument #1 to be of type string
+CLIPS> (check-syntax (create$ a x y))            
+[ARGACCES5] Function check-syntax expected argument #1 to be of type string
+CLIPS> (check-syntax cat)                       
+[ARGACCES5] Function check-syntax expected argument #1 to be of type string
+CLIPS> (check-syntax "dog")                    
+MISSING-LEFT-PARENTHESIS
+CLIPS> (check-syntax "7")                     
+MISSING-LEFT-PARENTHESIS
+CLIPS> (check-syntax "893.34")                 
+MISSING-LEFT-PARENTHESIS
+CLIPS> (check-syntax "[ab]")               
+MISSING-LEFT-PARENTHESIS
+CLIPS> (check-syntax "?x")                
+MISSING-LEFT-PARENTHESIS
+CLIPS> (check-syntax "?*x*")      
+MISSING-LEFT-PARENTHESIS
+CLIPS> (check-syntax "(facts)")                   
+FALSE
+CLIPS> (check-syntax "(+ 3 4)")                
+FALSE
+CLIPS> (check-syntax "(mv-append a b c)")         
+FALSE
+CLIPS> (check-syntax "(+ 3 (* 4 5))")   
+FALSE
+CLIPS> (check-syntax "(+ a b)")
+("[ARGACCES5] Function + expected argument #1 to be of type integer or float
+" FALSE)
+CLIPS> (check-syntax "(+ 3 4")
+("
+[EXPRNPSR2] Expected a constant, variable, or expression.
+" FALSE)
+CLIPS> (check-syntax "(assert (x y z))")
+FALSE
+CLIPS> (check-syntax "(+ 3 4) x")
+EXTRANEOUS-INPUT-AFTER-LAST-PARENTHESIS
+CLIPS> (check-syntax "(defrule foo =>) x")
+EXTRANEOUS-INPUT-AFTER-LAST-PARENTHESIS
+CLIPS> (deffacts a1 (x y z))
+CLIPS> (deftemplate a2 (slot r) (multislot s))
+CLIPS> (defrule a3 (x y z) =>)
+CLIPS> (defglobal ?*a4* = 9)
+CLIPS> (defmodule MAIN (export ?ALL))
+CLIPS> (defmodule a5 (import MAIN ?ALL))
+CLIPS> (set-current-module MAIN)
+a5
+CLIPS> (deffunction a6 (?x) (* 2 ?x))
+CLIPS> (defgeneric a7)
+CLIPS> (defmethod a8 ((?x INTEGER)) (* 7 ?x))
+CLIPS> 
+(defclass a9 (is-a USER) 
+   (role concrete)
+   (slot q (create-accessor read-write)))
+CLIPS> (definstances a10 (a10i of a9 (q 54)))
+CLIPS> (defmessage-handler a9 a11 (?u) (* ?self:q 3))
+CLIPS> (bsave "Temp//chksyntx.bin")
+[CSTRNBIN1] WARNING: Constraints are not saved with a binary image
+  when dynamic constraint checking is disabled.
+TRUE
+CLIPS> (check-syntax "(deffacts a1 (foo))")
+FALSE
+CLIPS> (check-syntax "(deftemplate a2 (slot g))")
+FALSE
+CLIPS> (check-syntax "(defrule a3 =>)")
+FALSE
+CLIPS> (check-syntax "(defglobal ?*a4* = 10)")
+FALSE
+CLIPS> (check-syntax "(defmodule a5)")
+FALSE
+CLIPS> (check-syntax "(deffunction a6 (?x) (* 6 ?x))")
+FALSE
+CLIPS> (check-syntax "(defgeneric a7)")
+FALSE
+CLIPS> (check-syntax "(defmethod a8 ((?x INTEGER)) (* 9 ?x))")
+FALSE
+CLIPS> (check-syntax " (defclass a9 (is-a USER) 
+   (role concrete)
+   (slot w (create-accessor read-write)))")
+FALSE
+CLIPS> (check-syntax "(definstances a10 (b10i of a9 (q 54)))")
+FALSE
+CLIPS> (check-syntax "(defmessage-handler a9 a11 (?u) (* ?self:q 10))")
+FALSE
+CLIPS> (reset)
+CLIPS> (facts)
+f-0     (initial-fact)
+f-1     (x y z)
+For a total of 2 facts.
+CLIPS> (agenda)
+0      a3: f-1
+For a total of 1 activation.
+CLIPS> (assert (a2 (r 2) (s 1 3)))
+<Fact-2>
+CLIPS> (instances)
+[initial-object] of INITIAL-OBJECT
+[a10i] of a9
+For a total of 2 instances.
+CLIPS> ?*a4*
+9
+CLIPS> (list-deftemplates a5)
+CLIPS> (a6 2)
+4
+CLIPS> (a8 3)
+21
+CLIPS> (send [a10i] a11 3)
+162
+CLIPS> (check-syntax "(deffacts b1 (foo))")
+FALSE
+CLIPS> (check-syntax "(deftemplate b2 (slot g))")
+FALSE
+CLIPS> (check-syntax "(defrule b3 =>)")
+FALSE
+CLIPS> (check-syntax "(defglobal ?*b4* = 10)")
+FALSE
+CLIPS> (check-syntax "(defmodule b5)")
+FALSE
+CLIPS> (check-syntax "(deffunction b6 (?x) (* 6 ?x))")
+FALSE
+CLIPS> (check-syntax "(defgeneric b7)")
+FALSE
+CLIPS> (check-syntax "(defmethod b8 ((?x INTEGER)) (* 9 ?x))")
+FALSE
+CLIPS> 
+(check-syntax " (defclass b9 (is-a USER) 
+   (role concrete)
+   (slot w (create-accessor read-write)))")
+FALSE
+CLIPS> (check-syntax "(definstances b10 (c10i of a9 (q 54)))")
+FALSE
+CLIPS> (check-syntax "(defmessage-handler a9 b11 (?u) (* ?self:q 10))")
+FALSE
+CLIPS> 
+(check-syntax "(deffacts c1 foo))")
+("
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for RHS patterns.
+
+ERROR:
+(deffacts MAIN::c1
+   foo
+" FALSE)
+CLIPS> (check-syntax "(deftemplate c2 slot g))")
+("
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for deftemplate.
+
+ERROR:
+(deftemplate MAIN::c2
+   slot
+" FALSE)
+CLIPS> (check-syntax "(defrule c3)")
+("
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defrule.
+
+ERROR:
+(defrule MAIN::c3)
+" FALSE)
+CLIPS> (check-syntax "(defglobal ?*c4* 10)")
+("
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defglobal.
+
+ERROR:
+(defglobal MAIN ?*c4* 10
+" FALSE)
+CLIPS> (check-syntax "(defmodule c5 (x))")
+("
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defmodule.
+
+ERROR:
+(defmodule c5
+   (x
+" FALSE)
+CLIPS> (check-syntax "(deffunction c6 (?x (* 6 ?x))")
+("
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for parameter list.
+
+ERROR:
+(deffunction MAIN::c6
+   (?x (
+" FALSE)
+CLIPS> (check-syntax "(defgeneric c7 (y))")
+("[GENRCPSR1] Expected ')' to complete defgeneric.
+
+ERROR:
+(defgeneric MAIN::c7
+   (
+" FALSE)
+CLIPS> (check-syntax "(defmethod c8 (?x INTEGER)) (* 9 ?x))")
+("[GENRCPSR9] Expected a variable or '(' for parameter specification.
+
+ERROR:
+(defmethod MAIN::c8
+   (?x
+    INTEGER
+" FALSE)
+CLIPS> 
+(check-syntax " (defclass c9 (is-a USER) 
+   (role bogus)
+   (slot w (create-accessor read-write)))")
+("
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defclass.
+
+ERROR:
+(defclass MAIN::c9
+   (is-a USER)
+   (role bogus
+" FALSE)
+CLIPS> (check-syntax "(definstances c10 c10i of a9 (q 54)))")
+("
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for definstances.
+
+ERROR:
+(definstances MAIN::c10
+   c10i
+" FALSE)
+CLIPS> (check-syntax "(defmessage-handler a9 c11 ?u) (* ?self:q 10))")
+("
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defmessage-handler.
+
+ERROR:
+(defmessage-handler MAIN::a9 c11 ?u 
+" FALSE)
+CLIPS> (list-deffacts)
+initial-fact
+a1
+For a total of 2 deffacts.
+CLIPS> (list-deftemplates)
+initial-fact
+x
+a2
+For a total of 3 deftemplates.
+CLIPS> (list-defrules)
+a3
+For a total of 1 defrule.
+CLIPS> (list-defglobals)
+a4
+For a total of 1 defglobal.
+CLIPS> (list-defmodules)
+MAIN
+a5
+For a total of 2 defmodules.
+CLIPS> (list-deffunctions)
+a6
+For a total of 1 deffunction.
+CLIPS> (list-defgenerics)
+a7
+a8
+For a total of 2 defgenerics.
+CLIPS> (list-defmethods)
+
+a8 #1  (INTEGER)
+For a total of 1 method.
+CLIPS> (list-defclasses)
+FLOAT
+INTEGER
+SYMBOL
+STRING
+MULTIFIELD
+EXTERNAL-ADDRESS
+FACT-ADDRESS
+INSTANCE-ADDRESS
+INSTANCE-NAME
+OBJECT
+PRIMITIVE
+NUMBER
+LEXEME
+ADDRESS
+INSTANCE
+USER
+INITIAL-OBJECT
+a9
+For a total of 18 defclasses.
+CLIPS> (list-definstances)
+initial-object
+a10
+For a total of 2 definstances.
+CLIPS> (list-defmessage-handlers)
+init primary in class USER
+delete primary in class USER
+create primary in class USER
+print primary in class USER
+direct-modify primary in class USER
+message-modify primary in class USER
+direct-duplicate primary in class USER
+message-duplicate primary in class USER
+get-q primary in class a9
+put-q primary in class a9
+a11 primary in class a9
+For a total of 11 message-handlers.
+CLIPS> (clear)
+CLIPS> (bload "Temp//chksyntx.bin")
+TRUE
+CLIPS> (check-syntax "(deffacts a1 (foo))")
+FALSE
+CLIPS> (check-syntax "(deftemplate a2 (slot g))")
+FALSE
+CLIPS> (check-syntax "(defrule a3 =>)")
+FALSE
+CLIPS> (check-syntax "(defglobal ?*a4* = 10)")
+FALSE
+CLIPS> (check-syntax "(defmodule a5)")
+FALSE
+CLIPS> (check-syntax "(deffunction a6 (?x) (* 6 ?x))")
+FALSE
+CLIPS> (check-syntax "(defgeneric a7)")
+FALSE
+CLIPS> (check-syntax "(defmethod a8 ((?x INTEGER)) (* 9 ?x))")
+FALSE
+CLIPS> (check-syntax " (defclass a9 (is-a USER) 
+   (role concrete)
+   (slot w (create-accessor read-write)))")
+FALSE
+CLIPS> (check-syntax "(definstances a10 (b10i of a9 (q 54)))")
+FALSE
+CLIPS> (check-syntax "(defmessage-handler a9 a11 (?u) (* ?self:q 10))")
+FALSE
+CLIPS> (reset)
+CLIPS> (facts)
+f-0     (initial-fact)
+f-1     (x y z)
+For a total of 2 facts.
+CLIPS> (agenda)
+0      a3: f-1
+For a total of 1 activation.
+CLIPS> (assert (a2 (r 2) (s 1 3)))
+<Fact-2>
+CLIPS> (instances)
+[initial-object] of INITIAL-OBJECT
+[a10i] of a9
+For a total of 2 instances.
+CLIPS> ?*a4*
+9
+CLIPS> (list-deftemplates a5)
+CLIPS> (a6 2)
+4
+CLIPS> (a8 3)
+21
+CLIPS> (send [a10i] a11 3)
+162
+CLIPS> (check-syntax "(deffacts b1 (foo))")
+FALSE
+CLIPS> (check-syntax "(deftemplate b2 (slot g))")
+FALSE
+CLIPS> (check-syntax "(defrule b3 =>)")
+FALSE
+CLIPS> (check-syntax "(defglobal ?*b4* = 10)")
+FALSE
+CLIPS> (check-syntax "(defmodule b5)")
+FALSE
+CLIPS> (check-syntax "(deffunction b6 (?x) (* 6 ?x))")
+FALSE
+CLIPS> (check-syntax "(defgeneric b7)")
+FALSE
+CLIPS> (check-syntax "(defmethod b8 ((?x INTEGER)) (* 9 ?x))")
+FALSE
+CLIPS> 
+(check-syntax " (defclass b9 (is-a USER) 
+   (role concrete)
+   (slot w (create-accessor read-write)))")
+FALSE
+CLIPS> (check-syntax "(definstances b10 (c10i of a9 (q 54)))")
+FALSE
+CLIPS> (check-syntax "(defmessage-handler a9 b11 (?u) (* ?self:q 10))")
+FALSE
+CLIPS> 
+(check-syntax "(deffacts c1 foo))")
+("
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for RHS patterns.
+
+ERROR:
+(deffacts MAIN::c1
+   foo
+" FALSE)
+CLIPS> (check-syntax "(deftemplate c2 slot g))")
+("
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for deftemplate.
+
+ERROR:
+(deftemplate MAIN::c2
+   slot
+" FALSE)
+CLIPS> (check-syntax "(defrule c3)")
+("
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defrule.
+
+ERROR:
+(defrule MAIN::c3)
+" FALSE)
+CLIPS> (check-syntax "(defglobal ?*c4* 10)")
+("
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defglobal.
+
+ERROR:
+(defglobal MAIN ?*c4* 10
+" FALSE)
+CLIPS> (check-syntax "(defmodule c5 (x))")
+("
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defmodule.
+
+ERROR:
+(defmodule c5
+   (x
+" FALSE)
+CLIPS> (check-syntax "(deffunction c6 (?x (* 6 ?x))")
+("
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for parameter list.
+
+ERROR:
+(deffunction MAIN::c6
+   (?x (
+" FALSE)
+CLIPS> (check-syntax "(defgeneric c7 (y))")
+("[GENRCPSR1] Expected ')' to complete defgeneric.
+
+ERROR:
+(defgeneric MAIN::c7
+   (
+" FALSE)
+CLIPS> (check-syntax "(defmethod c8 (?x INTEGER)) (* 9 ?x))")
+("[GENRCPSR9] Expected a variable or '(' for parameter specification.
+
+ERROR:
+(defmethod MAIN::c8
+   (?x
+    INTEGER
+" FALSE)
+CLIPS> 
+(check-syntax " (defclass c9 (is-a USER) 
+   (role bogus)
+   (slot w (create-accessor read-write)))")
+("
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defclass.
+
+ERROR:
+(defclass MAIN::c9
+   (is-a USER)
+   (role bogus
+" FALSE)
+CLIPS> (check-syntax "(definstances c10 c10i of a9 (q 54)))")
+("
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for definstances.
+
+ERROR:
+(definstances MAIN::c10
+   c10i
+" FALSE)
+CLIPS> (check-syntax "(defmessage-handler a9 c11 ?u) (* ?self:q 10))")
+("
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defmessage-handler.
+
+ERROR:
+(defmessage-handler MAIN::a9 c11 ?u 
+" FALSE)
+CLIPS> (list-deffacts)
+initial-fact
+a1
+For a total of 2 deffacts.
+CLIPS> (list-deftemplates)
+initial-fact
+x
+a2
+For a total of 3 deftemplates.
+CLIPS> (list-defrules)
+a3
+For a total of 1 defrule.
+CLIPS> (list-defglobals)
+a4
+For a total of 1 defglobal.
+CLIPS> (list-defmodules)
+MAIN
+a5
+For a total of 2 defmodules.
+CLIPS> (list-deffunctions)
+a6
+For a total of 1 deffunction.
+CLIPS> (list-defgenerics)
+a7
+a8
+For a total of 2 defgenerics.
+CLIPS> (list-defmethods)
+
+a8 #1  (INTEGER)
+For a total of 1 method.
+CLIPS> (list-defclasses)
+FLOAT
+INTEGER
+SYMBOL
+STRING
+MULTIFIELD
+EXTERNAL-ADDRESS
+FACT-ADDRESS
+INSTANCE-ADDRESS
+INSTANCE-NAME
+OBJECT
+PRIMITIVE
+NUMBER
+LEXEME
+ADDRESS
+INSTANCE
+USER
+INITIAL-OBJECT
+a9
+For a total of 18 defclasses.
+CLIPS> (list-definstances)
+initial-object
+a10
+For a total of 2 definstances.
+CLIPS> (list-defmessage-handlers)
+init primary in class USER
+delete primary in class USER
+create primary in class USER
+print primary in class USER
+direct-modify primary in class USER
+message-modify primary in class USER
+direct-duplicate primary in class USER
+message-duplicate primary in class USER
+get-q primary in class a9
+put-q primary in class a9
+a11 primary in class a9
+For a total of 11 message-handlers.
+CLIPS> (clear)
+CLIPS> (dribble-off)

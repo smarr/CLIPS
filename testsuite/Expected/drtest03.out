@@ -1,0 +1,256 @@
+TRUE
+CLIPS> (batch "drtest03.bat")
+TRUE
+CLIPS> (reset)                            ; DR0201
+CLIPS> (progn (assert (red)) (retract 1)) ; DR0201
+CLIPS> (facts)                            ; DR0201
+f-0     (initial-fact)
+For a total of 1 fact.
+CLIPS> (clear)                            ; DR0202
+CLIPS> (deffacts stuff
+   (point 1)
+   (point 2)
+   (point 3)
+   (point 4))
+CLIPS> (defrule get-min
+   ?x <-  (point ?min)
+   (not (point ?y&:(< ?y ?min)))
+   ?fy <- (point ?minp1&:(<> ?min ?minp1))
+   (not (point ?z&:(<> ?z ?min)&:(< ?z ?minp1)))
+   =>
+   (retract ?x ?fy)
+   (printout t "This rule fires" crlf))
+CLIPS> (reset)                            ; DR0202
+CLIPS> (agenda)                           ; DR0202
+0      get-min: f-1,*,f-2,*
+For a total of 1 activation.
+CLIPS> (watch rules)                      ; DR0202
+CLIPS> (run)                              ; DR0202
+FIRE    1 get-min: f-1,*,f-2,*
+This rule fires
+FIRE    2 get-min: f-3,*,f-4,*
+This rule fires
+CLIPS> (unwatch rules)                    ; DR0202
+CLIPS> (clear)                            ; DR0204
+CLIPS> (defrule test
+   ?fact <- (initial-fact)
+   =>
+   (printout t "any thing" crlf)
+   (retract ?fact))
+CLIPS> (reset)                            ; DR0204
+CLIPS> (run)                              ; DR0204
+any thing
+CLIPS> (clear)                            ; DR0206
+CLIPS> (deffacts test "rebinding of mulitfield vars"
+   (_1 to see if the vars mess up if the fields are long)
+   (_2 if so what is the limit also see if there is problem with bind))
+CLIPS> (defrule ok 
+   ?f1 <- (_1 $?one)
+   ?f2 <- (_2 ? $?two)
+   =>
+   (retract ?f1 ?f2)
+   (printout t "to see ... are long = " ?one  crlf)
+   (printout t "if so ... with bind = "?two crlf)
+   (bind ?one (create$ ?one (subseq$ ?two 1 10)))
+   (printout t ?one crlf))
+CLIPS> (reset)                            ; DR0206
+CLIPS> (run)                              ; DR0206
+to see ... are long = (to see if the vars mess up if the fields are long)
+if so ... with bind = (so what is the limit also see if there is problem with bind)
+(to see if the vars mess up if the fields are long so what is the limit also see if there is)
+CLIPS> (clear)                            ; DR0207
+CLIPS> (deffacts input
+   (gift ball shoe food "candies  " 3 1 )
+   (but we didn't have time !))
+CLIPS> (defrule check 
+   ?f1 <- (gift ?ball $?multi)
+   ?f2 <- (but $?rest)
+   =>
+   (printout t "?ball = "?ball crlf "?multi " ?multi crlf)
+   (printout t "but " ?rest crlf)
+   (printout t "let's mess with them " crlf)
+   (bind ?multi (create$ (subseq$ ?rest 1 3)))
+   (printout t "we didn't have = " ?multi  crlf))
+CLIPS> (reset)                            ; DR0207
+CLIPS> (run)                              ; DR0207
+?ball = ball
+?multi (shoe food "candies  " 3 1)
+but (we didn't have time !)
+let's mess with them 
+we didn't have = (we didn't have)
+CLIPS> (clear)                            ; DR0232
+CLIPS> (defrule a => (initialize-it))     ; DR0232
+
+[EXPRNPSR3] Missing function declaration for initialize-it.
+
+ERROR:
+(defrule MAIN::a
+   =>
+   (initialize-it
+CLIPS> (reset)                            ; DR0232
+CLIPS> (run)                              ; DR0232
+CLIPS> (format t "%6.5 " 8655.3)          ; DR0233
+[IOFUN3] Invalid format flag "%6.5 " specified in format function.
+""
+CLIPS> (clear)                            ; DR0235
+CLIPS> (deftemplate colors 
+   (field standard (default white))
+   (multifield metallic (default "plain black")))
+CLIPS> (reset)                            ; DR0235
+CLIPS> (assert (colors))                  ; DR0235
+<Fact-1>
+CLIPS> (assert (colors (standard black))) ; DR0235
+<Fact-2>
+CLIPS> (assert (colors (metallic "navy blue")))
+<Fact-3>
+CLIPS> (facts)                            ; DR0235
+f-0     (initial-fact)
+f-1     (colors (standard white) (metallic "plain black"))
+f-2     (colors (standard black) (metallic "plain black"))
+f-3     (colors (standard white) (metallic "navy blue"))
+For a total of 4 facts.
+CLIPS> (clear)                            ; DR0238
+CLIPS> (deftemplate auto (field name))
+CLIPS> (defrule one 
+   ?f1 <- (auto (name nil))
+   =>
+   (modify ?f1 (namse any))) 
+
+[TMPLTDEF1] Invalid slot namse not defined in corresponding deftemplate auto.
+
+ERROR:
+(defrule MAIN::one
+   ?f1 <- (auto (name nil))
+   =>
+   (modify ?f1 (namse any)))
+CLIPS> (reset)                            ; DR0238
+CLIPS> (assert (auto))                    ; DR0238
+<Fact-1>
+CLIPS> (agenda)                           ; DR0238
+CLIPS> (run)                              ; DR0238
+CLIPS> (format nil "%6.5f" 864)           ; DR0240
+"864.00000"
+CLIPS> (format nil "%6.5f" 86.543)        ; DR0240
+"86.54300"
+CLIPS> (format nil "%6.5f" 86551.)        ; DR0240    
+"86551.00000"
+CLIPS> (clear)                            ; DR0245
+CLIPS> (deftemplate a                     ; DR0245
+   (field one) (field two))
+CLIPS> (defrule b
+   (not (a (one anything) (three whatever)))
+   =>)       
+
+[TMPLTDEF1] Invalid slot three not defined in corresponding deftemplate a.
+
+ERROR:
+(defrule MAIN::b
+   (not (a (one anything) (three
+CLIPS> (clear)                            ; DR0246
+CLIPS> (defrule error                     ; DR0246
+   ?f <- (fact)
+   =>
+   (assert (new-fact ?f))) 
+CLIPS> (assert (fact))                    ; DR0246
+<Fact-1>
+CLIPS> (run)                              ; DR0246
+CLIPS> (facts)                            ; DR0246
+f-0     (initial-fact)
+f-1     (fact)
+f-2     (new-fact <Fact-1>)
+For a total of 3 facts.
+CLIPS> (clear)                            ; DR0248
+CLIPS> (deffacts a)                       ; DR0248
+CLIPS> (clear)                            ; DR0251
+CLIPS> (deftemplate auto (field name))    ; DR0251
+CLIPS> (defrule one "test the naked assert & modify"
+   ?f1 <- (auto (name nil))
+   (not (auto (mane nil)))
+   =>
+   (modify ?f1 (name any)))
+
+[TMPLTDEF1] Invalid slot mane not defined in corresponding deftemplate auto.
+
+ERROR:
+(defrule MAIN::one "test the naked assert & modify"
+   ?f1 <- (auto (name nil))
+   (not (auto (mane
+CLIPS> (str-implode (create$))          ; DR0256
+""
+CLIPS> (clear)                            ; DR0257
+CLIPS> (defrule foo                       ; DR0257
+   ?f1 <- (a 1) 
+   ?f2 <- (b 1)
+   (test (neq ?f1 ?f2))
+   =>)
+CLIPS> (defrule bar                       ; DR0257
+   ?f1 <- (a ?) 
+   ?f2 <- (b ?)
+   (test (neq ?f1 ?f2))
+   =>)
+CLIPS> (assert (a 1) (a 2) (b 1))         ; DR0257
+<Fact-3>
+CLIPS> (agenda)                           ; DR0257
+0      foo: f-1,f-3
+0      bar: f-1,f-3
+0      bar: f-2,f-3
+For a total of 3 activations.
+CLIPS> (clear)                            ; DR0261
+CLIPS> (deffacts a (one =(reset)))        ; DR0261
+CLIPS> (reset)                            ; DR0261
+CLIPS> (facts)                            ; DR0261
+f-0     (initial-fact)
+f-1     (one)
+For a total of 2 facts.
+CLIPS> (clear)                            ; DR0279
+CLIPS> (defrule with-error                ; DR0279
+   (value ?a&:(> ?a max))
+   =>)
+[ARGACCES5] Function > expected argument #2 to be of type integer or float
+
+ERROR:
+(defrule MAIN::with-error
+   (value ?a&:(> ?a max)
+CLIPS> (defrule with-error-inside-not     ; DR0279
+   (not (value ?b&:(> ?b max)))
+   =>)
+[ARGACCES5] Function > expected argument #2 to be of type integer or float
+
+ERROR:
+(defrule MAIN::with-error-inside-not
+   (not (value ?b&:(> ?b max)
+CLIPS> (clear)                            ; DR0296
+CLIPS> (create$ / 3 1)                  ; DR0296
+(/ 3 1)
+CLIPS> (eval "(create$ / 3 1)")         ; DR0296
+(/ 3 1)
+CLIPS> (deffacts a (one =(eval "(create$ / 3 1)")))
+CLIPS> (reset)                            ; DR0296
+CLIPS> (facts)                            ; DR0296
+f-0     (initial-fact)
+f-1     (one / 3 1)
+For a total of 2 facts.
+CLIPS> (clear)                            ; DR0298
+CLIPS> (deftemplate foo (field x) (field y))
+CLIPS> (defrule this-rule-doesnt-work     ; DR0298
+   (foo (y ?x1) (x ?x2&~?x1))
+   =>)
+CLIPS> (defrule this-rule-works           ; DR0298
+   (foo (y ?x1&~?x2) (x ?x2))
+   =>)
+
+[ANALYSIS4] Variable ?x2 was referenced in CE #1 slot y before being defined.
+
+ERROR:
+(defrule MAIN::this-rule-works
+   (foo (y ?x1&~?x2) (x ?x2))
+   =>)
+CLIPS> (assert (foo (x 3) (y 4)))         ; DR0298
+<Fact-1>
+CLIPS> (assert (foo (x 4) (y 3)))         ; DR0298
+<Fact-2>
+CLIPS> (agenda)                           ; DR0298
+0      this-rule-doesnt-work: f-2
+0      this-rule-doesnt-work: f-1
+For a total of 2 activations.
+CLIPS> (dribble-off)

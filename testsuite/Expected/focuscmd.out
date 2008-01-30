@@ -1,0 +1,166 @@
+TRUE
+CLIPS> (batch "focuscmd.bat")
+TRUE
+CLIPS> (clear)
+CLIPS> (get-focus 6)
+[ARGACCES4] Function get-focus expected exactly 0 argument(s)
+CLIPS> (get-focus-stack 6)
+[ARGACCES4] Function get-focus-stack expected exactly 0 argument(s)
+CLIPS> (pop-focus 6)
+[ARGACCES4] Function pop-focus expected exactly 0 argument(s)
+CLIPS> (list-focus-stack 6)
+[ARGACCES4] Function list-focus-stack expected exactly 0 argument(s)
+CLIPS> (clear-focus-stack 6)
+[ARGACCES4] Function clear-focus-stack expected exactly 0 argument(s)
+CLIPS> (clear)
+CLIPS> (get-focus)
+MAIN
+CLIPS> (get-focus-stack)
+(MAIN)
+CLIPS> (list-focus-stack)
+MAIN
+CLIPS> (clear-focus-stack)
+CLIPS> (get-focus)
+FALSE
+CLIPS> (get-focus-stack)
+()
+CLIPS> (list-focus-stack)
+CLIPS> (reset)
+CLIPS> (get-focus)
+MAIN
+CLIPS> (get-focus-stack)
+(MAIN)
+CLIPS> (list-focus-stack)
+MAIN
+CLIPS> (defmodule A)
+CLIPS> (defmodule B)
+CLIPS> (focus A B)
+TRUE
+CLIPS> (get-focus)
+A
+CLIPS> (get-focus-stack)
+(A B MAIN)
+CLIPS> (list-focus-stack)
+A
+B
+MAIN
+CLIPS> (pop-focus)
+A
+CLIPS> (get-focus)
+B
+CLIPS> (get-focus-stack)
+(B MAIN)
+CLIPS> (list-focus-stack)
+B
+MAIN
+CLIPS> (pop-focus)
+B
+CLIPS> (get-focus)
+MAIN
+CLIPS> (get-focus-stack)
+(MAIN)
+CLIPS> (list-focus-stack)
+MAIN
+CLIPS> (pop-focus)
+MAIN
+CLIPS> (get-focus)
+FALSE
+CLIPS> (get-focus-stack)
+()
+CLIPS> (list-focus-stack)
+CLIPS> (clear-focus-stack)
+CLIPS> (get-focus)
+FALSE
+CLIPS> (get-focus-stack)
+()
+CLIPS> (list-focus-stack)
+CLIPS> (focus A B)
+TRUE
+CLIPS> (clear-focus-stack)
+CLIPS> (get-focus)
+FALSE
+CLIPS> (get-focus-stack)
+()
+CLIPS> (list-focus-stack)
+CLIPS> (focus 6)
+[ARGACCES5] Function focus expected argument #1 to be of type symbol
+CLIPS> (focus "A")
+[ARGACCES5] Function focus expected argument #1 to be of type symbol
+CLIPS> (focus A 6)
+[ARGACCES5] Function focus expected argument #2 to be of type symbol
+CLIPS> (focus C)
+[PRNTUTIL1] Unable to find defmodule C.
+FALSE
+CLIPS> (focus)
+[ARGACCES4] Function focus expected at least 1 argument(s)
+CLIPS> (list-focus-stack)
+CLIPS> (focus A)
+TRUE
+CLIPS> (focus B)
+TRUE
+CLIPS> (list-focus-stack)
+B
+A
+CLIPS> (focus A B)
+TRUE
+CLIPS> (list-focus-stack)
+A
+B
+A
+CLIPS> (clear)
+CLIPS> (defmodule A)
+CLIPS> (defmodule B)
+CLIPS> (watch focus 6)
+[ARGACCES4] Function watch expected exactly 1 argument(s)
+CLIPS> (unwatch focus 6)
+[ARGACCES4] Function unwatch expected exactly 1 argument(s)
+CLIPS> (focus A B)
+TRUE
+CLIPS> (focus B C)
+[PRNTUTIL1] Unable to find defmodule C.
+FALSE
+CLIPS> (list-focus-stack)
+A
+B
+MAIN
+CLIPS> (clear-focus-stack)
+CLIPS> (watch focus)
+CLIPS> (reset)
+==> Focus MAIN
+CLIPS> (focus A B)
+==> Focus B from MAIN
+==> Focus A from B
+TRUE
+CLIPS> (pop-focus)
+<== Focus A to B
+A
+CLIPS> (clear-focus-stack)
+<== Focus B to MAIN
+<== Focus MAIN
+CLIPS> (focus A B)
+==> Focus B
+==> Focus A from B
+TRUE
+CLIPS> (clear)
+<== Focus MAIN
+==> Focus MAIN
+CLIPS> (run)
+<== Focus MAIN
+CLIPS> (run)
+==> Focus MAIN
+<== Focus MAIN
+CLIPS> (defmodule A)
+CLIPS> (defmodule B)
+CLIPS> (focus A B)
+==> Focus B
+==> Focus A from B
+TRUE
+CLIPS> (run)
+<== Focus A to B
+<== Focus B
+CLIPS> (unwatch focus)
+CLIPS> (reset)
+CLIPS> (focus A B)
+TRUE
+CLIPS> (clear)
+CLIPS> (dribble-off)

@@ -1,0 +1,271 @@
+TRUE
+CLIPS> (batch "drtest01.bat")
+TRUE
+CLIPS> (toss "a")                        ; DR0001
+FALSE
+CLIPS> (toss a)                          ; DR0001
+FALSE
+CLIPS> (clear)                           ; DR0003
+CLIPS> (>= 1)                            ; DR0003
+[ARGACCES4] Function >= expected at least 2 argument(s)
+CLIPS> (defrule b (x ?y&:(>= 1)) =>)     ; DR0003
+[ARGACCES4] Function >= expected at least 2 argument(s)
+
+ERROR:
+(defrule MAIN::b
+   (x ?y&:(>= 1)
+CLIPS> (clear)                           ; DR0006
+CLIPS> (defrule x                        ; DR0006
+   (not (a ?x))
+   (not (b ?x))
+   =>)
+CLIPS> (str-cat (readline))              ; DR0011
+a b
+"a b"
+CLIPS> (clear)                           ; DR0012
+CLIPS> (defrule b                        ; DR0012
+   (not (z))
+   (test (> 0 1))
+   =>)
+CLIPS> (agenda)                          ; DR0012
+CLIPS> (reset)                           ; DR0012
+CLIPS> (agenda)                          ; DR0012
+CLIPS> (clear)                           ; DR0033
+CLIPS> (=)                               ; DR0033
+[ARGACCES4] Function = expected at least 2 argument(s)
+CLIPS> (defrule b (x ?v) (test (=)) =>)  ; DR0033
+[ARGACCES4] Function = expected at least 2 argument(s)
+
+ERROR:
+(defrule MAIN::b
+   (x ?v)
+   (test (=)
+CLIPS> (defrule c (x ?v) => (clear))     ; DR0033
+CLIPS> (assert (x 9))                    ; DR0033
+<Fact-1>
+CLIPS> (run)                             ; DR0033
+[CONSTRCT1] Some constructs are still in use. Clear cannot continue.
+CLIPS> (clear)                           ; DR0034
+CLIPS> (bind ?b)                         ; DR0034
+FALSE
+CLIPS> (defrule a (x ?b) => (bind ?b)))  ; DR0034
+CLIPS> (assert (x n))                    ; DR0034
+<Fact-1>
+CLIPS> (run)                             ; DR0034
+CLIPS> (close blah)                      ; DR0037
+FALSE
+CLIPS> (deffacts a ())                   ; DR0039
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for first field of a RHS pattern.
+
+ERROR:
+(deffacts MAIN::a
+   ()
+CLIPS> (assert ())                       ; DR0039
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for first field of a RHS pattern.
+CLIPS> (system)                          ; DR0043
+[ARGACCES4] Function system expected at least 1 argument(s)
+CLIPS> (clear)                           ; DR0047
+CLIPS> (defrule a (= 5 7) =>)            ; DR0047
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for the field field of a pattern.
+
+ERROR:
+(defrule MAIN::a
+   (=
+CLIPS> (assert (= 5 7))                  ; DR0047
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for first field of a RHS pattern.
+CLIPS> (agenda)                          ; DR0047
+CLIPS> (open "Temp//f1.tmp" name "w")    ; DR0048
+TRUE
+CLIPS> (open "Temp//f2.tmp" name "w")    ; DR0048
+[IOFUN2] Logical name name already in use.
+FALSE
+CLIPS> (close name)                      ; DR0048
+TRUE
+CLIPS> (clear)                           ; DR0051
+CLIPS> (defrule a                        ; DR0051
+   (data $?a)
+   =>
+   (format t "%s" ?a))
+CLIPS> (assert (data a b c d))           ; DR0051
+<Fact-1>
+CLIPS> (run)                             ; DR0051
+[ARGACCES5] Function format expected argument #3 to be of type symbol or string
+[PRCCODE4] Execution halted during the actions of defrule a.
+CLIPS> (clear)                           ; DR0052
+CLIPS> (defrule one                      ; DR0052
+   (b ?x ?y&:(evenp ?value)|?y&:(oddp ?value) ?z)
+   =>)
+
+[ANALYSIS4] Variable ?value found in the expression (evenp ?value)
+was referenced in CE #1 field #2 before being defined.
+
+ERROR:
+(defrule MAIN::one
+   (b ?x ?y&:(evenp ?value)|?y&:(oddp ?value) ?z)
+   =>)
+CLIPS> (assert (b 2 3 4))                ; DR0052
+<Fact-1>
+CLIPS> (agenda)                          ; DR0052
+CLIPS> (clear)                           ; DR0053
+CLIPS> (defrule rule1 (oven-type $?) =>) ; DR0053
+CLIPS> (defrule rule2                    ; DR0053
+  (oven-type ?ch&:(not (numberp ?ch)))
+  =>)
+CLIPS> (defrule rule3 (oven-type ?) =>)  ; DR0053
+CLIPS> (assert (oven-type 1))            ; DR0053
+<Fact-1>
+CLIPS> (agenda)                          ; DR0053
+0      rule1: f-1
+0      rule3: f-1
+For a total of 2 activations.
+CLIPS> (clear)                           ; DR0054
+CLIPS> (defrule test (a ?i) (b ?n&=?i)   ; DR0054
+  =>)
+CLIPS> (assert (a 3) (b 3))              ; DR0054
+<Fact-2>
+CLIPS> (agenda)                          ; DR0054
+CLIPS> (oddp 3.1)                        ; DR0056
+[ARGACCES5] Function oddp expected argument #1 to be of type integer
+CLIPS> (oddp 4.1)                        ; DR0056
+[ARGACCES5] Function oddp expected argument #1 to be of type integer
+CLIPS> (evenp 3.1)                       ; DR0056
+[ARGACCES5] Function evenp expected argument #1 to be of type integer
+CLIPS> (evenp 4.1)                       ; DR0056
+[ARGACCES5] Function evenp expected argument #1 to be of type integer
+CLIPS> (integerp a)                      ; DR0058
+FALSE
+CLIPS> (symbolp 3)                       ; DR0059
+FALSE
+CLIPS> (symbolp x)                       ; DR0059
+TRUE
+CLIPS> (symbolp "x")                     ; DR0059
+FALSE
+CLIPS> (clear)                           ; DR0063
+CLIPS> (defrule foo                      ; DR0063
+  (data foo $?x)
+  =>
+  (printout t (nth 3 ?x) crlf))  ; DR0063
+CLIPS> (assert (data foo a b here d))    ; DR0063
+<Fact-1>
+CLIPS> (run)                             ; DR0063
+here
+CLIPS> (retract ?f)                      ; DR0067
+[EVALUATN1] Variable f is unbound
+[ARGACCES5] Function retract expected argument #1 to be of type fact-address, fact-index, or the symbol *
+CLIPS> (clear)                           ; DR0068
+CLIPS> (defrule foo =>)                  ; DR0068
+CLIPS> (reset)                           ; DR0068
+CLIPS> (agenda)                          ; DR0068
+0      foo: *
+For a total of 1 activation.
+CLIPS> (undefrule foo)                   ; DR0068
+CLIPS> (agenda)                          ; DR0068
+CLIPS> (clear)                           ; DR0069
+CLIPS> (defrule foo ?f (fact) =>)        ; DR0069
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for binding patterns.
+
+ERROR:
+(defrule MAIN::foo
+   ?f (
+CLIPS> (defrule foo ?f <- fact)          ; DR0069
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for binding patterns.
+
+ERROR:
+(defrule MAIN::foo
+   ?f <- fact
+CLIPS> (deffacts info (fact 1) fact 2)   ; DR0070
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for RHS patterns.
+
+ERROR:
+(deffacts MAIN::info
+   (fact 1)
+   fact
+CLIPS> (** 3 2)                          ; DR0074
+9.0
+CLIPS> (clear)                           ; DR0075
+CLIPS> (assert (a~b))                    ; DR0075
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for RHS patterns.
+CLIPS> (facts)                           ; DR0075
+f-0     (initial-fact)
+For a total of 1 fact.
+CLIPS> (print-region t "f.f")            ; DR0077
+FALSE
+CLIPS> (printout q)                      ; DR0080
+[ROUTER1] Logical name q was not recognized by any routers
+CLIPS> (eq)                              ; DR0082
+[ARGACCES4] Function eq expected at least 2 argument(s)
+CLIPS> (neq)                             ; DR0082
+[ARGACCES4] Function neq expected at least 2 argument(s)
+CLIPS> (neq 1 1 2)                       ; DR0082
+FALSE
+CLIPS> (!= 1 1 2)                        ; DR0082
+FALSE
+CLIPS> (and)                             ; DR0083
+[ARGACCES4] Function and expected at least 2 argument(s)
+CLIPS> (or)                              ; DR0083
+[ARGACCES4] Function or expected at least 2 argument(s)
+CLIPS> (not)                             ; DR0083
+[ARGACCES4] Function not expected exactly 1 argument(s)
+CLIPS> (clear)                           ; DR0087
+CLIPS> (defrule a                        ; DR0087
+  (x $?y) 
+  => 
+  (assert (z ?y)))
+CLIPS> (assert (x q))                    ; DR0087
+<Fact-1>
+CLIPS> (run)                             ; DR0087
+CLIPS> (facts)                           ; DR0087
+f-0     (initial-fact)
+f-1     (x q)
+f-2     (z q)
+For a total of 3 facts.
+CLIPS> (subseq$ a 2 4)                 ; DR0090
+[ARGACCES5] Function subseq$ expected argument #1 to be of type multifield
+CLIPS> (sub-string)                      ; DR0092
+[ARGACCES4] Function sub-string expected exactly 3 argument(s)
+CLIPS> (str-explode "a b c")             ; DR0093
+(a b c)
+CLIPS> (length (str-explode "a b c"))    ; DR0093
+3
+CLIPS> (tan 0)                           ; DR0096
+0.0
+CLIPS> (sec 0)                           ; DR0096
+1.0
+CLIPS> (/ 1 0)                           ; DR0097
+[PRNTUTIL7] Attempt to divide by zero in / function.
+1.0
+CLIPS> (/ 1.0 0.0)                       ; DR0097 
+[PRNTUTIL7] Attempt to divide by zero in / function.
+1.0
+CLIPS> (** 0 0)                          ; DR0098
+[EMATHFUN1] Domain error for ** function.
+0.0
+CLIPS> (** 0 -.5)                        ; DR0098
+[EMATHFUN1] Domain error for ** function.
+0.0
+CLIPS> (** -2 .5)                        ; DR0098 
+[EMATHFUN1] Domain error for ** function.
+0.0
+CLIPS> (** 0.0 0.0)                      ; DR0098
+[EMATHFUN1] Domain error for ** function.
+0.0
+CLIPS> (** 0.0 -.5)                      ; DR0098
+[EMATHFUN1] Domain error for ** function.
+0.0
+CLIPS> (** -2.0 .5)                      ; DR0098
+[EMATHFUN1] Domain error for ** function.
+0.0
+CLIPS> (** -3 2)                         ; DR0098
+9.0
+CLIPS> (** -3 2.2)                       ; DR0098
+[EMATHFUN1] Domain error for ** function.
+0.0
+CLIPS> (dribble-off)

@@ -1,0 +1,513 @@
+TRUE
+CLIPS> (batch "classerr.bat")
+TRUE
+CLIPS> (make-instance bad of OBJECT)
+[INSMNGR3] Cannot create instances of abstract class OBJECT.
+CLIPS> (make-instance bad of USER)
+[INSMNGR3] Cannot create instances of abstract class USER.
+CLIPS> (make-instance bad of PRIMITIVE)
+[INSMNGR3] Cannot create instances of abstract class PRIMITIVE.
+CLIPS> (make-instance bad of MULTIFIELD)
+[INSMNGR3] Cannot create instances of abstract class MULTIFIELD.
+CLIPS> (make-instance bad of NUMBER)
+[INSMNGR3] Cannot create instances of abstract class NUMBER.
+CLIPS> (make-instance bad of EXTERNAL-ADDRESS)
+[INSMNGR3] Cannot create instances of abstract class EXTERNAL-ADDRESS.
+CLIPS> (make-instance bad of INTEGER)
+[INSMNGR3] Cannot create instances of abstract class INTEGER.
+CLIPS> (make-instance bad of FLOAT)
+[INSMNGR3] Cannot create instances of abstract class FLOAT.
+CLIPS> (make-instance bad of LEXEME)
+[INSMNGR3] Cannot create instances of abstract class LEXEME.
+CLIPS> (make-instance bad of SYMBOL)
+[INSMNGR3] Cannot create instances of abstract class SYMBOL.
+CLIPS> (make-instance bad of STRING)
+[INSMNGR3] Cannot create instances of abstract class STRING.
+CLIPS> (make-instance bad of ADDRESS)
+[INSMNGR3] Cannot create instances of abstract class ADDRESS.
+CLIPS> (make-instance bad of INSTANCE)
+[INSMNGR3] Cannot create instances of abstract class INSTANCE.
+CLIPS> (make-instance bad of INSTANCE-NAME)
+[INSMNGR3] Cannot create instances of abstract class INSTANCE-NAME.
+CLIPS> (make-instance bad of INSTANCE-ADDRESS)
+[INSMNGR3] Cannot create instances of abstract class INSTANCE-ADDRESS.
+CLIPS> (make-instance bad of FACT-ADDRESS)
+[INSMNGR3] Cannot create instances of abstract class FACT-ADDRESS.
+CLIPS> (defclass OBJECT (is-a USER))
+[CLASSPSR2] Cannot redefine a predefined system class.
+
+ERROR:
+(defclass MAIN::OBJECT
+   (
+CLIPS> (defclass USER (is-a USER))
+[CLASSPSR2] Cannot redefine a predefined system class.
+
+ERROR:
+(defclass MAIN::USER
+   (
+CLIPS> (defclass PRIMITIVE (is-a USER))
+[CLASSPSR2] Cannot redefine a predefined system class.
+
+ERROR:
+(defclass MAIN::PRIMITIVE
+   (
+CLIPS> (defclass MULTIFIELD (is-a USER))
+[CLASSPSR2] Cannot redefine a predefined system class.
+
+ERROR:
+(defclass MAIN::MULTIFIELD
+   (
+CLIPS> (defclass NUMBER (is-a USER))
+[CLASSPSR2] Cannot redefine a predefined system class.
+
+ERROR:
+(defclass MAIN::NUMBER
+   (
+CLIPS> (defclass EXTERNAL-ADDRESS (is-a USER))
+[CLASSPSR2] Cannot redefine a predefined system class.
+
+ERROR:
+(defclass MAIN::EXTERNAL-ADDRESS
+   (
+CLIPS> (defclass INTEGER (is-a USER))
+[CLASSPSR2] Cannot redefine a predefined system class.
+
+ERROR:
+(defclass MAIN::INTEGER
+   (
+CLIPS> (defclass FLOAT (is-a USER))
+[CLASSPSR2] Cannot redefine a predefined system class.
+
+ERROR:
+(defclass MAIN::FLOAT
+   (
+CLIPS> (defclass LEXEME (is-a USER))
+[CLASSPSR2] Cannot redefine a predefined system class.
+
+ERROR:
+(defclass MAIN::LEXEME
+   (
+CLIPS> (defclass SYMBOL (is-a USER))
+[CLASSPSR2] Cannot redefine a predefined system class.
+
+ERROR:
+(defclass MAIN::SYMBOL
+   (
+CLIPS> (defclass STRING (is-a USER))
+[CLASSPSR2] Cannot redefine a predefined system class.
+
+ERROR:
+(defclass MAIN::STRING
+   (
+CLIPS> (defclass ADDRESS (is-a USER))
+[CLASSPSR2] Cannot redefine a predefined system class.
+
+ERROR:
+(defclass MAIN::ADDRESS
+   (
+CLIPS> (defclass INSTANCE (is-a USER))
+[CLASSPSR2] Cannot redefine a predefined system class.
+
+ERROR:
+(defclass MAIN::INSTANCE
+   (
+CLIPS> (defclass INSTANCE-NAME (is-a USER))
+[CLASSPSR2] Cannot redefine a predefined system class.
+
+ERROR:
+(defclass MAIN::INSTANCE-NAME
+   (
+CLIPS> (defclass INSTANCE-ADDRESS (is-a USER))
+[CLASSPSR2] Cannot redefine a predefined system class.
+
+ERROR:
+(defclass MAIN::INSTANCE-ADDRESS
+   (
+CLIPS> (defclass FACT-ADDRESS (is-a USER))
+[CLASSPSR2] Cannot redefine a predefined system class.
+
+ERROR:
+(defclass MAIN::FACT-ADDRESS
+   (
+CLIPS> (defclass BAD (is-a INSTANCE))
+[INHERPSR6] A user-defined class cannot be a subclass of INSTANCE.
+
+ERROR:
+(defclass MAIN::BAD
+   (is-a INSTANCE
+CLIPS> (defclass BAD (is-a INSTANCE-NAME))
+[INHERPSR6] A user-defined class cannot be a subclass of INSTANCE-NAME.
+
+ERROR:
+(defclass MAIN::BAD
+   (is-a INSTANCE-NAME
+CLIPS> (defclass BAD (is-a INSTANCE-ADDRESS))
+[INHERPSR6] A user-defined class cannot be a subclass of INSTANCE-ADDRESS.
+
+ERROR:
+(defclass MAIN::BAD
+   (is-a INSTANCE-ADDRESS
+CLIPS> (defmessage-handler INSTANCE bad ())
+[MSGPSR8] Message-handlers cannot be attached to the class INSTANCE.
+
+ERROR:
+(defmessage-handler MAIN::INSTANCE
+   bad
+CLIPS> (defmessage-handler INSTANCE-NAME bad ())
+[MSGPSR8] Message-handlers cannot be attached to the class INSTANCE-NAME.
+
+ERROR:
+(defmessage-handler MAIN::INSTANCE-NAME
+   bad
+CLIPS> (defmessage-handler INSTANCE-ADDRESS bad ())
+[MSGPSR8] Message-handlers cannot be attached to the class INSTANCE-ADDRESS.
+
+ERROR:
+(defmessage-handler MAIN::INSTANCE-ADDRESS
+   bad
+CLIPS> (defclass)
+
+[CSTRCPSR2] Missing name for defclass construct
+
+ERROR:
+(defclass )
+CLIPS> (defclass JUNK)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defclass inheritance.
+
+ERROR:
+(defclass MAIN::JUNK)
+CLIPS> (defclass JUNK bad-comment)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defclass inheritance.
+
+ERROR:
+(defclass MAIN::JUNK
+   bad-comment
+CLIPS> (defclass JUNK "comment")
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defclass inheritance.
+
+ERROR:
+(defclass MAIN::JUNK "comment")
+CLIPS> (defclass JUNK "comment" ())
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defclass inheritance.
+
+ERROR:
+(defclass MAIN::JUNK "comment"
+   ()
+CLIPS> (defclass JUNK ())
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defclass inheritance.
+
+ERROR:
+(defclass MAIN::JUNK
+   ()
+CLIPS> (defclass JUNK "comment" (is-a))
+[INHERPSR4] Must have at least one superclass.
+
+ERROR:
+(defclass MAIN::JUNK "comment"
+   (is-a )
+CLIPS> (defclass JUNK (is-a))
+[INHERPSR4] Must have at least one superclass.
+
+ERROR:
+(defclass MAIN::JUNK
+   (is-a )
+CLIPS> (defclass JUNK (is-a BOGUS))
+[INHERPSR3] A class must be defined after all its superclasses.
+
+ERROR:
+(defclass MAIN::JUNK
+   (is-a BOGUS
+CLIPS> (defclass JUNK (is-a USER) (role abstract) (role concrete))
+[CLASSPSR4] Class role already declared.
+
+ERROR:
+(defclass MAIN::JUNK
+   (is-a USER)
+   (role abstract)
+   (role
+CLIPS> (defclass JUNK (is-a USER) (role concrete) (role abstract))
+[CLASSPSR4] Class role already declared.
+
+ERROR:
+(defclass MAIN::JUNK
+   (is-a USER)
+   (role concrete)
+   (role
+CLIPS> (defclass GOOD (is-a USER) (role abstract))
+CLIPS> (make-instance bad of GOOD)
+[INSMNGR3] Cannot create instances of abstract class GOOD.
+CLIPS> (defclass blah (is-a USER) (is-a USER))
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defclass.
+
+ERROR:
+(defclass MAIN::blah
+   (is-a USER)
+   (is-a
+CLIPS> (defclass JUNK (is-a USER)
+   (role concrete)
+   (slot))
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defclass slot.
+
+ERROR:
+(defclass MAIN::JUNK
+   (is-a USER)
+   (role concrete)
+   (slot )
+CLIPS> (defclass JUNK (is-a USER)
+   (slot 5))
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defclass slot.
+
+ERROR:
+(defclass MAIN::JUNK
+   (is-a USER)
+   (slot 5
+CLIPS> (defclass JUNK (is-a USER)
+  (slot bad)
+  (slot bad))
+[CLSLTPSR1] Duplicate slots not allowed.
+
+ERROR:
+(defclass MAIN::JUNK
+   (is-a USER)
+   (slot bad)
+   (slot bad
+CLIPS> (defclass JUNK (is-a USER)
+  (slot bad (default) (default-dynamic (time))))
+[CLSLTPSR2] default facet already specified.
+
+ERROR:
+(defclass MAIN::JUNK
+   (is-a USER)
+   (slot bad
+      (default)
+      (default-dynamic
+CLIPS> (defclass JUNK (is-a USER)
+  (multislot bad)
+  (single-slot bad))
+[CLSLTPSR1] Duplicate slots not allowed.
+
+ERROR:
+(defclass MAIN::JUNK
+   (is-a USER)
+   (multislot bad)
+   (single-slot bad
+CLIPS> (defclass JUNK (is-a USER)
+  (slot bad (storage shared) (storage local)))
+[CLSLTPSR2] storage facet already specified.
+
+ERROR:
+(defclass MAIN::JUNK
+   (is-a USER)
+   (slot bad
+      (storage shared)
+      (storage
+CLIPS> (defclass JUNK (is-a USER)
+  (slot bad (access read-write) (access read-only)))
+[CLSLTPSR2] access facet already specified.
+
+ERROR:
+(defclass MAIN::JUNK
+   (is-a USER)
+   (slot bad
+      (access read-write)
+      (access
+CLIPS> (defclass JUNK (is-a USER)
+  (slot bad (access read-write) (access initialize-only)))
+[CLSLTPSR2] access facet already specified.
+
+ERROR:
+(defclass MAIN::JUNK
+   (is-a USER)
+   (slot bad
+      (access read-write)
+      (access
+CLIPS> (defclass JUNK (is-a USER)
+  (slot bad (access read-write) (access initialize-only)))
+[CLSLTPSR2] access facet already specified.
+
+ERROR:
+(defclass MAIN::JUNK
+   (is-a USER)
+   (slot bad
+      (access read-write)
+      (access
+CLIPS> (defclass JUNK (is-a USER)
+  (slot bad (propagation no-inherit) (propagation inherit)))
+[CLSLTPSR2] propagation facet already specified.
+
+ERROR:
+(defclass MAIN::JUNK
+   (is-a USER)
+   (slot bad
+      (propagation no-inherit)
+      (propagation
+CLIPS> (defclass JUNK (is-a USER)
+  (slot bad (source composite) (source exclusive)))
+[CLSLTPSR2] source facet already specified.
+
+ERROR:
+(defclass MAIN::JUNK
+   (is-a USER)
+   (slot bad
+      (source composite)
+      (source
+CLIPS> (defclass JUNK (is-a USER)
+  (multislot bad)
+  (slot bad))
+[CLSLTPSR1] Duplicate slots not allowed.
+
+ERROR:
+(defclass MAIN::JUNK
+   (is-a USER)
+   (multislot bad)
+   (slot bad
+CLIPS> (defclass JUNK (is-a USER)
+  (slot bad (bogus)))
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defclass slot.
+
+ERROR:
+(defclass MAIN::JUNK
+   (is-a USER)
+   (slot bad
+      (bogus
+CLIPS> (defclass JUNK (is-a USER)
+   (bogus))
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defclass.
+
+ERROR:
+(defclass MAIN::JUNK
+   (is-a USER)
+   (bogus
+CLIPS> (defclass JUNK (is-a USER)
+   (slot bad (default (+ (eval "(gensym)") 2))))
+[ARGACCES5] Function + expected argument #1 to be of type integer or float
+
+ERROR:
+(defclass MAIN::JUNK
+   (is-a USER)
+   (slot bad
+      (default (+ (eval "(gensym)") 2)))
+CLIPS> (defclass JUNK (is-a USER)
+   (slot bad (default-dynamic abc ())))
+
+[EXPRNPSR1] A function name must be a symbol
+
+ERROR:
+(defclass MAIN::JUNK
+   (is-a USER)
+   (slot bad
+      (default-dynamic abc ()
+CLIPS> (defclass JUNK (is-a USER)
+   (slot bad (default abc def)))
+[INSFUN7] (abc def) illegal for single-field slot bad found in slot default value.
+
+ERROR:
+(defclass MAIN::JUNK
+   (is-a USER)
+   (slot bad
+      (default abc def))
+CLIPS> (defclass JUNK (is-a USER)
+   (slot bad (default (mv-append))))
+[INSFUN7] () illegal for single-field slot bad found in slot default value.
+
+ERROR:
+(defclass MAIN::JUNK
+   (is-a USER)
+   (slot bad
+      (default (mv-append)))
+CLIPS> (defclass GOOD2 (is-a USER) (role concrete)
+   (slot bad (default-dynamic abc def)))
+[CSTRNCHK1] Expression for slot bad found in dynamic default value
+does not satisfy the cardinality restrictions.
+
+ERROR:
+(defclass MAIN::GOOD2
+   (is-a USER)
+   (role concrete)
+   (slot bad
+      (default-dynamic abc def))
+CLIPS> (make-instance gd2 of GOOD2)
+[PRNTUTIL1] Unable to find class GOOD2.
+CLIPS> (defclass SUBGOOD (is-a GOOD) (role concrete))
+CLIPS> (make-instance sg of SUBGOOD)
+[sg]
+CLIPS> (defclass GOOD (is-a USER))
+[CLASSPSR3] GOOD class cannot be redefined while
+    outstanding references to it still exist.
+
+ERROR:
+(defclass MAIN::GOOD
+   (
+CLIPS> (list-defclasses)
+FLOAT
+INTEGER
+SYMBOL
+STRING
+MULTIFIELD
+EXTERNAL-ADDRESS
+FACT-ADDRESS
+INSTANCE-ADDRESS
+INSTANCE-NAME
+OBJECT
+PRIMITIVE
+NUMBER
+LEXEME
+ADDRESS
+INSTANCE
+USER
+INITIAL-OBJECT
+GOOD
+SUBGOOD
+For a total of 19 defclasses.
+CLIPS> (instances)
+[initial-object] of INITIAL-OBJECT
+[sg] of SUBGOOD
+For a total of 2 instances.
+CLIPS> (defclass BOGUS (is-a USER)
+  (slot x (default ?y)))
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for default attribute.
+
+ERROR:
+(defclass MAIN::BOGUS
+   (is-a USER)
+   (slot x
+      (default ?y
+CLIPS> (defclass BOGUS (is-a USER)
+  (slot x (default-dynamic ?y)))
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for default-dynamic attribute.
+
+ERROR:
+(defclass MAIN::BOGUS
+   (is-a USER)
+   (slot x
+      (default-dynamic ?y
+CLIPS> (defclass BAD-GLOBAL (is-a USER) (role concrete)
+   (slot x (default ?*bogus*)))
+[GLOBLDEF1] Global variable ?*bogus* is unbound.
+
+ERROR:
+(defclass MAIN::BAD-GLOBAL
+   (is-a USER)
+   (role concrete)
+   (slot x
+      (default ?*bogus*))
+CLIPS> (defclass BAD-GLOBAL (is-a USER) (role concrete)
+   (slot x (default-dynamic ?*bogus*)))
+CLIPS> (make-instance bad-global of BAD-GLOBAL)
+[GLOBLDEF1] Global variable ?*bogus* is unbound.
+[PRCCODE4] Execution halted during the actions of message-handler init primary in class USER
+[INSMNGR8] An error occurred during the initialization of instance bad-global.
+FALSE
+CLIPS> (dribble-off)

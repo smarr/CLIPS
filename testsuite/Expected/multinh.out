@@ -1,0 +1,49 @@
+TRUE
+CLIPS> (testit)
+(OBJECT)
+(USER OBJECT)
+(USER OBJECT)
+(A B USER OBJECT)
+(B A USER OBJECT)
+(C A B USER OBJECT)
+(C A B USER OBJECT)
+(A USER OBJECT)
+(B USER OBJECT)
+(G H A B USER OBJECT)
+(G H B A USER OBJECT)
+(A B T USER OBJECT)
+(G A H B USER OBJECT)
+(L G A H B USER OBJECT)
+(C A B USER OBJECT)
+(D B A USER OBJECT)
+(USER OBJECT)
+(USER OBJECT)
+(P Q USER OBJECT)
+(C A B R P Q USER OBJECT)
+(C G A B USER OBJECT)
+(G C A B USER OBJECT)
+
+THE REST SHOULD BE ERRORS.
+
+[INHERPSR5] Partial precedence list formed: C D
+Precedence loop in superclasses: A B A
+
+ERROR:
+(defclass MAIN::JUNK
+   (is-a C D)
+INHERITANCE ERROR TEST #1 OK.
+[INHERPSR5] Partial precedence list formed:
+Precedence loop in superclasses: A C A
+
+ERROR:
+(defclass MAIN::JUNK
+   (is-a A C)
+INHERITANCE ERROR TEST #2 OK.
+[INHERPSR5] Partial precedence list formed: N C O D
+Precedence loop in superclasses: A B A
+
+ERROR:
+(defclass MAIN::JUNK
+   (is-a N O)
+INHERITANCE ERROR TEST #3 OK.
+CLIPS> (dribble-off)

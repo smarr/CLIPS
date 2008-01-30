@@ -1,0 +1,263 @@
+TRUE
+CLIPS> (batch "factscmd.bat")
+TRUE
+CLIPS> (clear)
+CLIPS> (facts)                            ; facts
+f-0     (initial-fact)
+For a total of 1 fact.
+CLIPS> (assert (a) (b) (c) (d) (e) (f))
+<Fact-6>
+CLIPS> (facts)
+f-0     (initial-fact)
+f-1     (a)
+f-2     (b)
+f-3     (c)
+f-4     (d)
+f-5     (e)
+f-6     (f)
+For a total of 7 facts.
+CLIPS> (facts 1 2 3 4 5)
+[ARGACCES4] Function facts expected no more than 4 argument(s)
+CLIPS> (facts "a")
+[ARGACCES5] Function facts expected argument #1 to be of type symbol or positive number
+CLIPS> (facts 1 a)
+[ARGACCES5] Function facts expected argument #2 to be of type integer
+CLIPS> (facts 1 2 a)
+[ARGACCES5] Function facts expected argument #3 to be of type integer
+CLIPS> (facts -1 5 2)
+[ARGACCES5] Function facts expected argument #1 to be of type symbol or positive number
+CLIPS> (facts 4 -1 2)
+[ARGACCES5] Function facts expected argument #2 to be of type positive number
+CLIPS> (facts 3 4 -2)
+[ARGACCES5] Function facts expected argument #3 to be of type positive number
+CLIPS> (facts 4 2)
+CLIPS> (facts 5)
+f-5     (e)
+f-6     (f)
+For a total of 2 facts.
+CLIPS> (facts 3 5)
+f-3     (c)
+f-4     (d)
+f-5     (e)
+For a total of 3 facts.
+CLIPS> (facts 2 6 2)
+f-2     (b)
+f-3     (c)
+For a total of 2 facts.
+CLIPS> (save-facts)                       ; save-facts and load-facts
+[ARGACCES4] Function save-facts expected at least 1 argument(s)
+CLIPS> (save-facts 10)
+[ARGACCES5] Function save-facts expected argument #1 to be of type symbol or string
+CLIPS> (save-facts "Temp//factscmd.tmp" 10)
+[ARGACCES5] Function save-facts expected argument #2 to be of type symbol
+CLIPS> (save-facts "Temp//factscmd.tmp")
+TRUE
+CLIPS> (clear)
+CLIPS> (facts)
+f-0     (initial-fact)
+For a total of 1 fact.
+CLIPS> (load-facts)
+[ARGACCES4] Function load-facts expected exactly 1 argument(s)
+CLIPS> (load-facts 10)
+[ARGACCES5] Function load-facts expected argument #1 to be of type symbol or string
+CLIPS> (load-facts "Temp//factscmd.tmp" 10)
+[ARGACCES4] Function load-facts expected exactly 1 argument(s)
+CLIPS> (load-facts "Temp//factscmd.tmp")
+TRUE
+CLIPS> (facts)
+f-0     (initial-fact)
+f-1     (a)
+f-2     (b)
+f-3     (c)
+f-4     (d)
+f-5     (e)
+f-6     (f)
+For a total of 7 facts.
+CLIPS> (clear)                            ; dependencies and dependents
+CLIPS> (defrule foo1 (logical (a) (b)) => (assert (e)))
+CLIPS> (defrule foo2 (logical (b)) (c) => (assert (e)))
+CLIPS> (defrule foo3 (logical (d) (b) (a)) (c) => (assert (e)))
+CLIPS> (defrule foo4 (logical (d) (b) (a) (c)) => (assert (e)))
+CLIPS> (defrule foo5 (logical (a) (c) (d)) => (assert (e)))
+CLIPS> (defrule foo6 (declare (salience -1)) (logical (c) (d)) => (assert (f)))
+CLIPS> (defrule foo7 (declare (salience -1)) (logical (a)) (c) => (assert (f)))
+CLIPS> (defrule foo8 (declare (salience -1)) (logical (c) (a)) (d) => (assert (f)))
+CLIPS> (defrule foo9 (declare (salience -2)) (logical (d) (c) (b)) => (assert (g)))
+CLIPS> (assert (a) (b) (c) (d))
+<Fact-4>
+CLIPS> (run)
+CLIPS> (facts)
+f-0     (initial-fact)
+f-1     (a)
+f-2     (b)
+f-3     (c)
+f-4     (d)
+f-5     (e)
+f-6     (f)
+f-7     (g)
+For a total of 8 facts.
+CLIPS> (dependencies)
+[ARGACCES4] Function dependencies expected exactly 1 argument(s)
+CLIPS> (dependencies a)
+[PRNTUTIL1] Unable to find instance a.
+CLIPS> (dependencies 10)
+[PRNTUTIL1] Unable to find fact f-10.
+CLIPS> (dependencies 5 6)
+[ARGACCES4] Function dependencies expected exactly 1 argument(s)
+CLIPS> (dependencies 5)
+f-1,f-2
+f-2
+f-1,f-3,f-4
+f-4,f-2,f-1,f-3
+f-4,f-2,f-1
+CLIPS> (dependencies 3)
+None
+CLIPS> (dependents)
+[ARGACCES4] Function dependents expected exactly 1 argument(s)
+CLIPS> (dependents a)
+[PRNTUTIL1] Unable to find instance a.
+CLIPS> (dependents 10)
+[PRNTUTIL1] Unable to find fact f-10.
+CLIPS> (dependents 5 6)
+[ARGACCES4] Function dependents expected exactly 1 argument(s)
+CLIPS> (dependents 1)
+f-5,f-6
+CLIPS> (dependents 2)
+f-5,f-7
+CLIPS> (dependents 3)
+f-5,f-6,f-7
+CLIPS> (dependents 4)
+f-5,f-6,f-7
+CLIPS> (dependents 5)
+None
+CLIPS> (dependents 6)
+None
+CLIPS> (clear)                            ; get-fact-duplication and set-fact-duplication
+CLIPS> (assert (a))
+<Fact-1>
+CLIPS> (assert (a))
+FALSE
+CLIPS> (facts)
+f-0     (initial-fact)
+f-1     (a)
+For a total of 2 facts.
+CLIPS> (get-fact-duplication)  
+FALSE
+CLIPS> (get-fact-duplication TRUE)
+[ARGACCES4] Function get-fact-duplication expected exactly 0 argument(s)
+CLIPS> (set-fact-duplication)
+[ARGACCES4] Function set-fact-duplication expected exactly 1 argument(s)
+CLIPS> (set-fact-duplication TRUE FALSE)
+[ARGACCES4] Function set-fact-duplication expected exactly 1 argument(s)
+CLIPS> (set-fact-duplication 10)
+FALSE
+CLIPS> (get-fact-duplication)
+TRUE
+CLIPS> (set-fact-duplication TRUE)
+TRUE
+CLIPS> (get-fact-duplication)
+TRUE
+CLIPS> (clear)
+CLIPS> (assert (a))
+<Fact-1>
+CLIPS> (assert (a))
+<Fact-2>
+CLIPS> (facts)
+f-0     (initial-fact)
+f-1     (a)
+f-2     (a)
+For a total of 3 facts.
+CLIPS> (set-fact-duplication FALSE)
+TRUE
+CLIPS> (get-fact-duplication)
+FALSE
+CLIPS> (clear)
+CLIPS> (assert (a))
+<Fact-1>
+CLIPS> (assert (a))
+FALSE
+CLIPS> (facts)
+f-0     (initial-fact)
+f-1     (a)
+For a total of 2 facts.
+CLIPS> (clear) ;; New 6.0 Stuff
+CLIPS> (defmodule A)
+CLIPS> (assert (x) (y) (z))
+<Fact-3>
+CLIPS> (defmodule B)
+CLIPS> (assert (a) (b) (c))
+<Fact-6>
+CLIPS> (facts)
+f-4     (a)
+f-5     (b)
+f-6     (c)
+For a total of 3 facts.
+CLIPS> (facts A)
+f-1     (x)
+f-2     (y)
+f-3     (z)
+For a total of 3 facts.
+CLIPS> (facts B)
+f-4     (a)
+f-5     (b)
+f-6     (c)
+For a total of 3 facts.
+CLIPS> (facts *)
+f-0     (initial-fact)
+f-1     (x)
+f-2     (y)
+f-3     (z)
+f-4     (a)
+f-5     (b)
+f-6     (c)
+For a total of 7 facts.
+CLIPS> (clear) ;; New 6.24 stuff
+CLIPS> (ppfact)
+[ARGACCES4] Function ppfact expected at least 1 argument(s)
+CLIPS> (ppfact a)
+[ARGACCES5] Function ppfact expected argument #1 to be of type fact-address or fact-index
+CLIPS> (ppfact 2)
+[PRNTUTIL1] Unable to find fact f-2.
+CLIPS> (assert (foo a b c d))
+<Fact-1>
+CLIPS> (ppfact 1)
+(foo a b c d)
+CLIPS> (ppfact 1 nil)
+CLIPS> (ppfact 1 t)
+(foo a b c d)
+CLIPS> (ppfact 1 t FALSE)
+(foo a b c d)
+CLIPS> (ppfact 1 t TRUE)
+(foo a b c d)
+CLIPS> 
+(deftemplate bar
+   (slot w)
+   (slot x (default 3))
+   (multislot y)
+   (multislot z (default a b)))
+CLIPS> (assert (bar))
+<Fact-2>
+CLIPS> (ppfact 2 t FALSE)
+(bar 
+   (w nil) 
+   (x 3) 
+   (y) 
+   (z a b))
+CLIPS> (ppfact 2 t TRUE)
+(bar)
+CLIPS> (assert (bar (w 1) (x 2) (y 3) (z 4)))
+<Fact-3>
+CLIPS> (ppfact 3 t FALSE)
+(bar 
+   (w 1) 
+   (x 2) 
+   (y 3) 
+   (z 4))
+CLIPS> (ppfact 3 t TRUE)
+(bar 
+   (w 1) 
+   (x 2) 
+   (y 3) 
+   (z 4))
+CLIPS> (clear)
+CLIPS> (dribble-off)

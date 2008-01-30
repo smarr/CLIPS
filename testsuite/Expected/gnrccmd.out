@@ -1,0 +1,55 @@
+TRUE
+CLIPS> (batch "gnrccmd.bat")
+TRUE
+CLIPS> (defclass CAR (is-a USER) (role concrete))
+CLIPS> (make-instance Rolls-Royce of CAR)
+[Rolls-Royce]
+CLIPS> (type Rolls-Royce)
+SYMBOL
+CLIPS> (type [Rolls-Royce])
+CAR
+CLIPS> (type (+ 2 2))
+INTEGER
+CLIPS> (defgeneric describe)
+CLIPS> (defmethod describe ((?a INTEGER))
+  (if (next-methodp) then
+     (bind ?extension (str-cat " " (call-next-method)))
+   else
+     (bind ?extension ""))
+   (str-cat "INTEGER" ?extension))
+CLIPS> (describe 3)
+"INTEGER"
+CLIPS> (defmethod describe ((?a NUMBER))
+   "NUMBER")
+CLIPS> (describe 3)
+"INTEGER NUMBER"
+CLIPS> (describe 3.0)
+"NUMBER"
+CLIPS> (ppdefgeneric describe)
+(defgeneric MAIN::describe)
+CLIPS> (ppdefmethod describe 2)
+(defmethod MAIN::describe
+   ((?a NUMBER))
+   "NUMBER")
+CLIPS> (preview-generic describe 34)
+describe #1  (INTEGER)
+describe #2  (NUMBER)
+CLIPS> (preview-generic describe 34.0)
+describe #2  (NUMBER)
+CLIPS> (list-defgenerics)
+describe
+For a total of 1 defgeneric.
+CLIPS> (list-defmethods)
+describe #1  (INTEGER)
+describe #2  (NUMBER)
+For a total of 2 methods.
+CLIPS> (undefgeneric *)
+CLIPS> (list-defgenerics)
+CLIPS> (list-defmethods)
+CLIPS> (call-next-method 0)
+[ARGACCES4] Function call-next-method expected exactly 0 argument(s)
+CLIPS> (next-methodp 0)
+[ARGACCES4] Function next-methodp expected exactly 0 argument(s)
+CLIPS> (preview-generic)
+[ARGACCES4] Function preview-generic expected at least 1 argument(s)
+CLIPS> (dribble-off)

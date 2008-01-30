@@ -1,0 +1,128 @@
+FIRE    1 startup: *
+
+The problem is
+
+   GERALD
+ + DONALD
+   ------
+ = ROBERT
+
+FIRE    2 generate-combinations: [gen1],[gen20]
+FIRE    3 generate-combinations: [gen2],[gen20]
+FIRE    4 generate-combinations: [gen3],[gen20]
+FIRE    5 generate-combinations: [gen4],[gen20]
+FIRE    6 generate-combinations: [gen5],[gen20]
+FIRE    7 generate-combinations: [gen6],[gen20]
+FIRE    8 generate-combinations: [gen7],[gen20]
+FIRE    9 generate-combinations: [gen8],[gen20]
+FIRE   10 generate-combinations: [gen9],[gen20]
+FIRE   11 generate-combinations: [gen10],[gen20]
+FIRE   12 generate-combinations: [gen1],[gen19]
+FIRE   13 generate-combinations: [gen2],[gen19]
+FIRE   14 generate-combinations: [gen3],[gen19]
+FIRE   15 generate-combinations: [gen4],[gen19]
+FIRE   16 generate-combinations: [gen5],[gen19]
+FIRE   17 generate-combinations: [gen6],[gen19]
+FIRE   18 generate-combinations: [gen7],[gen19]
+FIRE   19 generate-combinations: [gen8],[gen19]
+FIRE   20 generate-combinations: [gen9],[gen19]
+FIRE   21 generate-combinations: [gen10],[gen19]
+FIRE   22 generate-combinations: [gen1],[gen18]
+FIRE   23 generate-combinations: [gen2],[gen18]
+FIRE   24 generate-combinations: [gen3],[gen18]
+FIRE   25 generate-combinations: [gen4],[gen18]
+FIRE   26 generate-combinations: [gen5],[gen18]
+FIRE   27 generate-combinations: [gen6],[gen18]
+FIRE   28 generate-combinations: [gen7],[gen18]
+FIRE   29 generate-combinations: [gen8],[gen18]
+FIRE   30 generate-combinations: [gen9],[gen18]
+FIRE   31 generate-combinations: [gen10],[gen18]
+FIRE   32 generate-combinations: [gen1],[gen17]
+FIRE   33 generate-combinations: [gen2],[gen17]
+FIRE   34 generate-combinations: [gen3],[gen17]
+FIRE   35 generate-combinations: [gen4],[gen17]
+FIRE   36 generate-combinations: [gen5],[gen17]
+FIRE   37 generate-combinations: [gen6],[gen17]
+FIRE   38 generate-combinations: [gen7],[gen17]
+FIRE   39 generate-combinations: [gen8],[gen17]
+FIRE   40 generate-combinations: [gen9],[gen17]
+FIRE   41 generate-combinations: [gen10],[gen17]
+FIRE   42 generate-combinations: [gen1],[gen16]
+FIRE   43 generate-combinations: [gen2],[gen16]
+FIRE   44 generate-combinations: [gen3],[gen16]
+FIRE   45 generate-combinations: [gen4],[gen16]
+FIRE   46 generate-combinations: [gen5],[gen16]
+FIRE   47 generate-combinations: [gen6],[gen16]
+FIRE   48 generate-combinations: [gen7],[gen16]
+FIRE   49 generate-combinations: [gen8],[gen16]
+FIRE   50 generate-combinations: [gen9],[gen16]
+FIRE   51 generate-combinations: [gen10],[gen16]
+FIRE   52 generate-combinations: [gen1],[gen15]
+FIRE   53 generate-combinations: [gen2],[gen15]
+FIRE   54 generate-combinations: [gen3],[gen15]
+FIRE   55 generate-combinations: [gen4],[gen15]
+FIRE   56 generate-combinations: [gen5],[gen15]
+FIRE   57 generate-combinations: [gen6],[gen15]
+FIRE   58 generate-combinations: [gen7],[gen15]
+FIRE   59 generate-combinations: [gen8],[gen15]
+FIRE   60 generate-combinations: [gen9],[gen15]
+FIRE   61 generate-combinations: [gen10],[gen15]
+FIRE   62 generate-combinations: [gen1],[gen14]
+FIRE   63 generate-combinations: [gen2],[gen14]
+FIRE   64 generate-combinations: [gen3],[gen14]
+FIRE   65 generate-combinations: [gen4],[gen14]
+FIRE   66 generate-combinations: [gen5],[gen14]
+FIRE   67 generate-combinations: [gen6],[gen14]
+FIRE   68 generate-combinations: [gen7],[gen14]
+FIRE   69 generate-combinations: [gen8],[gen14]
+FIRE   70 generate-combinations: [gen9],[gen14]
+FIRE   71 generate-combinations: [gen10],[gen14]
+FIRE   72 generate-combinations: [gen1],[gen13]
+FIRE   73 generate-combinations: [gen2],[gen13]
+FIRE   74 generate-combinations: [gen3],[gen13]
+FIRE   75 generate-combinations: [gen4],[gen13]
+FIRE   76 generate-combinations: [gen5],[gen13]
+FIRE   77 generate-combinations: [gen6],[gen13]
+FIRE   78 generate-combinations: [gen7],[gen13]
+FIRE   79 generate-combinations: [gen8],[gen13]
+FIRE   80 generate-combinations: [gen9],[gen13]
+FIRE   81 generate-combinations: [gen10],[gen13]
+FIRE   82 generate-combinations: [gen1],[gen12]
+FIRE   83 generate-combinations: [gen2],[gen12]
+FIRE   84 generate-combinations: [gen3],[gen12]
+FIRE   85 generate-combinations: [gen4],[gen12]
+FIRE   86 generate-combinations: [gen5],[gen12]
+FIRE   87 generate-combinations: [gen6],[gen12]
+FIRE   88 generate-combinations: [gen7],[gen12]
+FIRE   89 generate-combinations: [gen8],[gen12]
+FIRE   90 generate-combinations: [gen9],[gen12]
+FIRE   91 generate-combinations: [gen10],[gen12]
+FIRE   92 generate-combinations: [gen1],[gen11]
+FIRE   93 generate-combinations: [gen2],[gen11]
+FIRE   94 find-solution: [gen66],[gen21],[gen79],[gen98],[gen85],[gen110],[gen47],[gen34],[gen53],[gen112]
+A Solution is:
+
+  G = 1
+  E = 9
+  R = 7
+  A = 4
+  L = 8
+  D = 5
+  O = 2
+  N = 6
+  B = 3
+  T = 0
+
+   197485
+ + 526485
+   ------
+ = 723970
+
+FIRE   95 generate-combinations: [gen3],[gen11]
+FIRE   96 generate-combinations: [gen4],[gen11]
+FIRE   97 generate-combinations: [gen5],[gen11]
+FIRE   98 generate-combinations: [gen6],[gen11]
+FIRE   99 generate-combinations: [gen7],[gen11]
+FIRE  100 generate-combinations: [gen8],[gen11]
+FIRE  101 generate-combinations: [gen9],[gen11]
+FIRE  102 generate-combinations: [gen10],[gen11]

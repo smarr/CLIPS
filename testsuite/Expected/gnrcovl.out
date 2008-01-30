@@ -1,0 +1,9 @@
+TRUE
+CLIPS> (testit)
+OVERLOAD TEST #1 OK.
+OVERLOAD TEST #2 OK.
+OVERLOAD TEST #3 OK.
+OVERLOAD TEST #4 OK.
+OVERLOAD TEST #5 OK.
+No errors detected.
+CLIPS> (dribble-off)

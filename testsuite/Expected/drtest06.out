@@ -1,0 +1,556 @@
+TRUE
+CLIPS> (batch "drtest06.bat")
+TRUE
+CLIPS> (clear)                            ; DR0501
+CLIPS> (defmessage-handler USER foo ())   ; DR0501
+CLIPS> (clear)                            ; DR0501
+CLIPS> (list-defmessage-handlers)         ; DR0501 - None
+init primary in class USER
+delete primary in class USER
+create primary in class USER
+print primary in class USER
+direct-modify primary in class USER
+message-modify primary in class USER
+direct-duplicate primary in class USER
+message-duplicate primary in class USER
+For a total of 8 message-handlers.
+CLIPS> (defclass a (is-a USER))           ; DR0501
+CLIPS> (defmessage-handler a foo ())      ; DR0501
+CLIPS> (defclass a (is-a USER))           ; DR0501
+CLIPS> (list-defmessage-handlers a)       ; DR0501 - Update 1/1/93
+CLIPS> (conserve-mem off)                 ; DR0501
+CLIPS> (defmessage-handler USER foo ())   ; DR0501
+CLIPS> (conserve-mem on)                  ; DR0501
+CLIPS> (defmessage-handler USER foo ())   ; DR0501
+CLIPS> (clear)                            ; DR0501
+CLIPS> (progn (release-mem) TRUE)         ; DR0501
+TRUE
+CLIPS> (conserve-mem off)                 ; DR0501
+CLIPS> (clear)                            ; DR0502
+CLIPS> (defclass a (is-a USER))           ; DR0502
+CLIPS> (defmessage-handler a get-bar ())  ; DR0502
+CLIPS> (defclass a (is-a USER) (slot bar (create-accessor ?NONE))) ;; Update 1/1/93
+CLIPS> (list-defmessage-handlers a)       ; DR0502 - None
+CLIPS> (clear)                            ; DR0503
+CLIPS> (defglobal ?*global-list* = (mv-append 1 2 3 4))
+CLIPS> (defrule foo                       ; DR0503
+   (items $?list)
+   (test (subset ?list ?*global-list*))
+   =>
+   (printout t "Success!" crlf))
+CLIPS> (assert (items 2 3))               ; DR0503
+<Fact-1>
+CLIPS> (run)                              ; DR0503 - Success!
+Success!
+CLIPS> (clear)                            ; DR0504
+CLIPS> (defrule blah =>)                  ; DR0504
+CLIPS> (deffacts a (x y) (z q))           ; DR0504
+CLIPS> (deftemplate foob (field x))       ; DR0504
+CLIPS> (defglobal ?*x* = 6)               ; DR0504
+CLIPS> (deffunction quox (?x) (* ?x 3))   ; DR0504
+CLIPS> (defclass hip (is-a USER))         ; DR0504
+CLIPS> (bsave "Temp//drtest06.bin")       ; DR0504
+[CSTRNBIN1] WARNING: Constraints are not saved with a binary image
+  when dynamic constraint checking is disabled.
+TRUE
+CLIPS> (bload "Temp//drtest06.bin")       ; DR0504
+TRUE
+CLIPS> (bload "Temp//drtest06.bin")       ; DR0504
+TRUE
+CLIPS> (clear)                            ; DR0504
+CLIPS> (clear)                            ; DR0506
+CLIPS> (retract *)                        ; DR0506
+CLIPS> (clear)                            ; DR0508
+CLIPS> (deffacts list-fact                ; DR0508
+   (list 12 "=" 3.0 i2))
+CLIPS> (defrule test-member               ; DR0508
+   (list $?list)
+   =>
+   (printout t "position=" (member i2 ?list) crlf))
+CLIPS> (reset)                            ; DR0508
+CLIPS> (run)                              ; DR0508 - position=4
+position=4
+CLIPS> (clear)                            ; DR0511
+CLIPS> (deftemplate calculate             ; DR0511
+   (field operation
+      (type SYMBOL) (default ?NONE)))
+CLIPS> (assert (calculate (operation +))) ; DR0511
+<Fact-1>
+CLIPS> (modify 1 
+   (calculate (operation op2)))    ; DR0511 - Error
+
+[EXPRNPSR3] Missing function declaration for operation.
+CLIPS> (duplicate 1 
+   (calculate (operation word)))   ; DR0511 - Error
+
+[EXPRNPSR3] Missing function declaration for operation.
+CLIPS> (clear)                            ; DR0512
+CLIPS> (deftemplate calculate             ; DR0512
+   (field operation
+      (type SYMBOL) (default ?NONE)))
+CLIPS> (assert (calculate 
+        (operation 4<56)))         ; DR0512 - Error
+
+[TMPLTDEF2] The single field slot operation can only contain a single field value.
+CLIPS> (assert (calculate (operation go)))
+<Fact-1>
+CLIPS> (modify 1 (operation 467<789)))    ; DR0512 - Error
+
+[TMPLTFUN2] Attempted to assert a multifield value 
+into the single field slot operation of deftemplate calculate.
+FALSE
+CLIPS> (duplicate 1 (operation 54<2345))) ; DR0512 - Error
+
+[TMPLTFUN2] Attempted to assert a multifield value 
+into the single field slot operation of deftemplate calculate.
+FALSE
+CLIPS> (clear)                            ; DR0517
+CLIPS> (deftemplate r                     ; DR0517
+   (field mine) (field yours))     ; DR0517
+CLIPS> (watch facts)                      ; DR0517
+CLIPS> (assert (r (mine "string")))       ; DR0517
+==> f-1     (r (mine "string") (yours nil))
+<Fact-1>
+CLIPS> (assert (r (yours this-is-a-word)))
+==> f-2     (r (mine nil) (yours this-is-a-word))
+<Fact-2>
+CLIPS> (modify 1 (mine "string"))         ; DR0517
+<== f-1     (r (mine "string") (yours nil))
+==> f-3     (r (mine "string") (yours nil))
+<Fact-3>
+CLIPS> (modify 2 (yours wordie))          ; DR0517
+<== f-2     (r (mine nil) (yours this-is-a-word))
+==> f-4     (r (mine nil) (yours wordie))
+<Fact-4>
+CLIPS> (modify 4 (yours is-mine))         ; DR0517
+<== f-4     (r (mine nil) (yours wordie))
+==> f-5     (r (mine nil) (yours is-mine))
+<Fact-5>
+CLIPS> (unwatch facts)                    ; DR0517
+CLIPS> (clear)                            ; DR0519
+CLIPS> (deftemplate result                ; DR0519
+   (field x
+      (type NUMBER)
+      (allowed-floats 5.0  6.0  7.0  8.8  9.0  8.0)
+      (allowed-integers  1 2 3 4)
+      (default ?NONE)))
+CLIPS> (assert (result (x 6)))            ; DR0519
+
+[CSTRNCHK1] A literal slot value found in the assert command
+does not match the allowed values for slot x.
+CLIPS> (clear)                            ; DR0520
+CLIPS> (assert (a) (b) (c))               ; DR0520
+<Fact-3>
+CLIPS> (facts)                            ; DR0520
+f-0     (initial-fact)
+f-1     (a)
+f-2     (b)
+f-3     (c)
+For a total of 4 facts.
+CLIPS> (facts 1 3 2)                      ; DR0520
+f-1     (a)
+f-2     (b)
+For a total of 2 facts.
+CLIPS> (facts 3)                          ; DR0520
+f-3     (c)
+For a total of 1 fact.
+CLIPS> (not FALSE)                        ; DR0521 - TRUE
+TRUE
+CLIPS> (not "FALSE")                      ; DR0521 - FALSE
+FALSE
+CLIPS> (clear)                            ; DR0522
+CLIPS> (deftemplate foo (field x))        ; DR0522
+CLIPS> (assert (foo (x (1 2))))           ; DR0522 - Error
+
+[EXPRNPSR1] A function name must be a symbol
+CLIPS> (facts)                            ; DR0522 - None
+f-0     (initial-fact)
+For a total of 1 fact.
+CLIPS> (print-region 1 1)                 ; DR0524 - Error
+[ARGACCES5] Function print-region expected argument #1 to be of type symbol
+CLIPS> (print-region 3 "foo.lis" ROOT SUBTOPIC)    
+[ARGACCES5] Function print-region expected argument #1 to be of type symbol
+CLIPS> (print-region t 3 ROOT SUBTOPIC)   ; DR0524 - Error
+[ARGACCES5] Function print-region expected argument #2 to be of type symbol or string
+CLIPS> (deffunction mftest ()             ; DR0525
+   (bind ?result (mv-append))
+   (bind ?i 140)
+   (while (> ?i 0) do
+      (bind ?result (mv-append ?i ?result))
+      (bind ?i (- ?i 1)))
+   ?result)
+CLIPS> (mftest)                           ; DR0525
+(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139 140)
+CLIPS> (clear)                            ; DR0526
+CLIPS> (defrule dr0384                    ; DR0526
+   =>
+   (bind ?a (** 2 (- -11 (numberp 3))))
+   (if (and (< ?a 0.000245)  (>=  ?a 0.000244))
+       then (assert (DR0384 OK))))
+[ARGACCES5] Function - expected argument #2 to be of type integer or float
+
+ERROR:
+(defrule MAIN::dr0384
+   =>
+   (bind ?a (** 2 (- -11 (numberp 3))
+CLIPS> (seed (5))                         ; DR0527
+
+[EXPRNPSR1] A function name must be a symbol
+CLIPS> (sym-cat (str-explode "a s d g e f")) ; DR0528 - Error
+[ARGACCES5] Function sym-cat expected argument #1 to be of type string, instance name, symbol, float, or integer
+nil
+CLIPS> (str-length                        ; DR0529 - Error
+   (str-implode ((mv-append 1 2 3 4)
+						           (mv-append 4 3 2 1))))
+
+[EXPRNPSR1] A function name must be a symbol
+CLIPS> (deg-grad 90)                      ; DR0532 - 100.0
+100.0
+CLIPS> (* 3.6 15.0)                       ; DR0533 - 54.0
+54.0
+CLIPS> (* 3.0 15.0)                       ; DR0533 - 45.0
+45.0
+CLIPS> 898~898                            ; DR0536 - 898
+898
+CLIPS> (format nil "%d" 12)               ; DR0539 - "12"
+"12"
+CLIPS> (format nil "|%d|" 12)             ; DR0539 - "|12|"
+"|12|"
+CLIPS> (clear)                            ; DR0540
+CLIPS> (defglobal ?*x* = ?*r*)            ; DR0540 - Error
+[GLOBLDEF1] Global variable ?*r* is unbound.
+
+ERROR:
+(defglobal MAIN ?*x* = ?*r*
+CLIPS> (defglobal ?*w* = 4)               ; DR0540 - OK
+CLIPS> (clear)                            ; DR0541
+CLIPS> (defclass a (is-a OBJECT) (role abstract))
+CLIPS> (defclass b (is-a OBJECT) (role abstract))
+CLIPS> (defclass c (is-a a))              ; DR0541
+CLIPS> (defclass d (is-a b))              ; DR0541
+CLIPS> (defclass e (is-a c d))            ; DR0541
+CLIPS> (defclass f (is-a e b a))          ; DR0541
+CLIPS> (describe-class e)                 ; DR0541 - e c a d b OBJECT
+================================================================================
+********************************************************************************
+Abstract: direct instances of this class cannot be created.
+
+Direct Superclasses: c d
+Inheritance Precedence: e c a d b OBJECT
+Direct Subclasses: f
+********************************************************************************
+================================================================================
+CLIPS> (describe-class f)                 ; DR0541 - f e c d b a OBJECT
+================================================================================
+********************************************************************************
+Abstract: direct instances of this class cannot be created.
+
+Direct Superclasses: e b a
+Inheritance Precedence: f e c d b a OBJECT
+Direct Subclasses:
+********************************************************************************
+================================================================================
+CLIPS> (clear)                            ; DR0542
+CLIPS> (defclass a (is-a USER)            ; DR0542
+   (slot x (default (+ 3 (eval "(gensym)")))))
+[ARGACCES5] Function + expected argument #2 to be of type integer or float
+
+ERROR:
+(defclass MAIN::a
+   (is-a USER)
+   (slot x
+      (default (+ 3 (eval "(gensym)"))))
+CLIPS> (clear)                            ; DR0543
+CLIPS> (deffunction blah () (if a b))     ; DR0543 - Error
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for if function.
+
+ERROR:
+(deffunction MAIN::blah
+   ()
+   (if a
+      b
+CLIPS> (blah)                             ; DR0543 - Undefined
+
+[EXPRNPSR3] Missing function declaration for blah.
+CLIPS> (clear)                            ; DR0548
+CLIPS> (set-incremental-reset FALSE)      ; DR0548
+TRUE
+CLIPS> (defrule foo (not (a)) =>)         ; DR0548
+CLIPS> (reset)                            ; DR0548
+CLIPS> (agenda)                           ; DR0548 - 1 Activation
+0      foo: *
+For a total of 1 activation.
+CLIPS> (clear)                            ; DR0548
+CLIPS> (set-incremental-reset TRUE)       ; DR0548
+FALSE
+CLIPS> (clear)                            ; DR0549
+CLIPS> (defclass A (is-a USER) (role concrete) (slot xy (create-accessor read-write)))
+CLIPS> (make-instance a of A 
+   ((sym-cat x y) 34))             ; DR0549
+[a]
+CLIPS> (send [a] print)                   ; DR0549
+[a] of A
+(xy 34)
+CLIPS> (clear)                            ; DR0551
+CLIPS> (set-strategy breadth)             ; DR0551
+depth
+CLIPS> (defrule blah (declare (salience 10)) =>)
+CLIPS> (defrule flub (declare (salience -10)) =>)
+CLIPS> (reset)                            ; DR0551
+CLIPS> (agenda)                           ; DR0551 - blah, flub
+10     blah: *
+-10    flub: *
+For a total of 2 activations.
+CLIPS> (set-strategy depth)               ; DR0551
+breadth
+CLIPS> (clear)                            ; DR0552
+CLIPS> (defclass A (is-a USER) (role concrete)); DR0552
+CLIPS> (defclass B (is-a USER) (role concrete)); DR0552
+CLIPS> (make-instance a1 of A)            ; DR0552 - [a1]
+[a1]
+CLIPS> (make-instance a2 of A)            ; DR0552 - [a2]
+[a2]
+CLIPS> (make-instance b1 of B)            ; DR0552 - [b1]
+[b1]
+CLIPS> (make-instance b2 of B)            ; DR0552 - [b2]
+[b2]
+CLIPS> (do-for-all-instances ((?a A)) TRUE
+   (do-for-all-instances ((?b B)) TRUE
+     (printout t (instance-name ?a) " " 
+                 (instance-name ?b) crlf))) ; [a1][b1], [a1][b2], [a2][b1], [a2][b2]
+[a1] [b1]
+[a1] [b2]
+[a2] [b1]
+[a2] [b2]
+CLIPS> (format nil "%d1234567890123456789012345678901234567890" 333) ; DR0559
+"3331234567890123456789012345678901234567890"
+CLIPS> (clear)                            ; DR0561
+CLIPS> (deftemplate foo                   ; DR0561
+   (field x (type EXTERNAL-ADDRESS)))
+CLIPS> (assert (foo))                     ; DR0561
+<Fact-1>
+CLIPS> (facts)                            ; DR0561
+f-0     (initial-fact)
+f-1     (foo (x <Pointer-0>)) ;; Any NULL pointer is OK
+For a total of 2 facts.
+CLIPS> (clear)                            ; DR0562
+CLIPS> (deffunction foo ()                ; DR0562
+   (+ ?a 1) (bind ?a 2))           ; DR0562
+CLIPS> (foo)                              ; DR0562 - Error
+[PRCCODE5] Variable a unbound in deffunction foo.
+[ARGACCES5] Function + expected argument #1 to be of type integer or float
+[PRCCODE4] Execution halted during the actions of deffunction foo.
+FALSE
+CLIPS> (clear)                            ; DR0566
+CLIPS> (bind ?a 3)                        ; DR0566 - 3
+3
+CLIPS> (bind ?b 4)                        ; DR0566 - 4
+4
+CLIPS> (+ ?a 3)
+6
+CLIPS> (+ ?a ?b)
+7
+CLIPS> (reset)
+CLIPS> (+ ?a 3)                           ; DR0566 - Error
+[EVALUATN1] Variable a is unbound
+[ARGACCES5] Function + expected argument #1 to be of type integer or float
+0
+CLIPS> (+ ?a ?b)                          ; DR0566 - Error
+[EVALUATN1] Variable a is unbound
+[ARGACCES5] Function + expected argument #1 to be of type integer or float
+0
+CLIPS> (+ ?e 4)                           ; DR0566 - Error
+[EVALUATN1] Variable e is unbound
+[ARGACCES5] Function + expected argument #1 to be of type integer or float
+0
+CLIPS> (clear)                            ; DR0567
+CLIPS> (deffunction foo (?a ?a))          ; DR0567 - Error
+[PRCCODE7] Duplicate parameter names not allowed.
+
+ERROR:
+(deffunction MAIN::foo
+   (?a ?a
+CLIPS> (format t "%s (Yes or No)" "Play Again?") ; DR0568
+Play Again? (Yes or No)"Play Again? (Yes or No)"
+CLIPS> (clear)                            ; DR0569
+CLIPS> (defclass A (is-a USER)            ; DR0569
+   (role concrete)
+   (slot unassigned-parcels)
+   (slot x-location (create-accessor read-write)))
+CLIPS> (make-instance a of A)             ; DR0569 - [a]
+[a]
+CLIPS> (send [a] put-x-location 34)       ; DR0569 - TRUE
+34
+CLIPS> (clear)                            ; DR0570
+CLIPS> (deffunction defgeneric ())        ; DR0570 - Error
+[DFFNXPSR1] Deffunctions are not allowed to replace constructs.
+
+ERROR:
+(deffunction MAIN::defgeneric
+   (
+CLIPS> (deffunction defclass ())          ; DR0570 - Error
+[DFFNXPSR1] Deffunctions are not allowed to replace constructs.
+
+ERROR:
+(deffunction MAIN::defclass
+   (
+CLIPS> (deffunction deftemplate ())       ; DR0570 - Error
+[DFFNXPSR1] Deffunctions are not allowed to replace constructs.
+
+ERROR:
+(deffunction MAIN::deftemplate
+   (
+CLIPS> (deffunction defmethod ())         ; DR0570 - Error
+[DFFNXPSR1] Deffunctions are not allowed to replace constructs.
+
+ERROR:
+(deffunction MAIN::defmethod
+   (
+CLIPS> (deffunction deffacts ())          ; DR0570 - Error
+[DFFNXPSR1] Deffunctions are not allowed to replace constructs.
+
+ERROR:
+(deffunction MAIN::deffacts
+   (
+CLIPS> (list-deffunctions)                ; DR0570 - None
+CLIPS> (clear)                            ; DR0571
+CLIPS> (defglobal ?*x* = 3)               ; DR0571
+CLIPS> (assert (a))                       ; DR0571
+<Fact-1>
+CLIPS> (defrule foo ?f <- (a) => (bind ?*x* ?f))
+CLIPS> (run)                              ; DR0571
+CLIPS> (printout t ?*x* crlf)             ; DR0571
+<Fact-1>
+CLIPS> ?*x*                               ; DR0571
+<Fact-1>
+CLIPS> (clear)                            ; DR0573
+CLIPS> (defclass A (is-a USER))           ; DR0573
+CLIPS> (defclass B (is-a USER))           ; DR0573
+CLIPS> (defclass C (is-a A B) (role concrete)) ; DR0573
+CLIPS> (make-instance c of C)             ; DR0573 - [c]
+[c]
+CLIPS> (instances)                        ; DR0573 - 1 instance
+[initial-object] of INITIAL-OBJECT
+[c] of C
+For a total of 2 instances.
+CLIPS> (instances MAIN B inherit)              ; DR0573 - 1 instance
+[c] of C
+For a total of 1 instance.
+CLIPS> (do-for-all-instances ((?u USER)) TRUE
+    (printout t ?u crlf))          ; DR0573 - 1 instance
+[initial-object]
+[c]
+CLIPS> (clear)                            ; DR0575
+CLIPS> (defrule try-or (or (a) (b)) =>)   ; DR0575
+CLIPS> (bsave "Temp//drtest06.bin")       ; DR0575
+TRUE
+CLIPS> (clear)                            ; DR0575
+CLIPS> (bload "Temp//drtest06.bin")       ; DR0575
+TRUE
+CLIPS> (clear)                            ; DR0575
+CLIPS> (clear)                            ; DR0576
+CLIPS> (deffunction bar () (eval "(+ 5 6)"))
+CLIPS> (deffunction foo () (eval "(+ 3 4 (bar))"))
+CLIPS> (foo)                              ; DR0576 - 18
+18
+CLIPS> (bar)                              ; DR0576 - 11
+11
+CLIPS> (clear)                            ; DR0577
+CLIPS> (defclass A (is-a USER) (slot foo (create-accessor read-write)))
+CLIPS> (defclass B (is-a A))              ; DR0577
+CLIPS> (defmessage-handler A put-foo ())  ; DR0577 - Error
+[MSGPSR3] System message-handlers may not be modified.
+
+ERROR:
+(defmessage-handler MAIN::A put-foo
+   (
+CLIPS> (defmessage-handler B get-foo ())  ; DR0577 - OK
+CLIPS> (defmessage-handler B put-foo ())  ; DR0577 - OK
+CLIPS> (clear)                            ; DR0584 - Behavior changed
+CLIPS> (defclass A (is-a USER)            ; DR0584
+   (role concrete)
+   (slot foo (create-accessor ?NONE) (access read-only) (default 5)))
+CLIPS> (defmessage-handler A put-foo primary (?value)
+  (dynamic-put foo ?value))
+CLIPS> (make-instance a of A)             ; DR0584 - [a]
+[a]
+CLIPS> (instances)                        ; DR0584
+[initial-object] of INITIAL-OBJECT
+[a] of A
+For a total of 2 instances.
+CLIPS> (save-instances "Temp//drtest06.tmp")    ; DR0584
+2
+CLIPS> (unmake-instance a)                ; DR0584
+TRUE
+CLIPS> (load-instances "Temp//drtest06.tmp")    ; DR0584
+[MSGFUN3] foo slot in [a] of A: write access denied.
+[PRCCODE4] Execution halted during the actions of message-handler put-foo primary in class A
+[INSFILE1] Function load-instances could not completely process file Temp//drtest06.tmp.
+1
+CLIPS> (instances)                        ; DR0584
+[initial-object] of INITIAL-OBJECT
+For a total of 1 instance.
+CLIPS> (restore-instances "Temp//drtest06.tmp") ; See CRS
+2
+CLIPS> (instances)                        ; DR0584
+[initial-object] of INITIAL-OBJECT
+[a] of A
+For a total of 2 instances.
+CLIPS> (clear)                            ; DR0588
+CLIPS> (ppdefinstances Teams)             ; DR0588
+[PRNTUTIL1] Unable to find definstances Teams.
+CLIPS> (clear)                            ; DR0590
+CLIPS> (undefinstances *)                 ; DR0590
+CLIPS> (undefinstances Tom)               ; DR0590
+[PRNTUTIL1] Unable to find definstances Tom.
+CLIPS> (clear)                            ; DR0591
+CLIPS> (defrule two                       ; DR0591
+   =>
+  (clear)
+  (printout t "Rule Fired" crlf))
+CLIPS> (reset)                            ; DR0591    
+CLIPS> (run)                              ; DR0591
+[CONSTRCT1] Some constructs are still in use. Clear cannot continue.
+Rule Fired
+CLIPS> (clear)                            ; DR0592
+CLIPS> (deftemplate color                 ; DR0592
+   (field standard
+      (type SYMBOL)
+      (default white)
+      (allowed-symbols red white blue)))
+CLIPS>  (defrule one                      ; DR0592 - Error
+    ?f1 <- (color (standard ?))
+    =>
+    (modify ?f1 (standard none)))
+
+[CSTRNCHK1] A literal slot value found in the modify command
+does not match the allowed values for slot standard.
+
+ERROR:
+(defrule MAIN::one
+   ?f1 <- (color (standard ?))
+   =>
+   (modify ?f1 (standard none)))
+CLIPS> (progn (release-mem) TRUE)         ; DR0592
+TRUE
+CLIPS> (clear)                            ; DR0594
+CLIPS> (defrule junk => (bsave "Temp//drtest06.bin"))     
+CLIPS> (reset)                            ; DR0594
+CLIPS> (run)                              ; DR0594
+CLIPS> (bload "Temp//drtest06.bin")       ; DR0594
+TRUE
+CLIPS> (reset)                            ; DR0594
+CLIPS> (run)                              ; DR0594
+[BSAVE1] Cannot perform a binary save while a binary load is in effect.
+CLIPS> (div 11.0 .5)                      ; DR0595
+[PRNTUTIL7] Attempt to divide by zero in div function.
+1
+CLIPS> (clear)                            ; DR0600
+CLIPS> (defmethod blah 1 ())              ; DR0600
+CLIPS> (defmethod blah (?a))              ; DR0600
+CLIPS> (list-defmethods)                  ; DR0600
+blah #2  ()
+blah #1  
+For a total of 2 methods.
+CLIPS> (dribble-off)

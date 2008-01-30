@@ -1,0 +1,12 @@
+(unwatch all)
+(clear)
+(set-strategy depth)
+(open "Results//drtest04.rsl" drtest04 "w")
+(dribble-on "Actual//drtest04.out")
+(batch "drtest04.bat")
+(dribble-off)
+(load "compline.clp")
+(printout drtest04 "drtest04.bat differences are as follows:" crlf)
+(compare-files "Expected//drtest04.out" "Actual//drtest04.out" drtest04)
+; close result file
+(close drtest04)

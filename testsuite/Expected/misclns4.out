@@ -1,0 +1,465 @@
+TRUE
+CLIPS> (batch "misclns4.bat")
+TRUE
+CLIPS> (clear) ;; Case 1
+CLIPS> (defmodule A (export ?ALL))
+CLIPS> (deftemplate A::foo)
+CLIPS> (defmodule MAIN (import A ?ALL) (export ?ALL))
+CLIPS> (defmodule B (import MAIN ?ALL))
+CLIPS> (deftemplate B::foo)
+
+[CSTRCPSR3] Cannot define deftemplate foo because of an import/export conflict.
+
+ERROR:
+(deftemplate B::foo
+CLIPS> (clear) ;; Case 2
+CLIPS> (defmodule B)
+CLIPS> (defmodule B::foo)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for module specifier.
+
+ERROR:
+(defmodule B::foo
+CLIPS> (clear) ;; Case 3
+CLIPS> (defmodule ROOT (export ?ALL))
+CLIPS> (deftemplate A)
+CLIPS> (defmodule CHILD-1 (import ROOT ?ALL) (export ?ALL))
+CLIPS> (defmodule CHILD-2 (import ROOT ?ALL) (export ?ALL))
+CLIPS> (defmodule CHILD-3 (import CHILD-1 ?ALL) (import CHILD-2 ?ALL))
+CLIPS> (clear) ;; Case 4
+CLIPS> (defmodule d3 (export ?ALL))
+CLIPS> (deftemplate t1)
+CLIPS> (deftemplate t2)
+CLIPS> (defmodule d4 (export deftemplate t3 t4) (import d3 deftemplate t1))
+CLIPS> (clear) ;; Case 5
+CLIPS> (deftemplate foo (slot x) (slot y))
+CLIPS> (defrule bar (foo (x 3) (x 4) (y 3)) =>)
+
+[PRNTUTIL5] The slot x has already been parsed.
+
+ERROR:
+(defrule MAIN::bar
+   (foo (x 3) (x
+CLIPS> (clear) ;; Case 6
+CLIPS> (deftemplate foo (slot x (type SYMBOL)))
+CLIPS> (defrule bar (foo (x ?x)) => (+ ?x 1))
+
+[RULECSTR3] Previous variable bindings of ?x caused the type restrictions
+for argument #1 of the expression (+ ?x 1)
+found in the rule's RHS to be violated.
+
+ERROR:
+(defrule MAIN::bar
+   (foo (x ?x))
+   =>
+   (+ ?x 1))
+CLIPS> (defrule bar (foo (x ?x)) => (assert (yak (+ ?x 1))))
+
+[RULECSTR3] Previous variable bindings of ?x caused the type restrictions
+for argument #1 of the expression (+ ?x 1)
+found in the rule's RHS to be violated.
+
+ERROR:
+(defrule MAIN::bar
+   (foo (x ?x))
+   =>
+   (assert (yak (+ ?x 1))))
+CLIPS> (clear) ;; Case 7
+CLIPS> (defmodule a)
+CLIPS> (assert (start))
+<Fact-1>
+CLIPS> (defrule foo (start) =>)
+CLIPS> (defmodule b)
+CLIPS> (assert (begin))
+<Fact-2>
+CLIPS> (defrule bar (begin) =>)
+CLIPS> (agenda)
+0      bar: f-2
+For a total of 1 activation.
+CLIPS> (agenda a)
+0      foo: f-1
+For a total of 1 activation.
+CLIPS> (agenda b)
+0      bar: f-2
+For a total of 1 activation.
+CLIPS> (agenda *)
+MAIN:
+a:
+   0      foo: f-1
+b:
+   0      bar: f-2
+For a total of 2 activations.
+CLIPS> (clear) ;; Case 8
+CLIPS> (defglobal ?*x* = 0)
+CLIPS> (defrule foo ?f <- (foo) => (bind ?*x* ?f))
+CLIPS> (assert (foo))
+<Fact-1>
+CLIPS> (run)
+CLIPS> (fact-index ?*x*)
+1
+CLIPS> (retract ?*x*)
+CLIPS> (fact-index ?*x*)
+-1
+CLIPS> (retract ?*x*)
+CLIPS> (clear) ;; Case 9
+CLIPS> (defmodule FOO (export ?ALL))
+CLIPS> (deftemplate FOO::foo)
+CLIPS> (defmodule BAR (export ?ALL) (import FOO ?ALL))
+CLIPS> (deftemplate BAR::foo)
+
+[CSTRCPSR3] Cannot define deftemplate foo because of an import/export conflict.
+
+ERROR:
+(deftemplate BAR::foo
+CLIPS> (clear) ;; Case 10
+CLIPS> (defmodule FOO (export ?ALL))
+CLIPS> (deftemplate FOO::foo)
+CLIPS> (defmodule BAR (export ?ALL))
+CLIPS> (deftemplate BAR::foo)
+CLIPS> (defmodule YAK (import FOO ?ALL) (import BAR ?ALL))
+
+[CSTRCPSR3] Cannot define defmodule YAK because of an import/export conflict caused by the deftemplate foo.
+
+ERROR:
+(defmodule YAK
+   (import FOO ?ALL)
+   (import BAR ?ALL))
+CLIPS> (clear) ;; Case 11
+CLIPS> 
+(deftemplate set 
+  (multislot members))
+CLIPS> 
+(deffacts stuff
+  (set (members Q R S D T A B D)))
+CLIPS> 
+(defrule remove-duplicates
+   ?f <- (set (members $?b ?element $?m ?element $?e))
+   =>
+   (printout t ?b " " ?element " " ?m " " ?e crlf)
+   (modify ?f (members ?b ?element ?m ?e)))
+CLIPS> (reset)
+CLIPS> (run)
+(Q R S) D (T A B) ()
+CLIPS> (facts)
+f-0     (initial-fact)
+f-2     (set (members Q R S D T A B))
+For a total of 2 facts.
+CLIPS> (clear) ;; Case 12
+CLIPS> 
+(deftemplate set 
+  (multislot m1)
+  (multislot m2))
+CLIPS> 
+(deffacts stuff
+  (set (m1 Q R S D T A B D X) (m2 Q R D A B D S X)))
+CLIPS> 
+(defrule remove-duplicates
+   ?f <- (set (m1 $?b1 ?element1 $?m1 ?element1 $?e1 X)
+              (m2 $?b2 ?element2 $?m2 ?element2 $?e2 X))
+   =>
+   (printout t ?b1 " " ?element1 " " ?m1 " " ?e1 crlf)
+   (printout t ?b2 " " ?element2 " " ?m2 " " ?e2 crlf)
+   (modify ?f (m1 ?b1 ?element1 ?m1 ?e1)
+              (m2 ?b2 ?element2 ?m2 ?e2)))
+CLIPS> (reset)
+CLIPS> (run)
+(Q R S) D (T A B) ()
+(Q R) D (A B) (S)
+CLIPS> (facts)
+f-0     (initial-fact)
+f-2     (set (m1 Q R S D T A B) (m2 Q R D A B S))
+For a total of 2 facts.
+CLIPS> (clear) ;; Case 13
+CLIPS> 
+(deftemplate set 
+  (multislot m2))
+CLIPS> 
+(deffacts stuff
+  (set (m2 D D S X)))
+CLIPS> 
+(defrule remove-duplicates
+   ?f <- (set (m2 ?l2 $?m2 ?l2 $?e2 X))
+   =>
+   (printout t ?l2 " " ?m2 " " ?e2 crlf)
+   (modify ?f (m2 ?l2 ?m2 ?e2)))
+CLIPS> (reset)
+CLIPS> (run)
+D () (S)
+CLIPS> (facts)
+f-0     (initial-fact)
+f-2     (set (m2 D S))
+For a total of 2 facts.
+CLIPS> (clear) ;; Case 14
+CLIPS> (defglobal ?*x* = 0)
+CLIPS> (defmodule  MAIN (export ?ALL))
+CLIPS> (defmodule FOO (import MAIN defglobal ?ALL))
+CLIPS> (bind ?*x* 1)
+1
+CLIPS> ?*x*
+1
+CLIPS> (clear) ;; Case 15
+CLIPS> 
+(defrule blah (m2 ?l2 $?m2 ?l2 $?e2 X) 
+   => 
+   (printout t ?l2 " " ?m2 " " ?e2 crlf))
+CLIPS> (assert (m2 D D S X))
+<Fact-1>
+CLIPS> (run)
+D () (S)
+CLIPS> (clear) ;; Case 16
+CLIPS> 
+(deftemplate adder
+  (multislot #-1)
+  (multislot #-2))
+CLIPS> 
+(deffacts adder-info
+  (adder (#-1 1 0 1) (#-2 1 1))
+  (adder (#-1 1) (#-2 0)))
+CLIPS> 
+(defrule another-bug
+  (adder (#-1 $?n1 ?v)
+         (#-2 $?n2 ~?v))
+  =>)
+CLIPS> (reset)
+CLIPS> (agenda)
+0      another-bug: f-2
+For a total of 1 activation.
+CLIPS> (clear) ;; Case 17
+CLIPS> (defmodule MAIN (export ?ALL))
+CLIPS> (defmodule A (import MAIN ?ALL) (export ?ALL))
+CLIPS> (deftemplate A::a (slot x))
+CLIPS> (defmodule B (import MAIN ?ALL) (import A ?ALL) (export ?ALL))
+CLIPS> (deftemplate B::b (slot y))
+CLIPS> (clear) ;; Case 18
+CLIPS> 
+(defrule foo
+  (declare (salience 4))
+  (x)
+  (not (and (a) (b)))
+  (y)
+  =>)
+CLIPS>   
+(defrule bar
+  (declare (salience 3))
+  (x)
+  (not (and (a) (b)))
+  (test (< 5 3))
+  (y)
+  =>)
+CLIPS>   
+(defrule dog
+  (declare (salience 2))
+  (x)
+  (z)
+  (not (and (a) (b)))
+  (test (< 5 3))
+  (y)
+  =>)
+CLIPS>   
+(defrule yak
+  (declare (salience 1))
+  (x)
+  (z)
+  (not (and (a) (b)))
+  (y)
+  =>)
+CLIPS> (reset)
+CLIPS> (agenda)
+CLIPS> (assert (x))
+<Fact-1>
+CLIPS> (agenda)
+CLIPS> (assert (y))
+<Fact-2>
+CLIPS> (agenda)
+4      foo: f-1,*,f-2
+For a total of 1 activation.
+CLIPS> (assert (z))
+<Fact-3>
+CLIPS> (agenda)
+4      foo: f-1,*,f-2
+1      yak: f-1,f-3,*,f-2
+For a total of 2 activations.
+CLIPS> (assert (a))
+<Fact-4>
+CLIPS> (agenda)
+4      foo: f-1,*,f-2
+1      yak: f-1,f-3,*,f-2
+For a total of 2 activations.
+CLIPS> (assert (b))
+<Fact-5>
+CLIPS> (agenda)
+CLIPS> (clear) ;; Case 19
+CLIPS> (assert (foo))
+<Fact-1>
+CLIPS> (defmodule BAR)
+CLIPS> (assert (bar))
+<Fact-2>
+CLIPS> (save-facts "Temp//bug.tmp")
+TRUE
+CLIPS> (bsave "Temp//bug.bin")
+TRUE
+CLIPS> (bload "Temp//bug.bin")
+TRUE
+CLIPS> (load-facts "Temp//bug.tmp") 
+[FACTRHS1] Template bar does not exist for assert.
+Function load-facts encountered an error
+FALSE
+CLIPS> (facts)
+CLIPS> (clear) ;; Case 20
+CLIPS> 
+(defrule foo1
+  (declare (salience 10))
+  =>)
+CLIPS> 
+(defrule foo2
+  (declare (auto-focus TRUE))
+  =>)
+CLIPS> 
+(defrule foo3
+  (declare (auto-focus TRUE) (salience 10))
+  =>)
+CLIPS> 
+(defrule foo4
+  (declare (salience 10) (auto-focus TRUE))
+  =>)
+CLIPS> (ppdefrule foo1)
+(defrule MAIN::foo1
+   (declare (salience 10))
+   =>)
+CLIPS> (ppdefrule foo2)
+(defrule MAIN::foo2
+   (declare (auto-focus TRUE))
+   =>)
+CLIPS> (ppdefrule foo3)
+(defrule MAIN::foo3
+   (declare (auto-focus TRUE) (salience 10))
+   =>)
+CLIPS> (ppdefrule foo4)
+(defrule MAIN::foo4
+   (declare (salience 10) (auto-focus TRUE))
+   =>)
+CLIPS> (clear) ; watching specific items
+CLIPS> (unwatch all)
+CLIPS> (defglobal ?*foo* = 1)
+CLIPS> (defglobal ?*bar* = 2)
+CLIPS> (deftemplate foo)
+CLIPS> (deftemplate bar)
+CLIPS> (defrule foo (foo) => (assert (bar)))
+CLIPS> (defrule bar (bar) =>)
+CLIPS> (watch rules foo)
+CLIPS> (watch globals foo)
+CLIPS> (watch facts foo)
+CLIPS> (watch activations foo)
+CLIPS> (watch rules yak)
+[ARGACCES5] Function watch expected argument #2 to be of type defrule
+CLIPS> (watch globals yak)
+[ARGACCES5] Function watch expected argument #2 to be of type defglobal
+CLIPS> (watch facts yak)
+[ARGACCES5] Function watch expected argument #2 to be of type deftemplate
+CLIPS> (watch activations yak)
+[ARGACCES5] Function watch expected argument #2 to be of type defrule
+CLIPS> (watch compilations foo)
+[ARGACCES4] Function watch expected exactly 1 argument(s)
+CLIPS> (watch statistics foo)
+[ARGACCES4] Function watch expected exactly 1 argument(s)
+CLIPS> (watch focus foo)
+[ARGACCES4] Function watch expected exactly 1 argument(s)
+CLIPS> (reset)
+:== ?*foo* ==> 1 <== 1
+CLIPS> (bind ?*foo* 3)
+:== ?*foo* ==> 3 <== 1
+3
+CLIPS> (bind ?*bar* 4)
+4
+CLIPS> (assert (foo))
+==> f-1     (foo)
+==> Activation 0      foo: f-1
+<Fact-1>
+CLIPS> (run)
+FIRE    1 foo: f-1
+CLIPS> (list-watch-items)
+facts = off
+instances = off
+slots = off
+rules = off
+activations = off
+messages = off
+message-handlers = off
+generic-functions = off
+methods = off
+deffunctions = off
+compilations = off
+statistics = off
+globals = off
+focus = off
+CLIPS> (list-watch-items globals)
+globals = off
+MAIN:
+   foo = on
+   bar = off
+CLIPS> (list-watch-items facts)
+facts = off
+MAIN:
+   initial-fact = off
+   foo = on
+   bar = off
+CLIPS> (list-watch-items rules)
+rules = off
+MAIN:
+   foo = on
+   bar = off
+CLIPS> (list-watch-items activations)
+activations = off
+MAIN:
+   foo = on
+   bar = off
+CLIPS> (list-watch-items compilations)
+compilations = off
+CLIPS> (list-watch-items statistics)
+statistics = off
+CLIPS> (list-watch-items focus)
+focus = off
+CLIPS> (unwatch all)
+CLIPS> (list-watch-items)
+facts = off
+instances = off
+slots = off
+rules = off
+activations = off
+messages = off
+message-handlers = off
+generic-functions = off
+methods = off
+deffunctions = off
+compilations = off
+statistics = off
+globals = off
+focus = off
+CLIPS> (list-watch-items globals)
+globals = off
+MAIN:
+   foo = off
+   bar = off
+CLIPS> (list-watch-items facts)
+facts = off
+MAIN:
+   initial-fact = off
+   foo = off
+   bar = off
+CLIPS> (list-watch-items rules)
+rules = off
+MAIN:
+   foo = off
+   bar = off
+CLIPS> (list-watch-items activations)
+activations = off
+MAIN:
+   foo = off
+   bar = off
+CLIPS> (list-watch-items compilations)
+compilations = off
+CLIPS> (list-watch-items statistics)
+statistics = off
+CLIPS> (list-watch-items focus)
+focus = off
+CLIPS> (dribble-off)

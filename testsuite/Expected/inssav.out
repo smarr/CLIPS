@@ -1,0 +1,1323 @@
+TRUE
+CLIPS> (batch "inssav.bat")
+TRUE
+CLIPS> (reset)
+CLIPS> (set-current-module MAIN)
+MAIN
+CLIPS> (generate-instances BAR 100 B D E)
+FALSE
+CLIPS> (generate-instances WOZ 100 F G)
+FALSE
+CLIPS> (instances *)
+MAIN:
+   [initial-object] of INITIAL-OBJECT
+   [gen1] of B
+   [gen2] of B
+   [gen3] of B
+   [gen4] of B
+   [gen5] of B
+   [gen6] of B
+   [gen7] of B
+   [gen8] of B
+   [gen9] of B
+   [gen10] of B
+   [gen11] of B
+   [gen12] of B
+   [gen13] of B
+   [gen14] of B
+   [gen15] of B
+   [gen16] of B
+   [gen17] of B
+   [gen18] of B
+   [gen19] of B
+   [gen20] of B
+   [gen21] of B
+   [gen22] of B
+   [gen23] of B
+   [gen24] of B
+   [gen25] of B
+   [gen26] of B
+   [gen27] of B
+   [gen28] of B
+   [gen29] of B
+   [gen30] of B
+   [gen31] of B
+   [gen32] of B
+   [gen33] of B
+   [gen34] of B
+   [gen35] of B
+   [gen36] of B
+   [gen37] of B
+   [gen38] of B
+   [gen39] of B
+   [gen40] of B
+   [gen41] of B
+   [gen42] of B
+   [gen43] of B
+   [gen44] of B
+   [gen45] of B
+   [gen46] of B
+   [gen47] of B
+   [gen48] of B
+   [gen49] of B
+   [gen50] of B
+   [gen51] of B
+   [gen52] of B
+   [gen53] of B
+   [gen54] of B
+   [gen55] of B
+   [gen56] of B
+   [gen57] of B
+   [gen58] of B
+   [gen59] of B
+   [gen60] of B
+   [gen61] of B
+   [gen62] of B
+   [gen63] of B
+   [gen64] of B
+   [gen65] of B
+   [gen66] of B
+   [gen67] of B
+   [gen68] of B
+   [gen69] of B
+   [gen70] of B
+   [gen71] of B
+   [gen72] of B
+   [gen73] of B
+   [gen74] of B
+   [gen75] of B
+   [gen76] of B
+   [gen77] of B
+   [gen78] of B
+   [gen79] of B
+   [gen80] of B
+   [gen81] of B
+   [gen82] of B
+   [gen83] of B
+   [gen84] of B
+   [gen85] of B
+   [gen86] of B
+   [gen87] of B
+   [gen88] of B
+   [gen89] of B
+   [gen90] of B
+   [gen91] of B
+   [gen92] of B
+   [gen93] of B
+   [gen94] of B
+   [gen95] of B
+   [gen96] of B
+   [gen97] of B
+   [gen98] of B
+   [gen99] of B
+   [gen100] of B
+BAR:
+   [gen101] of D
+   [gen102] of D
+   [gen103] of D
+   [gen104] of D
+   [gen105] of D
+   [gen106] of D
+   [gen107] of D
+   [gen108] of D
+   [gen109] of D
+   [gen110] of D
+   [gen111] of D
+   [gen112] of D
+   [gen113] of D
+   [gen114] of D
+   [gen115] of D
+   [gen116] of D
+   [gen117] of D
+   [gen118] of D
+   [gen119] of D
+   [gen120] of D
+   [gen121] of D
+   [gen122] of D
+   [gen123] of D
+   [gen124] of D
+   [gen125] of D
+   [gen126] of D
+   [gen127] of D
+   [gen128] of D
+   [gen129] of D
+   [gen130] of D
+   [gen131] of D
+   [gen132] of D
+   [gen133] of D
+   [gen134] of D
+   [gen135] of D
+   [gen136] of D
+   [gen137] of D
+   [gen138] of D
+   [gen139] of D
+   [gen140] of D
+   [gen141] of D
+   [gen142] of D
+   [gen143] of D
+   [gen144] of D
+   [gen145] of D
+   [gen146] of D
+   [gen147] of D
+   [gen148] of D
+   [gen149] of D
+   [gen150] of D
+   [gen151] of D
+   [gen152] of D
+   [gen153] of D
+   [gen154] of D
+   [gen155] of D
+   [gen156] of D
+   [gen157] of D
+   [gen158] of D
+   [gen159] of D
+   [gen160] of D
+   [gen161] of D
+   [gen162] of D
+   [gen163] of D
+   [gen164] of D
+   [gen165] of D
+   [gen166] of D
+   [gen167] of D
+   [gen168] of D
+   [gen169] of D
+   [gen170] of D
+   [gen171] of D
+   [gen172] of D
+   [gen173] of D
+   [gen174] of D
+   [gen175] of D
+   [gen176] of D
+   [gen177] of D
+   [gen178] of D
+   [gen179] of D
+   [gen180] of D
+   [gen181] of D
+   [gen182] of D
+   [gen183] of D
+   [gen184] of D
+   [gen185] of D
+   [gen186] of D
+   [gen187] of D
+   [gen188] of D
+   [gen189] of D
+   [gen190] of D
+   [gen191] of D
+   [gen192] of D
+   [gen193] of D
+   [gen194] of D
+   [gen195] of D
+   [gen196] of D
+   [gen197] of D
+   [gen198] of D
+   [gen199] of D
+   [gen200] of D
+   [gen201] of E
+   [gen202] of E
+   [gen203] of E
+   [gen204] of E
+   [gen205] of E
+   [gen206] of E
+   [gen207] of E
+   [gen208] of E
+   [gen209] of E
+   [gen210] of E
+   [gen211] of E
+   [gen212] of E
+   [gen213] of E
+   [gen214] of E
+   [gen215] of E
+   [gen216] of E
+   [gen217] of E
+   [gen218] of E
+   [gen219] of E
+   [gen220] of E
+   [gen221] of E
+   [gen222] of E
+   [gen223] of E
+   [gen224] of E
+   [gen225] of E
+   [gen226] of E
+   [gen227] of E
+   [gen228] of E
+   [gen229] of E
+   [gen230] of E
+   [gen231] of E
+   [gen232] of E
+   [gen233] of E
+   [gen234] of E
+   [gen235] of E
+   [gen236] of E
+   [gen237] of E
+   [gen238] of E
+   [gen239] of E
+   [gen240] of E
+   [gen241] of E
+   [gen242] of E
+   [gen243] of E
+   [gen244] of E
+   [gen245] of E
+   [gen246] of E
+   [gen247] of E
+   [gen248] of E
+   [gen249] of E
+   [gen250] of E
+   [gen251] of E
+   [gen252] of E
+   [gen253] of E
+   [gen254] of E
+   [gen255] of E
+   [gen256] of E
+   [gen257] of E
+   [gen258] of E
+   [gen259] of E
+   [gen260] of E
+   [gen261] of E
+   [gen262] of E
+   [gen263] of E
+   [gen264] of E
+   [gen265] of E
+   [gen266] of E
+   [gen267] of E
+   [gen268] of E
+   [gen269] of E
+   [gen270] of E
+   [gen271] of E
+   [gen272] of E
+   [gen273] of E
+   [gen274] of E
+   [gen275] of E
+   [gen276] of E
+   [gen277] of E
+   [gen278] of E
+   [gen279] of E
+   [gen280] of E
+   [gen281] of E
+   [gen282] of E
+   [gen283] of E
+   [gen284] of E
+   [gen285] of E
+   [gen286] of E
+   [gen287] of E
+   [gen288] of E
+   [gen289] of E
+   [gen290] of E
+   [gen291] of E
+   [gen292] of E
+   [gen293] of E
+   [gen294] of E
+   [gen295] of E
+   [gen296] of E
+   [gen297] of E
+   [gen298] of E
+   [gen299] of E
+   [gen300] of E
+WOZ:
+   [gen401] of G
+   [gen402] of G
+   [gen403] of G
+   [gen404] of G
+   [gen405] of G
+   [gen406] of G
+   [gen407] of G
+   [gen408] of G
+   [gen409] of G
+   [gen410] of G
+   [gen411] of G
+   [gen412] of G
+   [gen413] of G
+   [gen414] of G
+   [gen415] of G
+   [gen416] of G
+   [gen417] of G
+   [gen418] of G
+   [gen419] of G
+   [gen420] of G
+   [gen421] of G
+   [gen422] of G
+   [gen423] of G
+   [gen424] of G
+   [gen425] of G
+   [gen426] of G
+   [gen427] of G
+   [gen428] of G
+   [gen429] of G
+   [gen430] of G
+   [gen431] of G
+   [gen432] of G
+   [gen433] of G
+   [gen434] of G
+   [gen435] of G
+   [gen436] of G
+   [gen437] of G
+   [gen438] of G
+   [gen439] of G
+   [gen440] of G
+   [gen441] of G
+   [gen442] of G
+   [gen443] of G
+   [gen444] of G
+   [gen445] of G
+   [gen446] of G
+   [gen447] of G
+   [gen448] of G
+   [gen449] of G
+   [gen450] of G
+   [gen451] of G
+   [gen452] of G
+   [gen453] of G
+   [gen454] of G
+   [gen455] of G
+   [gen456] of G
+   [gen457] of G
+   [gen458] of G
+   [gen459] of G
+   [gen460] of G
+   [gen461] of G
+   [gen462] of G
+   [gen463] of G
+   [gen464] of G
+   [gen465] of G
+   [gen466] of G
+   [gen467] of G
+   [gen468] of G
+   [gen469] of G
+   [gen470] of G
+   [gen471] of G
+   [gen472] of G
+   [gen473] of G
+   [gen474] of G
+   [gen475] of G
+   [gen476] of G
+   [gen477] of G
+   [gen478] of G
+   [gen479] of G
+   [gen480] of G
+   [gen481] of G
+   [gen482] of G
+   [gen483] of G
+   [gen484] of G
+   [gen485] of G
+   [gen486] of G
+   [gen487] of G
+   [gen488] of G
+   [gen489] of G
+   [gen490] of G
+   [gen491] of G
+   [gen492] of G
+   [gen493] of G
+   [gen494] of G
+   [gen495] of G
+   [gen496] of G
+   [gen497] of G
+   [gen498] of G
+   [gen499] of G
+   [gen500] of G
+   [gen301] of F
+   [gen302] of F
+   [gen303] of F
+   [gen304] of F
+   [gen305] of F
+   [gen306] of F
+   [gen307] of F
+   [gen308] of F
+   [gen309] of F
+   [gen310] of F
+   [gen311] of F
+   [gen312] of F
+   [gen313] of F
+   [gen314] of F
+   [gen315] of F
+   [gen316] of F
+   [gen317] of F
+   [gen318] of F
+   [gen319] of F
+   [gen320] of F
+   [gen321] of F
+   [gen322] of F
+   [gen323] of F
+   [gen324] of F
+   [gen325] of F
+   [gen326] of F
+   [gen327] of F
+   [gen328] of F
+   [gen329] of F
+   [gen330] of F
+   [gen331] of F
+   [gen332] of F
+   [gen333] of F
+   [gen334] of F
+   [gen335] of F
+   [gen336] of F
+   [gen337] of F
+   [gen338] of F
+   [gen339] of F
+   [gen340] of F
+   [gen341] of F
+   [gen342] of F
+   [gen343] of F
+   [gen344] of F
+   [gen345] of F
+   [gen346] of F
+   [gen347] of F
+   [gen348] of F
+   [gen349] of F
+   [gen350] of F
+   [gen351] of F
+   [gen352] of F
+   [gen353] of F
+   [gen354] of F
+   [gen355] of F
+   [gen356] of F
+   [gen357] of F
+   [gen358] of F
+   [gen359] of F
+   [gen360] of F
+   [gen361] of F
+   [gen362] of F
+   [gen363] of F
+   [gen364] of F
+   [gen365] of F
+   [gen366] of F
+   [gen367] of F
+   [gen368] of F
+   [gen369] of F
+   [gen370] of F
+   [gen371] of F
+   [gen372] of F
+   [gen373] of F
+   [gen374] of F
+   [gen375] of F
+   [gen376] of F
+   [gen377] of F
+   [gen378] of F
+   [gen379] of F
+   [gen380] of F
+   [gen381] of F
+   [gen382] of F
+   [gen383] of F
+   [gen384] of F
+   [gen385] of F
+   [gen386] of F
+   [gen387] of F
+   [gen388] of F
+   [gen389] of F
+   [gen390] of F
+   [gen391] of F
+   [gen392] of F
+   [gen393] of F
+   [gen394] of F
+   [gen395] of F
+   [gen396] of F
+   [gen397] of F
+   [gen398] of F
+   [gen399] of F
+   [gen400] of F
+FOO:
+For a total of 501 instances.
+CLIPS> (instances)
+[initial-object] of INITIAL-OBJECT
+[gen1] of B
+[gen2] of B
+[gen3] of B
+[gen4] of B
+[gen5] of B
+[gen6] of B
+[gen7] of B
+[gen8] of B
+[gen9] of B
+[gen10] of B
+[gen11] of B
+[gen12] of B
+[gen13] of B
+[gen14] of B
+[gen15] of B
+[gen16] of B
+[gen17] of B
+[gen18] of B
+[gen19] of B
+[gen20] of B
+[gen21] of B
+[gen22] of B
+[gen23] of B
+[gen24] of B
+[gen25] of B
+[gen26] of B
+[gen27] of B
+[gen28] of B
+[gen29] of B
+[gen30] of B
+[gen31] of B
+[gen32] of B
+[gen33] of B
+[gen34] of B
+[gen35] of B
+[gen36] of B
+[gen37] of B
+[gen38] of B
+[gen39] of B
+[gen40] of B
+[gen41] of B
+[gen42] of B
+[gen43] of B
+[gen44] of B
+[gen45] of B
+[gen46] of B
+[gen47] of B
+[gen48] of B
+[gen49] of B
+[gen50] of B
+[gen51] of B
+[gen52] of B
+[gen53] of B
+[gen54] of B
+[gen55] of B
+[gen56] of B
+[gen57] of B
+[gen58] of B
+[gen59] of B
+[gen60] of B
+[gen61] of B
+[gen62] of B
+[gen63] of B
+[gen64] of B
+[gen65] of B
+[gen66] of B
+[gen67] of B
+[gen68] of B
+[gen69] of B
+[gen70] of B
+[gen71] of B
+[gen72] of B
+[gen73] of B
+[gen74] of B
+[gen75] of B
+[gen76] of B
+[gen77] of B
+[gen78] of B
+[gen79] of B
+[gen80] of B
+[gen81] of B
+[gen82] of B
+[gen83] of B
+[gen84] of B
+[gen85] of B
+[gen86] of B
+[gen87] of B
+[gen88] of B
+[gen89] of B
+[gen90] of B
+[gen91] of B
+[gen92] of B
+[gen93] of B
+[gen94] of B
+[gen95] of B
+[gen96] of B
+[gen97] of B
+[gen98] of B
+[gen99] of B
+[gen100] of B
+For a total of 101 instances.
+CLIPS> (set-current-module BAR)
+MAIN
+CLIPS> (instances)
+[initial-object] of INITIAL-OBJECT
+[gen1] of MAIN::B
+[gen2] of MAIN::B
+[gen3] of MAIN::B
+[gen4] of MAIN::B
+[gen5] of MAIN::B
+[gen6] of MAIN::B
+[gen7] of MAIN::B
+[gen8] of MAIN::B
+[gen9] of MAIN::B
+[gen10] of MAIN::B
+[gen11] of MAIN::B
+[gen12] of MAIN::B
+[gen13] of MAIN::B
+[gen14] of MAIN::B
+[gen15] of MAIN::B
+[gen16] of MAIN::B
+[gen17] of MAIN::B
+[gen18] of MAIN::B
+[gen19] of MAIN::B
+[gen20] of MAIN::B
+[gen21] of MAIN::B
+[gen22] of MAIN::B
+[gen23] of MAIN::B
+[gen24] of MAIN::B
+[gen25] of MAIN::B
+[gen26] of MAIN::B
+[gen27] of MAIN::B
+[gen28] of MAIN::B
+[gen29] of MAIN::B
+[gen30] of MAIN::B
+[gen31] of MAIN::B
+[gen32] of MAIN::B
+[gen33] of MAIN::B
+[gen34] of MAIN::B
+[gen35] of MAIN::B
+[gen36] of MAIN::B
+[gen37] of MAIN::B
+[gen38] of MAIN::B
+[gen39] of MAIN::B
+[gen40] of MAIN::B
+[gen41] of MAIN::B
+[gen42] of MAIN::B
+[gen43] of MAIN::B
+[gen44] of MAIN::B
+[gen45] of MAIN::B
+[gen46] of MAIN::B
+[gen47] of MAIN::B
+[gen48] of MAIN::B
+[gen49] of MAIN::B
+[gen50] of MAIN::B
+[gen51] of MAIN::B
+[gen52] of MAIN::B
+[gen53] of MAIN::B
+[gen54] of MAIN::B
+[gen55] of MAIN::B
+[gen56] of MAIN::B
+[gen57] of MAIN::B
+[gen58] of MAIN::B
+[gen59] of MAIN::B
+[gen60] of MAIN::B
+[gen61] of MAIN::B
+[gen62] of MAIN::B
+[gen63] of MAIN::B
+[gen64] of MAIN::B
+[gen65] of MAIN::B
+[gen66] of MAIN::B
+[gen67] of MAIN::B
+[gen68] of MAIN::B
+[gen69] of MAIN::B
+[gen70] of MAIN::B
+[gen71] of MAIN::B
+[gen72] of MAIN::B
+[gen73] of MAIN::B
+[gen74] of MAIN::B
+[gen75] of MAIN::B
+[gen76] of MAIN::B
+[gen77] of MAIN::B
+[gen78] of MAIN::B
+[gen79] of MAIN::B
+[gen80] of MAIN::B
+[gen81] of MAIN::B
+[gen82] of MAIN::B
+[gen83] of MAIN::B
+[gen84] of MAIN::B
+[gen85] of MAIN::B
+[gen86] of MAIN::B
+[gen87] of MAIN::B
+[gen88] of MAIN::B
+[gen89] of MAIN::B
+[gen90] of MAIN::B
+[gen91] of MAIN::B
+[gen92] of MAIN::B
+[gen93] of MAIN::B
+[gen94] of MAIN::B
+[gen95] of MAIN::B
+[gen96] of MAIN::B
+[gen97] of MAIN::B
+[gen98] of MAIN::B
+[gen99] of MAIN::B
+[gen100] of MAIN::B
+[gen101] of D
+[gen102] of D
+[gen103] of D
+[gen104] of D
+[gen105] of D
+[gen106] of D
+[gen107] of D
+[gen108] of D
+[gen109] of D
+[gen110] of D
+[gen111] of D
+[gen112] of D
+[gen113] of D
+[gen114] of D
+[gen115] of D
+[gen116] of D
+[gen117] of D
+[gen118] of D
+[gen119] of D
+[gen120] of D
+[gen121] of D
+[gen122] of D
+[gen123] of D
+[gen124] of D
+[gen125] of D
+[gen126] of D
+[gen127] of D
+[gen128] of D
+[gen129] of D
+[gen130] of D
+[gen131] of D
+[gen132] of D
+[gen133] of D
+[gen134] of D
+[gen135] of D
+[gen136] of D
+[gen137] of D
+[gen138] of D
+[gen139] of D
+[gen140] of D
+[gen141] of D
+[gen142] of D
+[gen143] of D
+[gen144] of D
+[gen145] of D
+[gen146] of D
+[gen147] of D
+[gen148] of D
+[gen149] of D
+[gen150] of D
+[gen151] of D
+[gen152] of D
+[gen153] of D
+[gen154] of D
+[gen155] of D
+[gen156] of D
+[gen157] of D
+[gen158] of D
+[gen159] of D
+[gen160] of D
+[gen161] of D
+[gen162] of D
+[gen163] of D
+[gen164] of D
+[gen165] of D
+[gen166] of D
+[gen167] of D
+[gen168] of D
+[gen169] of D
+[gen170] of D
+[gen171] of D
+[gen172] of D
+[gen173] of D
+[gen174] of D
+[gen175] of D
+[gen176] of D
+[gen177] of D
+[gen178] of D
+[gen179] of D
+[gen180] of D
+[gen181] of D
+[gen182] of D
+[gen183] of D
+[gen184] of D
+[gen185] of D
+[gen186] of D
+[gen187] of D
+[gen188] of D
+[gen189] of D
+[gen190] of D
+[gen191] of D
+[gen192] of D
+[gen193] of D
+[gen194] of D
+[gen195] of D
+[gen196] of D
+[gen197] of D
+[gen198] of D
+[gen199] of D
+[gen200] of D
+[gen201] of E
+[gen202] of E
+[gen203] of E
+[gen204] of E
+[gen205] of E
+[gen206] of E
+[gen207] of E
+[gen208] of E
+[gen209] of E
+[gen210] of E
+[gen211] of E
+[gen212] of E
+[gen213] of E
+[gen214] of E
+[gen215] of E
+[gen216] of E
+[gen217] of E
+[gen218] of E
+[gen219] of E
+[gen220] of E
+[gen221] of E
+[gen222] of E
+[gen223] of E
+[gen224] of E
+[gen225] of E
+[gen226] of E
+[gen227] of E
+[gen228] of E
+[gen229] of E
+[gen230] of E
+[gen231] of E
+[gen232] of E
+[gen233] of E
+[gen234] of E
+[gen235] of E
+[gen236] of E
+[gen237] of E
+[gen238] of E
+[gen239] of E
+[gen240] of E
+[gen241] of E
+[gen242] of E
+[gen243] of E
+[gen244] of E
+[gen245] of E
+[gen246] of E
+[gen247] of E
+[gen248] of E
+[gen249] of E
+[gen250] of E
+[gen251] of E
+[gen252] of E
+[gen253] of E
+[gen254] of E
+[gen255] of E
+[gen256] of E
+[gen257] of E
+[gen258] of E
+[gen259] of E
+[gen260] of E
+[gen261] of E
+[gen262] of E
+[gen263] of E
+[gen264] of E
+[gen265] of E
+[gen266] of E
+[gen267] of E
+[gen268] of E
+[gen269] of E
+[gen270] of E
+[gen271] of E
+[gen272] of E
+[gen273] of E
+[gen274] of E
+[gen275] of E
+[gen276] of E
+[gen277] of E
+[gen278] of E
+[gen279] of E
+[gen280] of E
+[gen281] of E
+[gen282] of E
+[gen283] of E
+[gen284] of E
+[gen285] of E
+[gen286] of E
+[gen287] of E
+[gen288] of E
+[gen289] of E
+[gen290] of E
+[gen291] of E
+[gen292] of E
+[gen293] of E
+[gen294] of E
+[gen295] of E
+[gen296] of E
+[gen297] of E
+[gen298] of E
+[gen299] of E
+[gen300] of E
+For a total of 301 instances.
+CLIPS> (bsave-instances "Temp//inssav1.bin")
+200
+CLIPS> (bload-instances inssav.clp)
+[INSFILE2] inssav.clp file is not a binary instances file.
+[INSFILE1] Function bload-instances could not completely process file inssav.clp.
+-1
+CLIPS> (save-instances "Actual//inssav1.out")
+200
+CLIPS> (progn
+  (bind ?start (time))
+  (restore-instances "Actual//inssav1.out")
+  (bind ?tt (- (time) ?start))
+  (bind ?start (time))
+  (bload-instances "Temp//inssav1.bin")
+  (bind ?bt (- (time) ?start))
+  (printout t "BINARY-LOAD TIME: " ?bt " seconds" crlf)
+  (printout t "TEXT-LOAD TIME: " ?tt " seconds" crlf)
+  (printout t "RATIO B/T: " (if (eq ?tt 0.0) then "Infinite" else (/ ?bt ?tt)) crlf)
+)
+BINARY-LOAD TIME: 0.1333333333333329 seconds ;; Different number OK
+TEXT-LOAD TIME: 0.2000000000000011 seconds ;; Different number OK
+RATIO B/T: 0.6666666666666607 ;; Ratio less than 1.0 OK
+CLIPS> (save-instances "Actual//inssav1.out")
+200
+CLIPS> (file-message "Actual//inssav1.out" "D E")
+TRUE
+CLIPS> (save-instances "Actual//inssav2.out" gobbledy-gook)
+[ARGACCES5] Function save-instances expected argument #2 to be of type symbol "local" or "visible"
+0
+CLIPS> (bsave-instances "Temp//inssav2.bin" gobbledy-gook)
+[ARGACCES5] Function bsave-instances expected argument #2 to be of type symbol "local" or "visible"
+0
+CLIPS> (save-instances "Actual//inssav2.out" 123)
+[ARGACCES5] Function save-instances expected argument #2 to be of type symbol
+CLIPS> (bsave-instances "Temp//inssav2.bin" 123)
+[ARGACCES5] Function bsave-instances expected argument #2 to be of type symbol
+CLIPS> (bsave-instances "Temp//inssav2.bin" local)
+200
+CLIPS> (bload-instances "Temp//inssav2.bin")
+200
+CLIPS> (save-instances "Actual//inssav2.out" local)
+200
+CLIPS> (file-message "Actual//inssav2.out" "D E")
+TRUE
+CLIPS> (bsave-instances "Temp//inssav3.bin" visible)
+301
+CLIPS> (bload-instances "Temp//inssav3.bin")
+301
+CLIPS> (save-instances "Actual//inssav3.out" visible)
+301
+CLIPS> (file-message "Actual//inssav3.out" "INITIAL-OBJECT B D E")
+TRUE
+CLIPS> (save-instances "Actual//inssav4.out" local inherit)
+[ARGACCES5] Function save-instances expected argument #3 to be of type valid concrete class name
+0
+CLIPS> (save-instances "Actual//inssav4.out" local inherit A)
+[ARGACCES5] Function save-instances expected argument #4 to be of type valid class name
+0
+CLIPS> (save-instances "Actual//inssav4.out" local A)
+[ARGACCES5] Function save-instances expected argument #3 to be of type valid concrete class name
+0
+CLIPS> (bsave-instances "Temp//inssav4.bin" visible inherit A)
+200
+CLIPS> (bload-instances "Temp//inssav4.bin")
+200
+CLIPS> (save-instances "Actual//inssav4.out" visible inherit A)
+200
+CLIPS> (file-message "Actual//inssav4.out" "B E")
+TRUE
+CLIPS> (save-instances "Actual//inssav5.out" local C)
+[ARGACCES5] Function save-instances expected argument #3 to be of type valid concrete class name
+0
+CLIPS> (save-instances "Actual//inssav5.out" local inherit inherit)
+[ARGACCES5] Function save-instances expected argument #4 to be of type valid class name
+0
+CLIPS> (save-instances "Actual//inssav5.out" local inherit C)
+200
+CLIPS> (file-message "Actual//inssav5.out" "D E")
+TRUE
+CLIPS> (set-current-module FOO)
+BAR
+CLIPS> (instances)
+[gen301] of WOZ::F
+[gen302] of WOZ::F
+[gen303] of WOZ::F
+[gen304] of WOZ::F
+[gen305] of WOZ::F
+[gen306] of WOZ::F
+[gen307] of WOZ::F
+[gen308] of WOZ::F
+[gen309] of WOZ::F
+[gen310] of WOZ::F
+[gen311] of WOZ::F
+[gen312] of WOZ::F
+[gen313] of WOZ::F
+[gen314] of WOZ::F
+[gen315] of WOZ::F
+[gen316] of WOZ::F
+[gen317] of WOZ::F
+[gen318] of WOZ::F
+[gen319] of WOZ::F
+[gen320] of WOZ::F
+[gen321] of WOZ::F
+[gen322] of WOZ::F
+[gen323] of WOZ::F
+[gen324] of WOZ::F
+[gen325] of WOZ::F
+[gen326] of WOZ::F
+[gen327] of WOZ::F
+[gen328] of WOZ::F
+[gen329] of WOZ::F
+[gen330] of WOZ::F
+[gen331] of WOZ::F
+[gen332] of WOZ::F
+[gen333] of WOZ::F
+[gen334] of WOZ::F
+[gen335] of WOZ::F
+[gen336] of WOZ::F
+[gen337] of WOZ::F
+[gen338] of WOZ::F
+[gen339] of WOZ::F
+[gen340] of WOZ::F
+[gen341] of WOZ::F
+[gen342] of WOZ::F
+[gen343] of WOZ::F
+[gen344] of WOZ::F
+[gen345] of WOZ::F
+[gen346] of WOZ::F
+[gen347] of WOZ::F
+[gen348] of WOZ::F
+[gen349] of WOZ::F
+[gen350] of WOZ::F
+[gen351] of WOZ::F
+[gen352] of WOZ::F
+[gen353] of WOZ::F
+[gen354] of WOZ::F
+[gen355] of WOZ::F
+[gen356] of WOZ::F
+[gen357] of WOZ::F
+[gen358] of WOZ::F
+[gen359] of WOZ::F
+[gen360] of WOZ::F
+[gen361] of WOZ::F
+[gen362] of WOZ::F
+[gen363] of WOZ::F
+[gen364] of WOZ::F
+[gen365] of WOZ::F
+[gen366] of WOZ::F
+[gen367] of WOZ::F
+[gen368] of WOZ::F
+[gen369] of WOZ::F
+[gen370] of WOZ::F
+[gen371] of WOZ::F
+[gen372] of WOZ::F
+[gen373] of WOZ::F
+[gen374] of WOZ::F
+[gen375] of WOZ::F
+[gen376] of WOZ::F
+[gen377] of WOZ::F
+[gen378] of WOZ::F
+[gen379] of WOZ::F
+[gen380] of WOZ::F
+[gen381] of WOZ::F
+[gen382] of WOZ::F
+[gen383] of WOZ::F
+[gen384] of WOZ::F
+[gen385] of WOZ::F
+[gen386] of WOZ::F
+[gen387] of WOZ::F
+[gen388] of WOZ::F
+[gen389] of WOZ::F
+[gen390] of WOZ::F
+[gen391] of WOZ::F
+[gen392] of WOZ::F
+[gen393] of WOZ::F
+[gen394] of WOZ::F
+[gen395] of WOZ::F
+[gen396] of WOZ::F
+[gen397] of WOZ::F
+[gen398] of WOZ::F
+[gen399] of WOZ::F
+[gen400] of WOZ::F
+[initial-object] of INITIAL-OBJECT
+[gen1] of MAIN::B
+[gen2] of MAIN::B
+[gen3] of MAIN::B
+[gen4] of MAIN::B
+[gen5] of MAIN::B
+[gen6] of MAIN::B
+[gen7] of MAIN::B
+[gen8] of MAIN::B
+[gen9] of MAIN::B
+[gen10] of MAIN::B
+[gen11] of MAIN::B
+[gen12] of MAIN::B
+[gen13] of MAIN::B
+[gen14] of MAIN::B
+[gen15] of MAIN::B
+[gen16] of MAIN::B
+[gen17] of MAIN::B
+[gen18] of MAIN::B
+[gen19] of MAIN::B
+[gen20] of MAIN::B
+[gen21] of MAIN::B
+[gen22] of MAIN::B
+[gen23] of MAIN::B
+[gen24] of MAIN::B
+[gen25] of MAIN::B
+[gen26] of MAIN::B
+[gen27] of MAIN::B
+[gen28] of MAIN::B
+[gen29] of MAIN::B
+[gen30] of MAIN::B
+[gen31] of MAIN::B
+[gen32] of MAIN::B
+[gen33] of MAIN::B
+[gen34] of MAIN::B
+[gen35] of MAIN::B
+[gen36] of MAIN::B
+[gen37] of MAIN::B
+[gen38] of MAIN::B
+[gen39] of MAIN::B
+[gen40] of MAIN::B
+[gen41] of MAIN::B
+[gen42] of MAIN::B
+[gen43] of MAIN::B
+[gen44] of MAIN::B
+[gen45] of MAIN::B
+[gen46] of MAIN::B
+[gen47] of MAIN::B
+[gen48] of MAIN::B
+[gen49] of MAIN::B
+[gen50] of MAIN::B
+[gen51] of MAIN::B
+[gen52] of MAIN::B
+[gen53] of MAIN::B
+[gen54] of MAIN::B
+[gen55] of MAIN::B
+[gen56] of MAIN::B
+[gen57] of MAIN::B
+[gen58] of MAIN::B
+[gen59] of MAIN::B
+[gen60] of MAIN::B
+[gen61] of MAIN::B
+[gen62] of MAIN::B
+[gen63] of MAIN::B
+[gen64] of MAIN::B
+[gen65] of MAIN::B
+[gen66] of MAIN::B
+[gen67] of MAIN::B
+[gen68] of MAIN::B
+[gen69] of MAIN::B
+[gen70] of MAIN::B
+[gen71] of MAIN::B
+[gen72] of MAIN::B
+[gen73] of MAIN::B
+[gen74] of MAIN::B
+[gen75] of MAIN::B
+[gen76] of MAIN::B
+[gen77] of MAIN::B
+[gen78] of MAIN::B
+[gen79] of MAIN::B
+[gen80] of MAIN::B
+[gen81] of MAIN::B
+[gen82] of MAIN::B
+[gen83] of MAIN::B
+[gen84] of MAIN::B
+[gen85] of MAIN::B
+[gen86] of MAIN::B
+[gen87] of MAIN::B
+[gen88] of MAIN::B
+[gen89] of MAIN::B
+[gen90] of MAIN::B
+[gen91] of MAIN::B
+[gen92] of MAIN::B
+[gen93] of MAIN::B
+[gen94] of MAIN::B
+[gen95] of MAIN::B
+[gen96] of MAIN::B
+[gen97] of MAIN::B
+[gen98] of MAIN::B
+[gen99] of MAIN::B
+[gen100] of MAIN::B
+[gen201] of BAR::E
+[gen202] of BAR::E
+[gen203] of BAR::E
+[gen204] of BAR::E
+[gen205] of BAR::E
+[gen206] of BAR::E
+[gen207] of BAR::E
+[gen208] of BAR::E
+[gen209] of BAR::E
+[gen210] of BAR::E
+[gen211] of BAR::E
+[gen212] of BAR::E
+[gen213] of BAR::E
+[gen214] of BAR::E
+[gen215] of BAR::E
+[gen216] of BAR::E
+[gen217] of BAR::E
+[gen218] of BAR::E
+[gen219] of BAR::E
+[gen220] of BAR::E
+[gen221] of BAR::E
+[gen222] of BAR::E
+[gen223] of BAR::E
+[gen224] of BAR::E
+[gen225] of BAR::E
+[gen226] of BAR::E
+[gen227] of BAR::E
+[gen228] of BAR::E
+[gen229] of BAR::E
+[gen230] of BAR::E
+[gen231] of BAR::E
+[gen232] of BAR::E
+[gen233] of BAR::E
+[gen234] of BAR::E
+[gen235] of BAR::E
+[gen236] of BAR::E
+[gen237] of BAR::E
+[gen238] of BAR::E
+[gen239] of BAR::E
+[gen240] of BAR::E
+[gen241] of BAR::E
+[gen242] of BAR::E
+[gen243] of BAR::E
+[gen244] of BAR::E
+[gen245] of BAR::E
+[gen246] of BAR::E
+[gen247] of BAR::E
+[gen248] of BAR::E
+[gen249] of BAR::E
+[gen250] of BAR::E
+[gen251] of BAR::E
+[gen252] of BAR::E
+[gen253] of BAR::E
+[gen254] of BAR::E
+[gen255] of BAR::E
+[gen256] of BAR::E
+[gen257] of BAR::E
+[gen258] of BAR::E
+[gen259] of BAR::E
+[gen260] of BAR::E
+[gen261] of BAR::E
+[gen262] of BAR::E
+[gen263] of BAR::E
+[gen264] of BAR::E
+[gen265] of BAR::E
+[gen266] of BAR::E
+[gen267] of BAR::E
+[gen268] of BAR::E
+[gen269] of BAR::E
+[gen270] of BAR::E
+[gen271] of BAR::E
+[gen272] of BAR::E
+[gen273] of BAR::E
+[gen274] of BAR::E
+[gen275] of BAR::E
+[gen276] of BAR::E
+[gen277] of BAR::E
+[gen278] of BAR::E
+[gen279] of BAR::E
+[gen280] of BAR::E
+[gen281] of BAR::E
+[gen282] of BAR::E
+[gen283] of BAR::E
+[gen284] of BAR::E
+[gen285] of BAR::E
+[gen286] of BAR::E
+[gen287] of BAR::E
+[gen288] of BAR::E
+[gen289] of BAR::E
+[gen290] of BAR::E
+[gen291] of BAR::E
+[gen292] of BAR::E
+[gen293] of BAR::E
+[gen294] of BAR::E
+[gen295] of BAR::E
+[gen296] of BAR::E
+[gen297] of BAR::E
+[gen298] of BAR::E
+[gen299] of BAR::E
+[gen300] of BAR::E
+For a total of 301 instances.
+CLIPS> (open "Actual//inssav6.out" inssav6 "w")
+TRUE
+CLIPS> (close inssav6)
+TRUE
+CLIPS> (save-instances "Actual//inssav6.out" local inherit B)
+[ARGACCES5] Function save-instances expected argument #4 to be of type valid class name
+0
+CLIPS> (file-message "Actual//inssav6.out" "no classes")
+TRUE
+CLIPS> (save-instances "Actual//inssav7.out" visible inherit B)
+300
+CLIPS> (file-message "Actual//inssav7.out" "B E F")
+TRUE
+CLIPS> (dribble-off)

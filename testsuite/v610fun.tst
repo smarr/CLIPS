@@ -1,0 +1,12 @@
+(unwatch all)
+(clear)
+(set-strategy depth)
+(open "Results//v610fun.rsl" v610fun "w")
+(dribble-on "Actual//v610fun.out")
+(batch "v610fun.bat")
+(dribble-off)
+(load "compline.clp")
+(printout v610fun "v610fun.bat differences are as follows:" crlf)
+(compare-files "Expected//v610fun.out" "Actual//v610fun.out" v610fun)
+; close result file
+(close v610fun)

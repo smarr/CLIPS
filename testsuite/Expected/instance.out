@@ -1,0 +1,151 @@
+TRUE
+CLIPS> (batch "instance.bat")
+TRUE
+CLIPS> (make-instance a of A)
+[a]
+CLIPS> (send [a] print)
+[a] of A
+(x 34)
+(y abc)
+CLIPS> (make-instance [a] of A (x 65))
+Old instance deleted.
+Slot x set with message.
+[a]
+CLIPS> (send [a] print)
+[a] of A
+(x 65)
+(y abc)
+CLIPS> (unmake-instance [a])
+Old instance deleted.
+TRUE
+CLIPS> (make-instance b1 of BOGUS)
+New instance received init message.
+Slot a set by class.
+Slot b set by class.
+[b1]
+CLIPS> (make-instance b1 of BOGUS (b 45))
+Deleting old copy of instance.
+Slot b in instance set with put- message.
+New instance received init message.
+Slot a set by class.
+[b1]
+CLIPS> (send [b1] put-a 1)
+Slot a in instance set with put- message.
+1
+CLIPS> (send [b1] put-b 2)
+Slot b in instance set with put- message.
+2
+CLIPS> (send [b1] print)
+[b1] of BOGUS
+(a 1)
+(b 2)
+CLIPS> (initialize-instance [b1] (a xyz))
+Slot a in instance set with put- message.
+New instance received init message.
+Slot b set by class.
+[b1]
+CLIPS> (send [b1] print)
+[b1] of BOGUS
+(a xyz)
+(b def)
+CLIPS> (unmake-instance [b1])
+Deleting old copy of instance.
+TRUE
+CLIPS> (make-instance b of B (z 0))
+[b]
+CLIPS> (send [b] print)
+[b] of B
+(x 34)
+(y 100)
+(z 0)
+CLIPS> (send [b] put-x 65)
+65
+CLIPS> (send [b] put-y abc)
+abc
+CLIPS> (send [b] put-z "Hello world.")
+"Hello world."
+CLIPS> (send [b] print)
+[b] of B
+(x 65)
+(y abc)
+(z "Hello world.")
+CLIPS> (initialize-instance b)
+[INSMNGR14] Override required for slot z in instance b.
+[PRCCODE4] Execution halted during the actions of message-handler init primary in class USER
+[INSMNGR8] An error occurred during the initialization of instance b.
+FALSE
+CLIPS> (send [b] print)
+[b] of B
+(x 34)
+(y 100)
+(z "Hello world.")
+CLIPS> (unmake-instance b)
+TRUE
+CLIPS> (watch instances)
+CLIPS> (reset)
+<== instance [initial-object] of INITIAL-OBJECT
+==> instance [initial-object] of INITIAL-OBJECT
+==> instance [c1] of C
+==> instance [gen1] of C
+CLIPS> (reset)
+<== instance [initial-object] of INITIAL-OBJECT
+<== instance [c1] of C
+<== instance [gen1] of C
+==> instance [initial-object] of INITIAL-OBJECT
+==> instance [c1] of C
+==> instance [gen2] of C
+CLIPS> (unwatch instances)
+CLIPS> (unmake-instance *)
+TRUE
+CLIPS> (make-instance d of D)
+[d]
+CLIPS> (sym-cat (send [d] get-x) def)
+abcdef
+CLIPS> (send [d] put-x "New value.")
+"New value."
+CLIPS> (send [d] get-x)
+"New value."
+CLIPS> (unmake-instance *)
+TRUE
+CLIPS> (make-instance z of Z)
+[z]
+CLIPS> (instances)
+[z] of Z
+For a total of 1 instance.
+CLIPS> (unmake-instance *)
+TRUE
+CLIPS> (unwatch all)
+CLIPS> (watch messages)
+CLIPS> (make-instance sv of SAVE-TEST (stamp 1))
+MSG >> create ED:1 (<Instance-sv>)
+MSG << create ED:1 (<Instance-sv>)
+[MSGFUN1] No applicable primary message-handlers found for put-stamp.
+FALSE
+CLIPS> (make-instance sv of SAVE-TEST)
+MSG >> create ED:1 (<Instance-sv>)
+MSG << create ED:1 (<Instance-sv>)
+MSG >> init ED:1 (<Instance-sv>)
+MSG << init ED:1 (<Instance-sv>)
+[sv]
+CLIPS> (save-instances "Temp//ins.tmp")
+1
+CLIPS> (load-instances "Temp//ins.tmp")
+MSG >> delete ED:1 (<Instance-sv>)
+MSG << delete ED:1 (<Stale Instance-sv>)
+MSG >> create ED:1 (<Instance-sv>)
+MSG << create ED:1 (<Instance-sv>)
+[MSGFUN1] No applicable primary message-handlers found for put-stamp.
+[INSFILE1] Function load-instances could not completely process file Temp//ins.tmp.
+0
+CLIPS> (instances)
+CLIPS> (restore-instances "Temp//ins.tmp")
+1
+CLIPS> (instances)
+[sv] of SAVE-TEST
+For a total of 1 instance.
+CLIPS> (send [sv] print)
+MSG >> print ED:1 (<Instance-sv>)
+[sv] of SAVE-TEST
+(stamp 26959.7) ;; Different number is OK
+MSG << print ED:1 (<Instance-sv>)
+CLIPS> (dribble-off)

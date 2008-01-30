@@ -1,0 +1,174 @@
+TRUE
+CLIPS> (batch "tmplmslt.bat")
+TRUE
+CLIPS> (clear) 
+CLIPS> 
+(deftemplate foo 
+  (multislot a)
+  (slot x)
+  (multislot b)
+  (slot y))
+CLIPS>   
+(defrule bar 
+   (foo (a $?a) (b $?b) (x ?x) (y ?y))
+   =>
+   (printout t ?a " " ?b " " ?x " " ?y crlf))
+CLIPS> (reset)
+CLIPS> (assert (foo))          
+<Fact-1>
+CLIPS> (duplicate 1 (a) (b) (x 8))
+<Fact-2>
+CLIPS> (duplicate 1 (a) (b 1) (x 8))
+<Fact-3>
+CLIPS> (duplicate 1 (a 1) (b) (x 8))
+<Fact-4>
+CLIPS> (duplicate 1 (a 1) (b 1) (x 8))
+<Fact-5>
+CLIPS> (duplicate 1 (a 1 2) (b 3 4 5) (x 8))
+<Fact-6>
+CLIPS> (facts)
+f-0     (initial-fact)
+f-1     (foo (a) (x nil) (b) (y nil))
+f-2     (foo (a) (x 8) (b) (y nil))
+f-3     (foo (a) (x 8) (b 1) (y nil))
+f-4     (foo (a 1) (x 8) (b) (y nil))
+f-5     (foo (a 1) (x 8) (b 1) (y nil))
+f-6     (foo (a 1 2) (x 8) (b 3 4 5) (y nil))
+For a total of 7 facts.
+CLIPS> (run)
+(1 2) (3 4 5) 8 nil
+(1) (1) 8 nil
+(1) () 8 nil
+() (1) 8 nil
+() () 8 nil
+() () nil nil
+CLIPS> (reset)
+CLIPS> (assert (foo (a) (b) (x 1) (y 2)))
+<Fact-1>
+CLIPS> (duplicate 1 (a) (b) (x 8))
+<Fact-2>
+CLIPS> (duplicate 1 (a) (b 1) (x 8))
+<Fact-3>
+CLIPS> (duplicate 1 (a 1) (b) (x 8))
+<Fact-4>
+CLIPS> (duplicate 1 (a 1) (b 1) (x 8))
+<Fact-5>
+CLIPS> (duplicate 1 (a 1 2) (b 3 4 5) (x 8))
+<Fact-6>
+CLIPS> (facts)
+f-0     (initial-fact)
+f-1     (foo (a) (x 1) (b) (y 2))
+f-2     (foo (a) (x 8) (b) (y 2))
+f-3     (foo (a) (x 8) (b 1) (y 2))
+f-4     (foo (a 1) (x 8) (b) (y 2))
+f-5     (foo (a 1) (x 8) (b 1) (y 2))
+f-6     (foo (a 1 2) (x 8) (b 3 4 5) (y 2))
+For a total of 7 facts.
+CLIPS> (run)
+(1 2) (3 4 5) 8 2
+(1) (1) 8 2
+(1) () 8 2
+() (1) 8 2
+() () 8 2
+() () 1 2
+CLIPS> (reset)
+CLIPS> (assert (foo (a 1) (b 2) (x 3) (y 4)))
+<Fact-1>
+CLIPS> (duplicate 1 (a) (b) (x 8))
+<Fact-2>
+CLIPS> (duplicate 1 (a) (b 1) (x 8))
+<Fact-3>
+CLIPS> (duplicate 1 (a 1) (b) (x 8))
+<Fact-4>
+CLIPS> (duplicate 1 (a 1) (b 1) (x 8))
+<Fact-5>
+CLIPS> (duplicate 1 (a 1 2) (b 3 4 5) (x 8))
+<Fact-6>
+CLIPS> (facts)
+f-0     (initial-fact)
+f-1     (foo (a 1) (x 3) (b 2) (y 4))
+f-2     (foo (a) (x 8) (b) (y 4))
+f-3     (foo (a) (x 8) (b 1) (y 4))
+f-4     (foo (a 1) (x 8) (b) (y 4))
+f-5     (foo (a 1) (x 8) (b 1) (y 4))
+f-6     (foo (a 1 2) (x 8) (b 3 4 5) (y 4))
+For a total of 7 facts.
+CLIPS> (run)
+(1 2) (3 4 5) 8 4
+(1) (1) 8 4
+(1) () 8 4
+() (1) 8 4
+() () 8 4
+(1) (2) 3 4
+CLIPS> (reset)
+CLIPS> (assert (foo (a 1 2) (b 3 4 5) (x 6) (y 7))) 
+<Fact-1>
+CLIPS> (duplicate 1 (a) (b) (x 8))
+<Fact-2>
+CLIPS> (duplicate 1 (a) (b 1) (x 8))
+<Fact-3>
+CLIPS> (duplicate 1 (a 1) (b) (x 8))
+<Fact-4>
+CLIPS> (duplicate 1 (a 1) (b 1) (x 8))
+<Fact-5>
+CLIPS> (duplicate 1 (a 1 2) (b 3 4 5) (x 8))
+<Fact-6>
+CLIPS> (facts)
+f-0     (initial-fact)
+f-1     (foo (a 1 2) (x 6) (b 3 4 5) (y 7))
+f-2     (foo (a) (x 8) (b) (y 7))
+f-3     (foo (a) (x 8) (b 1) (y 7))
+f-4     (foo (a 1) (x 8) (b) (y 7))
+f-5     (foo (a 1) (x 8) (b 1) (y 7))
+f-6     (foo (a 1 2) (x 8) (b 3 4 5) (y 7))
+For a total of 7 facts.
+CLIPS> (run)
+(1 2) (3 4 5) 8 7
+(1) (1) 8 7
+(1) () 8 7
+() (1) 8 7
+() () 8 7
+(1 2) (3 4 5) 6 7
+CLIPS> (reset)
+CLIPS> (watch facts)
+CLIPS> (assert (foo (a) (b) (x 1) (y 2))) 
+==> f-1     (foo (a) (x 1) (b) (y 2))
+<Fact-1>
+CLIPS> (modify 1 (a 1))
+<== f-1     (foo (a) (x 1) (b) (y 2))
+==> f-2     (foo (a 1) (x 1) (b) (y 2))
+<Fact-2>
+CLIPS> (modify 2 (b 1))
+<== f-2     (foo (a 1) (x 1) (b) (y 2))
+==> f-3     (foo (a 1) (x 1) (b 1) (y 2))
+<Fact-3>
+CLIPS> (modify 3 (a 1 2))
+<== f-3     (foo (a 1) (x 1) (b 1) (y 2))
+==> f-4     (foo (a 1 2) (x 1) (b 1) (y 2))
+<Fact-4>
+CLIPS> (modify 4 (b 1 2 3))
+<== f-4     (foo (a 1 2) (x 1) (b 1) (y 2))
+==> f-5     (foo (a 1 2) (x 1) (b 1 2 3) (y 2))
+<Fact-5>
+CLIPS> (modify 5 (a))
+<== f-5     (foo (a 1 2) (x 1) (b 1 2 3) (y 2))
+==> f-6     (foo (a) (x 1) (b 1 2 3) (y 2))
+<Fact-6>
+CLIPS> (modify 6 (b 1))
+<== f-6     (foo (a) (x 1) (b 1 2 3) (y 2))
+==> f-7     (foo (a) (x 1) (b 1) (y 2))
+<Fact-7>
+CLIPS> (modify 7 (a 1) (b 1 2))
+<== f-7     (foo (a) (x 1) (b 1) (y 2))
+==> f-8     (foo (a 1) (x 1) (b 1 2) (y 2))
+<Fact-8>
+CLIPS> (modify 8 (a 1 2) (b))
+<== f-8     (foo (a 1) (x 1) (b 1 2) (y 2))
+==> f-9     (foo (a 1 2) (x 1) (b) (y 2))
+<Fact-9>
+CLIPS> (modify 9 (a) (b))
+<== f-9     (foo (a 1 2) (x 1) (b) (y 2))
+==> f-10    (foo (a) (x 1) (b) (y 2))
+<Fact-10>
+CLIPS> (unwatch facts)
+CLIPS> (dribble-off)

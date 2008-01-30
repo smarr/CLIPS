@@ -1,0 +1,12 @@
+([initial-object] of INITIAL-OBJECT)
+
+([t1] of TEST
+   (x 100)
+   (y a [t2] c d e f)
+   (z nil))
+
+([t2] of TEST
+   (x nil)
+   (y blah)
+   (z [t1]))
+

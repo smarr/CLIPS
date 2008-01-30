@@ -1,0 +1,115 @@
+TRUE
+CLIPS> (load "joinshre.clp")
+Defining defrule: rule-1-1 +j+j+j+j+j+j
+Defining defrule: rule-1-2 =j=j=j=j+j+j
+Defining defrule: rule-1-3 =j+j+j+j+j
+Defining defrule: rule-1-4 =j=j=j+j+j
+Defining defrule: rule-2-1 +j+j+j+j+j
+Defining defrule: rule-2-2 =j=j+j+j+j+j
+Defining defrule: rule-2-3 =j=j=j=j+j+j
+Defining defrule: rule-3-1 +j+j+j+j+j+j
+Defining defrule: rule-3-2 =j=j=j=j+j+j
+Defining defrule: rule-3-3 =j=j+j+j+j
+Defining defrule: rule-4-1 +j+j+j+j+j
+Defining defrule: rule-4-2 =j=j=j=j+j
+Defining defrule: rule-5-1 +j+j+j+j+j
+Defining defrule: rule-5-2 =j=j=j=j+j
+Defining defrule: rule-5-3 =j=j=j+j
+Defining defrule: rule-5-4 =j=j=j=j+j+j
+Defining defrule: rule-5-5 =j+j+j+j
+Defining defrule: rule-5-6 =j=j+j+j+j
+Defining defrule: rule-5-7 =j+j
+Defining defrule: rule-5-8 =j+j
+Defining defrule: rule-5-9 +j+j
+Defining defrule: rule-5-10 =j+j+j
+Defining defrule: rule-5-11 =j+j+j
+Defining defrule: rule-5-12 =j+j+j+j
+Defining defrule: rule-6-1 +j=j+j+j+j+j
+Defining defrule: rule-6-2 =j=j=j=j=j+j
+TRUE
+CLIPS> (reset)
+CLIPS> (agenda)
+0      rule-5-9: *
+For a total of 1 activation.
+CLIPS> (assert (a-1) (a-2) (a-3) (a-4) (a-5))
+<Fact-5>
+CLIPS> (agenda)
+10     rule-4-1: f-4,*
+9      rule-4-2: f-4,*
+2      rule-5-7: f-5
+1      rule-5-8: f-5
+-1     rule-5-10: f-5,*
+For a total of 5 activations.
+CLIPS> (assert (d-1) (e-1) (f-1) (b-2) (b-3) (b-4) (b-5))
+<Fact-12>
+CLIPS> (agenda)
+20     rule-1-1: f-1,*,f-6
+19     rule-1-2: f-1,*,f-7
+15     rule-2-2: f-2,f-9,*
+12     rule-3-2: f-3,f-10,*
+10     rule-4-1: f-4,*
+9      rule-4-2: f-4,*
+2      rule-5-7: f-5
+1      rule-5-8: f-5
+For a total of 8 activations.
+CLIPS> (assert (b-1) (c-2) (c-3) (c-4) (c-5))
+<Fact-17>
+CLIPS> (agenda)
+20     rule-1-1: f-1,*,f-6
+19     rule-1-2: f-1,*,f-7
+15     rule-2-2: f-2,f-9,*
+12     rule-3-2: f-3,f-10,*
+6      rule-5-3: f-5,f-12,f-17
+2      rule-5-7: f-5
+1      rule-5-8: f-5
+For a total of 7 activations.
+CLIPS> (assert (c-1) (d-2) (d-3) (d-5))
+<Fact-21>
+CLIPS> (agenda)
+18     rule-1-3: f-1,f-13,f-18,f-7
+17     rule-1-4: f-1,f-13,f-18,f-8
+16     rule-2-1: f-2,f-9,f-14,f-19
+14     rule-2-3: f-2,f-9,*
+13     rule-3-1: f-3,f-10,*
+11     rule-3-3: f-3,f-10,f-15,f-20
+8      rule-5-1: f-5,f-12,f-17,f-21
+7      rule-5-2: f-5,f-12,f-17,f-21
+6      rule-5-3: f-5,f-12,f-17
+2      rule-5-7: f-5
+1      rule-5-8: f-5
+For a total of 11 activations.
+CLIPS> (assert (e-5))
+<Fact-22>
+CLIPS> (agenda)
+18     rule-1-3: f-1,f-13,f-18,f-7
+17     rule-1-4: f-1,f-13,f-18,f-8
+16     rule-2-1: f-2,f-9,f-14,f-19
+14     rule-2-3: f-2,f-9,*
+13     rule-3-1: f-3,f-10,*
+11     rule-3-3: f-3,f-10,f-15,f-20
+8      rule-5-1: f-5,f-12,f-17,f-21
+7      rule-5-2: f-5,f-12,f-17,f-21
+6      rule-5-3: f-5,f-12,f-17
+5      rule-5-4: f-5,f-12,f-17,f-21,f-22
+2      rule-5-7: f-5
+1      rule-5-8: f-5
+For a total of 12 activations.
+CLIPS> (assert (f-5) (g-5))
+<Fact-24>
+CLIPS> (agenda)
+18     rule-1-3: f-1,f-13,f-18,f-7
+17     rule-1-4: f-1,f-13,f-18,f-8
+16     rule-2-1: f-2,f-9,f-14,f-19
+14     rule-2-3: f-2,f-9,*
+13     rule-3-1: f-3,f-10,*
+11     rule-3-3: f-3,f-10,f-15,f-20
+8      rule-5-1: f-5,f-12,f-17,f-21
+7      rule-5-2: f-5,f-12,f-17,f-21
+6      rule-5-3: f-5,f-12,f-17
+5      rule-5-4: f-5,f-12,f-17,f-21,f-22
+4      rule-5-5: f-5,f-23,f-24
+3      rule-5-6: f-5,f-12,f-23,f-24
+2      rule-5-7: f-5
+1      rule-5-8: f-5
+For a total of 14 activations.
+CLIPS> (dribble-off)

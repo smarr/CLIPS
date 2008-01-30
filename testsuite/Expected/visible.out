@@ -1,0 +1,20 @@
+TRUE
+CLIPS> (load "visible.clp")
+##~~~[MSGFUN6] Private slot bar of class A cannot be accessed directly
+   by handlers attached to class B
+
+[PRCCODE3] Undefined variable self:bar referenced in message-handler.
+
+ERROR:
+(defmessage-handler MAIN::B fribban
+   ()
+   ?self:bar
+   )
+@!
+FALSE
+CLIPS> (go)
+[MSGPASS3] Static reference to slot foo of class A does not apply to [b] of B
+[PRCCODE4] Execution halted during the actions of message-handler woz primary in class A
+[PRCCODE4] Execution halted during the actions of deffunction go.
+FALSE
+CLIPS> (dribble-off)

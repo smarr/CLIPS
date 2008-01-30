@@ -1,0 +1,28 @@
+TRUE
+CLIPS> (batch "tceplace.bat")
+TRUE
+CLIPS> (load "tceplace.clp")
+**********
+TRUE
+CLIPS> (reset)
+CLIPS> (assert (a) (d) (e) (f) (g) (h) (i) (j) (k) (l))
+<Fact-10>
+CLIPS> (agenda) ; should be foo2 foo10
+7      foo2: f-2,*
+3      foo10: f-10,*
+For a total of 2 activations.
+CLIPS> (assert (b))
+<Fact-11>
+CLIPS> (agenda) ; should be foo2 foo10
+7      foo2: f-2,*
+3      foo10: f-10,*
+For a total of 2 activations.
+CLIPS> (assert (c))
+<Fact-12>
+CLIPS> (agenda) ; should be foo1 foo2 foo5 foo10
+9      foo1: f-1,*
+7      foo2: f-2,*
+5      foo5: f-5,*
+3      foo10: f-10,*
+For a total of 4 activations.
+CLIPS> (dribble-off)

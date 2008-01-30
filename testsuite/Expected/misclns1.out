@@ -1,0 +1,268 @@
+TRUE
+CLIPS> (batch "misclns1.bat")
+TRUE
+CLIPS> (clear) ; Test Begin   
+CLIPS> (defglobal ?*constraint-salience* = 0)
+CLIPS> (defrule bar 
+  (declare (salience ?*constraint-salience*))
+  ?f <- (x ?y&?x) 
+  => 
+  (retract ?ins))
+
+[ANALYSIS4] Variable ?x was referenced in CE #1 field #1 before being defined.
+
+ERROR:
+(defrule MAIN::bar
+   (declare (salience ?*constraint-salience*))
+   ?f <- (x ?y&?x)
+   =>
+   (retract ?ins))
+CLIPS> (clear) ; Test Begin
+CLIPS> (defrule foo
+  (declare (salience ?*my-salience*)) =>)
+[GLOBLDEF1] Global variable ?*my-salience* is unbound.
+
+[PRNTUTIL8] This error occurred while evaluating the salience for defrule foo.
+
+ERROR:
+(defrule MAIN::foo
+   (declare (salience ?*my-salience*
+CLIPS> (clear) ; Test Begin
+CLIPS> (deftemplate status 
+   (field parent))
+CLIPS> (deffacts initial-positions
+  (status (parent nil)))
+CLIPS> (defrule move-alone 
+  ?node <- (status (parent nil))
+  =>
+  (duplicate ?node (parent ?node)))
+CLIPS> (clear) ; Test Begin
+CLIPS> (defclass A (is-a USER) (role concrete) (pattern-match reactive))
+CLIPS> (deffacts bar (a))
+CLIPS> (definstances bar (a of A))
+CLIPS> (defrule foo1 
+  (logical (a))
+  => 
+  (assert (b)))
+CLIPS> (defrule foo2 
+  (logical (a))
+  => 
+  (make-instance [b] of A))
+CLIPS> (defrule foo3 
+  (logical (object (name [a])))
+  => 
+  (assert (c)))
+CLIPS> (defrule foo4 
+  (logical (object (name [a])))
+  => 
+  (make-instance [c] of A))
+CLIPS> (reset)
+CLIPS> (run)
+CLIPS> (dependents 1)
+[b],f-2
+CLIPS> (dependents 2)
+None
+CLIPS> (dependents 3)
+None
+CLIPS> (dependents [a])
+[c],f-3
+CLIPS> (dependents [b])
+None
+CLIPS> (dependents [c])
+None
+CLIPS> (dependencies 1)
+None
+CLIPS> (dependencies 2)
+f-1
+CLIPS> (dependencies 3)
+[a]
+CLIPS> (dependencies [a])
+None
+CLIPS> (dependencies [b])
+f-1
+CLIPS> (dependencies [c])
+[a]
+CLIPS> (clear) ; Test Begin
+CLIPS> (deftemplate yak (multifield x (type SYMBOL) (cardinality 3 5)))
+CLIPS> (assert (yak (x a b c)))
+<Fact-1>
+CLIPS> (assert (yak (x a b 1)))
+
+[CSTRNCHK1] A literal slot value found in the assert command
+does not match the allowed types for slot x.
+CLIPS> (assert (yak (x 1 b 1)))
+
+[CSTRNCHK1] A literal slot value found in the assert command
+does not match the allowed types for slot x.
+CLIPS> (assert (yak (x a b)))
+
+[CSTRNCHK1] Literal slot values found in the assert command
+does not satisfy the cardinality restrictions for slot x.
+CLIPS> (assert (yak (x a b c d e f)))
+
+[CSTRNCHK1] Literal slot values found in the assert command
+does not satisfy the cardinality restrictions for slot x.
+CLIPS> (assert (yak (x a b c d e f g 1)))
+
+[CSTRNCHK1] Literal slot values found in the assert command
+does not satisfy the cardinality restrictions for slot x.
+CLIPS> (clear) ; Test Begin
+CLIPS> (defrule foo (x ? ? ? ? ?) =>)
+CLIPS> (defrule bar (x ? ? ? ? ?x&:(> ?x 3)) =>)
+CLIPS> (deffacts yak (x a a a a abc))
+CLIPS> (reset)
+[ARGACCES5] Function > expected argument #1 to be of type integer or float
+
+[FACTMCH1] This error occurred in the fact pattern network
+   Currently active fact: (x a a a a abc)
+   Problem resides in field #5
+      Of pattern #1 in rule bar
+
+CLIPS> (clear)
+CLIPS> (defrule foo (x ?) =>)
+CLIPS> (defrule bar (x ?x&:(> ?x 3)) =>)
+CLIPS> (deffacts yak (x abc))
+CLIPS> (reset)
+[ARGACCES5] Function > expected argument #1 to be of type integer or float
+
+[FACTMCH1] This error occurred in the fact pattern network
+   Currently active fact: (x abc)
+   Problem resides in field #1
+      Of pattern #1 in rule bar
+
+CLIPS> (clear)
+CLIPS> (deftemplate x (field q) (field r) (field s) (field t))
+CLIPS> (defrule foo (x (t ?)) =>)
+CLIPS> (defrule bar (x (t ?x&:(> ?x 3))) =>)
+CLIPS> (deffacts yak (x (t abc)))
+CLIPS> (reset)
+[ARGACCES5] Function > expected argument #1 to be of type integer or float
+
+[FACTMCH1] This error occurred in the fact pattern network
+   Currently active fact: (x (q nil) (r nil) (s nil) (t abc))
+   Problem resides in slot t
+      Of pattern #1 in rule bar
+
+CLIPS> (clear) ; Test Begin
+CLIPS> (deffunction positive-slope
+   (?x1 ?y1 ?x2 ?y2)
+   (< 0 (/ (- ?y2 ?y1) (- ?x2 ?x1))))
+CLIPS> (defrule example-2
+   (point ?a ?x1 ?y1)
+   (point ?b ?x2 ?y2)
+   (test (> ?b ?a))
+   (test (positive-slope ?x1 ?y1 ?x2 ?y2))
+   =>)
+CLIPS> (assert (point 1 4.0 7.0) (point 2 5.0 9.0))
+<Fact-2>
+CLIPS> (clear) ; Test Begin
+CLIPS> (deftemplate A (field foo (type INTEGER)))
+CLIPS> (defrule foo (A (foo ?y&:(< ?y 3))) =>)
+CLIPS> (clear) ; Test Begin
+CLIPS> (deftemplate A
+   (field grid-x)
+   (field max)
+   (field min-xy)
+   (field max-xy))
+CLIPS> (defrule p327
+  (A (min-xy ?min) (max-xy ?max))
+  (A (grid-x ?gx&:(and (>= ?gx ?min) (> ?gx ?max))))
+  (A (max ?hmax&:(and (>= ?hmax ?gx) (> ?hmax ?min))))
+  =>)
+CLIPS> (clear) ; Test Begin
+CLIPS> (deftemplate foo
+   (field x (type INTEGER))
+   (field y (type STRING))
+   (field z (type FLOAT)))
+CLIPS> (deftemplate bar
+   (field x (type INTEGER))
+   (field y (type STRING))
+   (field z (type FLOAT)))
+CLIPS> (defrule bad-1 (foo (x ?x) (y ?x)) =>)
+
+[RULECSTR1] Variable ?x in CE #1 slot y
+has constraint conflicts which make the pattern unmatchable.
+
+ERROR:
+(defrule MAIN::bad-1
+   (foo (x ?x) (y ?x))
+   =>)
+CLIPS> (defrule bad-2 (foo (x ?x)) (bar (y ?x)) =>)
+
+[RULECSTR1] Variable ?x in CE #2 slot y
+has constraint conflicts which make the pattern unmatchable.
+
+ERROR:
+(defrule MAIN::bad-2
+   (foo (x ?x))
+   (bar (y ?x))
+   =>)
+CLIPS> (defrule bad-3 (foo (x ?x) (y ?y)) (bar (z ?x | ?y)) =>)
+
+[RULECSTR1] Pattern #2 slot z
+has constraint conflicts which make the pattern unmatchable.
+
+ERROR:
+(defrule MAIN::bad-3
+   (foo (x ?x) (y ?y))
+   (bar (z ?x|?y))
+   =>)
+CLIPS> (clear) ; Test Begin
+CLIPS> (defrule fin
+  (foo ?d)
+  (test (> ?d 2))
+  (foo ?l&~?d)
+  =>)
+CLIPS> (clear) ; Test Begin
+CLIPS> (deftemplate foo1 (field x (cardinality 3 4)))
+
+[CSTRNPSR5] The cardinality attribute can only be used with multifield slots.
+
+ERROR:
+(deftemplate MAIN::foo1
+   (field x (cardinality
+CLIPS> (deftemplate foo2 (multifield x (cardinality 3.0 4)))
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for cardinality attribute.
+
+ERROR:
+(deftemplate MAIN::foo2
+   (multifield x (cardinality 3.0
+CLIPS> (deftemplate foo3 (multifield x (cardinality 6 4)))
+
+[CSTRNPSR2] Minimum cardinality value must be less than
+or equal to the maximum cardinality value
+
+ERROR:
+(deftemplate MAIN::foo3
+   (multifield x (cardinality 6 4)
+CLIPS> (clear) ; Test Begin
+CLIPS> (defrule foo 
+  (blah $?x ?y&red $?z)
+  =>
+  (printout t  ?x " | " ?y " | " ?z crlf))
+CLIPS> (defrule bar 
+  (yech $?x $?y)
+  =>
+  (printout t ?x " | " ?y crlf))
+CLIPS> (assert (blah red) (blah red red) (blah a red b) (blah a red red b))
+<Fact-4>
+CLIPS> (assert (yech) (yech 1 2) (yech 1 2 3))
+<Fact-7>
+CLIPS> (run)
+() | (1 2 3)
+(1) | (2 3)
+(1 2) | (3)
+(1 2 3) | ()
+() | (1 2)
+(1) | (2)
+(1 2) | ()
+() | ()
+(a) | red | (red b)
+(a red) | red | (b)
+(a) | red | (b)
+() | red | (red)
+(red) | red | ()
+() | red | ()
+CLIPS> (clear)
+CLIPS> (dribble-off)

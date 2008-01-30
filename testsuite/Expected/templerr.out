@@ -1,0 +1,656 @@
+TRUE
+CLIPS> (load "templerr.clp")
+%
+[CSTRNPSR1] The type attribute conflicts with the range attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo01
+   (field x (type SYMBOL) (range 1 3))
+%
+[CSTRNPSR1] The type attribute conflicts with the range attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo02
+   (field x (range 1 3) (type SYMBOL))
+%
+[CSTRNPSR1] The type attribute conflicts with the range attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo03
+   (field x (type INTEGER) (range 1.0 3))
+%
+[CSTRNPSR1] The type attribute conflicts with the range attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo04
+   (field x (range 1 3.0) (type FLOAT))
+%%%%%
+[CSTRNPSR3] The allowed-integers attribute cannot be used
+in conjunction with the range attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo05
+   (field x (range 1 3.0) (allowed-integers
+%
+[CSTRNPSR3] The allowed-floats attribute cannot be used
+in conjunction with the range attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo06
+   (field x (range 1 3) (allowed-floats
+%
+[CSTRNPSR3] The range attribute cannot be used
+in conjunction with the allowed-integers attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo07
+   (field x (allowed-integers 4 5 6) (range
+%
+[CSTRNPSR3] The range attribute cannot be used
+in conjunction with the allowed-numbers attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo08
+   (field x (allowed-numbers 4.1 5) (range
+%%
+[CSTRNPSR1] The type attribute conflicts with the allowed-floats/numbers attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo09
+   (field x (type INTEGER) (allowed-floats 1.0 2.0))
+%
+[CSTRNPSR1] The type attribute conflicts with the allowed-integers/numbers attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo10
+   (field x (type FLOAT) (allowed-integers 1 2))
+%
+[CSTRNPSR1] The type attribute conflicts with the allowed-floats/numbers attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo11
+   (field x (allowed-floats 1.0 2.0) (type INTEGER))
+%
+[CSTRNPSR1] The type attribute conflicts with the allowed-integers/numbers attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo12
+   (field x (allowed-integers 1 2) (type FLOAT))
+%
+[CSTRNPSR1] The type attribute conflicts with the allowed-strings attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo13
+   (field x (allowed-strings "a" "b") (type SYMBOL))
+%
+[CSTRNPSR1] The type attribute conflicts with the allowed-symbols attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo13
+   (field x (allowed-symbols a b) (type STRING))
+%
+[CSTRNPSR1] The type attribute conflicts with the allowed-integers/numbers attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo12
+   (field x (allowed-integers 1 2) (type SYMBOL))
+%%%%%
+[CSTRNCHK1] An expression found in the default attribute
+does not match the allowed types for slot x.
+
+ERROR:
+(deftemplate MAIN::bad-foo13
+   (field x (type INTEGER) (default 1.0))
+%
+[CSTRNCHK1] An expression found in the default attribute
+does not match the allowed types for slot x.
+
+ERROR:
+(deftemplate MAIN::bad-foo14
+   (field x (type FLOAT) (default 1))
+%
+[CSTRNCHK1] An expression found in the default attribute
+does not match the allowed types for slot x.
+
+ERROR:
+(deftemplate MAIN::bad-foo15
+   (field x (type NUMBER) (default a))
+%
+[CSTRNCHK1] An expression found in the default attribute
+does not fall in the allowed range 1 to 3 for slot x.
+
+ERROR:
+(deftemplate MAIN::bad-foo16
+   (field x (range 1 3) (default 5))
+%
+[CSTRNCHK1] An expression found in the default attribute
+does not match the allowed values for slot x.
+
+ERROR:
+(deftemplate MAIN::bad-foo17
+   (field x (allowed-integers 2 3 4) (default 1))
+%
+[CSTRNCHK1] An expression found in the default attribute
+does not match the allowed types for slot x.
+
+ERROR:
+(deftemplate MAIN::bad-foo18
+   (field x (default 1.0) (type INTEGER))
+%
+[CSTRNCHK1] An expression found in the default attribute
+does not match the allowed types for slot x.
+
+ERROR:
+(deftemplate MAIN::bad-foo19
+   (field x (default 5) (type SYMBOL))
+%
+[CSTRNCHK1] An expression found in the default attribute
+does not fall in the allowed range 10.0 to 30 for slot x.
+
+ERROR:
+(deftemplate MAIN::bad-foo20
+   (field x (default 5.0) (range 10.0 30))
+%
+[CSTRNCHK1] An expression found in the default attribute
+does not match the allowed values for slot x.
+
+ERROR:
+(deftemplate MAIN::bad-foo21
+   (field x (allowed-strings "a" "b") (default "c"))
+%
+[CSTRNCHK1] An expression found in the default attribute
+does not match the allowed types for slot x.
+
+ERROR:
+(deftemplate MAIN::bad-foo22
+   (multifield x (default 3 4 a) (type INTEGER))
+%
+[CSTRNCHK1] An expression found in the default attribute
+does not fall in the allowed range 10.0 to 30.0 for slot x.
+
+ERROR:
+(deftemplate MAIN::bad-foo23
+   (multifield x (default 10.0 5.0) (range 10.0 30.0))
+%
+[CSTRNCHK1] An expression found in the default attribute
+does not match the allowed values for slot x.
+
+ERROR:
+(deftemplate MAIN::bad-foo24
+   (multifield x (allowed-strings "a" "b") (default "a" "b" "c"))
+%%%%%%%%%%%%%
+[PRNTUTIL5] The slot x has already been parsed.
+
+ERROR:
+(deftemplate MAIN::bad-foo25
+   (field x (type INTEGER))
+   (field x
+%
+[PRNTUTIL5] The slot x has already been parsed.
+
+ERROR:
+(deftemplate MAIN::bad-foo26
+   (multifield x (type INTEGER))
+   (field x
+%
+[PRNTUTIL5] The slot x has already been parsed.
+
+ERROR:
+(deftemplate MAIN::bad-foo27
+   (field x (type INTEGER))
+   (multifield x
+%
+[PRNTUTIL5] The slot x has already been parsed.
+
+ERROR:
+(deftemplate MAIN::bad-foo28
+   (multifield x (type INTEGER))
+   (multifield x
+%
+[PRNTUTIL5] The slot x has already been parsed.
+
+ERROR:
+(deftemplate MAIN::bad-foo29
+   (field x)
+   (field y)
+   (field x
+%
+[PRNTUTIL5] The slot x has already been parsed.
+
+ERROR:
+(deftemplate MAIN::bad-foo30
+   (field x)
+   (field y)
+   (field x
+%
+[PRNTUTIL5] The slot x has already been parsed.
+
+ERROR:
+(deftemplate MAIN::bad-foo31
+   (multifield x)
+   (field y)
+   (field x
+%
+[PRNTUTIL5] The slot x has already been parsed.
+
+ERROR:
+(deftemplate MAIN::bad-foo32
+   (field x)
+   (multifield y)
+   (field x
+%%%%%
+[PRNTUTIL5] The type attribute has already been parsed.
+
+ERROR:
+(deftemplate MAIN::bad-foo37
+   (field x (type INTEGER) (range 1 2) (type
+%
+[PRNTUTIL5] The range attribute has already been parsed.
+
+ERROR:
+(deftemplate MAIN::bad-foo38
+   (multifield x (range 0 3) (range
+%
+[PRNTUTIL5] The default attribute has already been parsed.
+
+ERROR:
+(deftemplate MAIN::bad-foo39
+   (field x (range 1 10) (default 3) (type INTEGER) (default
+%
+[PRNTUTIL5] The default attribute has already been parsed.
+
+ERROR:
+(deftemplate MAIN::bad-foo40
+   (multifield x (type SYMBOL) (default a b) (allowed-values a b c x y z) (default
+%
+[CSTRNPSR3] The allowed-floats attribute cannot be used
+in conjunction with the allowed-number attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo41
+   (field x (allowed-numbers 1 3.5 10 20.7) (type NUMBER) (allowed-floats
+%
+[CSTRNPSR3] The allowed-numbers attribute cannot be used
+in conjunction with the allowed-integers attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo42
+   (multifield x (allowed-integers 1 10) (allowed-numbers
+%
+[CSTRNPSR3] The allowed-numbers attribute cannot be used
+in conjunction with the allowed-floats attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo43
+   (multifield x (allowed-floats 3.5 20.7) (default ?NONE) (allowed-integers 1 10) (allowed-numbers
+%
+[PRNTUTIL5] The allowed-symbols attribute has already been parsed.
+
+ERROR:
+(deftemplate MAIN::bad-foo44
+   (field x (allowed-symbols a b c) (type SYMBOL) (allowed-symbols
+%
+[PRNTUTIL5] The allowed-integers attribute has already been parsed.
+
+ERROR:
+(deftemplate MAIN::bad-foo45
+   (field x (type INTEGER) (allowed-integers 1 2 3) (allowed-integers
+%
+[PRNTUTIL5] The allowed-floats attribute has already been parsed.
+
+ERROR:
+(deftemplate MAIN::bad-foo46
+   (field x (allowed-floats 1.0 2.0 3.0) (allowed-floats
+%
+[CSTRNPSR3] The allowed-values attribute cannot be used
+in conjunction with the allowed-integers attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo47
+   (field x (allowed-integers 4 5 6) (allowed-values
+%
+[CSTRNPSR3] The allowed-floats attribute cannot be used
+in conjunction with the allowed-values attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo48
+   (multifield x (allowed-values 1.0 2.0 3.0) (allowed-floats
+%
+[CSTRNPSR3] The allowed-values attribute cannot be used
+in conjunction with the allowed-symbols attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo49
+   (field x (allowed-symbols d e f) (allowed-values
+%
+[CSTRNPSR3] The allowed-strings attribute cannot be used
+in conjunction with the allowed-values attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo50
+   (multifield x (allowed-values "a" "b") (allowed-strings
+%
+[CSTRNPSR4] Value does not match the expected type for the allowed-symbols attribute
+
+ERROR:
+(deftemplate MAIN::bad-foo51
+   (field x (allowed-symbols d 1.0 
+%
+[CSTRNPSR4] Value does not match the expected type for the allowed-integers attribute
+
+ERROR:
+(deftemplate MAIN::bad-foo52
+   (multifield x (allowed-integers 1 2.0 
+%
+[CSTRNPSR4] Value does not match the expected type for the allowed-floats attribute
+
+ERROR:
+(deftemplate MAIN::bad-foo53
+   (field x (allowed-floats 1.0 2.0 3 
+%
+[CSTRNPSR4] Value does not match the expected type for the allowed-strings attribute
+
+ERROR:
+(deftemplate MAIN::bad-foo54
+   (multifield x (allowed-strings "a" "b" c 
+%
+[CSTRNPSR4] Value does not match the expected type for the allowed-numbers attribute
+
+ERROR:
+(deftemplate MAIN::bad-foo55
+   (multifield x (allowed-numbers 1 2.0 3 x 
+%
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for allowed-symbols attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo56
+   (field x (allowed-symbols d e f ?VARIABLE 
+%
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for allowed-integers attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo57
+   (multifield x (allowed-integers ?VARIABLE 1 
+%
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for allowed-floats attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo58
+   (field x (allowed-floats 1.0 ?VARIABLE 
+%
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for allowed-strings attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo59
+   (multifield x (allowed-strings ?VARIABLE "a" 
+%
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for allowed-numbers attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo60
+   (multifield x (allowed-numbers 1 2.0 3 ?VARIABLE 
+%
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for allowed-integers attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo61
+   (multifield x (allowed-integers ?NONE 
+%
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for allowed-symbols attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo62
+   (field x (allowed-symbols d e f ?NONE 
+%
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for type attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo63
+   (field x (type ?VARIABLE FLOAT 
+%
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for type attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo64
+   (multifield x (type FLOAT ?VARIABLE 
+%
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for type attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo65
+   (field x (type FLOAT NUMBER 
+%
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for type attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo66
+   (multifield x (type NUMBER INTEGER 
+%
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for type attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo67
+   (field x (type ?NONE 
+%
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for type attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo68
+   (multifield x (type FLOAT ?NONE 
+%
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for default attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo69
+   (field x (default ?NONE x
+%
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for default attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo70
+   (multifield x (default x ?NONE
+%
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for default attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo71
+   (field x (default ?VARIABLE
+%
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for default attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo72
+   (multifield x (default x ?VARIABLE
+%
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for range attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo73
+   (field x (range 1 a
+%
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for range attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo74
+   (multifield x (range a
+%
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for range attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo75
+   (field x (range 1 )
+%
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for range attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo76
+   (field x (range a
+%
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for range attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo77
+   (multifield x (range 1 ?NONE
+%
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for range attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo78
+   (field x (range ?NONE
+%
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for range attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo79
+   (field x (range ?NONE
+%
+[CSTRNPSR2] Minimum range value must be less than
+or equal to the maximum range value
+
+ERROR:
+(deftemplate MAIN::bad-foo80
+   (multifield x (range 8 1)
+%
+[CSTRNPSR2] Minimum range value must be less than
+or equal to the maximum range value
+
+ERROR:
+(deftemplate MAIN::bad-foo81
+   (field x (range 8.0 1)
+%
+[CSTRNPSR2] Minimum range value must be less than
+or equal to the maximum range value
+
+ERROR:
+(deftemplate MAIN::bad-foo82
+   (multifield x (range 8.0 1.0)
+%
+[CSTRNPSR2] Minimum range value must be less than
+or equal to the maximum range value
+
+ERROR:
+(deftemplate MAIN::bad-foo83
+   (field x (range 8 1.0)
+%
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for range attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo84
+   (multifield x (range ?VARIABLE )
+%
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for type attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo85
+   (field x (type STRING SYMBOL STRING 
+%
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for type attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo86
+   (multifield x (type SYMBOL SYMBOL 
+%
+[DEFAULT1] The default value for a single field slot must be a single field value
+
+ERROR:
+(deftemplate MAIN::bad-foo87
+   (field x (default)
+%
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for range attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo88
+   (field x (range )
+%
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for type attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo89
+   (field x (type)
+%
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for allowed-symbols attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo90
+   (field x (allowed-symbols )
+%
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for allowed-integers attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo91
+   (field x (allowed-integers )
+%
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for allowed-numbers attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo92
+   (field x (allowed-numbers )
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for type attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo93
+   (field x (type LEXEME SYMBOL 
+%
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for type attribute.
+
+ERROR:
+(deftemplate MAIN::bad-foo94
+   (field x (type STRING LEXEME 
+%
+FALSE
+CLIPS> (list-deftemplates)
+initial-fact
+aok-foo01
+aok-foo02
+aok-foo03
+aok-foo04
+aok-foo05
+aok-foo06
+aok-foo07
+aok-foo08
+aok-foo09
+aok-foo10
+aok-foo11
+aok-foo12
+aok-foo13
+aok-foo14
+aok-foo15
+aok-foo16
+aok-foo17
+aok-foo18
+aok-foo19
+aok-foo20
+aok-foo21
+aok-foo21a
+aok-foo21b
+aok-foo21c
+aok-foo21d
+aok-foo22
+aok-foo23
+aok-foo24
+aok-foo25
+aok-foo26
+aok-foo27
+aok-foo28
+aok-foo29
+aok-foo30
+aok-foo31
+aok-foo32
+aok-foo33
+aok-foo34
+aok-foo35
+aok-foo36
+aok-foo37
+aok-foo38
+aok-foo39
+aok-foo40
+aok-foo41
+aok-foo42
+aok-foo43
+aok-foo44
+aok-foo45
+aok-foo46
+aok-foo47
+For a total of 52 deftemplates.
+CLIPS> (dribble-off)

@@ -1,0 +1,12 @@
+(unwatch all)
+(clear)
+(set-strategy depth)
+(open "Results//basicfnx.rsl" basicfnx "w")
+(dribble-on "Actual//basicfnx.out")
+(batch "basicfnx.bat")
+(dribble-off)
+(load "compline.clp")
+(printout basicfnx "basicfnx.bat differences are as follows:" crlf)
+(compare-files "Expected//basicfnx.out" "Actual//basicfnx.out" basicfnx)
+; close result file
+(close basicfnx)

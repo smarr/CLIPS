@@ -1,0 +1,100 @@
+FIRE    1 move-alone: [gen1],[gen2]
+FIRE    2 fox-eats-goat: [gen4]
+FIRE    3 move-with-fox: [gen1],[gen2]
+FIRE    4 goat-eats-cabbage: [gen5]
+FIRE    5 move-with-goat: [gen1],[gen2]
+FIRE    6 move-alone: [gen6],[gen3]
+FIRE    7 move-alone: [gen7],[gen2]
+FIRE    8 circular-path: [gen6],[gen8]
+FIRE    9 move-with-fox: [gen7],[gen2]
+FIRE   10 move-alone: [gen9],[gen3]
+FIRE   11 fox-eats-goat: [gen10]
+FIRE   12 move-with-fox: [gen9],[gen3]
+FIRE   13 circular-path: [gen7],[gen11]
+FIRE   14 move-with-goat: [gen9],[gen3]
+FIRE   15 move-alone: [gen12],[gen2]
+FIRE   16 goat-eats-cabbage: [gen13]
+FIRE   17 move-with-goat: [gen12],[gen2]
+FIRE   18 circular-path: [gen9],[gen14]
+FIRE   19 move-with-cabbage: [gen12],[gen2]
+FIRE   20 move-alone: [gen15],[gen3]
+FIRE   21 move-alone: [gen16],[gen2]
+FIRE   22 circular-path: [gen15],[gen17]
+FIRE   23 move-with-goat: [gen16],[gen2]
+FIRE   24 recognize-solution: [gen18]
+FIRE   25 further-solution: [gen16],[gen19]
+FIRE   26 further-solution: [gen15],[gen19]
+FIRE   27 further-solution: [gen12],[gen19]
+FIRE   28 further-solution: [gen9],[gen19]
+FIRE   29 further-solution: [gen7],[gen19]
+FIRE   30 further-solution: [gen6],[gen19]
+FIRE   31 further-solution: [gen1],[gen19]
+FIRE   32 print-solution: [gen19]
+
+Solution found: 
+
+Farmer moves with goat to shore-2.
+Farmer moves alone to shore-1.
+Farmer moves with fox to shore-2.
+Farmer moves with goat to shore-1.
+Farmer moves with cabbage to shore-2.
+Farmer moves alone to shore-1.
+Farmer moves with goat to shore-2.
+FIRE   33 move-with-fox: [gen15],[gen3]
+FIRE   34 move-alone: [gen20],[gen2]
+FIRE   35 fox-eats-goat: [gen21]
+FIRE   36 move-with-fox: [gen20],[gen2]
+FIRE   37 circular-path: [gen15],[gen22]
+FIRE   38 move-with-goat: [gen20],[gen2]
+FIRE   39 move-alone: [gen23],[gen3]
+FIRE   40 goat-eats-cabbage: [gen24]
+FIRE   41 move-with-goat: [gen23],[gen3]
+FIRE   42 circular-path: [gen20],[gen25]
+FIRE   43 move-with-cabbage: [gen23],[gen3]
+FIRE   44 circular-path: [gen7],[gen26]
+FIRE   45 move-with-cabbage: [gen15],[gen3]
+FIRE   46 circular-path: [gen12],[gen27]
+FIRE   47 move-with-cabbage: [gen7],[gen2]
+FIRE   48 circular-path: [gen28],[gen23]
+FIRE   49 move-alone: [gen28],[gen3]
+FIRE   50 goat-eats-cabbage: [gen29]
+FIRE   51 move-with-goat: [gen28],[gen3]
+FIRE   52 circular-path: [gen30],[gen20]
+FIRE   53 move-alone: [gen30],[gen2]
+FIRE   54 fox-eats-goat: [gen31]
+FIRE   55 move-with-fox: [gen30],[gen2]
+FIRE   56 move-alone: [gen32],[gen3]
+FIRE   57 move-alone: [gen33],[gen2]
+FIRE   58 circular-path: [gen15],[gen34]
+FIRE   59 move-with-goat: [gen33],[gen2]
+FIRE   60 recognize-solution: [gen35]
+FIRE   61 further-solution: [gen33],[gen36]
+FIRE   62 further-solution: [gen32],[gen36]
+FIRE   63 further-solution: [gen30],[gen36]
+FIRE   64 further-solution: [gen28],[gen36]
+FIRE   65 further-solution: [gen7],[gen36]
+FIRE   66 further-solution: [gen6],[gen36]
+FIRE   67 further-solution: [gen1],[gen36]
+FIRE   68 print-solution: [gen36]
+
+Solution found: 
+
+Farmer moves with goat to shore-2.
+Farmer moves alone to shore-1.
+Farmer moves with cabbage to shore-2.
+Farmer moves with goat to shore-1.
+Farmer moves with fox to shore-2.
+Farmer moves alone to shore-1.
+Farmer moves with goat to shore-2.
+FIRE   69 move-with-fox: [gen32],[gen3]
+FIRE   70 circular-path: [gen30],[gen37]
+FIRE   71 move-with-cabbage: [gen32],[gen3]
+FIRE   72 circular-path: [gen12],[gen38]
+FIRE   73 move-with-goat: [gen30],[gen2]
+FIRE   74 circular-path: [gen28],[gen39]
+FIRE   75 move-with-cabbage: [gen28],[gen3]
+FIRE   76 circular-path: [gen7],[gen40]
+FIRE   77 move-with-goat: [gen6],[gen3]
+FIRE   78 circular-path: [gen1],[gen41]
+FIRE   79 move-with-cabbage: [gen1],[gen2]
+FIRE   80 fox-eats-goat: [gen42]

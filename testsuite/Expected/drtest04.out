@@ -1,0 +1,89 @@
+TRUE
+CLIPS> (batch "drtest04.bat")
+TRUE
+CLIPS> (clear)                            ; DR0301
+CLIPS> (assert (clock =(create$ a)))    ; DR0301 
+<Fact-1>
+CLIPS> (clear)                            ; DR0301
+CLIPS> (assert (clock =(create$ a)))    ; DR0301
+<Fact-1>
+CLIPS> (clear)                            ; DR0301
+CLIPS> (assert (clock =(create$ a)))    ; DR0301
+<Fact-1>
+CLIPS> (clear)                            ; DR0301
+CLIPS> (watch compile)                    ; DR0303
+[ARGACCES5] Function watch expected argument #1 to be of type watchable symbol
+CLIPS> (subseq$)                        ; DR0305
+[ARGACCES4] Function subseq$ expected exactly 3 argument(s)
+CLIPS> (clear)                            ; DR0336
+CLIPS> (deffacts initial (bounds  nil))   ; DR0336
+CLIPS> (defrule Print                     ; DR0336
+   (bounds ?type&:(or (eq ?type Cube) (eq ?type Square)))
+   =>)
+CLIPS> (reset)                            ; DR0336
+CLIPS> (run)                              ; DR0336
+CLIPS> (clear)                            ; DR0363
+CLIPS> (deftemplate a                     ; DR0363
+   (field one (default a a a)))    ; DR0363
+
+[DEFAULT1] The default value for a single field slot must be a single field value
+
+ERROR:
+(deftemplate MAIN::a
+   (field one (default a a a)
+CLIPS> (clear)                            ; DR0365
+CLIPS> (deftemplate bar                   ; DR0365
+   (field a) (multifield b))
+CLIPS> (reset)                            ; DR0365
+CLIPS> (assert (bar (b x y z) (a w)))     ; DR0365
+<Fact-1>
+CLIPS> (assert (bar (a g) (b =(create$ h i j))))
+<Fact-2>
+CLIPS> (facts)                            ; DR0365
+f-0     (initial-fact)
+f-1     (bar (a w) (b x y z))
+f-2     (bar (a g) (b h i j))
+For a total of 3 facts.
+CLIPS> (clear)                            ; DR0380
+CLIPS> (if (= 2 2)                        ; DR0380
+    then (eval (str-cat (run))))   ; DR0380
+[ARGACCES5] Function str-cat expected argument #1 to be of type string, instance name, symbol, float, or integer
+FALSE
+CLIPS> (clear)                            ; DR0381
+CLIPS> (deftemplate a                     ; DR0381
+   (field one
+      (max-number-of-elements 9)
+      (min-number-of-elements 3)))
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for slot attributes.
+
+ERROR:
+(deftemplate MAIN::a
+   (field one (max-number-of-elements
+CLIPS> (clear)                            ; DR0382
+CLIPS> (deftemplate a                     ; DR0382
+   (field one (default nothing)))  ; DR0382
+CLIPS> (assert (a (one a a a a)))         ; DR0382
+
+[TMPLTDEF2] The single field slot one can only contain a single field value.
+CLIPS> (clear)                            ; DR0383
+CLIPS> (deftemplate data (field one) (field two))
+CLIPS> (assert (data (one)))              ; DR0383
+
+[TMPLTDEF2] The single field slot one can only contain a single field value.
+CLIPS> (clear)                            ; DR0396
+CLIPS> (create$)                        ; DR0396
+()
+CLIPS> (str-compare (str-cat (create$)) 
+             (str-cat (create$)))
+[ARGACCES5] Function str-cat expected argument #1 to be of type string, instance name, symbol, float, or integer
+0
+CLIPS> (clear)                            ; DR0397
+CLIPS> (assert-string (str-cat " (" (bind ?var (read)) ")"))
+anything
+<Fact-1>
+CLIPS> (facts)                            ; DR0397
+f-0     (initial-fact)
+f-1     (anything)
+For a total of 2 facts.
+CLIPS> (dribble-off)

@@ -1,0 +1,326 @@
+TRUE
+CLIPS> (batch "miscfnx.bat")
+TRUE
+CLIPS> (clear)                            ; 10.9.1
+CLIPS> (fact-index)                       ; 10.9.1
+[ARGACCES4] Function fact-index expected exactly 1 argument(s)
+CLIPS> (fact-index a)                     ; 10.9.1
+[ARGACCES5] Function fact-index expected argument #1 to be of type fact-address
+CLIPS> (fact-index 1)                     ; 10.9.1
+[ARGACCES5] Function fact-index expected argument #1 to be of type fact-address
+CLIPS> (defglobal ?*gfi* = 1)             ; 10.9.1
+CLIPS> (defrule foo
+  ?f <- (the item)
+  =>
+  (bind ?*gfi* ?f)
+  (printout t (fact-index ?f) crlf))
+CLIPS> (deffacts stuff (a) (b) (c))
+CLIPS> (reset)                            ; 10.9.1
+CLIPS> (assert (the item))                ; 10.9.1
+<Fact-4>
+CLIPS> (run)                              ; 10.9.1
+4
+CLIPS> (fact-index ?*gfi*)                ; 10.9.1
+4
+CLIPS> (fact-index ?*gfi* ?*gfi*)         ; 10.9.1
+[ARGACCES4] Function fact-index expected exactly 1 argument(s)
+CLIPS> (retract ?*gfi*)                   ; 10.9.1
+CLIPS> (fact-index ?*gfi*)                ; 10.9.1
+-1
+CLIPS> (clear)                            ; 10.9.1
+CLIPS> (setgen 10)                        ; 10.9.4
+10
+CLIPS> (setgen)                           ; 10.9.4
+[ARGACCES4] Function setgen expected exactly 1 argument(s)
+CLIPS> (setgen 10 20)                     ; 10.9.4
+[ARGACCES4] Function setgen expected exactly 1 argument(s)
+CLIPS> (setgen a)                         ; 10.9.4
+[ARGACCES5] Function setgen expected argument #1 to be of type integer
+CLIPS> (setgen 30.3)                      ; 10.9.4
+[ARGACCES5] Function setgen expected argument #1 to be of type integer
+CLIPS> (setgen 20)                        ; 10.9.4  
+20
+CLIPS> (assert (gen20 gen21 gen22))       ; 10.9.4
+<Fact-1>
+CLIPS> (gensym)                           ; 10.9.2
+gen20
+CLIPS> (gensym a)                         ; 10.9.2
+[ARGACCES4] Function gensym expected exactly 0 argument(s)
+CLIPS> (gensym)                           ; 10.9.2
+gen21
+CLIPS> (gensym*)                          ; 10.9.3
+gen23
+CLIPS> (setgen 20)                        ; 10.9.3
+20
+CLIPS> (gensym*)                          ; 10.9.3   
+gen23
+CLIPS> (clear)                            ; 10.9.3
+CLIPS> (setgen 20)                        ; 10.9.3
+20
+CLIPS> (gensym*)                          ; 10.9.3
+gen20
+CLIPS> (seed)                             ; 10.9.6
+[ARGACCES4] Function seed expected exactly 1 argument(s)
+CLIPS> (seed a)                           ; 10.9.6
+[ARGACCES5] Function seed expected argument #1 to be of type integer
+CLIPS> (seed 20 a)                        ; 10.9.6
+[ARGACCES4] Function seed expected exactly 1 argument(s)
+CLIPS> (seed 30.5)                        ; 10.9.6
+[ARGACCES5] Function seed expected argument #1 to be of type integer
+CLIPS> (seed 100)                         ; 10.9.6
+CLIPS> (defglobal ?*r1* = 0
+           ?*r2* = 0
+           ?*r3* = 0)
+CLIPS> (progn (bind ?*r1* (random))
+       (bind ?*r2* (random))
+       (bind ?*r3* (random))
+       TRUE)
+TRUE
+CLIPS> (seed 100)                         ; 10.9.5
+CLIPS> (= ?*r1* (random))                 ; 10.9.5
+TRUE
+CLIPS> (= ?*r2* (random))                 ; 10.9.5
+TRUE
+CLIPS> (= ?*r3* (random))                 ; 10.9.5
+TRUE
+CLIPS> (progn (random) TRUE)              ; 10.9.5
+TRUE
+CLIPS> (progn (random 10) TRUE)           ; 10.9.5
+[MISCFUN2] Function random expected either 0 or 2 arguments
+TRUE
+CLIPS> (if)                               ; 10.9.7
+
+[EXPRNPSR2] Expected a constant, variable, or expression.
+CLIPS> (if (> 3 4) then)                  ; 10.9.7
+FALSE
+CLIPS> (if TRUE then (+ 3 4))             ; 10.9.7
+7
+CLIPS> (if FALSE then (create$ a b))      ; 10.9.7
+FALSE
+CLIPS> (if (create$) then 3 else 4)       ; 10.9.7
+3
+CLIPS> (if TRUE then a else b)            ; 10.9.7
+a
+CLIPS> (if FALSE then a else b)           ; 10.9.7
+b
+CLIPS> (if TRUE then (+ 2 1) else (+ 8 9))
+3
+CLIPS> (if FALSE then (+ 3 7) else (- 9 2))
+7
+CLIPS> (if TRUE then (printout t "1") (printout t "2" crlf)
+         else (printout t "3") (printout t "4" crlf))
+12
+CLIPS> (if FALSE then (printout t "1") (printout t "2" crlf)
+          else (printout t "3") (printout t "4" crlf))
+34
+CLIPS> (while)                            ; 10.9.8
+
+[EXPRNPSR2] Expected a constant, variable, or expression.
+CLIPS> (while FALSE)                      ; 10.9.8
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for while function.
+CLIPS> (while FALSE do)                   ; 10.9.8
+FALSE
+CLIPS> (clear)                            ; 10.9.8
+CLIPS> (defglobal ?*t* = 10)              ; 10.9.8
+CLIPS> (while (> ?*t* 0) do
+   (printout t ?*t* "... ")
+   (bind ?*t* (- ?*t* 1))
+   (if (= ?*t* 0) then (printout t crlf)))
+10... 9... 8... 7... 6... 5... 4... 3... 2... 1... 
+FALSE
+CLIPS> (clear)                            ; 10.9.8
+CLIPS> (progn (time) TRUE)                ; 10.9.9
+TRUE
+CLIPS> (<= (time) (time))                 ; 10.9.9
+TRUE
+CLIPS> (time a)                           ; 10.9.9
+[ARGACCES4] Function time expected exactly 0 argument(s)
+CLIPS> (progn)                            ; 10.9.10
+FALSE
+CLIPS> (progn x)                          ; 10.9.10
+x
+CLIPS> (progn 1 2 3)                      ; 10.9.10
+3
+CLIPS> (progn (create$ d) 3 (create$ b c))
+(b c)
+CLIPS> (defglobal ?*v1* = 0 ?*v2* = 1)    ; 10.9.10
+CLIPS> (progn (bind ?*v1* 3)
+       (bind ?*v2* 5)
+       (+ ?*v1* ?*v2*))
+8
+CLIPS> (clear)                            ; 10.9.11 & 10.9.12
+CLIPS> (load "miscfnx.clp")               ; 10.9.11 & 10.9.12
+!&~!!!!
+TRUE
+CLIPS> (return)                           ; 10.9.11 & 10.9.12...
+
+[PRCDRPSR2] The return function is not valid in this context.
+CLIPS> (return 2)
+
+[PRCDRPSR2] The return function is not valid in this context.
+CLIPS> (return 1 2 3)
+
+[PRCDRPSR2] The return function is not valid in this context.
+CLIPS> (return blah)
+
+[PRCDRPSR2] The return function is not valid in this context.
+CLIPS> (sign 10)
+1
+CLIPS> (sign -5)
+-1
+CLIPS> (sign 0)
+0
+CLIPS> (generic-sign 10)
+1
+CLIPS> (generic-sign -5)
+-1
+CLIPS> (generic-sign 0)
+0
+CLIPS> (send 10 sign)
+1
+CLIPS> (send -5 sign)
+-1
+CLIPS> (send 0 sign)
+0
+CLIPS> (break)
+
+[PRCDRPSR2] The break function not valid in this context.
+CLIPS> (break 1)
+
+[PRCDRPSR2] The break function not valid in this context.
+CLIPS> (iterate 0)
+
+CLIPS> (iterate 10)
+0 1 2 3 4 5 6 7 8 9 
+CLIPS> (test-return-in-while)
+50
+CLIPS> (while 1 do 
+   (do-break)
+   (printout t "Out of context break test succeeded" crlf)
+   (break))
+Out of context break test succeeded
+FALSE
+CLIPS> (while 1 do 
+   (nested-break)
+   (printout t "Nested break test succeeded" crlf)
+   (break))
+Nested break test succeeded
+FALSE
+CLIPS> (while 1 do
+   (return)
+   (printout t "return in while test succeeded" crlf)
+   (break))
+
+[PRCDRPSR2] The return function is not valid in this context.
+CLIPS> (while 1 do
+  (iterate (break)))
+
+[PRCDRPSR2] The break function not valid in this context.
+CLIPS> (iterate (return))
+
+[PRCDRPSR2] The return function is not valid in this context.
+CLIPS> (get-function-restrictions +)
+"2*n"
+CLIPS> (get-function-restrictions make-instance)
+"0**"
+CLIPS> (get-function-restrictions)
+[ARGACCES4] Function get-function-restrictions expected exactly 1 argument(s)
+CLIPS> (get-function-restrictions bogus)
+[PRNTUTIL1] Unable to find function bogus.
+""
+CLIPS> (progn (bind ?x 1) (bind ?x) ?x)
+[EVALUATN1] Variable x is unbound
+FALSE
+CLIPS> (defglobal ?*x* = (pi))
+CLIPS> (watch globals)
+CLIPS> (bind ?*x* 1 2 3)
+:== ?*x* ==> (1 2 3) <== 3.14159265358979
+(1 2 3)
+CLIPS> (bind ?*x*)
+:== ?*x* ==> 3.14159265358979 <== (1 2 3)
+3.14159265358979
+CLIPS> (unwatch globals)
+CLIPS> (progn (bind ?x abc def ghi) ?x)
+(abc def ghi)
+CLIPS> (bind ?x)
+FALSE
+CLIPS> (clear)
+CLIPS> (loop-for-count (+ 3 2) do (printout t Foo crlf))
+Foo
+Foo
+Foo
+Foo
+Foo
+FALSE
+CLIPS> (loop-for-count -100 do (printout t "SHOULD NOT EXECUTE" crlf))
+FALSE
+CLIPS> (loop-for-count)
+
+[EXPRNPSR2] Expected a constant, variable, or expression.
+CLIPS> (loop-for-count FALSE do abc)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for loop-for-count function.
+CLIPS> (loop-for-count (?x 3)
+  (loop-for-count (?y -4 -2) do
+     (printout t (* ?x ?y) " ")
+     (loop-for-count (?z -15 (* ?x ?y))
+        (printout t X))
+     (printout t crlf)))
+-4 XXXXXXXXXXXX
+-3 XXXXXXXXXXXXX
+-2 XXXXXXXXXXXXXX
+-8 XXXXXXXX
+-6 XXXXXXXXXX
+-4 XXXXXXXXXXXX
+-12 XXXX
+-9 XXXXXXX
+-6 XXXXXXXXXX
+FALSE
+CLIPS> (loop-for-count 1000 do (printout t Woz crlf) (break))
+Woz
+FALSE
+CLIPS> (deffunction foo ()
+  (loop-for-count 1000 do (printout t Woz crlf) (return 4)))
+CLIPS> (foo)
+Woz
+4
+CLIPS> (clear)
+CLIPS> (defglobal ?*x* = 0)  ;; CR0194
+CLIPS> (defglobal ?*y* = 1)
+CLIPS> (deffunction foo (?val)
+  (switch ?val
+     (case ?*x* then *x*)
+     (case ?*y* then *y*)
+     (default none)))
+CLIPS> (foo 0)
+*x*
+CLIPS> (foo 1)
+*y*
+CLIPS> (foo 2)
+none
+CLIPS> (bind ?*y* 2)
+2
+CLIPS> (foo 2)
+*y*
+CLIPS> (switch)
+
+[EXPRNPSR2] Expected a constant, variable, or expression.
+CLIPS> (switch 1 (default))
+FALSE
+CLIPS> (switch 2)
+FALSE
+CLIPS> (clear)
+CLIPS> (progn (break)) ;; CR0194 and CR0196
+
+[PRCDRPSR2] The break function not valid in this context.
+CLIPS> (progn (return))
+
+[PRCDRPSR2] The return function is not valid in this context.
+CLIPS> (deffunction foo () (progn 1 2 (return)))
+CLIPS> (foo)
+CLIPS> (while TRUE do
+  (progn (break) (printout t ERROR crlf)))
+FALSE
+CLIPS> (clear)
+CLIPS> (dribble-off)

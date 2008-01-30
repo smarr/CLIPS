@@ -1,0 +1,179 @@
+TRUE
+CLIPS> (batch "firstjoin.bat")
+TRUE
+CLIPS> (clear)                     ; Sharing
+CLIPS> (watch activations)
+CLIPS> (defrule foo =>)
+==> Activation 0      foo: *
+CLIPS> (agenda)
+0      foo: *
+For a total of 1 activation.
+CLIPS> (run)
+CLIPS> (reset)
+==> Activation 0      foo: *
+CLIPS> (agenda)
+0      foo: *
+For a total of 1 activation.
+CLIPS> (defrule bar =>)
+==> Activation 0      bar: *
+CLIPS> (agenda)
+0      bar: *
+0      foo: *
+For a total of 2 activations.
+CLIPS> (reset)
+<== Activation 0      bar: *
+<== Activation 0      foo: *
+==> Activation 0      bar: *
+==> Activation 0      foo: *
+CLIPS> (agenda)
+0      foo: *
+0      bar: *
+For a total of 2 activations.
+CLIPS> (clear)                     ; Bug 1
+CLIPS> (set-strategy mea)
+depth
+CLIPS> (defrule r1 =>))
+==> Activation 0      r1: *
+CLIPS> (defrule r7 (not (x)) =>)
+==> Activation 0      r7: *
+CLIPS> (agenda)
+0      r7: *
+0      r1: *
+For a total of 2 activations.
+CLIPS> (set-strategy lex)
+mea
+CLIPS> (reset)
+<== Activation 0      r1: *
+<== Activation 0      r7: *
+==> Activation 0      r1: *
+==> Activation 0      r7: *
+CLIPS> (agenda)
+0      r7: *
+0      r1: *
+For a total of 2 activations.
+CLIPS> (run)
+CLIPS> (set-strategy depth)
+lex
+CLIPS> (clear)                     ; First CE is not
+CLIPS> (defrule foo (not (a)) =>)
+==> Activation 0      foo: *
+CLIPS> (agenda)
+0      foo: *
+For a total of 1 activation.
+CLIPS> (assert (a))
+<== Activation 0      foo: *
+<Fact-1>
+CLIPS> (retract 1)
+==> Activation 0      foo: *
+CLIPS> (agenda)
+0      foo: *
+For a total of 1 activation.
+CLIPS> (reset)
+<== Activation 0      foo: *
+==> Activation 0      foo: *
+CLIPS> (agenda)
+0      foo: *
+For a total of 1 activation.
+CLIPS> (assert (a))
+<== Activation 0      foo: *
+<Fact-1>
+CLIPS> (reset)
+==> Activation 0      foo: *
+CLIPS> (clear)                     ; First CE is not/logical
+CLIPS> 
+(defrule foo 
+   (logical (not (a)))
+   =>
+   (assert (b)))
+==> Activation 0      foo: *
+CLIPS> (watch facts)
+CLIPS> (run)
+==> f-1     (b)
+CLIPS> (assert (a))
+==> f-2     (a)
+<== f-1     (b)
+<Fact-2>
+CLIPS> (clear)                     ; First CE is not/and
+==> f-0     (initial-fact)
+CLIPS> (defrule foo (not (and (a) (b))) =>)
+==> Activation 0      foo: *
+CLIPS> (assert (a))
+==> f-1     (a)
+<Fact-1>
+CLIPS> (assert (b))
+==> f-2     (b)
+<== Activation 0      foo: *
+<Fact-2>
+CLIPS> (retract 2)
+<== f-2     (b)
+==> Activation 0      foo: *
+CLIPS> (clear)                     ; First CE is test
+==> f-0     (initial-fact)
+CLIPS> (defrule foo (test (> 4 3)) =>)
+==> Activation 0      foo: *
+CLIPS> (defrule bar (test (< 4 3)) =>)
+CLIPS> (unwatch facts)
+CLIPS> (clear)                     ; First CE is not with test
+CLIPS> (defrule foo (not (a)) (test (> 0 1)) =>)
+CLIPS> (defrule bar (not (b)) (test (< 0 1)) =>)
+==> Activation 0      bar: *
+CLIPS> (reset)
+<== Activation 0      bar: *
+==> Activation 0      bar: *
+CLIPS> (clear)
+CLIPS> (assert (a) (b))
+<Fact-2>
+CLIPS> (defrule foo (not (a)) (test (> 0 1)) =>)
+CLIPS> (defrule bar (not (b)) (test (< 0 1)) =>)
+==> Activation 0      bar: *
+<== Activation 0      bar: *
+CLIPS> (reset)
+==> Activation 0      bar: *
+CLIPS> (defrule foo2 (not (a)) (test (> 0 1)) (not (x)) =>)
+CLIPS> (defrule bar2 (not (b)) (test (< 0 1)) (not (x)) =>)
+==> Activation 0      bar2: *,*
+CLIPS> (clear)
+CLIPS> (defrule bar (a) (not (and (test (< 5 3)) (b))) (c) =>)
+CLIPS> (matches bar)
+Matches for Pattern 1
+ None
+Matches for Pattern 2
+ None
+Matches for Pattern 3
+ None
+Matches for Pattern 4
+ None
+Partial matches for CEs 2 - 3
+ None
+Partial matches for CEs 1 - 3
+ None
+Partial matches for CEs 1 - 4
+ None
+Activations
+ None
+CLIPS> (defrule foo (test (> 3 4)) =>)
+CLIPS> (defrule yak (test (< 3 4)) =>)
+==> Activation 0      yak: *
+CLIPS> (matches foo)
+Matches for Pattern 1
+ None
+Activations
+ None
+CLIPS> (matches yak)
+Matches for Pattern 1
+*
+Activations
+*
+CLIPS> (clear)                     ; Incremental Reset exists/nand CE
+CLIPS> (defrule foo (a) (b) (c) =>)
+CLIPS> (assert (a) (b) (c) (d))
+==> Activation 0      foo: f-1,f-2,f-3
+<Fact-4>
+CLIPS> (defrule bar (exists (a) (b)) (d) =>)
+==> Activation 0      bar: *,f-4
+CLIPS> (defrule yak (exists (a) (b)) (c) =>)
+==> Activation 0      yak: *,f-3
+CLIPS> (defrule woz (not (and (a) (b))) (d) =>)
+CLIPS> (unwatch activations)       ; Done
+CLIPS> (clear)
+CLIPS> (dribble-off)

@@ -1,0 +1,10 @@
+;;;************************************************************
+;;; EXTERNAL TEXT PROCESSING TESTS
+;;;
+;;; This file textpro.clp tests the external text-processing
+;;; commands fetch, print-region and toss.
+;;;
+;;; To test, execute the command (batch "textpro.tst").
+;;; When the test is complete, check the file textpro.rsl
+;;; for the results.
+;;;************************************************************

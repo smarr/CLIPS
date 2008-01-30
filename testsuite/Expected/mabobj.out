@@ -1,0 +1,122 @@
+FIRE    1 hold-to-eat: [gen13],[gen1],*
+FIRE    2 unlock-chest-to-hold-thing: [gen14],[gen8],*
+FIRE    3 hold-chest-to-put-on-floor: [gen15],[gen7],[gen1],*
+FIRE    4 use-ladder-to-hold: [gen16],[gen7],*,*
+FIRE    5 unlock-chest-to-move-thing: [gen17],[gen6],*
+FIRE    6 hold-chest-to-put-on-floor: [gen18],[gen5],[gen1],*
+FIRE    7 walk-to-hold: [gen19],[gen5],[gen1],*
+FIRE    8 get-on-floor-to-walk: [gen20],[gen1],*
+FIRE    9 jump-onto-floor: [gen21],[gen1]
+Monkey jumps off the green-couch onto the floor.
+FIRE   10 walk-holding-nothing: [gen20],[gen1]
+Monkey walks to t2-2.
+FIRE   11 climb-to-hold: [gen19],[gen5],[gen1],*
+FIRE   12 climb-indirectly: [gen22],[gen4],[gen1],*
+FIRE   13 climb-directly: [gen23],[gen3],[gen1]
+Monkey climbs onto the red-couch.
+FIRE   14 climb-directly: [gen22],[gen4],[gen1]
+Monkey climbs onto the big-pillow.
+FIRE   15 grab-thing: [gen19],[gen5],[gen1]
+Monkey grabs the red-chest.
+FIRE   16 put-chest-on-floor: [gen18],[gen1],[gen5]
+Monkey throws the red-chest off the big-pillow onto the floor.
+FIRE   17 get-key-to-unlock: [gen18],[gen5],[gen6],[gen1],*
+FIRE   18 walk-to-hold: [gen24],[gen12],[gen1],*
+FIRE   19 get-on-floor-to-walk: [gen25],[gen1],*
+FIRE   20 jump-onto-floor: [gen26],[gen1]
+Monkey jumps off the big-pillow onto the floor.
+FIRE   21 walk-holding-nothing: [gen25],[gen1]
+Monkey walks to t1-3.
+FIRE   22 grab-thing: [gen24],[gen12],[gen1]
+Monkey grabs the red-key.
+FIRE   23 move-to-chest-with-key: [gen18],[gen1],[gen5],[gen6],*
+FIRE   24 walk-holding-thing: [gen27],[gen1]
+Monkey walks to t2-2 holding the red-key.
+FIRE   25 unlock-chest-with-key: [gen18],[gen6],[gen5],[gen1]
+Monkey opens the red-chest with the red-key revealing the  ladder.
+FIRE   26 hold-thing-to-move: [gen17],[gen28],[gen1],*
+FIRE   27 climb-to-hold: [gen29],[gen28],[gen1],*
+FIRE   28 drop-to-climb: [gen30],[gen5],[gen1],*
+FIRE   29 drop-thing: [gen31],[gen1],[gen12]
+Monkey drops the red-key.
+FIRE   30 climb-directly: [gen30],[gen5],[gen1]
+Monkey climbs onto the red-chest.
+FIRE   31 grab-thing: [gen29],[gen28],[gen1]
+Monkey grabs the ladder.
+FIRE   32 move-thing-to-place: [gen17],[gen1],*
+FIRE   33 get-on-floor-to-walk: [gen32],[gen1],*
+FIRE   34 jump-onto-floor: [gen33],[gen1]
+Monkey jumps off the red-chest onto the floor.
+FIRE   35 walk-holding-thing: [gen32],[gen1]
+Monkey walks to t7-7 holding the ladder.
+FIRE   36 drop-thing-once-moved: [gen17],[gen1],[gen28]
+Monkey drops the ladder.
+FIRE   37 climb-ladder-to-hold: [gen16],[gen7],[gen28],[gen1],*
+FIRE   38 climb-directly: [gen34],[gen28],[gen1]
+Monkey climbs onto the ladder.
+FIRE   39 grab-thing-from-ladder: [gen16],[gen7],[gen28],[gen1]
+Monkey grabs the blue-chest.
+FIRE   40 put-chest-on-floor: [gen15],[gen1],[gen7]
+Monkey throws the blue-chest off the ladder onto the floor.
+FIRE   41 get-key-to-unlock: [gen15],[gen7],[gen8],[gen1],*
+FIRE   42 unlock-chest-to-hold-thing: [gen35],[gen11],*
+FIRE   43 hold-chest-to-put-on-floor: [gen36],[gen10],[gen1],*
+FIRE   44 use-ladder-to-hold: [gen37],[gen10],*,*
+FIRE   45 hold-thing-to-move: [gen38],[gen28],[gen1],*
+FIRE   46 climb-to-hold: [gen39],[gen28],[gen1],*
+FIRE   47 jump-onto-floor: [gen40],[gen1]
+Monkey jumps off the ladder onto the floor.
+FIRE   48 grab-thing: [gen39],[gen28],[gen1]
+Monkey grabs the ladder.
+FIRE   49 move-thing-to-place: [gen38],[gen1],*
+FIRE   50 walk-holding-thing: [gen41],[gen1]
+Monkey walks to t8-8 holding the ladder.
+FIRE   51 drop-thing-once-moved: [gen38],[gen1],[gen28]
+Monkey drops the ladder.
+FIRE   52 climb-ladder-to-hold: [gen37],[gen10],[gen28],[gen1],*
+FIRE   53 climb-directly: [gen42],[gen28],[gen1]
+Monkey climbs onto the ladder.
+FIRE   54 grab-thing-from-ladder: [gen37],[gen10],[gen28],[gen1]
+Monkey grabs the green-chest.
+FIRE   55 put-chest-on-floor: [gen36],[gen1],[gen10]
+Monkey throws the green-chest off the ladder onto the floor.
+FIRE   56 get-key-to-unlock: [gen36],[gen10],[gen11],[gen1],*
+FIRE   57 walk-to-hold: [gen43],[gen12],[gen1],*
+FIRE   58 get-on-floor-to-walk: [gen44],[gen1],*
+FIRE   59 jump-onto-floor: [gen45],[gen1]
+Monkey jumps off the ladder onto the floor.
+FIRE   60 walk-holding-nothing: [gen44],[gen1]
+Monkey walks to t2-2.
+FIRE   61 grab-thing: [gen43],[gen12],[gen1]
+Monkey grabs the red-key.
+FIRE   62 move-to-chest-with-key: [gen36],[gen1],[gen10],[gen11],*
+FIRE   63 walk-holding-thing: [gen46],[gen1]
+Monkey walks to t8-8 holding the red-key.
+FIRE   64 unlock-chest-with-key: [gen36],[gen11],[gen10],[gen1]
+Monkey opens the green-chest with the red-key revealing the  blue-key.
+FIRE   65 climb-to-hold: [gen35],[gen47],[gen1],*
+FIRE   66 drop-to-climb: [gen48],[gen10],[gen1],*
+FIRE   67 drop-thing: [gen49],[gen1],[gen12]
+Monkey drops the red-key.
+FIRE   68 climb-directly: [gen48],[gen10],[gen1]
+Monkey climbs onto the green-chest.
+FIRE   69 grab-thing: [gen35],[gen47],[gen1]
+Monkey grabs the blue-key.
+FIRE   70 move-to-chest-with-key: [gen15],[gen1],[gen7],[gen8],*
+FIRE   71 get-on-floor-to-walk: [gen50],[gen1],*
+FIRE   72 jump-onto-floor: [gen51],[gen1]
+Monkey jumps off the green-chest onto the floor.
+FIRE   73 walk-holding-thing: [gen50],[gen1]
+Monkey walks to t7-7 holding the blue-key.
+FIRE   74 unlock-chest-with-key: [gen15],[gen8],[gen7],[gen1]
+Monkey opens the blue-chest with the blue-key revealing the  bananas.
+FIRE   75 climb-to-hold: [gen14],[gen52],[gen1],*
+FIRE   76 drop-to-climb: [gen53],[gen7],[gen1],*
+FIRE   77 drop-thing: [gen54],[gen1],[gen47]
+Monkey drops the blue-key.
+FIRE   78 climb-directly: [gen53],[gen7],[gen1]
+Monkey climbs onto the blue-chest.
+FIRE   79 grab-thing: [gen14],[gen52],[gen1]
+Monkey grabs the bananas.
+FIRE   80 satisfy-hunger: [gen13],[gen1],[gen52]
+Monkey eats the bananas.

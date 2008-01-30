@@ -1,0 +1,530 @@
+TRUE
+CLIPS> (batch "fctquery.bat")
+TRUE
+CLIPS> (reset)
+CLIPS> (do-for-all-facts ((?i MAN)) TRUE
+   (+ (eval "(gensym)") 2))
+[ARGACCES5] Function + expected argument #1 to be of type integer or float
+FALSE
+CLIPS> (do-for-all-facts ((?mb MALE) (?wg FEMALE))
+   TRUE
+   (printout t ?mb:name " " ?wg:name crlf))
+[Boy-1] [Girl-1]
+[Boy-1] [Girl-2]
+[Boy-1] [Woman-1]
+[Boy-1] [Woman-2]
+[Boy-1] [Woman-3]
+[Boy-2] [Girl-1]
+[Boy-2] [Girl-2]
+[Boy-2] [Woman-1]
+[Boy-2] [Woman-2]
+[Boy-2] [Woman-3]
+[Boy-3] [Girl-1]
+[Boy-3] [Girl-2]
+[Boy-3] [Woman-1]
+[Boy-3] [Woman-2]
+[Boy-3] [Woman-3]
+[Boy-4] [Girl-1]
+[Boy-4] [Girl-2]
+[Boy-4] [Woman-1]
+[Boy-4] [Woman-2]
+[Boy-4] [Woman-3]
+[Man-1] [Girl-1]
+[Man-1] [Girl-2]
+[Man-1] [Woman-1]
+[Man-1] [Woman-2]
+[Man-1] [Woman-3]
+[Man-2] [Girl-1]
+[Man-2] [Girl-2]
+[Man-2] [Woman-1]
+[Man-2] [Woman-2]
+[Man-2] [Woman-3]
+CLIPS> (do-for-all-facts ((?mb BOY MAN) (?wg GIRL WOMAN))
+   TRUE
+   (progn (printout t ?mb:name ) (printout t " " ?wg:name crlf)))
+[Boy-1] [Girl-1]
+[Boy-1] [Girl-2]
+[Boy-1] [Woman-1]
+[Boy-1] [Woman-2]
+[Boy-1] [Woman-3]
+[Boy-2] [Girl-1]
+[Boy-2] [Girl-2]
+[Boy-2] [Woman-1]
+[Boy-2] [Woman-2]
+[Boy-2] [Woman-3]
+[Boy-3] [Girl-1]
+[Boy-3] [Girl-2]
+[Boy-3] [Woman-1]
+[Boy-3] [Woman-2]
+[Boy-3] [Woman-3]
+[Boy-4] [Girl-1]
+[Boy-4] [Girl-2]
+[Boy-4] [Woman-1]
+[Boy-4] [Woman-2]
+[Boy-4] [Woman-3]
+[Man-1] [Girl-1]
+[Man-1] [Girl-2]
+[Man-1] [Woman-1]
+[Man-1] [Woman-2]
+[Man-1] [Woman-3]
+[Man-2] [Girl-1]
+[Man-2] [Girl-2]
+[Man-2] [Woman-1]
+[Man-2] [Woman-2]
+[Man-2] [Woman-3]
+CLIPS> (do-for-all-facts ((?f1 FEMALE) (?f2 FEMALE))
+   TRUE
+   (printout t ?f1:name " " ?f2:name crlf))
+[Girl-1] [Girl-1]
+[Girl-1] [Girl-2]
+[Girl-1] [Woman-1]
+[Girl-1] [Woman-2]
+[Girl-1] [Woman-3]
+[Girl-2] [Girl-1]
+[Girl-2] [Girl-2]
+[Girl-2] [Woman-1]
+[Girl-2] [Woman-2]
+[Girl-2] [Woman-3]
+[Woman-1] [Girl-1]
+[Woman-1] [Girl-2]
+[Woman-1] [Woman-1]
+[Woman-1] [Woman-2]
+[Woman-1] [Woman-3]
+[Woman-2] [Girl-1]
+[Woman-2] [Girl-2]
+[Woman-2] [Woman-1]
+[Woman-2] [Woman-2]
+[Woman-2] [Woman-3]
+[Woman-3] [Girl-1]
+[Woman-3] [Girl-2]
+[Woman-3] [Woman-1]
+[Woman-3] [Woman-2]
+[Woman-3] [Woman-3]
+CLIPS> (do-for-all-facts ((?mb MALE) (?wg FEMALE))
+   (= (fact-slot-value ?mb age) (fact-slot-value ?wg age))
+   (printout t ?mb:name " " ?wg:name crlf))
+[Boy-1] [Girl-1]
+[Boy-2] [Girl-2]
+[Boy-3] [Girl-2]
+[Boy-4] [Girl-2]
+[Man-1] [Woman-1]
+[Man-2] [Woman-2]
+CLIPS> (do-for-all-facts ((?mb MALE) (?wg FEMALE))
+   (= ?mb:age ?wg:age)
+   (printout t ?mb:name " " ?wg:name crlf))
+[Boy-1] [Girl-1]
+[Boy-2] [Girl-2]
+[Boy-3] [Girl-2]
+[Boy-4] [Girl-2]
+[Man-1] [Woman-1]
+[Man-2] [Woman-2]
+CLIPS> (count-facts WOMAN)
+3
+CLIPS> (count-facts-2 WOMAN)
+3
+CLIPS> (count-facts BOY)
+4
+CLIPS> (count-facts-2 BOY)
+4
+CLIPS> (any-factp ((?man MAN)) (> ?man:age 30))
+TRUE
+CLIPS> (find-fact ((?m MAN) (?w WOMAN)) (= ?m:age ?w:age))
+(<Fact-29> <Fact-31>)
+CLIPS> (find-all-facts ((?m MAN) (?w WOMAN)) (= ?m:age ?w:age))
+(<Fact-29> <Fact-31> <Fact-30> <Fact-32>)
+CLIPS> (do-for-fact ((?p1 PERSON) (?p2 PERSON) (?p3 PERSON))
+  (and (= ?p1:age ?p2:age ?p3:age)
+       (neq ?p1 ?p2)
+       (neq ?p1 ?p3)
+       (neq ?p2 ?p3))
+  (printout t ?p1:name " " ?p2:name " " ?p3:name crlf))
+[Girl-2] [Boy-2] [Boy-3]
+CLIPS> (do-for-all-facts ((?p1 PERSON) (?p2 PERSON) (?p3 PERSON))
+  (and (= ?p1:age ?p2:age ?p3:age)
+       (> (str-compare ?p1:name ?p2:name) 0)
+       (> (str-compare ?p2:name ?p3:name) 0))
+  (printout t ?p1:name " " ?p2:name " " ?p3:name crlf))
+[Girl-2] [Boy-3] [Boy-2]
+[Girl-2] [Boy-4] [Boy-2]
+[Girl-2] [Boy-4] [Boy-3]
+[Boy-4] [Boy-3] [Boy-2]
+CLIPS> (do-for-all-facts ((?p1 PERSON) (?p2 PERSON) (?p3 PERSON))
+  (= ?p1:age ?p2:age ?p3:age)
+  (printout t ?p1:name " " ?p2:name " " ?p3:name crlf))
+[Girl-1] [Girl-1] [Girl-1]
+[Girl-1] [Girl-1] [Boy-1]
+[Girl-1] [Boy-1] [Girl-1]
+[Girl-1] [Boy-1] [Boy-1]
+[Girl-2] [Girl-2] [Girl-2]
+[Girl-2] [Girl-2] [Boy-2]
+[Girl-2] [Girl-2] [Boy-3]
+[Girl-2] [Girl-2] [Boy-4]
+[Girl-2] [Boy-2] [Girl-2]
+[Girl-2] [Boy-2] [Boy-2]
+[Girl-2] [Boy-2] [Boy-3]
+[Girl-2] [Boy-2] [Boy-4]
+[Girl-2] [Boy-3] [Girl-2]
+[Girl-2] [Boy-3] [Boy-2]
+[Girl-2] [Boy-3] [Boy-3]
+[Girl-2] [Boy-3] [Boy-4]
+[Girl-2] [Boy-4] [Girl-2]
+[Girl-2] [Boy-4] [Boy-2]
+[Girl-2] [Boy-4] [Boy-3]
+[Girl-2] [Boy-4] [Boy-4]
+[Woman-1] [Woman-1] [Woman-1]
+[Woman-1] [Woman-1] [Man-1]
+[Woman-1] [Man-1] [Woman-1]
+[Woman-1] [Man-1] [Man-1]
+[Woman-2] [Woman-2] [Woman-2]
+[Woman-2] [Woman-2] [Man-2]
+[Woman-2] [Man-2] [Woman-2]
+[Woman-2] [Man-2] [Man-2]
+[Woman-3] [Woman-3] [Woman-3]
+[Boy-1] [Girl-1] [Girl-1]
+[Boy-1] [Girl-1] [Boy-1]
+[Boy-1] [Boy-1] [Girl-1]
+[Boy-1] [Boy-1] [Boy-1]
+[Boy-2] [Girl-2] [Girl-2]
+[Boy-2] [Girl-2] [Boy-2]
+[Boy-2] [Girl-2] [Boy-3]
+[Boy-2] [Girl-2] [Boy-4]
+[Boy-2] [Boy-2] [Girl-2]
+[Boy-2] [Boy-2] [Boy-2]
+[Boy-2] [Boy-2] [Boy-3]
+[Boy-2] [Boy-2] [Boy-4]
+[Boy-2] [Boy-3] [Girl-2]
+[Boy-2] [Boy-3] [Boy-2]
+[Boy-2] [Boy-3] [Boy-3]
+[Boy-2] [Boy-3] [Boy-4]
+[Boy-2] [Boy-4] [Girl-2]
+[Boy-2] [Boy-4] [Boy-2]
+[Boy-2] [Boy-4] [Boy-3]
+[Boy-2] [Boy-4] [Boy-4]
+[Boy-3] [Girl-2] [Girl-2]
+[Boy-3] [Girl-2] [Boy-2]
+[Boy-3] [Girl-2] [Boy-3]
+[Boy-3] [Girl-2] [Boy-4]
+[Boy-3] [Boy-2] [Girl-2]
+[Boy-3] [Boy-2] [Boy-2]
+[Boy-3] [Boy-2] [Boy-3]
+[Boy-3] [Boy-2] [Boy-4]
+[Boy-3] [Boy-3] [Girl-2]
+[Boy-3] [Boy-3] [Boy-2]
+[Boy-3] [Boy-3] [Boy-3]
+[Boy-3] [Boy-3] [Boy-4]
+[Boy-3] [Boy-4] [Girl-2]
+[Boy-3] [Boy-4] [Boy-2]
+[Boy-3] [Boy-4] [Boy-3]
+[Boy-3] [Boy-4] [Boy-4]
+[Boy-4] [Girl-2] [Girl-2]
+[Boy-4] [Girl-2] [Boy-2]
+[Boy-4] [Girl-2] [Boy-3]
+[Boy-4] [Girl-2] [Boy-4]
+[Boy-4] [Boy-2] [Girl-2]
+[Boy-4] [Boy-2] [Boy-2]
+[Boy-4] [Boy-2] [Boy-3]
+[Boy-4] [Boy-2] [Boy-4]
+[Boy-4] [Boy-3] [Girl-2]
+[Boy-4] [Boy-3] [Boy-2]
+[Boy-4] [Boy-3] [Boy-3]
+[Boy-4] [Boy-3] [Boy-4]
+[Boy-4] [Boy-4] [Girl-2]
+[Boy-4] [Boy-4] [Boy-2]
+[Boy-4] [Boy-4] [Boy-3]
+[Boy-4] [Boy-4] [Boy-4]
+[Man-1] [Woman-1] [Woman-1]
+[Man-1] [Woman-1] [Man-1]
+[Man-1] [Man-1] [Woman-1]
+[Man-1] [Man-1] [Man-1]
+[Man-2] [Woman-2] [Woman-2]
+[Man-2] [Woman-2] [Man-2]
+[Man-2] [Man-2] [Woman-2]
+[Man-2] [Man-2] [Man-2]
+CLIPS> (watch facts)
+CLIPS> (delayed-do-for-all-facts ((?b1 BOY))
+   (not (any-factp ((?b2 BOY))
+           (> ?b2:age (fact-slot-value ?b1 age))))
+   (retract ?b1))
+<== f-25    (BOY (name [Boy-1]) (sex male) (age 8))
+CLIPS> (unwatch facts)
+CLIPS> (reset)
+CLIPS> (watch facts)
+CLIPS> (do-for-all-facts ((?b1 BOY))
+   (not (any-factp ((?b2 BOY))
+           (> ?b2:age (fact-slot-value ?b1 age))))
+   (retract ?b1))
+<== f-25    (BOY (name [Boy-1]) (sex male) (age 8))
+<== f-26    (BOY (name [Boy-2]) (sex male) (age 4))
+<== f-27    (BOY (name [Boy-3]) (sex male) (age 4))
+<== f-28    (BOY (name [Boy-4]) (sex male) (age 4))
+CLIPS> (unwatch facts)
+CLIPS> (reset)
+CLIPS> (do-for-all-facts ((?b BOY)) TRUE
+  (do-for-all-facts ((?g GIRL)) TRUE
+    (printout t ?b:name " " ?g:name crlf)))
+[Boy-1] [Girl-1]
+[Boy-1] [Girl-2]
+[Boy-2] [Girl-1]
+[Boy-2] [Girl-2]
+[Boy-3] [Girl-1]
+[Boy-3] [Girl-2]
+[Boy-4] [Girl-1]
+[Boy-4] [Girl-2]
+CLIPS> (assert (A (name [a])))
+<Fact-34>
+CLIPS> (do-for-all-facts ((?a A)) TRUE
+  (printout t ?a crlf))
+<Fact-34>
+CLIPS> (any-factp)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query function.
+CLIPS> (any-factp TRUE)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query function.
+CLIPS> (any-factp ())
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query function.
+CLIPS> (any-factp (?B OBJECT) TRUE)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query function.
+CLIPS> (any-factp ((?b A)))
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query function.
+CLIPS> (any-factp ((?b BOGUS)) TRUE)
+[PRNTUTIL1] Unable to find deftemplate BOGUS.
+CLIPS> (any-factp ((?b 34)) TRUE)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query class restrictions.
+FALSE
+CLIPS> (any-factp ((?b (mv-append BOGUS USER))) TRUE)
+[PRNTUTIL1] Unable to find deftemplate BOGUS in function any-factp.
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query class restrictions.
+FALSE
+CLIPS> (any-factp ((?b (mv-append USER 34))) TRUE)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query class restrictions.
+FALSE
+CLIPS> (any-factp ((?b A)) (progn (bind ?b 1) TRUE))
+[FACTQPSR2] Binds are not allowed in fact-set query in function any-factp.
+CLIPS> (find-fact)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query function.
+CLIPS> (find-fact TRUE)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query function.
+CLIPS> (find-fact ())
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query function.
+CLIPS> (find-fact (?B OBJECT) TRUE)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query function.
+CLIPS> (find-fact ((?b A)))
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query function.
+CLIPS> (find-fact ((?b BOGUS)) TRUE)
+[PRNTUTIL1] Unable to find deftemplate BOGUS.
+CLIPS> (find-fact ((?b 34)) TRUE)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query class restrictions.
+()
+CLIPS> (find-fact ((?b (mv-append BOGUS USER))) TRUE)
+[PRNTUTIL1] Unable to find deftemplate BOGUS in function find-fact.
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query class restrictions.
+()
+CLIPS> (find-fact ((?b (mv-append USER 34))) TRUE)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query class restrictions.
+()
+CLIPS> (find-fact ((?b A)) (progn (bind ?b 1) TRUE))
+[FACTQPSR2] Binds are not allowed in fact-set query in function find-fact.
+CLIPS> (find-all-facts)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query function.
+CLIPS> (find-all-facts TRUE)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query function.
+CLIPS> (find-all-facts ())
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query function.
+CLIPS> (find-all-facts (?B OBJECT) TRUE)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query function.
+CLIPS> (find-all-facts ((?b A)))
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query function.
+CLIPS> (find-all-facts ((?b BOGUS)) TRUE)
+[PRNTUTIL1] Unable to find deftemplate BOGUS.
+CLIPS> (find-all-facts ((?b 34)) TRUE)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query class restrictions.
+()
+CLIPS> (find-all-facts ((?b (mv-append BOGUS USER))) TRUE)
+[PRNTUTIL1] Unable to find deftemplate BOGUS in function find-all-facts.
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query class restrictions.
+()
+CLIPS> (find-all-facts ((?b (mv-append USER 34))) TRUE)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query class restrictions.
+()
+CLIPS> (find-all-facts ((?b A)) (progn (bind ?b 1) TRUE))
+[FACTQPSR2] Binds are not allowed in fact-set query in function find-all-facts.
+CLIPS> (do-for-fact)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query function.
+CLIPS> (do-for-fact TRUE)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query function.
+CLIPS> (do-for-fact ())
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query function.
+CLIPS> (do-for-fact (?B OBJECT) TRUE)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query function.
+CLIPS> (do-for-fact ((?b A)))
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query function.
+CLIPS> (do-for-fact ((?b BOGUS)) TRUE)
+[PRNTUTIL1] Unable to find deftemplate BOGUS.
+CLIPS> (do-for-fact ((?b A)) (progn (bind ?b 1) TRUE))
+[FACTQPSR2] Binds are not allowed in fact-set query in function do-for-fact.
+CLIPS> (do-for-fact ((?b 34)) TRUE abc)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query class restrictions.
+FALSE
+CLIPS> (do-for-fact ((?b (mv-append BOGUS USER))) TRUE abc)
+[PRNTUTIL1] Unable to find deftemplate BOGUS in function do-for-fact.
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query class restrictions.
+FALSE
+CLIPS> (do-for-fact ((?b (mv-append USER 34))) TRUE abc)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query class restrictions.
+FALSE
+CLIPS> (do-for-fact ((?b MALE)) TRUE (bind ?b 1))
+[FACTQPSR3] Cannot rebind fact-set member variable b in function do-for-fact.
+CLIPS> (do-for-all-facts)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query function.
+CLIPS> (do-for-all-facts TRUE)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query function.
+CLIPS> (do-for-all-facts ())
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query function.
+CLIPS> (do-for-all-facts (?B OBJECT) TRUE)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query function.
+CLIPS> (do-for-all-facts ((?b A)))
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query function.
+CLIPS> (do-for-all-facts ((?b BOGUS)) TRUE)
+[PRNTUTIL1] Unable to find deftemplate BOGUS.
+CLIPS> (do-for-all-facts ((?b A)) (progn (bind ?b 1) TRUE))
+[FACTQPSR2] Binds are not allowed in fact-set query in function do-for-all-facts.
+CLIPS> (do-for-all-facts ((?b 34)) TRUE abc)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query class restrictions.
+FALSE
+CLIPS> (do-for-all-facts ((?b (mv-append BOGUS USER))) TRUE abc)
+[PRNTUTIL1] Unable to find deftemplate BOGUS in function do-for-all-facts.
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query class restrictions.
+FALSE
+CLIPS> (do-for-all-facts ((?b (mv-append USER 34))) TRUE abc)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query class restrictions.
+FALSE
+CLIPS> (do-for-all-facts ((?b MALE)) TRUE (bind ?b 1))
+[FACTQPSR3] Cannot rebind fact-set member variable b in function do-for-all-facts.
+CLIPS> (delayed-do-for-all-facts)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query function.
+CLIPS> (delayed-do-for-all-facts TRUE)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query function.
+CLIPS> (delayed-do-for-all-facts ())
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query function.
+CLIPS> (delayed-do-for-all-facts (?B OBJECT) TRUE)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query function.
+CLIPS> (delayed-do-for-all-facts ((?b A)))
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query function.
+CLIPS> (delayed-do-for-all-facts ((?b BOGUS)) TRUE)
+[PRNTUTIL1] Unable to find deftemplate BOGUS.
+CLIPS> (delayed-do-for-all-facts ((?b A)) (progn (bind ?b 1) TRUE))
+[FACTQPSR2] Binds are not allowed in fact-set query in function delayed-do-for-all-facts.
+CLIPS> (delayed-do-for-all-facts ((?b 34)) TRUE abc)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query class restrictions.
+FALSE
+CLIPS> (delayed-do-for-all-facts ((?b (mv-append BOGUS USER))) TRUE abc)
+[PRNTUTIL1] Unable to find deftemplate BOGUS in function delayed-do-for-all-facts.
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query class restrictions.
+FALSE
+CLIPS> (delayed-do-for-all-facts ((?b (mv-append USER 34))) TRUE abc)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for fact-set query class restrictions.
+FALSE
+CLIPS> (delayed-do-for-all-facts ((?b MALE)) TRUE (bind ?b 1))
+[FACTQPSR3] Cannot rebind fact-set member variable b in function delayed-do-for-all-facts.
+CLIPS> (assert (V (name [v])))
+<Fact-35>
+CLIPS> (assert (W (name [w])))
+<Fact-36>
+CLIPS> (assert (X (name [x])))
+<Fact-37>
+CLIPS> (assert (Y (name [y])))
+<Fact-38>
+CLIPS> (assert (Z (name [z]))))
+<Fact-39>
+CLIPS> (do-for-all-facts ((?ins1 ?*list* X (mv-append Y Z)) 
+                       (?ins2 X (mv-append Y Z) ?*list*))
+  TRUE
+  (printout t ?ins1:name " " ?ins2:name crlf))
+[v] [x]
+[v] [y]
+[v] [z]
+[v] [v]
+[v] [w]
+[w] [x]
+[w] [y]
+[w] [z]
+[w] [v]
+[w] [w]
+[x] [x]
+[x] [y]
+[x] [z]
+[x] [v]
+[x] [w]
+[y] [x]
+[y] [y]
+[y] [z]
+[y] [v]
+[y] [w]
+[z] [x]
+[z] [y]
+[z] [z]
+[z] [v]
+[z] [w]
+CLIPS> (while TRUE do
+   (delayed-do-for-all-facts ((?b initial-fact)) TRUE 
+     (progn (printout t DELAYED ?b crlf) (break)))
+   (do-for-all-facts ((?b initial-fact)) TRUE 
+     (progn (printout t DO-FOR-ALL ?b crlf) (break)))
+   (break))
+DELAYED<Fact-0>
+DO-FOR-ALL<Fact-0>
+FALSE
+CLIPS> (deffunction quoxnar ()
+   (do-for-all-facts ((?b initial-fact)) TRUE 
+     (progn (printout t INS-RETURN ?b crlf) (return))))
+CLIPS> (quoxnar)
+INS-RETURN<Fact-0>
+CLIPS> 
+(dribble-off)

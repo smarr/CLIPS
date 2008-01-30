@@ -1,0 +1,33 @@
+*********************************
+This should be the first test
+All values should appear the same
+               |3|(a b c)|5|8|
+*********************************
+rule-1 values: |3|(a b c)|5|8|
+rule-1 values: |3|(a b c)|5|8|
+Passed values: |3|(a b c)|5|8|
+Global values: |3|(a b c)|5|8|
+Passed values: |3|(a b c)|5|8|
+Global values: |3|(a b c)|5|8|
+*********************************
+This should be the second test
+No printout is associated
+*********************************
+*********************************
+This should be the third test
+All values should appear the same
+               |(d e f g)|9|(h i j)|(d e f g h i j)|
+*********************************
+rule-3 values: |(d e f g)|9|(h i j)|(d e f g h i j)|
+rule-3 values: |(d e f g)|9|(h i j)|(d e f g h i j)|
+Passed values: |(d e f g)|9|(h i j)|(d e f g h i j)|
+Global values: |(d e f g)|9|(h i j)|(d e f g h i j)|
+Passed values: |(d e f g)|9|(h i j)|(d e f g h i j)|
+Global values: |(d e f g)|9|(h i j)|(d e f g h i j)|
+*********************************
+This should be the fourth test
+No printout is associated
+*********************************
+*********************************
+Test Completed - No Errors
+*********************************

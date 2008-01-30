@@ -1,0 +1,951 @@
+TRUE
+CLIPS> (batch "drtest07.bat")
+TRUE
+CLIPS> (clear)                            ; DR0602
+CLIPS> (subset (mv-append bar)            ; DR0602
+        (mv-append "bar"))         ; DR0602 - FALSE
+FALSE
+CLIPS> (member fox (mv-append "fox"))     ; DR0602 - FALSE
+FALSE
+CLIPS> (clear)                            ; DR0604
+CLIPS> (defrule foo => (assert (x)))      ; DR0604
+CLIPS> (bsave "Temp//foo.bin")            ; DR0604
+TRUE
+CLIPS> (clear)                            ; DR0604
+CLIPS> (defrule bar => (assert (y)))      ; DR0604
+CLIPS> (bsave "Temp//bar.bin")            ; DR0604
+TRUE
+CLIPS> (clear)                            ; DR0604
+CLIPS> (bload "Temp//foo.bin")            ; DR0604
+TRUE
+CLIPS> (reset)                            ; DR0604
+CLIPS> (run)                              ; DR0604
+CLIPS> (facts)                            ; DR0604
+f-0     (initial-fact)
+f-1     (x)
+For a total of 2 facts.
+CLIPS> (bload "Temp//bar.bin")            ; DR0604
+TRUE
+CLIPS> (reset)                            ; DR0604
+CLIPS> (run)                              ; DR0604
+CLIPS> (facts)                            ; DR0604
+f-0     (initial-fact)
+f-1     (y)
+For a total of 2 facts.
+CLIPS> (clear)                            ; DR0606
+CLIPS> 
+(defrule blah                             ; DR0606
+   =>                                     ; DR0606
+  (bsave "Temp//me.bin")                  ; DR0606
+  (bload "Temp//me.bin"))                 ; DR0606
+CLIPS> (reset)                            ; DR0606
+CLIPS> (run)                              ; DR0606
+The CLIPS environment could not be cleared.
+Binary load cannot continue.
+CLIPS> (tan (deg-rad 270))                ; DR0609 - Error
+[EMATHFUN3] Singularity at asymptote in tan function.
+0.0
+CLIPS> (sec (deg-rad 270))                ; DR0609 - Error
+[EMATHFUN3] Singularity at asymptote in sec function.
+0.0
+CLIPS> (clear)                            ; DR0610
+CLIPS> (progn (release-mem) TRUE)         ; DR0610
+TRUE
+CLIPS> (deffunction foo ($?x) ?x ?x FALSE)
+CLIPS> (foo a b c d e)                    ; DR0610
+FALSE
+CLIPS> (clear)                            ; DR0610
+CLIPS> (progn (release-mem) TRUE)         ; DR0610 - Memory Loss
+TRUE
+CLIPS> (clear)                            ; DR0612
+CLIPS> (release-mem)                      ; DR0612
+937 ;; Different number is OK - Reference number
+CLIPS> (defrule x (not (a)) =>)           ; DR0612
+CLIPS> (clear)                            ; DR0612
+CLIPS> (progn (release-mem) TRUE)         ; DR0612 - Memory Loss
+TRUE
+CLIPS> (clear)                            ; DR0613
+CLIPS> (release-mem)                      ; DR0613
+937 ;; Different number is OK but should be same as reference number
+CLIPS> (defrule x (not (a)) (not (b))  =>) 
+CLIPS> (clear)                            ; DR0613
+CLIPS> (progn (release-mem) TRUE)         ; DR0613 - Memory Loss
+TRUE
+CLIPS> (clear)                            ; DR0614
+CLIPS> (release-mem)                      ; DR0614
+937 ;; Different number is OK but should be same as reference number
+CLIPS> (defglobal ?*x* = 3)               ; DR0614
+CLIPS> (defglobal ?*x* = 4)               ; DR0614
+CLIPS> (clear)                            ; DR0614
+CLIPS> (progn (release-mem) TRUE)         ; DR0614 - Memory Loss
+TRUE
+CLIPS> (clear)                            ; DR0615
+CLIPS> (release-mem)                      ; DR0615
+937 ;; Different number is OK but should be same as reference number
+CLIPS> (deftemplate x (multifield y) (multifield y))
+
+[PRNTUTIL5] The slot y has already been parsed.
+
+ERROR:
+(deftemplate MAIN::x
+   (multifield y)
+   (multifield y
+CLIPS> (clear)                            ; DR0615
+CLIPS> (progn (release-mem) TRUE)         ; DR0615 - Memory Loss
+TRUE
+CLIPS> (clear)                            ; DR0616
+CLIPS> (release-mem)                      ; DR0616
+937 ;; Different number is OK but should be same as reference number
+CLIPS> (any-instancep ((?a OBJECT) (?a OBJECT)) TRUE)
+[INSQYPSR1] Duplicate instance member variable name in function any-instancep.
+CLIPS> (clear)                            ; DR0616
+CLIPS> (progn (release-mem) TRUE)         ; DR0616 - Memory Loss
+TRUE
+CLIPS> (clear)                            ; DR0617
+CLIPS> (release-mem)                      ; DR0617
+937 ;; Different number is OK but should be same as reference number
+CLIPS> (bind ?a 3)                        ; DR0617
+3
+CLIPS> (clear)                            ; DR0617
+CLIPS> (progn (release-mem) TRUE)         ; DR0617 - Memory Loss
+TRUE
+CLIPS> (clear)                            ; DR0619
+CLIPS> (str-explode "")                   ; DR0619
+()
+CLIPS> (deftemplate foo (field x) (field y))
+CLIPS> (str-explode "foo")                ; DR0619
+(foo)
+CLIPS> (format t "%s"                     ; DR0621
+   "The allowed-values attribute cannot be used in conjunction with
+                      other value restriction attributes")
+The allowed-values attribute cannot be used in conjunction with
+                      other value restriction attributes"The allowed-values attribute cannot be used in conjunction with
+                      other value restriction attributes"
+CLIPS> (clear)                            ; DR0623
+CLIPS> (defclass A (is-a USER) (role abstract)
+   (multislot foo (create-accessor read-write)))
+CLIPS> (defclass B (is-a A)               ; DR0623
+   (slot foo (propagation no-inherit) (storage shared) (create-accessor read-write)))
+CLIPS> (defclass C (is-a B)               ; DR0623
+   (slot foo (source composite) (access read-only) (create-accessor read)))
+CLIPS> (describe-class C)                 ; DR0623
+================================================================================
+********************************************************************************
+Abstract: direct instances of this class cannot be created.
+
+Direct Superclasses: B
+Inheritance Precedence: C B A USER OBJECT
+Direct Subclasses:
+--------------------------------------------------------------------------------
+SLOTS : FLD DEF PRP ACC STO MCH SRC VIS CRT OVRD-MSG SOURCE(S)
+foo   : MLT STC INH  R  SHR RCT CMP PRV  R  NIL      A C
+
+Constraint information for slots:
+
+SLOTS : SYM STR INN INA EXA FTA INT FLT
+foo   :  +   +   +   +   +   +   +   +  RNG:[-oo..+oo] CRD:[0..+oo]
+--------------------------------------------------------------------------------
+Recognized message-handlers:
+init primary in class USER
+delete primary in class USER
+create primary in class USER
+print primary in class USER
+direct-modify primary in class USER
+message-modify primary in class USER
+direct-duplicate primary in class USER
+message-duplicate primary in class USER
+get-foo primary in class A
+put-foo primary in class A
+get-foo primary in class B
+put-foo primary in class B
+get-foo primary in class C
+********************************************************************************
+================================================================================
+CLIPS> (clear)                            ; DR0625
+CLIPS> (progn (release-mem) TRUE)         ; DR0625
+TRUE
+CLIPS> (deftemplate a (field one))        ; DR0625 
+CLIPS> (defrule a                         ; DR0625
+   ?f1 <- (a (one two three))
+   =>)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for deftemplate patterns.
+
+ERROR:
+(defrule MAIN::a
+   ?f1 <- (a (one two three
+CLIPS> (clear)                            ; DR0625
+CLIPS> (progn (release-mem) TRUE)         ; DR0625 - Memory Loss
+TRUE
+CLIPS> (clear)                            ; DR0626
+CLIPS> (deffacts one                      ; DR0626
+   (first =(assert let's see)))    ; DR0626 - Bad PPForm
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for RHS patterns.
+
+ERROR:
+(deffacts MAIN::one
+   (first =(assert let's
+CLIPS> (clear)                            ; DR0627
+CLIPS> (deftemplate a (field one))        ; DR0627
+CLIPS> (defrule a                         ; DR0627
+   ?f1 <- (a (one two three))      ; DR0627
+   =>                              ; DR0627
+   (assert (not good)))            ; DR0627
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for deftemplate patterns.
+
+ERROR:
+(defrule MAIN::a
+   ?f1 <- (a (one two three
+CLIPS> (clear)                            ; DR0628
+CLIPS> (defmethod foo (?a))               ; DR0628
+CLIPS> (defmethod foo ((?a NUMBER)))      ; DR0628
+CLIPS> (defmethod foo ((?a INTEGER FLOAT))) 
+CLIPS> (list-defmethods)                  ; DR0628 - Check Precedence
+foo #3  (INTEGER FLOAT)
+foo #2  (NUMBER)
+foo #1  ()
+For a total of 3 methods.
+CLIPS> (clear)                            ; DR0629
+CLIPS> (defclass A (is-a USER)            ; DR0629
+   (role concrete)
+   (multislot foo (default a) (create-accessor read-write)))
+CLIPS> (deffunction foo (?ins)            ; DR0629
+   (bind ?a (send ?ins get-foo))
+   (printout t ?a " ")
+   (printout t (send ?ins get-foo) " ")
+   (mv-slot-replace ?ins foo 1 1 1)
+   (printout t ?a " ")
+   (printout t (send ?ins get-foo) crlf))
+CLIPS> (make-instance a of A)             ; DR0629
+[a]
+CLIPS> (foo [a])                          ; DR0629 - (a) (a) (a) (1)
+(a) (a) (a) (1)
+CLIPS> (clear)                            ; DR0630
+CLIPS> (defrule blah                      ; DR0630
+   ?f <- (i-f)
+   (test (progn (retract ?f) TRUE))
+   =>)
+CLIPS> (assert (i-f))                     ; DR0630
+
+[FACTMNGR1] Facts may not be retracted during pattern-matching
+<Fact-1>
+CLIPS> (facts)                            ; DR0630
+f-0     (initial-fact)
+f-1     (i-f)
+For a total of 2 facts.
+CLIPS> (agenda)                           ; DR0630
+0      blah: f-1
+For a total of 1 activation.
+CLIPS> (clear)                            ; DR0630
+CLIPS> (assert (i-f))                     ; DR0630
+<Fact-1>
+CLIPS> (defrule blah                      ; DR0630
+   ?f <- (i-f)
+   (test (progn (retract ?f) TRUE))
+   =>)
+
+[FACTMNGR1] Facts may not be retracted during pattern-matching
+CLIPS> (facts)                            ; DR0630
+f-0     (initial-fact)
+f-1     (i-f)
+For a total of 2 facts.
+CLIPS> (agenda)                           ; DR0630
+0      blah: f-1
+For a total of 1 activation.
+CLIPS> (clear)                            ; DR0633
+CLIPS> (set-incremental-reset FALSE)      ; DR0633
+TRUE
+CLIPS> (defrule not-fire (not (color)) =>)
+CLIPS> (agenda)                           ; DR0633
+CLIPS> (assert (color))                   ; DR0633
+<Fact-1>
+CLIPS> (agenda)                           ; DR0633
+CLIPS> (clear)                            ; DR0633
+CLIPS> (set-incremental-reset TRUE)       ; DR0633
+FALSE
+CLIPS> (clear)                            ; DR0634
+CLIPS> (deffunction foo ()                ; DR0634
+   (bind ?i 1000)                  ; DR0634
+   (while (> ?i 0) do              ; DR0634
+      (bind ?a (mv-append))        ; DR0634
+      (bind ?i (- ?i 1))))         ; DR0634
+CLIPS> (foo)                              ; DR0634
+FALSE
+CLIPS> (clear)                            ; DR0635
+CLIPS> (format nil "1%N2%3$Q%d3%W" 5)     ; DR0635
+[IOFUN3] Invalid format flag "%N" specified in format function.
+""
+CLIPS> (clear)                            ; DR0636
+CLIPS> (defrule blah (fact $?x here $?x) =>)
+CLIPS> (assert (fact 1 2 here 3 4))       ; DR0636
+<Fact-1>
+CLIPS> (agenda)                           ; DR0636
+CLIPS> (subsetp (mv-append a a b) (mv-append a b)) ; DR0637
+TRUE
+CLIPS> (clear)                            ; DR0639
+CLIPS> (defrule foo (or (a) (b) (c)) =>)  ; DR0639
+CLIPS> (assert (a) (b) (c))               ; DR0639
+<Fact-3>
+CLIPS> (agenda)                           ; DR0639
+0      foo: f-3
+0      foo: f-2
+0      foo: f-1
+For a total of 3 activations.
+CLIPS> (run)                              ; DR0639
+CLIPS> (refresh foo)                      ; DR0639
+CLIPS> (agenda)                           ; DR0639
+0      foo: f-3
+0      foo: f-2
+0      foo: f-1
+For a total of 3 activations.
+CLIPS> (clear)                            ; DR0640
+CLIPS> (defclass A (is-a USER) (role concrete)); DR0640
+CLIPS> (make-instance a of A)             ; DR0640
+[a]
+CLIPS> (defglobal ?*x* = (instance-address a))
+CLIPS> (initialize-instance a)            ; DR0640
+[a]
+CLIPS> (clear)                            ; DR0642
+CLIPS> (deffunction foo ()
+   (do-for-all-instances ((?a USER)) TRUE (send ?a print))
+   (printout t "Finished." crlf))
+CLIPS> (ppdeffunction foo)                ; DR0642
+(deffunction MAIN::foo
+   ()
+   (do-for-all-instances ((?a USER))
+      TRUE
+      (send ?a print))
+   (printout t "Finished." crlf))
+CLIPS> (clear)                            ; DR0644
+CLIPS> (ppdeffunction bad)                ; DR0644
+[PRNTUTIL1] Unable to find deffunction bad.
+CLIPS> (clear)                            ; DR0645
+CLIPS> (deffacts start (result # 0 1 0))
+CLIPS> (defrule print-responses
+   (result $?input # $?response)
+   =>
+   (while (neq ?response (create$)) do
+      (nth 1 ?response)
+      (bind ?response (create$))))
+CLIPS> (reset)                            ; DR0645
+CLIPS> (run)                              ; DR0645
+CLIPS> (clear)                            ; DR0647
+CLIPS> (defclass A (is-a USER) (role abstract) (slot x (create-accessor read-write)))  ; DR0647
+CLIPS> (defclass B (is-a A))              ; DR0647
+CLIPS> (describe-class B)                 ; DR0647
+================================================================================
+********************************************************************************
+Abstract: direct instances of this class cannot be created.
+
+Direct Superclasses: A
+Inheritance Precedence: B A USER OBJECT
+Direct Subclasses:
+--------------------------------------------------------------------------------
+SLOTS : FLD DEF PRP ACC STO MCH SRC VIS CRT OVRD-MSG SOURCE(S)
+x     : SGL STC INH RW  LCL RCT EXC PRV RW  put-x    A
+
+Constraint information for slots:
+
+SLOTS : SYM STR INN INA EXA FTA INT FLT
+x     :  +   +   +   +   +   +   +   +  RNG:[-oo..+oo] 
+--------------------------------------------------------------------------------
+Recognized message-handlers:
+init primary in class USER
+delete primary in class USER
+create primary in class USER
+print primary in class USER
+direct-modify primary in class USER
+message-modify primary in class USER
+direct-duplicate primary in class USER
+message-duplicate primary in class USER
+get-x primary in class A
+put-x primary in class A
+********************************************************************************
+================================================================================
+CLIPS> (constructs-to-c bug 1 Temp/)      ; DR0647
+[CSTRNCMP1] WARNING: Constraints are not saved with a constructs-to-c image
+  when dynamic constraint checking is disabled.
+CLIPS> (describe-class B)                 ; DR0647
+================================================================================
+********************************************************************************
+Abstract: direct instances of this class cannot be created.
+
+Direct Superclasses: A
+Inheritance Precedence: B A USER OBJECT
+Direct Subclasses:
+--------------------------------------------------------------------------------
+SLOTS : FLD DEF PRP ACC STO MCH SRC VIS CRT OVRD-MSG SOURCE(S)
+x     : SGL STC INH RW  LCL RCT EXC PRV RW  put-x    A
+
+Constraint information for slots:
+
+SLOTS : SYM STR INN INA EXA FTA INT FLT
+x     :  +   +   +   +   +   +   +   +  RNG:[-oo..+oo] 
+--------------------------------------------------------------------------------
+Recognized message-handlers:
+init primary in class USER
+delete primary in class USER
+create primary in class USER
+print primary in class USER
+direct-modify primary in class USER
+message-modify primary in class USER
+direct-duplicate primary in class USER
+message-duplicate primary in class USER
+get-x primary in class A
+put-x primary in class A
+********************************************************************************
+================================================================================
+CLIPS> (clear)                            ; DR0648
+CLIPS> (bsave "Temp//none.bin")           ; DR0648
+TRUE
+CLIPS> (deffunction one ())               ; DR0648
+CLIPS> (bsave "Temp//some.bin")           ; DR0648
+TRUE
+CLIPS> (bload "Temp//none.bin")           ; DR0648
+TRUE
+CLIPS> (clear)                            ; DR0649
+CLIPS> (div a)                            ; DR0649
+[ARGACCES4] Function div expected at least 2 argument(s)
+CLIPS> (div 1)                            ; DR0649
+[ARGACCES4] Function div expected at least 2 argument(s)
+CLIPS> (asin 2)                           ; DR0649
+[EMATHFUN1] Domain error for asin function.
+0.0
+CLIPS> (atanh 1.0)                        ; DR0649
+[EMATHFUN1] Domain error for atanh function.
+0.0
+CLIPS> (clear)                            ; DR0650
+CLIPS> (deffacts foo)                     ; DR0650
+CLIPS> (defrule foo =>)                   ; DR0650
+CLIPS> (deftemplate foo)                  ; DR0650
+CLIPS> (deffacts *)                       ; DR0650
+CLIPS> (defrule * =>)                     ; DR0650
+CLIPS> (deftemplate *)                    ; DR0650
+CLIPS> (list-deffacts)                    ; DR0650
+initial-fact
+foo
+*
+For a total of 3 deffacts.
+CLIPS> (list-defrules)                    ; DR0650
+foo
+*
+For a total of 2 defrules.
+CLIPS> (list-deftemplates)                ; DR0650
+initial-fact
+foo
+*
+For a total of 3 deftemplates.
+CLIPS> (clear)                            ; DR0654
+CLIPS> (fetch "XYZBEDQ.txt")              ; DR0654
+[TEXTPRO1] Could not open file "XYZBEDQ.txt".
+FALSE
+CLIPS> (clear)                            ; DR0655
+CLIPS> (defclass A (is-a USER) (slot x (create-accessor read-write)))  ; DR0655
+CLIPS> (defclass B (is-a A) (slot y (create-accessor read-write)))     ; DR0655
+CLIPS> (defmessage-handler B get-y ())    ; DR0655
+[MSGPSR3] System message-handlers may not be modified.
+
+ERROR:
+(defmessage-handler MAIN::B get-y
+   (
+CLIPS> (clear)                            ; DR0656
+CLIPS> (defclass A (is-a USER) (role concrete) (multislot x (create-accessor read-write)))
+CLIPS> (make-instance a of A (x (instance-address a) 34))
+[a]
+CLIPS> (save-instances "Temp//ins.sav")   ; DR0656
+2
+CLIPS> (clear)                            ; DR0657
+CLIPS> (defclass A (is-a USER) (role concrete) (slot x (create-accessor read-write)))
+CLIPS> (defmessage-handler A foo (?a) 
+   (bind ?x 1)
+   (bind ?y 2)
+   (put x ?self)) 
+CLIPS> (make-instance a of A)             ; DR0657
+[a]
+CLIPS> (send [a] foo 1)                   ; DR0657
+<Instance-a>
+CLIPS> (clear)                            ; DR0658
+CLIPS> (defclass A (is-a USER) (role concrete) (multislot x (create-accessor read-write)))
+CLIPS> (make-instance a of A)             ; DR0658
+[a]
+CLIPS> (mv-slot-insert [a] x 1 abc)       ; DR0658
+(abc)
+CLIPS> (clear)                            ; DR0659
+CLIPS> (defclass a (is-a USER) ())        ; DR0659
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defclass.
+
+ERROR:
+(defclass MAIN::a
+   (is-a USER)
+   ()
+CLIPS> (defclass b (is-a USER) (slot))    ; DR0659
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defclass slot.
+
+ERROR:
+(defclass MAIN::b
+   (is-a USER)
+   (slot )
+CLIPS> (list-defclasses)                  ; DR0659
+FLOAT
+INTEGER
+SYMBOL
+STRING
+MULTIFIELD
+EXTERNAL-ADDRESS
+FACT-ADDRESS
+INSTANCE-ADDRESS
+INSTANCE-NAME
+OBJECT
+PRIMITIVE
+NUMBER
+LEXEME
+ADDRESS
+INSTANCE
+USER
+INITIAL-OBJECT
+For a total of 17 defclasses.
+CLIPS> (clear)                            ; DR0660
+CLIPS> (definstances bad (a of))          ; DR0660
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance class.
+
+ERROR:
+(definstances MAIN::bad
+   (a of )
+CLIPS> (clear)                            ; DR0661
+CLIPS> (definstances bad (a of BOGUS))    ; DR0661
+[PRNTUTIL1] Unable to find class BOGUS.
+
+ERROR:
+(definstances MAIN::bad
+   (a of BOGUS
+CLIPS> (reset)                            ; DR0661
+CLIPS> (facts)                            ; DR0661
+f-0     (initial-fact)
+For a total of 1 fact.
+CLIPS> (clear)                            ; DR0662
+CLIPS> (sub-string 0 0 abc)               ; DR0662
+""
+CLIPS> (clear)                            ; DR0663
+CLIPS> (defmessage-handler USER * ())     ; DR0663
+CLIPS> (list-defmessage-handlers USER)    ; DR0663 - changed
+init primary in class USER
+delete primary in class USER
+create primary in class USER
+print primary in class USER
+direct-modify primary in class USER
+message-modify primary in class USER
+direct-duplicate primary in class USER
+message-duplicate primary in class USER
+* primary in class USER
+For a total of 9 message-handlers.
+CLIPS> (clear)                            ; DR0664
+CLIPS> (defglobal ?*x* = 0)               ; DR0664
+CLIPS> (defclass A (is-a USER)            ; DR0664
+   (slot x (default ?*x*) (create-accessor read-write))
+   (slot y (default-dynamic ?*x*) (create-accessor read-write)))
+CLIPS> (clear)                            ; DR0665
+CLIPS> (preview-send OBJECT bogus)        ; DR0665
+[MSGFUN1] No applicable primary message-handlers found for bogus.
+CLIPS> (clear)                            ; DR0666
+CLIPS> (defglobal ?*x* = 300)             ; DR0666
+CLIPS> (defclass A (is-a USER) (role concrete)); DR0666
+CLIPS> (make-instance a of A)             ; DR0666
+[a]
+CLIPS> (while (> ?*x* 0) do 
+   (any-instancep ((?a A)) TRUE)
+   (bind ?*x* (- ?*x* 1)))
+FALSE
+CLIPS> (do-for-all-instances ((?a A)) TRUE (printout t "Foo!" crlf))
+Foo!
+CLIPS> (clear)                            ; DR0668
+CLIPS> (defclass a (is-a USER) (role abstract))
+CLIPS> (defclass b (is-a USER) (role abstract))
+CLIPS> (defclass c (is-a a b))            ; DR0668
+CLIPS> (defclass d (is-a a))              ; DR0668
+CLIPS> (defclass e (is-a c d))            ; DR0668
+CLIPS> (clear)                            ; DR0668
+CLIPS> (defclass a (is-a USER) (role abstract))
+CLIPS> (defclass b (is-a USER) (role abstract))
+CLIPS> (defclass c (is-a a))              ; DR0668
+CLIPS> (defclass d (is-a b))              ; DR0668
+CLIPS> (defclass e (is-a c d))            ; DR0668
+CLIPS> (defclass f (is-a e a b))          ; DR0668
+CLIPS> (describe-class f)                 ; DR0668
+================================================================================
+********************************************************************************
+Abstract: direct instances of this class cannot be created.
+
+Direct Superclasses: e a b
+Inheritance Precedence: f e c a d b USER OBJECT
+Direct Subclasses:
+--------------------------------------------------------------------------------
+Recognized message-handlers:
+init primary in class USER
+delete primary in class USER
+create primary in class USER
+print primary in class USER
+direct-modify primary in class USER
+message-modify primary in class USER
+direct-duplicate primary in class USER
+message-duplicate primary in class USER
+********************************************************************************
+================================================================================
+CLIPS> (clear)                            ; DR0670
+CLIPS> (defrule foo => (close blah))      ; DR0670
+CLIPS> (reset)                            ; DR0670
+CLIPS> (run)                              ; DR0670
+CLIPS> (clear)                            ; DR0672
+CLIPS> (defglobal ?*x* = (create$ a b c d))
+CLIPS> (deffunction foo ()
+   (bind ?y ?*x*)
+   (printout t ?y " " ?*x* crlf)
+   (bind ?*x* (create$ e f g h))
+   (printout t ?y " " ?*x* crlf))
+CLIPS> (foo)                              ; DR0672
+(a b c d) (a b c d)
+(a b c d) (e f g h)
+CLIPS> (clear)
+CLIPS> (reset)                   ; DR0675
+CLIPS> (defrule foo (initial-fact) (test (> 4 3)) =>)
+CLIPS> (agenda)
+0      foo: f-0
+For a total of 1 activation.
+CLIPS> (assert (a))
+<Fact-1>
+CLIPS> (defrule bar (initial-fact) (or (test (> 5 3)) (a)) =>)
+CLIPS> (agenda)
+0      bar: f-0,f-1
+0      bar: f-0
+0      foo: f-0
+For a total of 3 activations.
+CLIPS> (reset)
+CLIPS> (assert (a))
+<Fact-1>
+CLIPS> (agenda)
+0      bar: f-0,f-1
+0      foo: f-0
+0      bar: f-0
+For a total of 3 activations.
+CLIPS> (clear)
+CLIPS> (defmethod foo (?a)       ; DR0676
+  (bind ?b 10)
+  (call-next-method)
+  ?b)
+CLIPS> (defmethod foo ($?any)
+  (bind ?b 20))
+CLIPS> (foo bar)
+10
+CLIPS> (clear)
+CLIPS> (call-next-method 0)      ; DR0677
+[ARGACCES4] Function call-next-method expected exactly 0 argument(s)
+CLIPS> (next-methodp 0)
+[ARGACCES4] Function next-methodp expected exactly 0 argument(s)
+CLIPS> (preview-generic)
+[ARGACCES4] Function preview-generic expected at least 1 argument(s)
+CLIPS> (clear)
+CLIPS> (delete-instance 0)       ; DR0678
+[ARGACCES4] Function delete-instance expected exactly 0 argument(s)
+CLIPS> (init-slots 0)
+[ARGACCES4] Function init-slots expected exactly 0 argument(s)
+CLIPS> (ppinstance 0)
+[ARGACCES4] Function ppinstance expected exactly 0 argument(s)
+CLIPS> (clear)
+CLIPS> (print-region 1 2 3)      ; DR0679
+[ARGACCES5] Function print-region expected argument #1 to be of type symbol
+CLIPS> (print-region t 2 3)
+[ARGACCES5] Function print-region expected argument #2 to be of type symbol or string
+CLIPS> (clear)
+CLIPS> (defclass A (is-a USER))  ; DR0680
+CLIPS> (class-superclasses A inherit)
+(USER OBJECT)
+CLIPS> (defclass A (is-a USER))
+CLIPS> (class-superclasses A inherit)
+(USER OBJECT)
+CLIPS> (clear)
+CLIPS> ;; DRs 0681, 0682 and 0683 involve recompiling CLIPS
+(while 1 do ?a)           ; DR0684
+[EVALUATN1] Variable a is unbound
+FALSE
+CLIPS> (clear)
+CLIPS> (printout t ?a crlf)      ; DR0685
+[EVALUATN1] Variable a is unbound
+CLIPS> (defrule foo =>
+   (printout t ?a)
+   (bind ?a 1))
+CLIPS> (reset)
+CLIPS> (run)
+[PRCCODE5] Variable a unbound.
+[PRCCODE4] Execution halted during the actions of defrule foo.
+CLIPS> (clear)
+CLIPS> (str-cat abc (eval "(+ abc)") def) ; DR0686
+[ARGACCES4] Function + expected at least 2 argument(s)
+""
+CLIPS> (sym-cat abc (eval "(+ abc)") def)
+[ARGACCES4] Function + expected at least 2 argument(s)
+nil
+CLIPS> (clear)
+CLIPS> (deffunction foo (?a))    ; DR0687
+CLIPS> (foo (eval "(+ abc)"))
+[ARGACCES4] Function + expected at least 2 argument(s)
+[PRCCODE6] This error occurred while evaluating arguments for the deffunction foo.
+FALSE
+CLIPS> (clear)
+CLIPS> (defgeneric any-instancep) ; DR0688
+[GENRCPSR16] The system function any-instancep cannot be overloaded.
+
+ERROR:
+(defgeneric MAIN::any-instancep)
+CLIPS> (defgeneric assert)
+[GENRCPSR16] The system function assert cannot be overloaded.
+
+ERROR:
+(defgeneric MAIN::assert)
+CLIPS> (defgeneric bind)
+[GENRCPSR16] The system function bind cannot be overloaded.
+
+ERROR:
+(defgeneric MAIN::bind)
+CLIPS> (defgeneric break)
+[GENRCPSR16] The system function break cannot be overloaded.
+
+ERROR:
+(defgeneric MAIN::break)
+CLIPS> (defgeneric call-next-handler)
+[GENRCPSR16] The system function call-next-handler cannot be overloaded.
+
+ERROR:
+(defgeneric MAIN::call-next-handler)
+CLIPS> (defgeneric call-next-method)
+[GENRCPSR16] The system function call-next-method cannot be overloaded.
+
+ERROR:
+(defgeneric MAIN::call-next-method)
+CLIPS> (defgeneric delayed-do-for-all-instances)
+[GENRCPSR16] The system function delayed-do-for-all-instances cannot be overloaded.
+
+ERROR:
+(defgeneric MAIN::delayed-do-for-all-instances)
+CLIPS> (defgeneric do-for-all-instances)
+[GENRCPSR16] The system function do-for-all-instances cannot be overloaded.
+
+ERROR:
+(defgeneric MAIN::do-for-all-instances)
+CLIPS> (defgeneric do-for-instance)
+[GENRCPSR16] The system function do-for-instance cannot be overloaded.
+
+ERROR:
+(defgeneric MAIN::do-for-instance)
+CLIPS> (defgeneric duplicate)
+[GENRCPSR16] The system function duplicate cannot be overloaded.
+
+ERROR:
+(defgeneric MAIN::duplicate)
+CLIPS> (defgeneric expand$)
+[GENRCPSR16] The system function expand$ cannot be overloaded.
+
+ERROR:
+(defgeneric MAIN::expand$)
+CLIPS> (defgeneric find-all-instances)
+[GENRCPSR16] The system function find-all-instances cannot be overloaded.
+
+ERROR:
+(defgeneric MAIN::find-all-instances)
+CLIPS> (defgeneric find-instance)
+[GENRCPSR16] The system function find-instance cannot be overloaded.
+
+ERROR:
+(defgeneric MAIN::find-instance)
+CLIPS> (defgeneric if)
+[GENRCPSR16] The system function if cannot be overloaded.
+
+ERROR:
+(defgeneric MAIN::if)
+CLIPS> (defgeneric initialize-instance)
+[GENRCPSR16] The system function initialize-instance cannot be overloaded.
+
+ERROR:
+(defgeneric MAIN::initialize-instance)
+CLIPS> (defgeneric make-instance)
+[GENRCPSR16] The system function make-instance cannot be overloaded.
+
+ERROR:
+(defgeneric MAIN::make-instance)
+CLIPS> (defgeneric modify)
+[GENRCPSR16] The system function modify cannot be overloaded.
+
+ERROR:
+(defgeneric MAIN::modify)
+CLIPS> (defgeneric next-handlerp)
+[GENRCPSR16] The system function next-handlerp cannot be overloaded.
+
+ERROR:
+(defgeneric MAIN::next-handlerp)
+CLIPS> (defgeneric next-methodp)
+[GENRCPSR16] The system function next-methodp cannot be overloaded.
+
+ERROR:
+(defgeneric MAIN::next-methodp)
+CLIPS> (defgeneric override-next-handler)
+[GENRCPSR16] The system function override-next-handler cannot be overloaded.
+
+ERROR:
+(defgeneric MAIN::override-next-handler)
+CLIPS> (defgeneric progn)
+[GENRCPSR16] The system function progn cannot be overloaded.
+
+ERROR:
+(defgeneric MAIN::progn)
+CLIPS> (defgeneric retract)
+CLIPS> (defgeneric return)
+[GENRCPSR16] The system function return cannot be overloaded.
+
+ERROR:
+(defgeneric MAIN::return)
+CLIPS> (defgeneric while)
+[GENRCPSR16] The system function while cannot be overloaded.
+
+ERROR:
+(defgeneric MAIN::while)
+CLIPS> (clear)
+CLIPS> (defmethod blah  ;; DR0689
+  ((?a (progn (undefmethod blah *) TRUE))))
+CLIPS> (blah 1)
+[GENRCFUN1] Defgeneric blah cannot be modified while one of its methods is executing.
+FALSE
+CLIPS> (clear)
+CLIPS> (defgeneric foo)  ;; DR0690
+CLIPS> (foo (progn (undefgeneric foo) 1))
+[PRNTUTIL4] Unable to delete defgeneric foo.
+[GENRCEXE1] No applicable methods for foo.
+FALSE
+CLIPS> (deffunction bar (?a))
+CLIPS> (bar (progn (undeffunction bar) 1))
+[PRNTUTIL4] Unable to delete deffunction bar.
+FALSE
+CLIPS> (clear)
+CLIPS> (printout t (eval "(+ abc)") " OOPS " (eval "(+ abc)") crlf)  ;; DR0691
+[ARGACCES4] Function + expected at least 2 argument(s)
+CLIPS> (clear)
+CLIPS> (deftemplate foo             ;; DR0692
+  (multifield linkTagList))
+CLIPS> (defrule foo
+   ?w<-(foo)
+   =>
+   (modify ?w (linkTagList ?linktag ?linktagx ?a $?b)))
+
+[PRCCODE3] Undefined variable linktag referenced in RHS of defrule.
+
+ERROR:
+(defrule MAIN::foo
+   ?w <- (foo)
+   =>
+   (modify ?w (linkTagList ?linktag ?linktagx ?a $?b)))
+CLIPS> (clear)
+CLIPS> (unwatch all)  ;; DR0693
+CLIPS> (defrule foo (logical (not (a))) => (assert (b)))
+CLIPS> (watch facts)
+CLIPS> (reset)
+<== f-0     (initial-fact)
+==> f-0     (initial-fact)
+CLIPS> (run)
+==> f-1     (b)
+CLIPS> (assert (a))
+==> f-2     (a)
+<== f-1     (b)
+<Fact-2>
+CLIPS> (reset)
+<== f-0     (initial-fact)
+<== f-2     (a)
+==> f-0     (initial-fact)
+CLIPS> (defrule bar (declare (salience -1)) => (assert (a)))
+CLIPS> (run)
+==> f-1     (b)
+==> f-2     (a)
+<== f-1     (b)
+CLIPS> (unwatch all)
+CLIPS> (clear)
+CLIPS> (defclass A (is-a USER) (role concrete)
+  (slot foo (create-accessor read-write))
+  (multislot bar (create-accessor read-write))) ;; DR0697 and DR0700
+CLIPS> (make-instance fribban of A)
+[fribban]
+CLIPS> (make-instance quoxnar of A)
+[quoxnar]
+CLIPS> (send [quoxnar] put-foo (instance-address [fribban]))
+<Instance-fribban>
+CLIPS> (send [quoxnar] put-bar (mv-append))
+()
+CLIPS> (unmake-instance [fribban])
+TRUE
+CLIPS> (send (send [quoxnar] get-foo) print)
+[INSFUN4] Invalid instance-address in function send.
+FALSE
+CLIPS> (save-instances "Temp//badfile.tmp")
+2
+CLIPS> (reset)
+CLIPS> (restore-instances "Temp//badfile.tmp")
+2
+CLIPS> (send [quoxnar] print)
+[quoxnar] of A
+(foo [fribban])
+(bar)
+CLIPS> (clear)
+CLIPS> (defglobal ?*x* = 0) ;; DR0698 and DR0701
+CLIPS> (deffunction create-number-2 ()
+  (bind ?*x* (nth 1 (str-explode "2.0")))
+  BOGUS)
+CLIPS> (deffunction create-number ()
+  (create-number-2))
+CLIPS> (deffunction force-garbage-collection ()
+  (bind ?i 0)      
+  (while (< ?i 10000) do
+    (gensym*)
+    (bind ?i (+ ?i 1))))
+CLIPS> (mv-append (create-number) ?*x* (bind ?*x* 0)
+  (force-garbage-collection) (float (random))
+     (float (random)))
+(BOGUS 2.0 0 FALSE 29601.0 26138.0) ;; Last two fields can be different
+CLIPS> (clear)
+CLIPS> (deffunction foo ()      ;; DR0699
+   (printout t Foo crlf))
+CLIPS> (defmethod bar () (foo))
+CLIPS> (bar)
+Foo
+CLIPS> (undeffunction *)
+[DFFNXFUN1] WARNING: Deffunction foo only partially deleted due to usage by other constructs.
+CLIPS> (bar)
+FALSE
+CLIPS> (ppdeffunction foo)
+CLIPS> (clear) ;; DR0700
+CLIPS> (defclass A (is-a USER) (role concrete) (multislot foo (create-accessor read-write)))
+CLIPS> (make-instance a of A (foo (mv-append)))
+[a]
+CLIPS> (send [a] print)
+[a] of A
+(foo)
+CLIPS> (save-instances "Temp//ins.tmp")
+2
+CLIPS> (unmake-instance [a])
+TRUE
+CLIPS> (load-instances "Temp//ins.tmp")
+2
+CLIPS> (send [a] print)
+[a] of A
+(foo)
+CLIPS> (clear) ;; DR0704
+CLIPS> (defrule foo => (printout t [hdh] crlf))
+CLIPS> (reset)
+CLIPS> (run)
+[hdh]
+CLIPS> (bsave "Temp//foo.bin")
+TRUE
+CLIPS> (clear)
+CLIPS> (bload "Temp//foo.bin")
+TRUE
+CLIPS> (clear)
+CLIPS> (dribble-off)

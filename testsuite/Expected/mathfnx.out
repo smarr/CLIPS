@@ -1,0 +1,853 @@
+TRUE
+CLIPS> (batch "mathfnx.bat")
+TRUE
+CLIPS> (clear)                            ; 10.6.1.1
+CLIPS> (defglobal 
+   ?*pi1/4*  = (* (pi)  0.25)
+   ?*pi1/2*  = (* (pi)  0.50)
+   ?*pi3/4*  = (* (pi)  0.75)
+   ?*pi5/4*  = (* (pi)  1.25)
+   ?*pi3/2*  = (* (pi)  1.50)
+   ?*pi7/4*  = (* (pi)  1.75)
+   ?*pi2*    = (* (pi)  2.00)
+   ?*pi7*    = (* (pi)  7.00)
+   ?*pi-9/2* = (* (pi) -4.50))
+CLIPS> (reset)
+CLIPS> (+)                                ; 10.6.1.1
+[ARGACCES4] Function + expected at least 2 argument(s)
+CLIPS> (+ 1)                              ; 10.6.1.1
+[ARGACCES4] Function + expected at least 2 argument(s)
+CLIPS> (+ a)                              ; 10.6.1.1
+[ARGACCES4] Function + expected at least 2 argument(s)
+CLIPS> (+ 2 [a])                          ; 10.6.1.1
+[ARGACCES5] Function + expected argument #2 to be of type integer or float
+CLIPS> (+ 1 2)                            ; 10.6.1.1 : 3
+3
+CLIPS> (+ 4 5.0 8)                        ; 10.6.1.1 : 17.0
+17.0
+CLIPS> (+ 2.3 3.2)                        ; 10.6.1.1 : 5.5
+5.5
+CLIPS> (+ 12 3.5)                         ; 10.6.1.1 : 15.5
+15.5
+CLIPS> (+ 7.5 123)                        ; 10.6.1.1 : 130.5
+130.5
+CLIPS> (+ -10 5)                          ; 10.6.1.1 : -5
+-5
+CLIPS> (+ 13.5 -26)                       ; 10.6.1.1 : -12.5
+-12.5
+CLIPS> (+ -26 14.5)                       ; 10.6.1.1 : -11.5
+-11.5
+CLIPS> (-)                                ; 10.6.1.2
+[ARGACCES4] Function - expected at least 2 argument(s)
+CLIPS> (- 1)                              ; 10.6.1.2
+[ARGACCES4] Function - expected at least 2 argument(s)
+CLIPS> (- a)                              ; 10.6.1.2
+[ARGACCES4] Function - expected at least 2 argument(s)
+CLIPS> (- 2 "a")                          ; 10.6.1.2
+[ARGACCES5] Function - expected argument #2 to be of type integer or float
+CLIPS> (- 1 2)                            ; 10.6.1.2 : -1
+-1
+CLIPS> (- 24 5.0 8)                       ; 10.6.1.2 : 11.0
+11.0
+CLIPS> (format nil "%0.6f" (- 2.3 3.2))   ; 10.6.1.2 : -0.9
+"-0.900000"
+CLIPS> (- 12 3.5)                         ; 10.6.1.2 : 8.5
+8.5
+CLIPS> (- 7.5 123)                        ; 10.6.1.2 : - 115.5
+-115.5
+CLIPS> (- -10 5)                          ; 10.6.1.2 : -15
+-15
+CLIPS> (- 13.5 -26)                       ; 10.6.1.2 : 39.5
+39.5
+CLIPS> (- -26 14.5)                       ; 10.6.1.2 : -40.5
+-40.5
+CLIPS> (*)                                ; 10.6.1.3
+[ARGACCES4] Function * expected at least 2 argument(s)
+CLIPS> (* 1)                              ; 10.6.1.3
+[ARGACCES4] Function * expected at least 2 argument(s)
+CLIPS> (* (create$))                      ; 10.6.1.3
+[ARGACCES4] Function * expected at least 2 argument(s)
+CLIPS> (* 2 [b])                          ; 10.6.1.3
+[ARGACCES5] Function * expected argument #2 to be of type integer or float
+CLIPS> (* 2 3)                            ; 10.6.1.3 : 6
+6
+CLIPS> (format nil "%0.6f" (* -3.5 8.6))  ; 10.6.1.3 : -30.1
+"-30.100000"
+CLIPS> (format nil "%0.6f" (* 4 11.1))    ; 10.6.1.3 : 44.4
+"44.400000"
+CLIPS> (format nil "%0.6f" (* -13.2 -6))  ; 10.6.1.3 : 79.2
+"79.200000"
+CLIPS> (format nil "%0.6f" (* 2 3.7 1.2)) ; 10.6.1.3 : 8.88
+"8.880000"
+CLIPS> (/)                                ; 10.6.1.4
+[ARGACCES4] Function / expected at least 2 argument(s)
+CLIPS> (/ 1)                              ; 10.6.1.4
+[ARGACCES4] Function / expected at least 2 argument(s)
+CLIPS> (/ c)                              ; 10.6.1.4
+[ARGACCES4] Function / expected at least 2 argument(s)
+CLIPS> (/ 2 a)                            ; 10.6.1.4
+[ARGACCES5] Function / expected argument #2 to be of type integer or float
+CLIPS> (/ 4 0)                            ; 10.6.1.4
+[PRNTUTIL7] Attempt to divide by zero in / function.
+1.0
+CLIPS> (/ 4 0.0)                          ; 10.6.1.4
+[PRNTUTIL7] Attempt to divide by zero in / function.
+1.0
+CLIPS> (format nil "%0.6f" (/ 2 3))       ; 10.6.1.3 : 0.666667
+"0.666667"
+CLIPS> (format nil "%0.6f" (/ -3.5 8.6))  ; 10.6.1.3 : -0.406977
+"-0.406977"
+CLIPS> (format nil "%0.6f" (/ 4 11.1))    ; 10.6.1.3 : 0.360360
+"0.360360"
+CLIPS> (format nil "%0.6f" (/ -13.2 -6))  ; 10.6.1.3 : 2.2
+"2.200000"
+CLIPS> (format nil "%0.6f" (/ 2 3.7 1.2)) ; 10.6.1.3 : 0.450450
+"0.450450"
+CLIPS> (set-auto-float-dividend FALSE)    ; 10.6.1.3
+TRUE
+CLIPS> (/ 2 3)                            ; 10.6.1.3 : 0
+0
+CLIPS> (format nil "%0.6f" (/ 2 3.0))     ; 10.6.1.3 : 0.666667
+"0.666667"
+CLIPS> (format nil "%0.6f" (/ 2 4 3.0))   ; 10.6.1.3 : 0.0
+"0.000000"
+CLIPS> (set-auto-float-dividend TRUE)     ; 10.6.1.3
+FALSE
+CLIPS> (div)                              ; 10.6.1.5
+[ARGACCES4] Function div expected at least 2 argument(s)
+CLIPS> (div 1)                            ; 10.6.1.5
+[ARGACCES4] Function div expected at least 2 argument(s)
+CLIPS> (div a)                            ; 10.6.1.5
+[ARGACCES4] Function div expected at least 2 argument(s)
+CLIPS> (div 1 0.0)                        ; 10.6.1.5
+[PRNTUTIL7] Attempt to divide by zero in div function.
+1
+CLIPS> (div 1 0)                          ; 10.6.1.5
+[PRNTUTIL7] Attempt to divide by zero in div function.
+1
+CLIPS> (div 1 0.4)                        ; 10.6.1.5
+[PRNTUTIL7] Attempt to divide by zero in div function.
+1
+CLIPS> (div 5 2)                          ; 10.6.1.5 : 2
+2
+CLIPS> (div 19 2 2)                       ; 10.6.1.5 : 4
+4
+CLIPS> (div 7.5 1.5)                      ; 10.6.1.5 : 7
+7
+CLIPS> (max)                              ; 10.6.1.6
+[ARGACCES4] Function max expected at least 2 argument(s)
+CLIPS> (max a)                            ; 10.6.1.7
+[ARGACCES4] Function max expected at least 2 argument(s)
+CLIPS> (max 1)                            ; 10.6.1.7
+[ARGACCES4] Function max expected at least 2 argument(s)
+CLIPS> (max 1 2.0)                        ; 10.6.1.7 : 2.0
+2.0
+CLIPS> (max 2.0 1)                        ; 10.6.1.7 : 2.0
+2.0
+CLIPS> (max 1.0 1)                        ; 10.6.1.7 : 1.0
+1.0
+CLIPS> (max 1 1.0)                        ; 10.6.1.7 : 1
+1
+CLIPS> (max -3.0 2.0 4.0)                 ; 10.6.1.7 : 4.0
+4.0
+CLIPS> (max 2.0 4 3.0)                    ; 10.6.1.7 : 4
+4
+CLIPS> (max 3.0 4.0 -2.0)                 ; 10.6.1.7 : 4.0
+4.0
+CLIPS> (max 4 -2.0 -3.0)                  ; 10.6.1.7 : 4
+4
+CLIPS> (max 4.0 -3.0 2.0)                 ; 10.6.1.7 : 4.0
+4.0
+CLIPS> (max 2.0 3.0 4.0)                  ; 10.6.1.6 : 4.0
+4.0
+CLIPS> (min)                              ; 10.6.1.7
+[ARGACCES4] Function min expected at least 2 argument(s)
+CLIPS> (min a)                            ; 10.6.1.7
+[ARGACCES4] Function min expected at least 2 argument(s)
+CLIPS> (min 1)                            ; 10.6.1.7
+[ARGACCES4] Function min expected at least 2 argument(s)
+CLIPS> (min 1 2.0)                        ; 10.6.1.7 : 1
+1
+CLIPS> (min 2.0 1)                        ; 10.6.1.7 : 1
+1
+CLIPS> (min 1.0 1)                        ; 10.6.1.7 : 1.0
+1.0
+CLIPS> (min 1 1.0)                        ; 10.6.1.7 : 1
+1
+CLIPS> (min -3.0 2.0 4.0)                 ; 10.6.1.7 : -3.0
+-3.0
+CLIPS> (min 2.0 4.0 3.0)                  ; 10.6.1.7 : 2.0
+2.0
+CLIPS> (min 3.0 4.0 -2.0)                 ; 10.6.1.7 : -2.0
+-2.0
+CLIPS> (min 4.0 -2.0 -3.0)                ; 10.6.1.7 : -3.0
+-3.0
+CLIPS> (min 4.0 -3.0 2.0)                 ; 10.6.1.7 : -3.0
+-3.0
+CLIPS> (min 2.0 3.0 4.0)                  ; 10.6.1.7 : 2.0
+2.0
+CLIPS> (abs)                              ; 10.6.1.8
+[ARGACCES4] Function abs expected exactly 1 argument(s)
+CLIPS> (abs 1 2)                          ; 10.6.1.8
+[ARGACCES4] Function abs expected exactly 1 argument(s)
+CLIPS> (abs a)                            ; 10.6.1.8
+[ARGACCES5] Function abs expected argument #1 to be of type integer or float
+CLIPS> (abs 10)                           ; 10.6.1.8 : 10
+10
+CLIPS> (abs 0)                            ; 10.6.1.8 : 0
+0
+CLIPS> (abs -13)                          ; 10.6.1.8 : 13
+13
+CLIPS> (abs -3.5)                         ; 10.6.1.8 : 3.5
+3.5
+CLIPS> (abs 7.5)                          ; 10.6.1.8 : 7.5
+7.5
+CLIPS> (abs 4.0)                          ; 10.6.1.8 : 4.0
+4.0
+CLIPS> (abs -2)                           ; 10.6.1.8 : 2
+2
+CLIPS> (abs -4128.2)                      ; 10.6.1.8 : 4128.2
+4128.2
+CLIPS> (float)                            ; 10.6.1.9
+[ARGACCES4] Function float expected exactly 1 argument(s)
+CLIPS> (float 1 2)                        ; 10.6.1.9
+[ARGACCES4] Function float expected exactly 1 argument(s)
+CLIPS> (float a)                          ; 10.6.1.9
+[ARGACCES5] Function float expected argument #1 to be of type integer or float
+CLIPS> (float 10)                         ; 10.6.1.9 : 10.0
+10.0
+CLIPS> (float 0)                          ; 10.6.1.9 : 0.0
+0.0
+CLIPS> (float -13)                        ; 10.6.1.9 : -13.0
+-13.0
+CLIPS> (float -3.5)                       ; 10.6.1.9 : -3.5
+-3.5
+CLIPS> (float 7.5)                        ; 10.6.1.9 : 7.5
+7.5
+CLIPS> (float 4.0)                        ; 10.6.1.9 : 4.0
+4.0
+CLIPS> (float -2)                         ; 10.6.1.9 : -2.0
+-2.0
+CLIPS> (integer)                          ; 10.6.1.10
+[ARGACCES4] Function integer expected exactly 1 argument(s)
+CLIPS> (integer 1 2)                      ; 10.6.1.10
+[ARGACCES4] Function integer expected exactly 1 argument(s)
+CLIPS> (integer a)                        ; 10.6.1.10
+[ARGACCES5] Function integer expected argument #1 to be of type integer or float
+CLIPS> (integer 10)                       ; 10.6.1.10 : 10
+10
+CLIPS> (integer 0)                        ; 10.6.1.10 : 0
+0
+CLIPS> (integer -13)                      ; 10.6.1.10 : -13
+-13
+CLIPS> (integer -3.5)                     ; 10.6.1.10 : -3
+-3
+CLIPS> (integer 7.5)                      ; 10.6.1.10 : 7
+7
+CLIPS> (integer 4.0)                      ; 10.6.1.10 : 4
+4
+CLIPS> (integer -2)                       ; 10.6.1.10 : -2
+-2
+CLIPS> (acos)                             ; 10.6.2.1
+[ARGACCES4] Function acos expected exactly 1 argument(s)
+CLIPS> (acos a)                           ; 10.6.2.1
+[ARGACCES5] Function acos expected argument #1 to be of type integer or float
+CLIPS> (acos 1 [b])                       ; 10.6.2.1
+[ARGACCES4] Function acos expected exactly 1 argument(s)
+CLIPS> (acos -1.1)                        ; 10.6.2.1 : Error
+[EMATHFUN1] Domain error for acos function.
+0.0
+CLIPS> (acos 1.1)                         ; 10.6.2.1 : Error
+[EMATHFUN1] Domain error for acos function.
+0.0
+CLIPS> (format nil "%0.6f" (acos 1.0))    ; 10.6.2.1 : 0.0
+"0.000000"
+CLIPS> (format nil "%0.6f" (acos -1.0))   ; 10.6.2.1 : 3.141593
+"3.141593"
+CLIPS> (format nil "%0.6f" (acos 0.5))    ; 10.6.2.1 : 1.047198
+"1.047198"
+CLIPS> (acosh)                            ; 10.6.2.1
+[ARGACCES4] Function acosh expected exactly 1 argument(s)
+CLIPS> (acosh a)                          ; 10.6.2.1
+[ARGACCES5] Function acosh expected argument #1 to be of type integer or float
+CLIPS> (acosh 1 [b])                      ; 10.6.2.1
+[ARGACCES4] Function acosh expected exactly 1 argument(s)
+CLIPS> (format nil "%0.6f" (acosh 1.1))   ; 10.6.2.1 : 0.443568 
+"0.443568"
+CLIPS> (format nil "%0.6f" (acosh 1.0))   ; 10.6.2.1 : 0.0
+"0.000000"
+CLIPS> (format nil "%0.6f" (acosh 0.0))   ; 10.6.2.1 : Error
+[EMATHFUN1] Domain error for acosh function.
+""
+CLIPS> (format nil "%0.6f" (acosh -1.0))  ; 10.6.2.1 : Error
+[EMATHFUN1] Domain error for acosh function.
+""
+CLIPS> (format nil "%0.6f" (acosh 2.0))   ; 10.6.2.1 : 1.316958
+"1.316958"
+CLIPS> (acot)                             ; 10.6.2.1
+[ARGACCES4] Function acot expected exactly 1 argument(s)
+CLIPS> (acot a)                           ; 10.6.2.1
+[ARGACCES5] Function acot expected argument #1 to be of type integer or float
+CLIPS> (acot 1 [b])                       ; 10.6.2.1
+[ARGACCES4] Function acot expected exactly 1 argument(s)
+CLIPS> (format nil "%0.6f" (acot -11))    ; 10.6.2.1 : -0.090660
+"-0.090660"
+CLIPS> (format nil "%0.6f" (acot 11))     ; 10.6.2.1 : 0.090660
+"0.090660"
+CLIPS> (format nil "%0.6f" (acot 1.0))    ; 10.6.2.1 : 0.785398
+"0.785398"
+CLIPS> (format nil "%0.6f" (acot 0))      ; 10.6.2.1 : 1.570796
+"1.570796"
+CLIPS> (format nil "%0.6f" (acot -1.0))   ; 10.6.2.1 : -0.785398
+"-0.785398"
+CLIPS> (format nil "%0.6f" (acot 0.5))    ; 10.6.2.1 : 1.107149
+"1.107149"
+CLIPS> (acoth)                            ; 10.6.2.1
+[ARGACCES4] Function acoth expected exactly 1 argument(s)
+CLIPS> (acoth a)                          ; 10.6.2.1
+[ARGACCES5] Function acoth expected argument #1 to be of type integer or float
+CLIPS> (acoth 1 [b])                      ; 10.6.2.1
+[ARGACCES4] Function acoth expected exactly 1 argument(s)
+CLIPS> (format nil "%0.6f" (acoth -1.1))  ; 10.6.2.1 : -1.522261
+"-1.522261"
+CLIPS> (format nil "%0.6f" (acoth 1.1))   ; 10.6.2.1 : 1.522261
+"1.522261"
+CLIPS> (format nil "%0.6f" (acoth 1.0))   ; 10.6.2.1 : Error
+[EMATHFUN1] Domain error for acoth function.
+""
+CLIPS> (format nil "%0.6f" (acoth 0.0))   ; 10.6.2.1 : Error
+[EMATHFUN1] Domain error for acoth function.
+""
+CLIPS> (format nil "%0.6f" (acoth -1.0))  ; 10.6.2.1 : Error
+[EMATHFUN1] Domain error for acoth function.
+""
+CLIPS> (format nil "%0.6f" (acoth 2))     ; 10.6.2.1 : 0.549306
+"0.549306"
+CLIPS> (acsc)                             ; 10.6.2.1
+[ARGACCES4] Function acsc expected exactly 1 argument(s)
+CLIPS> (acsc a)                           ; 10.6.2.1
+[ARGACCES5] Function acsc expected argument #1 to be of type integer or float
+CLIPS> (acsc 1 [b])                       ; 10.6.2.1
+[ARGACCES4] Function acsc expected exactly 1 argument(s)
+CLIPS> (format nil "%0.6f" (acsc -1.1))   ; 10.6.2.1 : -1.141097
+"-1.141097"
+CLIPS> (format nil "%0.6f" (acsc 1.1))    ; 10.6.2.1 : 1.141097
+"1.141097"
+CLIPS> (format nil "%0.6f" (acsc 1.0))    ; 10.6.2.1 : 1.570796
+"1.570796"
+CLIPS> (format nil "%0.6f" (acsc 0.0))    ; 10.6.2.1 : Error
+[EMATHFUN1] Domain error for acsc function.
+""
+CLIPS> (format nil "%0.6f" (acsc -1.0))   ; 10.6.2.1 : -1.570796
+"-1.570796"
+CLIPS> (format nil "%0.6f" (acsc 2.0))    ; 10.6.2.1 : 0.523599
+"0.523599"
+CLIPS> (acsch)                            ; 10.6.2.1
+[ARGACCES4] Function acsch expected exactly 1 argument(s)
+CLIPS> (acsch a)                          ; 10.6.2.1
+[ARGACCES5] Function acsch expected argument #1 to be of type integer or float
+CLIPS> (acsch 1 [b])                      ; 10.6.2.1
+[ARGACCES4] Function acsch expected exactly 1 argument(s)
+CLIPS> (format nil "%0.6f" (acsch 1.0))   ; 10.6.2.1 : 0.881374
+"0.881374"
+CLIPS> (format nil "%0.6f" (acsch 0.0))   ; 10.6.2.1 : Error
+[EMATHFUN1] Domain error for acsch function.
+""
+CLIPS> (format nil "%0.6f" (acsch -1.0))  ; 10.6.2.1 : -0.881374
+"-0.881374"
+CLIPS> (format nil "%0.6f" (acsch 2.0))   ; 10.6.2.1 : 0.481212
+"0.481212"
+CLIPS> (asec)                             ; 10.6.2.1
+[ARGACCES4] Function asec expected exactly 1 argument(s)
+CLIPS> (asec a)                           ; 10.6.2.1
+[ARGACCES5] Function asec expected argument #1 to be of type integer or float
+CLIPS> (asec 1 [b])                       ; 10.6.2.1
+[ARGACCES4] Function asec expected exactly 1 argument(s)
+CLIPS> (format nil "%0.6f" (asec -1.1))   ; 10.6.2.1 : 2.711893
+"2.711893"
+CLIPS> (format nil "%0.6f" (asec 1.1))    ; 10.6.2.1 : 0.429700
+"0.429700"
+CLIPS> (format nil "%0.6f" (asec 1.0))    ; 10.6.2.1 : 0.0
+"0.000000"
+CLIPS> (format nil "%0.6f" (asec 0.0))    ; 10.6.2.1 : Error
+[EMATHFUN1] Domain error for asec function.
+""
+CLIPS> (format nil "%0.6f" (asec -1.0))   ; 10.6.2.1 : 3.141593
+"3.141593"
+CLIPS> (format nil "%0.6f" (asec 2.0))    ; 10.6.2.1 : 1.047198
+"1.047198"
+CLIPS> (asech)                            ; 10.6.2.1
+[ARGACCES4] Function asech expected exactly 1 argument(s)
+CLIPS> (asech a)                          ; 10.6.2.1
+[ARGACCES5] Function asech expected argument #1 to be of type integer or float
+CLIPS> (asech 1 [b])                      ; 10.6.2.1
+[ARGACCES4] Function asech expected exactly 1 argument(s)
+CLIPS> (format nil "%0.6f" (asech -1))    ; 10.6.2.1 : Error
+[EMATHFUN1] Domain error for asech function.
+""
+CLIPS> (format nil "%0.6f" (asech 0.0))   ; 10.6.2.1 : Error
+[EMATHFUN1] Domain error for asech function.
+""
+CLIPS> (format nil "%0.6f" (asech 1.0))   ; 10.6.2.1 : 0.0
+"0.000000"
+CLIPS> (format nil "%0.6f" (asech 1.5))   ; 10.6.2.1 : Error
+[EMATHFUN1] Domain error for asech function.
+""
+CLIPS> (format nil "%0.6f" (asech 0.5))   ; 10.6.2.1 : 1.316958
+"1.316958"
+CLIPS> (asin)                             ; 10.6.2.1
+[ARGACCES4] Function asin expected exactly 1 argument(s)
+CLIPS> (asin a)                           ; 10.6.2.1
+[ARGACCES5] Function asin expected argument #1 to be of type integer or float
+CLIPS> (asin 1 [b])                       ; 10.6.2.1
+[ARGACCES4] Function asin expected exactly 1 argument(s)
+CLIPS> (asin -1.1)                        ; 10.6.2.1 : Error
+[EMATHFUN1] Domain error for asin function.
+0.0
+CLIPS> (asin 1.1)                         ; 10.6.2.1 : Error
+[EMATHFUN1] Domain error for asin function.
+0.0
+CLIPS> (format nil "%0.6f" (asin 1.0))    ; 10.6.2.1 : 1.570796
+"1.570796"
+CLIPS> (format nil "%0.6f" (asin -1.0))   ; 10.6.2.1 : -1.570796
+"-1.570796"
+CLIPS> (format nil "%0.6f" (asin 0.5))    ; 10.6.2.1 : 0.523599
+"0.523599"
+CLIPS> (asinh)                            ; 10.6.2.1
+[ARGACCES4] Function asinh expected exactly 1 argument(s)
+CLIPS> (asinh a)                          ; 10.6.2.1
+[ARGACCES5] Function asinh expected argument #1 to be of type integer or float
+CLIPS> (asinh 1 [b])                      ; 10.6.2.1
+[ARGACCES4] Function asinh expected exactly 1 argument(s)
+CLIPS> (format nil "%0.6f" (asinh -1))    ; 10.6.2.1 : -0.881374
+"-0.881374"
+CLIPS> (format nil "%0.6f" (asinh 0.0))   ; 10.6.2.1 : 0.0
+"0.000000"
+CLIPS> (format nil "%0.6f" (asinh 1.0))   ; 10.6.2.1 : 0.881374
+"0.881374"
+CLIPS> (format nil "%0.6f" (asinh 2.0))   ; 10.6.2.1 : 1.443635
+"1.443635"
+CLIPS> (atan)                             ; 10.6.2.1
+[ARGACCES4] Function atan expected exactly 1 argument(s)
+CLIPS> (atan a)                           ; 10.6.2.1
+[ARGACCES5] Function atan expected argument #1 to be of type integer or float
+CLIPS> (atan 1 [b])                       ; 10.6.2.1
+[ARGACCES4] Function atan expected exactly 1 argument(s)
+CLIPS> (format nil "%0.6f" (atan -11))    ; 10.6.2.1 : -1.480136
+"-1.480136"
+CLIPS> (format nil "%0.6f" (atan 11))     ; 10.6.2.1 : 1.480136
+"1.480136"
+CLIPS> (format nil "%0.6f" (atan 1.0))    ; 10.6.2.1 : 0.785398
+"0.785398"
+CLIPS> (format nil "%0.6f" (atan 0))      ; 10.6.2.1 : 0.0
+"0.000000"
+CLIPS> (format nil "%0.6f" (atan -1.0))   ; 10.6.2.1 : -0.785398
+"-0.785398"
+CLIPS> (format nil "%0.6f" (atan 0.5))    ; 10.6.2.1 : 0.463648
+"0.463648"
+CLIPS> (atanh)                            ; 10.6.2.1
+[ARGACCES4] Function atanh expected exactly 1 argument(s)
+CLIPS> (atanh a)                          ; 10.6.2.1
+[ARGACCES5] Function atanh expected argument #1 to be of type integer or float
+CLIPS> (atanh 1 [b])                      ; 10.6.2.1
+[ARGACCES4] Function atanh expected exactly 1 argument(s)
+CLIPS> (format nil "%0.6f" (atanh -1))    ; 10.6.2.1 : -Infinity
+[EMATHFUN1] Domain error for atanh function.
+""
+CLIPS> (format nil "%0.6f" (atanh 0.0))   ; 10.6.2.1 : 0.0
+"0.000000"
+CLIPS> (format nil "%0.6f" (atanh 1.0))   ; 10.6.2.1 : +Infinity
+[EMATHFUN1] Domain error for atanh function.
+""
+CLIPS> (format nil "%0.6f" (atanh 0.5))   ; 10.6.2.1 : 0.549306
+"0.549306"
+CLIPS> (cos)                              ; 10.6.2.1
+[ARGACCES4] Function cos expected exactly 1 argument(s)
+CLIPS> (cos a)                            ; 10.6.2.1
+[ARGACCES5] Function cos expected argument #1 to be of type integer or float
+CLIPS> (cos 1 [b])                        ; 10.6.2.1
+[ARGACCES4] Function cos expected exactly 1 argument(s)
+CLIPS> (format nil "%0.6f" (cos 0.0))     ; 10.6.2.1 : 1.0
+"1.000000"
+CLIPS> (format nil "%0.6f" (cos ?*pi7*))  ; 10.6.2.1 : -1.0
+"-1.000000"
+CLIPS> (format nil "%0.6f" (cos ?*pi5/4*)); 10.6.2.1 : -0.707107
+"-0.707107"
+CLIPS> (format nil "%0.6f" (cos 1))       ; 10.6.2.1 : 0.540302
+"0.540302"
+CLIPS> (cosh)                             ; 10.6.2.1
+[ARGACCES4] Function cosh expected exactly 1 argument(s)
+CLIPS> (cosh a)                           ; 10.6.2.1
+[ARGACCES5] Function cosh expected argument #1 to be of type integer or float
+CLIPS> (cosh 1 [b])                       ; 10.6.2.1
+[ARGACCES4] Function cosh expected exactly 1 argument(s)
+CLIPS> (cosh 0)                           ; 10.6.2.1 : 1.0
+1.0
+CLIPS> (format nil "%0.6f" (cosh 1.0))    ; 10.6.2.1 : 1.543081
+"1.543081"
+CLIPS> (format nil "%0.6f" (cosh -1.0))   ; 10.6.2.1 : 1.543081
+"1.543081"
+CLIPS> (format nil "%0.6f" (cosh 0.5))    ; 10.6.2.1 : 1.127626
+"1.127626"
+CLIPS> (cot)                              ; 10.6.2.1
+[ARGACCES4] Function cot expected exactly 1 argument(s)
+CLIPS> (cot a)                            ; 10.6.2.1
+[ARGACCES5] Function cot expected argument #1 to be of type integer or float
+CLIPS> (cot 1 [b])                        ; 10.6.2.1
+[ARGACCES4] Function cot expected exactly 1 argument(s)
+CLIPS> (cot 0)                            ; 10.6.2.1 : Error
+[EMATHFUN3] Singularity at asymptote in cot function.
+0.0
+CLIPS> (format nil "%0.6f" (cot ?*pi1/2*)); 10.6.2.1 : 0.0 
+"0.000000"
+CLIPS> (format nil "%0.6f" (cot ?*pi3/4*)); 10.6.2.1 : -1.0
+"-1.000000"
+CLIPS> (format nil "%0.6f" (cot ?*pi7*))  ; 10.6.2.1 : Error
+[EMATHFUN3] Singularity at asymptote in cot function.
+""
+CLIPS> (format nil "%0.6f" (cot 1))       ; 10.6.2.1 : 0.642093
+"0.642093"
+CLIPS> (coth)                             ; 10.6.2.1
+[ARGACCES4] Function coth expected exactly 1 argument(s)
+CLIPS> (coth a)                           ; 10.6.2.1
+[ARGACCES5] Function coth expected argument #1 to be of type integer or float
+CLIPS> (coth 1 [b])                       ; 10.6.2.1
+[ARGACCES4] Function coth expected exactly 1 argument(s)
+CLIPS> (coth 0)                           ; 10.6.2.1 : Error
+[EMATHFUN3] Singularity at asymptote in coth function.
+0.0
+CLIPS> (format nil "%0.6f" (coth 1.0))    ; 10.6.2.1 : 1.313035
+"1.313035"
+CLIPS> (format nil "%0.6f" (coth -1.0))   ; 10.6.2.1 : -1.313035
+"-1.313035"
+CLIPS> (format nil "%0.6f" (coth 0.5))    ; 10.6.2.1 : 2.163953
+"2.163953"
+CLIPS> (csc)                              ; 10.6.2.1
+[ARGACCES4] Function csc expected exactly 1 argument(s)
+CLIPS> (csc a)                            ; 10.6.2.1
+[ARGACCES5] Function csc expected argument #1 to be of type integer or float
+CLIPS> (csc 1 [b])                        ; 10.6.2.1
+[ARGACCES4] Function csc expected exactly 1 argument(s)
+CLIPS> (format nil "%0.6f" (csc (pi)))    ; 10.6.2.1 : Error
+[EMATHFUN3] Singularity at asymptote in csc function.
+""
+CLIPS> (format nil "%0.6f" (csc 0.0))     ; 10.6.2.1 : Error
+[EMATHFUN3] Singularity at asymptote in csc function.
+""
+CLIPS> (format nil "%0.6f" (csc ?*pi1/2*)); 10.6.2.1 : 1.0
+"1.000000"
+CLIPS> (format nil "%0.6f" (csc 1.0))     ; 10.6.2.1 : 1.188395
+"1.188395"
+CLIPS> (csch)                             ; 10.6.2.1
+[ARGACCES4] Function csch expected exactly 1 argument(s)
+CLIPS> (csch a)                           ; 10.6.2.1
+[ARGACCES5] Function csch expected argument #1 to be of type integer or float
+CLIPS> (csch 1 [b])                       ; 10.6.2.10
+[ARGACCES4] Function csch expected exactly 1 argument(s)
+CLIPS> (csch 0)                           ; 10.6.2.1 : Error
+[EMATHFUN3] Singularity at asymptote in csch function.
+0.0
+CLIPS> (format nil "%0.6f" (csch 1.0))    ; 10.6.2.1 : 0.850918
+"0.850918"
+CLIPS> (format nil "%0.6f" (csch -1.0))   ; 10.6.2.1 : -0.850918
+"-0.850918"
+CLIPS> (format nil "%0.6f" (csch 0.5))    ; 10.6.2.1 : 1.919035
+"1.919035"
+CLIPS> (sec)                              ; 10.6.2.1
+[ARGACCES4] Function sec expected exactly 1 argument(s)
+CLIPS> (sec a)                            ; 10.6.2.1
+[ARGACCES5] Function sec expected argument #1 to be of type integer or float
+CLIPS> (sec 1 [b])                        ; 10.6.2.1
+[ARGACCES4] Function sec expected exactly 1 argument(s)
+CLIPS> (format nil "%0.6f" (sec ?*pi-9/2*)); 10.6.2.1 : Error
+[EMATHFUN3] Singularity at asymptote in sec function.
+""
+CLIPS> (format nil "%0.6f" (sec 0.0))     ; 10.6.2.1 : 1.0
+"1.000000"
+CLIPS> (format nil "%0.6f" (sec ?*pi1/2*)); 10.6.2.1 : Error
+[EMATHFUN3] Singularity at asymptote in sec function.
+""
+CLIPS> (format nil "%0.6f" (sec 1.0))     ; 10.6.2.1 : 1.850816
+"1.850816"
+CLIPS> (sech)                             ; 10.6.2.1
+[ARGACCES4] Function sech expected exactly 1 argument(s)
+CLIPS> (sech a)                           ; 10.6.2.1
+[ARGACCES5] Function sech expected argument #1 to be of type integer or float
+CLIPS> (sech 1 [b])                       ; 10.6.2.1
+[ARGACCES4] Function sech expected exactly 1 argument(s)
+CLIPS> (sech 0)                           ; 10.6.2.1 : 1.0
+1.0
+CLIPS> (format nil "%0.6f" (sech 1.0))    ; 10.6.2.1 : 0.648054
+"0.648054"
+CLIPS> (format nil "%0.6f" (sech -1.0))   ; 10.6.2.1 : 0.648054
+"0.648054"
+CLIPS> (format nil "%0.6f" (sech 0.5))    ; 10.6.2.1 : 0.886819
+"0.886819"
+CLIPS> (sin)                              ; 10.6.2.1 
+[ARGACCES4] Function sin expected exactly 1 argument(s)
+CLIPS> (sin a)                            ; 10.6.2.1
+[ARGACCES5] Function sin expected argument #1 to be of type integer or float
+CLIPS> (sin 1 [b])                        ; 10.6.2.1
+[ARGACCES4] Function sin expected exactly 1 argument(s)
+CLIPS> (format nil "%0.6f" (sin 0.0))     ; 10.6.2.1 : 0.0
+"0.000000"
+CLIPS> (format nil "%0.6f" (sin ?*pi3/2*)); 10.6.2.1 : -1.0
+"-1.000000"
+CLIPS> (format nil "%0.6f" (sin ?*pi5/4*)); 10.6.2.1 : -0.707107
+"-0.707107"
+CLIPS> (format nil "%0.6f" (sin 2))       ; 10.6.2.1 : 0.909297
+"0.909297"
+CLIPS> (sinh)                             ; 10.6.2.1
+[ARGACCES4] Function sinh expected exactly 1 argument(s)
+CLIPS> (sinh a)                           ; 10.6.2.1
+[ARGACCES5] Function sinh expected argument #1 to be of type integer or float
+CLIPS> (sinh 1 [b])                       ; 10.6.2.1
+[ARGACCES4] Function sinh expected exactly 1 argument(s)
+CLIPS> (sinh 0)                           ; 10.6.2.1 : 0.0
+0.0
+CLIPS> (format nil "%0.6f" (sinh 1.0))    ; 10.6.2.1 : 1.175201
+"1.175201"
+CLIPS> (format nil "%0.6f" (sinh -1.0))   ; 10.6.2.1 : -1.175201
+"-1.175201"
+CLIPS> (format nil "%0.6f" (sinh 0.5))    ; 10.6.2.1 : 0.521095
+"0.521095"
+CLIPS> (tan)                              ; 10.6.2.1 
+[ARGACCES4] Function tan expected exactly 1 argument(s)
+CLIPS> (tan a)                            ; 10.6.2.1
+[ARGACCES5] Function tan expected argument #1 to be of type integer or float
+CLIPS> (tan 1 [b])                        ; 10.6.2.1
+[ARGACCES4] Function tan expected exactly 1 argument(s)
+CLIPS> (tan 0)                            ; 10.6.2.1 : 0.0
+0.0
+CLIPS> (tan ?*pi1/2*)                     ; 10.6.2.1 : Error
+[EMATHFUN3] Singularity at asymptote in tan function.
+0.0
+CLIPS> (format nil "%0.6f" (tan ?*pi3/4*)); 10.6.2.1 : -1.0
+"-1.000000"
+CLIPS> (format nil "%0.6f" (abs (tan ?*pi7*))) ; 10.6.2.1 : 0.0
+"0.000000"
+CLIPS> (format nil "%0.6f" (tan 1))       ; 10.6.2.1 : 1.557408
+"1.557408"
+CLIPS> (tanh)                             ; 10.6.2.1
+[ARGACCES4] Function tanh expected exactly 1 argument(s)
+CLIPS> (tanh a)                           ; 10.6.2.1
+[ARGACCES5] Function tanh expected argument #1 to be of type integer or float
+CLIPS> (tanh 1 [b])                       ; 10.6.2.1
+[ARGACCES4] Function tanh expected exactly 1 argument(s)
+CLIPS> (tanh 0)                           ; 10.6.2.1 : 0.0
+0.0
+CLIPS> (format nil "%0.6f" (tanh 1.0))    ; 10.6.2.1 : 0.761594
+"0.761594"
+CLIPS> (format nil "%0.6f" (tanh -1.0))   ; 10.6.2.1 : -0.761594
+"-0.761594"
+CLIPS> (format nil "%0.6f" (tanh 0.5))    ; 10.6.2.1 : 0.462117
+"0.462117"
+CLIPS> (deg-grad)                         ; 10.6.2.2
+[ARGACCES4] Function deg-grad expected exactly 1 argument(s)
+CLIPS> (deg-grad (create$))               ; 10.6.2.2
+[ARGACCES5] Function deg-grad expected argument #1 to be of type integer or float
+CLIPS> (deg-grad 0 0.0)                   ; 10.6.2.2
+[ARGACCES4] Function deg-grad expected exactly 1 argument(s)
+CLIPS> (deg-grad 360)                     ; 10.6.2.2 : 400.0
+400.0
+CLIPS> (deg-grad -90.0)                   ; 10.6.2.2 : -100.0
+-100.0
+CLIPS> (deg-grad 540.0)                   ; 10.6.2.2 : 600.0
+600.0
+CLIPS> (deg-grad -720.0)                  ; 10.6.2.2 : -800.0
+-800.0
+CLIPS> (deg-rad)                          ; 10.6.2.3
+[ARGACCES4] Function deg-rad expected exactly 1 argument(s)
+CLIPS> (deg-rad a)                        ; 10.6.2.3
+[ARGACCES5] Function deg-rad expected argument #1 to be of type integer or float
+CLIPS> (deg-rad 360 9.3)                  ; 10.6.2.3
+[ARGACCES4] Function deg-rad expected exactly 1 argument(s)
+CLIPS> (deg-rad 0.0)                      ; 10.6.2.3 : 0.0
+0.0
+CLIPS> (format nil "%0.6f" (deg-rad 360)) ; 10.6.2.3 : 6.283185
+"6.283185"
+CLIPS> (format nil "%0.6f" (deg-rad -90.0))  ; 10.6.2.3 : -1.570796
+"-1.570796"
+CLIPS> (format nil "%0.6f" (deg-rad 1800.0)) ; 10.6.2.3 : 31.415927
+"31.415927"
+CLIPS> (grad-deg)                         ; 10.6.2.4
+[ARGACCES4] Function grad-deg expected exactly 1 argument(s)
+CLIPS> (grad-deg a)                       ; 10.6.2.4
+[ARGACCES5] Function grad-deg expected argument #1 to be of type integer or float
+CLIPS> (grad-deg 400 90)                  ; 10.6.2.4
+[ARGACCES4] Function grad-deg expected exactly 1 argument(s)
+CLIPS> (grad-deg 0)                       ; 10.6.2.4 : 0.0
+0.0
+CLIPS> (grad-deg 100)                     ; 10.6.2.4 : 90.0
+90.0
+CLIPS> (grad-deg -800.0)                  ; 10.6.2.4 : -720.0
+-720.0
+CLIPS> (grad-deg 600.0)                   ; 10.6.2.4 : 540.0
+540.0
+CLIPS> (rad-deg)                          ; 10.6.2.5
+[ARGACCES4] Function rad-deg expected exactly 1 argument(s)
+CLIPS> (rad-deg a)                        ; 10.6.2.5
+[ARGACCES5] Function rad-deg expected argument #1 to be of type integer or float
+CLIPS> (rad-deg (pi) a))                  ; 10.6.2.5
+[ARGACCES4] Function rad-deg expected exactly 1 argument(s)
+CLIPS> (rad-deg 0)                        ; 10.6.2.5 : 0.0
+0.0
+CLIPS> (rad-deg (pi))                     ; 10.6.2.5 : 180.0
+180.0
+CLIPS> (format nil "%0.6f" (rad-deg ?*pi-9/2*)) ; 10.6.2.5 : -810.0
+"-810.000000"
+CLIPS> (rad-deg ?*pi7*)                   ; 10.6.2.5 : 1260.0
+1260.0
+CLIPS> (format nil "%0.6f" (pi))          ; 10.6.2.6 : 3.141593
+"3.141593"
+CLIPS> (pi 3.14)                          ; 10.6.2.6
+[ARGACCES4] Function pi expected exactly 0 argument(s)
+CLIPS> (sqrt)                             ; 10.6.2.7
+[ARGACCES4] Function sqrt expected exactly 1 argument(s)
+CLIPS> (sqrt a)                           ; 10.6.2.7
+[ARGACCES5] Function sqrt expected argument #1 to be of type integer or float
+CLIPS> (sqrt 9 3)                         ; 10.6.2.7
+[ARGACCES4] Function sqrt expected exactly 1 argument(s)
+CLIPS> (sqrt -9)                          ; 10.6.2.7
+[EMATHFUN1] Domain error for sqrt function.
+0.0
+CLIPS> (format nil "%0.6f" (sqrt 2))      ; 10.6.2.7 : 1.414214
+"1.414214"
+CLIPS> (sqrt 16)                          ; 10.6.2.7 : 4.0
+4.0
+CLIPS> (sqrt 9.0)                         ; 10.6.2.7 : 3.0
+3.0
+CLIPS> (sqrt 10.89)                       ; 10.6.2.7 : 3.3
+3.3
+CLIPS> (**)                               ; 10.6.2.8
+[ARGACCES4] Function ** expected exactly 2 argument(s)
+CLIPS> (** 3)                             ; 10.6.2.8
+[ARGACCES4] Function ** expected exactly 2 argument(s)
+CLIPS> (** 3 a)                           ; 10.6.2.8
+[ARGACCES5] Function ** expected argument #2 to be of type integer or float
+CLIPS> (** 3 2 1)                         ; 10.6.2.8
+[ARGACCES4] Function ** expected exactly 2 argument(s)
+CLIPS> (format nil "%0.6f" (** -3 -2))    ; 10.6.2.8 : 0.111111
+"0.111111"
+CLIPS> (** 3 2)                           ; 10.6.2.8 : 9.0
+9.0
+CLIPS> (** 4.0 3)                         ; 10.6.2.8 : 64.0
+64.0
+CLIPS> (** 3 3.0)                         ; 10.6.2.8 : 27.0
+27.0
+CLIPS> (format nil "%0.6f" (** 27.0 (/ 1 3))); 10.6.2.8 : 3.0
+"3.000000"
+CLIPS> (** -3 3)                          ; 10.6.2.8 : -27.0
+-27.0
+CLIPS> (format nil "%0.6f" (** 10.89 -2.0)); 10.6.2.8 : 0.008432
+"0.008432"
+CLIPS> (format nil "%0.6f" (** 10.89 0.5)); 10.6.2.8 : 3.3
+"3.300000"
+CLIPS> (format nil "%0.6f" (** 2.1 3.2))  ; 10.6.2.8 : 10.742410
+"10.742410"
+CLIPS> (exp)                              ; 10.6.2.9
+[ARGACCES4] Function exp expected exactly 1 argument(s)
+CLIPS> (exp a)                            ; 10.6.2.9
+[ARGACCES5] Function exp expected argument #1 to be of type integer or float
+CLIPS> (exp 20 3.5)                       ; 10.6.2.9
+[ARGACCES4] Function exp expected exactly 1 argument(s)
+CLIPS> (format nil "%0.6f" (exp -3.3))    ; 10.6.2.9 : 0.036883
+"0.036883"
+CLIPS> (exp 0)                            ; 10.6.2.9 : 1
+1.0
+CLIPS> (format nil "%0.6f" (exp 1))       ; 10.6.2.9 : 2.171828
+"2.718282"
+CLIPS> (format nil "%0.6f" (exp 2.0))     ; 10.6.2.9 : 7.389056
+"7.389056"
+CLIPS> (log)                              ; 10.6.2.10
+[ARGACCES4] Function log expected exactly 1 argument(s)
+CLIPS> (log a)                            ; 10.6.2.10
+[ARGACCES5] Function log expected argument #1 to be of type integer or float
+CLIPS> (log 20 3.5)                       ; 10.6.2.10
+[ARGACCES4] Function log expected exactly 1 argument(s)
+CLIPS> (log -5.3)                         ; 10.6.2.10 : Error
+[EMATHFUN1] Domain error for log function.
+0.0
+CLIPS> (log 0)                            ; 10.6.2.10 : -Infinity
+[EMATHFUN2] Argument overflow for log function.
+0.0
+CLIPS> (format nil "%0.6f" (log 2.71828)) ; 10.6.2.10 : 0.999999
+"0.999999"
+CLIPS> (format nil "%0.6f" (log 2.0))     ; 10.6.2.10 : 0.693147
+"0.693147"
+CLIPS> (format nil "%0.6f" (log 2))       ; 10.6.2.10 : 0.693147
+"0.693147"
+CLIPS> (log10 a)                          ; 10.6.2.11
+[ARGACCES5] Function log10 expected argument #1 to be of type integer or float
+CLIPS> (log10 100 10)                     ; 10.6.2.11
+[ARGACCES4] Function log10 expected exactly 1 argument(s)
+CLIPS> (log10 -100)                       ; 10.6.2.11 : Error
+[EMATHFUN1] Domain error for log10 function.
+0.0
+CLIPS> (log10 0)                          ; 10.6.2.11 : -Infinity
+[EMATHFUN2] Argument overflow for log10 function.
+0.0
+CLIPS> (log10 0.01)                       ; 10.6.2.11 : -2.0
+-2.0
+CLIPS> (log10 0.1)                        ; 10.6.2.11 : -1.0
+-1.0
+CLIPS> (log10 1)                          ; 10.6.2.11 : 0.0
+0.0
+CLIPS> (log10 10)                         ; 10.6.2.11 : 1.0
+1.0
+CLIPS> (log10 100)                        ; 10.6.2.11 : 2.0
+2.0
+CLIPS> (format nil "%0.6f" (log10 2.0))   ; 10.6.2.11 : 0.301030
+"0.301030"
+CLIPS> (round)                            ; 10.6.2.12
+[ARGACCES4] Function round expected exactly 1 argument(s)
+CLIPS> (round a)                          ; 10.6.2.12
+[ARGACCES5] Function round expected argument #1 to be of type integer or float
+CLIPS> (round 3.8 2)                      ; 10.6.2.12
+[ARGACCES4] Function round expected exactly 1 argument(s)
+CLIPS> (round 0)                          ; 10.6.2.12 : 0
+0
+CLIPS> (round 4)                          ; 10.6.2.12 : 4
+4
+CLIPS> (round -4)                         ; 10.6.2.12 : -4
+-4
+CLIPS> (round 3.6)                        ; 10.6.2.12 : 4
+4
+CLIPS> (round 3.5)                        ; 10.6.2.12 : 3
+3
+CLIPS> (round 3.4)                        ; 10.6.2.12 : 3
+3
+CLIPS> (round -3.6)                       ; 10.6.2.12 : -4
+-4
+CLIPS> (round -3.5)                       ; 10.6.2.12 : -4
+-4
+CLIPS> (round -3.4)                       ; 10.6.2.12 : -3
+-3
+CLIPS> (mod)                              ; 10.6.2.13
+[ARGACCES4] Function mod expected exactly 2 argument(s)
+CLIPS> (mod 3)                            ; 10.6.2.13
+[ARGACCES4] Function mod expected exactly 2 argument(s)
+CLIPS> (mod 3 a)                          ; 10.6.2.13
+[ARGACCES5] Function mod expected argument #2 to be of type integer or float
+CLIPS> (mod 7 0)                          ; 10.6.2.13
+[PRNTUTIL7] Attempt to divide by zero in mod function.
+0
+CLIPS> (mod 5.0 0.0)                      ; 10.6.2.13
+[PRNTUTIL7] Attempt to divide by zero in mod function.
+0
+CLIPS> (mod 3 2 1)                        ; 10.6.2.13
+[ARGACCES4] Function mod expected exactly 2 argument(s)
+CLIPS> (mod 5 2.0)                        ; 10.6.2.13 : 1.0
+1.0
+CLIPS> (mod 5.0 2)                        ; 10.6.2.13 : 1.0
+1.0
+CLIPS> (mod -5 2)                         ; 10.6.2.13 : -1
+-1
+CLIPS> (mod 10.0 4.0)                     ; 10.6.2.13 : 2.0
+2.0
+CLIPS> (mod 5 2)                          ; 10.6.2.13 : 1
+1
+CLIPS> (format nil "%0.6f" (mod 3.7 1.2)) ; 10.6.2.13 : 0.1
+"0.100000"
+CLIPS> (clear)
+CLIPS> (dribble-off)

@@ -1,0 +1,396 @@
+TRUE
+CLIPS> (batch "tmpldflt.bat")
+TRUE
+CLIPS> (deftemplate error1 "Wrong Type"
+  (field x (type SYMBOL)
+           (default 7)))
+
+[CSTRNCHK1] An expression found in the default attribute
+does not match the allowed types for slot x.
+
+ERROR:
+(deftemplate MAIN::error1 "Wrong Type"
+   (field x (type SYMBOL) (default 7))
+CLIPS> (deftemplate error2 "Wrong Type"
+  (field x (type SYMBOL)
+           (default (+ 3 4))))
+
+[CSTRNCHK1] An expression found in the default attribute
+does not match the allowed types for slot x.
+
+ERROR:
+(deftemplate MAIN::error2 "Wrong Type"
+   (field x (type SYMBOL) (default (+ 3 4)))
+CLIPS> (deftemplate error3 "Wrong Type"
+  (field x (type SYMBOL)
+           (default-dynamic 7)))
+
+[CSTRNCHK1] An expression found in the default-dynamic attribute
+does not match the allowed types for slot x.
+
+ERROR:
+(deftemplate MAIN::error3 "Wrong Type"
+   (field x (type SYMBOL) (default-dynamic 7))
+CLIPS> (deftemplate error4 "Wrong Type"
+  (field x (type SYMBOL)
+           (default-dynamic (+ 3 4))))
+
+[CSTRNCHK1] The function return value found in the default-dynamic attribute
+does not match the allowed types for slot x.
+
+ERROR:
+(deftemplate MAIN::error4 "Wrong Type"
+   (field x (type SYMBOL) (default-dynamic (+ 3 4)))
+CLIPS> (deftemplate error5 "Wrong Value"
+  (field x (allowed-symbols a b c)
+           (default f)))
+
+[CSTRNCHK1] An expression found in the default attribute
+does not match the allowed values for slot x.
+
+ERROR:
+(deftemplate MAIN::error5 "Wrong Value"
+   (field x (allowed-symbols a b c) (default f))
+CLIPS> (deftemplate error6 "Wrong Cardinality"
+  (field x (default 1 2 3)))
+
+[DEFAULT1] The default value for a single field slot must be a single field value
+
+ERROR:
+(deftemplate MAIN::error6 "Wrong Cardinality"
+   (field x (default 1 2 3)
+CLIPS> (deftemplate error7 "Wrong Cardinality"
+  (field x (default)))
+
+[DEFAULT1] The default value for a single field slot must be a single field value
+
+ERROR:
+(deftemplate MAIN::error7 "Wrong Cardinality"
+   (field x (default)
+CLIPS> (deftemplate error8 "Wrong Cardinality"
+  (field x (default (create$ a b c))))
+
+[DEFAULT1] The default value for a single field slot must be a single field value
+
+ERROR:
+(deftemplate MAIN::error8 "Wrong Cardinality"
+   (field x (default (create$ a b c))
+CLIPS> (deftemplate error9 "Wrong Cardinality"
+  (field x (default (create$))))
+
+[DEFAULT1] The default value for a single field slot must be a single field value
+
+ERROR:
+(deftemplate MAIN::error9 "Wrong Cardinality"
+   (field x (default (create$))
+CLIPS> (deftemplate error11 "Wrong Cardinality"
+  (field x (default-dynamic 1 2 3)))
+
+[DEFAULT1] The default value for a single field slot must be a single field value
+
+ERROR:
+(deftemplate MAIN::error11 "Wrong Cardinality"
+   (field x (default-dynamic 1 2 3)
+CLIPS> (deftemplate error12 "Wrong Cardinality"
+  (field x (default-dynamic)))
+
+[DEFAULT1] The default value for a single field slot must be a single field value
+
+ERROR:
+(deftemplate MAIN::error12 "Wrong Cardinality"
+   (field x (default-dynamic)
+CLIPS> (deftemplate error13 "Wrong Cardinality"
+  (field x (default-dynamic (create$ a b c))))
+
+[DEFAULT1] The default value for a single field slot must be a single field value
+
+ERROR:
+(deftemplate MAIN::error13 "Wrong Cardinality"
+   (field x (default-dynamic (create$ a b c))
+CLIPS> (deftemplate error14 "Wrong Cardinality"
+  (field x (default-dynamic (create$))))
+
+[DEFAULT1] The default value for a single field slot must be a single field value
+
+ERROR:
+(deftemplate MAIN::error14 "Wrong Cardinality"
+   (field x (default-dynamic (create$))
+CLIPS> (deftemplate error16 "Wrong Cardinality"
+  (multifield x (cardinality 3 5)
+                (default a b c d e f)))
+
+[CSTRNCHK1] An expression found in the default attribute
+does not satisfy the cardinality restrictions for slot x.
+
+ERROR:
+(deftemplate MAIN::error16 "Wrong Cardinality"
+   (multifield x (cardinality 3 5) (default a b c d e f))
+CLIPS> (deftemplate error17 "Wrong Cardinality"
+  (multifield x (cardinality 3 5)
+                (default a)))
+
+[CSTRNCHK1] An expression found in the default attribute
+does not satisfy the cardinality restrictions for slot x.
+
+ERROR:
+(deftemplate MAIN::error17 "Wrong Cardinality"
+   (multifield x (cardinality 3 5) (default a))
+CLIPS> (deftemplate error18 "Wrong Cardinality"
+  (multifield x (cardinality 3 5)
+                (default (create$ a b c d e f))))
+
+[CSTRNCHK1] An expression found in the default attribute
+does not satisfy the cardinality restrictions for slot x.
+
+ERROR:
+(deftemplate MAIN::error18 "Wrong Cardinality"
+   (multifield x (cardinality 3 5) (default (create$ a b c d e f)))
+CLIPS> (deftemplate error19 "Wrong Cardinality"
+  (multifield x (cardinality 3 5)
+                (default (create$ a))))
+
+[CSTRNCHK1] An expression found in the default attribute
+does not satisfy the cardinality restrictions for slot x.
+
+ERROR:
+(deftemplate MAIN::error19 "Wrong Cardinality"
+   (multifield x (cardinality 3 5) (default (create$ a)))
+CLIPS> (deftemplate error20 "Wrong Cardinality"
+  (multifield x (cardinality 3 5)
+                (default (create$ a) (create$ a))))
+
+[CSTRNCHK1] An expression found in the default attribute
+does not satisfy the cardinality restrictions for slot x.
+
+ERROR:
+(deftemplate MAIN::error20 "Wrong Cardinality"
+   (multifield x (cardinality 3 5) (default (create$ a) (create$ a)))
+CLIPS> (deftemplate error21 "Wrong Cardinality"
+  (multifield x (cardinality 3 5)
+                (default (create$ a b c) (create$ a b c))))
+
+[CSTRNCHK1] An expression found in the default attribute
+does not satisfy the cardinality restrictions for slot x.
+
+ERROR:
+(deftemplate MAIN::error21 "Wrong Cardinality"
+   (multifield x (cardinality 3 5) (default (create$ a b c) (create$ a b c)))
+CLIPS> (deftemplate error22 "Wrong Cardinality"
+  (multifield x (cardinality 3 5)
+                (default a b c d e f)))
+
+[CSTRNCHK1] An expression found in the default attribute
+does not satisfy the cardinality restrictions for slot x.
+
+ERROR:
+(deftemplate MAIN::error22 "Wrong Cardinality"
+   (multifield x (cardinality 3 5) (default a b c d e f))
+CLIPS> (deftemplate error23 "Wrong Cardinality"
+  (multifield x (cardinality 3 5)
+                (default a)))
+
+[CSTRNCHK1] An expression found in the default attribute
+does not satisfy the cardinality restrictions for slot x.
+
+ERROR:
+(deftemplate MAIN::error23 "Wrong Cardinality"
+   (multifield x (cardinality 3 5) (default a))
+CLIPS> (deftemplate error24 "Wrong Cardinality"
+  (multifield x (cardinality 3 5)
+                (default (create$ a b c d e f))))
+
+[CSTRNCHK1] An expression found in the default attribute
+does not satisfy the cardinality restrictions for slot x.
+
+ERROR:
+(deftemplate MAIN::error24 "Wrong Cardinality"
+   (multifield x (cardinality 3 5) (default (create$ a b c d e f)))
+CLIPS> (deftemplate error25 "Wrong Cardinality"
+  (multifield x (cardinality 3 5)
+                (default (create$ a))))
+
+[CSTRNCHK1] An expression found in the default attribute
+does not satisfy the cardinality restrictions for slot x.
+
+ERROR:
+(deftemplate MAIN::error25 "Wrong Cardinality"
+   (multifield x (cardinality 3 5) (default (create$ a)))
+CLIPS> (deftemplate error26 "Wrong Cardinality"
+  (multifield x (cardinality 3 5)
+                (default (create$ a) (create$ a))))
+
+[CSTRNCHK1] An expression found in the default attribute
+does not satisfy the cardinality restrictions for slot x.
+
+ERROR:
+(deftemplate MAIN::error26 "Wrong Cardinality"
+   (multifield x (cardinality 3 5) (default (create$ a) (create$ a)))
+CLIPS> (deftemplate error27 "Wrong Cardinality"
+  (multifield x (cardinality 3 5)
+                (default (create$ a b c) (create$ a b c))))
+
+[CSTRNCHK1] An expression found in the default attribute
+does not satisfy the cardinality restrictions for slot x.
+
+ERROR:
+(deftemplate MAIN::error27 "Wrong Cardinality"
+   (multifield x (cardinality 3 5) (default (create$ a b c) (create$ a b c)))
+CLIPS> (deftemplate error28 "Wrong Cardinality"
+  (multifield x (cardinality 3 5)
+                (default)))
+
+[CSTRNCHK1] An expression found in the default attribute
+does not satisfy the cardinality restrictions for slot x.
+
+ERROR:
+(deftemplate MAIN::error28 "Wrong Cardinality"
+   (multifield x (cardinality 3 5) (default))
+CLIPS> (deftemplate error29 "Wrong Cardinality"
+  (multifield x (cardinality 3 5)
+                (default-dynamic)))
+
+[CSTRNCHK1] An expression found in the default-dynamic attribute
+does not satisfy the cardinality restrictions for slot x.
+
+ERROR:
+(deftemplate MAIN::error29 "Wrong Cardinality"
+   (multifield x (cardinality 3 5) (default-dynamic))
+CLIPS> (deftemplate error30 "Syntax Error"
+  (field x (default ?NONE 10)))
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for default attribute.
+
+ERROR:
+(deftemplate MAIN::error30 "Syntax Error"
+   (field x (default ?NONE 10
+CLIPS> (deftemplate error31 "Syntax Error"
+  (field x (default ?DERIVE 10)))
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for default attribute.
+
+ERROR:
+(deftemplate MAIN::error31 "Syntax Error"
+   (field x (default ?DERIVE 10
+CLIPS> (deftemplate error32 "Syntax Error"
+  (field x (default 10 ?DERIVE)))
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for default attribute.
+
+ERROR:
+(deftemplate MAIN::error32 "Syntax Error"
+   (field x (default 10 ?DERIVE
+CLIPS> (deftemplate error33 "Wrong Type"
+  (multifield x (allowed-symbols a b c)
+                (default 8 7 a 9 d)))
+
+[CSTRNCHK1] An expression found in the default attribute
+does not match the allowed values for slot x.
+
+ERROR:
+(deftemplate MAIN::error33 "Wrong Type"
+   (multifield x (allowed-symbols a b c) (default 8 7 a 9 d))
+CLIPS> (list-deftemplates)
+initial-fact
+For a total of 1 deftemplate.
+CLIPS> (watch facts)                
+CLIPS> (deftemplate foo1 (field x))
+CLIPS> (assert (foo1))
+==> f-1     (foo1 (x nil))
+<Fact-1>
+CLIPS> (deftemplate foo2 (field x (type LEXEME NUMBER INSTANCE FACT-ADDRESS EXTERNAL-ADDRESS)))
+CLIPS> (assert (foo2))
+==> f-2     (foo2 (x nil))
+<Fact-2>
+CLIPS> (deftemplate foo3 (field x (type STRING NUMBER INSTANCE FACT-ADDRESS EXTERNAL-ADDRESS)))
+CLIPS> (assert (foo3))
+==> f-3     (foo3 (x ""))
+<Fact-3>
+CLIPS> (deftemplate foo4 (field x (type NUMBER INSTANCE FACT-ADDRESS EXTERNAL-ADDRESS)))
+CLIPS> (assert (foo4))
+==> f-4     (foo4 (x 0))
+<Fact-4>
+CLIPS> (deftemplate foo5 (field x (type INTEGER INSTANCE FACT-ADDRESS EXTERNAL-ADDRESS)))
+CLIPS> (assert (foo5))
+==> f-5     (foo5 (x 0))
+<Fact-5>
+CLIPS> (deftemplate foo6 (field x (type FLOAT INSTANCE FACT-ADDRESS EXTERNAL-ADDRESS)))
+CLIPS> (assert (foo6))
+==> f-6     (foo6 (x 0.0))
+<Fact-6>
+CLIPS> (deftemplate foo7 (field x (type INSTANCE FACT-ADDRESS EXTERNAL-ADDRESS)))
+CLIPS> (assert (foo7))
+==> f-7     (foo7 (x [nil]))
+<Fact-7>
+CLIPS> (deftemplate foo8 (field x (type INSTANCE-ADDRESS FACT-ADDRESS EXTERNAL-ADDRESS)))
+CLIPS> (assert (foo8))
+==> f-8     (foo8 (x <Dummy Instance>))
+<Fact-8>
+CLIPS> (deftemplate foo9 (field x (type FACT-ADDRESS EXTERNAL-ADDRESS)))
+CLIPS> (assert (foo9))
+==> f-9     (foo9 (x <Dummy Fact>))
+<Fact-9>
+CLIPS> (deftemplate foo10 (field x (type EXTERNAL-ADDRESS)))
+CLIPS> (assert (foo10))
+==> f-10    (foo10 (x <Pointer-0>)) ;; Any NULL pointer is OK
+<Fact-10>
+CLIPS> (deftemplate foo11 (field x (type INTEGER) (allowed-integers 3 4 5)))
+CLIPS> (assert (foo11))
+==> f-11    (foo11 (x 3))
+<Fact-11>
+CLIPS> (deftemplate foo12 (field x (type FLOAT) (range 9.8 20.1)))
+CLIPS> (assert (foo12))
+==> f-12    (foo12 (x 9.8)) ;; Any value close to 9.8 is OK
+<Fact-12>
+CLIPS> (deftemplate foo13 (field x (type INTEGER) (range ?VARIABLE 43)))
+CLIPS> (assert (foo13))
+==> f-13    (foo13 (x 43))
+<Fact-13>
+CLIPS> (deftemplate foo14 (field x (type INTEGER) (range 28 ?VARIABLE)))
+CLIPS> (assert (foo14))
+==> f-14    (foo14 (x 28))
+<Fact-14>
+CLIPS> (deftemplate foo15 (multifield x))
+CLIPS> (assert (foo15))
+==> f-15    (foo15 (x))
+<Fact-15>
+CLIPS> (deftemplate foo16 (multifield x (cardinality ?VARIABLE 5)))
+CLIPS> (assert (foo16))
+==> f-16    (foo16 (x))
+<Fact-16>
+CLIPS> (deftemplate foo17 (multifield x (cardinality 3 5)))
+CLIPS> (assert (foo17))
+==> f-17    (foo17 (x nil nil nil))
+<Fact-17>
+CLIPS> (deftemplate foo18 (multifield x (cardinality 3 5) (type INTEGER)))
+CLIPS> (assert (foo18))
+==> f-18    (foo18 (x 0 0 0))
+<Fact-18>
+CLIPS> (deftemplate foo19 (multifield x (cardinality 3 5) (allowed-symbols a b c)))
+CLIPS> (assert (foo19))
+==> f-19    (foo19 (x a a a))
+<Fact-19>
+CLIPS> (deftemplate foo20 (multifield x (cardinality 3 5) (type INTEGER) (range 8 9)))
+CLIPS> (assert (foo20))
+==> f-20    (foo20 (x 8 8 8))
+<Fact-20>
+CLIPS> (deftemplate foo21 (field x (default ?NONE)))
+CLIPS> (assert (foo21))
+
+[TMPLTRHS1] Slot x requires a value because of its (default ?NONE) attribute.
+CLIPS> (setgen 1)
+1
+CLIPS> (deftemplate foo22 (field x (default b)) (field y (default (gensym))))
+CLIPS> (assert (foo22))
+==> f-21    (foo22 (x b) (y gen1))
+<Fact-21>
+CLIPS> (assert (foo22))
+FALSE
+CLIPS> (deftemplate foo23 (field x (default-dynamic b)) (field y (default-dynamic (gensym))))
+CLIPS> (assert (foo23))
+==> f-22    (foo23 (x b) (y gen2))
+<Fact-22>
+CLIPS> (assert (foo23))
+==> f-23    (foo23 (x b) (y gen3))
+<Fact-23>
+CLIPS> (unwatch facts)
+CLIPS> (dribble-off)

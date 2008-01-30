@@ -1,0 +1,12 @@
+(unwatch all)
+(clear)
+(set-strategy depth)
+(open "Results//bpgf8err.rsl" bpgf8err "w")
+(dribble-on "Actual//bpgf8err.out")
+(batch "bpgf8err.bat")
+(dribble-off)
+(load "compline.clp")
+(printout bpgf8err "bpgf8err.bat differences are as follows:" crlf)
+(compare-files "Expected//bpgf8err.out" "Actual//bpgf8err.out" bpgf8err)
+; close result file
+(close bpgf8err)

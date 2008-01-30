@@ -1,0 +1,320 @@
+TRUE
+CLIPS> (batch "drtest05.bat")
+TRUE
+CLIPS> (clear)                            ; DR0405
+CLIPS> (deffacts first (fact1 =(reset)))  ; DR0405
+CLIPS> (reset)                            ; DR0405
+CLIPS> (facts)                            ; DR0405
+f-0     (initial-fact)
+f-1     (fact1)
+For a total of 2 facts.
+CLIPS> (clear)                            ; DR0410
+CLIPS> (defrule foo                       ; DR0410
+   (fact ?x&:(and (< ?x 3) (> ?x 1)))
+   =>)
+CLIPS> (assert (fact a))                  ; DR0410 - Only one error message
+[ARGACCES5] Function < expected argument #1 to be of type integer or float
+
+[FACTMCH1] This error occurred in the fact pattern network
+   Currently active fact: (fact a)
+   Problem resides in field #1
+      Of pattern #1 in rule foo
+
+<Fact-1>
+CLIPS> (clear)                            ; DR0411
+CLIPS> (defrule foo                       ; DR0411
+   (fact ?x)
+   (fact $?y)
+   (test (eq ?y (str-explode ?x)))
+   =>)
+CLIPS> (reset)                            ; DR0411
+CLIPS> (assert (fact "a b c"))            ; DR0411
+<Fact-1>
+CLIPS> (assert (fact a b c))              ; DR0411
+<Fact-2>
+CLIPS> (agenda)                           ; DR0411
+0      foo: f-1,f-2
+For a total of 1 activation.
+CLIPS> (facts)                            ; DR0411
+f-0     (initial-fact)
+f-1     (fact "a b c")
+f-2     (fact a b c)
+For a total of 3 facts.
+CLIPS> (save-facts "Temp//foo.tmp")       ; DR0411
+TRUE
+CLIPS> (reset)                            ; DR0411
+CLIPS> (load-facts "Temp//foo.tmp")       ; DR0411
+TRUE
+CLIPS> (facts)                            ; DR0411
+f-0     (initial-fact)
+f-1     (fact "a b c")
+f-2     (fact a b c)
+For a total of 3 facts.
+CLIPS> (agenda)                           ; DR0411
+0      foo: f-1,f-2
+For a total of 1 activation.
+CLIPS> (clear)                            ; DR0427
+CLIPS> (deftemplate first (fild one))     ; DR0427
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for deftemplate.
+
+ERROR:
+(deftemplate MAIN::first
+   (fild
+CLIPS> (list-deftemplates)                ; DR0427
+initial-fact
+For a total of 1 deftemplate.
+CLIPS> (eval (str-cat                     ; DR0435
+      (printout t " fact-list "))) ; DR0435
+ fact-list [ARGACCES5] Function str-cat expected argument #1 to be of type string, instance name, symbol, float, or integer
+FALSE
+CLIPS> (clear)                            ; DR0441
+CLIPS> (deftemplate a)                    ; DR0441
+CLIPS> (assert (a))                       ; DR0441
+<Fact-1>
+CLIPS> (clear)                            ; DR0441
+CLIPS> (list-deftemplates)                ; DR0441
+initial-fact
+For a total of 1 deftemplate.
+CLIPS> (clear)                            ; DR0445
+CLIPS> (deftemplate congestion            ; DR0445
+   (field no-of-nets))
+CLIPS> (deftemplate total                 ; DR0445
+   (field net-name)
+   (field cong))
+CLIPS> (deffacts start                    ; DR0445
+   (congestion (no-of-nets 5))
+   (total (net-name 8) (cong nil))
+   (total (net-name 4) (cong 5)))
+CLIPS> (defrule p403                      ; DR0445
+   ?t1 <-  (total (cong nil))
+   (congestion (no-of-nets ?non))
+   =>
+   (retract ?t1))
+CLIPS> (defrule p410                      ; DR0445
+   (total (net-name ?nn) (cong ?non))
+   (not (total (cong nil)))
+   ?t <- (total (net-name ~?nn) (cong ?x&:(<= ?x ?non)))
+   =>
+   (retract ?t))
+CLIPS> (watch facts)                      ; DR0445
+CLIPS> (reset)                            ; DR0445
+<== f-0     (initial-fact)
+==> f-0     (initial-fact)
+==> f-1     (congestion (no-of-nets 5))
+==> f-2     (total (net-name 8) (cong nil))
+==> f-3     (total (net-name 4) (cong 5))
+CLIPS> (run)                              ; DR0445
+<== f-2     (total (net-name 8) (cong nil))
+[ARGACCES5] Function <= expected argument #1 to be of type integer or float
+
+[DRIVE1] This error occurred in the join network
+   Problem resides in associated join
+      Of pattern #3 in rule p410
+
+[ARGACCES5] Function <= expected argument #2 to be of type integer or float
+
+[DRIVE1] This error occurred in the join network
+   Problem resides in associated join
+      Of pattern #3 in rule p410
+
+[PRCCODE4] Execution halted during the actions of defrule p403.
+CLIPS> (unwatch facts)                    ; DR0445
+CLIPS> (clear)                            ; DR0447
+CLIPS> (deffacts one                      ; DR0447
+   (first =(assert let's see)))    ; DR0447
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for RHS patterns.
+
+ERROR:
+(deffacts MAIN::one
+   (first =(assert let's
+CLIPS> (clear)                            ; DR0451
+CLIPS> (defrule erroneous-syntax-error    ; DR0451
+   (fact1 test ?symbol&:(eq ?symbol :) ?num)
+   =>) 
+CLIPS> (clear)                            ; DR0452
+CLIPS> (deftemplate a (fileld one) (field two))
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for deftemplate.
+
+ERROR:
+(deftemplate MAIN::a
+   (fileld
+CLIPS> (defrule b                         ; DR0452
+   (not (a (one first) (three second)))
+   => 
+   (assert (problem)))             ; DR0452
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defrule.
+
+ERROR:
+(defrule MAIN::b
+   (not (a (
+CLIPS> (clear)                            ; DR0453
+CLIPS> (deftemplate a (field one))        ; DR0453
+CLIPS> (defrule a                         ; DR0453
+   ?f1 <- (a (one two three))
+   =>
+   (assert (not good)))            ; DR0453
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for deftemplate patterns.
+
+ERROR:
+(defrule MAIN::a
+   ?f1 <- (a (one two three
+CLIPS> (clear)                            ; DR0460
+CLIPS> (deftemplate a                     ; DR0460
+   (field one) (field two))
+CLIPS> (defrule one                       ; DR0460
+   ?fact <- (a)
+   =>
+   (modify ?a (two)))
+
+[PRCCODE3] Undefined variable a referenced in RHS of defrule.
+
+ERROR:
+(defrule MAIN::one
+   ?fact <- (a)
+   =>
+   (modify ?a (two)))
+CLIPS> (clear)                            ; DR0462
+CLIPS> (defrule a => (assert (x ?h)))     ; DR0462
+
+[PRCCODE3] Undefined variable h referenced in RHS of defrule.
+
+ERROR:
+(defrule MAIN::a
+   =>
+   (assert (x ?h)))
+CLIPS> (reset)                            ; DR0462
+CLIPS> (watch rules)                      ; DR0462
+CLIPS> (run)                              ; DR0462
+CLIPS> (unwatch rules)                    ; DR0462
+CLIPS> (clear)                            ; DR0466
+CLIPS> (defrule a 
+   ?f1 <- (fact 1)
+   =>
+   (eval "(retract ?f1)"))
+CLIPS> (reset)                            ; DR0466
+CLIPS> (assert (fact 1))                  ; DR0466
+<Fact-1>
+CLIPS> (run)                              ; DR0466
+[STRNGFUN2] Some variables could not be accessed by the eval function.
+[PRCCODE4] Execution halted during the actions of defrule a.
+CLIPS> (facts)                            ; DR0466
+f-0     (initial-fact)
+f-1     (fact 1)
+For a total of 2 facts.
+CLIPS> (mod 160 100)                      ; DR0475
+60
+CLIPS> (mod (+ 100 60) 100)               ; DR0475
+60
+CLIPS> (send diamond get-hardness)        ; DR0478
+[MSGFUN1] No applicable primary message-handlers found for get-hardness.
+FALSE
+CLIPS> (clear)                            ; DR0479
+CLIPS> (defclass FOO (is-a USER)          ; DR0479
+   (role concrete)
+   (multislot BAR (create-accessor read-write)))
+CLIPS> (make-instance foo of FOO)         ; DR0479 - [foo]
+[foo]
+CLIPS> (send [foo] put-BAR a b c)         ; DR0479 - TRUE
+(a b c)
+CLIPS> (find-instance ((?x FOO))          ; DR0479
+    (member d (send ?x get-BAR)))  ; DR0479 - ()
+()
+CLIPS> (clear)                            ; DR0480
+CLIPS> (defclass mineral (is-a USER)      ; DR0480
+   (role concrete)
+   (slot gemname (create-accessor read-write))
+   (slot group (create-accessor read-write)))
+CLIPS> (definstances gems                 ; DR0480
+   (almandite of mineral
+      (gemname almandite) (class garnet))
+   (grossularite of mineral
+      (gemname grossularite) (group garnet))
+   (spessartite of mineral
+      (gemname spessartite) (group garnet)))
+CLIPS> (reset)                            ; DR0480 - one error message
+[INSMNGR13] Slot class does not exist in instance almandite.
+CLIPS> (clear)                            ; DR0484
+CLIPS> (send [bogus-instance] bogus-message) ; DR0484
+[MSGPASS2] No such instance bogus-instance in function send.
+FALSE
+CLIPS> (clear)                            ; DR0486
+CLIPS> (defrule allie                     ; DR0486
+  (menu compress)
+  (compress ?nos ?range ?no&:(eq ?no 1))
+=>
+  (printout t "rule allie ?nos= " ?nos " ?range= " ?range " " ?no crlf))
+CLIPS> (reset)                            ; DR0486
+CLIPS> (assert (menu compress))           ; DR0486
+<Fact-1>
+CLIPS> (assert (compress "19k" "date" 1)) ; DR0486
+<Fact-2>
+CLIPS> (run)                              ; DR0486
+rule allie ?nos= 19k ?range= date 1
+CLIPS> "1234567890
+ 1234567890
+ 1234567890
+ 1234567890
+ 1234567890
+ 1234567890
+ 1234567890
+ 1234567890
+ 1234567890
+ 1234567890"                       ; DR0488
+"1234567890
+ 1234567890
+ 1234567890
+ 1234567890
+ 1234567890
+ 1234567890
+ 1234567890
+ 1234567890
+ 1234567890
+ 1234567890"
+CLIPS> (instance-address [bogus])         ; DR0491 - Error should contain function name
+[INSFUN2] No such instance bogus in function instance-address.
+FALSE
+CLIPS> (instance-namep [foo])             ; DR0492 - TRUE
+TRUE
+CLIPS> (clear)                            ; DR0494
+CLIPS> (defmethod foo (?a))               ; DR0494
+CLIPS> (defmethod foo ((?a NUMBER)))      ; DR0494
+CLIPS> (preview-generic foo 45)           ; DR0494
+foo #2  (NUMBER)
+foo #1  ()
+CLIPS> (clear)                            ; DR0495
+CLIPS> (defmethod foo ())                 ; DR0495
+CLIPS> (ppdefmethod foo 1)                ; DR0495
+(defmethod MAIN::foo
+   ())
+CLIPS> (clear)                            ; DR0496
+CLIPS> (defmethod foo ((?a INTEGER SYMBOL)))
+CLIPS> (defmethod foo ((?a INTEGER)))     ; DR0496
+CLIPS> (list-defmethods)                  ; DR0496
+foo #2  (INTEGER)
+foo #1  (INTEGER SYMBOL)
+For a total of 2 methods.
+CLIPS> (clear)                            ; DR0499
+CLIPS> (defmethod foo 1 (?a))             ; DR0499
+CLIPS> (defmethod foo 2 () (undefmethod foo 1))
+CLIPS> (foo)                              ; DR0499
+[GENRCFUN1] Defgeneric foo cannot be modified while one of its methods is executing.
+CLIPS> (clear)                            ; DR0500
+CLIPS> (defclass a (is-a USER) (role concrete))           ; DR0500
+CLIPS> (defmessage-handler a create-new-handler ()
+   (build "(defmessage-handler a new-handler ())"))
+CLIPS> (make-instance a of a)             ; DR0500 - [a]
+[a]
+CLIPS> (send [a] create-new-handler)      ; DR0500 - Error
+[MSGPSR2] Cannot (re)define message-handlers during execution of 
+  other message-handlers for the same class.
+
+ERROR:
+(defmessage-handler MAIN::a
+   new-handler
+FALSE
+CLIPS> (dribble-off)

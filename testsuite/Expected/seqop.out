@@ -1,0 +1,219 @@
+TRUE
+CLIPS> (batch "seqop.bat")
+TRUE
+CLIPS> (defglobal ?*x* = (mv-append 1 2 3))
+CLIPS> (deffunction foo (?a ?b)
+  (printout t "Foo arguments: " ?a " " ?b crlf))
+CLIPS> (batch "seqop2.bat")
+TRUE
+CLIPS> (expand$ $?a)
+[MISCFUN1] expand$ must be used in the argument list of a function call.
+FALSE
+CLIPS> (deffunction boggle ($?a) (return $?a))
+CLIPS> (boggle 1 2 3)
+(1 2 3)
+CLIPS> (progn $?a)
+[EVALUATN1] Variable a is unbound
+FALSE
+CLIPS> (while $?a do)
+[EVALUATN1] Variable a is unbound
+FALSE
+CLIPS> (if $?a then 1)
+[EVALUATN1] Variable a is unbound
+FALSE
+CLIPS> (eval "$?*x*")
+[MISCFUN1] expand$ must be used in the argument list of a function call.
+FALSE
+CLIPS> (defrule foo
+  ?f<-(foo $?b)
+=>
+  (retract ?f)
+  (printout t ?b crlf)
+  (printout t $?b crlf))
+CLIPS> (assert (foo a b c))
+<Fact-1>
+CLIPS> (run)
+(a b c)
+(a b c)
+CLIPS> (undeffunction boggle)
+CLIPS> (undefrule foo)
+CLIPS> (+ $?*x*)
+6
+CLIPS> (deffunction bar ($?a) (foo $?a))
+[ARGACCES4] Function foo expected exactly 2 argument(s)
+
+ERROR:
+(deffunction MAIN::bar
+   ($?a)
+   (foo $?a)
+CLIPS> (bar 1 2)
+
+[EXPRNPSR3] Missing function declaration for bar.
+CLIPS> (bar 1 2 3)
+
+[EXPRNPSR3] Missing function declaration for bar.
+CLIPS> (set-sequence-operator-recognition TRUE)
+FALSE
+CLIPS> (batch "seqop2.bat")
+TRUE
+CLIPS> (expand$ $?a)
+[EXPRNPSR4] $ Sequence operator not a valid argument for expand$.
+CLIPS> (deffunction boggle ($?a) (return $?a))
+[EXPRNPSR4] $ Sequence operator not a valid argument for return.
+
+ERROR:
+(deffunction MAIN::boggle
+   ($?a)
+   (return $?a)
+CLIPS> (boggle 1 2 3)
+
+[EXPRNPSR3] Missing function declaration for boggle.
+CLIPS> (progn $?a)
+[EXPRNPSR4] $ Sequence operator not a valid argument for progn.
+CLIPS> (while $?a do)
+[EXPRNPSR4] $ Sequence operator not a valid argument for while.
+CLIPS> (if $?a then 1)
+[EXPRNPSR4] $ Sequence operator not a valid argument for if.
+CLIPS> (eval "$?*x*")
+[MISCFUN1] expand$ must be used in the argument list of a function call.
+FALSE
+CLIPS> (defrule foo
+  ?f<-(foo $?b)
+=>
+  (retract ?f)
+  (printout t ?b crlf)
+  (printout t $?b crlf))
+CLIPS> (assert (foo a b c))
+<Fact-2>
+CLIPS> (run)
+(a b c)
+abc
+CLIPS> (undeffunction boggle)
+[PRNTUTIL1] Unable to find deffunction boggle.
+CLIPS> (undefrule foo)
+CLIPS> (+ $?*x*)
+6
+CLIPS> (deffunction bar ($?a) (foo $?a))
+CLIPS> (bar 1 2)
+Foo arguments: 1 2
+CLIPS> (bar 1 2 3)
+[ARGACCES4] Function foo expected exactly 2 argument(s)
+[PRCCODE4] Execution halted during the actions of deffunction bar.
+FALSE
+CLIPS> (load seqop.clp)
+%$#@&&**!~&
+TRUE
+CLIPS> (watch all)
+CLIPS> (unwatch statistics)
+CLIPS> (unwatch focus)
+CLIPS> (reset)
+MSG >> delete ED:1 (<Instance-initial-object>)
+HND >> delete primary in class USER
+       ED:1 (<Instance-initial-object>)
+<== instance [initial-object] of INITIAL-OBJECT
+HND << delete primary in class USER
+       ED:1 (<Stale Instance-initial-object>)
+MSG << delete ED:1 (<Stale Instance-initial-object>)
+<== f-0     (initial-fact)
+:== ?*x* ==> (1 2 3) <== (1 2 3)
+==> instance [initial-object] of INITIAL-OBJECT
+MSG >> create ED:1 (<Instance-initial-object>)
+HND >> create primary in class USER
+       ED:1 (<Instance-initial-object>)
+HND << create primary in class USER
+       ED:1 (<Instance-initial-object>)
+MSG << create ED:1 (<Instance-initial-object>)
+MSG >> init ED:1 (<Instance-initial-object>)
+HND >> init primary in class USER
+       ED:1 (<Instance-initial-object>)
+HND << init primary in class USER
+       ED:1 (<Instance-initial-object>)
+MSG << init ED:1 (<Instance-initial-object>)
+==> instance [s1] of SEQOP-TEST-CLASS
+MSG >> create ED:1 (<Instance-s1>)
+HND >> create primary in class USER
+       ED:1 (<Instance-s1>)
+HND << create primary in class USER
+       ED:1 (<Instance-s1>)
+MSG << create ED:1 (<Instance-s1>)
+MSG >> init ED:1 (<Instance-s1>)
+HND >> init primary in class USER
+       ED:1 (<Instance-s1>)
+::= local slot woz in instance s1 <- (watch dog)
+HND << init primary in class USER
+       ED:1 (<Instance-s1>)
+MSG << init ED:1 (<Instance-s1>)
+==> f-0     (initial-fact)
+==> f-1     (fact (foo nil) (bar 1 2 3 4))
+==> f-2     (flat-fact a b c d e)
+==> Activation 0      lhs-seqop-failure: f-1,f-2
+GNC >> test-arg  ED:1 (1 2 3 4)
+MTH >> test-arg:#1  ED:1 (1 2 3 4)
+MTH << test-arg:#1  ED:1 (1 2 3 4)
+GNC << test-arg  ED:1 (1 2 3 4)
+GNC >> test-arg  ED:1 (b c d e)
+MTH >> test-arg:#1  ED:1 (b c d e)
+MTH << test-arg:#1  ED:1 (b c d e)
+GNC << test-arg  ED:1 (b c d e)
+==> Activation 10     lhs-seqop-success: f-1,f-2
+CLIPS> (run)
+FIRE    1 lhs-seqop-success: f-1,f-2
+<== f-1     (fact (foo nil) (bar 1 2 3 4))
+<== Activation 0      lhs-seqop-failure: f-1,f-2
+<== f-2     (flat-fact a b c d e)
+(abc def ghi) --> abcdefghi ; abcdefghi
+Success:
+(1 2 3 4) --> 1234
+(b c d e) --> bcde
+CLIPS> (dfnx-seqop-test abc def ghi)
+DFN >> dfnx-seqop-test ED:1 (abc def ghi)
+(abc def ghi) --> abcdefghi ; abcdefghi
+(def ghi) --> defghi
+DFN << dfnx-seqop-test ED:1 (abc def ghi)
+CLIPS> (send [s1] seqop-test abc def ghi)
+MSG >> seqop-test ED:1 (<Instance-s1> abc def ghi)
+HND >> seqop-test primary in class SEQOP-TEST-CLASS
+       ED:1 (<Instance-s1> abc def ghi)
+(abc def ghi) --> abcdefghi ; abcdefghi
+(def ghi) --> defghi
+(watch dog) --> watchdog
+==> instance [gen1] of SEQOP-TEST-CLASS
+MSG >> create ED:2 (<Instance-gen1>)
+HND >> create primary in class USER
+       ED:2 (<Instance-gen1>)
+HND << create primary in class USER
+       ED:2 (<Instance-gen1>)
+MSG << create ED:2 (<Instance-gen1>)
+MSG >> put-woz ED:2 (<Instance-gen1> (watch dog) abc def ghi (watch dog))
+HND >> put-woz primary in class SEQOP-TEST-CLASS
+       ED:2 (<Instance-gen1> (watch dog) abc def ghi (watch dog))
+::= local slot woz in instance gen1 <- (watch dog abc def ghi watch dog)
+HND << put-woz primary in class SEQOP-TEST-CLASS
+       ED:2 (<Instance-gen1> (watch dog) abc def ghi (watch dog))
+MSG << put-woz ED:2 (<Instance-gen1> (watch dog) abc def ghi (watch dog))
+MSG >> init ED:2 (<Instance-gen1>)
+HND >> init primary in class USER
+       ED:2 (<Instance-gen1>)
+HND << init primary in class USER
+       ED:2 (<Instance-gen1>)
+MSG << init ED:2 (<Instance-gen1>)
+MSG >> get-woz ED:2 (<Instance-gen1>)
+HND >> get-woz primary in class SEQOP-TEST-CLASS
+       ED:2 (<Instance-gen1>)
+HND << get-woz primary in class SEQOP-TEST-CLASS
+       ED:2 (<Instance-gen1>)
+MSG << get-woz ED:2 (<Instance-gen1>)
+(watch dog abc def ghi watch dog)
+HND << seqop-test primary in class SEQOP-TEST-CLASS
+       ED:1 (<Instance-s1> abc def ghi)
+MSG << seqop-test ED:1 (<Instance-s1> abc def ghi)
+CLIPS> (+ "abc" "def" "ghi")
+GNC >> +  ED:1 ("abc" "def" "ghi")
+MTH >> +:#2  ED:1 ("abc" "def" "ghi")
+(abc def ghi) --> abcdefghi ; abcdefghi
+("abc" "def" "ghi") --> abcdefghi
+MTH << +:#2  ED:1 ("abc" "def" "ghi")
+GNC << +  ED:1 ("abc" "def" "ghi")
+"abcdefghi"
+CLIPS> (unwatch all)
+CLIPS> (dribble-off)

@@ -1,0 +1,600 @@
+TRUE
+CLIPS> (batch "insquery.bat")
+TRUE
+CLIPS> (reset)
+CLIPS> (do-for-all-instances ((?i OBJECT)) TRUE
+   (+ (eval "(gensym)") 2))
+[ARGACCES5] Function + expected argument #1 to be of type integer or float
+FALSE
+CLIPS> (do-for-all-instances ((?mb MALE) (?wg FEMALE))
+   TRUE
+   (printout t ?mb " " ?wg crlf))
+[Boy-1] [Girl-1]
+[Boy-1] [Girl-2]
+[Boy-1] [Woman-1]
+[Boy-1] [Woman-2]
+[Boy-1] [Woman-3]
+[Boy-2] [Girl-1]
+[Boy-2] [Girl-2]
+[Boy-2] [Woman-1]
+[Boy-2] [Woman-2]
+[Boy-2] [Woman-3]
+[Boy-3] [Girl-1]
+[Boy-3] [Girl-2]
+[Boy-3] [Woman-1]
+[Boy-3] [Woman-2]
+[Boy-3] [Woman-3]
+[Boy-4] [Girl-1]
+[Boy-4] [Girl-2]
+[Boy-4] [Woman-1]
+[Boy-4] [Woman-2]
+[Boy-4] [Woman-3]
+[Man-1] [Girl-1]
+[Man-1] [Girl-2]
+[Man-1] [Woman-1]
+[Man-1] [Woman-2]
+[Man-1] [Woman-3]
+[Man-2] [Girl-1]
+[Man-2] [Girl-2]
+[Man-2] [Woman-1]
+[Man-2] [Woman-2]
+[Man-2] [Woman-3]
+CLIPS> (do-for-all-instances ((?mb BOY MAN) (?wg GIRL WOMAN))
+   TRUE
+   (progn (printout t ?mb ) (printout t " " ?wg crlf)))
+[Boy-1] [Girl-1]
+[Boy-1] [Girl-2]
+[Boy-1] [Woman-1]
+[Boy-1] [Woman-2]
+[Boy-1] [Woman-3]
+[Boy-2] [Girl-1]
+[Boy-2] [Girl-2]
+[Boy-2] [Woman-1]
+[Boy-2] [Woman-2]
+[Boy-2] [Woman-3]
+[Boy-3] [Girl-1]
+[Boy-3] [Girl-2]
+[Boy-3] [Woman-1]
+[Boy-3] [Woman-2]
+[Boy-3] [Woman-3]
+[Boy-4] [Girl-1]
+[Boy-4] [Girl-2]
+[Boy-4] [Woman-1]
+[Boy-4] [Woman-2]
+[Boy-4] [Woman-3]
+[Man-1] [Girl-1]
+[Man-1] [Girl-2]
+[Man-1] [Woman-1]
+[Man-1] [Woman-2]
+[Man-1] [Woman-3]
+[Man-2] [Girl-1]
+[Man-2] [Girl-2]
+[Man-2] [Woman-1]
+[Man-2] [Woman-2]
+[Man-2] [Woman-3]
+CLIPS> (do-for-all-instances ((?f1 FEMALE) (?f2 FEMALE))
+   TRUE
+   (printout t ?f1 " " ?f2 crlf))
+[Girl-1] [Girl-1]
+[Girl-1] [Girl-2]
+[Girl-1] [Woman-1]
+[Girl-1] [Woman-2]
+[Girl-1] [Woman-3]
+[Girl-2] [Girl-1]
+[Girl-2] [Girl-2]
+[Girl-2] [Woman-1]
+[Girl-2] [Woman-2]
+[Girl-2] [Woman-3]
+[Woman-1] [Girl-1]
+[Woman-1] [Girl-2]
+[Woman-1] [Woman-1]
+[Woman-1] [Woman-2]
+[Woman-1] [Woman-3]
+[Woman-2] [Girl-1]
+[Woman-2] [Girl-2]
+[Woman-2] [Woman-1]
+[Woman-2] [Woman-2]
+[Woman-2] [Woman-3]
+[Woman-3] [Girl-1]
+[Woman-3] [Girl-2]
+[Woman-3] [Woman-1]
+[Woman-3] [Woman-2]
+[Woman-3] [Woman-3]
+CLIPS> (do-for-all-instances ((?mb MALE) (?wg FEMALE))
+   (= (send ?mb get-age) (send ?wg get-age))
+   (printout t ?mb " " ?wg crlf))
+[Boy-1] [Girl-1]
+[Boy-2] [Girl-2]
+[Boy-3] [Girl-2]
+[Boy-4] [Girl-2]
+[Man-1] [Woman-1]
+[Man-2] [Woman-2]
+CLIPS> (do-for-all-instances ((?mb MALE) (?wg FEMALE))
+   (= ?mb:age ?wg:age)
+   (printout t ?mb " " ?wg crlf))
+[Boy-1] [Girl-1]
+[Boy-2] [Girl-2]
+[Boy-3] [Girl-2]
+[Boy-4] [Girl-2]
+[Man-1] [Woman-1]
+[Man-2] [Woman-2]
+CLIPS> (count-instances WOMAN)
+3
+CLIPS> (count-instances-2 WOMAN)
+3
+CLIPS> (count-instances BOY)
+4
+CLIPS> (count-instances-2 BOY)
+4
+CLIPS> (any-instancep ((?man MAN)) (> ?man:age 30))
+TRUE
+CLIPS> (find-instance ((?m MAN) (?w WOMAN)) (= ?m:age ?w:age))
+([Man-1] [Woman-1])
+CLIPS> (find-all-instances ((?m MAN) (?w WOMAN)) (= ?m:age ?w:age))
+([Man-1] [Woman-1] [Man-2] [Woman-2])
+CLIPS> (do-for-instance ((?p1 PERSON) (?p2 PERSON) (?p3 PERSON))
+  (and (= ?p1:age ?p2:age ?p3:age)
+       (neq ?p1 ?p2)
+       (neq ?p1 ?p3)
+       (neq ?p2 ?p3))
+  (printout t ?p1 " " ?p2 " " ?p3 crlf))
+[Girl-2] [Boy-2] [Boy-3]
+CLIPS> (do-for-all-instances ((?p1 PERSON) (?p2 PERSON) (?p3 PERSON))
+  (and (= ?p1:age ?p2:age ?p3:age)
+       (> (str-compare ?p1 ?p2) 0)
+       (> (str-compare ?p2 ?p3) 0))
+  (printout t ?p1 " " ?p2 " " ?p3 crlf))
+[Girl-2] [Boy-3] [Boy-2]
+[Girl-2] [Boy-4] [Boy-2]
+[Girl-2] [Boy-4] [Boy-3]
+[Boy-4] [Boy-3] [Boy-2]
+CLIPS> (do-for-all-instances ((?p1 PERSON) (?p2 PERSON) (?p3 PERSON))
+  (= ?p1:age ?p2:age ?p3:age)
+  (printout t ?p1 " " ?p2 " " ?p3 crlf))
+[Girl-1] [Girl-1] [Girl-1]
+[Girl-1] [Girl-1] [Boy-1]
+[Girl-1] [Boy-1] [Girl-1]
+[Girl-1] [Boy-1] [Boy-1]
+[Girl-2] [Girl-2] [Girl-2]
+[Girl-2] [Girl-2] [Boy-2]
+[Girl-2] [Girl-2] [Boy-3]
+[Girl-2] [Girl-2] [Boy-4]
+[Girl-2] [Boy-2] [Girl-2]
+[Girl-2] [Boy-2] [Boy-2]
+[Girl-2] [Boy-2] [Boy-3]
+[Girl-2] [Boy-2] [Boy-4]
+[Girl-2] [Boy-3] [Girl-2]
+[Girl-2] [Boy-3] [Boy-2]
+[Girl-2] [Boy-3] [Boy-3]
+[Girl-2] [Boy-3] [Boy-4]
+[Girl-2] [Boy-4] [Girl-2]
+[Girl-2] [Boy-4] [Boy-2]
+[Girl-2] [Boy-4] [Boy-3]
+[Girl-2] [Boy-4] [Boy-4]
+[Woman-1] [Woman-1] [Woman-1]
+[Woman-1] [Woman-1] [Man-1]
+[Woman-1] [Man-1] [Woman-1]
+[Woman-1] [Man-1] [Man-1]
+[Woman-2] [Woman-2] [Woman-2]
+[Woman-2] [Woman-2] [Man-2]
+[Woman-2] [Man-2] [Woman-2]
+[Woman-2] [Man-2] [Man-2]
+[Woman-3] [Woman-3] [Woman-3]
+[Boy-1] [Girl-1] [Girl-1]
+[Boy-1] [Girl-1] [Boy-1]
+[Boy-1] [Boy-1] [Girl-1]
+[Boy-1] [Boy-1] [Boy-1]
+[Boy-2] [Girl-2] [Girl-2]
+[Boy-2] [Girl-2] [Boy-2]
+[Boy-2] [Girl-2] [Boy-3]
+[Boy-2] [Girl-2] [Boy-4]
+[Boy-2] [Boy-2] [Girl-2]
+[Boy-2] [Boy-2] [Boy-2]
+[Boy-2] [Boy-2] [Boy-3]
+[Boy-2] [Boy-2] [Boy-4]
+[Boy-2] [Boy-3] [Girl-2]
+[Boy-2] [Boy-3] [Boy-2]
+[Boy-2] [Boy-3] [Boy-3]
+[Boy-2] [Boy-3] [Boy-4]
+[Boy-2] [Boy-4] [Girl-2]
+[Boy-2] [Boy-4] [Boy-2]
+[Boy-2] [Boy-4] [Boy-3]
+[Boy-2] [Boy-4] [Boy-4]
+[Boy-3] [Girl-2] [Girl-2]
+[Boy-3] [Girl-2] [Boy-2]
+[Boy-3] [Girl-2] [Boy-3]
+[Boy-3] [Girl-2] [Boy-4]
+[Boy-3] [Boy-2] [Girl-2]
+[Boy-3] [Boy-2] [Boy-2]
+[Boy-3] [Boy-2] [Boy-3]
+[Boy-3] [Boy-2] [Boy-4]
+[Boy-3] [Boy-3] [Girl-2]
+[Boy-3] [Boy-3] [Boy-2]
+[Boy-3] [Boy-3] [Boy-3]
+[Boy-3] [Boy-3] [Boy-4]
+[Boy-3] [Boy-4] [Girl-2]
+[Boy-3] [Boy-4] [Boy-2]
+[Boy-3] [Boy-4] [Boy-3]
+[Boy-3] [Boy-4] [Boy-4]
+[Boy-4] [Girl-2] [Girl-2]
+[Boy-4] [Girl-2] [Boy-2]
+[Boy-4] [Girl-2] [Boy-3]
+[Boy-4] [Girl-2] [Boy-4]
+[Boy-4] [Boy-2] [Girl-2]
+[Boy-4] [Boy-2] [Boy-2]
+[Boy-4] [Boy-2] [Boy-3]
+[Boy-4] [Boy-2] [Boy-4]
+[Boy-4] [Boy-3] [Girl-2]
+[Boy-4] [Boy-3] [Boy-2]
+[Boy-4] [Boy-3] [Boy-3]
+[Boy-4] [Boy-3] [Boy-4]
+[Boy-4] [Boy-4] [Girl-2]
+[Boy-4] [Boy-4] [Boy-2]
+[Boy-4] [Boy-4] [Boy-3]
+[Boy-4] [Boy-4] [Boy-4]
+[Man-1] [Woman-1] [Woman-1]
+[Man-1] [Woman-1] [Man-1]
+[Man-1] [Man-1] [Woman-1]
+[Man-1] [Man-1] [Man-1]
+[Man-2] [Woman-2] [Woman-2]
+[Man-2] [Woman-2] [Man-2]
+[Man-2] [Man-2] [Woman-2]
+[Man-2] [Man-2] [Man-2]
+CLIPS> (watch instances)
+CLIPS> (delayed-do-for-all-instances ((?b1 BOY))
+   (not (any-instancep ((?b2 BOY))
+           (> ?b2:age (send ?b1 get-age))))
+   (send ?b1 delete))
+<== instance [Boy-1] of BOY
+TRUE
+CLIPS> (reset)
+<== instance [initial-object] of INITIAL-OBJECT
+<== instance [Man-1] of MAN
+<== instance [Man-2] of MAN
+<== instance [Woman-1] of WOMAN
+<== instance [Woman-2] of WOMAN
+<== instance [Woman-3] of WOMAN
+<== instance [Boy-2] of BOY
+<== instance [Boy-3] of BOY
+<== instance [Boy-4] of BOY
+<== instance [Girl-1] of GIRL
+<== instance [Girl-2] of GIRL
+==> instance [initial-object] of INITIAL-OBJECT
+==> instance [Man-1] of MAN
+==> instance [Man-2] of MAN
+==> instance [Woman-1] of WOMAN
+==> instance [Woman-2] of WOMAN
+==> instance [Woman-3] of WOMAN
+==> instance [Boy-1] of BOY
+==> instance [Boy-2] of BOY
+==> instance [Boy-3] of BOY
+==> instance [Boy-4] of BOY
+==> instance [Girl-1] of GIRL
+==> instance [Girl-2] of GIRL
+CLIPS> (do-for-all-instances ((?b1 BOY))
+   (not (any-instancep ((?b2 BOY))
+           (> ?b2:age (send ?b1 get-age))))
+   (send ?b1 delete))
+<== instance [Boy-1] of BOY
+<== instance [Boy-2] of BOY
+<== instance [Boy-3] of BOY
+<== instance [Boy-4] of BOY
+TRUE
+CLIPS> (unwatch instances)
+CLIPS> (reset)
+CLIPS> (do-for-all-instances ((?b BOY)) TRUE
+  (do-for-all-instances ((?g GIRL)) TRUE
+    (printout t ?b " " ?g crlf)))
+[Boy-1] [Girl-1]
+[Boy-1] [Girl-2]
+[Boy-2] [Girl-1]
+[Boy-2] [Girl-2]
+[Boy-3] [Girl-1]
+[Boy-3] [Girl-2]
+[Boy-4] [Girl-1]
+[Boy-4] [Girl-2]
+CLIPS> (make-instance d of D)
+[d]
+CLIPS> (do-for-all-instances ((?a A)) TRUE
+  (printout t ?a crlf))
+[d]
+CLIPS> (do-for-all-instances ((?a D) (?b D) (?c D) (?d D) (?e D) (?f D) (?g D))
+     TRUE 
+(do-for-all-instances ((?a D) (?b D) (?c D) (?d D) (?e D) (?f D) (?g D))
+     TRUE 
+(do-for-all-instances ((?a D) (?b D) (?c D) (?d D) (?e D) (?f D) (?g D))
+     TRUE 
+(do-for-all-instances ((?a D) (?b D) (?c D) (?d D) (?e D) (?f D) (?g D))
+     TRUE 
+(do-for-all-instances ((?a D) (?b D) (?c D) (?d D) (?e D) (?f D) (?g D))
+     TRUE 
+(do-for-all-instances ((?a D) (?b D) (?c D) (?d D) (?e D) (?f D) (?g D))
+     TRUE 
+(do-for-all-instances ((?a D) (?b D) (?c D) (?d D) (?e D) (?f D) (?g D))
+     TRUE 
+(do-for-all-instances ((?a D) (?b D) (?c D) (?d D) (?e D) (?f D) (?g D))
+     TRUE 
+(do-for-all-instances ((?a D) (?b D) (?c D) (?d D) (?e D) (?f D) (?g D))
+     TRUE 
+(do-for-all-instances ((?a D) (?b D) (?c D) (?d D) (?e D) (?f D) (?g D))
+     TRUE 
+(do-for-all-instances ((?a D) (?b D) (?c D) (?d D) (?e D) (?f D) (?g D))
+     TRUE 
+(do-for-all-instances ((?a D) (?b D) (?c D) (?d D) (?e D) (?f D) (?g D))
+     TRUE 
+(do-for-all-instances ((?a D) (?b D) (?c D) (?d D) (?e D) (?f D) (?g D))
+     TRUE 
+(do-for-all-instances ((?a D) (?b D) (?c D) (?d D) (?e D) (?f D) (?g D))
+     TRUE 
+(do-for-all-instances ((?a D) (?b D) (?c D) (?d D) (?e D) (?f D) (?g D))
+     TRUE 
+(do-for-all-instances ((?a D) (?b D) (?c D) (?d D) (?e D) (?f D) (?g D))
+     TRUE 
+(do-for-all-instances ((?a D) (?b D) (?c D) (?d D) (?e D) (?f D) (?g D))
+     TRUE 
+(do-for-all-instances ((?a D) (?b D) (?c D) (?d D) (?e D) (?f D) (?g D))
+     TRUE 
+(do-for-all-instances ((?a D) (?b D) (?c D) (?d D) (?e D) (?f D) (?g D))
+     TRUE 
+(do-for-all-instances ((?a D) (?b D) (?c D) (?d D) (?e D) (?f D) (?g D))
+     TRUE 
+  (printout t "Should get a nesting error!" crlf
+              "The allowed nesting level was increased," crlf
+              "So this error hasn't been duplicated recently." crlf)
+))))))))))))))))))))
+[CLASSFUN2] Maximum number of simultaneous class hierarchy
+  traversals exceeded 128.
+FALSE
+CLIPS> (any-instancep)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query function.
+CLIPS> (any-instancep TRUE)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query function.
+CLIPS> (any-instancep ())
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query function.
+CLIPS> (any-instancep (?B OBJECT) TRUE)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query function.
+CLIPS> (any-instancep ((?b A)))
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query function.
+CLIPS> (any-instancep ((?b BOGUS)) TRUE)
+[PRNTUTIL1] Unable to find class BOGUS.
+CLIPS> (any-instancep ((?b 34)) TRUE)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query class restrictions.
+FALSE
+CLIPS> (any-instancep ((?b (mv-append BOGUS USER))) TRUE)
+[CLASSFUN1] Unable to find class BOGUS in function any-instancep.
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query class restrictions.
+FALSE
+CLIPS> (any-instancep ((?b (mv-append USER 34))) TRUE)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query class restrictions.
+FALSE
+CLIPS> (any-instancep ((?b A)) (progn (bind ?b 1) TRUE))
+[INSQYPSR2] Binds are not allowed in instance-set query in function any-instancep.
+CLIPS> (find-instance)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query function.
+CLIPS> (find-instance TRUE)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query function.
+CLIPS> (find-instance ())
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query function.
+CLIPS> (find-instance (?B OBJECT) TRUE)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query function.
+CLIPS> (find-instance ((?b A)))
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query function.
+CLIPS> (find-instance ((?b BOGUS)) TRUE)
+[PRNTUTIL1] Unable to find class BOGUS.
+CLIPS> (find-instance ((?b 34)) TRUE)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query class restrictions.
+()
+CLIPS> (find-instance ((?b (mv-append BOGUS USER))) TRUE)
+[CLASSFUN1] Unable to find class BOGUS in function find-instance.
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query class restrictions.
+()
+CLIPS> (find-instance ((?b (mv-append USER 34))) TRUE)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query class restrictions.
+()
+CLIPS> (find-instance ((?b A)) (progn (bind ?b 1) TRUE))
+[INSQYPSR2] Binds are not allowed in instance-set query in function find-instance.
+CLIPS> (find-all-instances)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query function.
+CLIPS> (find-all-instances TRUE)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query function.
+CLIPS> (find-all-instances ())
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query function.
+CLIPS> (find-all-instances (?B OBJECT) TRUE)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query function.
+CLIPS> (find-all-instances ((?b A)))
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query function.
+CLIPS> (find-all-instances ((?b BOGUS)) TRUE)
+[PRNTUTIL1] Unable to find class BOGUS.
+CLIPS> (find-all-instances ((?b 34)) TRUE)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query class restrictions.
+()
+CLIPS> (find-all-instances ((?b (mv-append BOGUS USER))) TRUE)
+[CLASSFUN1] Unable to find class BOGUS in function find-all-instances.
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query class restrictions.
+()
+CLIPS> (find-all-instances ((?b (mv-append USER 34))) TRUE)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query class restrictions.
+()
+CLIPS> (find-all-instances ((?b A)) (progn (bind ?b 1) TRUE))
+[INSQYPSR2] Binds are not allowed in instance-set query in function find-all-instances.
+CLIPS> (do-for-instance)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query function.
+CLIPS> (do-for-instance TRUE)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query function.
+CLIPS> (do-for-instance ())
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query function.
+CLIPS> (do-for-instance (?B OBJECT) TRUE)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query function.
+CLIPS> (do-for-instance ((?b A)))
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query function.
+CLIPS> (do-for-instance ((?b BOGUS)) TRUE)
+[PRNTUTIL1] Unable to find class BOGUS.
+CLIPS> (do-for-instance ((?b A)) (progn (bind ?b 1) TRUE))
+[INSQYPSR2] Binds are not allowed in instance-set query in function do-for-instance.
+CLIPS> (do-for-instance ((?b 34)) TRUE abc)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query class restrictions.
+FALSE
+CLIPS> (do-for-instance ((?b (mv-append BOGUS USER))) TRUE abc)
+[CLASSFUN1] Unable to find class BOGUS in function do-for-instance.
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query class restrictions.
+FALSE
+CLIPS> (do-for-instance ((?b (mv-append USER 34))) TRUE abc)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query class restrictions.
+FALSE
+CLIPS> (do-for-instance ((?b OBJECT)) TRUE (bind ?b 1))
+[INSQYPSR3] Cannot rebind instance-set member variable b in function do-for-instance.
+CLIPS> (do-for-all-instances)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query function.
+CLIPS> (do-for-all-instances TRUE)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query function.
+CLIPS> (do-for-all-instances ())
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query function.
+CLIPS> (do-for-all-instances (?B OBJECT) TRUE)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query function.
+CLIPS> (do-for-all-instances ((?b A)))
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query function.
+CLIPS> (do-for-all-instances ((?b BOGUS)) TRUE)
+[PRNTUTIL1] Unable to find class BOGUS.
+CLIPS> (do-for-all-instances ((?b A)) (progn (bind ?b 1) TRUE))
+[INSQYPSR2] Binds are not allowed in instance-set query in function do-for-all-instances.
+CLIPS> (do-for-all-instances ((?b 34)) TRUE abc)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query class restrictions.
+FALSE
+CLIPS> (do-for-all-instances ((?b (mv-append BOGUS USER))) TRUE abc)
+[CLASSFUN1] Unable to find class BOGUS in function do-for-all-instances.
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query class restrictions.
+FALSE
+CLIPS> (do-for-all-instances ((?b (mv-append USER 34))) TRUE abc)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query class restrictions.
+FALSE
+CLIPS> (do-for-all-instances ((?b OBJECT)) TRUE (bind ?b 1))
+[INSQYPSR3] Cannot rebind instance-set member variable b in function do-for-all-instances.
+CLIPS> (delayed-do-for-all-instances)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query function.
+CLIPS> (delayed-do-for-all-instances TRUE)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query function.
+CLIPS> (delayed-do-for-all-instances ())
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query function.
+CLIPS> (delayed-do-for-all-instances (?B OBJECT) TRUE)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query function.
+CLIPS> (delayed-do-for-all-instances ((?b A)))
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query function.
+CLIPS> (delayed-do-for-all-instances ((?b BOGUS)) TRUE)
+[PRNTUTIL1] Unable to find class BOGUS.
+CLIPS> (delayed-do-for-all-instances ((?b A)) (progn (bind ?b 1) TRUE))
+[INSQYPSR2] Binds are not allowed in instance-set query in function delayed-do-for-all-instances.
+CLIPS> (delayed-do-for-all-instances ((?b 34)) TRUE abc)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query class restrictions.
+FALSE
+CLIPS> (delayed-do-for-all-instances ((?b (mv-append BOGUS USER))) TRUE abc)
+[CLASSFUN1] Unable to find class BOGUS in function delayed-do-for-all-instances.
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query class restrictions.
+FALSE
+CLIPS> (delayed-do-for-all-instances ((?b (mv-append USER 34))) TRUE abc)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for instance-set query class restrictions.
+FALSE
+CLIPS> (delayed-do-for-all-instances ((?b OBJECT)) TRUE (bind ?b 1))
+[INSQYPSR3] Cannot rebind instance-set member variable b in function delayed-do-for-all-instances.
+CLIPS> (make-instance v of V)
+[v]
+CLIPS> (make-instance w of W)
+[w]
+CLIPS> (make-instance x of X)
+[x]
+CLIPS> (make-instance y of Y)
+[y]
+CLIPS> (make-instance z of Z)
+[z]
+CLIPS> (do-for-all-instances ((?ins1 ?*list* X (mv-append Y Z)) 
+                       (?ins2 X (mv-append Y Z) ?*list*))
+  TRUE
+  (printout t ?ins1 " " ?ins2 crlf))
+[v] [x]
+[v] [y]
+[v] [z]
+[v] [v]
+[v] [w]
+[w] [x]
+[w] [y]
+[w] [z]
+[w] [v]
+[w] [w]
+[x] [x]
+[x] [y]
+[x] [z]
+[x] [v]
+[x] [w]
+[y] [x]
+[y] [y]
+[y] [z]
+[y] [v]
+[y] [w]
+[z] [x]
+[z] [y]
+[z] [z]
+[z] [v]
+[z] [w]
+CLIPS> (while TRUE do
+   (delayed-do-for-all-instances ((?b OBJECT)) TRUE 
+     (progn (printout t DELAYED ?b crlf) (break)))
+   (do-for-all-instances ((?b OBJECT)) TRUE 
+     (progn (printout t DO-FOR-ALL ?b crlf) (break)))
+   (break))
+DELAYED[initial-object]
+DO-FOR-ALL[initial-object]
+FALSE
+CLIPS> (deffunction quoxnar ()
+   (do-for-all-instances ((?b OBJECT)) TRUE 
+     (progn (printout t INS-RETURN ?b crlf) (return))))
+CLIPS> (quoxnar)
+INS-RETURN[initial-object]
+CLIPS> 
+(dribble-off)

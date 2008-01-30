@@ -1,0 +1,604 @@
+TRUE
+CLIPS> (load "sfmfmix.clp")
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-1 "constant & $?var"
+   (bar $?y&yak)
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-2 "constant & $?var"
+   (bar $?y yak&$?y)
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-3 "constant & $?var"
+   (bar yak&$?y)
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-4 "constant & $?var"
+   (bar $?y $?y|yak)
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-5 "constant & $?var"
+   (bar $?y yak|$?y)
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-6 "constant & $?var"
+   (bar yak|$?y)
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-7 "? return value & $?var"
+   (bar $?y&=(+ 3 4))
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-8 "? return value & $?var"
+   (bar $?y =(+ 3 4)&$?y)
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-9 "? return value & $?var"
+   (bar =(+ 3 4)&$?y)
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-10 "? return value & $?var"
+   (bar $?y $?y|=(+ 3 4))
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-11 "? return value & $?var"
+   (bar $?y =(+ 3 4)|$?y)
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-12 "? return value & $?var"
+   (bar =(+ 3 4)|$?y)
+***
+[ANALYSIS4] Variable ?y was referenced in CE #1 field #1 before being defined.
+
+ERROR:
+(defrule MAIN::error-12a "$? return value & $?var"
+   (bar =(create$)&$?y)
+   =>)
+***
+[ANALYSIS4] Variable ?y was referenced in CE #1 field #1 before being defined.
+
+ERROR:
+(defrule MAIN::error-12b "$? return value & $?var"
+   (bar =(create$)|$?y)
+   =>)
+*
+[ANALYSIS4] Variable ?y was referenced in CE #1 field #1 before being defined.
+
+ERROR:
+(defrule MAIN::error-13 "$?var & $?var"
+   (bar $?z&$?y)
+   =>)
+**
+[ANALYSIS4] Variable ?y was referenced in CE #1 field #2 before being defined.
+
+ERROR:
+(defrule MAIN::error-14 "$?var & $?var"
+   (bar $?z $?z&$?y)
+   =>)
+**
+[ANALYSIS4] Variable ?z was referenced in CE #1 field #1 before being defined.
+
+ERROR:
+(defrule MAIN::error-15 "$?var & $?var"
+   (bar $?z|$?y)
+   =>)
+*
+[ANALYSIS4] Variable ?z was referenced in CE #1 field #2 before being defined.
+
+ERROR:
+(defrule MAIN::error-16 "$?var & $?var"
+   (bar $?y $?z|$?y)
+   =>)
+*
+[ANALYSIS4] Variable ?y was referenced in CE #1 field #2 before being defined.
+
+ERROR:
+(defrule MAIN::error-17 "$?var & $?var"
+   (bar $?z $?z|$?y)
+   =>)
+**
+[ANALYSIS4] Variable ?y was referenced in CE #1 field #1 before being defined.
+
+ERROR:
+(defrule MAIN::error-18 "?var & ?var"
+   (bar ?z&?y)
+   =>)
+**
+[ANALYSIS4] Variable ?y was referenced in CE #1 field #2 before being defined.
+
+ERROR:
+(defrule MAIN::error-19 "?var & ?var"
+   (bar ?z ?z&?y)
+   =>)
+**
+[ANALYSIS4] Variable ?z was referenced in CE #1 field #1 before being defined.
+
+ERROR:
+(defrule MAIN::error-20 "?var & ?var"
+   (bar ?z|?y)
+   =>)
+*
+[ANALYSIS4] Variable ?z was referenced in CE #1 field #2 before being defined.
+
+ERROR:
+(defrule MAIN::error-21 "?var & ?var"
+   (bar ?y ?z|?y)
+   =>)
+*
+[ANALYSIS4] Variable ?y was referenced in CE #1 field #2 before being defined.
+
+ERROR:
+(defrule MAIN::error-22 "?var & ?var"
+   (bar ?z ?z|?y)
+   =>)
+**
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-23 "$?var & ?var"
+   (bar $?z&?y)
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-24 "$?var & ?var"
+   (bar ?y $?z&?y)
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-25 "$?var & ?var"
+   (bar $?z $?z&?y)
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-26 "$?var & ?var"
+   (bar $?z ?y $?z&?y)
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-27 "$?var & ?var"
+   (bar $?z|?y)
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-28 "$?var & ?var"
+   (bar ?y $?z|?y)
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-29 "$?var & ?var"
+   (bar $?z $?z|?y)
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-30 "$?var & ?var"
+   (bar $?z ?y $?z|?y)
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-31 "$?var & ?var"
+   (bar ?z&$?y)
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-32 "$?var & ?var"
+   (bar $?y ?z&$?y)
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-33 "$?var & ?var"
+   (bar ?z ?z&$?y)
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-34 "$?var & ?var"
+   (bar ?z $?y ?z&$?y)
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-35 "$?var & ?var"
+   (bar ?z|$?y)
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-36 "$?var & ?var"
+   (bar $?y ?z|$?y)
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-37 "$?var & ?var"
+   (bar ?z ?z|$?y)
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-38 "$?var & ?var"
+   (bar ?z $?y ?z|$?y)
+*
+[ANALYSIS3] Variable ?y is used as both a single and multifield variable in the LHS
+
+ERROR:
+(defrule MAIN::error-39 "$?var & ?var"
+   (bar $?y ?z&?y)
+   =>)
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-40 "$?var & ?var"
+   (bar ?y ?z&$?y)
+*
+[ANALYSIS3] Variable ?y is used as both a single and multifield variable in the LHS
+
+ERROR:
+(defrule MAIN::error-41 "$?var & ?var"
+   (bar ?z $?y ?z&?y)
+   =>)
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-42 "$?var & ?var"
+   (bar ?z ?y ?z&$?y)
+*
+[ANALYSIS3] Variable ?y is used as both a single and multifield variable in the LHS
+
+ERROR:
+(defrule MAIN::error-43 "$?var & ?var"
+   (bar $?y ?z|?y)
+   =>)
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-44 "$?var & ?var"
+   (bar ?y ?z|$?y)
+*
+[ANALYSIS3] Variable ?y is used as both a single and multifield variable in the LHS
+
+ERROR:
+(defrule MAIN::error-45 "$?var & ?var"
+   (bar ?z $?y ?z|?y)
+   =>)
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-46 "$?var & ?var"
+   (bar ?z ?y ?z|$?y)
+*
+[ANALYSIS3] Variable ?z is used as both a single and multifield variable in the LHS
+
+ERROR:
+(defrule MAIN::error-47 "$?var & ?var"
+   (bar $?z ?z&?y)
+   =>)
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-48 "$?var & ?var"
+   (bar ?z $?z&?y)
+*
+[ANALYSIS3] Variable ?z is used as both a single and multifield variable in the LHS
+
+ERROR:
+(defrule MAIN::error-49 "$?var & ?var"
+   (bar $?z ?y ?z&?y)
+   =>)
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-50 "$?var & ?var"
+   (bar ?z ?y $?z&?y)
+*
+[ANALYSIS3] Variable ?z is used as both a single and multifield variable in the LHS
+
+ERROR:
+(defrule MAIN::error-51 "$?var & ?var"
+   (bar $?z ?z|?y)
+   =>)
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-52 "$?var & ?var"
+   (bar ?z $?z|?y)
+*
+[ANALYSIS3] Variable ?z is used as both a single and multifield variable in the LHS
+
+ERROR:
+(defrule MAIN::error-53 "$?var & ?var"
+   (bar $?z ?y ?z|?y)
+   =>)
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-54 "$?var & ?var"
+   (bar ?z ?y $?z|?y)
+***
+[ANALYSIS4] Variable ?y was referenced in CE #1 field #1 before being defined.
+
+ERROR:
+(defrule MAIN::error-54a "constant & ?var"
+   (bar yak&?y)
+   =>)
+***
+[ANALYSIS4] Variable ?y was referenced in CE #1 field #1 before being defined.
+
+ERROR:
+(defrule MAIN::error-54b "constant & ?var"
+   (bar yak|?y)
+   =>)
+***
+[ANALYSIS4] Variable ?y was referenced in CE #1 field #1 before being defined.
+
+ERROR:
+(defrule MAIN::error-55 "? return value & ?var"
+   (bar =(+ 3 4)&?y)
+   =>)
+***
+[ANALYSIS4] Variable ?y was referenced in CE #1 field #1 before being defined.
+
+ERROR:
+(defrule MAIN::error-56 "? return value & ?var"
+   (bar =(+ 3 4)|?y)
+   =>)
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-57 "$? return value & ?var"
+   (bar ?y&=(create$))
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-58 "$? return value & ?var"
+   (bar ?y =(create$)&?y)
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-59 "$? return value & ?var"
+   (bar =(create$)&?y)
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-60 "$? return value & ?var"
+   (bar ?y ?y|=(create$))
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-61 "$? return value & ?var"
+   (bar ?y =(create$)|?y)
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-62 "$? return value & ?var"
+   (bar =(create$)|?y)
+*******
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-63 "? return value & $? return value"
+   (bar =(+ 3 4)&=(create$))
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-64 "? return value & $? return value"
+   (bar =(create$)&=(+ 3 4))
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-65 "? return value & $? return value"
+   (bar =(+ 3 4)|=(create$))
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-66 "? return value & $? return value"
+   (bar =(create$)|=(+ 3 4))
+*****
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-67 "constant & $? return value"
+   (bar 7&=(create$))
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-68 "constant & $? return value"
+   (bar =(create$)&7)
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-69 "constant & $? return value"
+   (bar yak|=(create$))
+*
+[PATTERN2] Single and multifield constraints cannot be mixed in a field constraint
+
+ERROR:
+(defrule MAIN::error-70 "constant & $? return value"
+   (bar =(create$)|yak)
+*
+[ANALYSIS3] Variable ?f is used as both a single and multifield variable in the LHS
+
+ERROR:
+(defrule MAIN::error-71 "? and $? mixing"
+   (foo ?f $?f)
+   =>)
+*
+[ANALYSIS3] Variable ?f is used as both a single and multifield variable in the LHS
+
+ERROR:
+(defrule MAIN::error-72 "? and $? mixing"
+   (foo $?f ?f)
+   =>)
+*
+[ANALYSIS3] Variable ?f is used as both a single and multifield variable in the LHS
+
+ERROR:
+(defrule MAIN::error-73 "? and $? mixing"
+   ?f <- (foo $?f)
+   =>)
+*
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defrule.
+
+ERROR:
+(defrule MAIN::error-74 "? and $? mixing"
+   $?f
+*
+[ANALYSIS3] Variable ?f is used as both a single and multifield variable in the LHS
+
+ERROR:
+(defrule MAIN::error-75 "? and $? mixing"
+   (foo ?f)
+   (foo $?f)
+   =>)
+*
+[ANALYSIS3] Variable ?f is used as both a single and multifield variable in the LHS
+
+ERROR:
+(defrule MAIN::error-76 "? and $? mixing"
+   (foo $?f)
+   (foo ?f)
+   =>)
+*
+[ANALYSIS3] Variable ?f is used as both a single and multifield variable in the LHS
+
+ERROR:
+(defrule MAIN::error-77 "? and $? mixing"
+   ?f <- (foo)
+   (foo $?f)
+   =>)
+*
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defrule.
+
+ERROR:
+(defrule MAIN::error-78 "? and $? mixing"
+   $?f
+*
+[ANALYSIS3] Variable ?f is used as both a single and multifield variable in the LHS
+
+ERROR:
+(defrule MAIN::error-79 "? and $? mixing"
+   (foo ?f $?x&$?f)
+   =>)
+*
+[ANALYSIS3] Variable ?f is used as both a single and multifield variable in the LHS
+
+ERROR:
+(defrule MAIN::error-80 "? and $? mixing"
+   (foo ?f $?x|$?f)
+   =>)
+*
+[ANALYSIS3] Variable ?f is used as both a single and multifield variable in the LHS
+
+ERROR:
+(defrule MAIN::error-81 "? and $? mixing"
+   (foo $?f ?x&?f)
+   =>)
+*
+[ANALYSIS3] Variable ?f is used as both a single and multifield variable in the LHS
+
+ERROR:
+(defrule MAIN::error-82 "? and $? mixing"
+   (foo $?f ?x|?f)
+   =>)
+*
+[ANALYSIS3] Variable ?f is used as both a single and multifield variable in the LHS
+
+ERROR:
+(defrule MAIN::error-83 "? and $? mixing"
+   (foo $?f)
+   (foo ?x&?f)
+   =>)
+*
+[ANALYSIS3] Variable ?f is used as both a single and multifield variable in the LHS
+
+ERROR:
+(defrule MAIN::error-84 "? and $? mixing"
+   (foo ?f)
+   (foo $?x|$?f)
+   =>)
+
+FALSE
+CLIPS> (rules)
+okay!-1
+okay!-2
+okay!-3
+okay!-4
+okay!-5
+okay!-6
+okay!-7
+okay!-8
+okay!-9
+okay!-10
+okay!-11
+okay!-12
+okay!-13
+okay!-14
+okay!-15
+okay!-16
+okay!-17
+okay!-18
+okay!-19
+okay!-20
+okay!-21
+okay!-22
+okay!-23
+okay!-24
+okay!-25
+okay!-26
+okay!-27
+okay!-28
+For a total of 28 defrules.
+CLIPS> (dribble-off)

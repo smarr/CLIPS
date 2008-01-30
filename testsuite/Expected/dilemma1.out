@@ -1,0 +1,100 @@
+FIRE    1 move-alone: f-1,f-2
+FIRE    2 fox-eats-goat: f-4
+FIRE    3 move-with-fox: f-1,f-2
+FIRE    4 goat-eats-cabbage: f-5
+FIRE    5 move-with-goat: f-1,f-2
+FIRE    6 move-alone: f-6,f-3
+FIRE    7 move-alone: f-7,f-2
+FIRE    8 circular-path: f-6,f-8
+FIRE    9 move-with-fox: f-7,f-2
+FIRE   10 move-alone: f-9,f-3
+FIRE   11 fox-eats-goat: f-10
+FIRE   12 move-with-fox: f-9,f-3
+FIRE   13 circular-path: f-7,f-11
+FIRE   14 move-with-goat: f-9,f-3
+FIRE   15 move-alone: f-12,f-2
+FIRE   16 goat-eats-cabbage: f-13
+FIRE   17 move-with-goat: f-12,f-2
+FIRE   18 circular-path: f-9,f-14
+FIRE   19 move-with-cabbage: f-12,f-2
+FIRE   20 move-alone: f-15,f-3
+FIRE   21 move-alone: f-16,f-2
+FIRE   22 circular-path: f-15,f-17
+FIRE   23 move-with-goat: f-16,f-2
+FIRE   24 recognize-solution: f-18
+FIRE   25 further-solution: f-16,f-19
+FIRE   26 further-solution: f-15,f-20
+FIRE   27 further-solution: f-12,f-21
+FIRE   28 further-solution: f-9,f-22
+FIRE   29 further-solution: f-7,f-23
+FIRE   30 further-solution: f-6,f-24
+FIRE   31 further-solution: f-1,f-25
+FIRE   32 print-solution: f-26
+
+Solution found: 
+
+Farmer moves with goat to shore-2.
+Farmer moves alone to shore-1.
+Farmer moves with fox to shore-2.
+Farmer moves with goat to shore-1.
+Farmer moves with cabbage to shore-2.
+Farmer moves alone to shore-1.
+Farmer moves with goat to shore-2.
+FIRE   33 move-with-fox: f-15,f-3
+FIRE   34 move-alone: f-27,f-2
+FIRE   35 fox-eats-goat: f-28
+FIRE   36 move-with-fox: f-27,f-2
+FIRE   37 circular-path: f-15,f-29
+FIRE   38 move-with-goat: f-27,f-2
+FIRE   39 move-alone: f-30,f-3
+FIRE   40 goat-eats-cabbage: f-31
+FIRE   41 move-with-goat: f-30,f-3
+FIRE   42 circular-path: f-27,f-32
+FIRE   43 move-with-cabbage: f-30,f-3
+FIRE   44 circular-path: f-7,f-33
+FIRE   45 move-with-cabbage: f-15,f-3
+FIRE   46 circular-path: f-12,f-34
+FIRE   47 move-with-cabbage: f-7,f-2
+FIRE   48 circular-path: f-35,f-30
+FIRE   49 move-alone: f-35,f-3
+FIRE   50 goat-eats-cabbage: f-36
+FIRE   51 move-with-goat: f-35,f-3
+FIRE   52 circular-path: f-37,f-27
+FIRE   53 move-alone: f-37,f-2
+FIRE   54 fox-eats-goat: f-38
+FIRE   55 move-with-fox: f-37,f-2
+FIRE   56 move-alone: f-39,f-3
+FIRE   57 move-alone: f-40,f-2
+FIRE   58 circular-path: f-15,f-41
+FIRE   59 move-with-goat: f-40,f-2
+FIRE   60 recognize-solution: f-42
+FIRE   61 further-solution: f-40,f-43
+FIRE   62 further-solution: f-39,f-44
+FIRE   63 further-solution: f-37,f-45
+FIRE   64 further-solution: f-35,f-46
+FIRE   65 further-solution: f-7,f-47
+FIRE   66 further-solution: f-6,f-48
+FIRE   67 further-solution: f-1,f-49
+FIRE   68 print-solution: f-50
+
+Solution found: 
+
+Farmer moves with goat to shore-2.
+Farmer moves alone to shore-1.
+Farmer moves with cabbage to shore-2.
+Farmer moves with goat to shore-1.
+Farmer moves with fox to shore-2.
+Farmer moves alone to shore-1.
+Farmer moves with goat to shore-2.
+FIRE   69 move-with-fox: f-39,f-3
+FIRE   70 circular-path: f-37,f-51
+FIRE   71 move-with-cabbage: f-39,f-3
+FIRE   72 circular-path: f-12,f-52
+FIRE   73 move-with-goat: f-37,f-2
+FIRE   74 circular-path: f-35,f-53
+FIRE   75 move-with-cabbage: f-35,f-3
+FIRE   76 circular-path: f-7,f-54
+FIRE   77 move-with-goat: f-6,f-3
+FIRE   78 circular-path: f-1,f-55
+FIRE   79 move-with-cabbage: f-1,f-2
+FIRE   80 fox-eats-goat: f-56

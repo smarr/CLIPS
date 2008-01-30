@@ -1,0 +1,12 @@
+(unwatch all)
+(clear)
+(set-strategy depth)
+(open "Results//mathfnx.rsl" mathfnx "w")
+(dribble-on "Actual//mathfnx.out")
+(batch "mathfnx.bat")
+(dribble-off)
+(load "compline.clp")
+(printout mathfnx "mathfnx.bat differences are as follows:" crlf)
+(compare-files "Expected//mathfnx.out" "Actual//mathfnx.out" mathfnx)
+; close result file
+(close mathfnx)

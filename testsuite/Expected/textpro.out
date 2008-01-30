@@ -1,0 +1,87 @@
+TRUE
+CLIPS> (batch "textpro.bat")
+TRUE
+CLIPS> (fetch "textpro.dat")
+7
+CLIPS> (print-region t "textpro.dat" root)
+
+ROOT3 TEXT
+TRUE
+CLIPS> (print-region t "textpro.dat" ^ root1 sub)
+
+SUBTOPIC1 TEXT
+TRUE
+CLIPS> (print-region t "textpro.dat" sub)
+
+SUBTOPIC4 TEXT
+TRUE
+CLIPS> (print-region t "textpro.dat")
+
+ROOT1 TEXT
+TRUE
+CLIPS> (print-region t "textpro.dat" subtopic2)
+
+SUBTOPIC2 TEXT
+  1I BEGIN-ENTRY-SUBTOPIC2
+  END-ENTRY
+TRUE
+CLIPS> (print-region t "textpro.dat" ^ root2)
+
+ROOT2 TEXT
+TRUE
+CLIPS> (print-region t "textpro.dat" ^ r s)
+
+SUBTOPIC3 TEXT
+TRUE
+CLIPS> (print-region 1 2 3)
+[ARGACCES5] Function print-region expected argument #1 to be of type symbol
+CLIPS> (print-region t 2 3)
+[ARGACCES5] Function print-region expected argument #2 to be of type symbol or string
+CLIPS> (defglobal ?*cnt* = 0)
+CLIPS> (while (< ?*cnt* 100) do
+  (print-region t "textpro.dat" junk)
+  (bind ?*cnt* (+ ?*cnt* 1)))
+FALSE
+CLIPS> (toss "textpro.dat")
+TRUE
+CLIPS> (toss "textpro.dat")
+FALSE
+CLIPS> (fetch "textpro.doc")
+[TEXTPRO3] No entries found.
+FALSE
+CLIPS> (fetch "textpro.dat")
+7
+CLIPS> (get-region "textpro.dat" root)
+"ROOT3 TEXT
+"
+CLIPS> (get-region "textpro.dat" ^ root1 sub)
+"SUBTOPIC1 TEXT
+"
+CLIPS> (get-region "textpro.dat" sub)
+"SUBTOPIC4 TEXT
+"
+CLIPS> (get-region "textpro.dat")
+"ROOT1 TEXT
+"
+CLIPS> (get-region "textpro.dat" subtopic2)
+"SUBTOPIC2 TEXT
+  1I BEGIN-ENTRY-SUBTOPIC2
+  END-ENTRY
+"
+CLIPS> (get-region "textpro.dat" ^ root2)
+"ROOT2 TEXT
+"
+CLIPS> (get-region "textpro.dat" ^ r s)
+"SUBTOPIC3 TEXT
+"
+CLIPS> (get-region 2 3)
+[ARGACCES5] Function get-region expected argument #1 to be of type symbol or string
+CLIPS> (bind ?*cnt* 0)
+0
+CLIPS> (while (< ?*cnt* 100) do
+  (get-region "textpro.dat" junk)
+  (bind ?*cnt* (+ ?*cnt* 1)))
+FALSE
+CLIPS> (toss "textpro.dat")
+TRUE
+CLIPS> (dribble-off)

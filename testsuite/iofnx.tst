@@ -1,0 +1,12 @@
+(unwatch all)
+(clear)
+(set-strategy depth)
+(open "Results//iofnx.rsl" iofnx "w")
+(dribble-on "Actual//iofnx.out")
+(batch "iofnx.bat")
+(dribble-off)
+(load "compline.clp")
+(printout iofnx "iofnx.bat differences are as follows:" crlf)
+(compare-files "Expected//iofnx.out" "Actual//iofnx.out" iofnx)
+; close result file
+(close iofnx)

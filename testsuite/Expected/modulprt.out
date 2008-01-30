@@ -1,0 +1,530 @@
+TRUE
+CLIPS> (batch "modulprt.bat")
+TRUE
+CLIPS> (clear) ; Test for illegal export/import constructs
+CLIPS> (defmodule A (export ?ALL))
+CLIPS> (defmodule B (export deffacts ?ALL))
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defmodule export specification.
+
+ERROR:
+(defmodule B
+   (export deffacts
+CLIPS> (defmodule B (export defrule ?ALL))
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defmodule export specification.
+
+ERROR:
+(defmodule B
+   (export defrule
+CLIPS> (defmodule B (export defmethod ?ALL))
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defmodule export specification.
+
+ERROR:
+(defmodule B
+   (export defmethod
+CLIPS> (defmodule B (export defmessage-handler ?ALL))
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defmodule export specification.
+
+ERROR:
+(defmodule B
+   (export defmessage-handler
+CLIPS> (defmodule B (export definstances ?ALL))
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defmodule export specification.
+
+ERROR:
+(defmodule B
+   (export definstances
+CLIPS> (defmodule B (import A deffacts ?ALL))
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defmodule import specification.
+
+ERROR:
+(defmodule B
+   (import A deffacts
+CLIPS> (defmodule B (import A defrule ?ALL))
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defmodule import specification.
+
+ERROR:
+(defmodule B
+   (import A defrule
+CLIPS> (defmodule B (import A defmethod ?ALL))
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defmodule import specification.
+
+ERROR:
+(defmodule B
+   (import A defmethod
+CLIPS> (defmodule B (import A defmessage-handler ?ALL))
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defmodule import specification.
+
+ERROR:
+(defmodule B
+   (import A defmessage-handler
+CLIPS> (defmodule B (import A definstances ?ALL))
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defmodule import specification.
+
+ERROR:
+(defmodule B
+   (import A definstances
+CLIPS> (list-defmodules)
+MAIN
+A
+For a total of 2 defmodules.
+CLIPS> (clear) ; Test for importing undefined constructs
+CLIPS> (defmodule A (export ?ALL))
+CLIPS> (defmodule B (import A deftemplate foo))
+
+[MODULPSR1] Module A does not export the deftemplate foo.
+
+ERROR:
+(defmodule B
+   (import A deftemplate foo)
+CLIPS> (defmodule B (import A defglobal foo))
+
+[MODULPSR1] Module A does not export the defglobal foo.
+
+ERROR:
+(defmodule B
+   (import A defglobal foo)
+CLIPS> (defmodule B (import A defclass FOO))
+
+[MODULPSR1] Module A does not export the defclass FOO.
+
+ERROR:
+(defmodule B
+   (import A defclass FOO)
+CLIPS> (defmodule B (import A defgeneric foo))
+
+[MODULPSR1] Module A does not export the defgeneric foo.
+
+ERROR:
+(defmodule B
+   (import A defgeneric foo)
+CLIPS> (clear) ; Test for name conflicts
+CLIPS> (defmodule A (export ?ALL))
+CLIPS> (defrule A::foo (a) =>)
+CLIPS> (deffacts A::foo)
+CLIPS> (deftemplate A::foo)
+CLIPS> (defglobal A ?*foo* = 3)
+CLIPS> (defgeneric A::foo)
+CLIPS> (defmethod A::foo ())
+CLIPS> (defclass A::FOO (is-a USER))
+CLIPS> (defmessage-handler A::FOO bar ())
+CLIPS> (definstances A::foo)
+CLIPS> (defmodule MAIN (import A ?ALL) (export ?ALL))
+CLIPS> (defmodule B (import MAIN ?ALL))
+CLIPS> (defrule B::foo (b) =>)
+CLIPS> (deffacts B::foo)
+CLIPS> (deftemplate B::foo)
+
+[CSTRCPSR3] Cannot define deftemplate foo because of an import/export conflict.
+
+ERROR:
+(deftemplate B::foo
+CLIPS> (defglobal B ?*foo* = 3)
+
+[CSTRCPSR3] Cannot define defglobal foo because of an import/export conflict.
+
+ERROR:
+(defglobal B ?*foo* 
+CLIPS> (defgeneric B::foo)
+
+[CSTRCPSR3] Cannot define defgeneric foo because of an import/export conflict.
+
+ERROR:
+(defgeneric B::foo
+CLIPS> (defmethod B::foo ())
+
+[CSTRCPSR3] Cannot define defgeneric foo because of an import/export conflict.
+
+ERROR:
+(defmethod B::foo
+CLIPS> (defclass B::FOO (is-a USER))
+
+[CSTRCPSR3] Cannot define defclass FOO because of an import/export conflict.
+
+ERROR:
+(defclass B::FOO
+CLIPS> (defmessage-handler B::FOO bar ())
+CLIPS> (definstances B::foo)
+CLIPS> (defmodule C (export ?ALL))
+CLIPS> (defmodule D (import A ?ALL) (import C ?ALL))
+CLIPS> (defrule C::foo =>)
+CLIPS> (deffacts C::foo)
+CLIPS> (deftemplate C::foo)
+
+[CSTRCPSR3] Cannot define deftemplate foo because of an import/export conflict.
+
+ERROR:
+(deftemplate C::foo
+CLIPS> (defglobal C ?*foo* = 3)
+
+[CSTRCPSR3] Cannot define defglobal foo because of an import/export conflict.
+
+ERROR:
+(defglobal C ?*foo* 
+CLIPS> (defgeneric C::foo)
+
+[CSTRCPSR3] Cannot define defgeneric foo because of an import/export conflict.
+
+ERROR:
+(defgeneric C::foo
+CLIPS> (defmethod C::foo ())
+
+[CSTRCPSR3] Cannot define defgeneric foo because of an import/export conflict.
+
+ERROR:
+(defmethod C::foo
+CLIPS> (defclass C::FOO (is-a USER))
+
+[CSTRCPSR3] Cannot define defclass FOO because of an import/export conflict.
+
+ERROR:
+(defclass C::FOO
+CLIPS> (defmessage-handler C::FOO bar ())
+[MSGPSR1] A class must be defined before its message-handlers.
+
+ERROR:
+(defmessage-handler C::FOO
+   bar
+CLIPS> (definstances C::foo)
+CLIPS> (defmodule E (import A ?ALL) (import C ?ALL))
+CLIPS> (list-defrules *)
+MAIN:
+A:
+   foo
+B:
+   foo
+C:
+   foo
+D:
+E:
+For a total of 3 defrules.
+CLIPS> (list-deffacts *)
+MAIN:
+   initial-fact
+A:
+   foo
+B:
+   foo
+C:
+   foo
+D:
+E:
+For a total of 4 deffacts.
+CLIPS> (list-deftemplates *)
+MAIN:
+   initial-fact
+A:
+   a
+   foo
+B:
+   b
+C:
+D:
+E:
+For a total of 4 deftemplates.
+CLIPS> (list-defglobals *)
+MAIN:
+A:
+   foo
+B:
+C:
+D:
+E:
+For a total of 1 defglobal.
+CLIPS> (list-defgenerics *)
+MAIN:
+A:
+   foo
+B:
+C:
+D:
+E:
+For a total of 1 defgeneric.
+CLIPS> (list-defmethods A::foo)
+foo #1  
+For a total of 1 method.
+CLIPS> (list-defmethods B::foo)
+[GENRCFUN3] Unable to find generic function B::foo in function list-defmethods.
+CLIPS> (list-defmethods C::foo)
+[GENRCFUN3] Unable to find generic function C::foo in function list-defmethods.
+CLIPS> (list-defmethods D::foo)
+[GENRCFUN3] Unable to find generic function D::foo in function list-defmethods.
+CLIPS> (list-defclasses *)
+MAIN:
+   FLOAT
+   INTEGER
+   SYMBOL
+   STRING
+   MULTIFIELD
+   EXTERNAL-ADDRESS
+   FACT-ADDRESS
+   INSTANCE-ADDRESS
+   INSTANCE-NAME
+   OBJECT
+   PRIMITIVE
+   NUMBER
+   LEXEME
+   ADDRESS
+   INSTANCE
+   USER
+   INITIAL-OBJECT
+A:
+   FOO
+B:
+C:
+D:
+E:
+For a total of 18 defclasses.
+CLIPS> (list-defmessage-handlers A::FOO)
+bar primary in class A::FOO
+For a total of 1 message-handler.
+CLIPS> (list-defmessage-handlers B::FOO)
+[CLASSFUN1] Unable to find class B::FOO in function list-defmessage-handlers.
+CLIPS> (list-defmessage-handlers C::FOO)
+[CLASSFUN1] Unable to find class C::FOO in function list-defmessage-handlers.
+CLIPS> (list-defmessage-handlers D::FOO)
+[CLASSFUN1] Unable to find class D::FOO in function list-defmessage-handlers.
+CLIPS> (list-definstances *)
+MAIN:
+   initial-object
+A:
+   foo
+B:
+   foo
+C:
+   foo
+D:
+E:
+For a total of 4 definstances.
+CLIPS> (clear) ; Test for scope
+CLIPS> (defmodule A (export ?ALL))
+CLIPS> (deftemplate A::foo (slot x))
+CLIPS> (defglobal A ?*foo* = 3)
+CLIPS> (defgeneric A::foo)
+CLIPS> (defmethod A::foo () x)
+CLIPS> (defclass A::FOO (is-a USER) (role concrete) (slot x))
+CLIPS> (defmodule B (import A ?ALL))
+CLIPS> (deffacts B::foo (foo (x 3)))
+CLIPS> (defrule B::bar (foo (x 3)) => (printout t ?*foo* " " (foo)))
+CLIPS> (make-instance of FOO)
+[A::gen1] ;; Different Name OK
+CLIPS> (instances)
+[initial-object] of INITIAL-OBJECT
+[gen1] of A::FOO ;; Should have same name as above
+For a total of 2 instances.
+CLIPS> (clear) ; Test fact scoping
+CLIPS> (defmodule A)
+CLIPS> (assert (a))
+<Fact-1>
+CLIPS> (assert (b))
+<Fact-2>
+CLIPS> (defmodule B)
+CLIPS> (assert (b))
+<Fact-3>
+CLIPS> (assert (c))
+<Fact-4>
+CLIPS> (assert (c))
+FALSE
+CLIPS> (facts A)
+f-1     (a)
+f-2     (b)
+For a total of 2 facts.
+CLIPS> (facts B)
+f-3     (b)
+f-4     (c)
+For a total of 2 facts.
+CLIPS> (facts MAIN)
+f-0     (initial-fact)
+For a total of 1 fact.
+CLIPS> (facts *)
+f-0     (initial-fact)
+f-1     (a)
+f-2     (b)
+f-3     (b)
+f-4     (c)
+For a total of 5 facts.
+CLIPS> (clear) ; Test redefinition of MAIN module
+CLIPS> (defmodule MAIN (export ?ALL))
+CLIPS> (defmodule MAIN (export deftemplate ?ALL))
+
+[CSTRCPSR4] Cannot redefine defmodule MAIN while it is in use.
+
+ERROR:
+(defmodule MAIN
+CLIPS> (clear)
+CLIPS> (defmodule MAIN (export ?ALL))
+CLIPS> (clear) ; Test ?NONE keyword
+CLIPS> (defmodule MAIN (export ?NONE ?ALL))
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defmodule export specification.
+
+ERROR:
+(defmodule MAIN
+   (export ?NONE ?ALL
+CLIPS> (defmodule MAIN (export deftemplate ?NONE ?ALL))
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for defmodule export specification.
+
+ERROR:
+(defmodule MAIN
+   (export deftemplate ?NONE ?ALL
+CLIPS> (clear)
+CLIPS> (deftemplate MAIN::foo (slot x))
+CLIPS> (defmodule MAIN (export ?NONE))
+CLIPS> (defmodule FOO (import MAIN ?NONE))
+
+[MODULPSR1] Module MAIN does not export any constructs.
+
+ERROR:
+(defmodule FOO
+   (import MAIN
+CLIPS> (clear)
+CLIPS> (deftemplate MAIN::foo (slot x))
+CLIPS> (defmodule MAIN (export ?NONE))
+CLIPS> (defmodule FOO (import MAIN deftemplate ?NONE))
+
+[MODULPSR1] Module MAIN does not export any constructs.
+
+ERROR:
+(defmodule FOO
+   (import MAIN
+CLIPS> (clear)
+CLIPS> (deftemplate MAIN::foo (slot x))
+CLIPS> (defmodule MAIN (export deftemplate ?NONE))
+CLIPS> (defmodule FOO (import MAIN ?NONE))
+
+[MODULPSR1] Module MAIN does not export any constructs.
+
+ERROR:
+(defmodule FOO
+   (import MAIN
+CLIPS> (clear)
+CLIPS> (deftemplate MAIN::foo (slot x))
+CLIPS> (defmodule MAIN (export deftemplate ?NONE))
+CLIPS> (defmodule FOO (import MAIN deftemplate ?NONE))
+
+[MODULPSR1] Module MAIN does not export any constructs.
+
+ERROR:
+(defmodule FOO
+   (import MAIN
+CLIPS> (clear)
+CLIPS> (deftemplate MAIN::foo (slot x))
+CLIPS> (defmodule MAIN (export deftemplate foo))
+CLIPS> (defmodule FOO (import MAIN ?NONE))
+CLIPS> (assert (foo (x 3)))
+
+[EXPRNPSR3] Missing function declaration for x.
+CLIPS> (clear)
+CLIPS> (deftemplate MAIN::foo (slot x))
+CLIPS> (defmodule MAIN (export deftemplate foo))
+CLIPS> (defmodule FOO (import MAIN deftemplate ?NONE))
+CLIPS> (assert (foo (x 3)))
+
+[EXPRNPSR3] Missing function declaration for x.
+CLIPS> (clear) ; Miscellaneous (previously a bug)
+CLIPS> (defmodule FOO (export deftemplate woz pif))
+CLIPS> (deftemplate FOO::bar)
+CLIPS> (deftemplate FOO::woz)
+CLIPS> (defmodule YAK1 (import FOO deftemplate bar))
+
+[MODULPSR1] Module FOO does not export the deftemplate bar.
+
+ERROR:
+(defmodule YAK1
+   (import FOO deftemplate bar)
+CLIPS> (defmodule YAK2 (import FOO deftemplate woz))
+CLIPS> (defmodule YAK3 (import FOO deftemplate pif))
+
+[MODULPSR1] Module FOO does not export the deftemplate pif.
+
+ERROR:
+(defmodule YAK3
+   (import FOO deftemplate pif)
+CLIPS> (defmodule FIB)
+CLIPS> (defmodule BIK (import FIB ?ALL))
+
+[MODULPSR1] Module FIB does not export any constructs.
+
+ERROR:
+(defmodule BIK
+   (import FIB
+CLIPS> (defmodule FIB1 (export defglobal ?ALL))
+CLIPS> (defmodule BIK1 (import FIB1 deftemplate ?ALL))
+
+[MODULPSR1] Module FIB1 does not export any deftemplate constructs.
+
+ERROR:
+(defmodule BIK1
+   (import FIB1 deftemplate ?ALL)
+CLIPS> (clear) ; Implied deftemplates causing conflict
+CLIPS> (defmodule MAIN (export ?ALL))
+CLIPS> (defmodule BAR (import MAIN ?ALL))
+CLIPS> (deftemplate BAR::b (slot x))
+CLIPS> (assert (b (x 3)))
+<Fact-1>
+CLIPS> (set-current-module MAIN)
+BAR
+CLIPS> (assert (b 3))
+
+[CSTRCPSR3] Cannot define implied deftemplate b because of an import/export conflict.
+CLIPS> (defrule foo => (assert (b)))
+
+[CSTRCPSR3] Cannot define implied deftemplate b because of an import/export conflict.
+
+ERROR:
+(defrule MAIN::foo
+   =>
+   (assert (b
+CLIPS> (defrule foo (b) =>)
+
+[CSTRCPSR3] Cannot define implied deftemplate b because of an import/export conflict.
+
+ERROR:
+(defrule MAIN::foo
+   (b
+CLIPS> (list-deftemplates *)
+MAIN:
+   initial-fact
+BAR:
+   b
+For a total of 2 deftemplates.
+CLIPS> (clear)
+CLIPS> (defmodule MAIN (export ?ALL))
+CLIPS> (deftemplate a (slot x))
+CLIPS> (defmodule BAR (import MAIN ?ALL) (export ?ALL))
+CLIPS> (deftemplate b (slot x))
+CLIPS> (defmodule YAK (import MAIN ?ALL) (import BAR ?ALL))
+CLIPS> (deftemplate c (slot x))
+CLIPS> (assert (c (x 3)))
+<Fact-1>
+CLIPS> (set-current-module BAR)
+YAK
+CLIPS> (assert (b (x 4)))
+<Fact-2>
+CLIPS> (set-current-module MAIN)
+BAR
+CLIPS> (assert (a (x 5)))
+<Fact-3>
+CLIPS> (defrule YAK::c (a (x ?)) (b (x ?)) (c (x ?)) =>)
+CLIPS> (defrule BAR::b (a (x ?)) (b (x ?)) =>)
+CLIPS> (defrule MAIN::a (a (x ?)) =>)
+CLIPS> (agenda *)
+MAIN:
+   0      a: f-3
+BAR:
+   0      b: f-3,f-2
+YAK:
+   0      c: f-3,f-2,f-1
+For a total of 3 activations.
+CLIPS> (clear)
+CLIPS> (dribble-off)

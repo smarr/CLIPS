@@ -1,0 +1,128 @@
+TRUE
+CLIPS> (batch "dfnxerr.bat")
+TRUE
+CLIPS> (deffunction test-args (?a ?b))
+CLIPS> (test-args)
+[ARGACCES4] Function test-args expected exactly 2 argument(s)
+CLIPS> (test-args 1 2 3)
+[ARGACCES4] Function test-args expected exactly 2 argument(s)
+CLIPS> (deffunction test-args (?a ?b $?c))
+CLIPS> (test-args 1)
+[ARGACCES4] Function test-args expected at least 2 argument(s)
+CLIPS> (deffunction bad (?a $?b ?c))
+[PRCCODE8] No parameters allowed after wildcard parameter.
+
+ERROR:
+(deffunction MAIN::bad
+   (?a $?b ?c
+CLIPS> (deffunction bad ()
+   (+ ?a 1))
+
+[PRCCODE3] Undefined variable a referenced in deffunction.
+
+ERROR:
+(deffunction MAIN::bad
+   ()
+   (+ ?a 1)
+   )
+CLIPS> (deffunction bad (?a ?a))
+[PRCCODE7] Duplicate parameter names not allowed.
+
+ERROR:
+(deffunction MAIN::bad
+   (?a ?a
+CLIPS> (deffunction defgeneric ())
+[DFFNXPSR1] Deffunctions are not allowed to replace constructs.
+
+ERROR:
+(deffunction MAIN::defgeneric
+   (
+CLIPS> (deffunction + ())
+[DFFNXPSR2] Deffunctions are not allowed to replace external functions.
+
+ERROR:
+(deffunction MAIN::+
+   (
+CLIPS> (defgeneric blah)
+CLIPS> (deffunction blah ())
+[DFFNXPSR3] Deffunctions are not allowed to replace generic functions.
+
+ERROR:
+(deffunction MAIN::blah
+   (
+CLIPS> (deffunction bad)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for parameter list.
+
+ERROR:
+(deffunction MAIN::bad)
+CLIPS> (deffunction bad (?a abc))
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for parameter list.
+
+ERROR:
+(deffunction MAIN::bad
+   (?a abc
+CLIPS> (deffunction weird ()
+  (build "(deffunction weird ())"))
+CLIPS> (weird)
+[DFNXPSR4] Deffunction weird may not be redefined while it is executing.
+
+ERROR:
+(deffunction MAIN::weird
+   (
+FALSE
+CLIPS> (deffunction)
+
+[CSTRCPSR2] Missing name for deffunction construct
+
+ERROR:
+(deffunction )
+CLIPS> (deffunction foo (?a))
+CLIPS> (deffunction globble () (foo))
+[ARGACCES4] Function foo expected exactly 1 argument(s)
+
+ERROR:
+(deffunction MAIN::globble
+   ()
+   (foo)
+CLIPS> (globble)
+
+[EXPRNPSR3] Missing function declaration for globble.
+CLIPS> (deffunction globble ($?any) (foo $?any))
+CLIPS> (globble)
+[ARGACCES4] Function foo expected exactly 1 argument(s)
+[PRCCODE4] Execution halted during the actions of deffunction globble.
+FALSE
+CLIPS> (foo (+ (eval "(gensym)") 2))
+[ARGACCES5] Function + expected argument #1 to be of type integer or float
+[PRCCODE6] This error occurred while evaluating arguments for the deffunction foo.
+FALSE
+CLIPS> (foo (instances))
+[initial-object] of INITIAL-OBJECT
+For a total of 1 instance.
+[PRCCODE2] Functions without a return value are illegal as deffunction arguments.
+[PRCCODE6] This error occurred while evaluating arguments for the deffunction foo.
+FALSE
+CLIPS> (deffunction foo ()
+  (+ ?a 2)
+  (bind ?a 1))
+CLIPS> (foo)
+[PRCCODE5] Variable a unbound in deffunction foo.
+[ARGACCES5] Function + expected argument #1 to be of type integer or float
+[PRCCODE4] Execution halted during the actions of deffunction foo.
+FALSE
+CLIPS> (deffunction foo ()
+  (printout t "Hello world!" crlf))
+CLIPS> (deffunction bar ()
+  (foo)
+  (undeffunction *))
+CLIPS> (bar)
+Hello world!
+[PRNTUTIL4] Unable to delete deffunction bar.
+[DFFNXFUN1] WARNING: Deffunction foo only partially deleted due to usage by other constructs.
+CLIPS> (list-deffunctions)
+foo
+bar
+For a total of 2 deffunctions.
+CLIPS> (dribble-off)

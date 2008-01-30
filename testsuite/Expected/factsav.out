@@ -1,0 +1,192 @@
+TRUE
+CLIPS> (batch "factsav.bat")
+TRUE
+CLIPS> (clear) ; Test error conditions for load/save facts
+CLIPS> (save-facts)
+[ARGACCES4] Function save-facts expected at least 1 argument(s)
+CLIPS> (save-facts 7)
+[ARGACCES5] Function save-facts expected argument #1 to be of type symbol or string
+CLIPS> (save-facts blah.tmp 7)
+[ARGACCES5] Function save-facts expected argument #2 to be of type symbol
+CLIPS> (save-facts blah.tmp hello)
+[ARGACCES5] Function save-facts expected argument #2 to be of type symbol with value local or visible
+FALSE
+CLIPS> (save-facts blah.tmp local bogus)
+[ARGACCES5] Function save-facts expected argument #3 to be of type local deftemplate name
+FALSE
+CLIPS> (remove blah.tmp)
+TRUE
+CLIPS> (save-facts blah.tmp)
+TRUE
+CLIPS> (load-facts)
+[ARGACCES4] Function load-facts expected exactly 1 argument(s)
+CLIPS> (load-facts 7)
+[ARGACCES5] Function load-facts expected argument #1 to be of type symbol or string
+CLIPS> (load-facts blah.tmp bogus)
+[ARGACCES4] Function load-facts expected exactly 1 argument(s)
+CLIPS> (remove blah.tmp)
+TRUE
+CLIPS> (load-facts blah.tmp)
+[ARGACCES2] Function load-facts was unable to open file blah.tmp.
+FALSE
+CLIPS> (clear) ; Test Saving and Reloading
+CLIPS> (load factsav.clp)
++%%+%%%+%%+
+TRUE
+CLIPS> (reset)
+CLIPS> (set-current-module MAIN)
+MAIN
+CLIPS> (assert (A (x 1)) (B (x 1)) (B (x 2)))
+<Fact-3>
+CLIPS> (set-current-module BAR)
+MAIN
+CLIPS> (assert (D (x 2)) (C (x 1)) (D (x 1)) (E (x 1)))
+<Fact-7>
+CLIPS> (set-current-module WOZ)
+BAR
+CLIPS> (assert (G (x 1)) (F (x 1)) (G (x 2)))
+<Fact-10>
+CLIPS> (set-current-module MAIN)
+WOZ
+CLIPS> (facts *)
+f-0     (initial-fact)
+f-1     (A (x 1))
+f-2     (B (x 1))
+f-3     (B (x 2))
+f-4     (D (x 2))
+f-5     (C (x 1))
+f-6     (D (x 1))
+f-7     (E (x 1))
+f-8     (G (x 1))
+f-9     (F (x 1))
+f-10    (G (x 2))
+For a total of 11 facts.
+CLIPS> (facts)
+f-0     (initial-fact)
+f-1     (A (x 1))
+f-2     (B (x 1))
+f-3     (B (x 2))
+For a total of 4 facts.
+CLIPS> (save-facts "Temp//fctsav1.fct" visible)
+TRUE
+CLIPS> (save-facts "Temp//fctsav2.fct" local A)
+TRUE
+CLIPS> (set-current-module BAR)
+MAIN
+CLIPS> (facts)
+f-1     (A (x 1))
+f-2     (B (x 1))
+f-3     (B (x 2))
+f-4     (D (x 2))
+f-5     (C (x 1))
+f-6     (D (x 1))
+f-7     (E (x 1))
+For a total of 7 facts.
+CLIPS> (save-facts "Temp//fctsav3.fct" local C)
+TRUE
+CLIPS> (save-facts "Temp//fctsav4.fct" visible B E)
+TRUE
+CLIPS> (set-current-module WOZ)
+BAR
+CLIPS> (facts)
+f-7     (E (x 1))
+f-8     (G (x 1))
+f-9     (F (x 1))
+f-10    (G (x 2))
+For a total of 4 facts.
+CLIPS> (save-facts "Temp//fctsav5.fct" local)
+TRUE
+CLIPS> (save-facts "Temp//fctsav6.fct" visible F G E)
+TRUE
+CLIPS> (set-current-module FOO)
+WOZ
+CLIPS> (facts)
+f-0     (initial-fact)
+f-1     (A (x 1))
+f-2     (B (x 1))
+f-3     (B (x 2))
+f-7     (E (x 1))
+f-9     (F (x 1))
+For a total of 6 facts.
+CLIPS> (save-facts "Temp//fctsav7.fct" local)
+TRUE
+CLIPS> (save-facts "Temp//fctsav8.fct" visible)
+TRUE
+CLIPS> (reset)
+CLIPS> (set-current-module MAIN)
+MAIN
+CLIPS> (load-facts "Temp//fctsav1.fct")
+TRUE
+CLIPS> (facts *)
+f-0     (initial-fact)
+f-1     (A (x 1))
+f-2     (B (x 1))
+f-3     (B (x 2))
+For a total of 4 facts.
+CLIPS> (retract *)
+CLIPS> (load-facts "Temp//fctsav2.fct")
+TRUE
+CLIPS> (facts *)
+f-4     (A (x 1))
+For a total of 1 fact.
+CLIPS> (retract *)
+CLIPS> (load-facts "Temp//fctsav3.fct")
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for RHS patterns.
+Function load-facts encountered an error
+FALSE
+CLIPS> (facts *)
+CLIPS> (retract *)
+CLIPS> (set-current-module BAR)
+MAIN
+CLIPS> (load-facts "Temp//fctsav3.fct")
+TRUE
+CLIPS> (facts *)
+f-5     (C (x 1))
+For a total of 1 fact.
+CLIPS> (retract *)
+CLIPS> (load-facts "Temp//fctsav4.fct")
+TRUE
+CLIPS> (facts *)
+f-6     (B (x 1))
+f-7     (B (x 2))
+f-8     (E (x 1))
+For a total of 3 facts.
+CLIPS> (retract *)
+CLIPS> (set-current-module WOZ)
+BAR
+CLIPS> (load-facts "Temp//fctsav5.fct")
+TRUE
+CLIPS> (facts *)
+f-9     (G (x 1))
+f-10    (F (x 1))
+f-11    (G (x 2))
+For a total of 3 facts.
+CLIPS> (retract *)
+CLIPS> (load-facts "Temp//fctsav6.fct")
+TRUE
+CLIPS> (facts *)
+f-12    (E (x 1))
+f-13    (G (x 1))
+f-14    (F (x 1))
+f-15    (G (x 2))
+For a total of 4 facts.
+CLIPS> (retract *)
+CLIPS> (set-current-module FOO)
+WOZ
+CLIPS> (load-facts "Temp//fctsav7.fct")
+TRUE
+CLIPS> (facts *)
+CLIPS> (retract *)
+CLIPS> (load-facts "Temp//fctsav8.fct")
+TRUE
+CLIPS> (facts *)
+f-16    (initial-fact)
+f-17    (A (x 1))
+f-18    (B (x 1))
+f-19    (B (x 2))
+f-20    (E (x 1))
+f-21    (F (x 1))
+For a total of 6 facts.
+CLIPS> (retract *)
+CLIPS> (dribble-off)

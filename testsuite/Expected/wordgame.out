@@ -1,0 +1,128 @@
+FIRE    1 startup: *
+
+The problem is
+
+   GERALD
+ + DONALD
+   ------
+ = ROBERT
+
+FIRE    2 generate-combinations: f-1,f-20
+FIRE    3 generate-combinations: f-2,f-20
+FIRE    4 generate-combinations: f-3,f-20
+FIRE    5 generate-combinations: f-4,f-20
+FIRE    6 generate-combinations: f-5,f-20
+FIRE    7 generate-combinations: f-6,f-20
+FIRE    8 generate-combinations: f-7,f-20
+FIRE    9 generate-combinations: f-8,f-20
+FIRE   10 generate-combinations: f-9,f-20
+FIRE   11 generate-combinations: f-10,f-20
+FIRE   12 generate-combinations: f-1,f-19
+FIRE   13 generate-combinations: f-2,f-19
+FIRE   14 generate-combinations: f-3,f-19
+FIRE   15 generate-combinations: f-4,f-19
+FIRE   16 generate-combinations: f-5,f-19
+FIRE   17 generate-combinations: f-6,f-19
+FIRE   18 generate-combinations: f-7,f-19
+FIRE   19 generate-combinations: f-8,f-19
+FIRE   20 generate-combinations: f-9,f-19
+FIRE   21 generate-combinations: f-10,f-19
+FIRE   22 generate-combinations: f-1,f-18
+FIRE   23 generate-combinations: f-2,f-18
+FIRE   24 generate-combinations: f-3,f-18
+FIRE   25 generate-combinations: f-4,f-18
+FIRE   26 generate-combinations: f-5,f-18
+FIRE   27 generate-combinations: f-6,f-18
+FIRE   28 generate-combinations: f-7,f-18
+FIRE   29 generate-combinations: f-8,f-18
+FIRE   30 generate-combinations: f-9,f-18
+FIRE   31 generate-combinations: f-10,f-18
+FIRE   32 generate-combinations: f-1,f-17
+FIRE   33 generate-combinations: f-2,f-17
+FIRE   34 generate-combinations: f-3,f-17
+FIRE   35 generate-combinations: f-4,f-17
+FIRE   36 generate-combinations: f-5,f-17
+FIRE   37 generate-combinations: f-6,f-17
+FIRE   38 generate-combinations: f-7,f-17
+FIRE   39 generate-combinations: f-8,f-17
+FIRE   40 generate-combinations: f-9,f-17
+FIRE   41 generate-combinations: f-10,f-17
+FIRE   42 generate-combinations: f-1,f-16
+FIRE   43 generate-combinations: f-2,f-16
+FIRE   44 generate-combinations: f-3,f-16
+FIRE   45 generate-combinations: f-4,f-16
+FIRE   46 generate-combinations: f-5,f-16
+FIRE   47 generate-combinations: f-6,f-16
+FIRE   48 generate-combinations: f-7,f-16
+FIRE   49 generate-combinations: f-8,f-16
+FIRE   50 generate-combinations: f-9,f-16
+FIRE   51 generate-combinations: f-10,f-16
+FIRE   52 generate-combinations: f-1,f-15
+FIRE   53 generate-combinations: f-2,f-15
+FIRE   54 generate-combinations: f-3,f-15
+FIRE   55 generate-combinations: f-4,f-15
+FIRE   56 generate-combinations: f-5,f-15
+FIRE   57 generate-combinations: f-6,f-15
+FIRE   58 generate-combinations: f-7,f-15
+FIRE   59 generate-combinations: f-8,f-15
+FIRE   60 generate-combinations: f-9,f-15
+FIRE   61 generate-combinations: f-10,f-15
+FIRE   62 generate-combinations: f-1,f-14
+FIRE   63 generate-combinations: f-2,f-14
+FIRE   64 generate-combinations: f-3,f-14
+FIRE   65 generate-combinations: f-4,f-14
+FIRE   66 generate-combinations: f-5,f-14
+FIRE   67 generate-combinations: f-6,f-14
+FIRE   68 generate-combinations: f-7,f-14
+FIRE   69 generate-combinations: f-8,f-14
+FIRE   70 generate-combinations: f-9,f-14
+FIRE   71 generate-combinations: f-10,f-14
+FIRE   72 generate-combinations: f-1,f-13
+FIRE   73 generate-combinations: f-2,f-13
+FIRE   74 generate-combinations: f-3,f-13
+FIRE   75 generate-combinations: f-4,f-13
+FIRE   76 generate-combinations: f-5,f-13
+FIRE   77 generate-combinations: f-6,f-13
+FIRE   78 generate-combinations: f-7,f-13
+FIRE   79 generate-combinations: f-8,f-13
+FIRE   80 generate-combinations: f-9,f-13
+FIRE   81 generate-combinations: f-10,f-13
+FIRE   82 generate-combinations: f-1,f-12
+FIRE   83 generate-combinations: f-2,f-12
+FIRE   84 generate-combinations: f-3,f-12
+FIRE   85 generate-combinations: f-4,f-12
+FIRE   86 generate-combinations: f-5,f-12
+FIRE   87 generate-combinations: f-6,f-12
+FIRE   88 generate-combinations: f-7,f-12
+FIRE   89 generate-combinations: f-8,f-12
+FIRE   90 generate-combinations: f-9,f-12
+FIRE   91 generate-combinations: f-10,f-12
+FIRE   92 generate-combinations: f-1,f-11
+FIRE   93 generate-combinations: f-2,f-11
+FIRE   94 find-solution: f-66,f-21,f-79,f-98,f-85,f-110,f-47,f-34,f-53,f-112
+A Solution is:
+
+  G = 1
+  E = 9
+  R = 7
+  A = 4
+  L = 8
+  D = 5
+  O = 2
+  N = 6
+  B = 3
+  T = 0
+
+   197485
+ + 526485
+   ------
+ = 723970
+
+FIRE   95 generate-combinations: f-3,f-11
+FIRE   96 generate-combinations: f-4,f-11
+FIRE   97 generate-combinations: f-5,f-11
+FIRE   98 generate-combinations: f-6,f-11
+FIRE   99 generate-combinations: f-7,f-11
+FIRE  100 generate-combinations: f-8,f-11
+FIRE  101 generate-combinations: f-9,f-11
+FIRE  102 generate-combinations: f-10,f-11

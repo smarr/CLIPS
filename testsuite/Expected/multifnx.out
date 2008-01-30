@@ -1,0 +1,563 @@
+TRUE
+CLIPS> (batch "multifnx.bat")
+TRUE
+CLIPS> (clear)                            ; 10.3.1
+CLIPS> (create$)                        ; 10.3.1
+()
+CLIPS> (create$ a "a" 3 5.1 [x])          ; 10.3.1
+(a "a" 3 5.1 [x])
+CLIPS> (create$ (create$) (create$))  ; 10.3.1
+()
+CLIPS> (create$ (create$ a b) (create$ c)); 10.3.1
+(a b c)
+CLIPS> (create$ a (create$ e f))          ; 10.3.1
+(a e f)
+CLIPS> (create$ (create$ d x y) a 2)      ; 10.3.1
+(d x y a 2)
+CLIPS> (create$ hammer drill saw screw pliers wrench)
+(hammer drill saw screw pliers wrench)
+CLIPS> (create$ (+ 3 4) (* 2 3) (/ 8 4))
+(7 6 2.0)
+CLIPS> (nth$)                              ; 10.3.2
+[ARGACCES4] Function nth$ expected exactly 2 argument(s)
+CLIPS> (nth$ 1)                           ; 10.3.2
+[ARGACCES4] Function nth$ expected exactly 2 argument(s)
+CLIPS> (nth$ 2 (create$ a b c) 5)          ; 10.3.2
+[ARGACCES4] Function nth$ expected exactly 2 argument(s)
+CLIPS> (nth$ a (create$ x y z))           ; 10.3.2
+[ARGACCES5] Function nth$ expected argument #1 to be of type integer
+CLIPS> (nth$ 1 x)                         ; 10.3.2
+[ARGACCES5] Function nth$ expected argument #2 to be of type multifield
+CLIPS> (nth$ 2 (create$ d e f))         ; 10.3.2
+e
+CLIPS> (nth$ -1 (create$ x y z))          ; 10.3.2
+nil
+CLIPS> (nth$ 0 (create$ x y z))           ; 10.3.2
+nil
+CLIPS> (nth$ 4 (create$ x y z))            ; 10.3.2
+nil
+CLIPS> (nth$ 2 (create$ x y z))            ; 10.3.2
+y
+CLIPS> (nth$ -1 (create$))                ; 10.3.2
+nil
+CLIPS> (nth$ 0 (create$))                 ; 10.3.2
+nil
+CLIPS> (nth$ 1 (create$))                 ; 10.3.2
+nil
+CLIPS> (nth$ 2 (create$))                 ; 10.3.2
+nil
+CLIPS> (nth$ 3 (create$ a b c d e f g))  ; 10.3.2
+c
+CLIPS> (member$)                           ; 10.3.3
+[ARGACCES4] Function member$ expected exactly 2 argument(s)
+CLIPS> (member$ x)                        ; 10.3.3
+[ARGACCES4] Function member$ expected exactly 2 argument(s)
+CLIPS> (member$ x (create$ y x q) r)       ; 10.3.3
+[ARGACCES4] Function member$ expected exactly 2 argument(s)
+CLIPS> (member$ a (create$ 3 4.1 "a" [a] a))
+5
+CLIPS> (member$ "a" (create$ 3 a 4.1 [a] "a"))
+5
+CLIPS> (member$ [a] (create$ 3 4.1 "a" a [a]))
+5
+CLIPS> (member$ 3 (create$ 4.1 3.0 "a" [a] 3 a))
+5
+CLIPS> (member$ 4 (create$ 4 a 4.0 "a" [a]))
+1
+CLIPS> (member$ (create$ a) (create$ b a))
+2
+CLIPS> (member$ a (create$ a b c))        ; 10.3.3
+1
+CLIPS> (member$ x (create$ a b c))        ; 10.3.3
+FALSE
+CLIPS> (member$ blue (create$ red 3 "text" 8.7 blue))
+5
+CLIPS> (member$ 4 (create$ red 3 "text" 8.7 blue))
+FALSE
+CLIPS> (subsetp)                          ; 10.3.4
+[ARGACCES4] Function subsetp expected exactly 2 argument(s)
+CLIPS> (subsetp (create$ a))              ; 10.3.4
+[ARGACCES4] Function subsetp expected exactly 2 argument(s)
+CLIPS> (subsetp (create$ a) (create$ b) 3)
+[ARGACCES4] Function subsetp expected exactly 2 argument(s)
+CLIPS> (subsetp 1 (create$ a))            ; 10.3.4
+[ARGACCES5] Function subsetp expected argument #1 to be of type multifield
+CLIPS> (subsetp (create$ a) a)            ; 10.3.4
+[ARGACCES5] Function subsetp expected argument #2 to be of type multifield
+CLIPS> (subsetp (create$) (create$))      ; 10.3.4
+TRUE
+CLIPS> (subsetp (create$) (create$ x y))  ; 10.3.4
+TRUE
+CLIPS> (subsetp (create$ x y) (create$))  ; 10.3.4
+FALSE
+CLIPS> (subsetp (create$ a b) (create$ b a))
+TRUE
+CLIPS> (subsetp (create$ a) (create$ a b))
+TRUE
+CLIPS> (subsetp (create$ b) (create$ a b))
+TRUE
+CLIPS> (subsetp (create$ b a a b) (create$ c a b d))
+TRUE
+CLIPS> (subsetp (create$ a b c) (create$ a b d))
+FALSE
+CLIPS> (subsetp (create$ a) (create$ 3 4.1 "a" [a])) 
+FALSE
+CLIPS> (subsetp (create$ [a]) (create$ 3 4.1 "a" a))  
+FALSE
+CLIPS> (subsetp (create$ "a") (create$ 3 4.1 a [a]))  
+FALSE
+CLIPS> (subsetp (create$ 3) (create$ 3.0 "a" [a]))   
+FALSE
+CLIPS> (subsetp (create$ 3.0) (create$ 3 "a" [a])) 
+FALSE
+CLIPS> (subsetp (create$ a) (create$ 3 a 4.1)) 
+TRUE
+CLIPS> (subsetp (create$ [a]) (create$ [a] 3 4.1))  
+TRUE
+CLIPS> (subsetp (create$ "a") (create$ 3 4.1 "a"))  
+TRUE
+CLIPS> (subsetp (create$ 3) (create$ 3 "a" [a]))   
+TRUE
+CLIPS> (subsetp (create$ 3.0) (create$ "a" [a] 3.0)) 
+TRUE
+CLIPS> (subsetp (create$ hammer saw drill)
+         (create$ hammer drill wrench pliers saw))
+TRUE
+CLIPS> (subsetp (create$ wrench crowbar)
+         (create$ hammer drill wrench pliers saw))  
+FALSE
+CLIPS> (delete$)                        ; 10.3.5
+[ARGACCES4] Function delete$ expected exactly 3 argument(s)
+CLIPS> (delete$ 1)                        ; 10.3.5
+[ARGACCES4] Function delete$ expected exactly 3 argument(s)
+CLIPS> (delete$ (create$ a b c) [x] 3 3)    ; 10.3.5
+[ARGACCES4] Function delete$ expected exactly 3 argument(s)
+CLIPS> (delete$ (create$ a b c d) 3.4 3.4)    ; 10.3.5
+[ARGACCES5] Function delete$ expected argument #2 to be of type integer
+CLIPS> (delete$ (create$ a b c d) a a)      ; 10.3.5
+[ARGACCES5] Function delete$ expected argument #2 to be of type integer
+CLIPS> (delete$ "a b" 3 3)                ; 10.3.5
+[ARGACCES5] Function delete$ expected argument #1 to be of type multifield
+CLIPS> (delete$ (create$ x 1 z) -1 -1)     ; 10.3.5
+[MULTIFUN1] Multifield index -1 out of range 1..3 in function delete$.
+()
+CLIPS> (delete$ (create$ x 4.2 z) 0 0)    ; 10.3.5
+[MULTIFUN1] Multifield index 0 out of range 1..3 in function delete$.
+()
+CLIPS> (delete$ (create$ [ab] cd ef) 1 1) ; 10.3.5
+(cd ef)
+CLIPS> (delete$ (create$ abc d ef) 2 2)   ; 10.3.5
+(abc ef)
+CLIPS> (delete$ (create$ abcd 2 e) 3 3)   ; 10.3.5
+(abcd 2)
+CLIPS> (delete$ (create$ q 3 "tx") 4 4)   ; 10.3.5
+[MULTIFUN1] Multifield index 4 out of range 1..3 in function delete$.
+()
+CLIPS> (delete$ (create$) -1 -1)             ; 10.3.5
+[MULTIFUN1] Multifield index -1 out of range 1..0 in function delete$.
+()
+CLIPS> (delete$ (create$) 0 0)              ; 10.3.5
+[MULTIFUN1] Multifield index 0 out of range 1..0 in function delete$.
+()
+CLIPS> (delete$ (create$) 1 1)              ; 10.3.5
+[MULTIFUN1] Multifield index 1 out of range 1..0 in function delete$.
+()
+CLIPS> (delete$ (create$) 2 2)              ; 10.3.5
+[MULTIFUN1] Multifield index 2 out of range 1..0 in function delete$.
+()
+CLIPS> (delete$ (create$ hammer drill saw pliers wrench) 3 3)
+(hammer drill pliers wrench)
+CLIPS> (delete$ (create$ computer printer hard-disk) 1 1)
+(printer hard-disk)
+CLIPS> (delete$ (create$ computer printer hard-disk floppy-drive) 2 3)
+(computer floppy-drive)
+CLIPS> (delete$ (create$ computer printer hard-disk floppy-drive) 1 4)
+()
+CLIPS> (delete$ (create$ computer printer hard-disk floppy-drive) 1 2)
+(hard-disk floppy-drive)
+CLIPS> (delete$ (create$ computer printer hard-disk floppy-drive) 1 3)
+(floppy-drive)
+CLIPS> (delete$ (create$ computer printer hard-disk floppy-drive) 2 4)
+(computer)
+CLIPS> (delete$ (create$ computer printer hard-disk floppy-drive) 3 4)
+(computer printer)
+CLIPS> (delete$ (create$ computer printer hard-disk floppy-drive) 3 2)
+[MULTIFUN1] Multifield index range 3..2 out of range 1..4 in function delete$.
+()
+CLIPS> (length)                           ; 10.3.6
+[ARGACCES4] Function length expected exactly 1 argument(s)
+CLIPS> (length "x" 3)                     ; 10.3.6
+[ARGACCES4] Function length expected exactly 1 argument(s)
+CLIPS> (length [def])                     ; 10.3.6
+[ARGACCES5] Function length expected argument #1 to be of type multifield, symbol, or string
+CLIPS> (length 4.3)                       ; 10.3.6
+[ARGACCES5] Function length expected argument #1 to be of type multifield, symbol, or string
+CLIPS> (length 567)                       ; 10.3.6
+[ARGACCES5] Function length expected argument #1 to be of type multifield, symbol, or string
+CLIPS> (length blah-blah-blah)            ; 10.3.6
+14
+CLIPS> (length "")                        ; 10.3.6
+0
+CLIPS> (length "Hello world")             ; 10.3.6
+11
+CLIPS> (length (create$))                 ; 10.3.6
+0
+CLIPS> (length (create$ a b c))           ; 10.3.6
+3
+CLIPS> (length (create$ a b c d e f g)) ; 10.3.6
+7
+CLIPS> (length "cat")                     ; 10.3.6
+3
+CLIPS> (explode$)                      ; 10.3.7
+[ARGACCES4] Function explode$ expected exactly 1 argument(s)
+CLIPS> (explode$ "x" 3)                ; 10.3.7
+[ARGACCES4] Function explode$ expected exactly 1 argument(s)
+CLIPS> (explode$ [jocko])              ; 10.3.7
+[ARGACCES5] Function explode$ expected argument #1 to be of type string
+CLIPS> (explode$ 134.78)               ; 10.3.7
+[ARGACCES5] Function explode$ expected argument #1 to be of type string
+CLIPS> (explode$ -8939)                ; 10.3.7
+[ARGACCES5] Function explode$ expected argument #1 to be of type string
+CLIPS> (explode$ yak-yak)              ; 10.3.7
+[ARGACCES5] Function explode$ expected argument #1 to be of type string
+CLIPS> (explode$ "")                   ; 10.3.7
+()
+CLIPS> (explode$ "Hello world")        ; 10.3.7
+(Hello world)
+CLIPS> (explode$ "-3.45 89 [xyx] thishere \"a string\"")
+(-3.45 89 [xyx] thishere "a string")
+CLIPS> (explode$ "hammer drill saw screw")
+(hammer drill saw screw)
+CLIPS> (explode$ "1 2 abc 3 4 \"abc\" \"def\"")
+(1 2 abc 3 4 "abc" "def")
+CLIPS> (explode$ "?x ~ )")             ; 10.3.7
+("?x" "~" ")")
+CLIPS> (implode$)                      ; 10.3.8
+[ARGACCES4] Function implode$ expected exactly 1 argument(s)
+CLIPS> (implode$ (create$ a b) dkj)    ; 10.3.8
+[ARGACCES4] Function implode$ expected exactly 1 argument(s)
+CLIPS> (implode$ [outstanding])        ; 10.3.8
+[ARGACCES5] Function implode$ expected argument #1 to be of type multifield
+CLIPS> (implode$ 3499.3)               ; 10.3.8
+[ARGACCES5] Function implode$ expected argument #1 to be of type multifield
+CLIPS> (implode$ 203033)               ; 10.3.8
+[ARGACCES5] Function implode$ expected argument #1 to be of type multifield
+CLIPS> (implode$ moresymbols)          ; 10.3.8
+[ARGACCES5] Function implode$ expected argument #1 to be of type multifield
+CLIPS> (implode$ "Another string")     ; 10.3.8
+[ARGACCES5] Function implode$ expected argument #1 to be of type multifield
+CLIPS> (implode$ (create$))            ; 10.3.8
+""
+CLIPS> (implode$ (create$ axydk "here it is" -348e3 893 [instance]))
+"axydk "here it is" -348000.0 893 [instance]"
+CLIPS> (implode$ (create$ hammer drill screwdriver))
+"hammer drill screwdriver"
+CLIPS> (implode$ (create$ 1 "abc" def "ghi" 2))
+"1 "abc" def "ghi" 2"
+CLIPS> (implode$ (explode$ "abc      def     ghi"))
+"abc def ghi"
+CLIPS> (subseq$)                        ; 10.3.9
+[ARGACCES4] Function subseq$ expected exactly 3 argument(s)
+CLIPS> (subseq$ 1)                      ; 10.3.9
+[ARGACCES4] Function subseq$ expected exactly 3 argument(s)
+CLIPS> (subseq$ 1 3)                    ; 10.3.9
+[ARGACCES4] Function subseq$ expected exactly 3 argument(s)
+CLIPS> (subseq$ (create$ a c d) 1 2 3)  ; 10.3.9
+[ARGACCES4] Function subseq$ expected exactly 3 argument(s)
+CLIPS> (subseq$ (create$ a b c) a 2)    ; 10.3.9
+[ARGACCES5] Function subseq$ expected argument #2 to be of type integer
+CLIPS> (subseq$ (create$ d e) 2 a)      ; 10.3.9
+[ARGACCES5] Function subseq$ expected argument #3 to be of type integer
+CLIPS> (subseq$ this 1 2)               ; 10.3.9
+[ARGACCES5] Function subseq$ expected argument #1 to be of type multifield
+CLIPS> (subseq$ (create$ a b c) 1 2)  ; 10.3.9
+(a b)
+CLIPS> (subseq$ (create$ a b c) 1 2)  ; 10.3.9
+(a b)
+CLIPS> (subseq$ (create$ a b c) 1 2.5)  ; 10.3.9
+[ARGACCES5] Function subseq$ expected argument #3 to be of type integer
+CLIPS> (subseq$ (create$ a b c) 1 3)    ; 10.3.9
+(a b c)
+CLIPS> (subseq$ (create$ a b c) -1 3)   ; 10.3.9
+(a b c)
+CLIPS> (subseq$ (create$ a "b" c) 1 4)  ; 10.3.9
+(a "b" c)
+CLIPS> (subseq$ (create$ a b c) 3 1)    ; 10.3.9
+()
+CLIPS> (subseq$ (create$ 3 b c) 1 1)    ; 10.3.9
+(3)
+CLIPS> (subseq$ (create$ a 4.1 c) 2 2)  ; 10.3.9
+(4.1)
+CLIPS> (subseq$ (create$ a b [x]) 3 3)  ; 10.3.9
+([x])
+CLIPS> (subseq$ (create$ a b c) 0 0)    ; 10.3.9
+()
+CLIPS> (subseq$ (create$ a b c) 4 4)    ; 10.3.9
+()
+CLIPS> (subseq$ (create$ a b c d) 2 3)  ; 10.3.9
+(b c)
+CLIPS> (subseq$ (create$ a b c) 5 7)    ; 10.3.9
+()
+CLIPS> (subseq$ (create$ a b c) -1 0)   ; 10.3.9
+()
+CLIPS> (subseq$ (create$ hammer drill wrench pliers) 3 4)
+(wrench pliers)
+CLIPS> (subseq$ (create$ a "abc" def "ghi" 2)  1 1)
+(a)
+CLIPS> (replace$)                       ; 10.3.10
+[ARGACCES4] Function replace$ expected at least 4 argument(s)
+CLIPS> (replace$ 1)                     ; 10.3.10
+[ARGACCES4] Function replace$ expected at least 4 argument(s)
+CLIPS> (replace$ (create$ a b) 1 1)       ; 10.3.10
+[ARGACCES4] Function replace$ expected at least 4 argument(s)
+CLIPS> (replace$ (create$ a b) 1 1 3 4)   ; 10.3.10
+(3 4 b)
+CLIPS> (replace$ (create$ a) 1.5 1.5 [x])   ; 10.3.10
+[ARGACCES5] Function replace$ expected argument #2 to be of type integer
+CLIPS> (replace$ 3.5 1 1 a)               ; 10.3.10
+[ARGACCES5] Function replace$ expected argument #1 to be of type multifield
+CLIPS> (replace$ (create$ a b) 2 2(create$))
+(a)
+CLIPS> (replace$ (create$ a b) -1 -1 x)    ; 10.3.10
+[MULTIFUN1] Multifield index -1 out of range 1..2 in function replace$.
+()
+CLIPS> (replace$ (create$ c d) 0 0 3.5)   ; 10.3.10
+[MULTIFUN1] Multifield index 0 out of range 1..2 in function replace$.
+()
+CLIPS> (replace$ (create$ "c" "d") 1 1 13)
+(13 "d")
+CLIPS> (replace$ (create$ 3 5) 2 2 "x")   ; 10.3.10
+(3 "x")
+CLIPS> (replace$ (create$ [a] [b]) 3 3 3) ; 10.3.10
+[MULTIFUN1] Multifield index 3 out of range 1..2 in function replace$.
+()
+CLIPS> (replace$ (create$ drill wrench pliers) 3 3 machete)
+(drill wrench machete)
+CLIPS> (replace$ (create$ drill wrench pliers hammer) 2 3 machete)
+(drill machete hammer)
+CLIPS> (replace$ (create$ drill wrench pliers hammer) 2 4 machete knife)
+(drill machete knife)
+CLIPS> (replace$ (create$ drill wrench pliers hammer) 1 4 (create$))
+()
+CLIPS> (replace$ (create$ drill wrench pliers hammer) 1 2 machete (create$))
+(machete pliers hammer)
+CLIPS> (replace$ (create$ drill wrench pliers hammer) 3 4 machete)
+(drill wrench machete)
+CLIPS> (replace$ (create$ drill wrench pliers hammer) 4 3 machete)
+[MULTIFUN1] Multifield index range 4..3 out of range 1..4 in function replace$.
+()
+CLIPS> (insert$ (create$ drill wrench pliers hammer) 1 machete)
+(machete drill wrench pliers hammer)
+CLIPS> (insert$ (create$ drill wrench pliers hammer) 2 machete)
+(drill machete wrench pliers hammer)
+CLIPS> (insert$ (create$ drill wrench pliers hammer) 3 machete)
+(drill wrench machete pliers hammer)
+CLIPS> (insert$ (create$ drill wrench pliers hammer) 4 machete)
+(drill wrench pliers machete hammer)
+CLIPS> (insert$ (create$ drill wrench pliers hammer) 3 machete knife)
+(drill wrench machete knife pliers hammer)
+CLIPS> (insert$ (create$ drill wrench pliers hammer) 2 machete knife (create$))
+(drill machete knife wrench pliers hammer)
+CLIPS> (insert$ (create$ drill wrench pliers hammer) 5 machete)
+(drill wrench pliers hammer machete)
+CLIPS> (progn$)
+
+[EXPRNPSR2] Expected a constant, variable, or expression.
+CLIPS> (progn$ abc)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for progn$.
+CLIPS> (progn$ (create$) (bind ?field))
+FALSE
+CLIPS> (progn$ (?field (create$)) (bind ?field))
+[MULTIFUN2] Cannot rebind field variable in function progn$.
+CLIPS> (progn (bind ?x 0) 
+   (progn$ (create$ 1 2 3) (bind ?x (+ ?x ?field))))
+[EVALUATN1] Variable field is unbound
+[ARGACCES5] Function + expected argument #2 to be of type integer or float
+FALSE
+CLIPS> (progn (bind ?x 0) 
+   (progn$ (?field (create$ 1 2 3)) (bind ?x (+ ?x ?field))))
+6
+CLIPS> (progn
+  (bind ?outer (create$ abc def ghi jkl mno))
+  (progn$ (?x ?outer)
+    (bind ?inner (subseq$ ?outer ?x-index (length$ ?outer)))
+    (progn$ (?y ?inner)
+       (printout t ?y " "))
+    (printout t crlf)))
+abc def ghi jkl mno 
+def ghi jkl mno 
+ghi jkl mno 
+jkl mno 
+mno 
+CLIPS> (foreach)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for foreach.
+CLIPS> (foreach abc)
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for foreach.
+CLIPS> (foreach (create$) (bind ?field))
+
+[PRNTUTIL2] Syntax Error:  Check appropriate syntax for foreach.
+CLIPS> (foreach ?field (create$) (bind ?field))
+[MULTIFUN2] Cannot rebind field variable in function foreach.
+CLIPS> (progn (bind ?x 0) 
+   (foreach ?field (create$ 1 2 3) (bind ?x (+ ?x ?field))))
+6
+CLIPS> (progn
+  (bind ?outer (create$ abc def ghi jkl mno))
+  (foreach ?x ?outer
+    (bind ?inner (subseq$ ?outer ?x-index (length$ ?outer)))
+    (foreach ?y ?inner
+       (printout t ?y " "))
+    (printout t crlf)))
+abc def ghi jkl mno 
+def ghi jkl mno 
+ghi jkl mno 
+jkl mno 
+mno 
+CLIPS> (first$)
+[ARGACCES4] Function first$ expected exactly 1 argument(s)
+CLIPS> (first$ 1)
+[ARGACCES5] Function first$ expected argument #1 to be of type multifield
+CLIPS> (first$ (create$ a b c) a)
+[ARGACCES4] Function first$ expected exactly 1 argument(s)
+CLIPS> (first$ (create$ a b c))
+(a)
+CLIPS> (first$ (create$ a))
+(a)
+CLIPS> (first$ (create$))
+()
+CLIPS> (rest$)
+[ARGACCES4] Function rest$ expected exactly 1 argument(s)
+CLIPS> (rest$ 1)
+[ARGACCES5] Function rest$ expected argument #1 to be of type multifield
+CLIPS> (rest$ (create$ a b c) a)
+[ARGACCES4] Function rest$ expected exactly 1 argument(s)
+CLIPS> (rest$ (create$ a b c))
+(b c)
+CLIPS> (rest$ (create$ a))
+()
+CLIPS> (rest$ (create$))
+()
+CLIPS> (mv-delete)                        
+[ARGACCES4] Function mv-delete expected exactly 2 argument(s)
+CLIPS> (mv-delete 1)                        
+[ARGACCES4] Function mv-delete expected exactly 2 argument(s)
+CLIPS> (mv-delete 3 (create$ a b c) [x])    
+[ARGACCES4] Function mv-delete expected exactly 2 argument(s)
+CLIPS> (mv-delete 3.4 (create$ a b c d))    
+[ARGACCES5] Function mv-delete expected argument #1 to be of type integer
+CLIPS> (mv-delete a (create$ a b c d))      
+[ARGACCES5] Function mv-delete expected argument #1 to be of type integer
+CLIPS> (mv-delete 3 "a b")                
+[ARGACCES5] Function mv-delete expected argument #2 to be of type multifield
+CLIPS> (mv-delete -1 (create$ x 1 z))     
+[MULTIFUN1] Multifield index -1 out of range 1..3 in function mv-delete.
+()
+CLIPS> (mv-delete 0 (create$ x 4.2 z))    
+[MULTIFUN1] Multifield index 0 out of range 1..3 in function mv-delete.
+()
+CLIPS> (mv-delete 1 (create$ [ab] cd ef)) 
+(cd ef)
+CLIPS> (mv-delete 2 (create$ abc d ef))   
+(abc ef)
+CLIPS> (mv-delete 3 (create$ abcd 2 e))   
+(abcd 2)
+CLIPS> (mv-delete 4 (create$ q 3 "tx"))   
+[MULTIFUN1] Multifield index 4 out of range 1..3 in function mv-delete.
+()
+CLIPS> (mv-delete -1 (create$))             
+[MULTIFUN1] Multifield index -1 out of range 1..0 in function mv-delete.
+()
+CLIPS> (mv-delete 0 (create$))              
+[MULTIFUN1] Multifield index 0 out of range 1..0 in function mv-delete.
+()
+CLIPS> (mv-delete 1 (create$))              
+[MULTIFUN1] Multifield index 1 out of range 1..0 in function mv-delete.
+()
+CLIPS> (mv-delete 2 (create$))              
+[MULTIFUN1] Multifield index 2 out of range 1..0 in function mv-delete.
+()
+CLIPS> (mv-delete 3 (create$ hammer drill saw pliers wrench))
+(hammer drill pliers wrench)
+CLIPS> (mv-delete 1 (create$ computer printer hard-disk))
+(printer hard-disk)
+CLIPS> (mv-subseq)                        
+[ARGACCES4] Function mv-subseq expected exactly 3 argument(s)
+CLIPS> (mv-subseq 1)                      
+[ARGACCES4] Function mv-subseq expected exactly 3 argument(s)
+CLIPS> (mv-subseq 1 3)                    
+[ARGACCES4] Function mv-subseq expected exactly 3 argument(s)
+CLIPS> (mv-subseq 1 2 (create$ a c d) 3)  
+[ARGACCES4] Function mv-subseq expected exactly 3 argument(s)
+CLIPS> (mv-subseq a 2 (create$ a b c))    
+[ARGACCES5] Function mv-subseq expected argument #1 to be of type integer
+CLIPS> (mv-subseq 2 a (create$ d e))      
+[ARGACCES5] Function mv-subseq expected argument #2 to be of type integer
+CLIPS> (mv-subseq 1 2 this)               
+[ARGACCES5] Function mv-subseq expected argument #3 to be of type multifield
+CLIPS> (mv-subseq 1 2 (create$ a b c))  
+(a b)
+CLIPS> (mv-subseq 1 2 (create$ a b c))  
+(a b)
+CLIPS> (mv-subseq 1 2.5 (create$ a b c))  
+[ARGACCES5] Function mv-subseq expected argument #2 to be of type integer
+CLIPS> (mv-subseq 1 3 (create$ a b c))    
+(a b c)
+CLIPS> (mv-subseq -1 3 (create$ a b c))   
+(a b c)
+CLIPS> (mv-subseq 1 4 (create$ a "b" c))  
+(a "b" c)
+CLIPS> (mv-subseq 3 1 (create$ a b c))    
+()
+CLIPS> (mv-subseq 1 1 (create$ 3 b c))    
+(3)
+CLIPS> (mv-subseq 2 2 (create$ a 4.1 c))  
+(4.1)
+CLIPS> (mv-subseq 3 3 (create$ a b [x]))  
+([x])
+CLIPS> (mv-subseq 0 0 (create$ a b c))    
+()
+CLIPS> (mv-subseq 4 4 (create$ a b c))    
+()
+CLIPS> (mv-subseq 2 3 (create$ a b c d))  
+(b c)
+CLIPS> (mv-subseq 5 7 (create$ a b c))    
+()
+CLIPS> (mv-subseq -1 0 (create$ a b c))   
+()
+CLIPS> (mv-subseq 3 4 (create$ hammer drill wrench pliers))
+(wrench pliers)
+CLIPS> (mv-subseq 1 1 (create$ a "abc" def "ghi" 2))
+(a)
+CLIPS> (mv-replace)                       
+[ARGACCES4] Function mv-replace expected exactly 3 argument(s)
+CLIPS> (mv-replace 1)                     
+[ARGACCES4] Function mv-replace expected exactly 3 argument(s)
+CLIPS> (mv-replace 1 (create$ a b))       
+[ARGACCES4] Function mv-replace expected exactly 3 argument(s)
+CLIPS> (mv-replace 1 (create$ a b) 3 4)   
+[ARGACCES4] Function mv-replace expected exactly 3 argument(s)
+CLIPS> (mv-replace 1.5 (create$ a) [x])   
+[ARGACCES5] Function mv-replace expected argument #1 to be of type integer
+CLIPS> (mv-replace 1 3.5 a)               
+[ARGACCES5] Function mv-replace expected argument #2 to be of type multifield
+CLIPS> (mv-replace 2 (create$ a b) (create$))
+(a)
+CLIPS> (mv-replace -1 (create$ a b) x)    
+[MULTIFUN1] Multifield index -1 out of range 1..2 in function mv-replace.
+()
+CLIPS> (mv-replace 0 (create$ c d) 3.5)   
+[MULTIFUN1] Multifield index 0 out of range 1..2 in function mv-replace.
+()
+CLIPS> (mv-replace 1 (create$ "c" "d") 13)
+(13 "d")
+CLIPS> (mv-replace 2 (create$ 3 5) "x")   
+(3 "x")
+CLIPS> (mv-replace 3 (create$ [a] [b]) 3) 
+[MULTIFUN1] Multifield index 3 out of range 1..2 in function mv-replace.
+()
+CLIPS> (mv-replace 3 (create$ drill wrench pliers) machete)
+(drill wrench machete)
+CLIPS> (dribble-off)

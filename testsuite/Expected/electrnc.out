@@ -1,0 +1,144 @@
+FIRE    1 startup: *
+FIRE    2 compute-response-1st-time: f-1
+FIRE    3 compute-response-other-times: f-3
+FIRE    4 compute-response-other-times: f-5
+FIRE    5 merge-responses: f-6,f-4
+FIRE    6 compute-response-other-times: f-7
+FIRE    7 compute-response-other-times: f-10
+FIRE    8 compute-response-other-times: f-12
+FIRE    9 merge-responses: f-13,f-11
+FIRE   10 compute-response-other-times: f-14
+FIRE   11 compute-response-other-times: f-17
+FIRE   12 compute-response-other-times: f-19
+FIRE   13 merge-responses: f-20,f-18
+FIRE   14 compute-response-other-times: f-21
+FIRE   15 merge-responses: f-23,f-16
+FIRE   16 compute-response-other-times: f-24
+FIRE   17 compute-response-other-times: f-27
+FIRE   18 merge-responses: f-28,f-26
+FIRE   19 compute-response-other-times: f-29
+FIRE   20 compute-response-other-times: f-32
+FIRE   21 merge-responses: f-33,f-31
+FIRE   22 compute-response-other-times: f-34
+FIRE   23 compute-response-other-times: f-37
+FIRE   24 merge-responses: f-38,f-2
+FIRE   25 compute-response-other-times: f-39
+FIRE   26 compute-response-other-times: f-42
+FIRE   27 merge-responses: f-43,f-36
+FIRE   28 compute-response-other-times: f-44
+FIRE   29 compute-response-other-times: f-47
+FIRE   30 merge-responses: f-48,f-46
+FIRE   31 merge-responses: f-50,f-35
+FIRE   32 compute-response-other-times: f-49
+FIRE   33 compute-response-other-times: f-53
+FIRE   34 merge-responses: f-54,f-52
+FIRE   35 compute-response-other-times: f-55
+FIRE   36 compute-response-other-times: f-58
+FIRE   37 compute-response-other-times: f-60
+FIRE   38 merge-responses: f-61,f-59
+FIRE   39 merge-responses: f-63,f-22
+FIRE   40 compute-response-other-times: f-62
+FIRE   41 merge-responses: f-65,f-57
+FIRE   42 merge-responses: f-67,f-25
+FIRE   43 compute-response-other-times: f-66
+FIRE   44 compute-response-other-times: f-70
+FIRE   45 merge-responses: f-71,f-69
+FIRE   46 merge-responses: f-73,f-56
+FIRE   47 compute-response-other-times: f-72
+FIRE   48 merge-responses: f-75,f-9
+FIRE   49 compute-response-other-times: f-76
+FIRE   50 compute-response-other-times: f-79
+FIRE   51 merge-responses: f-80,f-78
+FIRE   52 merge-responses: f-82,f-8
+FIRE   53 compute-response-other-times: f-81
+FIRE   54 merge-responses: f-84,f-41
+FIRE   55 merge-responses: f-86,f-40
+FIRE   56 compute-response-other-times: f-85
+FIRE   57 compute-response-other-times: f-89
+FIRE   58 compute-response-other-times: f-91
+FIRE   59 merge-responses: f-92,f-90
+FIRE   60 compute-response-other-times: f-93
+FIRE   61 compute-response-other-times: f-96
+FIRE   62 compute-response-other-times: f-98
+FIRE   63 merge-responses: f-99,f-97
+FIRE   64 compute-response-other-times: f-100
+FIRE   65 compute-response-other-times: f-103
+FIRE   66 compute-response-other-times: f-105
+FIRE   67 merge-responses: f-106,f-104
+FIRE   68 compute-response-other-times: f-107
+FIRE   69 merge-responses: f-109,f-102
+FIRE   70 compute-response-other-times: f-110
+FIRE   71 compute-response-other-times: f-113
+FIRE   72 merge-responses: f-114,f-112
+FIRE   73 compute-response-other-times: f-115
+FIRE   74 compute-response-other-times: f-118
+FIRE   75 merge-responses: f-119,f-117
+FIRE   76 compute-response-other-times: f-120
+FIRE   77 compute-response-other-times: f-123
+FIRE   78 merge-responses: f-124,f-88
+FIRE   79 compute-response-other-times: f-125
+FIRE   80 compute-response-other-times: f-128
+FIRE   81 merge-responses: f-129,f-122
+FIRE   82 merge-responses: f-131,f-45
+FIRE   83 compute-response-other-times: f-130
+FIRE   84 compute-response-other-times: f-134
+FIRE   85 merge-responses: f-135,f-133
+FIRE   86 merge-responses: f-137,f-121
+FIRE   87 merge-responses: f-138,f-51
+FIRE   88 compute-response-other-times: f-136
+FIRE   89 compute-response-other-times: f-141
+FIRE   90 merge-responses: f-142,f-140
+FIRE   91 merge-responses: f-144,f-116
+FIRE   92 compute-response-other-times: f-143
+FIRE   93 compute-response-other-times: f-147
+FIRE   94 compute-response-other-times: f-149
+FIRE   95 merge-responses: f-150,f-148
+FIRE   96 merge-responses: f-152,f-108
+FIRE   97 merge-responses: f-153,f-64
+FIRE   98 compute-response-other-times: f-151
+FIRE   99 merge-responses: f-155,f-146
+FIRE  100 merge-responses: f-157,f-111
+FIRE  101 merge-responses: f-158,f-68
+FIRE  102 compute-response-other-times: f-156
+FIRE  103 compute-response-other-times: f-161
+FIRE  104 merge-responses: f-162,f-160
+FIRE  105 merge-responses: f-164,f-101
+FIRE  106 compute-response-other-times: f-163
+FIRE  107 merge-responses: f-166,f-95
+FIRE  108 merge-responses: f-168,f-77
+FIRE  109 compute-response-other-times: f-167
+FIRE  110 compute-response-other-times: f-171
+FIRE  111 merge-responses: f-172,f-170
+FIRE  112 merge-responses: f-174,f-94
+FIRE  113 merge-responses: f-175,f-83
+FIRE  114 compute-response-other-times: f-173
+FIRE  115 merge-responses: f-177,f-127
+FIRE  116 merge-responses: f-179,f-126
+FIRE  117 merge-responses: f-180,f-87
+FIRE  118 print-header: *
+ S-1  S-2  S-3  S-4  S-5  S-6  |  L-1  L-2  L-3 
+-------------------------------+----------------
+FIRE  119 print-result: f-182,f-139,*
+  *    1    0    1    *    *   |   0    1    0  
+FIRE  120 print-result: f-182,f-176,*
+  1    *    0    0    *    *   |   0    1    1  
+FIRE  121 print-result: f-182,f-169,*
+  0    1    0    0    *    *   |   0    1    1  
+FIRE  122 print-result: f-182,f-154,*
+  0    0    1    *    *    *   |   0    1    1  
+FIRE  123 print-result: f-182,f-132,*
+  1    0    0    1    *    *   |   0    1    1  
+FIRE  124 print-result: f-182,f-145,*
+  *    1    1    1    *    1   |   1    0    0  
+FIRE  125 print-result: f-182,f-30,*
+  *    1    1    1    0    0   |   1    0    0  
+FIRE  126 print-result: f-182,f-181,*
+  0    0    0    *    *    *   |   1    0    1  
+FIRE  127 print-result: f-182,f-165,*
+  *    1    1    0    *    1   |   1    0    1  
+FIRE  128 print-result: f-182,f-159,*
+  1    0    1    *    *    *   |   1    0    1  
+FIRE  129 print-result: f-182,f-74,*
+  *    1    1    *    1    0   |   1    0    1  
+FIRE  130 print-result: f-182,f-15,*
+  *    1    1    0    0    0   |   1    0    1  

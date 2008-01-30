@@ -1,0 +1,491 @@
+TRUE
+CLIPS> (batch "class.bat")
+TRUE
+CLIPS> (describe-class OBJECT)
+================================================================================
+********************************************************************************
+Abstract: direct instances of this class cannot be created.
+
+Direct Superclasses:
+Inheritance Precedence: OBJECT
+Direct Subclasses: PRIMITIVE USER
+********************************************************************************
+================================================================================
+CLIPS> (describe-class USER)
+================================================================================
+********************************************************************************
+Abstract: direct instances of this class cannot be created.
+
+Direct Superclasses: OBJECT
+Inheritance Precedence: USER OBJECT
+Direct Subclasses: INITIAL-OBJECT doc-test A1 A2 A3 A4 A5 A6 A7 A8 A9 GLOBAL-TEST
+--------------------------------------------------------------------------------
+Recognized message-handlers:
+init primary in class USER
+delete primary in class USER
+create primary in class USER
+print primary in class USER
+direct-modify primary in class USER
+message-modify primary in class USER
+direct-duplicate primary in class USER
+message-duplicate primary in class USER
+********************************************************************************
+================================================================================
+CLIPS> (describe-class PRIMITIVE)
+================================================================================
+********************************************************************************
+Abstract: direct instances of this class cannot be created.
+
+Direct Superclasses: OBJECT
+Inheritance Precedence: PRIMITIVE OBJECT
+Direct Subclasses: NUMBER LEXEME MULTIFIELD ADDRESS INSTANCE
+********************************************************************************
+================================================================================
+CLIPS> (describe-class MULTIFIELD)
+================================================================================
+********************************************************************************
+Abstract: direct instances of this class cannot be created.
+
+Direct Superclasses: PRIMITIVE
+Inheritance Precedence: MULTIFIELD PRIMITIVE OBJECT
+Direct Subclasses:
+********************************************************************************
+================================================================================
+CLIPS> (describe-class NUMBER)
+================================================================================
+********************************************************************************
+Abstract: direct instances of this class cannot be created.
+
+Direct Superclasses: PRIMITIVE
+Inheritance Precedence: NUMBER PRIMITIVE OBJECT
+Direct Subclasses: INTEGER FLOAT
+********************************************************************************
+================================================================================
+CLIPS> (describe-class EXTERNAL-ADDRESS)
+================================================================================
+********************************************************************************
+Abstract: direct instances of this class cannot be created.
+
+Direct Superclasses: ADDRESS
+Inheritance Precedence: EXTERNAL-ADDRESS ADDRESS PRIMITIVE OBJECT
+Direct Subclasses:
+********************************************************************************
+================================================================================
+CLIPS> (describe-class LEXEME)
+================================================================================
+********************************************************************************
+Abstract: direct instances of this class cannot be created.
+
+Direct Superclasses: PRIMITIVE
+Inheritance Precedence: LEXEME PRIMITIVE OBJECT
+Direct Subclasses: SYMBOL STRING
+********************************************************************************
+================================================================================
+CLIPS> (describe-class INTEGER)
+================================================================================
+********************************************************************************
+Abstract: direct instances of this class cannot be created.
+
+Direct Superclasses: NUMBER
+Inheritance Precedence: INTEGER NUMBER PRIMITIVE OBJECT
+Direct Subclasses:
+********************************************************************************
+================================================================================
+CLIPS> (describe-class FLOAT)
+================================================================================
+********************************************************************************
+Abstract: direct instances of this class cannot be created.
+
+Direct Superclasses: NUMBER
+Inheritance Precedence: FLOAT NUMBER PRIMITIVE OBJECT
+Direct Subclasses:
+********************************************************************************
+================================================================================
+CLIPS> (describe-class SYMBOL)
+================================================================================
+********************************************************************************
+Abstract: direct instances of this class cannot be created.
+
+Direct Superclasses: LEXEME
+Inheritance Precedence: SYMBOL LEXEME PRIMITIVE OBJECT
+Direct Subclasses:
+********************************************************************************
+================================================================================
+CLIPS> (describe-class STRING)
+================================================================================
+********************************************************************************
+Abstract: direct instances of this class cannot be created.
+
+Direct Superclasses: LEXEME
+Inheritance Precedence: STRING LEXEME PRIMITIVE OBJECT
+Direct Subclasses:
+********************************************************************************
+================================================================================
+CLIPS> (list-defclasses)
+FLOAT
+INTEGER
+SYMBOL
+STRING
+MULTIFIELD
+EXTERNAL-ADDRESS
+FACT-ADDRESS
+INSTANCE-ADDRESS
+INSTANCE-NAME
+OBJECT
+PRIMITIVE
+NUMBER
+LEXEME
+ADDRESS
+INSTANCE
+USER
+INITIAL-OBJECT
+doc-test
+A1
+B1
+A2
+A3
+A4
+A5
+A6
+A7
+B7
+A8
+B8
+C8
+A9
+B9
+GLOBAL-TEST
+For a total of 33 defclasses.
+CLIPS> (describe-class A1)
+================================================================================
+********************************************************************************
+Concrete: direct instances of this class can be created.
+Non-reactive: direct instances of this class cannot match defrule patterns.
+
+Direct Superclasses: USER
+Inheritance Precedence: A1 USER OBJECT
+Direct Subclasses: B1
+--------------------------------------------------------------------------------
+SLOTS : FLD DEF PRP ACC STO MCH SRC VIS CRT OVRD-MSG SOURCE(S)
+fooA  : SGL STC INH RW  LCL RCT EXC PRV RW  put-fooA A1
+barA  : SGL STC INH RW  LCL RCT EXC PRV RW  put-barA A1
+
+Constraint information for slots:
+
+SLOTS : SYM STR INN INA EXA FTA INT FLT
+fooA  :  +   +   +   +   +   +   +   +  RNG:[-oo..+oo] 
+barA  :  +   +   +   +   +   +   +   +  RNG:[-oo..+oo] 
+--------------------------------------------------------------------------------
+Recognized message-handlers:
+init primary in class USER
+delete primary in class USER
+create primary in class USER
+print primary in class USER
+direct-modify primary in class USER
+message-modify primary in class USER
+direct-duplicate primary in class USER
+message-duplicate primary in class USER
+get-fooA primary in class A1
+put-fooA primary in class A1
+get-barA primary in class A1
+put-barA primary in class A1
+********************************************************************************
+================================================================================
+CLIPS> (describe-class B1)
+================================================================================
+********************************************************************************
+Concrete: direct instances of this class can be created.
+Non-reactive: direct instances of this class cannot match defrule patterns.
+
+Direct Superclasses: A1
+Inheritance Precedence: B1 A1 USER OBJECT
+Direct Subclasses:
+--------------------------------------------------------------------------------
+SLOTS : FLD DEF PRP ACC STO MCH SRC VIS CRT OVRD-MSG SOURCE(S)
+fooA  : SGL STC INH RW  LCL RCT EXC PRV RW  put-fooA A1
+barA  : SGL STC INH RW  LCL RCT EXC PRV RW  put-barA A1
+fooB  : SGL STC INH RW  LCL RCT EXC PRV RW  put-fooB B1
+barB  : SGL STC INH RW  LCL RCT EXC PRV RW  put-barB B1
+
+Constraint information for slots:
+
+SLOTS : SYM STR INN INA EXA FTA INT FLT
+fooA  :  +   +   +   +   +   +   +   +  RNG:[-oo..+oo] 
+barA  :  +   +   +   +   +   +   +   +  RNG:[-oo..+oo] 
+fooB  :  +   +   +   +   +   +   +   +  RNG:[-oo..+oo] 
+barB  :  +   +   +   +   +   +   +   +  RNG:[-oo..+oo] 
+--------------------------------------------------------------------------------
+Recognized message-handlers:
+init primary in class USER
+delete primary in class USER
+create primary in class USER
+print primary in class USER
+direct-modify primary in class USER
+message-modify primary in class USER
+direct-duplicate primary in class USER
+message-duplicate primary in class USER
+get-fooA primary in class A1
+put-fooA primary in class A1
+get-barA primary in class A1
+put-barA primary in class A1
+get-fooB primary in class B1
+put-fooB primary in class B1
+get-barB primary in class B1
+put-barB primary in class B1
+********************************************************************************
+================================================================================
+CLIPS> (make-instance a21 of A2)
+[a21]
+CLIPS> (make-instance a22 of A2)
+[a22]
+CLIPS> (send [a21] print)
+[a21] of A2
+(foo gen2)
+(bar gen1)
+CLIPS> (send [a22] print)
+[a22] of A2
+(foo gen3)
+(bar gen1)
+CLIPS> (make-instance a3 of A3)
+[a3]
+CLIPS> (nth 2 (send [a3] get-foo))
+def
+CLIPS> (send [a3] put-bar 45)
+45
+CLIPS> (send [a3] get-bar)
+45
+CLIPS> (make-instance a4 of A4)
+[a4]
+CLIPS> (send [a4] print)
+[a4] of A4
+(foo 1)
+(bar 2)
+(woz nil)
+CLIPS> (send [a4] put-foo 56)
+56
+CLIPS> (send [a4] put-bar 104)
+104
+CLIPS> (make-instance [b4] of A4)
+[b4]
+CLIPS> (send [b4] print)
+[b4] of A4
+(foo 56)
+(bar 2)
+(woz nil)
+CLIPS> (send [b4] put-foo 34)
+34
+CLIPS> (send [b4] put-woz 68)
+68
+CLIPS> (send [a4] print)
+[a4] of A4
+(foo 34)
+(bar 2)
+(woz nil)
+CLIPS> (send [b4] print)
+[b4] of A4
+(foo 34)
+(bar 2)
+(woz 68)
+CLIPS> (describe-class A5)
+================================================================================
+********************************************************************************
+Concrete: direct instances of this class can be created.
+Non-reactive: direct instances of this class cannot match defrule patterns.
+
+Direct Superclasses: USER
+Inheritance Precedence: A5 USER OBJECT
+Direct Subclasses:
+--------------------------------------------------------------------------------
+SLOTS : FLD DEF PRP ACC STO MCH SRC VIS CRT OVRD-MSG SOURCE(S)
+foo   : SGL STC INH  R  SHR RCT EXC PRV  R  NIL      A5
+
+Constraint information for slots:
+
+SLOTS : SYM STR INN INA EXA FTA INT FLT
+foo   :  +   +   +   +   +   +   +   +  RNG:[-oo..+oo] 
+--------------------------------------------------------------------------------
+Recognized message-handlers:
+init primary in class USER
+delete primary in class USER
+create primary in class USER
+print primary in class USER
+direct-modify primary in class USER
+message-modify primary in class USER
+direct-duplicate primary in class USER
+message-duplicate primary in class USER
+get-foo primary in class A5
+********************************************************************************
+================================================================================
+CLIPS> (make-instance a6 of A6 (bar 34))
+[MSGFUN1] No applicable primary message-handlers found for put-bar.
+FALSE
+CLIPS> (make-instance a6 of A6 (foo 34) (woz 65))
+[a6]
+CLIPS> (send [a6] put-bar 1)
+[MSGFUN1] No applicable primary message-handlers found for put-bar.
+FALSE
+CLIPS> (send [a6] put-woz 1)
+[MSGFUN3] woz slot in [a6] of A6: write access denied.
+[PRCCODE4] Execution halted during the actions of message-handler put-woz primary in class A6
+FALSE
+CLIPS> (send [a6] print)
+[a6] of A6
+(foo 34)
+(bar abc)
+(woz 65)
+CLIPS> (describe-class A7)
+================================================================================
+********************************************************************************
+Concrete: direct instances of this class can be created.
+Non-reactive: direct instances of this class cannot match defrule patterns.
+
+Direct Superclasses: USER
+Inheritance Precedence: A7 USER OBJECT
+Direct Subclasses: B7
+--------------------------------------------------------------------------------
+SLOTS : FLD DEF PRP ACC STO MCH SRC VIS CRT OVRD-MSG SOURCE(S)
+foo   : SGL STC INH RW  LCL RCT EXC PRV RW  put-foo  A7
+bar   : SGL STC NIL RW  LCL RCT EXC PRV RW  put-bar  A7
+
+Constraint information for slots:
+
+SLOTS : SYM STR INN INA EXA FTA INT FLT
+foo   :  +   +   +   +   +   +   +   +  RNG:[-oo..+oo] 
+bar   :  +   +   +   +   +   +   +   +  RNG:[-oo..+oo] 
+--------------------------------------------------------------------------------
+Recognized message-handlers:
+init primary in class USER
+delete primary in class USER
+create primary in class USER
+print primary in class USER
+direct-modify primary in class USER
+message-modify primary in class USER
+direct-duplicate primary in class USER
+message-duplicate primary in class USER
+get-foo primary in class A7
+put-foo primary in class A7
+get-bar primary in class A7
+put-bar primary in class A7
+********************************************************************************
+================================================================================
+CLIPS> (describe-class B7)
+================================================================================
+********************************************************************************
+Concrete: direct instances of this class can be created.
+Non-reactive: direct instances of this class cannot match defrule patterns.
+
+Direct Superclasses: A7
+Inheritance Precedence: B7 A7 USER OBJECT
+Direct Subclasses:
+--------------------------------------------------------------------------------
+SLOTS : FLD DEF PRP ACC STO MCH SRC VIS CRT OVRD-MSG SOURCE(S)
+foo   : SGL STC INH RW  LCL RCT EXC PRV RW  put-foo  A7
+
+Constraint information for slots:
+
+SLOTS : SYM STR INN INA EXA FTA INT FLT
+foo   :  +   +   +   +   +   +   +   +  RNG:[-oo..+oo] 
+--------------------------------------------------------------------------------
+Recognized message-handlers:
+init primary in class USER
+delete primary in class USER
+create primary in class USER
+print primary in class USER
+direct-modify primary in class USER
+message-modify primary in class USER
+direct-duplicate primary in class USER
+message-duplicate primary in class USER
+get-foo primary in class A7
+put-foo primary in class A7
+get-bar primary in class A7
+put-bar primary in class A7
+********************************************************************************
+================================================================================
+CLIPS> (describe-class C8)
+================================================================================
+********************************************************************************
+Concrete: direct instances of this class can be created.
+Non-reactive: direct instances of this class cannot match defrule patterns.
+
+Direct Superclasses: B8
+Inheritance Precedence: C8 B8 A8 USER OBJECT
+Direct Subclasses:
+--------------------------------------------------------------------------------
+SLOTS : FLD DEF PRP ACC STO MCH SRC VIS CRT OVRD-MSG SOURCE(S)
+foo   : MLT STC INH  R  SHR RCT CMP PRV  R  NIL      A8 C8
+
+Constraint information for slots:
+
+SLOTS : SYM STR INN INA EXA FTA INT FLT
+foo   :  +   +   +   +   +   +   +   +  RNG:[-oo..+oo] CRD:[0..+oo]
+--------------------------------------------------------------------------------
+Recognized message-handlers:
+init primary in class USER
+delete primary in class USER
+create primary in class USER
+print primary in class USER
+direct-modify primary in class USER
+message-modify primary in class USER
+direct-duplicate primary in class USER
+message-duplicate primary in class USER
+get-foo primary in class A8
+put-foo primary in class A8
+get-foo primary in class B8
+put-foo primary in class B8
+get-foo primary in class C8
+********************************************************************************
+================================================================================
+CLIPS> (describe-class B9)
+================================================================================
+********************************************************************************
+Concrete: direct instances of this class can be created.
+Non-reactive: direct instances of this class cannot match defrule patterns.
+
+Direct Superclasses: A9
+Inheritance Precedence: B9 A9 USER OBJECT
+Direct Subclasses:
+--------------------------------------------------------------------------------
+SLOTS : FLD DEF PRP ACC STO MCH SRC VIS CRT OVRD-MSG SOURCE(S)
+foo   : MLT STC INH  R  SHR RCT CMP PRV  R  NIL      A9 B9
+
+Constraint information for slots:
+
+SLOTS : SYM STR INN INA EXA FTA INT FLT
+foo   :  +   +   +   +   +   +   +   +  RNG:[-oo..+oo] CRD:[0..+oo]
+--------------------------------------------------------------------------------
+Recognized message-handlers:
+init primary in class USER
+delete primary in class USER
+create primary in class USER
+print primary in class USER
+direct-modify primary in class USER
+message-modify primary in class USER
+direct-duplicate primary in class USER
+message-duplicate primary in class USER
+get-foo primary in class A9
+get-foo primary in class B9
+********************************************************************************
+================================================================================
+CLIPS> (make-instance a9 of A9)
+[a9]
+CLIPS> (make-instance b9 of B9)
+[b9]
+CLIPS> (send [a9] get-foo)
+(a b c)
+CLIPS> (send [b9] get-foo)
+(d e f)
+CLIPS> (make-instance global-test of GLOBAL-TEST)
+[global-test]
+CLIPS> (send [global-test] print)
+[global-test] of GLOBAL-TEST
+(x 100)
+(y 100)
+CLIPS> (bind ?*global-test* 200)
+200
+CLIPS> (initialize-instance global-test)
+[global-test]
+CLIPS> (send [global-test] print)
+[global-test] of GLOBAL-TEST
+(x 100)
+(y 200)
+CLIPS> (dribble-off)

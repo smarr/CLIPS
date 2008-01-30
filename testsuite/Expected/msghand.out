@@ -1,0 +1,39 @@
+TRUE
+CLIPS> (batch "msghand.bat")
+TRUE
+CLIPS> (make-instance bogusi of BOGUS)
+[bogusi]
+CLIPS> (send [bogusi] bad-message-1)
+[ARGACCES5] Function integer expected argument #1 to be of type integer
+[PRCCODE4] Execution halted during the actions of message-handler bad-message-1 primary in class BOGUS
+FALSE
+CLIPS> (send [bogusi] bad-message-2)
+[ARGACCES5] Function integer expected argument #1 to be of type integer
+[PRCCODE4] Execution halted during the actions of message-handler bad-message-2 primary in class BOGUS
+FALSE
+CLIPS> (send [bogusi] add-em-up)
+2
+CLIPS> (testit)
+[a] of THINGO
+(s d e "f")
+(x s)
+(r 3)
+(q a "b" c)
+(y 3.5)
+(z k 1 9.4)
+a "b" c 3 d e "f" s 3.5 k 1 9.4
+d e "f" s k 1 9.4 3.5 3 a "b" c
+This message should appear first
+This message should appear second
+This message should appear third
+This message should appear forth
+This message should appear fifth
+This message should appear sixth
+This message should appear seventh
+This message should appear eighth
+Test 4 Passed.
+Test 5 Passed.
+Test 6 Passed.
+Test 7 Passed.
+TRUE
+CLIPS> (dribble-off)

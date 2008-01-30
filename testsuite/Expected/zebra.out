@@ -1,0 +1,52 @@
+FIRE    1 startup: *
+There are five houses, each of a different color, inhabited by men of
+different nationalities, with different pets, drinks, and cigarettes.
+
+The Englishman lives in the red house.  The Spaniard owns the dog.
+The ivory house is immediately to the left of the green house, where
+the coffee drinker lives.  The milk drinker lives in the middle house.
+The man who smokes Old Golds also keeps snails.  The Ukrainian drinks
+tea.  The Norwegian resides in the first house on the left.  The
+Chesterfields smoker lives next door to the fox owner.  The Lucky
+Strike smoker drinks orange juice.  The Japanese smokes Parliaments.
+The horse owner lives next to the Kools smoker, whose house is yellow.
+The Norwegian lives next to the blue house.
+
+Now, who drinks water?  And who owns the zebra?
+
+FIRE    2 generate-combinations: f-25
+FIRE    3 generate-combinations: f-24
+FIRE    4 generate-combinations: f-23
+FIRE    5 generate-combinations: f-22
+FIRE    6 generate-combinations: f-21
+FIRE    7 generate-combinations: f-20
+FIRE    8 generate-combinations: f-19
+FIRE    9 generate-combinations: f-18
+FIRE   10 generate-combinations: f-17
+FIRE   11 generate-combinations: f-16
+FIRE   12 generate-combinations: f-15
+FIRE   13 generate-combinations: f-14
+FIRE   14 generate-combinations: f-13
+FIRE   15 generate-combinations: f-12
+FIRE   16 generate-combinations: f-11
+FIRE   17 generate-combinations: f-10
+FIRE   18 generate-combinations: f-9
+FIRE   19 generate-combinations: f-8
+FIRE   20 generate-combinations: f-7
+FIRE   21 generate-combinations: f-6
+FIRE   22 generate-combinations: f-5
+FIRE   23 generate-combinations: f-4
+FIRE   24 generate-combinations: f-3
+FIRE   25 generate-combinations: f-2
+FIRE   26 generate-combinations: f-1
+FIRE   27 find-solution: f-123,f-148,f-119,f-99,f-139,f-145,f-70,f-63,f-48,f-93,f-112,f-52,f-106,f-37,f-86,f-34,f-59,f-105,f-30,f-82,f-41,f-131,f-127,f-71,f-80
+FIRE   28 print-solution: f-163,f-172,f-165,f-174,f-171,f-161,f-173,f-170,f-162,f-164,f-151,f-152,f-160,f-158,f-159,f-153,f-155,f-154,f-167,f-166,f-168,f-156,f-175,f-157,f-169
+HOUSE | Nationality | Color  | Pet    | Drink        | Smokes       
+--------------------------------------------------------------------
+  1   | norwegian   | yellow | fox    | water        | kools        
+  2   | ukrainian   | blue   | horse  | tea          | chesterfields
+  3   | englishman  | red    | snails | milk         | old-golds    
+  4   | spaniard    | ivory  | dog    | orange-juice | lucky-strikes
+  5   | japanese    | green  | zebra  | coffee       | parliaments  
+
+

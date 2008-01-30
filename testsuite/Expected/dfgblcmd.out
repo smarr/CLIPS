@@ -1,0 +1,272 @@
+TRUE
+CLIPS> (batch "dfgblcmd.bat")
+TRUE
+CLIPS> (clear)
+CLIPS> (defglobal ?*d1* = 1)
+CLIPS> (defglobal ?*d2* = 2)
+CLIPS> (defglobal ?*d3* = 3)
+CLIPS> (defglobal ?*d4* = 4)
+CLIPS> (defglobal ?*d5* = 5)
+CLIPS> (defglobal ?*d6* = 6)
+CLIPS> (defglobal ?*** = 7)
+CLIPS> (list-defglobals d6)
+[ARGACCES5] Function list-defglobals expected argument #1 to be of type defmodule name
+CLIPS> (list-defglobals)
+d1
+d2
+d3
+d4
+d5
+d6
+*
+For a total of 7 defglobals.
+CLIPS> (ppdefglobal d1)
+(defglobal MAIN ?*d1* = 1)
+CLIPS> (ppdefglobal d2)
+(defglobal MAIN ?*d2* = 2)
+CLIPS> (ppdefglobal d3)
+(defglobal MAIN ?*d3* = 3)
+CLIPS> (ppdefglobal d4)
+(defglobal MAIN ?*d4* = 4)
+CLIPS> (ppdefglobal d5)
+(defglobal MAIN ?*d5* = 5)
+CLIPS> (ppdefglobal d6)
+(defglobal MAIN ?*d6* = 6)
+CLIPS> (undefglobal)
+[ARGACCES4] Function undefglobal expected exactly 1 argument(s)
+CLIPS> (undefglobal 10)
+[ARGACCES5] Function undefglobal expected argument #1 to be of type symbol
+CLIPS> (undefglobal bad-name)
+[PRNTUTIL1] Unable to find defglobal bad-name.
+CLIPS> (undefglobal d6 10)
+[ARGACCES4] Function undefglobal expected exactly 1 argument(s)
+CLIPS> (list-defglobals)
+d1
+d2
+d3
+d4
+d5
+d6
+*
+For a total of 7 defglobals.
+CLIPS> (undefglobal d1)
+CLIPS> (undefglobal d2)
+CLIPS> (undefglobal d3)
+CLIPS> (list-defglobals)
+d4
+d5
+d6
+*
+For a total of 4 defglobals.
+CLIPS> (undefglobal *)
+CLIPS> (list-defglobals)
+d4
+d5
+d6
+For a total of 3 defglobals.
+CLIPS> (undefglobal *)
+CLIPS> (list-defglobals)
+CLIPS> (clear)
+CLIPS> (defglobal ?*x* = 3 ?*y* = ?*x* ?*z* = (+ 4 ?*x*))
+CLIPS> (defglobal ?*q* = (create$ a b c))
+CLIPS> (reset)
+CLIPS> (show-defglobals x y)
+[ARGACCES4] Function show-defglobals expected no more than 1 argument(s)
+CLIPS> (show-defglobals)
+?*x* = 3
+?*y* = 3
+?*z* = 7
+?*q* = (a b c)
+CLIPS> (ppdefglobal x)
+(defglobal MAIN ?*x* = 3)
+CLIPS> (ppdefglobal y)
+(defglobal MAIN ?*y* = ?*x*)
+CLIPS> (ppdefglobal z)
+(defglobal MAIN ?*z* = (+ 4 ?*x*))
+CLIPS> (ppdefglobal q)
+(defglobal MAIN ?*q* = (create$ a b c))
+CLIPS> (get-reset-globals)
+TRUE
+CLIPS> (get-reset-globals TRUE)
+[ARGACCES4] Function get-reset-globals expected exactly 0 argument(s)
+CLIPS> (set-reset-globals)
+[ARGACCES4] Function set-reset-globals expected exactly 1 argument(s)
+CLIPS> (set-reset-globals TRUE FALSE)
+[ARGACCES4] Function set-reset-globals expected exactly 1 argument(s)
+CLIPS> (set-reset-globals 10)
+TRUE
+CLIPS> (get-reset-globals)
+TRUE
+CLIPS> (set-reset-globals FALSE)
+TRUE
+CLIPS> (get-reset-globals)
+FALSE
+CLIPS> (bind ?*x* a)
+a
+CLIPS> (bind ?*y* 3.2)
+3.2
+CLIPS> (bind ?*z* [x])
+[x]
+CLIPS> (bind ?*q* "red")
+"red"
+CLIPS> (reset)
+CLIPS> (show-defglobals)
+?*x* = a
+?*y* = 3.2
+?*z* = [x]
+?*q* = "red"
+CLIPS> (set-reset-globals TRUE)
+FALSE
+CLIPS> (get-reset-globals)
+TRUE
+CLIPS> (reset)
+CLIPS> (show-defglobals)
+?*x* = 3
+?*y* = 3
+?*z* = 7
+?*q* = (a b c)
+CLIPS> (clear)
+CLIPS> (show-defglobals)
+CLIPS> (ppdefglobal x)
+[PRNTUTIL1] Unable to find defglobal x.
+CLIPS> (clear) ; Some new 6.0 features
+CLIPS> (defglobal BOGUS d5 = 5)
+[PRNTUTIL1] Unable to find defmodule BOGUS.
+
+ERROR:
+(defglobal BOGUS
+CLIPS> (defmodule FOO)
+CLIPS> (defglobal FOO ?*d1* = 1)
+CLIPS> (defglobal FOO ?*d2* = 2)
+CLIPS> (defmodule BAR)
+CLIPS> (defglobal BAR ?*d2* = 2)
+CLIPS> (defglobal BAR ?*d3* = 3)
+CLIPS> (list-defglobals BOGUS)
+[ARGACCES5] Function list-defglobals expected argument #1 to be of type defmodule name
+CLIPS> (list-defglobals FOO 7)
+[ARGACCES4] Function list-defglobals expected no more than 1 argument(s)
+CLIPS> (list-defglobals FOO)
+d1
+d2
+For a total of 2 defglobals.
+CLIPS> (list-defglobals BAR)
+d2
+d3
+For a total of 2 defglobals.
+CLIPS> (list-defglobals)
+d2
+d3
+For a total of 2 defglobals.
+CLIPS> (list-defglobals *)
+MAIN:
+FOO:
+   d1
+   d2
+BAR:
+   d2
+   d3
+For a total of 4 defglobals.
+CLIPS> (get-defglobal-list 7)
+[ARGACCES5] Function get-defglobal-list expected argument #1 to be of type symbol
+CLIPS> (get-defglobal-list BOGUS 7)
+[ARGACCES4] Function get-defglobal-list expected no more than 1 argument(s)
+CLIPS> (get-defglobal-list)
+(d2 d3)
+CLIPS> (get-defglobal-list BOGUS)
+[ARGACCES5] Function get-defglobal-list expected argument #1 to be of type defmodule name
+()
+CLIPS> (get-defglobal-list FOO)
+(d1 d2)
+CLIPS> (get-defglobal-list BAR)
+(d2 d3)
+CLIPS> (get-defglobal-list *)
+(FOO::d1 FOO::d2 BAR::d2 BAR::d3)
+CLIPS> (ppdefglobal d1)
+[PRNTUTIL1] Unable to find defglobal d1.
+CLIPS> (ppdefglobal d2)
+(defglobal BAR ?*d2* = 2)
+CLIPS> (ppdefglobal d3)
+(defglobal BAR ?*d3* = 3)
+CLIPS> (ppdefglobal BOGUS::d2)
+[PRNTUTIL1] Unable to find defglobal BOGUS::d2.
+CLIPS> (ppdefglobal FOO::d1)
+(defglobal FOO ?*d1* = 1)
+CLIPS> (ppdefglobal FOO::d2)
+(defglobal FOO ?*d2* = 2)
+CLIPS> (ppdefglobal FOO::d3)
+[PRNTUTIL1] Unable to find defglobal FOO::d3.
+CLIPS> (ppdefglobal BAR::d1)
+[PRNTUTIL1] Unable to find defglobal BAR::d1.
+CLIPS> (ppdefglobal BAR::d2)
+(defglobal BAR ?*d2* = 2)
+CLIPS> (ppdefglobal BAR::d3)
+(defglobal BAR ?*d3* = 3)
+CLIPS> (defglobal-module)
+[ARGACCES4] Function defglobal-module expected exactly 1 argument(s)
+CLIPS> (defglobal-module bogus)
+[PRNTUTIL1] Unable to find defglobal bogus.
+FALSE
+CLIPS> (defglobal-module d3 7)
+[ARGACCES4] Function defglobal-module expected exactly 1 argument(s)
+CLIPS> (defglobal-module d2)
+BAR
+CLIPS> (defglobal-module d3)
+BAR
+CLIPS> (defglobal-module FOO::d1)
+FOO
+CLIPS> (defglobal-module FOO::d2)
+FOO
+CLIPS> (defglobal-module BAR::d2)
+BAR
+CLIPS> (defglobal-module BAR::d3)
+BAR
+CLIPS> (show-defglobals)
+?*d2* = 2
+?*d3* = 3
+CLIPS> (show-defglobals 7)
+[ARGACCES5] Function show-defglobals expected argument #1 to be of type symbol
+CLIPS> (show-defglobals BOGUS)
+[ARGACCES5] Function show-defglobals expected argument #1 to be of type defmodule name
+CLIPS> (show-defglobals FOO 7)
+[ARGACCES4] Function show-defglobals expected no more than 1 argument(s)
+CLIPS> (show-defglobals FOO)
+?*d1* = 1
+?*d2* = 2
+CLIPS> (show-defglobals BAR)
+?*d2* = 2
+?*d3* = 3
+CLIPS> (show-defglobals *)
+MAIN:
+FOO:
+   ?*d1* = 1
+   ?*d2* = 2
+BAR:
+   ?*d2* = 2
+   ?*d3* = 3
+CLIPS> (undefglobal BOGUS::d2)
+[PRNTUTIL1] Unable to find defglobal BOGUS::d2.
+CLIPS> (undefglobal FOO::d2)
+CLIPS> (list-defglobals *)
+MAIN:
+FOO:
+   d1
+BAR:
+   d2
+   d3
+For a total of 3 defglobals.
+CLIPS> (undefglobal BAR::d2)
+CLIPS> (list-defglobals *)
+MAIN:
+FOO:
+   d1
+BAR:
+   d3
+For a total of 2 defglobals.
+CLIPS> (undefglobal *)
+CLIPS> (list-defglobals *)
+MAIN:
+FOO:
+   d1
+BAR:
+For a total of 1 defglobal.
+CLIPS> (dribble-off)

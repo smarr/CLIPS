@@ -1,0 +1,155 @@
+TRUE
+CLIPS> (batch "factsfun.bat")
+TRUE
+CLIPS> (clear)
+CLIPS> (reset)
+CLIPS> (defglobal ?*w* = (assert (a)))
+CLIPS> (defglobal ?*x* = (assert (b)))
+CLIPS> (defglobal ?*y* = (assert (c)))
+CLIPS> (defglobal ?*z* = (assert (d)))
+CLIPS> (retract 3 4)
+CLIPS> (fact-existp ?*w*)
+TRUE
+CLIPS> (fact-existp ?*x*)
+TRUE
+CLIPS> (fact-existp ?*y*)
+FALSE
+CLIPS> (fact-existp ?*z*)
+FALSE
+CLIPS> (fact-existp 1)
+TRUE
+CLIPS> (fact-existp 2)
+TRUE
+CLIPS> (fact-existp 3)
+FALSE
+CLIPS> (fact-existp 4)
+FALSE
+CLIPS> (fact-existp 5)
+FALSE
+CLIPS> (fact-existp -1)
+[ARGACCES5] Function fact-existp expected argument #1 to be of type fact-address or fact-index
+FALSE
+CLIPS> (fact-existp a)
+[ARGACCES5] Function fact-existp expected argument #1 to be of type fact-address or fact-index
+FALSE
+CLIPS> (fact-existp 1 2)
+[ARGACCES4] Function fact-existp expected exactly 1 argument(s)
+CLIPS> (clear)
+CLIPS> (reset)
+CLIPS> (deftemplate foo (slot x) (slot y))
+CLIPS> (defglobal ?*w* = (assert (foo (x 1) (y 2))))
+CLIPS> (defglobal ?*x* = (assert (a)))
+CLIPS> (fact-relation)
+[ARGACCES4] Function fact-relation expected exactly 1 argument(s)
+CLIPS> (fact-relation a)
+[ARGACCES5] Function fact-relation expected argument #1 to be of type fact-address or fact-index
+FALSE
+CLIPS> (fact-relation 2 3)
+[ARGACCES4] Function fact-relation expected exactly 1 argument(s)
+CLIPS> (fact-relation ?*w*)
+foo
+CLIPS> (fact-relation ?*x*)
+a
+CLIPS> (fact-relation 1)
+foo
+CLIPS> (fact-relation 2)
+a
+CLIPS> (fact-relation 3)
+FALSE
+CLIPS> (retract 1 2)
+CLIPS> (fact-relation ?*w*)
+FALSE
+CLIPS> (fact-relation ?*x*)
+FALSE
+CLIPS> (clear)
+CLIPS> (reset)
+CLIPS> (deftemplate foo (slot x) (multislot y))
+CLIPS> (defglobal ?*w1* = (assert (foo (x 1) (y))))
+CLIPS> (defglobal ?*w2* = (assert (foo (x 1) (y 1))))
+CLIPS> (defglobal ?*w3* = (assert (foo (x 1) (y 1 2))))
+CLIPS> (defglobal ?*x1* = (assert (a)))
+CLIPS> (defglobal ?*x2* = (assert (a b)))
+CLIPS> (defglobal ?*x3* = (assert (a b c)))
+CLIPS> (fact-slot-value)
+[ARGACCES4] Function fact-slot-value expected exactly 2 argument(s)
+CLIPS> (fact-slot-value 1)
+[ARGACCES4] Function fact-slot-value expected exactly 2 argument(s)
+CLIPS> (fact-slot-value ?*w1*)
+[ARGACCES4] Function fact-slot-value expected exactly 2 argument(s)
+CLIPS> (fact-slot-value a)
+[ARGACCES4] Function fact-slot-value expected exactly 2 argument(s)
+CLIPS> (fact-slot-value 1 2)
+[ARGACCES5] Function fact-slot-value expected argument #2 to be of type symbol
+CLIPS> (fact-slot-value 1 x 3)
+[ARGACCES4] Function fact-slot-value expected exactly 2 argument(s)
+CLIPS> (fact-slot-value 1 z)
+[TMPLTDEF1] Invalid slot z not defined in corresponding deftemplate foo.
+FALSE
+CLIPS> (fact-slot-value 4 z)
+[TMPLTDEF1] Invalid slot z not defined in corresponding deftemplate a.
+FALSE
+CLIPS> (fact-slot-value 1 x)
+1
+CLIPS> (fact-slot-value ?*w2* x)
+1
+CLIPS> (fact-slot-value 3 x)
+1
+CLIPS> (fact-slot-value ?*w1* y)
+()
+CLIPS> (fact-slot-value 2 y)
+(1)
+CLIPS> (fact-slot-value ?*w3* y)
+(1 2)
+CLIPS> (fact-slot-value 4 implied)
+()
+CLIPS> (fact-slot-value ?*x2* implied)
+(b)
+CLIPS> (fact-slot-value 6 implied)
+(b c)
+CLIPS> (retract 1 4)
+CLIPS> (fact-slot-value 1 x)
+[PRNTUTIL1] Unable to find fact f-1.
+FALSE
+CLIPS> (fact-slot-value 4 implied)
+[PRNTUTIL1] Unable to find fact f-4.
+FALSE
+CLIPS> (clear)
+CLIPS> (reset)
+CLIPS> (deftemplate foo1)
+CLIPS> (deftemplate foo2 (slot x))
+CLIPS> (deftemplate foo3 (slot x) (multislot y))
+CLIPS> (deftemplate foo4 (slot x) (multislot y) (slot z))
+CLIPS> (defglobal ?*w1* = (assert (foo1)))
+CLIPS> (defglobal ?*w2* = (assert (foo2)))
+CLIPS> (defglobal ?*w3* = (assert (foo3)))
+CLIPS> (defglobal ?*w4* = (assert (foo4)))
+CLIPS> (defglobal ?*x1* = (assert (a)))
+CLIPS> (defglobal ?*x2* = (assert (b c)))
+CLIPS> (fact-slot-names) 
+[ARGACCES4] Function fact-slot-names expected exactly 1 argument(s)
+CLIPS> (fact-slot-names a)
+[ARGACCES5] Function fact-slot-names expected argument #1 to be of type fact-address or fact-index
+FALSE
+CLIPS> (fact-slot-names 1 a)
+[ARGACCES4] Function fact-slot-names expected exactly 1 argument(s)
+CLIPS> (fact-slot-names ?*w1*)
+()
+CLIPS> (fact-slot-names 2)
+(x)
+CLIPS> (fact-slot-names ?*w3*)
+(x y)
+CLIPS> (fact-slot-names 4)
+(x y z)
+CLIPS> (fact-slot-names ?*x1*)
+(implied)
+CLIPS> (fact-slot-names 6)
+(implied)
+CLIPS> (retract 1 5)
+CLIPS> (fact-slot-names 1)
+[PRNTUTIL1] Unable to find fact f-1.
+FALSE
+CLIPS> (fact-slot-names 5)
+[PRNTUTIL1] Unable to find fact f-5.
+FALSE
+CLIPS> (clear)
+CLIPS> (dribble-off)

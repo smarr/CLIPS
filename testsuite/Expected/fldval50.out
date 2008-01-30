@@ -1,0 +1,179 @@
+
+TESTING CLIPS - BASIC PROGRAMMING GUIDE
+common capabilities such as:
+assert, retract, salience, fprintout
+are exercised all through the test
+literal pattern matching successful
+multi-and-single-field-wildcard should fire six times
+multi-and-single-field-wildcard should fire six times
+multi-and-single-field-wildcard should fire six times
+multi-and-single-field-wildcard should fire six times
+multi-and-single-field-wildcard should fire six times
+multi-and-single-field-wildcard should fire six times
+multi-multi-field-wildcard should fire eighteen times
+multi-multi-field-wildcard should fire eighteen times
+multi-multi-field-wildcard should fire eighteen times
+multi-multi-field-wildcard should fire eighteen times
+multi-multi-field-wildcard should fire eighteen times
+multi-multi-field-wildcard should fire eighteen times
+multi-multi-field-wildcard should fire eighteen times
+multi-multi-field-wildcard should fire eighteen times
+multi-multi-field-wildcard should fire eighteen times
+multi-multi-field-wildcard should fire eighteen times
+multi-multi-field-wildcard should fire eighteen times
+multi-multi-field-wildcard should fire eighteen times
+multi-multi-field-wildcard should fire eighteen times
+multi-multi-field-wildcard should fire eighteen times
+multi-multi-field-wildcard should fire eighteen times
+multi-multi-field-wildcard should fire eighteen times
+multi-multi-field-wildcard should fire eighteen times
+multi-multi-field-wildcard should fire eighteen times
+multi-single-field-wildcard should fire four times
+multi-single-field-wildcard should fire four times
+multi-single-field-wildcard should fire four times
+multi-single-field-wildcard should fire four times
+multi-field-wildcard should fire five times
+multi-field-wildcard should fire five times
+multi-field-wildcard should fire five times
+multi-field-wildcard should fire five times
+multi-field-wildcard should fire five times
+single-field-wildcard should fire three times
+single-field-wildcard should fire three times
+single-field-wildcard should fire three times
+multi-field-and-literal-field should fire six times
+multi-field-and-literal-field should fire six times
+multi-field-and-literal-field should fire six times
+multi-field-and-literal-field should fire six times
+multi-field-and-literal-field should fire six times
+multi-field-and-literal-field should fire six times
+single-and-multi-field-variable-single-pattern should fire four times
+single-and-multi-field-variable-single-pattern should fire four times
+single-and-multi-field-variable-single-pattern should fire four times
+single-and-multi-field-variable-single-pattern should fire four times
+multi-multi-field-variable-single-pattern should fire ten times
+multi-multi-field-variable-single-pattern should fire ten times
+multi-multi-field-variable-single-pattern should fire ten times
+multi-multi-field-variable-single-pattern should fire ten times
+multi-multi-field-variable-single-pattern should fire ten times
+multi-multi-field-variable-single-pattern should fire ten times
+multi-multi-field-variable-single-pattern should fire ten times
+multi-multi-field-variable-single-pattern should fire ten times
+multi-multi-field-variable-single-pattern should fire ten times
+multi-multi-field-variable-single-pattern should fire ten times
+multi-single-variable-single-pattern should fire four times
+multi-single-variable-single-pattern should fire four times
+multi-single-variable-single-pattern should fire four times
+multi-single-variable-single-pattern should fire four times
+multi-field-variable-single-pattern should fire five times
+multi-field-variable-single-pattern should fire five times
+multi-field-variable-single-pattern should fire five times
+multi-field-variable-single-pattern should fire five times
+multi-field-variable-single-pattern should fire five times
+single-variable-single-pattern should fire three times
+single-variable-single-pattern should fire three times
+single-variable-single-pattern should fire three times
+multi-field-variable-multiple-patterns should fire three times
+multi-field-variable-multiple-patterns should fire three times
+multi-field-variable-multiple-patterns should fire three times
+single-field-variable-multiple-patterns should fire twice
+single-field-variable-multiple-patterns should fire twice
+not-with-no-variable-assignment should fire three times
+not-with-no-variable-assignment should fire three times
+not-with-no-variable-assignment should fire three times
+or-with-no-variable-assignment should fire twice
+or-with-no-variable-assignment should fire twice
+not-and-with-no-variable-assignment should fire twice 
+not-and-with-no-variable-assignment should fire twice 
+not-or-and-with-no-variable-assignment should fire twice  
+not-or-and-with-no-variable-assignment should fire twice  
+not-with-variable-assignment should fire three times 
+not-with-variable-assignment should fire three times 
+not-with-variable-assignment should fire three times 
+or-with-variable-assignment should fire twice
+or-with-variable-assignment should fire twice
+not-with-variable-assignment-multiple-patterns should fire once
+or-with-variable-assignment-multiple-patterns should fire twice
+or-with-variable-assignment-multiple-patterns should fire twice
+predicate-function-numberp should fire five times 
+predicate-function-numberp should fire five times 
+predicate-function-numberp should fire five times 
+predicate-function-numberp should fire five times 
+predicate-function-numberp should fire five times 
+predicate-function-evenp should fire twice
+predicate-function-evenp should fire twice
+predicate-function-oddp should fire twice
+predicate-function-oddp should fire twice
+predicate-function-stringp should fire once
+predicate-function-wordp should fire once
+predicate-function-integerp should fire four times
+predicate-function-integerp should fire four times
+predicate-function-integerp should fire four times
+predicate-function-integerp should fire four times
+external-functions-logical-operators should fire four times
+external-functions-logical-operators should fire four times
+external-functions-logical-operators should fire four times
+external-functions-logical-operators should fire four times
+constraining-functions-vertical should fire twice 
+constraining-functions-vertical should fire twice 
+constraining-functions-not-vertical should fire ten times
+constraining-functions-not-vertical should fire ten times
+constraining-functions-not-vertical should fire ten times
+constraining-functions-not-vertical should fire ten times
+constraining-functions-not-vertical should fire ten times
+constraining-functions-not-vertical should fire ten times
+constraining-functions-not-vertical should fire ten times
+constraining-functions-not-vertical should fire ten times
+constraining-functions-not-vertical should fire ten times
+constraining-functions-not-vertical should fire ten times
+slope-of-line-negative-test-function should fire four times
+slope-of-line-negative-test-function should fire four times
+slope-of-line-negative-test-function should fire four times
+slope-of-line-negative-test-function should fire four times
+slope-of-line-positive-test-function fire four times
+slope-of-line-positive-test-function fire four times
+slope-of-line-positive-test-function fire four times
+slope-of-line-positive-test-function fire four times
+fact-address-test-function should fire seven times
+fact-address-test-function should fire seven times
+fact-address-test-function should fire seven times
+fact-address-test-function should fire seven times
+fact-address-test-function should fire seven times
+fact-address-test-function should fire seven times
+fact-address-test-function should fire seven times
+or-not-nested-constraining-patterns should fire three times
+or-not-nested-constraining-patterns should fire three times
+or-not-nested-constraining-patterns should fire three times
+multiple-ors-constraining-patterns should fire four times
+multiple-ors-constraining-patterns should fire four times
+multiple-ors-constraining-patterns should fire four times
+multiple-ors-constraining-patterns should fire four times
+nested-ors-constraining-patterns should fire four times
+nested-ors-constraining-patterns should fire four times
+nested-ors-constraining-patterns should fire four times
+nested-ors-constraining-patterns should fire four times
+nested-ands-or-not-constraining-patterns should fire ten times
+nested-ands-or-not-constraining-patterns should fire ten times
+nested-ands-or-not-constraining-patterns should fire ten times
+nested-ands-or-not-constraining-patterns should fire ten times
+nested-ands-or-not-constraining-patterns should fire ten times
+nested-ands-or-not-constraining-patterns should fire ten times
+nested-ands-or-not-constraining-patterns should fire ten times
+nested-ands-or-not-constraining-patterns should fire ten times
+nested-ands-or-not-constraining-patterns should fire ten times
+nested-ands-or-not-constraining-patterns should fire ten times
+Enter the number 7: 
+7
+retract by fact number test successful
+assert using external functions and assert-string tests successful
+testing halt function
+enter the (run) commmand to continue
+
+CLIPS> (progn (run) (dribble-off))
+open, close, readline, bind and assert-string tests successful
+length, member nth and multifield tests successful
+subset, str-cat, str-index, sub_string, setgen, gensym, 
+if then else and while tests successful
+list of facts that were not cleaned up, error if any
+file text.tmp may be deleted
+CLIPS TESTING COMPLETED
+

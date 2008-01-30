@@ -1,0 +1,18 @@
+Testing Standard Rule Execution...
+This rule should fire 1st
+This rule should fire 2nd
+This rule should fire 3rd
+This rule should fire 4th
+This rule should fire 5th
+Testing Single External Refresh Agenda...
+This rule should fire 1st
+This rule should fire 2nd
+This rule should fire 3rd
+This rule should fire 4th
+This rule should fire 5th
+Testing Refresh Agenda Within Rules...
+This rule should fire 1st
+This rule should fire 2nd
+This rule should fire 3rd
+This rule should fire 4th
+This rule should fire 5th
