@@ -1,1 +1,10 @@
-;;;************************************************************;;; DEFFUNCTION COMMAND AND FUNCTION TESTING;;;;;; This file dfnxcmd.bat test the various ancillary functions;;; and commands for deffunctions.;;;;;; To test, execute the command (batch "dfnxcmd.tst").;;; When the test is complete, check the file dfnxcmd.rsl;;; for the results.;;;************************************************************
+;;;************************************************************
+;;; DEFFUNCTION COMMAND AND FUNCTION TESTING
+;;;
+;;; This file dfnxcmd.bat test the various ancillary functions
+;;; and commands for deffunctions.
+;;;
+;;; To test, execute the command (batch "dfnxcmd.tst").
+;;; When the test is complete, check the file dfnxcmd.rsl
+;;; for the results.
+;;;************************************************************

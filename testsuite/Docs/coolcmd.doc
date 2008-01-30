@@ -1,1 +1,10 @@
-;;;*******************************************************************;;; COOL COMMAND TESTS;;;;;; These files coolcmd.bat and coolcmd.ins test various commands;;; associated with COOL constructs.;;;;;; To test, execute the command (batch "coolcmd.tst").;;; When the test is complete, check the file coolcmd.rsl;;; for the results.;;;*******************************************************************
+;;;*******************************************************************
+;;; COOL COMMAND TESTS
+;;;
+;;; These files coolcmd.bat and coolcmd.ins test various commands
+;;; associated with COOL constructs.
+;;;
+;;; To test, execute the command (batch "coolcmd.tst").
+;;; When the test is complete, check the file coolcmd.rsl
+;;; for the results.
+;;;*******************************************************************

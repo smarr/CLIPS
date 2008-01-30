@@ -1,1 +1,10 @@
-;;;*******************************************************************;;; COOL FUNCTION TESTS;;;;;; These files coolfnx.bat and coolfnx.clp test various;;; COOL ancillary functions.;;;;;; To test, execute the command (batch "coolfnx.tst").;;; When the test is complete, check the file coolfnx.rsl;;; for the results.;;;*******************************************************************
+;;;*******************************************************************
+;;; COOL FUNCTION TESTS
+;;;
+;;; These files coolfnx.bat and coolfnx.clp test various
+;;; COOL ancillary functions.
+;;;
+;;; To test, execute the command (batch "coolfnx.tst").
+;;; When the test is complete, check the file coolfnx.rsl
+;;; for the results.
+;;;*******************************************************************

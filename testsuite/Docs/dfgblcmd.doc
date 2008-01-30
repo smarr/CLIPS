@@ -1,1 +1,11 @@
-;;;************************************************************;;; DEFGLOBAL COMMAND TESTING;;;;;; The file dfgblcmd.tst tests the commands described in the;;; BPG in section 11.8 (defglobal commands).;;;;;; To test, execute the command (batch "dfgblcmd.tst").;;; When the test is complete, check the file dfgblcmd.rsl;;; for the results (differences between expected and ;;; actual output are listed).;;;************************************************************
+;;;************************************************************
+;;; DEFGLOBAL COMMAND TESTING
+;;;
+;;; The file dfgblcmd.tst tests the commands described in the
+;;; BPG in section 11.8 (defglobal commands).
+;;;
+;;; To test, execute the command (batch "dfgblcmd.tst").
+;;; When the test is complete, check the file dfgblcmd.rsl
+;;; for the results (differences between expected and 
+;;; actual output are listed).
+;;;************************************************************

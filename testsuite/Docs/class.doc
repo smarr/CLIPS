@@ -1,1 +1,9 @@
-;;;*******************************************************************;;; DEFCLASS TESTS;;;;;; This file class.bat tests various features of defclasses.;;;;;; To test, execute the command (batch "class.tst").;;; When the test is complete, check the file class.rsl;;; for the results.;;;*******************************************************************
+;;;*******************************************************************
+;;; DEFCLASS TESTS
+;;;
+;;; This file class.bat tests various features of defclasses.
+;;;
+;;; To test, execute the command (batch "class.tst").
+;;; When the test is complete, check the file class.rsl
+;;; for the results.
+;;;*******************************************************************

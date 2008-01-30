@@ -1,1 +1,1 @@
-rm all.log *.c *.h *.bin *.rsl *.out *.tmp
+rm all.log *.c *.h *.bin *.rsl *.out *.tmp
