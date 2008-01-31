@@ -57,16 +57,13 @@
 extern int LIB$SPAWN();
 #endif
 
-#if MAC
-
 #if MAC_MCW || MAC_XCD
 #include <Carbon/Carbon.h> 
+#define kTwoPower32 (4294967296.0)      /* 2^32 */
 #endif
 
-#define kTwoPower32 (4294967296.0)      /* 2^32 */
 #if MAC_MCW || MAC_XCD
 #include <strings.h>
-#endif
 #endif
 
 #if MAC_MCW || WIN_MCW || MAC_XCD 
@@ -245,9 +242,6 @@ struct systemDependentData
    static void                    RestoreInterruptVectors(void);
 #endif
 */
-#if MAC && (! WINDOW_INTERFACE)
-   static void                    CallSystemTask(void);
-#endif
 
 /********************************************************/
 /* InitializeSystemDependentData: Allocates environment */
@@ -676,7 +670,7 @@ static void SystemFunctionDefinitions(
 /*********************************************************/
 globle double gentime()
   {
-#if   MAC
+#if   MAC_XCD || MAC_MCW
    UnsignedWide result;
 
    Microseconds(&result);
@@ -859,10 +853,6 @@ static void InitializeNonportableFeatures(
 #endif
 #if ! WINDOW_INTERFACE
 
-#if MAC
-   AddPeriodicFunction("systemtask",CallSystemTask,0);
-#endif
-
 #if VAX_VMS || UNIX_V || LINUX || DARWIN || UNIX_7 || WIN_GCC || WIN_BTC || WIN_MVC
    signal(SIGINT,CatchCtrlC);
 #endif
@@ -899,23 +889,7 @@ static void InitializeNonportableFeatures(
 
 #if ! WINDOW_INTERFACE
 
-#if MAC
-/************************************************************/
-/* CallSystemTask: Macintosh specific function which allows */
-/*   periodic tasks to be handled by the operating system.  */
-/************************************************************/
-static void CallSystemTask()
-  {
-   static unsigned long int lastCall;
-
-   if (TickCount() < (lastCall + 10)) return;
-   SystemTask();
-   lastCall = TickCount();
-   return;
-  }
-#endif
-
-#if   VAX_VMS || UNIX_V || LINUX || DARWIN || UNIX_7 || WIN_GCC || WIN_BTC || WIN_MVC
+#if   VAX_VMS || UNIX_V || LINUX || DARWIN || UNIX_7 || WIN_GCC || WIN_BTC || WIN_MVC || DARWIN
 /**********************************************/
 /* CatchCtrlC: VMS and UNIX specific function */
 /*   to allow control-c interrupts.           */

@@ -72,11 +72,11 @@
 #endif
 
 #ifndef DARWIN
-#define DARWIN  0   /* Darwin Mac OS 10.5, presumably with gcc */
+#define DARWIN  0   /* Darwin Mac OS 10.5, presumably with gcc or Xcode 3.0 with Console */
 #endif
 
 #ifndef MAC_XCD
-#define MAC_XCD 0   /* MacOS 10.5, with Xcode 3.0 */
+#define MAC_XCD 0   /* MacOS 10.5, with Xcode 3.0 and Cocoa GUI */
 #endif
 
 #ifndef MAC_MCW
@@ -122,12 +122,6 @@
 #define IBM 1
 #else
 #define IBM 0
-#endif
-
-#if MAC_MCW || MAC_XCD
-#define MAC 1
-#else
-#define MAC 0
 #endif
 
 /***********************************************/
@@ -373,7 +367,7 @@
 #define  EMACS_EDITOR 1
 #endif
 
-#if GENERIC || MAC || WIN_MCW || WIN_BTC || WIN_MVC
+#if GENERIC || MAC_XCD || MAC_MCW || WIN_MCW || WIN_BTC || WIN_MVC
 #undef EMACS_EDITOR
 #define  EMACS_EDITOR  0
 #endif
