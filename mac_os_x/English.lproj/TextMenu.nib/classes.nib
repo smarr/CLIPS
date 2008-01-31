@@ -1,0 +1,24 @@
+{
+    IBClasses = (
+        {
+            CLASS = CLIPSTextMenu; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {textMenu = NSMenu; }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {
+                balance = id; 
+                batchSelection = id; 
+                comment = id; 
+                loadBuffer = id; 
+                loadSelection = id; 
+                uncomment = id; 
+            }; 
+            CLASS = FirstResponder; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }
+    ); 
+    IBVersion = 1; 
+}

@@ -1,0 +1,35 @@
+{
+    IBClasses = (
+        {
+            CLASS = CLIPSEnvironment; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {delegate = id; }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {
+                clearScrollback = id; 
+                loadBatch = id; 
+                loadConstructs = id; 
+                pauseContinue = id; 
+            }; 
+            CLASS = CLIPSTerminalController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                environment = CLIPSEnvironment; 
+                executionIndicator = NSProgressIndicator; 
+                pauseButton = NSButton; 
+                textView = CLIPSTerminalView; 
+            }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {
+            CLASS = CLIPSTerminalView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {dialogWindow = id; environment = CLIPSEnvironment; }; 
+            SUPERCLASS = NSTextView; 
+        }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }
+    ); 
+    IBVersion = 1; 
+}

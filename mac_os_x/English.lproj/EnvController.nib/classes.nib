@@ -1,0 +1,57 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {
+                clearScrollback = id; 
+                halt = id; 
+                haltImmediately = id; 
+                loadBatch = id; 
+                loadConstructs = id; 
+                pauseContinue = id; 
+                setDirectory = id; 
+            }; 
+            CLASS = CLIPSTerminalController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                environment = CLIPSEnvironment; 
+                executionIndicator = NSProgressIndicator; 
+                pauseButton = NSButton; 
+                textView = CLIPSTerminalView; 
+            }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {
+            ACTIONS = {
+                newDebugAgenda = id; 
+                newDebugFactBrowser = id; 
+                newDebugFactInspector = id; 
+                newDebugGenericInspector = id; 
+                newEnvironment = id; 
+                showConstructInspectorPanel = id; 
+            }; 
+            CLASS = EnvController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                debugMenu = NSMenu; 
+                environmentArrayController = NSArrayController; 
+                environmentMenu = NSMenu; 
+                terminalArrayController = NSArrayController; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {
+                clearScrollback = id; 
+                halt = id; 
+                haltImmediately = id; 
+                loadBatch = id; 
+                loadConstructs = id; 
+                setDirectory = id; 
+            }; 
+            CLASS = FirstResponder; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }
+    ); 
+    IBVersion = 1; 
+}

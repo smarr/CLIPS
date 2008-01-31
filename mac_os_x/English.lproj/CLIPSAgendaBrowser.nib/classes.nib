@@ -1,0 +1,24 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {halt = id; reset = id; run = id; showDefrule = id; step = id; }; 
+            CLASS = CLIPSAgendaController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                agendaList = NSTableView; 
+                environmentList = NSPopUpButton; 
+                executionIndicator = NSProgressIndicator; 
+                focusStack = NSTableView; 
+                focusStackController = id; 
+                haltButton = NSButton; 
+                resetButton = NSButton; 
+                runButton = NSButton; 
+                splitView = NSSplitView; 
+                stepButton = NSButton; 
+            }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }
+    ); 
+    IBVersion = 1; 
+}

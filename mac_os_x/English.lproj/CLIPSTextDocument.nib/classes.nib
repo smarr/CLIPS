@@ -1,0 +1,25 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {
+                balance = id; 
+                batchSelection = id; 
+                comment = id; 
+                loadBuffer = id; 
+                loadSelection = id; 
+                uncomment = id; 
+            }; 
+            CLASS = CLIPSTextDocument; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                environmentList = NSPopUpButton; 
+                popupActivator = NSButton; 
+                textView = CLIPSTextView; 
+            }; 
+            SUPERCLASS = NSDocument; 
+        }, 
+        {CLASS = CLIPSTextView; LANGUAGE = ObjC; SUPERCLASS = NSTextView; }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }
+    ); 
+    IBVersion = 1; 
+}

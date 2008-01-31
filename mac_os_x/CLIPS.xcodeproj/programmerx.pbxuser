@@ -1,0 +1,227 @@
+// !$*UTF8*$!
+{
+	1EEB33EA0D4DA2230053B35B /* CLIPS Console */ = {
+		isa = PBXExecutable;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		breakpointsEnabled = 0;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		dylibVariantSuffix = "";
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = "CLIPS Console";
+		sourceDirectories = (
+		);
+	};
+	1EEB33EB0D4DA2230053B35B /* CLIPS IDE */ = {
+		isa = PBXExecutable;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		breakpointsEnabled = 0;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		dylibVariantSuffix = "";
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = "CLIPS IDE";
+		savedGlobals = {
+		};
+		sourceDirectories = (
+		);
+		variableFormatDictionary = {
+		};
+	};
+	1EEB33FC0D4DA2410053B35B /* Source Control */ = {
+		isa = PBXSourceControlManager;
+		fallbackIsa = XCSourceControlManager;
+		isSCMEnabled = 0;
+		scmConfiguration = {
+		};
+	};
+	1EEB33FD0D4DA2410053B35B /* Code sense */ = {
+		isa = PBXCodeSenseManager;
+		indexTemplatePath = "";
+	};
+	2A37F4A9FDCFA73011CA2CEA /* Project object */ = {
+		activeArchitecture = i386;
+		activeBuildConfigurationName = Release;
+		activeExecutable = 1EEB33EB0D4DA2230053B35B /* CLIPS IDE */;
+		activeTarget = 8D15AC270486D014006FF6A4 /* CLIPS IDE */;
+		breakpoints = (
+		);
+		codeSenseManager = 1EEB33FD0D4DA2410053B35B /* Code sense */;
+		executables = (
+			1EEB33EA0D4DA2230053B35B /* CLIPS Console */,
+			1EEB33EB0D4DA2230053B35B /* CLIPS IDE */,
+		);
+		perUserDictionary = {
+			PBXConfiguration.PBXFileTableDataSource3.PBXFileTableDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					637,
+					20,
+					48,
+					43,
+					43,
+					20,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+					PBXFileDataSource_Target_ColumnID,
+				);
+			};
+			PBXConfiguration.PBXTargetDataSource.PBXTargetDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					597,
+					60,
+					20,
+					48,
+					43,
+					43,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXTargetDataSource_PrimaryAttribute,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+				);
+			};
+			PBXPerProjectTemplateStateSaveDate = 223446066;
+			PBXWorkspaceStateSaveDate = 223446066;
+		};
+		sourceControlManager = 1EEB33FC0D4DA2410053B35B /* Source Control */;
+		userBuildSettings = {
+		};
+	};
+	8D15AC270486D014006FF6A4 /* CLIPS IDE */ = {
+		activeExec = 0;
+		executables = (
+			1EEB33EB0D4DA2230053B35B /* CLIPS IDE */,
+		);
+	};
+	B59979A60D4D9B9E00C9B896 /* CLIPS Console */ = {
+		activeExec = 0;
+		executables = (
+			1EEB33EA0D4DA2230053B35B /* CLIPS Console */,
+		);
+	};
+	B5B1B53909CDE36A00F76417 /* CLIPSAgendaController.m */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {917, 8176}}";
+			sepNavSelRange = "{2411, 31}";
+			sepNavVisRange = "{2280, 433}";
+		};
+	};
+	B5BCEF5409AD23BF000E597B /* CLIPS */ = {
+		activeExec = 0;
+	};
+	B5BCEF8509AD245A000E597B /* cstrccom.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {796, 22988}}";
+			sepNavSelRange = "{42341, 0}";
+			sepNavVisRange = "{42425, 405}";
+		};
+	};
+	B5BCEF9D09AD245A000E597B /* dffctbsc.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {796, 4088}}";
+			sepNavSelRange = "{4676, 0}";
+			sepNavVisRange = "{4513, 387}";
+			sepNavWindowFrame = "{{252, 38}, {788, 740}}";
+		};
+	};
+	B5BCEFC109AD245A000E597B /* evaluatn.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {796, 17668}}";
+			sepNavSelRange = "{4393, 0}";
+			sepNavVisRange = "{12027, 500}";
+		};
+	};
+	B5BCEFD309AD245A000E597B /* factcom.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {796, 18088}}";
+			sepNavSelRange = "{4873, 0}";
+			sepNavVisRange = "{8073, 452}";
+		};
+	};
+	B5BCEFD909AD245A000E597B /* facthsh.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {720, 5446}}";
+			sepNavSelRange = "{2305, 8}";
+			sepNavVisRange = "{2122, 519}";
+			sepNavWindowFrame = "{{183, 26}, {788, 740}}";
+		};
+	};
+	B5BCEFDF09AD245A000E597B /* factmngr.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {842, 21700}}";
+			sepNavSelRange = "{21840, 0}";
+			sepNavVisRange = "{22581, 1501}";
+			sepNavWindowFrame = "{{510, -32}, {788, 740}}";
+		};
+	};
+	B5BCF05C09AD245A000E597B /* prcdrfun.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {796, 9380}}";
+			sepNavSelRange = "{19072, 0}";
+			sepNavVisRange = "{19136, 437}";
+		};
+	};
+	B5BCF06209AD245A000E597B /* prntutil.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {729, 8722}}";
+			sepNavSelRange = "{3935, 74}";
+			sepNavVisRange = "{3264, 1088}";
+			sepNavWindowFrame = "{{15, 33}, {788, 740}}";
+		};
+	};
+	B5BCF06C09AD245A000E597B /* router.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {729, 10192}}";
+			sepNavSelRange = "{3744, 27}";
+			sepNavVisRange = "{3015, 1359}";
+			sepNavWindowFrame = "{{664, -81}, {788, 740}}";
+		};
+	};
+	B5FB531C09AD41E2001AE877 /* CLIPSTextDocument.m */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {917, 15050}}";
+			sepNavSelRange = "{3740, 31}";
+			sepNavVisRange = "{3408, 430}";
+		};
+	};
+}

@@ -1,0 +1,21 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {changeFactIndex = id; displayDefaultedValues = id; stepFactIndex = id; }; 
+            CLASS = CLIPSFactInspectorController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                countText = NSTextField; 
+                displayDefaultedValuesButton = NSButton; 
+                environmentList = NSPopUpButton; 
+                factIndex = NSComboBox; 
+                factListController = NSArrayController; 
+                factStepper = NSStepper; 
+                slotValuesController = NSArrayController; 
+            }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }
+    ); 
+    IBVersion = 1; 
+}

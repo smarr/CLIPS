@@ -1,0 +1,31 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {displayDefaultedValues = id; search = id; showDefrule = id; }; 
+            CLASS = CLIPSFactController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                displayDefaultedValuesButton = NSButton; 
+                environmentList = NSPopUpButton; 
+                executionIndicator = NSProgressIndicator; 
+                factList = NSTableView; 
+                factListController = ModuleArrayController; 
+                moduleList = NSTableView; 
+                moduleListController = NSArrayController; 
+                searchField = NSSearchField; 
+                slotValues = NSTableView; 
+                slotValuesController = NSArrayController; 
+                splitView = NSSplitView; 
+            }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {search = id; }; 
+            CLASS = ModuleArrayController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSArrayController; 
+        }
+    ); 
+    IBVersion = 1; 
+}
