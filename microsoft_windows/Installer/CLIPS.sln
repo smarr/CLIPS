@@ -1,0 +1,29 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "CLIPS", "CLIPS.vdproj", "{A08F96F9-E636-491C-A27D-989DE62C6F88}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "CLIPSSource", "CLIPSSource.vdproj", "{E0A0AD6E-42B3-4FE0-8812-A5DB115A1BA5}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		Release = Release
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{A08F96F9-E636-491C-A27D-989DE62C6F88}.Debug.ActiveCfg = Debug
+		{A08F96F9-E636-491C-A27D-989DE62C6F88}.Debug.Build.0 = Debug
+		{A08F96F9-E636-491C-A27D-989DE62C6F88}.Release.ActiveCfg = Release
+		{A08F96F9-E636-491C-A27D-989DE62C6F88}.Release.Build.0 = Release
+		{E0A0AD6E-42B3-4FE0-8812-A5DB115A1BA5}.Debug.ActiveCfg = Debug
+		{E0A0AD6E-42B3-4FE0-8812-A5DB115A1BA5}.Debug.Build.0 = Debug
+		{E0A0AD6E-42B3-4FE0-8812-A5DB115A1BA5}.Release.ActiveCfg = Release
+		{E0A0AD6E-42B3-4FE0-8812-A5DB115A1BA5}.Release.Build.0 = Release
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

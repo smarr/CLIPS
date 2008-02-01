@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<PersonalityInfo>
+		<Option>
+			<Option Name="Personality">Default.Personality</Option>
+			<Option Name="ProjectType"></Option>
+			<Option Name="Version">1.0</Option>
+			<Option Name="GUID">{34998D34-59AE-4497-9A11-2BC235290B82}</Option>
+		</Option>
+	</PersonalityInfo>
+	<Default.Personality>  <Projects>
+      <Projects Name="CLIPSWin.exe">CLIPSWin.bdsproj</Projects>
+      <Projects Name="CLIPSDOS.exe">CLIPSDOS.bdsproj</Projects>
+      <Projects Name="CLIPSCPP.lib">CLIPSCPP.bdsproj</Projects>
+      <Projects Name="CLIPSWin32.dll">CLIPSWin32.bdsproj</Projects>
+      <Projects Name="CLIPSWin32CPP.lib">CLIPSWin32CPP.bdsproj</Projects>
+      <Projects Name="CLIPSJNI.dll">CLIPSJNI.bdsproj</Projects>
+      <Projects Name="Targets">CLIPSWin.exe CLIPSDOS.exe CLIPSCPP.lib CLIPSWin32.dll CLIPSWin32CPP.lib CLIPSJNI.dll</Projects>
+    </Projects>
+    <Dependencies/>
+  </Default.Personality>
+</BorlandProject>

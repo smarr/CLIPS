@@ -1,0 +1,586 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#define APSTUDIO_HIDDEN_SYMBOLS
+#include "windows.h"
+#undef APSTUDIO_HIDDEN_SYMBOLS
+#include "winver.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON    DISCARDABLE     "CLIPSwinc.ico"
+IDR_TEXT                ICON    DISCARDABLE     "CLIPSedit.ico"
+IDR_DISPLAY             ICON    DISCARDABLE     "CLIPSedit.ico"
+IDR_STATUS              ICON    DISCARDABLE     "CLIPSedit.ico"
+  
+CLIPS_WAIT CURSOR "wait.cur"
+CLIPS_QUERY CURSOR "query.cur"
+CURSOR0 CURSOR "1.cur"
+CURSOR1 CURSOR "2.cur"
+CURSOR2 CURSOR "3.cur"
+CURSOR3 CURSOR "4.cur"
+CURSOR4 CURSOR "5.cur"
+CURSOR5 CURSOR "6.cur"
+CURSOR6 CURSOR "7.cur"
+CURSOR7 CURSOR "8.cur"
+CURSOR8 CURSOR "9.cur"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_CLIPS MENU DISCARDABLE 
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&New\tCtrl+N",                ID_FILE_NEW
+        MENUITEM "&Open...\tCtrl+O",            ID_FILE_OPEN
+        MENUITEM "&Load...\tCtrl+L",            ID_FILE_LOAD
+        MENUITEM "Load &Batch...",              ID_FILE_LOAD_BATCH
+        MENUITEM "Load B&inary...",             ID_FILE_LOAD_BINARY
+        MENUITEM "Turn &Dribble On...",         ID_FILE_DRIBBLE        
+        MENUITEM "&Close",                      ID_FILE_CLOSE, GRAYED
+        MENUITEM SEPARATOR
+        MENUITEM "&Save\tCtrl+S",               ID_FILE_SAVE, GRAYED
+        MENUITEM "Save &As...",                 ID_FILE_SAVE_AS, GRAYED
+        MENUITEM "Save Bi&nary...",             ID_FILE_SAVE_BINARY
+        MENUITEM "&Revert",                     ID_FILE_REVERT, GRAYED
+        MENUITEM SEPARATOR
+        MENUITEM "Pa&ge Setup...",              ID_FILE_PAGE_SETUP
+        MENUITEM "&Print...\tCtrl+P",           ID_FILE_PRINT
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",                       ID_APP_EXIT
+    END
+
+    POPUP "&Edit"
+    BEGIN
+        MENUITEM "&Undo\tCtrl+Z",               ID_EDIT_UNDO, GRAYED
+        MENUITEM SEPARATOR
+        MENUITEM "Cu&t\tCtrl+X",                ID_EDIT_CUT, GRAYED
+        MENUITEM "&Copy\tCtrl+C",               ID_EDIT_COPY, GRAYED
+        MENUITEM "&Paste\tCtrl+V",              ID_EDIT_PASTE, GRAYED
+        MENUITEM "&Delete\tDel",                ID_EDIT_CLEAR, GRAYED
+        MENUITEM "Select Al&l",                 ID_EDIT_SELECT_ALL, GRAYED
+        MENUITEM SEPARATOR
+        MENUITEM "&Balance\tCtrl+B",            ID_EDIT_BALANCE, GRAYED
+        MENUITEM "Co&mment\tCtrl+;",            ID_EDIT_COMMENT
+        MENUITEM "U&ncomment\tCtrl+U",          ID_EDIT_UNCOMMENT
+        MENUITEM SEPARATOR
+        MENUITEM "&Set Font...",                 ID_EDIT_SET_FONT, GRAYED
+    END
+
+	POPUP "&Buffer"
+	BEGIN
+		MENUITEM "&Find\tCtrl+F",               ID_BUFFER_FIND
+		MENUITEM "&Replace\tCtrl+H",            ID_BUFFER_REPLACE
+		MENUITEM SEPARATOR
+		MENUITEM "&Load Selection\tCtrl+K",     ID_BUFFER_LOAD, GRAYED
+		MENUITEM "Batch S&election\tCtrl+M",    ID_BUFFER_BATCH, GRAYED
+		MENUITEM "L&oad Buffer",                 ID_BUFFER_LOAD_BUFFER, GRAYED
+	END
+
+	POPUP "E&xecution"
+    BEGIN
+        MENUITEM "R&eset\tCtrl+E",              ID_EXECUTION_RESET
+        MENUITEM "&Run\tCtrl+R",                ID_EXECUTION_RUN
+        MENUITEM "&Step\tCtrl+T",               ID_EXECUTION_STEP
+        MENUITEM SEPARATOR
+        MENUITEM "&Watch...\tCtrl+W",           ID_EXECUTION_WATCH
+        MENUITEM "&Options...",                 ID_EXECUTION_OPTIONS
+        MENUITEM "&Preferences...",             ID_EXECUTION_PREFERENCES
+        MENUITEM SEPARATOR
+        MENUITEM "&Clear CLIPS",                ID_EXECUTION_CLEAR
+    END
+
+	POPUP "B&rowse"
+	BEGIN
+ 		POPUP "&Module"
+		BEGIN
+   			MENUITEM "Item",                    IDM_MODULE_ONE
+		END
+		
+        MENUITEM SEPARATOR
+        MENUITEM "Def&rule Manager...",         ID_BROWSE_RULE, GRAYED
+        MENUITEM "Def&facts Manager...",        ID_BROWSE_FACTS, GRAYED
+        MENUITEM "Def&template Manager...",     ID_BROWSE_TEMPLATE, GRAYED
+        MENUITEM "Deff&unction Manager ...",    ID_BROWSE_FUNCTION, GRAYED
+        MENUITEM "Defg&lobal Manager ...",      ID_BROWSE_GLOBAL, GRAYED
+        MENUITEM "Def&generic Manager...",      ID_BROWSE_GENERIC, GRAYED
+        MENUITEM "Def&class Manager...",        ID_BROWSE_CLASS, GRAYED
+        MENUITEM "Def&instances Manager...",    ID_BROWSE_INSTANCES, GRAYED
+        MENUITEM "&Agenda Manager...",          ID_BROWSE_AGENDA, GRAYED
+	END
+
+    POPUP "&Window"
+    BEGIN
+        MENUITEM "&Cascade",                    ID_WINDOW_CASCADE
+        MENUITEM "&Tile Horizontally",          ID_WINDOW_TILE_HORZ
+        MENUITEM "Tile &Vertically",            ID_WINDOW_TILE_VERT
+        MENUITEM "Close &All",                  ID_CLOSE_ALL
+        MENUITEM SEPARATOR
+        MENUITEM "&Show Status Windows",        ID_WIN_SHOW_ALL
+        MENUITEM "&Hide Status Windows",        ID_WIN_HIDE_ALL
+        MENUITEM "Tile &Dialog && Status Windows",  ID_WINDOW_ARRANGE_STATUS
+        MENUITEM "Clear Dialog &Window",        ID_WIN_CLEAR
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&About CLIPS...",             ID_HELP_ABOUT
+        MENUITEM "CLIPS &Help...",              ID_HELP_CLIPS
+        MENUITEM SEPARATOR
+        MENUITEM "&Command Complete...\tCtrl+J",ID_HELP_COMPLETE
+        MENUITEM "&Status Line",                ID_VIEW_STATUS_BAR
+    END
+END
+
+IDR_TEXT_CONTEXT MENU DISCARDABLE 
+BEGIN
+    POPUP "&Text popup"
+    BEGIN
+        MENUITEM "&Undo\tCtrl+Z",               ID_EDIT_UNDO, GRAYED
+        MENUITEM SEPARATOR
+        MENUITEM "Cu&t\tCtrl+X",                ID_EDIT_CUT, GRAYED
+        MENUITEM "&Copy\tCtrl+C",               ID_EDIT_COPY, GRAYED
+        MENUITEM "&Paste\tCtrl+V",              ID_EDIT_PASTE, GRAYED
+        MENUITEM "&Delete\tDel",                ID_EDIT_CLEAR, GRAYED
+        MENUITEM "Select Al&l",                 ID_EDIT_SELECT_ALL, GRAYED
+        MENUITEM SEPARATOR
+        MENUITEM "&Balance\tCtrl+B",            ID_EDIT_BALANCE, GRAYED
+        MENUITEM "Co&mment\tCtrl+;",            ID_EDIT_COMMENT
+        MENUITEM "U&ncomment\tCtrl+U",          ID_EDIT_UNCOMMENT
+        MENUITEM SEPARATOR
+        MENUITEM "&Set Font...",                ID_EDIT_SET_FONT
+		MENUITEM SEPARATOR
+		MENUITEM "&Load Selection\tCtrl+K",     ID_BUFFER_LOAD, GRAYED
+		MENUITEM "Batch S&election\tCtrl+M",    ID_BUFFER_BATCH, GRAYED
+		MENUITEM "L&oad Buffer",                ID_BUFFER_LOAD_BUFFER, GRAYED
+    END
+END
+
+IDR_DISPLAY_CONTEXT MENU DISCARDABLE 
+BEGIN
+    POPUP "&Display popup"
+    BEGIN
+        MENUITEM "&Copy\tCtrl+C",                   ID_EDIT_COPY, GRAYED
+        MENUITEM "&Paste\tCtrl+V",                  ID_EDIT_PASTE, GRAYED
+        MENUITEM SEPARATOR
+        MENUITEM "Tile &Dialog && Status Windows",  ID_WINDOW_ARRANGE_STATUS
+        MENUITEM "Clear Dialog &Window",            ID_WIN_CLEAR
+    END
+END
+
+IDR_STATUS_CONTEXT MENU DISCARDABLE 
+BEGIN
+    POPUP "&Status popup"
+    BEGIN
+        MENUITEM "Tile &Dialog && Status Windows",  ID_WINDOW_ARRANGE_STATUS
+    END
+END
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+ClipsAcc ACCELERATORS 
+BEGIN
+	"^B", ID_EDIT_BALANCE
+	"^C", ID_EDIT_COPY
+	"^E", ID_EXECUTION_RESET
+	"^F", ID_BUFFER_FIND
+    "H",  ID_BUFFER_REPLACE,       VIRTKEY, CONTROL, NOINVERT
+	"^J", ID_HELP_COMPLETE
+	"K",  ID_BUFFER_LOAD,          VIRTKEY, CONTROL, NOINVERT
+	"^L", ID_FILE_LOAD
+	"M",  ID_BUFFER_BATCH,         VIRTKEY, CONTROL, NOINVERT
+	"^N", ID_FILE_NEW
+	"^O", ID_FILE_OPEN
+	"^P", ID_FILE_PRINT
+	"^R", ID_EXECUTION_RUN
+	"^S", ID_FILE_SAVE
+	"^T", ID_EXECUTION_STEP
+	"^U", ID_EDIT_UNCOMMENT
+	"^V", ID_EDIT_PASTE
+	"W",  ID_EXECUTION_WATCH,      VIRTKEY, CONTROL, NOINVERT
+	"^X", ID_EDIT_CUT
+	"^Z", ID_EDIT_UNDO
+	190,  ID_EXECUTION_HALT,       VIRTKEY, CONTROL, NOINVERT        // VK_OEM_PERIOD or "."
+	190,  ID_EXECUTION_HALT_NOW,   VIRTKEY, CONTROL, NOINVERT, SHIFT // VK_OEM_PERIOD or "."
+	186,  ID_EDIT_COMMENT,         VIRTKEY, CONTROL                  // VK_OEM_1 or ";" 
+END
+
+
+IDR_MAINFRAME ACCELERATORS   
+BEGIN
+    "/",            ID_HELP_ABOUT,           ASCII,  ALT, NOINVERT
+    "?",            ID_HELP_ABOUT,           ASCII,  ALT, NOINVERT
+    "^N",           ID_FILE_NEW           
+	"O",            ID_FILE_OPEN,          VIRTKEY, CONTROL, NOINVERT
+END
+
+IDR_TEXT ACCELERATORS   
+BEGIN
+    "/",            ID_HELP_ABOUT,           ASCII,  ALT, NOINVERT
+    "?",            ID_HELP_ABOUT,           ASCII,  ALT, NOINVERT
+    "C",            ID_EDIT_COPY,           VIRTKEY, CONTROL, NOINVERT
+    "F",            ID_EDIT_SET_FONT,       VIRTKEY, CONTROL, NOINVERT
+    "^N",           ID_FILE_NEW           
+	"O",             ID_FILE_OPEN,          VIRTKEY, CONTROL, NOINVERT
+    "P",            ID_FILE_PRINT,          VIRTKEY, CONTROL, NOINVERT
+    "S",            ID_FILE_SAVE,           VIRTKEY, CONTROL, NOINVERT
+    "V",            ID_EDIT_PASTE,          VIRTKEY, CONTROL, NOINVERT
+    VK_BACK,        ID_EDIT_UNDO,           VIRTKEY, ALT, NOINVERT
+    VK_DELETE,      ID_EDIT_CLEAR,          VIRTKEY, CONTROL, NOINVERT
+    VK_DELETE,      ID_EDIT_CUT,            VIRTKEY, SHIFT, NOINVERT
+    VK_F1,          ID_HELP_CLIPS,          VIRTKEY, NOINVERT
+    VK_INSERT,      ID_EDIT_COPY,           VIRTKEY, CONTROL, NOINVERT
+    VK_INSERT,      ID_EDIT_PASTE,          VIRTKEY, SHIFT, NOINVERT
+    "X",            ID_EDIT_CUT,            VIRTKEY, CONTROL, NOINVERT
+    "Z",            ID_EDIT_UNDO,           VIRTKEY, CONTROL, NOINVERT
+END
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+AboutBox DIALOG 18, 22, 118, 108
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION
+CAPTION "About CLIPS 6.3"
+FONT 8, "MS Sans Serif"
+{
+ CTEXT "CLIPS Version 6.3", -1, 39, 31, 40, 25, WS_CHILD | WS_VISIBLE | WS_GROUP
+ CONTROL "06-24-07", -1, "STATIC", SS_CENTER | WS_CHILD | WS_VISIBLE | WS_GROUP, 45, 63, 28, 8
+ PUSHBUTTON "&OK", IDC_OK, 45, 82, 28, 14, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+ ICON "Clips_Icon", -1, 51, 5, 16, 16, WS_CHILD | WS_VISIBLE
+}
+
+Clips_Icon ICON "clipswinc.ico"
+
+WatchDlg DIALOG 34, 34, 161, 145
+FONT 8, "MS Sans Serif"
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION
+CAPTION "Watch Options"
+BEGIN
+	CHECKBOX "C&ompilations", IDC_WATCH_COMPILE, 8, 5, 56, 13, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	CHECKBOX "&Deffunctions", IDC_WATCH_DEFFUN, 82, 5, 60, 11, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	CHECKBOX "&Facts", IDC_WATCH_FACTS, 8, 18, 30, 12, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	CHECKBOX "&Generic Functions", IDC_WATCH_GENERIC, 82, 18, 70, 12, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	CHECKBOX "&Rules", IDC_WATCH_RULES, 8, 31, 30, 12, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	CHECKBOX "&Methods", IDC_WATCH_METHOD, 82, 31, 44, 12, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	CHECKBOX "&Statistics", IDC_WATCH_STATS, 8, 44, 58, 11, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	CHECKBOX "&Instances", IDC_WATCH_INSTANCE, 82, 44, 47, 12, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	CHECKBOX "A&ctivations", IDC_WATCH_ACTIVE, 8, 57, 51, 12, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	CHECKBOX "&Slots", IDC_WATCH_SLOT, 82, 57, 31, 12, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	CHECKBOX "&Focus", IDC_WATCH_FOCUS, 8, 70, 44, 12, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	CHECKBOX "Message-&handlers", IDC_WATCH_MSGHANDLER, 82, 70, 70, 12, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	CHECKBOX "&Globals", IDC_WATCH_GLOBAL, 8, 83, 44, 12, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	CHECKBOX "&Messages", IDC_WATCH_MESSAGE, 82, 83, 47, 12, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	PUSHBUTTON "&All", IDC_WATCH_ALL, 36, 103, 34, 14, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	PUSHBUTTON "&None", IDC_WATCH_NONE, 92, 103, 34, 14, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	PUSHBUTTON "&Cancel", IDC_CANCEL, 36, 127, 33, 14, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	DEFPUSHBUTTON "&OK", IDC_OK, 92, 127, 34, 14, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	CONTROL "", -1, "static", SS_GRAYFRAME | WS_CHILD | WS_VISIBLE, 0, 121, 161, 1
+END
+
+Exec_Option DIALOG 34, 34, 212, 139
+FONT 8, "MS Sans Serif"
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION
+CAPTION "Execution Options"
+BEGIN
+	LTEXT "&Salience Evaluation:", -1, 26, 13, 67, 9, WS_CHILD | WS_VISIBLE | WS_GROUP
+	LTEXT "S&trategy:", -1, 64, 29, 29, 9
+	CONTROL "", IDC_EXE_SALIENCE, "COMBOBOX", CBS_DROPDOWNLIST | CBS_SORT | WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_TABSTOP, 101, 11, 72, 44
+	CONTROL "", IDC_EXE_STRATEGY, "COMBOBOX", CBS_DROPDOWNLIST | CBS_SORT | WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_TABSTOP, 101, 28, 72, 87
+	CHECKBOX "Static Co&nstraint Checking", IDC_EXE_STATIC, 5, 51, 119, 12, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	CHECKBOX "&Dynamic Constraint Checking", IDC_EXE_DYNAMIC, 5, 65, 107, 11, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	CHECKBOX "Reset &Global Variables", IDC_EXE_GLOBAL, 5, 79, 107, 11, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	CHECKBOX "Sequence &Expansion Operator Recognition", IDC_EXE_SEQUENCE, 5, 93, 150, 11, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	CHECKBOX "&Incremental Reset", IDC_EXE_RESET, 129, 51, 83, 12, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	CHECKBOX "&Auto-Float Dividend", IDC_EXE_AUTO, 129, 65, 82, 12, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	CHECKBOX "&Fact Duplication", IDC_EXE_FACT, 129, 79, 65, 12, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	PUSHBUTTON "&Cancel", IDC_CANCEL, 51, 118, 40, 14, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	PUSHBUTTON "&OK", IDC_OK, 115, 118, 40, 14, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+END
+
+OptionDlg DIALOGEX 34, 34, 142, 77
+FONT 8, "MS Sans Serif"
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION
+CAPTION "Preferences"
+BEGIN
+	CHECKBOX "&Enable Warnings", IDC_WARN, 11, 5, 121, 11, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	CHECKBOX "&Command Completion Dialog", IDC_PREF_COMPLETE, 11, 18, 121, 10, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	LTEXT "&Step Rule Firing Increment:", -1, 11, 38, 91, 8, WS_CHILD | WS_VISIBLE | WS_GROUP
+	CONTROL "1", IDC_EDIT, "EDIT", ES_LEFT | WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP, 106, 37, 18, 12
+	PUSHBUTTON "&Cancel", IDC_CANCEL, 23, 59, 37, 13, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	DEFPUSHBUTTON "&OK", IDC_OK, 82, 59, 37, 13, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+END
+
+List_Manager DIALOG 34, 34, 243, 188
+FONT 8, "MS Sans Serif"
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION
+CAPTION "List Manager"
+BEGIN
+	CONTROL "IDC_LISTBOX", IDC_LISTBOX, "LISTBOX", LBS_STANDARD | LBS_HASSTRINGS | LBS_DISABLENOSCROLL | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 5, 13, 155, 167
+	PUSHBUTTON "&Remove", IDC_PBUTTON1, 167, 12, 68, 15, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	PUSHBUTTON "Refresh", IDC_PBUTTON2, 167, 32, 68, 15, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	PUSHBUTTON "&Matches", IDC_PBUTTON3, 167, 52, 68, 15, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	PUSHBUTTON "&Pprint", IDC_PBUTTON4, 167, 72, 68, 15, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	PUSHBUTTON "Msg. Handlers...", IDC_PBUTTON5, 167, 92, 68, 15, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	CHECKBOX "&Watch", IDC_CBOX1, 167, 113, 64, 15, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	CHECKBOX "Watch &Activation", IDC_CBOX2, 167, 130, 72, 15, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	CHECKBOX "Watch &Slot Changes", IDC_CBOX3, 167, 147, 74, 15, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	DEFPUSHBUTTON "&Done", IDC_PBUTTON6, 167, 166, 68, 15, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	CTEXT "", NIDC_TEXT, 5, 3, 155, 8, WS_CHILD | WS_VISIBLE | WS_GROUP
+END
+
+List_Manager2 DIALOG 0, 0, 243, 188
+FONT 8, "MS Sans Serif"
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION
+CAPTION "List Manager"
+BEGIN
+	CONTROL "IDC_LISTBOX", IDC_LISTBOX, "LISTBOX", LBS_STANDARD | LBS_HASSTRINGS | LBS_DISABLENOSCROLL | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 5, 13, 155, 167
+	PUSHBUTTON "&Remove", IDC_PBUTTON1, 167, 12, 68, 15, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	PUSHBUTTON "Refresh", IDC_PBUTTON2, 167, 32, 68, 15, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	PUSHBUTTON "&Matches", IDC_PBUTTON3, 167, 52, 68, 15, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	PUSHBUTTON "&Pprint", IDC_PBUTTON4, 167, 72, 68, 15, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	PUSHBUTTON "Msg. Handlers...", IDC_PBUTTON5, 167, 92, 68, 15, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	CHECKBOX "&Watch", IDC_CBOX1, 167, 113, 64, 15, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	CHECKBOX "Watch &Activation", IDC_CBOX2, 167, 130, 72, 15, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	CHECKBOX "Watch &Slot Changes", IDC_CBOX3, 167, 147, 74, 15, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	DEFPUSHBUTTON "&Done", IDC_PBUTTON6, 167, 166, 68, 15, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	CTEXT "", NIDC_TEXT, 5, 3, 155, 8, WS_CHILD | WS_VISIBLE | WS_GROUP
+END
+
+Agenda_Manager DIALOG 34, 34, 211, 171
+FONT 8, "MS Sans Serif"
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION
+CAPTION "Agenda Manager - 0 Items"
+BEGIN
+	CONTROL "IDC_LISTBOX", IDC_LISTBOX, "LISTBOX", LBS_NOTIFY | LBS_HASSTRINGS | LBS_DISABLENOSCROLL | WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_TABSTOP, 3, 6, 155, 163
+	PUSHBUTTON "&Remove", IDC_PBUTTON1, 166, 5, 42, 15, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	PUSHBUTTON "&Fire", IDC_PBUTTON4, 166, 80, 42, 15, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+	PUSHBUTTON "&Done", IDC_PBUTTON6, 166, 149, 42, 15, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+END
+
+PrintDlgBox DIALOG 20, 20, 100, 76
+STYLE WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_VISIBLE
+CAPTION "CLIPS"
+BEGIN
+     CTEXT "Sending",                  -1,  0, 10, 100,  8
+     CTEXT "",                  IDD_FNAME,  0, 20, 100,  8
+     CTEXT "to print spooler.",        -1,  0, 30, 100,  8
+     DEFPUSHBUTTON  "Cancel",    IDCANCEL, 34, 50,  32, 14, WS_GROUP
+END
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDR_MAINFRAME           BITMAP  DISCARDABLE     "toolbar.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 83
+    END
+
+    IDD_NEW, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 178
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 58
+    END
+
+    IDD_OPTIONS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 281
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 147
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+{
+ IDS_APP_TITLE, "CLIPS 6.3"
+ IDS_RULES, "CLIPS Files(*.CLP)|*.CLP|All Files(*.*)|*.*|"
+ IDS_BATCH, "Batch Files (*.BAT)|*.BAT|All Files (*.*)|*.*|"
+ IDS_BINARY, "Binary Files (*.BIN)|*.BIN|All Files (*.*)|*.*|"
+ IDS_DRIBBLE, "Dribble Files (*.OUT)|*.OUT|All Files (*.*)|*.*|"
+ IDS_TEXT_FILES, "Text Files (*.TXT)|*.TXT|All Files (*.*)|*.*|"
+}
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDR_MAINFRAME           "MDI Explorer Frame Window Class"
+    IDR_TEXT                "Text Class"
+    IDS_TEXT                "Text window"
+    IDR_DISPLAY             "Display Class"
+    IDS_DISPLAY             "Display window"
+    IDR_STATUS              "Status Class"
+    IDS_STATUS              "Status window"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_HS                  "HS"
+    IDS_VS                  "VS"
+    IDS_AH                  "AH"
+    IDS_AV                  "AV"
+    IDS_TC                  "TC"
+    IDS_TL                  "TL"
+    IDS_ML                  "ML"
+    IDS_PW                  "PW"
+    IDS_OEM                 "OEM"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_FILE_NEW             "Create a new document\nNew"
+    ID_FILE_OPEN            "Open an existing document\nOpen"
+    ID_FILE_LOAD            "Load a CLIPS construct file\nLoad"
+    ID_FILE_LOAD_BATCH      "Load a CLIPS batch file\nLoad Batch"
+    ID_FILE_LOAD_BINARY     "Load a CLIPS binary file\nLoad Binary"
+    ID_FILE_DRIBBLE         "Enables\\Disables capture of Dialog Window output to a file\nTurn Dribble On"
+    ID_FILE_CLOSE           "Close the active document\nClose"
+    ID_FILE_SAVE            "Save the active document\nSave"
+    ID_FILE_SAVE_AS         "Save the active document with a new name\nSave As"
+    ID_FILE_SAVE_BINARY     "Save a CLIPS binary file\nSave Binary"
+    ID_FILE_REVERT          "Revert to last saved version of active document\nRevert"
+    ID_FILE_PAGE_SETUP      "Change the printing options\nPage Setup"
+    ID_FILE_PRINT_SETUP     "Change the printer and printing options\nPrint Setup"
+    ID_FILE_PRINT           "Print the active document\nPrint"
+    ID_FILE_PRINT_PREVIEW   "Display full pages\nPrint Preview"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_HELP_ABOUT           "Display CLIPS version number and release date\nAbout"
+    ID_APP_EXIT             "Quit the application; prompts to save documents\nExit"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_WINDOW_CASCADE       "Arrange windows so they overlap\nCascade Windows"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_WINDOW_TILE_HORZ     "Arrange windows as non-overlapping tiles\nTile Windows"
+    ID_WINDOW_TILE_VERT     "Arrange windows as non-overlapping tiles\nTile Windows"
+    ID_WINDOW_SPLIT         "Split the active window into panes\nSplit"
+    ID_HELP_CLIPS           "Display on-line help"
+    ID_HELP_COMPLETE        "Display possible completions for Edit or Dialog Window text\nCommand Complete"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_EDIT_UNDO            "Undo the last action\nUndo"
+    ID_EDIT_REDO            "Redo the previously undone action\nRedo"
+    ID_EDIT_CUT             "Cut the selection and put it on the Clipboard\nCut"
+    ID_EDIT_COPY            "Copy the selection and put it on the Clipboard\nCopy"
+    ID_EDIT_PASTE           "Insert Clipboard contents\nPaste"
+    ID_EDIT_CLEAR           "Erase the selection\nErase"
+    ID_EDIT_CLEAR_ALL       "Erase everything\nErase All"
+    ID_EDIT_REPEAT          "Repeat the last action\nRepeat"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_EDIT_SELECT_ALL       "Select the entire document\nSelect All"
+    ID_EDIT_SET_FONT         "Choose the text font\nFont selection"
+    ID_EDIT_BALANCE          "Select text between matching parentheses\nBalance"
+    ID_EDIT_COMMENT          "Place a comment character at the beginning of each line\nComment"
+    ID_EDIT_UNCOMMENT        "Remove a comment character from the beginning of each line\nUncomment"
+    ID_CLOSE_ALL             "Close all Edit and Status Windows"
+    ID_VIEW_TOOLBAR          "Show or hide the toolbar\nToggle ToolBar"
+    ID_VIEW_STATUS_BAR       "Show or hide the status bar\nToggle StatusBar"
+	ID_BUFFER_FIND           "Search for text\nFind"
+	ID_BUFFER_REPLACE        "Search for text and replace it with new text\nReplace"
+	ID_BUFFER_LOAD           "Load the current selection\nLoad Selection"
+	ID_BUFFER_BATCH          "Batch the current selection\nBatch Selection"
+	ID_BUFFER_LOAD_BUFFER    "Load the entire buffer\nLoad Buffer"
+	ID_EXECUTION_RESET       "Reset the environment\nReset"
+	ID_EXECUTION_RUN         "Begin rule execution\nRun"
+	ID_EXECUTION_STEP        "Execute rules up to the step limit\nStep"
+	ID_EXECUTION_WATCH       "Change watch flags\nWatch"
+	ID_EXECUTION_OPTIONS     "Change environment options\nOptions"
+	ID_EXECUTION_PREFERENCES "Change interface preferences\nPreferences"
+	ID_EXECUTION_CLEAR       "Clear the environment\nClear"
+	ID_BROWSE_RULE           "Perform actions on defrule constructs\nDefrule Manager"
+	ID_BROWSE_FACTS          "Perform actions on deffacts constructs\nDeffacts Manager"
+	ID_BROWSE_TEMPLATE       "Perform actions on deftemplate constructs\nDeftemplate Manager"
+	ID_BROWSE_FUNCTION       "Perform actions on deffunction constructs\nDeffunction Manager"
+	ID_BROWSE_GLOBAL         "Perform actions on defglobal constructs\nDefglobal Manager"
+	ID_BROWSE_GENERIC        "Perform actions on defgeneric and defmethod constructs\nDefgeneric Manager"
+	ID_BROWSE_CLASS          "Perform actions on defclass and defmessage-handler constructs\nDefclass Manager"
+	ID_BROWSE_INSTANCES      "Perform actions on definstances constructs\nDefinstances Manager"
+	ID_BROWSE_AGENDA         "Perform actions on rule activations\nAgenda Manager"
+	ID_WIN_SHOW_ALL          "Show the Facts, Agenda, Instances, Globals, and Focus Windows\nShow Status Windows"
+	ID_WIN_HIDE_ALL          "Hide the Facts, Agenda, Instances, Globals, and Focus Windows\nHide Status Windows"
+	
+	ID_WINDOW_ARRANGE_STATUS "Arrange Dialog and Status Windows as non-overlapping tiles\nTile Dialog & Status Windows"
+	ID_WIN_CLEAR             "Clear the output in the Dialog Window\nClear Dialog Window"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_LC                  "LC"
+    IDS_UC                  "UC"
+    IDS_WR                  "WR"
+    IDS_RO                  "RO"
+    IDS_NM                  "#"
+    IDS_RO_TEXT             "Read-only text"
+    IDS_TR                  "TR"
+    IDS_NO_SUBCLASS         "X"
+    IDS_NO_COLOR            "nc"
+    IDS_NH                  "NH"
+    IDS_HELP_FAILED         "Unable to activate help"
+    IDS_SAVE_CHANGES_CAPTION "Buffer modified"
+    IDS_SAVE_CHANGES        "Buffer has been modified. Save changes before closing?"
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
