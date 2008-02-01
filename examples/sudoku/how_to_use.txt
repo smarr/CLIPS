@@ -1,0 +1,42 @@
+1) Load the core program files.
+
+   (load "sudoku.clp")
+   (load "solve.clp")
+   
+2) Load one of the output files: output-frills.clp, output-simple.clp,
+   or output-none.clp. All three contain the same number of rules with
+   identical LHS patterns and RHS assertion/retractions. The key 
+   difference between the files is how they display output. The frills
+   version displays the output as a grid of values. The simple version
+   displays each row/column/value triplet on a single line. The none
+   version displays no output at all.
+   
+   (load "output-none.clp")
+   
+3) Load one of the puzzle files. The puzzle file names signify both the
+   size of the puzzle grid and the difficulty of the rules required to
+   solve the puzzle. In general, the larger the grid size, the longer
+   it takes for the solution to be found. The rule complexity ranges
+   from p1, the simplest, to p18, the most complex. A complex rule is
+   only attempted after the program has determined that simpler rules
+   are insufficient to solve the puzzle. In general, the more complex
+   the rules required, the longer it takes for the solution to be found.
+
+   (load "puzzles//grid3x3-p17.clp")
+   
+4) If desired, assert the stress-test fact. The default program 
+   behavior only considers complex rules when simpler rules have failed
+   to find a solution. This allows the simpler rules to eliminate many
+   choices before the complex rules are considered, greatly reducing the
+   number of partial matches created which improves program performance.
+   If the stress-test fact is asserted, the complex rules will be
+   considered simultaneously with simpler rules. Running the stress test
+   with a grid larger than 3x3 is not recommended due to the excessive
+   time/memory requirements.
+
+   (assert (stress-test))
+   
+5) Reset and run the program.
+
+   (reset)
+   (run)
