@@ -1,0 +1,14 @@
+﻿# Properties Source File for Arabic
+# Generate the properties file from this file using the following command:
+# native2ascii -encoding UTF-8 SudokuResources_ar.source SudokuResources_ar.properties
+SudokuDemo=تظاهرة سودوكو
+Clear=واضح
+ClearTip=واضح فإن سودوكو الشبكه.
+Reset=اعادة تعيين
+ResetTip=اعادة الدولة الى حل قبل الماضية.
+Solve=حل
+SolveTip=حل اللغز.
+Techniques=تقنيات
+TechniquesTip=عرض التقنيات المستخدمة في حل اللغز.
+SolutionTechniques=الحل تقنيات
+Instructions=اختر خلية وادخل الرقم 1 الى 9 او الصحافة زر لاعادة الكتابة / حذف.

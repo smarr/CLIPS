@@ -1,0 +1,14 @@
+﻿# Properties Source File for Spanish
+# Generate the properties file from this file using the following command:
+# native2ascii -encoding UTF-8 SudokuResources_es.source SudokuResources_es.properties
+SudokuDemo=Sudoku Demostración
+Clear=Borrar
+ClearTip=Limpiar la rejilla de sudoku.
+Reset=Restablecer
+ResetTip=Restablecer al estado antes de la última solución.
+Solve=Resolver
+SolveTip=Resolver el rompecabezas.
+Techniques=Técnicas
+TechniquesTip=Mostrar las técnicas utilizadas para solucionar los rompecabezas.
+SolutionTechniques=Técnicas de solución
+Instructions=Seleccione la celda y escriba dígitos 1-9 o pulse retroceso/borrar.

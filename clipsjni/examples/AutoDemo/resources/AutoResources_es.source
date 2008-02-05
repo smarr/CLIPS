@@ -1,0 +1,35 @@
+﻿# Properties Source File for Spanish
+# Generate the properties file from this file using the following command:
+# native2ascii -encoding UTF-8 AutoResources_es.source AutoResources_es.properties
+AutoDemo=Demostración de Automóviles
+No=No
+Yes=Sí
+Normal=Normal
+Burned=Quemadas
+Contaminated=Contaminados
+Next=Siguiente
+Prev=Anterior
+Restart=Reiniciar
+WelcomeMessage=Bienvenido al motor de Diagnóstico del Sistema de Expertos.
+StartQuestion=¿El motor?
+RunQuestion=¿El motor de ejecutar normalmente?
+RotateQuestion=¿El motor de rotar?
+SluggishQuestion=¿Es el motor lento?
+MisfireQuestion=¿El fallo de encendido del motor?
+KnockQuestion=¿El motor golpee?
+OutputQuestion=¿Es la salida de los motores de baja?
+GasQuestion=¿El tanque tiene en el gas?
+BatteryQuestion=¿Es la batería cargada?
+PointsQuestion=¿Cuál es el estado de la superficie de puntos?
+CoilQuestion=¿Es la prueba de conductividad de la bobina de encendido positivo?
+NoRepair=Reparación sugerido: Ninguna.
+FuelLineRepair=Reparación sugerido: Limpie la línea de combustible.
+PointGapRepair=Reparación sugerido: Ajustar punto de diferencia.
+AdjustTimingRepair=Reparación sugerido: Ajustar el calendario.
+AddGasRepair=Reparación sugerido: Añadir gas.
+ReplaceBatteryRepair=Reparación sugerido: Cargue la batería.
+ReplacePointsRepair=Reparación sugerido: Sustituir los puntos.
+CleanPointsRepair=Reparación sugerido: Limpie los puntos.
+LeadWireRepair=Reparación sugerido: Sustitúyase el distribuidor conducir alambre.
+CoilRepair=Reparación sugerido: Sustitúyase la bobina de encendido.
+MechanicRepair=Reparación sugerido: Lleve su vehículo a un mecánico.

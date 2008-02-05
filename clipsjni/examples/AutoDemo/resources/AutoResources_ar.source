@@ -1,0 +1,35 @@
+﻿# Properties Source File for Arabic
+# Generate the properties file from this file using the following command:
+# native2ascii -encoding UTF-8 AutoResources_ar.source AutoResources_ar.properties
+AutoDemo=تظاهرة السيارات
+No=ل
+Yes=نعم
+Normal=عادية
+Burned=أحرق
+Contaminated=ملوثة
+Next=القادم
+Prev=السابق
+Restart=استأنف
+WelcomeMessage=أهلا بكم الى محرك تشخيص النظام الخبير.
+StartQuestion=هل محرك البداية؟
+RunQuestion=هل محرك بالظهور بشكل طبيعي؟
+RotateQuestion=هل تدوير محرك؟
+SluggishQuestion=هو المحرك البطء؟
+MisfireQuestion=هل محرك خلل الإشعال؟
+KnockQuestion=هل محرك بلغها؟
+OutputQuestion=هو ناتج المحرك منخفضه؟
+GasQuestion=هل لديها أي صهريج الغاز فى ذلك؟
+BatteryQuestion=البطاريه هي تهمة؟
+PointsQuestion=ما هو سطح الدولة من النقاط؟
+CoilQuestion=هو اختبار التوصيل للاشتعال الملف ايجابية؟
+NoRepair=اقترح اصلاح : لا شيء.
+FuelLineRepair=اقترح تصليح : تنظيف الوقود الخط.
+PointGapRepair=اقترح اصلاح : تعديل نقطة الفجوه.
+AdjustTimingRepair=اقترح اصلاح : ضبط توقيت.
+AddGasRepair=اقترح اصلاح : تضاف الغاز.
+ReplaceBatteryRepair=اقترح اصلاح : تهمة البطاريه.
+ReplacePointsRepair=اقترح اصلاح : استبدال نقاط.
+CleanPointsRepair=اقترح تصليح : تنظيف نقاط.
+LeadWireRepair=اقترح اصلاح : يستعاض عن الموزع يؤدي الاسلاك.
+CoilRepair=اقترح اصلاح : يستعاض عن ملف الإشعال.
+MechanicRepair=اقترح اصلاح : تأخذ سيارتك الى وميكانيكي.

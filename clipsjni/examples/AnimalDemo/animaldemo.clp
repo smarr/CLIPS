@@ -11,8 +11,7 @@
 ;;;
 ;;;     CLIPS Version 6.3 Example
 ;;; 
-;;;     To execute, merely load, reset, and run.
-;;;     Answer questions yes or no.
+;;;     For use with the Animal Demo Example
 ;;;======================================================
 
 (defmodule MAIN (export ?ALL)) 

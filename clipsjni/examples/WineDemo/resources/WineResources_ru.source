@@ -1,0 +1,37 @@
+﻿# Properties Source File for Russian
+# Generate the properties file from this file using the following command:
+# native2ascii -encoding UTF-8 AutoResources_ru.source AutoResources_ru.properties
+WineDemo=Вино Демонстрация
+PreferencesTitle=Настройки
+ColorLabel=Цвет:
+BodyLabel=Тело:
+SweetnessLabel=Сладость:
+MainCourseLabel=Основные курсы:
+SauceLabel=Соус:
+FlavorLabel=Вариант:
+MealTitle=Питание
+WineTitle=Вино
+RecommendationTitle=Рекомендация Вес
+Don'tCare=Не Уход
+Red=Красный
+White=Белый
+Light=Легкие
+Medium=Среднесрочной
+Full=Полный
+Dry=Сухой
+Sweet=Сладкий
+Don'tKnow=Не знаю
+Beef=Говядина
+Pork=Свинина
+Lamb=Агнец
+Turkey=Турция
+Chicken=Курица
+Duck=Утка
+Fish=Рыбы
+Other=Другие
+None=Никто
+Spicy=Пикантный
+Cream=Сливки
+Delicate=Деликатный
+Average=Средний
+Strong=Сильные

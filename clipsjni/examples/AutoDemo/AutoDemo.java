@@ -6,6 +6,12 @@ import java.awt.event.*;
  
 import java.util.Iterator;
 import java.util.List;
+
+import java.text.BreakIterator;
+
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.MissingResourceException;
  
 import CLIPSJNI.*;
 
@@ -19,16 +25,27 @@ class AutoDemo implements ActionListener
    JButton prevButton;
    JPanel choicesPanel;
    ButtonGroup choicesButtons;
+   ResourceBundle autoResources;
  
    Environment clips;
       
    AutoDemo()
      {  
+      try
+        {
+         autoResources = ResourceBundle.getBundle("resources.AutoResources",Locale.getDefault());
+        }
+      catch (MissingResourceException mre)
+        {
+         mre.printStackTrace();
+         return;
+        }
+      
       /*================================*/
       /* Create a new JFrame container. */
       /*================================*/
      
-      JFrame jfrm = new JFrame("Auto Demo");  
+      JFrame jfrm = new JFrame(autoResources.getString("AutoDemo"));  
  
       /*=============================*/
       /* Specify FlowLayout manager. */
@@ -53,7 +70,7 @@ class AutoDemo implements ActionListener
       /*===========================*/
       
       JPanel displayPanel = new JPanel(); 
-      displayLabel = new JLabel("<html><br>");
+      displayLabel = new JLabel();
       displayPanel.add(displayLabel);
       
       /*===========================*/
@@ -69,12 +86,12 @@ class AutoDemo implements ActionListener
 
       JPanel buttonPanel = new JPanel(); 
       
-      prevButton = new JButton("Prev");
+      prevButton = new JButton(autoResources.getString("Prev"));
       prevButton.setActionCommand("Prev");
       buttonPanel.add(prevButton);
       prevButton.addActionListener(this);
       
-      nextButton = new JButton("Next");
+      nextButton = new JButton(autoResources.getString("Next"));
       nextButton.setActionCommand("Next");
       buttonPanel.add(nextButton);
       nextButton.addActionListener(this);
@@ -97,13 +114,18 @@ class AutoDemo implements ActionListener
       
       clips.reset();
       clips.run();
-      nextUIState();
-      
+
       /*====================*/
       /* Display the frame. */
       /*====================*/
       
       jfrm.setVisible(true);  
+
+      /*==================================*/
+      /* Get the current state of the UI. */
+      /*==================================*/
+      
+      nextUIState();
      }  
 
    /****************/
@@ -149,19 +171,19 @@ class AutoDemo implements ActionListener
       if (fv.getFactSlot("state").toString().equals("final"))
         { 
          nextButton.setActionCommand("Restart");
-         nextButton.setText("Restart"); 
+         nextButton.setText(autoResources.getString("Restart")); 
          prevButton.setVisible(true);
         }
       else if (fv.getFactSlot("state").toString().equals("initial"))
         {
          nextButton.setActionCommand("Next");
-         nextButton.setText("Next");
+         nextButton.setText(autoResources.getString("Next"));
          prevButton.setVisible(false);
         }
       else
         { 
          nextButton.setActionCommand("Next");
-         nextButton.setText("Next");
+         nextButton.setText(autoResources.getString("Next"));
          prevButton.setVisible(true);
         }
       
@@ -182,12 +204,12 @@ class AutoDemo implements ActionListener
         {
          PrimitiveValue bv = (PrimitiveValue) itr.next();
          JRadioButton rButton;
-                                                            
+                        
          if (bv.toString().equals(selected))
-            { rButton = new JRadioButton(bv.toString(),true); }
+            { rButton = new JRadioButton(autoResources.getString(bv.toString()),true); }
          else
-            { rButton = new JRadioButton(bv.toString(),false); }
-            
+            { rButton = new JRadioButton(autoResources.getString(bv.toString()),false); }
+                     
          rButton.setActionCommand(bv.toString());
          choicesPanel.add(rButton);
          choicesButtons.add(rButton);
@@ -199,9 +221,9 @@ class AutoDemo implements ActionListener
       /* Set the label to the display text. */
       /*====================================*/
 
-      String theText = ((StringValue) fv.getFactSlot("display")).stringValue();
-      
-      displayLabel.setText("<html><br>" + theText);
+      String theText = autoResources.getString(((SymbolValue) fv.getFactSlot("display")).stringValue());
+            
+      wrapLabelText(displayLabel,theText);
      }
 
    /*########################*/
@@ -260,6 +282,62 @@ class AutoDemo implements ActionListener
          clips.run();
          nextUIState();
         }
+     }
+
+   /*****************/
+   /* wrapLabelText */
+   /*****************/  
+   private void wrapLabelText(
+     JLabel label, 
+     String text) 
+     {
+      FontMetrics fm = label.getFontMetrics(label.getFont());
+      Container container = label.getParent();
+      int containerWidth = container.getWidth();
+      int textWidth = SwingUtilities.computeStringWidth(fm,text);
+      int desiredWidth;
+
+      if (textWidth <= containerWidth)
+        { desiredWidth = containerWidth; }
+      else
+        { 
+         int lines = (int) ((textWidth + containerWidth) / containerWidth);
+                  
+         desiredWidth = (int) (textWidth / lines);
+        }
+                 
+      BreakIterator boundary = BreakIterator.getWordInstance();
+      boundary.setText(text);
+   
+      StringBuffer trial = new StringBuffer();
+      StringBuffer real = new StringBuffer("<html><center>");
+   
+      int start = boundary.first();
+      for (int end = boundary.next(); end != BreakIterator.DONE;
+           start = end, end = boundary.next())
+        {
+         String word = text.substring(start,end);
+         trial.append(word);
+         int trialWidth = SwingUtilities.computeStringWidth(fm,trial.toString());
+         if (trialWidth > containerWidth) 
+           {
+            trial = new StringBuffer(word);
+            real.append("<br>");
+            real.append(word);
+           }
+         else if (trialWidth > desiredWidth)
+           {
+            trial = new StringBuffer("");
+            real.append(word);
+            real.append("<br>");
+           }
+         else
+           { real.append(word); }
+        }
+   
+      real.append("</html>");
+   
+      label.setText(real.toString());
      }
      
    public static void main(String args[])

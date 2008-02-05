@@ -1,0 +1,37 @@
+﻿# Properties Source File for Spanish
+# Generate the properties file from this file using the following command:
+# native2ascii -encoding UTF-8 WineResources_es.source WineResources_es.properties
+WineDemo=Vino de demostración
+PreferencesTitle=Preferencias
+ColorLabel=Color:
+BodyLabel=Cuerpo:
+SweetnessLabel=Dulzura:
+MainCourseLabel=Segundo Plato:
+SauceLabel=Salsa:
+FlavorLabel=Sabor:
+MealTitle=Comida
+WineTitle=Vino
+RecommendationTitle=Recomendación Peso
+Don'tCare=No Care
+Red=Roja
+White=Blanco
+Light=Luz
+Medium=Mediano
+Full=Completo
+Dry=Seco
+Sweet=Dulce
+Don'tKnow=No sé
+Beef=Carne
+Pork=Carne de cerdo
+Lamb=Cordero
+Turkey=Turquía
+Chicken=Pollo
+Duck=Pato
+Fish=Peces
+Other=Otros
+None=Ninguno
+Spicy=Picante
+Cream=Crema
+Delicate=Delicado
+Average=Promedio
+Strong=Fuerte

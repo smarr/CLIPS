@@ -214,7 +214,6 @@ class AnimalDemo implements ActionListener
       String theText = ((StringValue) fv.getFactSlot("display")).stringValue();
       
       wrapLabelText(displayLabel,theText);
-      /* displayLabel.setText("<html>" + theText + "</html>"); */
      }
 
    /*########################*/
@@ -287,23 +286,16 @@ class AnimalDemo implements ActionListener
       int containerWidth = container.getWidth();
       int textWidth = SwingUtilities.computeStringWidth(fm,text);
       int desiredWidth;
-/*
-      System.out.println("containerWidth = " + containerWidth);
-      System.out.println("textWidth = " + textWidth);
-*/     
+
       if (textWidth <= containerWidth)
         { desiredWidth = containerWidth; }
       else
         { 
          int lines = (int) ((textWidth + containerWidth) / containerWidth);
-         
-         /* System.out.println("lines = " + lines); */
-         
+                  
          desiredWidth = (int) (textWidth / lines);
         }
-        
-      /* System.out.println("desiredWidth = " + desiredWidth); */
-         
+                 
       BreakIterator boundary = BreakIterator.getWordInstance();
       boundary.setText(text);
    
@@ -336,8 +328,6 @@ class AnimalDemo implements ActionListener
       real.append("</html>");
    
       label.setText(real.toString());
-   
-      /* System.out.println("text = " + real.toString()); */
      }
 
    public static void main(String args[])

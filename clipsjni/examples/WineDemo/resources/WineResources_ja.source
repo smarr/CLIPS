@@ -1,0 +1,37 @@
+﻿# Properties Source File for Japanese
+# Generate the properties file from this file using the following command:
+# native2ascii -encoding UTF-8 WineResources_ja.source WineResources_ja.properties
+WineDemo=ワインデモ
+PreferencesTitle=環境設定
+ColorLabel=色：
+BodyLabel=本文：
+SweetnessLabel=甘味：
+MainCourseLabel=メインコース：
+SauceLabel=ソース：
+FlavorLabel=フレーバー：
+MealTitle=食事
+WineTitle=ワイン
+RecommendationTitle=重量勧告
+Don'tCare=気にかけない
+Red=赤
+White=白
+Light=光
+Medium=メディア
+Full=フル
+Dry=乾式
+Sweet=甘い
+Don'tKnow=知らない
+Beef=牛肉
+Pork=豚肉
+Lamb=ラム
+Turkey=トルコ
+Chicken=ニワトリ
+Duck=アヒル
+Fish=魚
+Other=その他
+None=なし
+Spicy=スパイシー
+Cream=クリーム
+Delicate=繊細な
+Average=平均
+Strong=強い

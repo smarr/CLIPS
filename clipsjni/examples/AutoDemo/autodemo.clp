@@ -37,7 +37,7 @@
 
   =>
   
-  (assert (UI-state (display "Welcome to the Engine Diagnosis Expert System.")
+  (assert (UI-state (display WelcomeMessage)
                     (relation-asserted start)
                     (state initial)
                     (valid-answers))))
@@ -52,7 +52,7 @@
 
    =>
 
-   (assert (UI-state (display "Does the engine start?")
+   (assert (UI-state (display StartQuestion)
                      (relation-asserted engine-starts)
                      (response No)
                      (valid-answers No Yes))))
@@ -63,7 +63,7 @@
 
    =>
 
-   (assert (UI-state (display "Does the engine run normally?")
+   (assert (UI-state (display RunQuestion)
                      (relation-asserted runs-normally)
                      (response No)
                      (valid-answers No Yes))))
@@ -74,7 +74,7 @@
 
    =>
 
-   (assert (UI-state (display "Does the engine rotate?")
+   (assert (UI-state (display RotateQuestion)
                      (relation-asserted engine-rotates)
                      (response No)
                      (valid-answers No Yes))))
@@ -85,7 +85,7 @@
 
    =>
 
-   (assert (UI-state (display "Is the engine sluggish?")
+   (assert (UI-state (display SluggishQuestion)
                      (relation-asserted engine-sluggish)
                      (response No)
                      (valid-answers No Yes))))
@@ -96,7 +96,7 @@
 
    =>
 
-   (assert (UI-state (display "Does the engine misfire?")
+   (assert (UI-state (display MisfireQuestion)
                      (relation-asserted engine-misfires)
                      (response No)
                      (valid-answers No Yes))))
@@ -107,7 +107,7 @@
 
    =>
 
-   (assert (UI-state (display "Does the engine knock?")
+   (assert (UI-state (display KnockQuestion)
                      (relation-asserted engine-knocks)
                      (response No)
                      (valid-answers No Yes))))
@@ -118,7 +118,7 @@
 
    =>
 
-   (assert (UI-state (display "Is the output of the engine low?")
+   (assert (UI-state (display OutputQuestion)
                      (relation-asserted engine-output-low)
                      (response No)
                      (valid-answers No Yes))))
@@ -131,7 +131,7 @@
 
    =>
 
-   (assert (UI-state (display "Does the tank have any gas in it?")
+   (assert (UI-state (display GasQuestion)
                      (relation-asserted tank-has-gas)
                      (response No)
                      (valid-answers No Yes))))
@@ -142,7 +142,7 @@
 
    =>
    
-   (assert (UI-state (display "Is the battery charged?")
+   (assert (UI-state (display BatteryQuestion)
                      (relation-asserted battery-has-charge)
                      (response No)
                      (valid-answers No Yes))))
@@ -157,7 +157,7 @@
 
    =>
 
-   (assert (UI-state (display "What is the surface state of the points?")
+   (assert (UI-state (display PointsQuestion)
                      (relation-asserted point-surface-state)
                      (response Normal)
                      (valid-answers Normal Burned Contaminated))))
@@ -172,7 +172,7 @@
 
    =>
 
-   (assert (UI-state (display "Is the conductivity test for the ignition coil positive?")
+   (assert (UI-state (display CoilQuestion)
                      (relation-asserted conductivity-test-positive)
                      (response No)
                      (valid-answers No Yes))))
@@ -187,7 +187,7 @@
    
    =>
 
-   (assert (UI-state (display "Suggested Repair: None.")
+   (assert (UI-state (display NoRepair)
                      (state final))))
 
 (defrule engine-sluggish ""
@@ -196,7 +196,7 @@
    
    =>
 
-   (assert (UI-state (display "Suggested Repair: Clean the fuel line.")
+   (assert (UI-state (display FuelLineRepair)
                      (state final))))
 
 (defrule engine-misfires ""
@@ -205,7 +205,7 @@
 
    =>
 
-   (assert (UI-state (display "Suggested Repair: Adjust point gap.")
+   (assert (UI-state (display PointGapRepair)
                      (state final))))
 
 (defrule engine-knocks ""
@@ -214,7 +214,7 @@
 
    =>
 
-   (assert (UI-state (display "Suggested Repair: Adjust timing.")
+   (assert (UI-state (display AdjustTimingRepair)
                      (state final))))
 
 (defrule tank-out-of-gas ""
@@ -223,7 +223,7 @@
 
    =>
 
-   (assert (UI-state (display "Suggested Repair: Add gas.")
+   (assert (UI-state (display AddGasRepair)
                      (state final))))
    
 (defrule battery-dead ""
@@ -232,7 +232,7 @@
    
    =>
 
-   (assert (UI-state (display "Suggested Repair: Charge the battery.")
+   (assert (UI-state (display ReplaceBatteryRepair)
                      (state final))))
    
 (defrule point-surface-state-burned ""
@@ -241,7 +241,7 @@
 
    =>
 
-   (assert (UI-state (display "Suggested Repair: Replace the points.")
+   (assert (UI-state (display ReplacePointsRepair)
                      (state final))))
                      
 (defrule point-surface-state-contaminated ""
@@ -250,7 +250,7 @@
    
    =>
 
-   (assert (UI-state (display "Suggested Repair: Clean the points.")
+   (assert (UI-state (display CleanPointsRepair)
                      (state final))))
 
 (defrule conductivity-test-positive-yes ""
@@ -259,7 +259,7 @@
    
    =>
 
-   (assert (UI-state (display "Suggested Repair: Replace the distributor lead wire.")
+   (assert (UI-state (display LeadWireRepair)
                      (state final))))
                      
 (defrule conductivity-test-positive-no ""
@@ -268,7 +268,7 @@
       
    =>
 
-   (assert (UI-state (display "Suggested Repair: Replace the ignition coil.")
+   (assert (UI-state (display CoilRepair)
                      (state final))))
                      
 (defrule no-repairs ""
@@ -281,7 +281,7 @@
      
    =>
   
-   (assert (UI-state (display "Suggested Repair: Take your car to a mechanic.")
+   (assert (UI-state (display MechanicRepair)
                      (state final))))
                      
 ;;;*************************

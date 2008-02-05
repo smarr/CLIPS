@@ -1,0 +1,35 @@
+﻿# Properties Source File for Japanese
+# Generate the properties file from this file using the following command:
+# native2ascii -encoding UTF-8 AutoResources_ja.source AutoResources_ja.properties
+AutoDemo=自動車のデモンストレーション
+No=いいえ
+Yes=はい
+Normal=正常
+Burned=やけどを負った
+Contaminated=汚染
+Next=次の
+Prev=前の
+Restart=再起動
+WelcomeMessage=エンジン診断エキスパートシステムへようこそ。
+StartQuestion=では、エンジンスタートですか？
+RunQuestion=エンジンは、通常どおり実行するか？
+RotateQuestion=は、エンジンの回転するか？
+SluggishQuestion=エンジンは、不振のですか？
+MisfireQuestion=このエンジンは不発？
+KnockQuestion=ノックは、エンジンですか？
+OutputQuestion=エンジンは、低出力のですか？
+GasQuestion=ガスでは、タンクがあることですか？
+BatteryQuestion=バッテリーの充電は？
+PointsQuestion=表面には、どのような状態のポイントですか？
+CoilQuestion=導電率は、肯定的なテストのため点火コイルですか？
+NoRepair=推奨修理：なし。
+FuelLineRepair=推奨修理：クリーン燃料ラインです。
+PointGapRepair=推奨修理：ポイントのギャップを調整します。
+AdjustTimingRepair=推奨修理：タイミングを調整します。
+AddGasRepair=推奨修理：ガスを追加します。
+ReplaceBatteryRepair=推奨修理：バッテリーを充電します。
+ReplacePointsRepair=推奨修理：ポイントを交換している。
+CleanPointsRepair=推奨修理：きれいなポイントです。
+LeadWireRepair=推奨修理：交換してリード線の特約店です。
+CoilRepair=推奨修理：点火コイル交換している。
+MechanicRepair=推奨修理：お客様の車を整備士を取る。

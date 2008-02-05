@@ -7,12 +7,18 @@ import java.awt.event.*;
 import java.util.Iterator;
 import java.util.List;
  
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.MissingResourceException;
+
 import CLIPSJNI.*;
 
 /* TBD module qualifier with find-all-facts */
 
 class WineDemo implements ActionListener
   {  
+   JFrame jfrm;
+   
    DefaultTableModel wineList;
   
    JComboBox preferredColor; 
@@ -24,14 +30,24 @@ class WineDemo implements ActionListener
    JComboBox flavor; 
    
    JLabel jlab; 
- 
-   String preferredColorChoices[] = { "Don't Care", "Red", "White" }; 
-   String preferredBodyChoices[] = { "Don't Care", "Light", "Medium", "Full" }; 
-   String preferredSweetnessChoices[] = { "Don't Care", "Dry", "Medium", "Sweet" }; 
+
+   String preferredColorNames[] = { "Don't Care", "Red", "White" }; 
+   String preferredBodyNames[] = { "Don't Care", "Light", "Medium", "Full" }; 
+   String preferredSweetnessNames[] = { "Don't Care", "Dry", "Medium", "Sweet" }; 
    
-   String mainCourseChoices[] = { "Don't Know", "Beef", "Pork", "Lamb", "Turkey", "Chicken", "Duck", "Fish", "Other" };
-   String sauceChoices[] = { "Don't Know", "None", "Spicy", "Sweet", "Cream", "Other" };
-   String flavorChoices[] = { "Don't Know", "Delicate", "Average", "Strong" };
+   String mainCourseNames[] = { "Don't Know", "Beef", "Pork", "Lamb", "Turkey", "Chicken", "Duck", "Fish", "Other" };
+   String sauceNames[] = { "Don't Know", "None", "Spicy", "Sweet", "Cream", "Other" };
+   String flavorNames[] = { "Don't Know", "Delicate", "Average", "Strong" };
+ 
+   String preferredColorChoices[] = new String[3]; 
+   String preferredBodyChoices[] = new String[4]; 
+   String preferredSweetnessChoices[] = new String[4]; 
+   
+   String mainCourseChoices[] = new String[9];
+   String sauceChoices[] = new String[6];
+   String flavorChoices[] = new String[4];
+
+   ResourceBundle wineResources;
 
    Environment clips;
 
@@ -56,20 +72,65 @@ class WineDemo implements ActionListener
         }
      }
       
+   /************/
+   /* WineDemo */
+   /************/
    WineDemo()
      {  
-      /*================================*/
-      /* Create a new JFrame container. */
-      /*================================*/
+      try
+        {
+         wineResources = ResourceBundle.getBundle("resources.WineResources",Locale.getDefault());
+        }
+      catch (MissingResourceException mre)
+        {
+         mre.printStackTrace();
+         return;
+        }
+
+      preferredColorChoices[0] = wineResources.getString("Don'tCare"); 
+      preferredColorChoices[1] = wineResources.getString("Red"); 
+      preferredColorChoices[2] = wineResources.getString("White"); 
+      
+      preferredBodyChoices[0] = wineResources.getString("Don'tCare"); 
+      preferredBodyChoices[1] = wineResources.getString("Light"); 
+      preferredBodyChoices[2] = wineResources.getString("Medium"); 
+      preferredBodyChoices[3] = wineResources.getString("Full"); 
+
+      preferredSweetnessChoices[0] = wineResources.getString("Don'tCare"); 
+      preferredSweetnessChoices[1] = wineResources.getString("Dry"); 
+      preferredSweetnessChoices[2] = wineResources.getString("Medium"); 
+      preferredSweetnessChoices[3] = wineResources.getString("Sweet"); 
+      
+      mainCourseChoices[0] = wineResources.getString("Don'tKnow"); 
+      mainCourseChoices[1] = wineResources.getString("Beef"); 
+      mainCourseChoices[2] = wineResources.getString("Pork"); 
+      mainCourseChoices[3] = wineResources.getString("Lamb"); 
+      mainCourseChoices[4] = wineResources.getString("Turkey"); 
+      mainCourseChoices[5] = wineResources.getString("Chicken"); 
+      mainCourseChoices[6] = wineResources.getString("Duck"); 
+      mainCourseChoices[7] = wineResources.getString("Fish"); 
+      mainCourseChoices[8] = wineResources.getString("Other"); 
+   
+      sauceChoices[0] = wineResources.getString("Don'tKnow"); 
+      sauceChoices[1] = wineResources.getString("None"); 
+      sauceChoices[2] = wineResources.getString("Spicy"); 
+      sauceChoices[3] = wineResources.getString("Sweet"); 
+      sauceChoices[4] = wineResources.getString("Cream"); 
+      sauceChoices[5] = wineResources.getString("Other"); 
+
+      flavorChoices[0] = wineResources.getString("Don'tKnow"); 
+      flavorChoices[1] = wineResources.getString("Delicate"); 
+      flavorChoices[2] = wineResources.getString("Average"); 
+      flavorChoices[3] = wineResources.getString("Strong"); 
+
+      /*===================================*/
+      /* Create a new JFrame container and */
+      /* assign a layout manager to it.    */
+      /*===================================*/
      
-      JFrame jfrm = new JFrame("Wine Demo");  
- 
-      /*=============================*/
-      /* Specify FlowLayout manager. */
-      /*=============================*/
-        
-      jfrm.getContentPane().setLayout(new FlowLayout());  
- 
+      jfrm = new JFrame(wineResources.getString("WineDemo"));          
+      jfrm.getContentPane().setLayout(new BoxLayout(jfrm.getContentPane(),BoxLayout.Y_AXIS));
+    
       /*=================================*/
       /* Give the frame an initial size. */
       /*=================================*/
@@ -90,21 +151,21 @@ class WineDemo implements ActionListener
       GridLayout theLayout = new GridLayout(3,2);
       preferencesPanel.setLayout(theLayout);   
       preferencesPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(),
-                                                                 "Preferences",
+                                                                 wineResources.getString("PreferencesTitle"),
                                                                  TitledBorder.CENTER,
                                                                  TitledBorder.ABOVE_TOP));
  
-      preferencesPanel.add(new JLabel("Color:"));
+      preferencesPanel.add(new JLabel(wineResources.getString("ColorLabel")));
       preferredColor = new JComboBox(preferredColorChoices); 
       preferencesPanel.add(preferredColor);
       preferredColor.addActionListener(this);
      
-      preferencesPanel.add(new JLabel("Body:"));
+      preferencesPanel.add(new JLabel(wineResources.getString("BodyLabel")));
       preferredBody = new JComboBox(preferredBodyChoices); 
       preferencesPanel.add(preferredBody);
       preferredBody.addActionListener(this);
 
-      preferencesPanel.add(new JLabel("Sweetness:"));
+      preferencesPanel.add(new JLabel(wineResources.getString("SweetnessLabel")));
       preferredSweetness = new JComboBox(preferredSweetnessChoices); 
       preferencesPanel.add(preferredSweetness);
       preferredSweetness.addActionListener(this);
@@ -117,25 +178,37 @@ class WineDemo implements ActionListener
       theLayout = new GridLayout(3,2);
       mealPanel.setLayout(theLayout);   
       mealPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(),
-                                                                 "Meal",
+                                                                 wineResources.getString("MealTitle"),
                                                                  TitledBorder.CENTER,
                                                                  TitledBorder.ABOVE_TOP));
  
-      mealPanel.add(new JLabel("Main Course:"));
+      mealPanel.add(new JLabel(wineResources.getString("MainCourseLabel")));
       mainCourse = new JComboBox(mainCourseChoices); 
       mealPanel.add(mainCourse);
       mainCourse.addActionListener(this);
     
-      mealPanel.add(new JLabel("Sauce:"));
+      mealPanel.add(new JLabel(wineResources.getString("SauceLabel")));
       sauce = new JComboBox(sauceChoices); 
       mealPanel.add(sauce);
       sauce.addActionListener(this);
 
-      mealPanel.add(new JLabel("Flavor:"));
+      mealPanel.add(new JLabel(wineResources.getString("FlavorLabel")));
       flavor = new JComboBox(flavorChoices); 
       mealPanel.add(flavor);
       flavor.addActionListener(this);
       
+      /*==============================================*/
+      /* Create a panel including the preferences and */
+      /* meal panels and add it to the content pane.  */
+      /*==============================================*/
+
+      JPanel choicesPanel = new JPanel(); 
+      choicesPanel.setLayout(new FlowLayout());
+      choicesPanel.add(preferencesPanel);
+      choicesPanel.add(mealPanel);
+      
+      jfrm.getContentPane().add(choicesPanel); 
+ 
       /*==================================*/
       /* Create the recommendation panel. */
       /*==================================*/
@@ -143,7 +216,8 @@ class WineDemo implements ActionListener
       wineList = new DefaultTableModel();
 
       wineList.setDataVector(new Object[][] { },
-                             new Object[] { "Wine", "Recommendation Weight"});
+                             new Object[] { wineResources.getString("WineTitle"), 
+                                            wineResources.getString("RecommendationTitle")});
          
       JTable table = 
          new JTable(wineList)
@@ -163,12 +237,10 @@ class WineDemo implements ActionListener
     
       table.setPreferredScrollableViewportSize(new Dimension(450,210)); 
         
-      /*==================================================*/
-      /* Add the two ComboBox panels to the content pane. */
-      /*==================================================*/
-      
-      jfrm.getContentPane().add(preferencesPanel); 
-      jfrm.getContentPane().add(mealPanel); 
+      /*===================================================*/
+      /* Add the recommendation panel to the content pane. */
+      /*===================================================*/
+
       jfrm.getContentPane().add(pane); 
 
       /*===================================================*/
@@ -195,7 +267,8 @@ class WineDemo implements ActionListener
       /*====================*/
       /* Display the frame. */
       /*====================*/
-      
+
+      jfrm.pack();
       jfrm.setVisible(true);  
      }  
  
@@ -220,9 +293,11 @@ class WineDemo implements ActionListener
    private void runWine() 
      { 
       String item;
+      
       clips.reset();      
             
-      item = (String) preferredColor.getSelectedItem();
+      item = preferredColorNames[preferredColor.getSelectedIndex()];
+      
       if (item.equals("Red"))   
         { clips.assertString("(attribute (name preferred-color) (value red))"); }
       else if (item.equals("White"))   
@@ -230,7 +305,7 @@ class WineDemo implements ActionListener
       else
         { clips.assertString("(attribute (name preferred-color) (value unknown))"); }
 
-      item = (String) preferredBody.getSelectedItem();
+      item = preferredBodyNames[preferredBody.getSelectedIndex()];
       if (item.equals("Light"))   
         { clips.assertString("(attribute (name preferred-body) (value light))"); }
       else if (item.equals("Medium"))   
@@ -240,7 +315,7 @@ class WineDemo implements ActionListener
       else
         { clips.assertString("(attribute (name preferred-body) (value unknown))"); }
  
-      item = (String) preferredSweetness.getSelectedItem();
+      item = preferredSweetnessNames[preferredSweetness.getSelectedIndex()];
       if (item.equals("Dry"))   
         { clips.assertString("(attribute (name preferred-sweetness) (value dry))"); }
       else if (item.equals("Medium"))   
@@ -250,7 +325,7 @@ class WineDemo implements ActionListener
       else
         { clips.assertString("(attribute (name preferred-sweetness) (value unknown))"); }
 
-      item = (String) mainCourse.getSelectedItem();
+      item = mainCourseNames[mainCourse.getSelectedIndex()];
       if (item.equals("Beef") ||
           item.equals("Pork") ||
           item.equals("Lamb"))
@@ -285,7 +360,7 @@ class WineDemo implements ActionListener
          clips.assertString("(attribute (name has-turkey) (value unknown))");
         }
 
-      item = (String) sauce.getSelectedItem();
+      item = sauceNames[sauce.getSelectedIndex()];
       if (item.equals("None"))   
         { clips.assertString("(attribute (name has-sauce) (value no))"); }
       else if (item.equals("Spicy"))   
@@ -314,7 +389,7 @@ class WineDemo implements ActionListener
          clips.assertString("(attribute (name sauce) (value unknown))");
         }
 
-      item = (String) flavor.getSelectedItem();
+      item = flavorNames[flavor.getSelectedIndex()];
       if (item.equals("Delicate"))   
         { clips.assertString("(attribute (name tastiness) (value delicate))"); }
       else if (item.equals("Average"))   
@@ -344,12 +419,20 @@ class WineDemo implements ActionListener
                   
          wineList.addRow(new Object[] { wineName, new Integer(certainty) });
 
-        }      
+        }  
+        
+      jfrm.pack();
      }
      
+   /********/
+   /* main */
+   /********/  
    public static void main(String args[])
      {  
-      // Create the frame on the event dispatching thread.  
+      /*===================================================*/
+      /* Create the frame on the event dispatching thread. */
+      /*===================================================*/
+      
       SwingUtilities.invokeLater(
         new Runnable() 
           {  

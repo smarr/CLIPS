@@ -1,9 +1,12 @@
-    
 import java.awt.*;    
 import java.awt.event.*;
 import javax.swing.*;    
 import javax.swing.event.*; 
 import javax.swing.table.*; 
+
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.MissingResourceException;
 
 import CLIPSJNI.*;
 
@@ -25,6 +28,8 @@ class SudokuDemo implements ActionListener, FocusListener, KeyListener
    
    boolean solved = false;
    
+   ResourceBundle sudokuResources;
+   
    Environment clips;
    
    /**************/
@@ -34,15 +39,29 @@ class SudokuDemo implements ActionListener, FocusListener, KeyListener
      {    
       JTable theSubGrid;
       int r, c;
+      
+      /*====================================*/
+      /* Load the internationalized string  */
+      /* resources used by the application. */
+      /*====================================*/
+      
+      try
+        {
+         sudokuResources = ResourceBundle.getBundle("resources.SudokuResources",Locale.getDefault());
+        }
+      catch (MissingResourceException mre)
+        {
+         mre.printStackTrace();
+         return;
+        }
        
       /*===================================*/
       /* Create the main JFrame container. */
       /*===================================*/
       
-      jfrm = new JFrame("Sudoku Demo");  
-      jfrm.getContentPane().setLayout(new FlowLayout());    
-      jfrm.setSize(350,285);
-    
+      jfrm = new JFrame(sudokuResources.getString("SudokuDemo"));  
+      jfrm.getContentPane().setLayout(new BorderLayout());
+
       /*=============================================================*/
       /* Terminate the program when the user closes the application. */
       /*=============================================================*/
@@ -140,38 +159,48 @@ class SudokuDemo implements ActionListener, FocusListener, KeyListener
       buttonGrid.setLayout(theLayout);   
       buttonGrid.setOpaque(true);
             
-      clearButton = new JButton("Clear"); 
+      clearButton = new JButton(sudokuResources.getString("Clear")); 
+      clearButton.setActionCommand("Clear");
       buttonGrid.add(clearButton);
       clearButton.addActionListener(this);
-      clearButton.setToolTipText("Clear the sudoku grid."); 
+      clearButton.setToolTipText(sudokuResources.getString("ClearTip")); 
       
-      resetButton = new JButton("Reset"); 
+      resetButton = new JButton(sudokuResources.getString("Reset")); 
+      resetButton.setActionCommand("Reset");
       resetButton.setEnabled(false);
       buttonGrid.add(resetButton);
       resetButton.addActionListener(this);
-      resetButton.setToolTipText("Reset to state before last solution."); 
+      resetButton.setToolTipText(sudokuResources.getString("ResetTip")); 
       
-      solveButton = new JButton("Solve"); 
+      solveButton = new JButton(sudokuResources.getString("Solve")); 
+      solveButton.setActionCommand("Solve");
       buttonGrid.add(solveButton);
       solveButton.addActionListener(this);
-      solveButton.setToolTipText("Solve the puzzle."); 
+      solveButton.setToolTipText(sudokuResources.getString("SolveTip")); 
       
-      techniquesButton = new JButton("Techniques");
+      techniquesButton = new JButton(sudokuResources.getString("Techniques"));
+      techniquesButton.setActionCommand("Techniques");
       techniquesButton.setEnabled(false); 
       buttonGrid.add(techniquesButton);
       techniquesButton.addActionListener(this);
-      techniquesButton.setToolTipText("Show techniques used to solve puzzle."); 
+      techniquesButton.setToolTipText(sudokuResources.getString("TechniquesTip")); 
       
       /*=============================================*/
       /* Add the grid and button panels to the pane. */
       /*=============================================*/
-      
-      jfrm.getContentPane().add(mainGrid); 
-      jfrm.getContentPane().add(buttonGrid); 
 
-      JLabel instructions = new JLabel("<html><p style=\"font-size:95%\">Select cell and enter digit 1-9 or press backspace/delete.</p>");
-      jfrm.getContentPane().add(instructions);
-  
+      JPanel mainPanel = new JPanel(); 
+      mainPanel.setLayout(new FlowLayout());
+      mainPanel.add(mainGrid);
+      mainPanel.add(buttonGrid);
+      jfrm.getContentPane().add(mainPanel,BorderLayout.NORTH);
+
+      JLabel instructions = new JLabel("<html><p style=\"font-size:95%\">" + sudokuResources.getString("Instructions") + "</p><br>");
+      JPanel labelPanel = new JPanel(); 
+      labelPanel.setLayout(new FlowLayout());
+      labelPanel.add(instructions);
+      jfrm.getContentPane().add(labelPanel,BorderLayout.SOUTH);
+
       /*==========================*/
       /* Load the sudoku program. */
       /*==========================*/
@@ -185,6 +214,7 @@ class SudokuDemo implements ActionListener, FocusListener, KeyListener
       /* Display the frame. */
       /**********************/
       
+      jfrm.pack(); 
       jfrm.setVisible(true);    
      }    
    
@@ -409,7 +439,7 @@ class SudokuDemo implements ActionListener, FocusListener, KeyListener
                                       ((StringValue) fv.getFactSlot("reason")).getValue() + "<br>";
            }
         
-         JOptionPane.showMessageDialog(jfrm,messageStr,"Solution Techniques",JOptionPane.PLAIN_MESSAGE);
+         JOptionPane.showMessageDialog(jfrm,messageStr,sudokuResources.getString("SolutionTechniques"),JOptionPane.PLAIN_MESSAGE);
         }
      } 
 

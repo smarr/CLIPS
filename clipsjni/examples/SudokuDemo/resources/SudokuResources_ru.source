@@ -1,0 +1,14 @@
+﻿# Properties Source File for Russian
+# Generate the properties file from this file using the following command:
+# native2ascii -encoding UTF-8 SudokuResources_ru.source SudokuResources_ru.properties
+SudokuDemo=Судоку Демонстрация
+Clear=Ясно
+ClearTip=Очистить сетку судоку.
+Reset=Сбросить
+ResetTip=Сбросить бы заявить, до последнего решения.
+Solve=Решить
+SolveTip=Решить головоломку.
+Techniques=Методов
+TechniquesTip=Показать методов, используемых для решения головоломки.
+SolutionTechniques=Решение Техники
+Instructions=Выберите ячейку и введите цифры 1-9, или нажмите возврата/удалить.

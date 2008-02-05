@@ -1,0 +1,35 @@
+﻿# Properties Source File for Russian
+# Generate the properties file from this file using the following command:
+# native2ascii -encoding UTF-8 AutoResources_ru.source AutoResources_ru.properties
+AutoDemo=Автомобильный Демонстрация
+No=Нет
+Yes=Да
+Normal=Нормальных
+Burned=Ожоговый
+Contaminated=Зараженных
+Next=Следующий
+Prev=Предыдущие
+Restart=Перезапустите
+WelcomeMessage=Добро пожаловать в Двигатель Диагноз экспертов Системы.
+StartQuestion=Имеет ли двигатель начать?
+RunQuestion=Имеет ли двигатель работать в нормальном режиме?
+RotateQuestion=Имеет ли двигатель вращаться?
+SluggishQuestion=Является ли двигатель вялого?
+MisfireQuestion=Имеет ли двигатель осечка?
+KnockQuestion=Имеет ли двигатель стучать?
+OutputQuestion=Является ли выход из двигателей с низким?
+GasQuestion=Имеет ли танк есть газ в это?
+BatteryQuestion=Является ли аккумулятор обвинение?
+PointsQuestion=Каково состояние поверхности моменты?
+CoilQuestion=Является ли проводимость испытанием для катушки зажигания положительными?
+NoRepair=Рекомендуемые Ремонт: Нет.
+FuelLineRepair=Рекомендуемые Ремонт: чистого топлива линии.
+PointGapRepair=Рекомендуемые Ремонт: настройка точки разрыва.
+AdjustTimingRepair=Рекомендуемые Ремонт: настройка времени.
+AddGasRepair=Рекомендуемые Ремонт: Добавить газа.
+ReplaceBatteryRepair=Рекомендуемые Ремонт: Зарядка батареи.
+ReplacePointsRepair=Рекомендуемые ремонт: заменить баллов.
+CleanPointsRepair=Рекомендуемые Ремонт: Очистите баллов.
+LeadWireRepair=Рекомендуемые ремонт: заменить дистрибьютора приведет проволоки.
+CoilRepair=Рекомендуемые ремонт: заменить катушки зажигания.
+MechanicRepair=Рекомендуемые Ремонт: Сделайте Ваш автомобиль механиком.

@@ -1,0 +1,37 @@
+﻿# Properties Source File for Arabic
+# Generate the properties file from this file using the following command:
+# native2ascii -encoding UTF-8 WineResources_ar.source WineResources_ar.properties
+WineDemo=النبيذ تظاهرة
+PreferencesTitle=تفضيلات
+ColorLabel=لون
+BodyLabel=الجسم
+SweetnessLabel=الحلاوة
+MainCourseLabel=بالطبع الرئيسية
+SauceLabel=صلصه
+FlavorLabel=نكهه
+MealTitle=وجبه
+WineTitle=النبيذ
+RecommendationTitle=التوصيه الوزن
+Don'tCare=لا أهتم
+Red=أحمر
+White=أبيض
+Light=ضوء
+Medium=متوسط
+Full=كامل
+Dry=جاف
+Sweet=حلوي
+Don'tKnow=لا أعرف
+Beef=اللحم
+Pork=لحم الخنزير
+Lamb=الحمل
+Turkey=تركيا
+Chicken=الدجاجه
+Duck=بطه
+Fish=السمك
+Other=آخر
+None=لا شيء
+Spicy=كثير التوابل
+Cream=قشطة الحليب
+Delicate=حساس
+Average=متوسط
+Strong=قوى

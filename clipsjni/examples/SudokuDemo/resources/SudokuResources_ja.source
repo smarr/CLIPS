@@ -1,0 +1,14 @@
+﻿# Properties Source File for Japanese
+# Generate the properties file from this file using the following command:
+# native2ascii -encoding UTF-8 SudokuResources_ja.source SudokuResources_ja.properties
+SudokuDemo=数独デモ
+Clear=クリア
+ClearTip=数独グリッドをクリアする。
+Reset=リセット
+ResetTip=最後の解前の状態にリセットされます。
+Solve=解決する
+SolveTip=パズルを解決します。
+Techniques=テクニック
+TechniquesTip=パズルを解くテクニックを示す使用されています。
+SolutionTechniques=溶液のテクニック
+Instructions=セルを選択して入力するとバックスペースを押して桁または一〜九/削除しています。
