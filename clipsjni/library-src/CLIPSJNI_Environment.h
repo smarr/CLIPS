@@ -167,6 +167,38 @@ JNIEXPORT void JNICALL Java_CLIPSJNI_Environment_commandLoop
 JNIEXPORT jboolean JNICALL Java_CLIPSJNI_Environment_addRouter
   (JNIEnv *, jobject, jlong, jstring, jint, jobject);
 
+/*
+ * Class:     CLIPSJNI_Environment
+ * Method:    incrementFactCount
+ * Signature: (LCLIPSJNI/Environment;JJ)V
+ */
+JNIEXPORT void JNICALL Java_CLIPSJNI_Environment_incrementFactCount
+  (JNIEnv *, jobject, jobject, jlong, jlong);
+
+/*
+ * Class:     CLIPSJNI_Environment
+ * Method:    decrementFactCount
+ * Signature: (LCLIPSJNI/Environment;JJ)V
+ */
+JNIEXPORT void JNICALL Java_CLIPSJNI_Environment_decrementFactCount
+  (JNIEnv *, jobject, jobject, jlong, jlong);
+
+/*
+ * Class:     CLIPSJNI_Environment
+ * Method:    incrementInstanceCount
+ * Signature: (LCLIPSJNI/Environment;JJ)V
+ */
+JNIEXPORT void JNICALL Java_CLIPSJNI_Environment_incrementInstanceCount
+  (JNIEnv *, jobject, jobject, jlong, jlong);
+
+/*
+ * Class:     CLIPSJNI_Environment
+ * Method:    decrementInstanceCount
+ * Signature: (LCLIPSJNI/Environment;JJ)V
+ */
+JNIEXPORT void JNICALL Java_CLIPSJNI_Environment_decrementInstanceCount
+  (JNIEnv *, jobject, jobject, jlong, jlong);
+
 #ifdef __cplusplus
 }
 #endif

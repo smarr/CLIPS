@@ -14,6 +14,7 @@ public class FactAddressValue extends PrimitiveValue
       super(new Long(value));
       
       owner = env;
+      env.incrementFactCount(this);
      }
 
    /*******************/
@@ -49,4 +50,16 @@ public class FactAddressValue extends PrimitiveValue
       return "<Fact-" + getFactIndex() + ">";
      }
 
+   /*************/
+   /* finalize: */
+   /*************/
+   protected void finalize() throws Throwable
+     {
+      try
+        {
+         owner.decrementFactCount(this);
+        }
+      finally
+        { super.finalize(); }
+     }
   }

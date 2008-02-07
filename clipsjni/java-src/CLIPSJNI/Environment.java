@@ -318,6 +318,70 @@ public class Environment
       return addRouter(theEnvironment,theRouter.getName(),theRouter.getPriority(),theRouter);
      }
 
+   /***********************/
+   /* incrementFactCount: */
+   /***********************/
+   private native void incrementFactCount(Environment javaEnv,long env,long fact);
+
+   /***********************/
+   /* decrementFactCount: */
+   /***********************/
+   private native void decrementFactCount(Environment javaEnv,long env,long fact);
+
+   /***********************/
+   /* incrementFactCount: */
+   /***********************/
+   public void incrementFactCount(
+     FactAddressValue theFact)
+     {
+      incrementFactCount(theFact.getEnvironment(),
+                         theFact.getEnvironment().getEnvironmentAddress(),
+                         theFact.getFactAddress());
+     }
+
+   /***********************/
+   /* decrementFactCount: */
+   /***********************/
+   public void decrementFactCount(
+     FactAddressValue theFact)
+     {
+      decrementFactCount(theFact.getEnvironment(),
+                         theFact.getEnvironment().getEnvironmentAddress(),
+                         theFact.getFactAddress());
+     }
+
+   /***************************/
+   /* incrementInstanceCount: */
+   /***************************/
+   private native void incrementInstanceCount(Environment javaEnv,long env,long instance);
+
+   /***************************/
+   /* decrementInstanceCount: */
+   /***************************/
+   private native void decrementInstanceCount(Environment javaEnv,long env,long instance);
+
+   /***************************/
+   /* incrementInstanceCount: */
+   /***************************/
+   public void incrementInstanceCount(
+     InstanceAddressValue theInstance)
+     {
+      incrementInstanceCount(theInstance.getEnvironment(),
+                             theInstance.getEnvironment().getEnvironmentAddress(),
+                             theInstance.getInstanceAddress());
+     }
+
+   /***************************/
+   /* decrementInstanceCount: */
+   /***************************/
+   public void decrementInstanceCount(
+     InstanceAddressValue theInstance)
+     {
+      decrementInstanceCount(theInstance.getEnvironment(),
+                             theInstance.getEnvironment().getEnvironmentAddress(),
+                             theInstance.getInstanceAddress());
+     }
+
    /*************/
    /* finalize: */
    /*************/

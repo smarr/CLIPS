@@ -30,7 +30,7 @@ OBJS = agenda.obj analysis.obj argacces.obj bload.obj bmathfun.obj bsave.obj \
  	utility.obj watch.obj CLIPSJNI_Environment.obj
 
 .c.obj :
-	cl -c /I"c:\Program Files\Java\jdk1.6.0\include" /I"c:\Program Files\Java\jdk1.6.0\include\win32" $<
+	cl -c -DWIN_MVC -DALLOW_ENVIRONMENT_GLOBALS=0 /I"c:\Program Files\Java\jdk1.6.0\include" /I"c:\Program Files\Java\jdk1.6.0\include\win32" $<
 
 CLIPSJNI.dll : $(OBJS)
 	link /libpath:"c:\Program Files\Java\jdk1.6.0\lib" *.obj /dll /out:CLIPSJNI.dll

@@ -14,6 +14,7 @@ public class InstanceAddressValue extends InstanceValue
       super(new Long(value));
       
       owner = env;
+      env.incrementInstanceCount(this);
      }
 
    /*******************/
@@ -47,5 +48,18 @@ public class InstanceAddressValue extends InstanceValue
    public String toString()
      {        
       return "<Instance-" + getInstanceName() + ">";
+     }
+
+   /*************/
+   /* finalize: */
+   /*************/
+   protected void finalize() throws Throwable
+     {
+      try
+        {
+         owner.decrementInstanceCount(this);
+        }
+      finally
+        { super.finalize(); }
      }
   }

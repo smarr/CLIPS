@@ -900,6 +900,44 @@ JNIEXPORT jobject JNICALL Java_CLIPSJNI_Environment_getFactSlot(
    return ConvertDataObject(env,javaEnv,theCLIPSEnv,&theDO);
   }
 
+/**********************************************************/
+/* Java_CLIPSJNI_Environment_incrementFactCount: Native   */
+/*   function for the CLIPSJNI incrementFactCount method. */
+/*                                                        */
+/*                                                        */
+/* Class:     CLIPSJNI_Environment                        */
+/* Method:    incrementFactCount                          */
+/* Signature: (LCLIPSJNI/Environment;JJ)V                 */
+/**********************************************************/
+JNIEXPORT void JNICALL Java_CLIPSJNI_Environment_incrementFactCount(
+  JNIEnv *env, 
+  jclass javaClass, 
+  jobject javaEnv,
+  jlong clipsEnv, 
+  jlong clipsFact)
+  {
+   EnvIncrementFactCount(JLongToPointer(clipsEnv),JLongToPointer(clipsFact));
+  }
+  
+/**********************************************************/
+/* Java_CLIPSJNI_Environment_decrementFactCount: Native   */
+/*   function for the CLIPSJNI decrementFactCount method. */
+/*                                                        */
+/*                                                        */
+/* Class:     CLIPSJNI_Environment                        */
+/* Method:    decrementFactCount                          */
+/* Signature: (LCLIPSJNI/Environment;JJ)V                 */
+/**********************************************************/
+JNIEXPORT void JNICALL Java_CLIPSJNI_Environment_decrementFactCount(
+  JNIEnv *env, 
+  jclass javaClass, 
+  jobject javaEnv,
+  jlong clipsEnv, 
+  jlong clipsFact)
+  {
+   EnvDecrementFactCount(JLongToPointer(clipsEnv),JLongToPointer(clipsFact));
+  }
+  
 /*******************************************************************/
 /* Java_CLIPSJNI_Environment_makeInstance: Native function for the */
 /*   CLIPSJNI makeInstance method.                                 */
@@ -944,6 +982,44 @@ JNIEXPORT jstring JNICALL Java_CLIPSJNI_Environment_getInstanceName(
   jlong clipsInstance)
   {
    return (*env)->NewStringUTF(env,EnvGetInstanceName(JLongToPointer(clipsEnv),JLongToPointer(clipsInstance)));
+  }
+
+/**************************************************************/
+/* Java_CLIPSJNI_Environment_incrementInstanceCount: Native   */
+/*   function for the CLIPSJNI incrementInstanceCount method. */
+/*                                                            */
+/*                                                            */
+/* Class:     CLIPSJNI_Environment                            */
+/* Method:    incrementInstanceCount                          */
+/* Signature: (LCLIPSJNI/Environment;JJ)V                     */
+/**************************************************************/
+JNIEXPORT void JNICALL Java_CLIPSJNI_Environment_incrementInstanceCount(
+  JNIEnv *env, 
+  jclass javaClass, 
+  jobject javaEnv,
+  jlong clipsEnv, 
+  jlong clipsInstance)
+  {
+   EnvIncrementInstanceCount(JLongToPointer(clipsEnv),JLongToPointer(clipsInstance));
+  }
+  
+/**************************************************************/
+/* Java_CLIPSJNI_Environment_decrementInstanceCount: Native   */
+/*   function for the CLIPSJNI decrementInstanceCount method. */
+/*                                                            */
+/*                                                            */
+/* Class:     CLIPSJNI_Environment                            */
+/* Method:    decrementInstanceCount                          */
+/* Signature: (LCLIPSJNI/Environment;JJ)V                     */
+/**************************************************************/
+JNIEXPORT void JNICALL Java_CLIPSJNI_Environment_decrementInstanceCount(
+  JNIEnv *env, 
+  jclass javaClass, 
+  jobject javaEnv,
+  jlong clipsEnv, 
+  jlong clipsInstance)
+  {
+   EnvDecrementInstanceCount(JLongToPointer(clipsEnv),JLongToPointer(clipsInstance));
   }
 
 /**************************************************************/
