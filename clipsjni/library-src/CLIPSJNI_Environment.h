@@ -49,6 +49,30 @@ JNIEXPORT void JNICALL Java_CLIPSJNI_Environment_load
 
 /*
  * Class:     CLIPSJNI_Environment
+ * Method:    loadFacts
+ * Signature: (JLjava/lang/String;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_CLIPSJNI_Environment_loadFacts
+  (JNIEnv *, jobject, jlong, jstring);
+
+/*
+ * Class:     CLIPSJNI_Environment
+ * Method:    watch
+ * Signature: (JLjava/lang/String;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_CLIPSJNI_Environment_watch
+  (JNIEnv *, jobject, jlong, jstring);
+
+/*
+ * Class:     CLIPSJNI_Environment
+ * Method:    unwatch
+ * Signature: (JLjava/lang/String;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_CLIPSJNI_Environment_unwatch
+  (JNIEnv *, jobject, jlong, jstring);
+
+/*
+ * Class:     CLIPSJNI_Environment
  * Method:    run
  * Signature: (JJ)J
  */

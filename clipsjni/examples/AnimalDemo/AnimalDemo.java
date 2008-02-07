@@ -9,6 +9,10 @@ import java.util.List;
  
 import java.text.BreakIterator;
 
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.MissingResourceException;
+
 import CLIPSJNI.*;
 
 /* Implement FindFact which returns just a FactAddressValue or null */
@@ -21,16 +25,27 @@ class AnimalDemo implements ActionListener
    JButton prevButton;
    JPanel choicesPanel;
    ButtonGroup choicesButtons;
- 
+   ResourceBundle animalResources;
+
    Environment clips;
       
    AnimalDemo()
      {  
+      try
+        {
+         animalResources = ResourceBundle.getBundle("resources.AnimalResources",Locale.getDefault());
+        }
+      catch (MissingResourceException mre)
+        {
+         mre.printStackTrace();
+         return;
+        }
+
       /*================================*/
       /* Create a new JFrame container. */
       /*================================*/
      
-      JFrame jfrm = new JFrame("Animal Demo");  
+      JFrame jfrm = new JFrame(animalResources.getString("AnimalDemo"));  
  
       /*=============================*/
       /* Specify FlowLayout manager. */
@@ -71,12 +86,12 @@ class AnimalDemo implements ActionListener
 
       JPanel buttonPanel = new JPanel(); 
       
-      prevButton = new JButton("Prev");
+      prevButton = new JButton(animalResources.getString("Prev"));
       prevButton.setActionCommand("Prev");
       buttonPanel.add(prevButton);
       prevButton.addActionListener(this);
       
-      nextButton = new JButton("Next");
+      nextButton = new JButton(animalResources.getString("Next"));
       nextButton.setActionCommand("Next");
       buttonPanel.add(nextButton);
       nextButton.addActionListener(this);
@@ -95,6 +110,7 @@ class AnimalDemo implements ActionListener
       
       clips = new Environment();
       
+      clips.load("bcdemo.clp");
       clips.load("animaldemo.clp");
       clips.reset();
       clips.run();
@@ -155,19 +171,19 @@ class AnimalDemo implements ActionListener
       if (fv.getFactSlot("state").toString().equals("final"))
         { 
          nextButton.setActionCommand("Restart");
-         nextButton.setText("Restart"); 
+         nextButton.setText(animalResources.getString("Restart")); 
          prevButton.setVisible(true);
         }
       else if (fv.getFactSlot("state").toString().equals("initial"))
         {
          nextButton.setActionCommand("Next");
-         nextButton.setText("Next");
+         nextButton.setText(animalResources.getString("Next"));
          prevButton.setVisible(false);
         }
       else
         { 
          nextButton.setActionCommand("Next");
-         nextButton.setText("Next");
+         nextButton.setText(animalResources.getString("Next"));
          prevButton.setVisible(true);
         }
       
@@ -196,9 +212,9 @@ class AnimalDemo implements ActionListener
          JRadioButton rButton;
                                                             
          if (bv1.toString().equals(selected))
-            { rButton = new JRadioButton(bv2.getValue().toString(),true); }
+            { rButton = new JRadioButton(animalResources.getString(bv2.getValue().toString()),true); }
          else
-            { rButton = new JRadioButton(bv2.getValue().toString(),false); }
+            { rButton = new JRadioButton(animalResources.getString(bv2.getValue().toString()),false); }
             
          rButton.setActionCommand(bv1.toString());
          choicesPanel.add(rButton);
@@ -211,8 +227,8 @@ class AnimalDemo implements ActionListener
       /* Set the label to the display text. */
       /*====================================*/
 
-      String theText = ((StringValue) fv.getFactSlot("display")).stringValue();
-      
+      String theText = animalResources.getString(((SymbolValue) fv.getFactSlot("display")).stringValue());
+ 
       wrapLabelText(displayLabel,theText);
      }
 

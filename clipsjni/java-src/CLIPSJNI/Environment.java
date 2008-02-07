@@ -7,6 +7,21 @@ public class Environment
   {
    private static final String CLIPSJNI_VERSION = "0.1";
 
+   public static final String FACTS = "facts";
+   public static final String RULES = "rules";
+   public static final String DEFFUNCTIONS = "deffunctions";
+   public static final String COMPILATIONS = "compilations";
+   public static final String INSTANCES = "instances";
+   public static final String SLOTS = "slots";
+   public static final String ACTIVATIONS = "activations";
+   public static final String STATISTICS = "statistics";
+   public static final String FOCUS = "focus";
+   public static final String GENERIC_FUNCTIONS = "generic-functions";
+   public static final String METHODS = "methods";
+   public static final String GLOBALS = "globals";
+   public static final String MESSAGES = "messages";
+   public static final String MESSAGE_HANDLERS = "message-handlers";
+
    static { System.loadLibrary("CLIPSJNI"); }
 
    private long theEnvironment;
@@ -90,6 +105,45 @@ public class Environment
    public void load(String filename)
      {
       load(theEnvironment,filename);
+     }
+     
+   /**************/
+   /* loadFacts: */
+   /**************/
+   private native boolean loadFacts(long env,String filename);
+
+   /**************/
+   /* loadFacts: */
+   /**************/
+   public boolean loadFacts(String filename)
+     {
+      return loadFacts(theEnvironment,filename);
+     }
+
+   /**********/
+   /* watch: */
+   /**********/
+   private native boolean watch(long env,String watchItem);
+
+   /**********/
+   /* watch: */
+   /**********/
+   public boolean watch(String watchItem)
+     {
+      return watch(theEnvironment,watchItem);
+     }
+
+   /************/
+   /* unwatch: */
+   /************/
+   private native boolean unwatch(long env,String watchItem);
+
+   /************/
+   /* unwatch: */
+   /************/
+   public boolean unwatch(String watchItem)
+     {
+      return unwatch(theEnvironment,watchItem);
      }
      
    /********/

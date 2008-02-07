@@ -521,6 +521,78 @@ JNIEXPORT void JNICALL Java_CLIPSJNI_Environment_load(
    (*env)->ReleaseStringUTFChars(env,fileName,cFileName);
   }
 
+/*************************************************/
+/* Java_CLIPSJNI_Environment_loadFacts: Native   */ 
+/*   function for the CLIPSJNI loadFacts method. */
+/*                                               */
+/* Class:     CLIPSJNI_Environment               */
+/* Method:    loadFact                           */
+/* Signature: (JLjava/lang/String;)Z             */
+/*************************************************/
+JNIEXPORT jboolean JNICALL Java_CLIPSJNI_Environment_loadFacts(
+  JNIEnv *env, 
+  jobject obj,
+  jlong clipsEnv,
+  jstring fileName)
+  {
+   jboolean rv;
+   const char *cFileName = (*env)->GetStringUTFChars(env,fileName,NULL);
+
+   rv = EnvLoadFacts(JLongToPointer(clipsEnv),(char *) cFileName);
+   
+   (*env)->ReleaseStringUTFChars(env,fileName,cFileName);
+   
+   return rv;
+  }
+
+/*********************************************/
+/* Java_CLIPSJNI_Environment_watch: Native   */ 
+/*   function for the CLIPSJNI watch method. */
+/*                                           */
+/* Class:     CLIPSJNI_Environment           */
+/* Method:    watch                          */
+/* Signature: (JLjava/lang/String;)Z         */
+/*********************************************/
+JNIEXPORT jboolean JNICALL Java_CLIPSJNI_Environment_watch(
+  JNIEnv *env, 
+  jobject obj,
+  jlong clipsEnv,
+  jstring watchItem)
+  {
+   jboolean rv;
+   const char *cWatchItem = (*env)->GetStringUTFChars(env,watchItem,NULL);
+
+   rv = EnvWatch(JLongToPointer(clipsEnv),(char *) cWatchItem);
+   
+   (*env)->ReleaseStringUTFChars(env,watchItem,cWatchItem);
+   
+   return rv;
+  }
+
+/***********************************************/
+/* Java_CLIPSJNI_Environment_unwatch: Native   */ 
+/*   function for the CLIPSJNI unwatch method. */
+/*                                             */
+/* Class:     CLIPSJNI_Environment             */
+/* Method:    unwatch                          */
+/* Signature: (JLjava/lang/String;)Z           */
+/***********************************************/
+JNIEXPORT jboolean JNICALL Java_CLIPSJNI_Environment_unwatch(
+  JNIEnv *env, 
+  jobject obj,
+  jlong clipsEnv,
+  jstring watchItem)
+  {
+   jboolean rv;
+   const char *cWatchItem = (*env)->GetStringUTFChars(env,watchItem,NULL);
+
+   rv = EnvUnwatch(JLongToPointer(clipsEnv),(char *) cWatchItem);
+   
+   (*env)->ReleaseStringUTFChars(env,watchItem,cWatchItem);
+   
+   return rv;
+  }
+
 /**************************************************/
 /* Java_CLIPSJNI_Environment_run: Native function */ 
 /*   for the CLIPSJNI run method.                 */
