@@ -1357,7 +1357,7 @@ globle void CallFunction(
    
    if (GetType(theValue) == EXTERNAL_ADDRESS)
      { 
-      theEA = GetValue(theValue);
+      theEA = (struct externalAddressHashNode *) GetValue(theValue);
       
       theType = theEA->type;
       
