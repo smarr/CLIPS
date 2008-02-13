@@ -1,9 +1,12 @@
 #include <stdio.h>
 
+#include <iostream>
+
 #include "clipscpp.h"
 
+using namespace std;
 using namespace CLIPS;
-
+    
 #ifndef CLIPS_WIN32_DLL
 #if CLIPS_COMPILED_AS_C_PLUS_PLUS
 #include "clips.h"
@@ -201,6 +204,138 @@ int CLIPSCPPRouter::Exit(
   int exitCode)
   {
    return FALSE;
+  }
+  
+/*####################*/
+/* DataObject Methods */
+/*####################*/
+
+/***************/
+/* Operator << */
+/***************/
+std::ostream& CLIPS::operator<< (std::ostream& o, const DataObject& s)
+  {
+   s.print(o);
+   return o;
+  }
+
+/***************/
+/* Operator << */
+/***************/
+std::ostream& CLIPS::operator<< (std::ostream& o, const DataObject* s)
+  {
+   s->print(o);
+   return o;
+  }
+  
+/*********/
+/* print */
+/*********/
+std::ostream& DataObject::print (std::ostream& o) const
+  {
+   return std::cout << "<DataObject>"; 
+  }
+
+/*#####################*/
+/* StringValue Methods */
+/*#####################*/
+    
+/***************/
+/* StringValue */
+/***************/
+StringValue::StringValue()
+  {
+   theString = new string("");
+  }
+
+/***************/
+/* StringValue */
+/***************/
+StringValue::StringValue(
+  char *initialString)
+  {
+   theString = new string(initialString);
+  }
+
+/****************/
+/* ~StringValue */
+/****************/
+StringValue::~StringValue()
+  {  
+   /* cout << "Delete StringValue " << *theString << endl; */
+   delete theString;
+  }
+  
+/*****************/
+/* StringValue = */
+/*****************/
+StringValue& StringValue::operator = (
+  const StringValue& s)
+  {
+   if (this == &s) return *this;
+  
+   delete theString;
+   theString = new string(*s.theString);
+   return *this;
+  }
+ 
+/*********/
+/* print */
+/*********/
+std::ostream& StringValue::print (std::ostream& o) const
+  {
+   return std::cout << '\"' << theString->c_str() << '\"'; 
+  }
+
+/*#####################*/
+/* SymbolValue Methods */
+/*#####################*/
+
+/***************/
+/* SymbolValue */
+/***************/
+SymbolValue::SymbolValue()
+  {
+   theString = new string("");
+  }
+
+/***************/
+/* SymbolValue */
+/***************/
+SymbolValue::SymbolValue(
+  char *initialString)
+  {
+   /* cout << "StringValue Initial string is " << initialString << endl; */
+   theString = new string(initialString);
+  }
+
+/****************/
+/* ~SymbolValue */
+/****************/
+SymbolValue::~SymbolValue()
+  {
+   delete theString;
+  }
+
+/*****************/
+/* SymbolValue = */
+/*****************/
+SymbolValue& SymbolValue::operator = (
+  const SymbolValue& s)
+  {
+   if (this == &s) return *this;
+  
+   delete theString;
+   theString = new string(*s.theString);
+   return *this;
+  }
+  
+/*********/
+/* print */
+/*********/
+std::ostream& SymbolValue::print (std::ostream& o) const
+  {
+   return std::cout << theString->c_str(); 
   }
   
 /*#########################*/
