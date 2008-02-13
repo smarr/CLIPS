@@ -238,12 +238,24 @@ class SudokuDemo implements ActionListener, FocusListener, KeyListener
    /*########################*/
    /* ActionListener Methods */
    /*########################*/
-   
+
    /*******************/
    /* actionPerformed */
    /*******************/  
    public void actionPerformed(
      ActionEvent ae) 
+     {
+      try
+        { onActionPerformed(ae); }
+      catch (Exception e)
+        { e.printStackTrace(); }
+     }
+     
+   /*******************/
+   /* onActionPerformed */
+   /*******************/  
+   public void onActionPerformed(
+     ActionEvent ae) throws Exception 
      {      
       /*==========================*/
       /* Handle the Clear button. */
@@ -379,11 +391,11 @@ class SudokuDemo implements ActionListener, FocusListener, KeyListener
                                        "(and (eq ?f:row " + (r + (rowGroup * 3) + 1) + ") " +
                                             "(eq ?f:column " + (c + (colGroup * 3) + 1) + ")))";
                                         
-                  MultifieldValue pv = (MultifieldValue) clips.eval(evalStr);
+                  PrimitiveValue pv = clips.eval(evalStr);
                   
-                  if (pv.listValue().size() != 1) continue;
+                  if (pv.size() != 1) continue;
                   
-                  FactAddressValue fv = (FactAddressValue) pv.listValue().get(0);
+                  PrimitiveValue fv = pv.get(0);
                   
                   theTable.setValueAt(" " + fv.getFactSlot("value") + " ",r,c);
                  }         
@@ -422,21 +434,21 @@ class SudokuDemo implements ActionListener, FocusListener, KeyListener
          
          evalStr = "(find-all-facts ((?f technique)) TRUE)";
          
-         MultifieldValue pv = (MultifieldValue) clips.eval(evalStr);
-         int tNum = pv.listValue().size();
+         PrimitiveValue pv = clips.eval(evalStr);
+         int tNum = pv.size();
          
          for (int i = 1; i <= tNum; i++)
            {
             evalStr = "(find-fact ((?f technique-employed)) " +
                            "(eq ?f:priority " + i + "))";
                            
-            pv = (MultifieldValue) clips.eval(evalStr);
-            if (pv.listValue().size() == 0) continue;
+            pv = clips.eval(evalStr);
+            if (pv.size() == 0) continue;
             
-            FactAddressValue fv = (FactAddressValue) pv.listValue().get(0);
+            pv = pv.get(0);
 
-            messageStr = messageStr + ((IntegerValue) fv.getFactSlot("priority")).intValue() + ". " +
-                                      ((StringValue) fv.getFactSlot("reason")).getValue() + "<br>";
+            messageStr = messageStr + pv.getFactSlot("priority").intValue() + ". " +
+                                      pv.getFactSlot("reason").stringValue() + "<br>";
            }
         
          JOptionPane.showMessageDialog(jfrm,messageStr,sudokuResources.getString("SolutionTechniques"),JOptionPane.PLAIN_MESSAGE);

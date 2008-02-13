@@ -20,9 +20,17 @@ public class SymbolValue extends PrimitiveValue
      }
 
    /****************/
-   /* stringValue: */
+   /* lexemeValue: */
    /****************/
-   public String stringValue()
+   public String lexemeValue() throws Exception
+     {
+      return (String) getValue();
+     }
+     
+   /****************/
+   /* symbolValue: */
+   /****************/
+   public String symbolValue() throws Exception
      {
       return (String) getValue();
      }

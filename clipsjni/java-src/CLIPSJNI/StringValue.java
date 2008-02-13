@@ -18,11 +18,19 @@ public class StringValue extends PrimitiveValue
      {
       super(value);
      }
+
+   /****************/
+   /* lexemeValue: */
+   /****************/
+   public String lexemeValue() throws Exception
+     {
+      return (String) getValue();
+     }
      
    /****************/
    /* stringValue: */
    /****************/
-   public String stringValue()
+   public String stringValue() throws Exception
      {
       return (String) getValue();
      }

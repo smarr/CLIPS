@@ -3,10 +3,7 @@ import javax.swing.border.*;
 import javax.swing.table.*;
 import java.awt.*; 
 import java.awt.event.*; 
- 
-import java.util.Iterator;
-import java.util.List;
- 
+
 import java.text.BreakIterator;
 
 import java.util.Locale;
@@ -125,45 +122,35 @@ class AnimalDemo implements ActionListener
       /* Get the current state of the UI. */
       /*==================================*/
       
-      nextUIState();
+      try
+        { nextUIState(); }
+      catch (Exception e)
+        { e.printStackTrace(); }
      }  
 
    /****************/
    /* nextUIState: */
    /****************/  
-   private void nextUIState() 
+   private void nextUIState() throws Exception
      {
+      
       /*=====================*/
       /* Get the state-list. */
       /*=====================*/
       
       String evalStr = "(find-all-facts ((?f state-list)) TRUE)";
-
-      MultifieldValue pv = (MultifieldValue) clips.eval(evalStr);
-
-      int tNum = pv.listValue().size();
-
-      if (tNum == 0) return;
-
-      FactAddressValue fv = (FactAddressValue) pv.listValue().get(0);
       
-      String currentID = fv.getFactSlot("current").toString();
+      String currentID = clips.eval(evalStr).get(0).getFactSlot("current").toString();
 
       /*===========================*/
       /* Get the current UI state. */
       /*===========================*/
       
       evalStr = "(find-all-facts ((?f UI-state)) " +
-                                "(eq ?f:id " + currentID + "))";
+                                   "(eq ?f:id " + currentID + "))";
       
-      pv = (MultifieldValue) clips.eval(evalStr);
-      
-      tNum = pv.listValue().size();
-      
-      if (tNum == 0) return;
-      
-      fv = (FactAddressValue) pv.listValue().get(0);
-      
+      PrimitiveValue fv = clips.eval(evalStr).get(0);
+            
       /*========================================*/
       /* Determine the Next/Prev button states. */
       /*========================================*/
@@ -193,22 +180,17 @@ class AnimalDemo implements ActionListener
       
       choicesPanel.removeAll();
       choicesButtons = new ButtonGroup();
-            
-      pv = (MultifieldValue) fv.getFactSlot("valid-answers");      
-      List theList1 = pv.listValue();
       
-      pv = (MultifieldValue) fv.getFactSlot("display-answers");
-      List theList2 = pv.listValue();
+      PrimitiveValue pv1 = fv.getFactSlot("valid-answers");      
+      
+      PrimitiveValue pv2 = fv.getFactSlot("display-answers");
 
       String selected = fv.getFactSlot("response").toString();
      
-      Iterator itr1, itr2;
-      
-      for (itr1 = theList1.iterator(), itr2 = theList2.iterator(); 
-           itr1.hasNext() && itr2.hasNext();) 
+      for (int i = 0, j = 0; (i < pv1.size()) && (j < pv2.size()); i++, j++)
         {
-         PrimitiveValue bv1 = (PrimitiveValue) itr1.next();
-         PrimitiveValue bv2 = (PrimitiveValue) itr2.next();
+         PrimitiveValue bv1 = pv1.get(i);
+         PrimitiveValue bv2 = pv2.get(j);
          JRadioButton rButton;
                                                             
          if (bv1.toString().equals(selected))
@@ -227,7 +209,7 @@ class AnimalDemo implements ActionListener
       /* Set the label to the display text. */
       /*====================================*/
 
-      String theText = animalResources.getString(((SymbolValue) fv.getFactSlot("display")).stringValue());
+      String theText = animalResources.getString(fv.getFactSlot("display").symbolValue());
  
       wrapLabelText(displayLabel,theText);
      }
@@ -240,23 +222,27 @@ class AnimalDemo implements ActionListener
    /* actionPerformed */
    /*******************/  
    public void actionPerformed(
-     ActionEvent ae) 
+     ActionEvent ae)
+     { 
+      try
+        { onActionPerformed(ae); }
+      catch (Exception e)
+        { e.printStackTrace(); }
+     }
+
+   /*********************/
+   /* onActionPerformed */
+   /*********************/  
+   private void onActionPerformed(
+     ActionEvent ae) throws Exception
      { 
       /*=====================*/
       /* Get the state-list. */
       /*=====================*/
       
       String evalStr = "(find-all-facts ((?f state-list)) TRUE)";
-
-      MultifieldValue pv = (MultifieldValue) clips.eval(evalStr);
-
-      int tNum = pv.listValue().size();
-
-      if (tNum == 0) return;
-
-      FactAddressValue fv = (FactAddressValue) pv.listValue().get(0);
       
-      String currentID = fv.getFactSlot("current").toString();
+      String currentID = clips.eval(evalStr).get(0).getFactSlot("current").toString();
 
       /*=========================*/
       /* Handle the Next button. */

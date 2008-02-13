@@ -23,12 +23,33 @@ public class MultifieldValue extends PrimitiveValue
       super(value);
      }
      
-   /**************/
-   /* listValue: */
-   /**************/
-   public List listValue()
+   /********************/
+   /* multifieldValue: */
+   /********************/
+   public List multifieldValue() throws Exception
      {
       return (List) getValue();
+     }
+
+   /********************/
+   /* get: */
+   /********************/
+   public PrimitiveValue get(
+     int index) throws Exception
+     {
+      List theList = (List) getValue();
+      
+      return (PrimitiveValue) theList.get(index);
+     }
+     
+   /********************/
+   /* size: */
+   /********************/
+   public int size() throws Exception
+     {
+      List theList = (List) getValue();
+      
+      return theList.size();
      }
      
    /*************/

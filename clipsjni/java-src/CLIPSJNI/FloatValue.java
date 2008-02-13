@@ -27,21 +27,28 @@ public class FloatValue extends PrimitiveValue
      {
       super(value);
      }
+
+   /****************/
+   /* numberValue: */
+   /****************/
+   public Number numberValue() throws Exception
+     {
+      return (Number) getValue();
+     }
      
-   /*************/
-   /* intValue: */
-   /*************/
-   public int intValue()
+   /***************/
+   /* floatValue: */
+   /***************/
+   public float floatValue() throws Exception
      {
-      return ((Double) getValue()).intValue();
+      return ((Double) getValue()).floatValue();
      }
 
-   /**************/
-   /* longValue: */
-   /**************/
-   public long longValue()
+   /****************/
+   /* doubleValue: */
+   /****************/
+   public double doubleValue() throws Exception
      {
-      return ((Double) getValue()).longValue();
+      return ((Double) getValue()).doubleValue();
      }
-
   }

@@ -3,9 +3,6 @@ import javax.swing.border.*;
 import javax.swing.table.*;
 import java.awt.*; 
 import java.awt.event.*; 
- 
-import java.util.Iterator;
-import java.util.List;
 
 import java.text.BreakIterator;
 
@@ -125,29 +122,24 @@ class AutoDemo implements ActionListener
       /* Get the current state of the UI. */
       /*==================================*/
       
-      nextUIState();
+      try
+        { nextUIState(); }
+      catch (Exception e)
+        { e.printStackTrace(); }
      }  
 
    /****************/
    /* nextUIState: */
    /****************/  
-   private void nextUIState() 
+   private void nextUIState() throws Exception
      {
       /*=====================*/
       /* Get the state-list. */
       /*=====================*/
       
       String evalStr = "(find-all-facts ((?f state-list)) TRUE)";
-
-      MultifieldValue pv = (MultifieldValue) clips.eval(evalStr);
-
-      int tNum = pv.listValue().size();
-
-      if (tNum == 0) return;
-
-      FactAddressValue fv = (FactAddressValue) pv.listValue().get(0);
       
-      String currentID = fv.getFactSlot("current").toString();
+      String currentID = clips.eval(evalStr).get(0).getFactSlot("current").toString();
 
       /*===========================*/
       /* Get the current UI state. */
@@ -156,13 +148,7 @@ class AutoDemo implements ActionListener
       evalStr = "(find-all-facts ((?f UI-state)) " +
                                 "(eq ?f:id " + currentID + "))";
       
-      pv = (MultifieldValue) clips.eval(evalStr);
-      
-      tNum = pv.listValue().size();
-      
-      if (tNum == 0) return;
-      
-      fv = (FactAddressValue) pv.listValue().get(0);
+      PrimitiveValue fv = clips.eval(evalStr).get(0);
       
       /*========================================*/
       /* Determine the Next/Prev button states. */
@@ -194,15 +180,13 @@ class AutoDemo implements ActionListener
       choicesPanel.removeAll();
       choicesButtons = new ButtonGroup();
             
-      pv = (MultifieldValue) fv.getFactSlot("valid-answers");
-      
-      List theList = pv.listValue();
+      PrimitiveValue pv = fv.getFactSlot("valid-answers");
       
       String selected = fv.getFactSlot("response").toString();
      
-      for (Iterator itr = theList.iterator(); itr.hasNext();) 
+      for (int i = 0; i < pv.size(); i++) 
         {
-         PrimitiveValue bv = (PrimitiveValue) itr.next();
+         PrimitiveValue bv = pv.get(i);
          JRadioButton rButton;
                         
          if (bv.toString().equals(selected))
@@ -221,7 +205,7 @@ class AutoDemo implements ActionListener
       /* Set the label to the display text. */
       /*====================================*/
 
-      String theText = autoResources.getString(((SymbolValue) fv.getFactSlot("display")).stringValue());
+      String theText = autoResources.getString(fv.getFactSlot("display").symbolValue());
             
       wrapLabelText(displayLabel,theText);
      }
@@ -229,28 +213,32 @@ class AutoDemo implements ActionListener
    /*########################*/
    /* ActionListener Methods */
    /*########################*/
-   
+
    /*******************/
    /* actionPerformed */
    /*******************/  
    public void actionPerformed(
      ActionEvent ae) 
      { 
+      try
+        { onActionPerformed(ae); }
+      catch (Exception e)
+        { e.printStackTrace(); }
+     }
+     
+   /*********************/
+   /* onActionPerformed */
+   /*********************/  
+   public void onActionPerformed(
+     ActionEvent ae) throws Exception 
+     { 
       /*=====================*/
       /* Get the state-list. */
       /*=====================*/
       
       String evalStr = "(find-all-facts ((?f state-list)) TRUE)";
-
-      MultifieldValue pv = (MultifieldValue) clips.eval(evalStr);
-
-      int tNum = pv.listValue().size();
-
-      if (tNum == 0) return;
-
-      FactAddressValue fv = (FactAddressValue) pv.listValue().get(0);
       
-      String currentID = fv.getFactSlot("current").toString();
+      String currentID = clips.eval(evalStr).get(0).getFactSlot("current").toString();
 
       /*=========================*/
       /* Handle the Next button. */

@@ -271,20 +271,20 @@
              (query nearly.hairless.query))
    (rule (if species is 400 and
           land.based is yes) 
-         (then type.animal is bear/tiger/lion))
+         (then type.animal is bear.tiger.lion))
    (rule (if species is 400 and
           land.based is no) 
          (then type.animal is walrus))
    (question (variable land.based)
-             (query "Is your animal land based?"))
+             (query land.based.query))
    (rule (if species is under400 and
           thintail is yes) 
          (then type.animal is cat))
    (rule (if species is under400 and
           thintail is no) 
-         (then type.animal is coyote/wolf/fox/dog))
+         (then type.animal is coyote.wolf.fox.dog))
    (question (variable thintail)
-             (query "Does your animal have a thin tail?"))
+             (query thintail.query))
    (rule (if species is nohorns and
           lives.in.desert is yes) 
          (then type.animal is camel))
@@ -297,48 +297,48 @@
           semi.aquatic is yes) 
          (then type.animal is hippopotamus))
    (question (variable lives.in.desert)
-             (query "Does your animal normally live in the desert?"))
+             (query lives.in.desert.query))
    (question (variable semi.aquatic)
-             (query "Is your animal semi-aquatic?"))
+             (query semi.aquatic.query))
    (rule (if species is teeth and
           large.ears is yes) 
          (then type.animal is rabbit))
    (rule (if species is teeth and
           large.ears is no)
-         (then type.animal is rat/mouse/squirrel/beaver/porcupine))
+         (then type.animal is rat.mouse.squirrel.beaver.porcupine))
    (question (variable large.ears)
-             (query "Does your animal have large ears?"))
+             (query large.ears.query))
    (rule (if species is noteeth and
           pouch is yes) 
-         (then type.animal is "kangaroo/koala bear"))
+         (then type.animal is kangaroo.koala.bear))
    (rule (if species is noteeth and
           pouch is no) 
-         (then type.animal is mole/shrew/elephant))
+         (then type.animal is mole.shrew.elephant))
    (question (variable pouch)
-             (query "Does your animal have a pouch?"))
+             (query pouch.query))
    (rule (if subspecies is hair and
           long.powerful.arms is yes) 
-         (then type.animal is orangutan/gorilla/chimpanzie))
+         (then type.animal is orangutan.gorilla.chimpanzee))
    (rule (if subspecies is hair and
           long.powerful.arms is no) 
          (then type.animal is baboon))
    (question (variable long.powerful.arms)
-             (query "Does your animal have long, powerful arms?"))
+             (query long.powerful.arms.query))
    (rule (if species is horns and
           fleece is yes) 
-         (then type.animal is sheep/goat))
+         (then type.animal is sheep.goat))
    (rule (if species is horns and
           fleece is no) 
          (then subsubspecies is nofleece))
    (question (variable fleece)
-             (query "Does your animal have fleece?"))
+             (query fleece.query))
    (rule (if subsubspecies is nofleece and
           domesticated is yes) 
          (then type.animal is cow))
    (rule (if subsubspecies is nofleece and
           domesticated is no) 
-         (then type.animal is deer/moose/antelope))
+         (then type.animal is deer.moose.antelope))
    (question (variable domesticated)
-             (query "Is your animal domesticated?"))
+             (query domesticated.query))
    (answer (prefix "I think your animal is a ") (variable type.animal) (postfix ".")))
 

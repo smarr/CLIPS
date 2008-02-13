@@ -33,7 +33,7 @@ public class FactAddressValue extends PrimitiveValue
    /* getFactSlot: */
    /****************/     
    public PrimitiveValue getFactSlot(
-     String slotName)
+     String slotName) throws Exception
      { return Environment.getFactSlot(this,slotName); }
 
    /*****************/

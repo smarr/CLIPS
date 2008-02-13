@@ -19,22 +19,6 @@ public class IntegerValue extends PrimitiveValue
       super(new Long(value));
      }
      
-   /*************/
-   /* intValue: */
-   /*************/
-   public int intValue()
-     {
-      return ((Long) getValue()).intValue();
-     }
-
-   /**************/
-   /* longValue: */
-   /**************/
-   public long longValue()
-     {
-      return ((Long) getValue()).longValue();
-     }
-
    /*****************/
    /* IntegerValue: */
    /*****************/
@@ -42,5 +26,29 @@ public class IntegerValue extends PrimitiveValue
      Long value)
      {
       super(value);
+     }
+
+   /****************/
+   /* numberValue: */
+   /****************/
+   public Number numberValue() throws Exception
+     {
+      return (Number) getValue();
+     }
+
+   /*************/
+   /* intValue: */
+   /*************/
+   public int intValue() throws Exception
+     {
+      return ((Long) getValue()).intValue();
+     }
+
+   /**************/
+   /* longValue: */
+   /**************/
+   public long longValue() throws Exception
+     {
+      return ((Long) getValue()).longValue();
      }
   }

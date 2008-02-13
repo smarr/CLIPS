@@ -4,9 +4,6 @@ import javax.swing.table.*;
 import java.awt.*; 
 import java.awt.event.*; 
  
-import java.util.Iterator;
-import java.util.List;
- 
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.MissingResourceException;
@@ -262,7 +259,10 @@ class WineDemo implements ActionListener
       
       clips.load("winedemo.clp");
       
-      runWine();
+      try
+        { runWine(); }
+      catch (Exception e)
+        { e.printStackTrace(); }
        
       /*====================*/
       /* Display the frame. */
@@ -272,10 +272,10 @@ class WineDemo implements ActionListener
       jfrm.setVisible(true);  
      }  
  
-    /*########################*/
+   /*########################*/
    /* ActionListener Methods */
    /*########################*/
-   
+
    /*******************/
    /* actionPerformed */
    /*******************/  
@@ -284,13 +284,16 @@ class WineDemo implements ActionListener
      { 
       if (clips == null) return;
       
-      runWine();
+      try
+        { runWine(); }
+      catch (Exception e)
+        { e.printStackTrace(); }
      }
      
-   /*******************/
+   /***********/
    /* runWine */
-   /*******************/  
-   private void runWine() 
+   /***********/  
+   private void runWine() throws Exception
      { 
       String item;
       
@@ -402,23 +405,20 @@ class WineDemo implements ActionListener
       clips.run();
       
       String evalStr = "(WINES::get-wine-list)";
-                                             
-      MultifieldValue pv = (MultifieldValue) clips.eval(evalStr);
-            
-      List theList = pv.listValue();
-      
+                                       
+      PrimitiveValue pv = clips.eval(evalStr);
+               
       wineList.setRowCount(0);
       
-      for (Iterator itr = theList.iterator(); itr.hasNext(); ) 
+      for (int i = 0; i < pv.size(); i++) 
         {
-         FactAddressValue fv = (FactAddressValue) itr.next();
+         PrimitiveValue fv = pv.get(i);
 
-         int certainty = ((FloatValue) fv.getFactSlot("certainty")).intValue(); 
+         int certainty = fv.getFactSlot("certainty").numberValue().intValue(); 
          
-         String wineName = ((StringValue) fv.getFactSlot("value")).stringValue();
+         String wineName = fv.getFactSlot("value").stringValue();
                   
          wineList.addRow(new Object[] { wineName, new Integer(certainty) });
-
         }  
         
       jfrm.pack();
