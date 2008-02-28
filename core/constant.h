@@ -75,7 +75,7 @@
 #endif
 
 #ifndef BANNER_STRING
-#define BANNER_STRING "         CLIPS (Quicksilver Beta 1/30/08)\n"
+#define BANNER_STRING "         CLIPS (Quicksilver Beta 2/27/08)\n"
 #endif
 
 /*************************/

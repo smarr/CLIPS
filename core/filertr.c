@@ -178,8 +178,9 @@ static int PrintFile(
    FILE *fptr;
 
    fptr = FindFptr(theEnv,logicalName);
-   fprintf(fptr,"%s",str);
-   fflush(fptr);
+   
+   genprintfile(theEnv,fptr,str);
+   
    return(1);
   }
 

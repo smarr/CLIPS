@@ -1144,7 +1144,7 @@ static struct expr *ForeachParser(
    struct BindInfo *oldBindList,*newBindList,*prev;
    struct token tkn;
    struct expr *tmp;
-   SYMBOL_HN *fieldVar = NULL;
+   SYMBOL_HN *fieldVar;
 
    SavePPBuffer(theEnv," ");
    GetToken(theEnv,infile,&tkn);

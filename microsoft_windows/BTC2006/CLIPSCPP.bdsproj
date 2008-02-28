@@ -107,6 +107,7 @@
           <property category="win32.*.win32b.bcc32" name="option.I.arg.1" value="..\Source\Integration"/>
           <property category="win32.*.win32b.bcc32" name="option.I.arg.2" value="..\Source\CLIPS"/>
           <property category="win32.*.win32b.bcc32" name="option.I.arg.3" value="$(BDS)\include"/>
+          <property category="win32.*.win32b.bcc32" name="option.I.arg.4" value="$(BDS)\include\dinkumware"/>
           <property category="win32.*.win32b.bcc32" name="option.I.arg.merge" value="1"/>
           <property category="win32.*.win32b.bcc32" name="option.I.enabled" value="1"/>
           <property category="win32.*.win32b.bcc32" name="option.Jgi.enabled" value="0"/>
@@ -116,6 +117,7 @@
           <property category="win32.*.win32b.bcc32" name="option.Od.enabled" value="0"/>
           <property category="win32.*.win32b.bcc32" name="option.V0.enabled" value="0"/>
           <property category="win32.*.win32b.bcc32" name="option.V1.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.VI.enabled" value="0"/>
           <property category="win32.*.win32b.bcc32" name="option.Vmd.enabled" value="0"/>
           <property category="win32.*.win32b.bcc32" name="option.Vmm.enabled" value="0"/>
           <property category="win32.*.win32b.bcc32" name="option.Vms.enabled" value="0"/>

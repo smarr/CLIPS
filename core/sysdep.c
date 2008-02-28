@@ -836,6 +836,44 @@ globle void VMSSystem(
 
 #endif
 
+/****************************************************/
+/* genprintfile: Generic routine for print a single */
+/*   character string to a file (including stdout). */
+/****************************************************/
+globle void genprintfile(
+  void *theEnv,
+  FILE *fptr,
+  char *str)
+  {
+   if (fptr != stdout)
+     {
+      fprintf(fptr,"%s",str);
+      fflush(fptr);
+     }
+   else
+     {
+#if WIN_MVC
+/*
+      int rv;
+      wchar_t *wbuffer;
+      size_t len = strlen(str);
+
+      wbuffer = genalloc(theEnv,sizeof(wchar_t) * (len + 1));
+      rv = MultiByteToWideChar(CP_UTF8,MB_ERR_INVALID_CHARS,str,-1,wbuffer,len+1);
+      
+      fwprintf(fptr,L"%ls",wbuffer);
+      fflush(fptr);
+      genfree(theEnv,wbuffer,sizeof(wchar_t) * (len + 1));
+*/
+      fprintf(fptr,"%s",str);
+      fflush(fptr);
+#else
+      fprintf(fptr,"%s",str);
+      fflush(fptr);
+#endif
+     }
+  }
+  
 /***********************************************************/
 /* InitializeNonportableFeatures: Initializes non-portable */
 /*   features. Currently, the only non-portable feature    */

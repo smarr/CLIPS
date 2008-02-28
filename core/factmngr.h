@@ -108,15 +108,18 @@ struct factsData
 #define AssignFactSlotDefaults(a) EnvAssignFactSlotDefaults(GetCurrentEnvironment(),a)
 #define CreateFact(a) EnvCreateFact(GetCurrentEnvironment(),a)
 #define DecrementFactCount(a) EnvDecrementFactCount(GetCurrentEnvironment(),a)
-#define FactIndex(a) EnvFactIndex(GetCurrentEnvironment(),a)
 #define GetFactListChanged() EnvGetFactListChanged(GetCurrentEnvironment())
 #define GetFactPPForm(a,b,c) EnvGetFactPPForm(GetCurrentEnvironment(),a,b,c)
-#define GetFactSlot(a,b,c) EnvGetFactSlot(GetCurrentEnvironment(),a,b,c)
 #define GetNextFact(a) EnvGetNextFact(GetCurrentEnvironment(),a)
 #define IncrementFactCount(a) EnvIncrementFactCount(GetCurrentEnvironment(),a)
 #define PutFactSlot(a,b,c) EnvPutFactSlot(GetCurrentEnvironment(),a,b,c)
 #define Retract(a) EnvRetract(GetCurrentEnvironment(),a)
 #define SetFactListChanged(a) EnvSetFactListChanged(GetCurrentEnvironment(),a)
+
+#if ALLOW_ENVIRONMENT_GLOBALS
+   LOCALE intBool                        GetFactSlot(void *,char *,DATA_OBJECT *);
+   LOCALE long long                      FactIndex(void *);
+#endif
 
    LOCALE void                          *EnvAssert(void *,void *);
    LOCALE void                          *EnvAssertString(void *,char *);

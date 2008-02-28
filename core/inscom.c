@@ -772,6 +772,22 @@ globle char *EnvGetInstanceName(
   }
 
 /***************************************************
+  NAME         : GetInstanceName
+  DESCRIPTION  : Returns name of instance
+  INPUTS       : Pointer to instance
+  RETURNS      : Name of instance
+  SIDE EFFECTS : None
+  NOTES        : None
+ ***************************************************/
+#if ALLOW_ENVIRONMENT_GLOBALS
+globle char *GetInstanceName(
+  void *iptr)
+  {
+   return EnvGetInstanceName(GetCurrentEnvironment(),iptr);
+  }
+#endif
+  
+/***************************************************
   NAME         : EnvGetInstanceClass
   DESCRIPTION  : Returns class of instance
   INPUTS       : Pointer to instance

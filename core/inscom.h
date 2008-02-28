@@ -69,7 +69,6 @@ struct instanceData
 #define DirectPutSlot(a,b,c) EnvDirectPutSlot(GetCurrentEnvironment(),a,b,c)
 #define FindInstance(a,b,c) EnvFindInstance(GetCurrentEnvironment(),a,b,c)
 #define GetInstanceClass(a) EnvGetInstanceClass(GetCurrentEnvironment(),a)
-#define GetInstanceName(a) EnvGetInstanceName(GetCurrentEnvironment(),a)
 #define GetInstancePPForm(a,b,c) EnvGetInstancePPForm(GetCurrentEnvironment(),a,b,c)
 #define GetNextInstance(a) EnvGetNextInstance(GetCurrentEnvironment(),a)
 #define GetNextInstanceInClass(a,b) EnvGetNextInstanceInClass(GetCurrentEnvironment(),a,b)
@@ -78,6 +77,10 @@ struct instanceData
 #define MakeInstance(a) EnvMakeInstance(GetCurrentEnvironment(),a)
 #define UnmakeInstance(a) EnvUnmakeInstance(GetCurrentEnvironment(),a)
 #define ValidInstanceAddress(a) EnvValidInstanceAddress(GetCurrentEnvironment(),a)
+
+#if ALLOW_ENVIRONMENT_GLOBALS
+   LOCALE char                          *GetInstanceName(void *);
+#endif
 
 LOCALE void SetupInstances(void *);
 LOCALE intBool EnvDeleteInstance(void *,void *);

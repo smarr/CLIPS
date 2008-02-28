@@ -926,6 +926,20 @@ globle intBool EnvGetFactSlot(
    return(TRUE);
   }
 
+/****************************************/
+/* GetFactSlot: Returns the slot value  */
+/*   from the specified slot of a fact. */
+/****************************************/
+#if ALLOW_ENVIRONMENT_GLOBALS
+globle intBool GetFactSlot(
+  void *vTheFact,
+  char *slotName,
+  DATA_OBJECT *theValue)
+  {
+   return(EnvGetFactSlot(GetCurrentEnvironment(),vTheFact,slotName,theValue));
+  }
+#endif
+
 /***************************************/
 /* EnvPutFactSlot: Sets the slot value */
 /*   of the specified slot of a fact.  */
@@ -1459,6 +1473,18 @@ globle long long EnvFactIndex(
 
    return(((struct fact *) factPtr)->factIndex);
   }
+
+/**********************************/
+/* FactIndex: C access routine    */
+/*   for the fact-index function. */
+/**********************************/
+#if ALLOW_ENVIRONMENT_GLOBALS
+globle long long FactIndex(
+  void *factPtr)
+  {
+   return(EnvFactIndex(GetCurrentEnvironment(),factPtr));
+  }
+#endif
 
 /*************************************/
 /* EnvAssertString: C access routine */
