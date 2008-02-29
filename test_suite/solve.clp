@@ -1,3 +1,7 @@
+;;; Version 1.1
+;;;
+;;; Added Unique Rectangles
+
 ;;; #######################
 ;;; DEFTEMPLATES & DEFFACTS
 ;;; #######################
@@ -5,8 +9,8 @@
 (deffacts techniques
    (technique (name Naked-Single) (priority 1))
    (technique (name Hidden-Single) (priority 2))
-   (technique (name Locked-Candidates-Single-Line) (priority 3))
-   (technique (name Locked-Candidates-Multiple-Lines) (priority 4))
+   (technique (name Locked-Candidate-Single-Line) (priority 3))
+   (technique (name Locked-Candidate-Multiple-Lines) (priority 4))
    (technique (name Naked-Pairs) (priority 5))
    (technique (name Hidden-Pairs) (priority 6))
    (technique (name X-Wing) (priority 7))
@@ -19,7 +23,8 @@
    (technique (name Multi-Color-Type-1) (priority 14))
    (technique (name Multi-Color-Type-2) (priority 15))
    (technique (name Forced-Chain-Convergence) (priority 16))
-   (technique (name Forced-Chain-XY) (priority 17)))
+   (technique (name Forced-Chain-XY) (priority 17))
+   (technique (name Unique-Rectangle) (priority 18)))
 
 (deffacts color-pairs
    (color-pair green magenta)
@@ -283,19 +288,19 @@
    
    (assert (impossible (id ?id) (value ?v2) (priority ?p) (reason "Hidden Single"))))
 
-;;; #############################
-;;; Locked Candidates Single Line
-;;; #############################
+;;; ############################
+;;; Locked Candidate Single Line
+;;; ############################
 
-;;; *********************************
-;;; locked-candidates-single-line-row
-;;; *********************************
+;;; ********************************
+;;; locked-candidate-single-line-row
+;;; ********************************
 
-(defrule locked-candidates-single-line-row
+(defrule locked-candidate-single-line-row
    
    (priority ?p)
 
-   (technique (name Locked-Candidates-Single-Line) (priority ?p))
+   (technique (name Locked-Candidate-Single-Line) (priority ?p))
    
    (possible (value ?v) (row ?r) (group ?g))
    
@@ -305,17 +310,17 @@
    
    =>
    
-   (assert (impossible (id ?id) (value ?v) (priority ?p) (reason "Locked Candidates Single Line"))))
+   (assert (impossible (id ?id) (value ?v) (priority ?p) (reason "Locked Candidate Single Line"))))
 
-;;; ************************************
-;;; locked-candidates-single-line-column
-;;; ************************************
+;;; ***********************************
+;;; locked-candidate-single-line-column
+;;; ***********************************
 
-(defrule locked-candidates-single-line-column
+(defrule locked-candidate-single-line-column
    
    (priority ?p)
 
-   (technique (name Locked-Candidates-Single-Line) (priority ?p))
+   (technique (name Locked-Candidate-Single-Line) (priority ?p))
    
    (possible (value ?v) (column ?c) (group ?g))
    
@@ -325,21 +330,21 @@
    
    =>
    
-   (assert (impossible (id ?id) (value ?v) (priority ?p) (reason "Locked Candidates Single Line"))))
+   (assert (impossible (id ?id) (value ?v) (priority ?p) (reason "Locked Candidate Single Line"))))
 
-;;; ################################
-;;; Locked Candidates Multiple Lines
-;;; ################################
+;;; ###############################
+;;; Locked Candidate Multiple Lines
+;;; ###############################
 
-;;; ************************************
-;;; locked-candidates-multiple-lines-row
-;;; ************************************
+;;; ***********************************
+;;; locked-candidate-multiple-lines-row
+;;; ***********************************
 
 (defrule locked-candidates-multiple-lines-row
 
    (priority ?p)
 
-   (technique (name Locked-Candidates-Multiple-Lines) (priority ?p))
+   (technique (name Locked-Candidate-Multiple-Lines) (priority ?p))
    
    (possible (value ?v) (row ?r) (group ?g))
    
@@ -349,17 +354,17 @@
    
    =>
    
-   (assert (impossible (id ?id) (value ?v) (priority ?p) (reason "Locked Candidates Multiple Lines"))))
+   (assert (impossible (id ?id) (value ?v) (priority ?p) (reason "Locked Candidate Multiple Lines"))))
 
-;;; ***************************************
-;;; locked-candidates-multiple-lines-column
-;;; ***************************************
+;;; **************************************
+;;; locked-candidate-multiple-lines-column
+;;; **************************************
 
-(defrule locked-candidates-multiple-lines-column
+(defrule locked-candidate-multiple-lines-column
 
    (priority ?p)
 
-   (technique (name Locked-Candidates-Multiple-Lines) (priority ?p))
+   (technique (name Locked-Candidate-Multiple-Lines) (priority ?p))
    
    (possible (value ?v) (column ?c) (group ?g))
    
@@ -369,7 +374,7 @@
    
    =>
    
-   (assert (impossible (id ?id) (value ?v) (priority ?p) (reason "Locked Candidates Multiple Lines"))))
+   (assert (impossible (id ?id) (value ?v) (priority ?p) (reason "Locked Candidate Multiple Lines"))))
 
 
 ;;; ###########
@@ -897,7 +902,7 @@
    (test (or (= ?r1 ?r2) (= ?c1 ?c2) (= ?g1 ?g2)))
 
    (possible (value ?y) (row ?r3) (column ?c3) (group ?g3) (id ?id3&~?id2&~?id1))
-      
+   
    (possible (value ?z&~?y) (id ?id3))
    
    (not (possible (value ~?z&~?y) (id ?id3)))
@@ -1230,7 +1235,7 @@
                         
    =>
       
-   (assert (impossible (id ?id) (value ?v) (priority ?p) (reason "Color Conjugate Pair"))))
+   (assert (impossible (id ?id) (value ?v) (priority ?p) (reason "Color Conjugate Pairs"))))
    
 ;;; ##################
 ;;; Multi-Color-Type-1
@@ -1520,4 +1525,87 @@
    
    (assert (impossible (id ?id) (value ?v1) (priority ?p) (reason "Forced Chain XY"))))
    
+;;; ################
+;;; Unique-Rectangle
+;;; ################
+
+;;; ********************
+;;; Unique-Rectangle-Row
+;;; ********************
+
+(defrule Unique-Rectangle-Row
+   
+   (priority ?p)
+
+   (technique (name Unique-Rectangle) (priority ?p))
+   
+   (possible (value ?v1) (group ?g1) (row ?r1) (column ?c1))
+
+   (possible (value ?v2&~?v1) (group ?g1) (row ?r1) (column ?c1))
+
+   (not (possible (value ~?v2&~?v1) (row ?r1) (column ?c1)))
+   
+   (possible (value ?v1) (group ?g1) (row ?r1) (column ?c2&~?c1))
+
+   (possible (value ?v2&~?v1) (group ?g1) (row ?r1) (column ?c2&~?c1))
+
+   (not (possible (value ~?v2&~?v1) (row ?r1) (column ?c2)))
+   
+   (possible (value ?v1) (group ?g2&~?g1) (row ?r2) (column ?c1))
+
+   (possible (value ?v2) (group ?g2) (row ?r2) (column ?c1))
+   
+   (not (possible (value ~?v2&~?v1) (group ?g2) (row ?r2) (column ?c1)))  
+   
+   (possible (value ?v1) (id ?id1) (group ?g2) (row ?r2) (column ?c2))
+
+   (possible (value ?v2) (id ?id2) (group ?g2) (row ?r2) (column ?c2))
+   
+   (possible (value ~?v2&~?v1) (group ?g2) (row ?r2) (column ?c2)) 
+   
+   =>
+   
+   (assert (impossible (id ?id1) (value ?v1) (priority ?p) (reason "Unique Rectangle")))
+
+   (assert (impossible (id ?id2) (value ?v2) (priority ?p) (reason "Unique Rectangle"))))
+   
+;;; ***********************
+;;; Unique-Rectangle-Column
+;;; ***********************
+
+(defrule Unique-Rectangle-Column
+   
+   (priority ?p)
+
+   (technique (name Unique-Rectangle) (priority ?p))
+   
+   (possible (value ?v1) (group ?g1) (row ?r1) (column ?c1))
+
+   (possible (value ?v2&~?v1) (group ?g1) (row ?r1) (column ?c1))
+
+   (not (possible (value ~?v2&~?v1) (row ?r1) (column ?c1)))
+   
+   (possible (value ?v1) (group ?g1) (row ?r2&~?r1) (column ?c1))
+
+   (possible (value ?v2&~?v1) (group ?g1) (row ?r2&~?r1) (column ?c1))
+
+   (not (possible (value ~?v2&~?v1) (row ?r2) (column ?c1)))
+   
+   (possible (value ?v1) (group ?g2&~?g1) (row ?r1) (column ?c2))
+
+   (possible (value ?v2) (group ?g2) (row ?r1) (column ?c2))
+   
+   (not (possible (value ~?v2&~?v1) (group ?g2) (row ?r1) (column ?c2)))  
+   
+   (possible (value ?v1) (id ?id1) (group ?g2) (row ?r2) (column ?c2))
+
+   (possible (value ?v2) (id ?id2) (group ?g2) (row ?r2) (column ?c2))
+   
+   (possible (value ~?v2&~?v1) (group ?g2) (row ?r2) (column ?c2)) 
+   
+   =>
+   
+   (assert (impossible (id ?id1) (value ?v1) (priority ?p) (reason "Unique Rectangle")))
+
+   (assert (impossible (id ?id2) (value ?v2) (priority ?p) (reason "Unique Rectangle"))))
 

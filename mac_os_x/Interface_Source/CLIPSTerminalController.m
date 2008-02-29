@@ -713,7 +713,7 @@
    
    if (theCString != NULL)
      {
-      theStr = [NSString stringWithCString: theCString encoding: NSMacOSRomanStringEncoding];
+      theStr = [NSString stringWithCString: theCString encoding: NSUTF8StringEncoding];
       [theStr retain];
       [self print: theStr];
       [theStr release];
@@ -784,7 +784,7 @@
   {
    NSString *theStr;
    
-   theStr = [NSString stringWithCString: theString encoding: NSMacOSRomanStringEncoding];
+   theStr = [NSString stringWithCString: theString encoding: NSUTF8StringEncoding];
    [theStr retain];
    [textView print: theStr];
    [theStr release];
@@ -795,7 +795,7 @@
 /***********/    
 - (void) printC: (char *) theString
   {
-   NSString *theStr = [NSString stringWithCString: theString encoding: NSMacOSRomanStringEncoding];
+   NSString *theStr = [NSString stringWithCString: theString encoding: NSUTF8StringEncoding];
    
    /*=================================================================*/
    /* If the buffer has grown too large, wait for it to be dumped by  */

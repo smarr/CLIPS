@@ -376,7 +376,8 @@
       newFocus = [[CLIPSFocus alloc] init];
 
       moduleName = EnvGetDefmoduleName(environment,theFocus->theModule);
-      theStr = [NSString stringWithCString: moduleName encoding: NSMacOSRomanStringEncoding];
+
+      theStr = [NSString stringWithCString: moduleName encoding: NSUTF8StringEncoding];
 
       [newFocus setModuleName: theStr];
 
@@ -517,7 +518,8 @@
       newModule = [[CLIPSModule alloc] init];
 
       moduleName = EnvGetDefmoduleName(environment,theModule);
-      theStr = [NSString stringWithCString: moduleName encoding: NSMacOSRomanStringEncoding];
+
+      theStr = [NSString stringWithCString: moduleName encoding: NSUTF8StringEncoding];
 
       [newModule setModuleName: theStr];
 

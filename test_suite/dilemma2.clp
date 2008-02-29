@@ -11,9 +11,9 @@
 ;;;     it.
 ;;;     This example uses COOL to solve the problem.
 ;;;
-;;;     CLIPS Version 5.0 Example
+;;;     CLIPS Version 6.0 Example
 ;;; 
-;;;     To execute, merely load, reset, and run.
+;;;     To execute, merely load and enter (solve-dilemma).
 ;;;======================================================
 
 ;;;**************

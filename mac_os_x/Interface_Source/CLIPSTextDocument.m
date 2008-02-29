@@ -345,7 +345,7 @@
 
    [self updateString];
    
-   return [string dataUsingEncoding: NSMacOSRomanStringEncoding allowLossyConversion:YES];
+   return [string dataUsingEncoding: NSUTF8StringEncoding allowLossyConversion:YES];
   }
 
 /**********************************/
@@ -364,7 +364,7 @@
    // -readFromURL:ofType:error: or -readFromFileWrapper:ofType:error: instead.
 
    aString = [[NSString alloc] initWithData:data 
-                               encoding: NSMacOSRomanStringEncoding]; 
+                               encoding: NSUTF8StringEncoding]; 
                                          
    if (aString == nil)
      { return NO; }
@@ -424,6 +424,7 @@
 - (IBAction) loadSelection: (id) sender
   {
    char *theString, *convString;
+   NSUInteger length;
    NSString *entireString = [textView string];
    
    /*============================================*/
@@ -451,7 +452,10 @@
    
    void *theEnvironment = [[terminalController environment] environment];
 
-   theString = (char *) gm2(theEnvironment,selectedRange.length + 1);
+   length = [theSelection lengthOfBytesUsingEncoding: NSUTF8StringEncoding];
+   
+   theString = (char *) gm2(theEnvironment,length + 1);
+
    convString = (char *) [theSelection UTF8String];
    strcpy(theString,convString);
 
@@ -468,13 +472,13 @@
    EnvPrintRouter(theEnvironment,"stdout","Loading Selection...\n");
    FlushCommandString(theEnvironment);
    
-   OpenTextSource(theEnvironment,"aecompiletext",theString,0,(unsigned) selectedRange.length); // TBD Make the name unique
+   OpenTextSource(theEnvironment,"aecompiletext",theString,0,(unsigned) length); // TBD Make the name unique
    SetPrintWhileLoading(theEnvironment,TRUE);
    LoadConstructsFromLogicalName(theEnvironment,"aecompiletext");
    SetPrintWhileLoading(theEnvironment,FALSE);
    CloseStringSource(theEnvironment,"aecompiletext");
    
-   rm(theEnvironment,theString,(unsigned int) selectedRange.length+1);
+   rm(theEnvironment,theString,(unsigned int) length+1);
    PrintPrompt(theEnvironment);
   }
   
@@ -484,6 +488,7 @@
 - (IBAction) batchSelection: (id) sender
   {
    char *theString, *convString;
+   NSUInteger length;
    NSString *entireString = [textView string];
    
    /*============================================*/
@@ -511,7 +516,10 @@
    
    void *theEnvironment = [[terminalController environment] environment];
 
-   theString = (char *) gm2(theEnvironment,selectedRange.length + 1);
+   length = [theSelection lengthOfBytesUsingEncoding: NSUTF8StringEncoding];
+   
+   theString = (char *) gm2(theEnvironment,length + 1);
+   
    convString = (char *) [theSelection UTF8String];
    strcpy(theString,convString);
 
@@ -534,6 +542,7 @@
 - (IBAction) loadBuffer: (id) sender
   {
    char *theString, *convString;
+   NSUInteger length;
    NSString *entireString = [textView string];
       
    /*=======================================================*/
@@ -548,7 +557,10 @@
    
    void *theEnvironment = [[terminalController environment] environment];
 
-   theString = (char *) gm2(theEnvironment,[entireString length] + 1);
+   length = [entireString lengthOfBytesUsingEncoding: NSUTF8StringEncoding];
+
+   theString = (char *) gm2(theEnvironment,length + 1);
+
    convString = (char *) [entireString UTF8String];
    strcpy(theString,convString);
 
@@ -565,13 +577,13 @@
    EnvPrintRouter(theEnvironment,"stdout","Loading Buffer...\n");
    FlushCommandString(theEnvironment);
    
-   OpenTextSource(theEnvironment,"aecompiletext",theString,0,(unsigned) [entireString length]); // TBD Make the name unique
+   OpenTextSource(theEnvironment,"aecompiletext",theString,0,(unsigned) length); // TBD Make the name unique
    SetPrintWhileLoading(theEnvironment,TRUE);
    LoadConstructsFromLogicalName(theEnvironment,"aecompiletext");
    SetPrintWhileLoading(theEnvironment,FALSE);
    CloseStringSource(theEnvironment,"aecompiletext");
    
-   rm(theEnvironment,theString,(unsigned int) [entireString length]+1);
+   rm(theEnvironment,theString,(unsigned int) length+1);
    PrintPrompt(theEnvironment);
   }
 
@@ -617,7 +629,7 @@
 
    leftMiddle = selectionRange.location;
    rightMiddle = selectionRange.location + selectionRange.length;
-   textLength = [theText length];
+   textLength = [theText length]; /* TBD UTF-8 */
  
    /*===================================*/
    /* If the selection is empty then... */

@@ -108,7 +108,8 @@ struct utilityData
    LOCALE short                          EnableYieldFunction(void *,short);
    LOCALE struct trackedMemory          *AddTrackedMemory(void *,void *,size_t);
    LOCALE void                           RemoveTrackedMemory(void *,struct trackedMemory *);
-
+   LOCALE void                           UTF8Increment(char *,size_t *);
+   
 #endif
 
 

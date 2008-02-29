@@ -7,7 +7,7 @@
 ;;;     The point is for the monkee to find
 ;;;     and eat some bananas.
 ;;;
-;;;     CLIPS Version 5.0 Example
+;;;     CLIPS Version 6.0 Example
 ;;;
 ;;;     To execute, merely load, reset and run.
 ;;;======================================================
@@ -17,48 +17,48 @@
 ;;;*************
 
 (deftemplate monkey 
-   (field location 
+   (slot location 
       (type SYMBOL) 
       (default green-couch))
-   (field on-top-of 
+   (slot on-top-of 
       (type SYMBOL) 
       (default floor)) 
-   (field holding 
+   (slot holding 
       (type SYMBOL) 
       (default nothing)))
 
 (deftemplate thing 
-   (field name 
+   (slot name 
       (type SYMBOL)
       (default ?NONE)) 
-   (field location 
+   (slot location 
       (type SYMBOL)
       (default ?NONE)) 
-   (field on-top-of 
+   (slot on-top-of 
       (type SYMBOL) 
       (default floor))
-   (field weight 
+   (slot weight 
       (type SYMBOL) 
       (allowed-symbols light heavy)
       (default light)))
                     
 (deftemplate chest 
-   (field name 
+   (slot name 
       (type SYMBOL)
       (default ?NONE)) 
-   (field contents 
+   (slot contents 
       (type SYMBOL)
       (default ?NONE)) 
-   (field unlocked-by 
+   (slot unlocked-by 
       (type SYMBOL)
       (default ?NONE)))
                
 (deftemplate goal-is-to 
-   (field action 
+   (slot action 
       (type SYMBOL)
       (allowed-symbols hold unlock eat move on walk-to)
       (default ?NONE)) 
-   (multifield arguments 
+   (multislot arguments 
       (type SYMBOL)
       (default ?NONE)))
              

@@ -76,6 +76,8 @@
    
    (declare (salience 10))
    
+   (phase match)
+   
    (stress-test)
    
    (priority ?last)
@@ -97,6 +99,8 @@
 (defrule enable-techniques
 
    (declare (salience 10))
+   
+   (phase match)
    
    (size ?)
    

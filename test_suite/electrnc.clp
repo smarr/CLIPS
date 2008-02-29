@@ -37,7 +37,7 @@
 ;;;        printed.
 ;;;        
 ;;;     This example illustrates the use of most of the
-;;;     constructs available in CLIPS 5.0 and also shows how
+;;;     constructs available in CLIPS 6.0 and also shows how
 ;;;     COOL can be effectively integrated with rules.
 ;;;     Generic functions are used to connect the components
 ;;;     of the circuit during initialization. Classes,
@@ -67,15 +67,17 @@
 
 (defclass NO-OUTPUT
   (is-a USER)
-  (slot number-of-outputs (access read-only) (default 0)
-   (create-accessor read)))
+  (slot number-of-outputs (access read-only) 
+                          (default 0)
+                          (create-accessor read)))
 
 (defmessage-handler NO-OUTPUT compute-output ())
 
 (defclass ONE-OUTPUT
   (is-a NO-OUTPUT)
-  (slot number-of-outputs (access read-only) (default 1)
-    (create-accessor read))
+  (slot number-of-outputs (access read-only) 
+                          (default 1)
+                          (create-accessor read))
   (slot output-1 (default UNDEFINED) (create-accessor write))
   (slot output-1-link (default GROUND) (create-accessor write))
   (slot output-1-link-pin (default 1) (create-accessor write)))
@@ -87,8 +89,9 @@
 
 (defclass TWO-OUTPUT
   (is-a ONE-OUTPUT)
-  (slot number-of-outputs (access read-only) (default 2)
-     (create-accessor read))
+  (slot number-of-outputs (access read-only) 
+                          (default 2)
+                          (create-accessor read))
   (slot output-2 (default UNDEFINED) (create-accessor write))
   (slot output-2-link (default GROUND) (create-accessor write))
   (slot output-2-link-pin (default 1) (create-accessor write)))
@@ -100,15 +103,18 @@
 
 (defclass NO-INPUT
   (is-a USER)
-  (slot number-of-inputs (access read-only) (default 0)
-     (create-accessor read)))
+  (slot number-of-inputs (access read-only) 
+                         (default 0)
+                         (create-accessor read)))
 
 (defclass ONE-INPUT
   (is-a NO-INPUT)
-  (slot number-of-inputs (access read-only) (default 1)
-     (create-accessor read))
-  (slot input-1 (default UNDEFINED) (visibility public)
-     (create-accessor read-write))
+  (slot number-of-inputs (access read-only) 
+                         (default 1)
+                         (create-accessor read))
+  (slot input-1 (default UNDEFINED) 
+                (visibility public)
+                (create-accessor read-write))
   (slot input-1-link (default GROUND) (create-accessor write))
   (slot input-1-link-pin (default 1) (create-accessor write)))
 
@@ -117,10 +123,12 @@
 
 (defclass TWO-INPUT
   (is-a ONE-INPUT)
-  (slot number-of-inputs (access read-only) (default 2)
-     (create-accessor read))
-  (slot input-2 (default UNDEFINED) (visibility public)
-     (create-accessor write))
+  (slot number-of-inputs (access read-only) 
+                         (default 2)
+                         (create-accessor read))
+  (slot input-2 (default UNDEFINED) 
+                (visibility public)
+                (create-accessor write))
   (slot input-2-link (default GROUND) (create-accessor write))
   (slot input-2-link-pin (default 1) (create-accessor write)))
 
@@ -160,7 +168,7 @@
   (role concrete))
 
 (deffunction and# (?x ?y) 
-  (if (and (!= ?x 0) (!= ?y 0)) then 1 else 0))
+  (if (and (<> ?x 0) (<> ?y 0)) then 1 else 0))
 
 (defmessage-handler AND-GATE compute-output ()
    (if (and (integerp ?self:input-1) 
@@ -176,7 +184,7 @@
   (role concrete))
 
 (deffunction or# (?x ?y) 
-  (if (or (!= ?x 0) (!= ?y 0)) then 1 else 0))
+  (if (or (<> ?x 0) (<> ?y 0)) then 1 else 0))
 
 (defmessage-handler OR-GATE compute-output ()
    (if (and (integerp ?self:input-1) 
@@ -192,7 +200,7 @@
   (role concrete))
 
 (deffunction nand# (?x ?y) 
-  (if (not (and (!= ?x 0) (!= ?y 0))) then 1 else 0))
+  (if (not (and (<> ?x 0) (<> ?y 0))) then 1 else 0))
 
 (defmessage-handler NAND-GATE compute-output ()
    (if (and (integerp ?self:input-1) 
@@ -294,7 +302,7 @@
 ;;; Algorithm courtesy of John R. Kennedy (The BitMan).
 (deffunction change-which-bit (?x)
    (bind ?i 1)
-   (while (and (evenp ?x) (!= ?x 0)) do 
+   (while (and (evenp ?x) (<> ?x 0)) do 
       (bind ?x (div ?x 2))
       (bind ?i (+ ?i 1)))
    ?i)

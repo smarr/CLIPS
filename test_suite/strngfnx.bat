@@ -148,3 +148,6 @@
 (str-length a)                     ; 10.4.10
 (str-length "abcd")                ; 10.4.10
 (str-length xyz)                   ; 10.4.10
+(str-length "Привет мир")          ; UTF-8 Support
+(str-length "여러분 안녕하세요")       ; UTF-8 Support
+(str-length "Olá Mundo")           ; UTF-8 Support

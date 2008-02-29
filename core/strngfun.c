@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.23  01/31/05            */
+   /*             CLIPS Version 6.30  02/28/08            */
    /*                                                     */
    /*               STRING FUNCTIONS MODULE               */
    /*******************************************************/
@@ -20,6 +20,9 @@
 /*                                                           */
 /* Revision History:                                         */
 /*      6.23: Correction for FalseSymbol/TrueSymbol. DR0859  */
+/*                                                           */
+/*      6.30: Added support for UTF-8 strings to str-length  */
+/*            function.                                      */
 /*                                                           */
 /*************************************************************/
 
@@ -249,6 +252,9 @@ globle long long StrLengthFunction(
   void *theEnv)
   {
    DATA_OBJECT theArg;
+   long long length = 0;
+   size_t i = 0;
+   char *theString;
 
    /*===================================================*/
    /* Function str-length expects exactly one argument. */
@@ -268,7 +274,15 @@ globle long long StrLengthFunction(
    /* Return the length of the string or symbol. */
    /*============================================*/
 
-   return( (long long) strlen(DOToString(theArg)));
+   theString = DOToString(theArg);
+   
+   while (theString[i] != '\0')
+     { 
+      UTF8Increment(theString,&i); 
+      length++;
+     }
+   
+   return(length);
   }
 
 /****************************************/

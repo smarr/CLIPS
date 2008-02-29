@@ -311,4 +311,10 @@ CLIPS> (str-length "abcd")                ; 10.4.10
 4
 CLIPS> (str-length xyz)                   ; 10.4.10
 3
+CLIPS> (str-length "Привет мир")          ; UTF-8 Support
+10
+CLIPS> (str-length "여러분 안녕하세요")       ; UTF-8 Support
+9
+CLIPS> (str-length "Olá Mundo")           ; UTF-8 Support
+9
 CLIPS> (dribble-off)

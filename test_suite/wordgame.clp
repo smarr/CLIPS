@@ -9,7 +9,7 @@
 ;;;          ------
 ;;;        = ROBERT
 ;;;
-;;;     CLIPS Version 5.0 Example
+;;;     CLIPS Version 6.0 Example
 ;;;
 ;;;     To execute, merely load, reset and run.
 ;;;     This example takes alot of memory to execute.

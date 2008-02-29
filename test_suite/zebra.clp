@@ -9,7 +9,7 @@
 ;;;     set of conditions, it must be determined which
 ;;;     attributes are assigned to each man.
 ;;;
-;;;     CLIPS Version 5.1 Example
+;;;     CLIPS Version 6.0 Example
 ;;;
 ;;;     To execute, merely load, reset and run.
 ;;;======================================================

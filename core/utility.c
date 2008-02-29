@@ -17,10 +17,14 @@
 /*                                                           */
 /* Contributing Programmer(s):                               */
 /*      Brian Dantes                                         */
+/*      Jeff Bezanson                                        */
+/*         www.cprogramming.com/tutorial/unicode.html        */
 /*                                                           */
 /* Revision History:                                         */
 /*                                                           */
 /*      6.24: Renamed BOOLEAN macro type to intBool.         */
+/*                                                           */
+/*      6.30: Added UTF-8 routines.                          */
 /*                                                           */
 /*************************************************************/
 
@@ -49,6 +53,9 @@
 #define MAX_EPHEMERAL_SIZE 10240L
 #define COUNT_INCREMENT 1000L
 #define SIZE_INCREMENT 10240L
+
+/* Is c the start of a utf8 sequence? */
+#define isutf(c) (((c) & 0xC0) !=0x80)
 
 /***************************************/
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
@@ -720,7 +727,7 @@ globle unsigned long ItemHashValue(
 /*   application responsiveness when CLIPS  */
 /*   is running in the background.          */
 /********************************************/
-void YieldTime(
+globle void YieldTime(
   void *theEnv)
   {
    if ((UtilityData(theEnv)->YieldTimeFunction != NULL) && UtilityData(theEnv)->YieldFunctionEnabled)
@@ -730,7 +737,7 @@ void YieldTime(
 /********************************************/
 /* SetGarbageCollectionHeuristics:         */
 /********************************************/
-short SetGarbageCollectionHeuristics(
+globle short SetGarbageCollectionHeuristics(
   void *theEnv,
   short newValue)
   {
@@ -767,7 +774,7 @@ globle void EnvDecrementGCLocks(
 /********************************************/
 /* EnablePeriodicFunctions:         */
 /********************************************/
-short EnablePeriodicFunctions(
+globle short EnablePeriodicFunctions(
   void *theEnv,
   short value)
   {
@@ -783,7 +790,7 @@ short EnablePeriodicFunctions(
 /********************************************/
 /* EnableYieldFunction:         */
 /********************************************/
-short EnableYieldFunction(
+globle short EnableYieldFunction(
   void *theEnv,
   short value)
   {
@@ -799,7 +806,7 @@ short EnableYieldFunction(
 /********************************************/
 /* AddTrackedMemory: */
 /********************************************/
-struct trackedMemory *AddTrackedMemory(
+globle struct trackedMemory *AddTrackedMemory(
   void *theEnv,
   void *theMemory,
   size_t theSize)
@@ -820,7 +827,7 @@ struct trackedMemory *AddTrackedMemory(
 /********************************************/
 /* RemoveTrackedMemory: */
 /********************************************/
-void RemoveTrackedMemory(
+globle void RemoveTrackedMemory(
   void *theEnv,
   struct trackedMemory *theTracker)
   {   
@@ -834,3 +841,17 @@ void RemoveTrackedMemory(
      
    rtn_struct(theEnv,trackedMemory,theTracker);
   }
+  
+/********************************************/
+/* UTF8Increment: */
+/********************************************/
+globle void UTF8Increment(
+  char *s,
+  size_t *i)
+  {
+   (void) (isutf(s[++(*i)]) || 
+           isutf(s[++(*i)]) ||
+           isutf(s[++(*i)]) || 
+           ++(*i));
+  }
+
