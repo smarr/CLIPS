@@ -124,7 +124,7 @@ globle void GetToken(
    /* Process Symbolic Tokens. */
    /*==========================*/
 
-   if (isalpha(inchar))
+   if (isalpha(inchar) || IsUTF8MultiByteStart(inchar))
      {
       theToken->type = SYMBOL;
       EnvUngetcRouter(theEnv,inchar,logicalName);
@@ -391,7 +391,9 @@ static void *ScanSymbol(
            (inchar != '(') && (inchar != ')') &&
            (inchar != '&') && (inchar != '|') && (inchar != '~') &&
            (inchar != ' ') && (inchar != ';') &&
-           isprint(inchar) )
+           (isprint(inchar) ||
+            IsUTF8MultiByteStart(inchar) || 
+            IsUTF8MultiByteContinuation(inchar)))
      {
       ScannerData(theEnv)->GlobalString = ExpandStringWithChar(theEnv,inchar,ScannerData(theEnv)->GlobalString,&ScannerData(theEnv)->GlobalPos,&ScannerData(theEnv)->GlobalMax,ScannerData(theEnv)->GlobalMax+80);
 

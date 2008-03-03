@@ -68,7 +68,12 @@ struct utilityData
   };
 
 #define UtilityData(theEnv) ((struct utilityData *) GetEnvironmentData(theEnv,UTILITY_DATA))
-  
+
+  /* Is c the start of a utf8 sequence? */
+#define IsUTF8Start(ch) (((ch) & 0xC0) != 0x80)
+#define IsUTF8MultiByteStart(ch) ((((unsigned char) ch) >= 0xC0) && (((unsigned char) ch) <= 0xF7))
+#define IsUTF8MultiByteContinuation(ch) ((((unsigned char) ch) >= 0x80) && (((unsigned char) ch) <= 0xBF))
+
 #ifdef _UTILITY_SOURCE_
 #define LOCALE
 #else
@@ -109,6 +114,9 @@ struct utilityData
    LOCALE struct trackedMemory          *AddTrackedMemory(void *,void *,size_t);
    LOCALE void                           RemoveTrackedMemory(void *,struct trackedMemory *);
    LOCALE void                           UTF8Increment(char *,size_t *);
+   LOCALE size_t                         UTF8Offset(char *,size_t);
+   LOCALE size_t                         UTF8Length(char *);
+   LOCALE size_t                         UTF8CharNum(char *,size_t);
    
 #endif
 

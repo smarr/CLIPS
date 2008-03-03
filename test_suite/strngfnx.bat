@@ -151,3 +151,12 @@
 (str-length "Привет мир")          ; UTF-8 Support
 (str-length "여러분 안녕하세요")       ; UTF-8 Support
 (str-length "Olá Mundo")           ; UTF-8 Support
+(sub-string 8 10 "Привет мир")     ; UTF-8 Support
+(sub-string 5 8 "여러분 안녕하세요")  ; UTF-8 Support
+(sub-string 3 5 "Olá Mundo")       ; UTF-8 Support
+(str-index "" "Привет мир")        ; UTF-8 Support
+(str-index "" "여러분 안녕하세요")     ; UTF-8 Support
+(str-index "" "Olá Mundo")         ; UTF-8 Support
+(str-index "ет" "Привет мир")      ; UTF-8 Support
+(str-index "여러분" "여러분 안녕하세요")  ; UTF-8 Support
+(str-index "á" "Olá Mundo")        ; UTF-8 Support

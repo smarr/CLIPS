@@ -54,9 +54,6 @@
 #define COUNT_INCREMENT 1000L
 #define SIZE_INCREMENT 10240L
 
-/* Is c the start of a utf8 sequence? */
-#define isutf(c) (((c) & 0xC0) !=0x80)
-
 /***************************************/
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
@@ -841,17 +838,81 @@ globle void RemoveTrackedMemory(
      
    rtn_struct(theEnv,trackedMemory,theTracker);
   }
+
+/******************************************/
+/* UTF8Length: Returns the logical number */
+/*   of characters in a UTF8 string.      */
+/******************************************/
+globle size_t UTF8Length(
+  char *s)
+  {
+   size_t i = 0, length = 0;
+   
+   while (s[i] != '\0')
+     { 
+      UTF8Increment(s,&i); 
+      length++;
+     }
+   
+   return(length);
+  }
   
-/********************************************/
-/* UTF8Increment: */
-/********************************************/
+/*********************************************/
+/* UTF8Increment: Finds the beginning of the */
+/*   next character in a UTF8 string.        */
+/*********************************************/
 globle void UTF8Increment(
   char *s,
   size_t *i)
   {
-   (void) (isutf(s[++(*i)]) || 
-           isutf(s[++(*i)]) ||
-           isutf(s[++(*i)]) || 
+   (void) (IsUTF8Start(s[++(*i)]) || 
+           IsUTF8Start(s[++(*i)]) ||
+           IsUTF8Start(s[++(*i)]) || 
            ++(*i));
   }
 
+/****************************************************/
+/* UTF8Offset: Converts the logical character index */
+/*   in a UTF8 string to the actual byte offset.    */
+/****************************************************/
+globle size_t UTF8Offset(
+  char *str, 
+  size_t charnum)
+  {
+   size_t offs = 0;
+
+   while ((charnum > 0) && (str[offs])) 
+     {
+      (void) (IsUTF8Start(str[++offs]) || 
+              IsUTF8Start(str[++offs]) ||
+              IsUTF8Start(str[++offs]) || 
+              ++offs);
+              
+      charnum--;
+     }
+     
+   return offs;
+  }
+
+/*************************************************/
+/* UTF8CharNum: Converts the UTF8 character byte */ 
+/*   offset to the logical character index.      */
+/*************************************************/
+globle size_t UTF8CharNum(
+  char *s, 
+  size_t offset)
+  {
+   size_t charnum = 0, offs=0;
+
+   while ((offs < offset) && (s[offs])) 
+     {
+      (void) (IsUTF8Start(s[++offs]) ||
+              IsUTF8Start(s[++offs]) ||
+              IsUTF8Start(s[++offs]) || 
+              ++offs);
+              
+      charnum++;
+     }
+     
+   return charnum;
+  }

@@ -317,4 +317,22 @@ CLIPS> (str-length "여러분 안녕하세요")       ; UTF-8 Support
 9
 CLIPS> (str-length "Olá Mundo")           ; UTF-8 Support
 9
+CLIPS> (sub-string 8 10 "Привет мир")     ; UTF-8 Support
+"мир"
+CLIPS> (sub-string 5 8 "여러분 안녕하세요")  ; UTF-8 Support
+"안녕하세"
+CLIPS> (sub-string 3 5 "Olá Mundo")       ; UTF-8 Support
+"á M"
+CLIPS> (str-index "" "Привет мир")        ; UTF-8 Support
+11
+CLIPS> (str-index "" "여러분 안녕하세요")     ; UTF-8 Support
+10
+CLIPS> (str-index "" "Olá Mundo")         ; UTF-8 Support
+10
+CLIPS> (str-index "ет" "Привет мир")      ; UTF-8 Support
+5
+CLIPS> (str-index "여러분" "여러분 안녕하세요")  ; UTF-8 Support
+1
+CLIPS> (str-index "á" "Olá Mundo")        ; UTF-8 Support
+3
 CLIPS> (dribble-off)
