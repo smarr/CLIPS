@@ -169,7 +169,7 @@ BOOL factsWindow_New(
    FactsWindow = statusWindow_New(hwnd,"Facts",xpos,ypos,
                                   wwidth,wheight,
                                   EnvGetFactPPForm,
-								  EnvGetNextFact,
+								  GetNextFactInScope,
 								  EnvGetFactListChanged,
                                   EnvSetFactListChanged,
 								  CountFacts);
@@ -229,7 +229,7 @@ BOOL instancesWindow_New(
       
    InstancesWindow = statusWindow_New(hwnd,"Instances",xpos,ypos,wwidth,wheight,
                                       EnvGetInstancePPForm,
-									  EnvGetNextInstance,
+									  GetNextInstanceInScope,
 									  EnvGetInstancesChanged,
                                       EnvSetInstancesChanged,
 									  CountInstances);
@@ -259,7 +259,7 @@ BOOL globalsWindow_New(
       
    GlobalsWindow = statusWindow_New(hwnd,"Globals",xpos,ypos,wwidth,wheight,
                                     EnvGetDefglobalValueForm,
-									EnvGetNextDefglobal,
+									GetNextDefglobalInScope,
 									EnvGetGlobalsChanged,
                                     EnvSetGlobalsChanged,
 									CountDefglobals);

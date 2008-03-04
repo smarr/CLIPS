@@ -481,7 +481,7 @@ globle void *SubStringFunction(
    if (CoerceToLongInteger(theArgument.type,theArgument.value) < 1)
      { start = 0; }
    else
-     { start = CoerceToLongInteger(theArgument.type,theArgument.value) - 1; }
+     { start = (size_t) CoerceToLongInteger(theArgument.type,theArgument.value) - 1; }
 
    if (EnvArgTypeCheck(theEnv,"sub-string",2,INTEGER,&theArgument) == FALSE)
      {  return((void *) EnvAddSymbol(theEnv,"")); }
@@ -489,7 +489,7 @@ globle void *SubStringFunction(
    if (CoerceToLongInteger(theArgument.type,theArgument.value) < 1)
      { return((void *) EnvAddSymbol(theEnv,"")); }
    else
-     { end = CoerceToLongInteger(theArgument.type,theArgument.value) - 1; }
+     { end = (size_t) CoerceToLongInteger(theArgument.type,theArgument.value) - 1; }
 
    if (EnvArgTypeCheck(theEnv,"sub-string",3,SYMBOL_OR_STRING,&theArgument) == FALSE)
      { return((void *) EnvAddSymbol(theEnv,"")); }
