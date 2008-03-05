@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*               CLIPS Version 6.24  07/01/05          */
+   /*               CLIPS Version 6.30  03/04/08          */
    /*                                                     */
    /*                                                     */
    /*******************************************************/
@@ -25,6 +25,8 @@
 /*                                                           */
 /*            Renamed BOOLEAN macro type to intBool.         */
 /*                                                           */
+/*      6.30: Added EnvSlotDefaultP function.                */
+/*                                                           */
 /*************************************************************/
 
 #ifndef _H_classexm
@@ -46,6 +48,7 @@
 #define SlotExistP(a,b,c) EnvSlotExistP(GetCurrentEnvironment(),a,b,c)
 #define SlotInitableP(a,b) EnvSlotInitableP(GetCurrentEnvironment(),a,b)
 #define SlotPublicP(a,b) EnvSlotPublicP(GetCurrentEnvironment(),a,b)
+#define SlotDefaultP(a,b) EnvSlotDefaultP(GetCurrentEnvironment(),a,b)
 #define SlotWritableP(a,b) EnvSlotWritableP(GetCurrentEnvironment(),a,b)
 #define SubclassP(a,b) EnvSubclassP(GetCurrentEnvironment(),a,b)
 #define SuperclassP(a,b) EnvSuperclassP(GetCurrentEnvironment(),a,b)
@@ -79,7 +82,8 @@ LOCALE intBool EnvSlotDirectAccessP(void *,void *,char *);
 LOCALE void SlotDefaultValueCommand(void *,DATA_OBJECT_PTR);
 LOCALE intBool EnvSlotDefaultValue(void *,void *,char *,DATA_OBJECT_PTR);
 LOCALE int ClassExistPCommand(void *);
-
+LOCALE int EnvSlotDefaultP(void *,void *,char *);
+  
 #ifndef _CLASSEXM_SOURCE_
 #endif
 

@@ -16,6 +16,7 @@
    NSNumber *index;
    void *environment;
    void *scopeMap;
+   void *theCPointer;
   }
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
@@ -23,6 +24,9 @@
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
 - initWithFact: (struct fact *) theFact
+  fromEnvironment: (void *) theEnvironment;
+
+- initWithInstance: (struct instance *) theInstance
   fromEnvironment: (void *) theEnvironment;
 
 - (BOOL)                         searchForString: (NSString *) theString;
@@ -45,5 +49,7 @@
 
 - (void)                         setScopeMap: (void *) theValue;
 - (void *)                       scopeMap;
+
+- (void *)                       CPointer;
 
 @end

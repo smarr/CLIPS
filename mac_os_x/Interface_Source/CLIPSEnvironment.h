@@ -14,6 +14,12 @@
 #define FETCH_FACTS             3
 #define FACTS_FETCHED           4
 
+#define NO_INSTANCES_LISTENERS      0
+#define START_INSTANCES_LISTENING   1
+#define STOP_INSTANCES_LISTENING    2
+#define FETCH_INSTANCES             3
+#define INSTANCES_FETCHED           4
+
 @interface CLIPSEnvironment : NSObject
   {
    void *environment;
@@ -28,11 +34,20 @@
    NSArray *factList;
    NSMutableArray *runningFactList;
 
+   NSArray *instanceModule;
+   NSMutableArray *runningInstanceModule;
+
+   NSArray *instanceList;
+   NSMutableArray *runningInstanceList;
+
    long int agendaChanged;
    long int lastAgendaFetch;
 
    long int factsChanged;
    long int lastFactsFetch;
+
+   long int instancesChanged;
+   long int lastInstancesFetch;
    
    IBOutlet id delegate;
    NSLock *executionLock;
@@ -40,9 +55,11 @@
    
    NSConditionLock *agendaLock;
    NSConditionLock *factsLock;
+   NSConditionLock *instancesLock;
    
    int agendaListenerCount;
    int factsListenerCount;
+   int instancesListenerCount;
    
    BOOL executing;
    BOOL exited;
@@ -54,6 +71,9 @@
 
 - (void) fetchFacts: (BOOL) lockFacts;
 - (void) transferFacts: (BOOL) lockFacts;
+
+- (void) fetchInstances: (BOOL) lockInstances;
+- (void) transferInstances: (BOOL) lockInstances;
 
 - (void) destroy;
 - (BOOL) performCommandIfPresent;
@@ -77,6 +97,12 @@
 - (void)                         setFactList: (NSArray *) theFactList;
 - (NSArray *)                    factList;
 
+- (void)                         setInstanceModule: (NSArray *) theInstanceModule;
+- (NSArray *)                    instanceModule;
+
+- (void)                         setInstanceList: (NSArray *) theInstanceList;
+- (NSArray *)                    instanceList;
+
 - (void)                         setExecutionLock: (NSLock *) theLock;
 - (NSLock *)                     executionLock;
 
@@ -84,6 +110,7 @@
 
 - (NSConditionLock *)            agendaLock;
 - (NSConditionLock *)            factsLock;
+- (NSConditionLock *)            instancesLock;
 
 - (void)                         setEnvironment: (void *) theEnvironment;
 - (void *)                       environment;
@@ -96,6 +123,9 @@
 
 - (void)                         setFactsChanged: (long int) theCount;
 - (long int)                     factsChanged;
+
+- (void)                         setInstancesChanged: (long int) theCount;
+- (long int)                     instancesChanged;
 
 - (void)                         setExecuting: (BOOL) theValue;
 - (BOOL)                         executing;
@@ -112,5 +142,9 @@
 - (void)                         incrementFactsListeners;
 - (void)                         decrementFactsListeners;
 - (int)                          factsListenerCount;
+
+- (void)                         incrementInstancesListeners;
+- (void)                         decrementInstancesListeners;
+- (int)                          instancesListenerCount;
 
 @end

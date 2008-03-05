@@ -37,6 +37,8 @@
       [self setValue: [NSString stringWithFormat:@"%lld", EnvFactIndex(theEnvironment,theFact)] forKey: @"name"]; 
 
       [self setValue: [NSNumber numberWithLongLong: EnvFactIndex(theEnvironment,theFact)] forKey: @"index"]; 
+
+      theCPointer = theFact; 
             
       EnvFactSlotNames(theEnvironment,theFact,&slotNames);
       
@@ -84,6 +86,90 @@
         }
       
       [self setValue: tempArray forKey: @"attributeValues"];
+      
+      /* EnvIncrementFactCount(theEnvironment,theFact); */
+     }
+     
+   return self;
+  }
+
+/*********************/
+/* initWithInstance: */
+/*********************/
+- initWithInstance: (struct instance *) theInstance 
+  fromEnvironment: (void *) theEnvironment
+  {
+   if (self = [super init])
+     {
+      int i;
+      DATA_OBJECT slotNames;
+      DATA_OBJECT slotValue;
+      DATA_OBJECT defaultValue;
+      NSMutableArray *tempArray;
+      NSMutableDictionary *theMD;
+      NSNumber *theNumber;
+      BITMAP_HN *theScopeMap;
+      void *theClass;
+
+      theClass = EnvGetInstanceClass(theEnvironment,theInstance);
+      [self setValue: [NSString stringWithFormat:@"%s", EnvGetDefclassName(theEnvironment,theClass)] forKey: @"relationName"]; 
+      
+      [self setValue: [NSString stringWithFormat:@"%s", EnvGetInstanceName(theEnvironment,theInstance)] forKey: @"name"]; 
+
+      /*====================================================*/
+      /* An index of -1 indicates that this is an instance. */
+      /*====================================================*/
+      
+      [self setValue: [NSNumber numberWithLongLong: -1] forKey: @"index"]; 
+      
+      theCPointer = theInstance; 
+            
+      EnvClassSlots(theEnvironment,theClass,&slotNames,TRUE);
+      
+      environment = theEnvironment;
+
+      theScopeMap = CreateClassScopeMap(theEnvironment,theClass);
+      
+      scopeMap = malloc(theScopeMap->size);
+      
+      memcpy(scopeMap,theScopeMap->contents,theScopeMap->size);
+      
+      DecrementBitMapCount(theEnvironment,theScopeMap);
+
+      tempArray = [NSMutableArray arrayWithCapacity: (unsigned) GetDOLength(slotNames)];
+
+      for (i = 1; i <= GetDOLength(slotNames); i++)
+        {
+         char *theCSlotName = ValueToString(GetMFValue(GetValue(slotNames),i));
+         NSString *theSlotName = [NSString stringWithFormat:@"%s", theCSlotName];
+         
+         EnvDirectGetSlot(theEnvironment,theInstance,ValueToString(GetMFValue(GetValue(slotNames),i)),&slotValue);
+
+         NSString *theSlotValue = [NSString stringWithFormat:@"%s", DataObjectToString(theEnvironment,&slotValue)];
+
+         /* Only static defaults will be excluded from display. */
+ 
+         if (EnvSlotDefaultP(theEnvironment,theClass,theCSlotName) == STATIC_DEFAULT)
+           {
+            EnvSlotDefaultValue(theEnvironment,theClass,theCSlotName,&defaultValue);
+                                            
+            if (DOsEqual(&slotValue,&defaultValue))
+              { theNumber = [NSNumber numberWithBool: NO]; }
+            else
+              { theNumber = [NSNumber numberWithBool: YES]; }
+           }
+         else
+           { theNumber = [NSNumber numberWithBool: YES]; }
+         
+         theMD = [NSMutableDictionary dictionaryWithObjectsAndKeys: theSlotName, @"slotName", theSlotValue, @"slotValue",
+                                       theNumber, @"slotDefault", nil];
+          
+         [tempArray addObject: theMD];
+        }
+      
+      [self setValue: tempArray forKey: @"attributeValues"];
+
+      /* EnvIncrementInstanceCount(theEnvironment,theInstance); */
      }
      
    return self;
@@ -114,7 +200,12 @@
    
    if (scopeMap != NULL)
      { free(scopeMap); }
-     
+/*
+   if ([index longLongValue] == -1)
+     { EnvDecrementInstanceCount(environment,theCPointer); }
+   else
+     { EnvDecrementFactCount(environment,theCPointer); }
+*/  
    [super dealloc];
   }
 
@@ -256,6 +347,14 @@
 - (void *) scopeMap
   {
    return scopeMap;
+  }
+
+/**************/
+/* CPointer: */
+/**************/
+- (void *) CPointer
+  {
+   return theCPointer;
   }
   
 @end

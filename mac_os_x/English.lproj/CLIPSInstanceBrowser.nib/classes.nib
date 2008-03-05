@@ -24,11 +24,9 @@
 				<string>id</string>
 				<key>search</key>
 				<string>id</string>
-				<key>showDefrule</key>
-				<string>id</string>
 			</dict>
 			<key>CLASS</key>
-			<string>CLIPSFactController</string>
+			<string>CLIPSInstanceController</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
 			<key>OUTLETS</key>
@@ -39,9 +37,9 @@
 				<string>NSPopUpButton</string>
 				<key>executionIndicator</key>
 				<string>NSProgressIndicator</string>
-				<key>factList</key>
+				<key>instanceList</key>
 				<string>NSTableView</string>
-				<key>factListController</key>
+				<key>instanceListController</key>
 				<string>ModuleArrayController</string>
 				<key>moduleList</key>
 				<string>NSTableView</string>

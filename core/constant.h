@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.30  10/19/06            */
+   /*             CLIPS Version 6.30  03/04/08            */
    /*                                                     */
    /*                CONSTANTS HEADER FILE                */
    /*******************************************************/
@@ -15,6 +15,10 @@
 /* Contributing Programmer(s):                               */
 /*                                                           */
 /* Revision History:                                         */
+/*                                                           */
+/*      6.30: Moved default type constants (NO_DEFAULT,      */
+/*            STATIC_DEFAULT, and DYNAMIC_DEFAULT) to        */
+/*            constant.h                                     */
 /*                                                           */
 /*************************************************************/
 
@@ -54,6 +58,10 @@
 #define LOCAL_SAVE    1
 #define VISIBLE_SAVE  2
 
+#define NO_DEFAULT      0
+#define STATIC_DEFAULT  1
+#define DYNAMIC_DEFAULT 2
+
 #ifndef WPROMPT_STRING
 #define WPROMPT_STRING "wclips"
 #endif
@@ -71,11 +79,11 @@
 #endif
 
 #ifndef CREATION_DATE_STRING
-#define CREATION_DATE_STRING "3/2/08"
+#define CREATION_DATE_STRING "3/4/08"
 #endif
 
 #ifndef BANNER_STRING
-#define BANNER_STRING "         CLIPS (Quicksilver Beta 3/2/08)\n"
+#define BANNER_STRING "         CLIPS (Quicksilver Beta 3/4/08)\n"
 #endif
 
 /*************************/

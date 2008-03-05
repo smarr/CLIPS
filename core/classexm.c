@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.24  07/01/05            */
+   /*             CLIPS Version 6.30  03/04/08            */
    /*                                                     */
    /*                 CLASS EXAMINATION MODULE            */
    /*******************************************************/
@@ -33,6 +33,8 @@
 /*            specified). DR0870                              */
 /*                                                            */
 /*      6.30: Used %zd for printing size_t arguments.         */
+/*                                                            */
+/*            Added EnvSlotDefaultP function.                 */
 /*                                                            */
 /**************************************************************/
 
@@ -634,6 +636,35 @@ globle intBool EnvSlotPublicP(
    return(sd->publicVisibility ? TRUE : FALSE);
   }
 
+/***************************************************
+  NAME         : EnvSlotDefaultP
+  DESCRIPTION  : Determines if a slot has a default value
+  INPUTS       : 1) The class
+                 2) The slot name
+  RETURNS      : TRUE if slot is public,
+                 FALSE otherwise
+  SIDE EFFECTS : None
+  NOTES        : None
+ ***************************************************/
+globle int EnvSlotDefaultP(
+  void *theEnv,
+  void *theDefclass,
+  char *slotName)
+  {
+   SLOT_DESC *sd;
+
+   if ((sd = LookupSlot(theEnv,(DEFCLASS *) theDefclass,slotName,FALSE)) == NULL)
+     return(NO_DEFAULT);
+     
+   if (sd->noDefault)
+     { return(NO_DEFAULT); }
+   else if (sd->dynamicDefault)
+     { return(DYNAMIC_DEFAULT); }
+   
+   return(STATIC_DEFAULT);
+  }
+  
+  
 /**********************************************************************
   NAME         : SlotDirectAccessPCommand
   DESCRIPTION  : Determines if an existing slot can be directly

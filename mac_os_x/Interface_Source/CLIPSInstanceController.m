@@ -1,12 +1,12 @@
 //
-//  CLIPSFactController.m
+//  CLIPSInstanceController.m
 //  CLIPS
 //
-//  Created by Gary Riley on 3/10/06.
-//  Copyright 2006 __MyCompanyName__. All rights reserved.
+//  Created by Gary Riley on 3/3/08.
+//  Copyright 2008 __MyCompanyName__. All rights reserved.
 //
 
-#import "CLIPSFactController.h"
+#import "CLIPSInstanceController.h"
 
 #import "AppController.h"
 #import "EnvController.h"
@@ -16,7 +16,7 @@
 
 #include <CLIPS/clips.h>
 
-@implementation CLIPSFactController
+@implementation CLIPSInstanceController
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 /* Initialization/Deallocation Methods */
@@ -27,7 +27,7 @@
 /*********/
 - (id) init
   {
-   self = [super initWithWindowNibName:@"CLIPSFactBrowser"];
+   self = [super initWithWindowNibName:@"CLIPSInstanceBrowser"];
 
    if (self)
      {
@@ -41,7 +41,7 @@
 /************/    
 - (void) dealloc
   {
-   NSLog(@"CLIPSFactController dealloc");
+   NSLog(@"CLIPSInstanceController dealloc");
    
    [super dealloc];
   }
@@ -104,7 +104,7 @@
    
    theValues = [[NSUserDefaultsController sharedUserDefaultsController] values];
    
-   if ([[theValues valueForKey: @"factsDisplayDefaultedValues"] boolValue]) 
+   if ([[theValues valueForKey: @"instancesDisplayDefaultedValues"] boolValue]) 
      { 
       [self setValue: nil forKey: @"slotFilter"]; 
       [displayDefaultedValuesButton setState: NSOnState];
@@ -123,15 +123,16 @@
    
    [executionIndicator setDisplayedWhenStopped: NO];
         
-   /*=========================================================*/
-   /* If we can get the execution lock, then the environment  */
-   /* isn't executing, so we can directly retrieve the facts. */
-   /*=========================================================*/
+   /*========================================*/
+   /* If we can get the execution lock, then */
+   /* the environment isn't executing, so we */
+   /* can directly retrieve the instances.   */
+   /*========================================*/
    
    if ([[environment executionLock] tryLock]) 
      {
-      [environment fetchFacts: YES];
-      [environment transferFacts: YES];
+      [environment fetchInstances: YES];
+      [environment transferInstances: YES];
       [[environment executionLock] unlock];
      }
    else
@@ -148,10 +149,10 @@
                         change: (NSDictionary *) change 
                        context: (void *) context 
   {
-   if ([keyPath isEqual:@"factsChanged"])
+   if ([keyPath isEqual:@"instancesChanged"])
      {
       [moduleList selectRowIndexes: [NSIndexSet indexSetWithIndex: 0] byExtendingSelection: NO];
-      [factList selectRowIndexes: [NSIndexSet indexSetWithIndex: 0] byExtendingSelection: NO];
+      [instanceList selectRowIndexes: [NSIndexSet indexSetWithIndex: 0] byExtendingSelection: NO];
      }
    else if ([keyPath isEqual:@"executing"])
      { 
@@ -200,10 +201,10 @@
 
 /******************************************************************/
 /* displayDefaultedValues: Handles the "Display Defaulted Values" */
-/*   checkbox. If checked, then all of the slot values of a fact  */
-/*   are displayed by the inspector. If unchecked, then the slot  */
-/*   values that are the same as the static default for the slot  */
-/*   are not displayed.                                           */
+/*   checkbox. If checked, then all of the slot values of an      */
+/*   instance are displayed by the inspector. If unchecked, then  */
+/*   the slot values that are the same as the static default for  */
+/*   the slot are not displayed.                                  */
 /******************************************************************/
 - (IBAction) displayDefaultedValues: (id) sender
   {
@@ -227,17 +228,17 @@
       displayValue = [NSNumber numberWithBool:NO];
      }
      
-   [theValues setValue: displayValue forKey: @"factsDisplayDefaultedValues"];
+   [theValues setValue: displayValue forKey: @"instancesDisplayDefaultedValues"];
    [theDefaultsController save: self];
   }
 
-/****************/  
+/***********/  
 /* search: */
-/****************/  
+/***********/  
 - (IBAction) search: (id) sender
  {
-  NSLog(@"CLIPSFactController search");
-  [factListController search: sender];
+  NSLog(@"CLIPSInstanceController search");
+  [instanceListController search: sender];
 /*
   [self setSearchString: [sender stringValue]];
   [self rearrangeObjects];
@@ -255,7 +256,7 @@
   {
    if ([menuItem action] == @selector(showDefrule:))
      {
-      if ([factList selectedRow] == -1) 
+      if ([instanceList selectedRow] == -1) 
         { return NO; } 
      }
      
@@ -267,7 +268,7 @@
 /********************/
 - (void) windowWillClose: (NSNotification *) aNotification
   {
-   NSLog(@"CLIPSFactController windowWillClose:");
+   NSLog(@"CLIPSInstanceController windowWillClose:");
    
    [self setValue: nil forKey: @"environment"]; 
    [self setValue: nil forKey: @"environmentController"]; 
@@ -275,10 +276,10 @@
    [self autorelease];
   }
 
-/************************************************/
-/* tableViewSelectionDidChange: Called when the */
-/*   selection changes in the fact NSTableView. */
-/************************************************/
+/****************************************************/
+/* tableViewSelectionDidChange: Called when the     */
+/*   selection changes in the instance NSTableView. */
+/****************************************************/
 - (void) tableViewSelectionDidChange: (NSNotification *) aNotification
   {
    int theRow;
@@ -288,37 +289,38 @@
      {
       theRow = [moduleList selectedRow];
 
-      [factListController setModuleIndex: theRow];
+      [instanceListController setModuleIndex: theRow];
      }
-     
-   theRow = [factList selectedRow];
+    
+   theRow = [instanceList selectedRow];
    if (theRow != -1)
      {
       void *theEnvironment = [environment environment];
-      struct fact *clipsFact;
-      long long theFactIndex;
-      NSArray *theArray = [factListController arrangedObjects];
-      CLIPSFactInstance *theFact = [theArray objectAtIndex: theRow];
+      struct instance *clipsInstance = NULL;
+      char *theInstanceName;
+      NSArray *theArray = [instanceListController arrangedObjects];
+      CLIPSFactInstance *theInstance = [theArray objectAtIndex: theRow];
       
-      /*============================================================*/
-      /* Use the fact index stored with the GUI fact object to find */
-      /* the actual CLIPS fact referenced. TBD: It would be more    */
-      /* efficient to directly store the pointer to the fact with   */
-      /* the GUI fact object.                                       */
-      /*============================================================*/
+      /*===============================================================*/
+      /* Use the instance name stored with the GUI fact object to find */
+      /* the actual CLIPS instance referenced. TBD: It would be more   */
+      /* efficient to directly store the pointer to the instance with  */
+      /* the GUI instance object.                                      */
+      /*===============================================================*/
       
-      theFactIndex = [[theFact index] longLongValue];
-      clipsFact = FindIndexedFact(theEnvironment,theFactIndex);
+      theInstanceName = (char *) [[theInstance name] UTF8String];
+      if (theInstanceName != NULL)
+        { clipsInstance = EnvFindInstance(theEnvironment,NULL,theInstanceName,TRUE); }
       
-      /*========================================================*/
-      /* If we were able to find the corresponding CLIPS fact,  */
-      /* then retrieve the pretty print form of the deftemplate */
-      /* associated with the fact.                              */
-      /*========================================================*/
+      /*===========================================================*/
+      /* If we were able to find the corresponding CLIPS instance, */
+      /* then retrieve the pretty print form of the defclass       */
+      /* associated with the instance.                             */
+      /*===========================================================*/
       
-      if ((clipsFact != NULL) && 
-          EnvGetDeftemplatePPForm(theEnvironment,EnvFactDeftemplate(theEnvironment,clipsFact)) != NULL)
-        { thePPForm = [NSString stringWithFormat:@"%s", EnvGetDeftemplatePPForm(theEnvironment,EnvFactDeftemplate(theEnvironment,clipsFact))]; }
+      if ((clipsInstance != NULL) && 
+          EnvGetDefclassPPForm(theEnvironment,EnvGetInstanceClass(theEnvironment,clipsInstance)) != NULL)
+        { thePPForm = [NSString stringWithFormat:@"%s", EnvGetDefclassPPForm(theEnvironment,EnvGetInstanceClass(theEnvironment,clipsInstance))]; }
      }
      
    [environmentController setValue: thePPForm forKey: @"constructInspectorText"];
@@ -383,12 +385,12 @@
           object: environment];
           
       [environment removeObserver: self 
-                       forKeyPath: @"factsChanged"]; 
+                       forKeyPath: @"instancesChanged"]; 
 
       [environment removeObserver: self 
                        forKeyPath: @"executing"]; 
                     
-      [environment decrementFactsListeners];
+      [environment decrementInstancesListeners];
      }
 
    /*======================================*/
@@ -403,7 +405,7 @@
           object: theEnvironment];
           
       [theEnvironment addObserver: self 
-                      forKeyPath: @"factsChanged" 
+                      forKeyPath: @"instancesChanged" 
                       options: (NSKeyValueObservingOptionNew | 
                                 NSKeyValueObservingOptionOld) 
                       context: nil]; 
@@ -414,23 +416,23 @@
                                 NSKeyValueObservingOptionOld) 
                       context: nil]; 
             
-      /*==================================================*/
-      /* Fetch the fact list if no other fact controllers */
-      /* are attached to the environment.                 */
-      /*==================================================*/
+      /*==============================================*/
+      /* Fetch the instance list if no other instance */ 
+      /* controllers are attached to the environment. */
+      /*==============================================*/
    
-      if ([theEnvironment factsListenerCount] == 0)
+      if ([theEnvironment instancesListenerCount] == 0)
         {
-         /*========================================*/
-         /* If we can get the execution lock, then */
-         /* the environment isn't executing, so we */
-         /* can directly retrieve the fact list.   */
-         /*========================================*/
+         /*==========================================================*/
+         /* If we can get the execution lock, then the environment   */
+         /* isn't executing, so we can directly retrieve the list    */
+         /* of instances.                                            */
+         /*==========================================================*/
 
          if ([[theEnvironment executionLock] tryLock]) 
            {
-            [theEnvironment fetchFacts: YES];
-            [theEnvironment transferFacts: YES];
+            [theEnvironment fetchInstances: YES];
+            [theEnvironment transferInstances: YES];
             [[theEnvironment executionLock] unlock];
            }
         }
@@ -451,20 +453,20 @@
          [executionIndicator startAnimation: nil];
         }
       
-      /*======================================================*/
-      /* Increment the count of fact controllers watching the */
-      /* specified enviroment. For performance, the fact list */
-      /* isn't retrieved unless there are controllers         */
-      /* interested in the content of the fact list.          */
-      /*======================================================*/
+      /*=====================================================*/
+      /* Increment the count of instance list controllers    */
+      /* watching the specified enviroment. For performance, */
+      /* the instance list isn't retrieved unless there are  */
+      /* controllers interested in the list of instances.    */
+      /*=====================================================*/
       
-      [theEnvironment incrementFactsListeners];
+      [theEnvironment incrementInstancesListeners];
      }
    
-   /*===============================================================*/
-   /* Otherwise, the fact browser isn't attached to an environment. */
-   /* The buttons and execution indicator should be disabled.       */
-   /*===============================================================*/
+   /*====================================================================*/
+   /* Otherwise, the instances browser isn't attached to an environment. */
+   /* The buttons and execution indicator should be disabled.            */
+   /*====================================================================*/
    
    else
      {

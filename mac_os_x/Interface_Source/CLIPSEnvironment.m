@@ -48,9 +48,19 @@
 
       factList = [[NSArray alloc] init];
       runningFactList = NULL;
+
+      instancesLock = [[NSConditionLock alloc] initWithCondition: NO_FACTS_LISTENERS];
+      instancesListenerCount = 0;
+
+      instanceModule = [[NSArray alloc] init];
+      runningInstanceModule = NULL;
+
+      instanceList = [[NSArray alloc] init];
+      runningInstanceList = NULL;
       
       lastAgendaFetch = -1;
       lastFactsFetch = -1;
+      lastInstancesFetch = -1;
       exited = FALSE;
      }
    
@@ -74,6 +84,7 @@
       focusStack = nil;
       [runningFocusStack release];
       runningFocusStack = nil;
+
       [factModule release];
       factModule = nil;
       [runningFactModule release];
@@ -82,6 +93,16 @@
       factList = nil;
       [runningFactList release];
       runningFactList = nil;
+
+      [instanceModule release];
+      instanceModule = nil;
+      [runningInstanceModule release];
+      runningInstanceModule = nil;
+      [instanceList release];
+      instanceList = nil;
+      [runningInstanceList release];
+      runningInstanceList = nil;
+
       DestroyEnvironment(environment);
       [executionLock unlock];
      }
@@ -105,6 +126,7 @@
    [accessLock release];
    [agendaLock release];
    [factsLock release];
+   [instancesLock release];
 
    /*=====================================*/
    /* Call the superclass dealloc method. */
@@ -288,6 +310,16 @@
       if ((runningFactModule != NULL) ||
           (runningFactList != NULL))
         { [self transferFacts : YES]; }
+     }
+
+   if (instancesListenerCount > 0)
+     {
+      if (EnvGetInstancesChanged(environment))
+        { [self fetchInstances: YES]; }
+        
+      if ((runningInstanceModule != NULL) ||
+          (runningInstanceList != NULL))
+        { [self transferInstances : YES]; }
      }
   }
   
@@ -545,6 +577,98 @@
    if (lockFacts)
      { [factsLock unlock]; }
   }
+
+/*******************/
+/* fetchInstances: */
+/*******************/
+- (void) fetchInstances: (BOOL) lockInstances
+  {
+   struct defmodule *theModule;
+   CLIPSModule *newModule;
+   char *moduleName;
+   NSString *theStr;
+   struct instance *theInstance;
+   CLIPSFactInstance *newInstance;
+   unsigned moduleCount, instanceCount;
+
+   /*================================================*/
+   /* If nothing has changed since the last time the */
+   /* instance list was fetched, nothing needs to be */ 
+   /* done.                                          */
+   /*================================================*/
+   
+   if (EnvGetInstancesChanged(environment) == FALSE) return;
+   EnvSetInstancesChanged(environment,FALSE);
+
+   if (lockInstances)
+     { [instancesLock lock]; }
+
+   /*=====================================*/
+   /* Determine the number of modules and */
+   /* create an array to contain them.    */
+   /*=====================================*/
+   
+   moduleCount = 0;
+   for (theModule = EnvGetNextDefmodule(environment,NULL);
+        theModule != NULL;
+        theModule = EnvGetNextDefmodule(environment,theModule))
+     { moduleCount++; }
+
+   [runningInstanceModule release];
+   runningInstanceModule = [[NSMutableArray alloc] initWithCapacity: moduleCount];
+
+   /*=======================================*/
+   /* Determine the number of instances and */
+   /* create an array to contain them.      */
+   /*=======================================*/
+
+   instanceCount = 0;
+   for (theInstance = EnvGetNextInstance(environment,NULL);
+        theInstance != NULL;
+        theInstance = EnvGetNextInstance(environment,theInstance))
+     { instanceCount++; }
+     
+   [runningInstanceList release];
+   runningInstanceList = [[NSMutableArray alloc] initWithCapacity: instanceCount];
+
+   /*================================*/
+   /* Get a list of all the modules. */
+   /*================================*/
+   
+   for (theModule = EnvGetNextDefmodule(environment,NULL);
+        theModule != NULL;
+        theModule = EnvGetNextDefmodule(environment,theModule))
+     {
+      newModule = [[CLIPSModule alloc] init];
+
+      moduleName = EnvGetDefmoduleName(environment,theModule);
+
+      theStr = [NSString stringWithCString: moduleName encoding: NSUTF8StringEncoding];
+
+      [newModule setModuleName: theStr];
+
+      [runningInstanceModule addObject: newModule];
+      [newModule release];
+     }
+   
+   /*====================================*/
+   /* Get the list of all the instances. */
+   /*====================================*/
+   
+   for (theInstance = EnvGetNextInstance(environment,NULL);
+        theInstance != NULL;
+        theInstance = EnvGetNextInstance(environment,theInstance))
+     {
+      newInstance = [[CLIPSFactInstance alloc] initWithInstance: theInstance fromEnvironment: environment];
+
+      [runningInstanceList addObject: newInstance];
+
+      [newInstance release];
+     }
+
+   if (lockInstances)
+     { [instancesLock unlock]; }
+  }
   
 /********************/
 /* transferAgenda: */
@@ -602,6 +726,38 @@
       
    if (lockFacts)
      { [factsLock unlock]; }
+  }
+
+/**********************/
+/* transferInstances: */
+/**********************/
+- (void) transferInstances: (BOOL) lockInstances
+  {
+   if (lockInstances)
+     { [instancesLock lock]; }
+
+   if ((runningInstanceModule == NULL) &&
+       (runningInstanceList == NULL))
+     {
+      if (lockInstances)
+        { [instancesLock unlock]; }
+      return;
+     }
+
+   [self setValue: runningInstanceModule forKey: @"instanceModule"];
+
+   [runningInstanceModule release];
+   runningInstanceModule = NULL;
+
+   [self setValue: runningInstanceList forKey: @"instanceList"];
+
+   [runningInstanceList release];
+   runningInstanceList = NULL;
+
+   [self setValue: [NSNumber numberWithLong: (instancesChanged + 1)] forKey: @"instancesChanged"];
+      
+   if (lockInstances)
+     { [instancesLock unlock]; }
   }
    
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%*/
@@ -669,6 +825,14 @@
   {
    return factsLock;
   }
+
+/******************/
+/* instancesLock: */
+/******************/
+- (NSConditionLock *) instancesLock
+  {
+   return instancesLock;
+  }
   
 /*******************/
 /* setEnvironment: */
@@ -735,6 +899,22 @@
   {
    return factsChanged;
   }
+
+/************************/
+/* setInstancesChanged: */
+/************************/
+- (void) setInstancesChanged: (long int) theCount
+  {
+   instancesChanged = theCount;
+  }
+
+/*********************/
+/* instancesChanged: */
+/*********************/
+- (long int) instancesChanged
+  {
+   return instancesChanged;
+  }
       
 /****************************/
 /* setFocusStack: */
@@ -789,6 +969,43 @@
   {
    return factList;
   }
+
+/***********************/
+/* setInstancetModule: */
+/***********************/
+- (void) setInstanceModule: (NSArray *) theInstanceModule
+  {
+   [theInstanceModule retain];
+   [instanceModule release];
+   instanceModule = theInstanceModule;
+  }
+
+/*******************/
+/* instanceModule: */
+/*******************/
+- (NSArray *) instanceModule
+  {
+   return instanceModule;
+  }
+
+/********************/
+/* setInstanceList: */
+/********************/
+- (void) setInstanceList: (NSArray *) theInstanceList
+  {
+   [theInstanceList retain];
+   [instanceList release];
+   instanceList = theInstanceList;
+  }
+
+/*****************/
+/* instanceList: */
+/*****************/
+- (NSArray *) instanceList
+  {
+   return instanceList;
+  }
+
 
 /*****************/
 /* setExecuting: */
@@ -912,6 +1129,48 @@
 - (int) factsListenerCount
   {
    return factsListenerCount;
+  }
+
+/*****************************/
+/* incrementInstancesListeners: */
+/*****************************/
+- (void) incrementInstancesListeners
+  {
+   [instancesLock lock];
+   
+   instancesListenerCount++;
+
+   /* NSLog(@"increment %@ instancesListenerCount = %d",self,instancesListenerCount); */
+
+   if (instancesListenerCount == 1)
+     { [instancesLock unlockWithCondition: START_INSTANCES_LISTENING]; }
+   else
+     { [instancesLock unlock]; }
+  }
+
+/*****************************/
+/* decrementInstancesListeners: */
+/*****************************/
+- (void) decrementInstancesListeners
+  {
+   [instancesLock lock];
+
+   instancesListenerCount--;
+   
+   /* NSLog(@"decrement %@ factsListenerCount = %d",self,factsListenerCount); */
+
+   if (instancesListenerCount == 0)
+     { [instancesLock unlock]; }
+   else
+     { [instancesLock unlockWithCondition: STOP_INSTANCES_LISTENING]; }
+  }
+  
+/************************/
+/* instancesListenerCount: */
+/************************/
+- (int) instancesListenerCount
+  {
+   return instancesListenerCount;
   }
       
 @end

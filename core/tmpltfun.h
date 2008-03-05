@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.24  07/01/05            */
+   /*             CLIPS Version 6.30  03/04/08            */
    /*                                                     */
    /*          DEFTEMPLATE FUNCTION HEADER FILE           */
    /*******************************************************/
@@ -28,6 +28,10 @@
 /*                                                           */
 /*            Renamed BOOLEAN macro type to intBool.         */
 /*                                                           */
+/*      6.30: Moved default type constants (NO_DEFAULT,      */
+/*            STATIC_DEFAULT, and DYNAMIC_DEFAULT) to        */
+/*            constant.h                                     */
+/*                                                           */
 /*************************************************************/
 
 #ifndef _H_tmpltfun
@@ -49,10 +53,6 @@
 #ifndef _H_tmpltdef
 #include "tmpltdef.h"
 #endif
-
-#define NO_DEFAULT      0
-#define STATIC_DEFAULT  1
-#define DYNAMIC_DEFAULT 2
 
 #ifdef LOCALE
 #undef LOCALE

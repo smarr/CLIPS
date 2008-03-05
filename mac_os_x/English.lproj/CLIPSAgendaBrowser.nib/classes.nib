@@ -1,24 +1,65 @@
-{
-    IBClasses = (
-        {
-            ACTIONS = {halt = id; reset = id; run = id; showDefrule = id; step = id; }; 
-            CLASS = CLIPSAgendaController; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                agendaList = NSTableView; 
-                environmentList = NSPopUpButton; 
-                executionIndicator = NSProgressIndicator; 
-                focusStack = NSTableView; 
-                focusStackController = id; 
-                haltButton = NSButton; 
-                resetButton = NSButton; 
-                runButton = NSButton; 
-                splitView = NSSplitView; 
-                stepButton = NSButton; 
-            }; 
-            SUPERCLASS = NSWindowController; 
-        }, 
-        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }
-    ); 
-    IBVersion = 1; 
-}
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IBClasses</key>
+	<array>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>halt</key>
+				<string>id</string>
+				<key>haltImmediately</key>
+				<string>id</string>
+				<key>reset</key>
+				<string>id</string>
+				<key>run</key>
+				<string>id</string>
+				<key>showDefrule</key>
+				<string>id</string>
+				<key>step</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>CLIPSAgendaController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>agendaList</key>
+				<string>NSTableView</string>
+				<key>environmentList</key>
+				<string>NSPopUpButton</string>
+				<key>executionIndicator</key>
+				<string>NSProgressIndicator</string>
+				<key>focusStack</key>
+				<string>NSTableView</string>
+				<key>focusStackController</key>
+				<string>NSArrayController</string>
+				<key>haltButton</key>
+				<string>NSButton</string>
+				<key>resetButton</key>
+				<string>NSButton</string>
+				<key>runButton</key>
+				<string>NSButton</string>
+				<key>splitView</key>
+				<string>NSSplitView</string>
+				<key>stepButton</key>
+				<string>NSButton</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSWindowController</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>FirstResponder</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+	</array>
+	<key>IBVersion</key>
+	<string>1</string>
+</dict>
+</plist>

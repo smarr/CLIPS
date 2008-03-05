@@ -2,6 +2,7 @@
 #import "CLIPSTerminalController.h"
 #import "CLIPSAgendaController.h"
 #import "CLIPSFactController.h"
+#import "CLIPSInstanceController.h"
 #import "CLIPSConstructInspectorController.h"
 #import "GenericController.h"
 
@@ -166,14 +167,26 @@
    [theController showWindow: self];
   }
 
-/*******************/
+/************************/
 /* newDebugFactBrowser: */
-/*******************/
+/************************/
 - (IBAction) newDebugFactBrowser: (id) sender
   {
    CLIPSFactController *theController;
       
    theController = [[CLIPSFactController alloc] init]; 
+        
+   [theController showWindow: self];
+  }
+
+/****************************/
+/* newDebugInstanceBrowser: */
+/****************************/
+- (IBAction) newDebugInstanceBrowser: (id) sender
+  {
+   CLIPSInstanceController *theController;
+      
+   theController = [[CLIPSInstanceController alloc] init]; 
         
    [theController showWindow: self];
   }

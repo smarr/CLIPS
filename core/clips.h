@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.24  06/05/06            */
+   /*             CLIPS Version 6.30  03/04/08            */
    /*                                                     */
    /*                   API HEADER FILE                   */
    /*******************************************************/
@@ -18,6 +18,8 @@
 /*                                                           */
 /*      6.24: Added filertr.h and tmpltfun.h to include      */
 /*            list.                                          */
+/*                                                           */
+/*      6.30: Added classpsr.h to include list.              */
 /*                                                           */
 /*************************************************************/
 
@@ -118,6 +120,7 @@
 #include "classexm.h"
 #include "classinf.h"
 #include "classini.h"
+#include "classpsr.h"
 #include "defins.h"
 #include "inscom.h"
 #include "insfile.h"

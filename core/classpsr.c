@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*               CLIPS Version 6.24  07/01/05          */
+   /*               CLIPS Version 6.30  03/04/08          */
    /*                                                     */
    /*                  CLASS PARSER MODULE                */
    /*******************************************************/
@@ -21,6 +21,9 @@
 /*            DEFRULE_CONSTRUCT.                              */
 /*                                                            */
 /*            Renamed BOOLEAN macro type to intBool.          */
+/*                                                            */
+/*      6.30: Added support to allow CreateClassScopeMap to   */
+/*            be used by other functions.                     */
 /*                                                            */
 /**************************************************************/
 
@@ -86,9 +89,6 @@ static void FormInstanceTemplate(void *,DEFCLASS *);
 static void FormSlotNameMap(void *,DEFCLASS *);
 static TEMP_SLOT_LINK *MergeSlots(void *,TEMP_SLOT_LINK *,DEFCLASS *,short *,int);
 static void PackSlots(void *,DEFCLASS *,TEMP_SLOT_LINK *);
-#if DEFMODULE_CONSTRUCT
-static void CreateClassScopeMap(void *,DEFCLASS *);
-#endif
 static void CreatePublicSlotMessageHandlers(void *,DEFCLASS *);
 
 /* =========================================
@@ -609,7 +609,7 @@ static void AddClass(
       Create a bitmap indicating whether this
       class is in scope or not for every module
       ========================================= */
-   CreateClassScopeMap(theEnv,cls);
+   cls->scopeMap = (BITMAP_HN *) CreateClassScopeMap(theEnv,cls);
 
 #endif
 
@@ -844,7 +844,7 @@ static void PackSlots(
   SIDE EFFECTS : Scope bitmap created and attached
   NOTES        : Uses FindImportedConstruct()
  ********************************************************/
-static void CreateClassScopeMap(
+globle void *CreateClassScopeMap(
   void *theEnv,
   DEFCLASS *theDefclass)
   {
@@ -854,6 +854,7 @@ static void CreateClassScopeMap(
    struct defmodule *matchModule,
                     *theModule;
    int moduleID,count;
+   void *theBitMap;
 
    className = ValueToString(theDefclass->header.name);
    matchModule = theDefclass->header.whichModule->theModule;
@@ -874,9 +875,10 @@ static void CreateClassScopeMap(
         SetBitMap(scopeMap,moduleID);
      }
    RestoreCurrentModule(theEnv);
-   theDefclass->scopeMap = (BITMAP_HN *) EnvAddBitMap(theEnv,scopeMap,scopeMapSize);
-   IncrementBitMapCount(theDefclass->scopeMap);
+   theBitMap = (BITMAP_HN *) EnvAddBitMap(theEnv,scopeMap,scopeMapSize);
+   IncrementBitMapCount(theBitMap);
    rm(theEnv,(void *) scopeMap,scopeMapSize);
+   return(theBitMap);
   }
 
 #endif
