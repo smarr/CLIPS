@@ -318,7 +318,7 @@
       
       if ((clipsFact != NULL) && 
           EnvGetDeftemplatePPForm(theEnvironment,EnvFactDeftemplate(theEnvironment,clipsFact)) != NULL)
-        { thePPForm = [NSString stringWithFormat:@"%s", EnvGetDeftemplatePPForm(theEnvironment,EnvFactDeftemplate(theEnvironment,clipsFact))]; }
+        { thePPForm = [NSString stringWithUTF8String: EnvGetDeftemplatePPForm(theEnvironment,EnvFactDeftemplate(theEnvironment,clipsFact))]; }
      }
      
    [environmentController setValue: thePPForm forKey: @"constructInspectorText"];

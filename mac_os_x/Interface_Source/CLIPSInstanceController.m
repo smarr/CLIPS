@@ -320,7 +320,7 @@
       
       if ((clipsInstance != NULL) && 
           EnvGetDefclassPPForm(theEnvironment,EnvGetInstanceClass(theEnvironment,clipsInstance)) != NULL)
-        { thePPForm = [NSString stringWithFormat:@"%s", EnvGetDefclassPPForm(theEnvironment,EnvGetInstanceClass(theEnvironment,clipsInstance))]; }
+        { thePPForm = [NSString stringWithUTF8String: EnvGetDefclassPPForm(theEnvironment,EnvGetInstanceClass(theEnvironment,clipsInstance))]; }
      }
      
    [environmentController setValue: thePPForm forKey: @"constructInspectorText"];

@@ -453,7 +453,7 @@
          
          [newActivation setSalience: [NSNumber numberWithInt: theActivation->salience]];
          
-         [newActivation setRuleName: [NSString stringWithFormat:@"%s", EnvGetDefruleName(environment,theActivation->theRule)]];
+         [newActivation setRuleName: [NSString stringWithUTF8String: EnvGetDefruleName(environment,theActivation->theRule)]];
 
          EnvGetActivationBasisPPForm(environment,bindingsBuffer,1024,theActivation);
          [newActivation setBindings: [NSString stringWithFormat:@"%s", bindingsBuffer]];

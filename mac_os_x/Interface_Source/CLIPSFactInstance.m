@@ -32,7 +32,7 @@
       NSNumber *theNumber;
       BITMAP_HN *theScopeMap;
 
-      [self setValue: [NSString stringWithFormat:@"%s", ValueToString(FactRelation(theFact))] forKey: @"relationName"]; 
+      [self setValue: [NSString stringWithUTF8String: ValueToString(FactRelation(theFact))] forKey: @"relationName"]; 
       
       [self setValue: [NSString stringWithFormat:@"%lld", EnvFactIndex(theEnvironment,theFact)] forKey: @"name"]; 
 
@@ -57,11 +57,11 @@
       for (i = 1; i <= GetDOLength(slotNames); i++)
         {
          char *theCSlotName = ValueToString(GetMFValue(GetValue(slotNames),i));
-         NSString *theSlotName = [NSString stringWithFormat:@"%s", theCSlotName];
+         NSString *theSlotName = [NSString stringWithUTF8String: theCSlotName];
          
          FactSlotValue(theEnvironment,theFact,ValueToString(GetMFValue(GetValue(slotNames),i)),&slotValue);
 
-         NSString *theSlotValue = [NSString stringWithFormat:@"%s", DataObjectToString(theEnvironment,&slotValue)];
+         NSString *theSlotValue = [NSString stringWithUTF8String: DataObjectToString(theEnvironment,&slotValue)];
 
          /* Only static defaults will be excluded from display. */
 
@@ -112,9 +112,9 @@
       void *theClass;
 
       theClass = EnvGetInstanceClass(theEnvironment,theInstance);
-      [self setValue: [NSString stringWithFormat:@"%s", EnvGetDefclassName(theEnvironment,theClass)] forKey: @"relationName"]; 
+      [self setValue: [NSString stringWithUTF8String: EnvGetDefclassName(theEnvironment,theClass)] forKey: @"relationName"]; 
       
-      [self setValue: [NSString stringWithFormat:@"%s", EnvGetInstanceName(theEnvironment,theInstance)] forKey: @"name"]; 
+      [self setValue: [NSString stringWithUTF8String: EnvGetInstanceName(theEnvironment,theInstance)] forKey: @"name"]; 
 
       /*====================================================*/
       /* An index of -1 indicates that this is an instance. */
@@ -141,11 +141,11 @@
       for (i = 1; i <= GetDOLength(slotNames); i++)
         {
          char *theCSlotName = ValueToString(GetMFValue(GetValue(slotNames),i));
-         NSString *theSlotName = [NSString stringWithFormat:@"%s", theCSlotName];
+         NSString *theSlotName = [NSString stringWithUTF8String: theCSlotName];
          
          EnvDirectGetSlot(theEnvironment,theInstance,ValueToString(GetMFValue(GetValue(slotNames),i)),&slotValue);
 
-         NSString *theSlotValue = [NSString stringWithFormat:@"%s", DataObjectToString(theEnvironment,&slotValue)];
+         NSString *theSlotValue = [NSString stringWithUTF8String: DataObjectToString(theEnvironment,&slotValue)];
 
          /* Only static defaults will be excluded from display. */
  

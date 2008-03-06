@@ -384,7 +384,7 @@
          
       struct activation *theActivation = [[theArray objectAtIndex: theRow] activation];
          
-      NSString *thePPForm = [NSString stringWithFormat:@"%s",EnvGetDefrulePPForm(theEnvironment,theActivation->theRule)];
+      NSString *thePPForm = [NSString stringWithUTF8String: EnvGetDefrulePPForm(theEnvironment,theActivation->theRule)];
 
       [environmentController setValue: thePPForm forKey: @"constructInspectorText"];
      }

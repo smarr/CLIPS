@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.20  01/31/02            */
+   /*             CLIPS Version 6.30  03/06/08            */
    /*                                                     */
    /*                    SCANNER MODULE                   */
    /*******************************************************/
@@ -18,6 +18,8 @@
 /*      Brian Dantes                                         */
 /*                                                           */
 /* Revision History:                                         */
+/*                                                           */
+/*      6.30: Added UTF-8 support.                           */
 /*                                                           */
 /*************************************************************/
 
@@ -171,7 +173,7 @@ globle void GetToken(
 
        case '?':
           inchar = EnvGetcRouter(theEnv,logicalName);
-          if (isalpha(inchar)
+          if (isalpha(inchar) || IsUTF8MultiByteStart(inchar)
 #if DEFGLOBAL_CONSTRUCT
               || (inchar == '*'))
 #else
@@ -217,7 +219,7 @@ globle void GetToken(
          if ((inchar = EnvGetcRouter(theEnv,logicalName)) == '?')
            {
             inchar = EnvGetcRouter(theEnv,logicalName);
-            if (isalpha(inchar)
+            if (isalpha(inchar) || IsUTF8MultiByteStart(inchar)
 #if DEFGLOBAL_CONSTRUCT
                  || (inchar == '*'))
 #else
@@ -593,7 +595,7 @@ static void ScanNumber(
                    (inchar == '(') || (inchar == ')') ||
                    (inchar == '&') || (inchar == '|') || (inchar == '~') ||
                    (inchar == ' ') || (inchar == ';') ||
-                   (isprint(inchar) == 0) )
+                   ((isprint(inchar) == 0) && (! IsUTF8MultiByteStart(inchar))) )
            { phase = 5; }
          else
            {
@@ -620,7 +622,7 @@ static void ScanNumber(
                    (inchar == '(') || (inchar == ')') ||
                    (inchar == '&') || (inchar == '|') || (inchar == '~') ||
                    (inchar == ' ') || (inchar == ';') ||
-                   (isprint(inchar) == 0) )
+                   ((isprint(inchar) == 0) && (! IsUTF8MultiByteStart(inchar))) )
            { phase = 5; }
          else
            {
@@ -647,7 +649,7 @@ static void ScanNumber(
                    (inchar == '(') || (inchar == ')') ||
                    (inchar == '&') || (inchar == '|') || (inchar == '~') ||
                    (inchar == ' ') || (inchar == ';') ||
-                   (isprint(inchar) == 0) )
+                   ((isprint(inchar) == 0) && (! IsUTF8MultiByteStart(inchar))) )
            {
             digitFound = FALSE;
             phase = 5;
@@ -670,7 +672,7 @@ static void ScanNumber(
                    (inchar == '(') || (inchar == ')') ||
                    (inchar == '&') || (inchar == '|') || (inchar == '~') ||
                    (inchar == ' ') || (inchar == ';') ||
-                   (isprint(inchar) == 0) )
+                   ((isprint(inchar) == 0) && (! IsUTF8MultiByteStart(inchar))) )
            {
             if ((ScannerData(theEnv)->GlobalString[count-1] == '+') || (ScannerData(theEnv)->GlobalString[count-1] == '-'))
               { digitFound = FALSE; }
