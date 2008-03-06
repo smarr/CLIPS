@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.24  06/05/06            */
+   /*             CLIPS Version 6.30  03/05/08            */
    /*                                                     */
    /*                   UTILITY MODULE                    */
    /*******************************************************/
@@ -532,6 +532,17 @@ globle char *ExpandStringWithChar(
     }
   else
     {
+     /*===========================================================*/
+     /* First delete any UTF-8 multibyte continuation characters. */
+     /*===========================================================*/
+
+     while ((*pos > 1) && IsUTF8MultiByteContinuation(str[*pos - 1]))
+       { (*pos)--; }
+     
+     /*===================================================*/
+     /* Now delete the first byte of the UTF-8 character. */
+     /*===================================================*/
+     
      if (*pos > 0) (*pos)--;
      str[*pos] = '\0';
     }

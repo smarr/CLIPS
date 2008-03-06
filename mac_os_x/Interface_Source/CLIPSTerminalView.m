@@ -59,6 +59,7 @@
    
    if (self) 
      {    
+      inputBuffer = NULL;
      }
    
    return self;
@@ -70,6 +71,9 @@
 - (void) dealloc
   {
    NSLog(@"CLIPSTerminalView dealloc");
+     
+   if (inputBuffer != NULL)
+     { free(inputBuffer); }
      
    [inputCharLock release];
    [hiliteColor release];
@@ -348,9 +352,22 @@
    if ([inputCharLock condition] == NEEDS_CHAR)
      {
       char *str; 
+      size_t len;
       str = (char *) [theText UTF8String];
       charFound = str[0];
       [super insertText: theText];
+      
+      if ((len = strlen(str)) >  1)
+        {
+         /* TBD Concatenate to existing buffer */
+         if (inputBuffer != NULL)
+           { free(inputBuffer); }
+           
+         inputBuffer = (char *) malloc(len);
+         strcpy(inputBuffer,&str[1]);
+         inputPos = 0;
+        }
+      
       [inputCharLock lock];
       [inputCharLock unlockWithCondition: HAS_CHAR];
       return;
@@ -389,13 +406,43 @@
 - (void) deleteBackward: (id) sender
   {
    //NSLog(@"CLIPSTerminalView deleteBackward");
-   
+
+   /*===================================*/
+   /* Move the cursor to the end of the */
+   /* last line in the terminal.        */
+   /*===================================*/
+      
    NSRange theRange = { [[super string] length], 0 };
 
    [super setSelectedRange: theRange];   
-   
-   if (RouterData([environment environment])->CommandBufferInputCount <= 0) return;
 
+   /*==========================================*/
+   /* If the input buffer is empty, then there */
+   /* are no characters to delete.             */
+   /*==========================================*/
+   
+   if (RouterData([environment environment])->CommandBufferInputCount <= 0) 
+     { return; }
+
+   /*==========================================================*/
+   /* Is a running CLIPS function or program (such as the read */
+   /* function) waiting for character input from stdin.        */
+   /*==========================================================*/
+   
+   if ([inputCharLock condition] == NEEDS_CHAR)
+     {
+      [super deleteBackward: sender];
+      charFound = '\b';
+      [inputCharLock lock];
+      [inputCharLock unlockWithCondition: HAS_CHAR];
+      return;
+     }
+   
+   /*==============================================*/
+   /* Process the backspace against the unexecuted */
+   /* command being entered at the command prompt. */
+   /*==============================================*/
+    
    ExpandCommandString([environment environment],'\b');
       
    [super deleteBackward: sender];
@@ -419,6 +466,23 @@
    
    [super scrollRangeToVisible: theRange]; 
 
+   /*=====================================*/
+   /* Check for queued input from a UTF-8 */
+   /* character or a pasted string.       */
+   /*=====================================*/
+   
+   if (inputBuffer != NULL)
+     {
+      charFound = inputBuffer[inputPos];
+      if (inputBuffer[++inputPos] == '\0')
+        {
+         free(inputBuffer);
+         inputBuffer = NULL;
+        }
+        
+      return charFound;
+     }
+     
    /*==============================================*/
    /* Change the condition on the lock to indicate */
    /* that an input character is needed.           */

@@ -335,4 +335,10 @@ CLIPS> (str-index "여러분" "여러분 안녕하세요")  ; UTF-8 Support
 1
 CLIPS> (str-index "á" "Olá Mundo")        ; UTF-8 Support
 3
+CLIPS> Привет мир                         ; UTF-8 Support
+Привет
+CLIPS> 여러분 안녕하세요                      ; UTF-8 Support
+여러분
+CLIPS> Olá Mundo                          ; UTF-8 Support
+Olá
 CLIPS> (dribble-off)

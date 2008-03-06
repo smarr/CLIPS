@@ -160,3 +160,6 @@
 (str-index "ет" "Привет мир")      ; UTF-8 Support
 (str-index "여러분" "여러분 안녕하세요")  ; UTF-8 Support
 (str-index "á" "Olá Mundo")        ; UTF-8 Support
+Привет мир                         ; UTF-8 Support
+여러분 안녕하세요                      ; UTF-8 Support
+Olá Mundo                          ; UTF-8 Support

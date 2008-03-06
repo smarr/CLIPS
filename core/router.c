@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.24  07/01/05            */
+   /*             CLIPS Version 6.30  03/05/08            */
    /*                                                     */
    /*                  I/O ROUTER MODULE                  */
    /*******************************************************/
@@ -198,8 +198,6 @@ globle int EnvGetcRouter(
            { IncrementLineCount(theEnv); }
         }
 
-      /* if (inchar == '\r') return('\n'); */
-
       return(inchar);
      }
 
@@ -226,11 +224,6 @@ globle int EnvGetcRouter(
               { IncrementLineCount(theEnv); }
            }
 
-         /* if (inchar == '\r') return('\n'); */
-         /*
-         if (inchar != '\b')
-           { return(inchar); }
-         */
          return(inchar);
         }
       currentPtr = currentPtr->next;

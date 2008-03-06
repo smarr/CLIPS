@@ -17,6 +17,8 @@
    BOOL routerPrint;
    //BOOL waitingForChar;
    int charFound;
+   char *inputBuffer;
+   size_t inputPos;
    NSConditionLock *inputCharLock;
    NSDictionary *hiliteColor;
   }
