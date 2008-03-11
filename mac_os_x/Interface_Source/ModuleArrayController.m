@@ -3,7 +3,6 @@
 //  CLIPS
 //
 //  Created by Gary Riley on 3/21/07.
-//  Copyright 2007 __MyCompanyName__. All rights reserved.
 //
 
 #import "ModuleArrayController.h"

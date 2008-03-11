@@ -105,17 +105,67 @@
 - (IBAction) showCLIPSHomePage: (id) sender
   {
    [[NSWorkspace sharedWorkspace] 
-       openURL: [NSURL URLWithString: @"http://www.ghg.net/clips/CLIPS.html"]];
+       openURL: [NSURL URLWithString: @"http://clipsrules.sourceforge.net/"]];
   }
 
-/***************************************/
-/* showCLIPSDevelopersForum: Opens the */
-/*   CLIPS Developers Forum Web Page.  */
-/***************************************/
-- (IBAction) showCLIPSDevelopersForum: (id) sender
+/*****************************************/
+/* showCLIPSExpertSystemGroup: Opens the */
+/*   CLIPS Expert System Group Web Page. */
+/*****************************************/
+- (IBAction) showCLIPSExpertSystemGroup: (id) sender
   {
    [[NSWorkspace sharedWorkspace] 
        openURL: [NSURL URLWithString: @"http://groups.google.com/group/CLIPSESG/"]];
+  }
+
+/*****************************************/
+/* showCLIPSSourceForgeForums: Opens the */
+/*   CLIPS SourceForge Forums Web Page.  */
+/*****************************************/
+- (IBAction) showCLIPSSourceForgeForums: (id) sender
+  {
+   [[NSWorkspace sharedWorkspace] 
+       openURL: [NSURL URLWithString: @"http://sourceforge.net/forum/?group_id=215471"]];
+  }
+
+/***********************************/
+/* showUsersGuide: Opens the CLIPS */
+/*   User's Guide Web Page.        */
+/***********************************/
+- (IBAction) showUsersGuide: (id) sender
+  {
+   [[NSWorkspace sharedWorkspace] 
+       openURL: [NSURL URLWithString: @"http://clipsrules.sourceforge.net/documentation/v630/ug.pdf"]];
+  }
+
+/**********************************************/
+/* showBasicProgrammingGuide: Opens the CLIPS */
+/*   Basic Programming Guide Web Page.        */
+/**********************************************/
+- (IBAction) showBasicProgrammingGuide: (id) sender
+  {
+   [[NSWorkspace sharedWorkspace] 
+       openURL: [NSURL URLWithString: @"http://clipsrules.sourceforge.net/documentation/v630/bpg.pdf"]];
+  }
+
+/**********************************************/
+/* showAdvancedProgrammingGuide: Opens the CLIPS */
+/*   Advanced Programming Guide Web Page.        */
+/**********************************************/
+- (IBAction) showAdvancedProgrammingGuide: (id) sender
+  {
+   [[NSWorkspace sharedWorkspace] 
+       openURL: [NSURL URLWithString: @"http://clipsrules.sourceforge.net/documentation/v630/apg.pdf"]];
+  }
+
+/****************************************/
+/* showInterfacesGuide: Opens the CLIPS */
+/*   Interfaces Guide Web Page.         */
+/****************************************/
+- (IBAction) showInterfacesGuide: (id) sender
+  {
+   [[NSWorkspace sharedWorkspace] 
+       openURL: [NSURL URLWithString: @"http://clipsrules.sourceforge.net/documentation/v630/ig.pdf"]];
   }
 
 /*%%%%%%%%%%%%%%%%%%*/

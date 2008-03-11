@@ -3,7 +3,6 @@
 //  CLIPS
 //
 //  Created by Gary Riley on 2/25/06.
-//  Copyright 2006 __MyCompanyName__. All rights reserved.
 //
 
 #import "CLIPSTerminalView.h"

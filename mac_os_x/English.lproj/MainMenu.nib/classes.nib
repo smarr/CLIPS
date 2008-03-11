@@ -15,11 +15,21 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
-				<key>showCLIPSDevelopersForum</key>
+				<key>showAdvancedProgrammingGuide</key>
+				<string>id</string>
+				<key>showBasicProgrammingGuide</key>
+				<string>id</string>
+				<key>showCLIPSExpertSystemGroup</key>
 				<string>id</string>
 				<key>showCLIPSHomePage</key>
 				<string>id</string>
+				<key>showCLIPSSourceForgeForums</key>
+				<string>id</string>
+				<key>showInterfacesGuide</key>
+				<string>id</string>
 				<key>showPreferencePanel</key>
+				<string>id</string>
+				<key>showUsersGuide</key>
 				<string>id</string>
 			</dict>
 			<key>CLASS</key>

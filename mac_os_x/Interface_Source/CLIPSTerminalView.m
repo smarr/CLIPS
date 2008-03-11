@@ -3,7 +3,6 @@
 //  CLIPS
 //
 //  Created by Gary Riley on 2/23/06.
-//  Copyright 2006 __MyCompanyName__. All rights reserved.
 //
 
 #import "CLIPSEnvironment.h"

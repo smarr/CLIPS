@@ -3,7 +3,6 @@
 //  CLIPS
 //
 //  Created by Gary Riley on 3/13/06.
-//  Copyright 2006 __MyCompanyName__. All rights reserved.
 //
 
 #import "CLIPSFocus.h"

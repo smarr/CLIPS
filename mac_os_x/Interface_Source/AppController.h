@@ -20,7 +20,12 @@
 
 - (IBAction) showPreferencePanel: (id) sender;
 - (IBAction) showCLIPSHomePage: (id) sender;
-- (IBAction) showCLIPSDevelopersForum: (id) sender;
+- (IBAction) showCLIPSExpertSystemGroup: (id) sender;
+- (IBAction) showCLIPSSourceForgeForums: (id) sender;
+- (IBAction) showUsersGuide: (id) sender;
+- (IBAction) showBasicProgrammingGuide: (id) sender;
+- (IBAction) showAdvancedProgrammingGuide: (id) sender;
+- (IBAction) showInterfacesGuide: (id) sender;
 
 /*%%%%%%%%%%%%%%%%%%*/
 /* Delegate Methods */

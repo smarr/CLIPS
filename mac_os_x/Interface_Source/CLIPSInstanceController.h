@@ -3,7 +3,6 @@
 //  CLIPS
 //
 //  Created by Gary Riley on 3/3/2008.
-//  Copyright 2008 __MyCompanyName__. All rights reserved.
 //
 
 #import <Cocoa/Cocoa.h>
