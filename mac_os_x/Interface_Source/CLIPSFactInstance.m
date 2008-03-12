@@ -227,7 +227,10 @@
     
    if (index != nil)
      {
-      tempString = [NSString stringWithFormat:@"f-%lld",[index longLongValue]];
+      if ([index longLongValue] == -1)
+        { tempString = [NSString stringWithFormat:@"[%@]",name]; }
+      else
+        { tempString = [NSString stringWithFormat:@"f-%lld",[index longLongValue]]; }
       
       range = [tempString rangeOfString: searchString
                           options: NSCaseInsensitiveSearch];
