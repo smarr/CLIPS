@@ -90,12 +90,12 @@ class WineDemo implements ActionListener
       
       preferredBodyChoices[0] = wineResources.getString("Don'tCare"); 
       preferredBodyChoices[1] = wineResources.getString("Light"); 
-      preferredBodyChoices[2] = wineResources.getString("Medium"); 
+      preferredBodyChoices[2] = wineResources.getString("MediumBody"); 
       preferredBodyChoices[3] = wineResources.getString("Full"); 
 
       preferredSweetnessChoices[0] = wineResources.getString("Don'tCare"); 
       preferredSweetnessChoices[1] = wineResources.getString("Dry"); 
-      preferredSweetnessChoices[2] = wineResources.getString("Medium"); 
+      preferredSweetnessChoices[2] = wineResources.getString("MediumSweetness"); 
       preferredSweetnessChoices[3] = wineResources.getString("Sweet"); 
       
       mainCourseChoices[0] = wineResources.getString("Don'tKnow"); 
