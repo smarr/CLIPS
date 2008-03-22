@@ -659,7 +659,6 @@
 		B57AFA0B0BA9F90F002491B9 /* CLIPSModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CLIPSModule.m; path = Interface_Source/CLIPSModule.m; sourceTree = "<group>"; };
 		B591DCA60A13C16D0021AA02 /* CLIPSTextMenu.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = CLIPSTextMenu.m; path = Interface_Source/CLIPSTextMenu.m; sourceTree = "<group>"; };
 		B591DCA70A13C16D0021AA02 /* CLIPSTextMenu.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = CLIPSTextMenu.h; path = Interface_Source/CLIPSTextMenu.h; sourceTree = "<group>"; };
-		B594317509B4CA7800936A6B /* ToDo.txt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = ToDo.txt; sourceTree = "<group>"; };
 		B5997A580D4D9B9E00C9B896 /* CLIPS Console */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "CLIPS Console"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B5AC0A4209B21DA100297B9E /* EnvController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = EnvController.h; path = Interface_Source/EnvController.h; sourceTree = "<group>"; };
 		B5AC0A4309B21DA100297B9E /* EnvController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = EnvController.m; path = Interface_Source/EnvController.m; sourceTree = "<group>"; };
@@ -1092,7 +1091,6 @@
 		2A37F4AAFDCFA73011CA2CEA /* CLIPSEditor */ = {
 			isa = PBXGroup;
 			children = (
-				B594317509B4CA7800936A6B /* ToDo.txt */,
 				2A37F4ABFDCFA73011CA2CEA /* Classes */,
 				B5BCF20509AD249F000E597B /* CLIPS Source */,
 				B54DA5D109AE1D4C00D9DF3D /* CLIPS Source Headers */,
@@ -1107,9 +1105,6 @@
 		2A37F4ABFDCFA73011CA2CEA /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				B5CE5D850D7DB62B002166A8 /* CLIPSInstanceController.h */,
-				B5CE5D860D7DB62B002166A8 /* CLIPSInstanceController.m */,
-				B5AF77150BA89B750090AC5E /* CLIPSFactController.m */,
 				B5AF77130BA89B360090AC5E /* CLIPSAgendaController.h */,
 				B533574E09D72E5900893C2F /* CLIPSConstructInspectorController.h */,
 				B533574F09D72E5900893C2F /* CLIPSConstructInspectorController.m */,
@@ -1120,6 +1115,7 @@
 				B5B1B53609CDE36A00F76417 /* CLIPSActivation.h */,
 				B5B1B53709CDE36A00F76417 /* CLIPSActivation.m */,
 				B5B1B53809CDE36A00F76417 /* CLIPSFactController.h */,
+				B5AF77150BA89B750090AC5E /* CLIPSFactController.m */,
 				B5B1B53909CDE36A00F76417 /* CLIPSAgendaController.m */,
 				B5FB531709AD41E2001AE877 /* CLIPSEnvironment.h */,
 				B5FB531809AD41E2001AE877 /* CLIPSEnvironment.m */,
@@ -1127,6 +1123,8 @@
 				B5B1B57909CDE69F00F76417 /* CLIPSFactInstance.m */,
 				B5B1B54009CDE38600F76417 /* CLIPSFocus.h */,
 				B5B1B54109CDE38600F76417 /* CLIPSFocus.m */,
+				B5CE5D850D7DB62B002166A8 /* CLIPSInstanceController.h */,
+				B5CE5D860D7DB62B002166A8 /* CLIPSInstanceController.m */,
 				B53E50D809B1046500F72EB0 /* CLIPSTerminalController.h */,
 				B53E50D909B1046500F72EB0 /* CLIPSTerminalController.m */,
 				B53E50C909B0FD8A00F72EB0 /* CLIPSTerminalView.h */,
