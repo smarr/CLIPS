@@ -25,6 +25,8 @@ class AnimalDemo implements ActionListener
    ResourceBundle animalResources;
 
    Environment clips;
+   boolean isExecuting = false;
+   Thread executionThread;
       
    AnimalDemo()
      {  
@@ -110,22 +112,13 @@ class AnimalDemo implements ActionListener
       clips.load("bcdemo.clp");
       clips.load("animaldemo.clp");
       clips.reset();
-      clips.run();
+      runAnimal();
 
       /*====================*/
       /* Display the frame. */
       /*====================*/
       
       jfrm.setVisible(true);  
-
-      /*==================================*/
-      /* Get the current state of the UI. */
-      /*==================================*/
-      
-      try
-        { nextUIState(); }
-      catch (Exception e)
-        { e.printStackTrace(); }
      }  
 
    /****************/
@@ -212,6 +205,10 @@ class AnimalDemo implements ActionListener
       String theText = animalResources.getString(fv.getFactSlot("display").symbolValue());
  
       wrapLabelText(displayLabel,theText);
+      
+      executionThread = null;
+      
+      isExecuting = false;
      }
 
    /*########################*/
@@ -230,12 +227,47 @@ class AnimalDemo implements ActionListener
         { e.printStackTrace(); }
      }
 
+   /*************/
+   /* runAnimal */
+   /*************/  
+   public void runAnimal()
+     {
+      Runnable runThread = 
+         new Runnable()
+           {
+            public void run()
+              {
+               clips.run();
+               
+               SwingUtilities.invokeLater(
+                  new Runnable()
+                    {
+                     public void run()
+                       {
+                        try 
+                          { nextUIState(); }
+                        catch (Exception e)
+                          { e.printStackTrace(); }
+                       }
+                    });
+              }
+           };
+      
+      isExecuting = true;
+      
+      executionThread = new Thread(runThread);
+      
+      executionThread.start();
+     }
+     
    /*********************/
    /* onActionPerformed */
    /*********************/  
    private void onActionPerformed(
      ActionEvent ae) throws Exception
      { 
+      if (isExecuting) return;
+
       /*=====================*/
       /* Get the state-list. */
       /*=====================*/
@@ -259,20 +291,17 @@ class AnimalDemo implements ActionListener
                                ") (value-set TRUE))");
            }
            
-         clips.run();
-         nextUIState();
+         runAnimal();
         }
       else if (ae.getActionCommand().equals("Restart"))
         { 
          clips.reset(); 
-         clips.run();
-         nextUIState();
+         runAnimal();
         }
       else if (ae.getActionCommand().equals("Prev"))
         {
          clips.assertString("(prev (id " + currentID + "))");
-         clips.run();
-         nextUIState();
+         runAnimal();
         }
      }
      

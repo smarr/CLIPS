@@ -25,6 +25,8 @@ class AutoDemo implements ActionListener
    ResourceBundle autoResources;
  
    Environment clips;
+   boolean isExecuting = false;
+   Thread executionThread;
       
    AutoDemo()
      {  
@@ -110,22 +112,13 @@ class AutoDemo implements ActionListener
       clips.load("autodemo.clp");
       
       clips.reset();
-      clips.run();
+      runAuto();
 
       /*====================*/
       /* Display the frame. */
       /*====================*/
       
       jfrm.setVisible(true);  
-
-      /*==================================*/
-      /* Get the current state of the UI. */
-      /*==================================*/
-      
-      try
-        { nextUIState(); }
-      catch (Exception e)
-        { e.printStackTrace(); }
      }  
 
    /****************/
@@ -208,6 +201,10 @@ class AutoDemo implements ActionListener
       String theText = autoResources.getString(fv.getFactSlot("display").symbolValue());
             
       wrapLabelText(displayLabel,theText);
+      
+      executionThread = null;
+      
+      isExecuting = false;
      }
 
    /*########################*/
@@ -225,13 +222,48 @@ class AutoDemo implements ActionListener
       catch (Exception e)
         { e.printStackTrace(); }
      }
-     
+ 
+   /***********/
+   /* runAuto */
+   /***********/  
+   public void runAuto()
+     {
+      Runnable runThread = 
+         new Runnable()
+           {
+            public void run()
+              {
+               clips.run();
+               
+               SwingUtilities.invokeLater(
+                  new Runnable()
+                    {
+                     public void run()
+                       {
+                        try 
+                          { nextUIState(); }
+                        catch (Exception e)
+                          { e.printStackTrace(); }
+                       }
+                    });
+              }
+           };
+      
+      isExecuting = true;
+      
+      executionThread = new Thread(runThread);
+      
+      executionThread.start();
+     }
+
    /*********************/
    /* onActionPerformed */
    /*********************/  
    public void onActionPerformed(
      ActionEvent ae) throws Exception 
      { 
+      if (isExecuting) return;
+      
       /*=====================*/
       /* Get the state-list. */
       /*=====================*/
@@ -255,20 +287,17 @@ class AutoDemo implements ActionListener
                                ")");
            }
            
-         clips.run();
-         nextUIState();
+         runAuto();
         }
       else if (ae.getActionCommand().equals("Restart"))
         { 
          clips.reset(); 
-         clips.run();
-         nextUIState();
+         runAuto();
         }
       else if (ae.getActionCommand().equals("Prev"))
         {
          clips.assertString("(prev " + currentID + ")");
-         clips.run();
-         nextUIState();
+         runAuto();
         }
      }
 

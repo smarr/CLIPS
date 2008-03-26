@@ -31,6 +31,8 @@ class SudokuDemo implements ActionListener, FocusListener, KeyListener
    ResourceBundle sudokuResources;
    
    Environment clips;
+   boolean isExecuting = false;
+   Thread executionThread;
    
    /**************/
    /* SudokuDemo */
@@ -251,12 +253,49 @@ class SudokuDemo implements ActionListener, FocusListener, KeyListener
         { e.printStackTrace(); }
      }
      
-   /*******************/
+   /*************/
+   /* runSudoku */
+   /*************/  
+   public void runSudoku()
+     {
+      Runnable runThread = 
+         new Runnable()
+           {
+            public void run()
+              {
+               clips.run();
+               
+               SwingUtilities.invokeLater(
+                  new Runnable()
+                    {
+                     public void run()
+                       {
+                        try 
+                          { updateGrid(); }
+                        catch (Exception e)
+                          { e.printStackTrace(); }
+                       }
+                    });
+              }
+           };
+      
+      isExecuting = true;
+      
+      executionThread = new Thread(runThread);
+      
+      jfrm.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+         
+      executionThread.start();
+     }
+
+   /*********************/
    /* onActionPerformed */
-   /*******************/  
+   /*********************/  
    public void onActionPerformed(
      ActionEvent ae) throws Exception 
      {      
+      if (isExecuting) return;
+
       /*==========================*/
       /* Handle the Clear button. */
       /*==========================*/
@@ -356,71 +395,16 @@ class SudokuDemo implements ActionListener, FocusListener, KeyListener
          /* Update the status of the buttons. */
          /*===================================*/
          
-         solved = true;
-         resetButton.setEnabled(true);
+         clearButton.setEnabled(false);
+         resetButton.setEnabled(false);
          solveButton.setEnabled(false);
-         techniquesButton.setEnabled(true);
+         techniquesButton.setEnabled(false);
          
          /*===================*/
          /* Solve the puzzle. */
          /*===================*/
 
-         clips.run();
-
-         /*===================================*/
-         /* Retrieve the solution from CLIPS. */
-         /*===================================*/
- 
-          for (int i = 0; i < 9; i++)
-           {
-            JTable theTable = (JTable) mainGrid.getComponent(i);
-            int rowGroup = i / 3;
-            int colGroup = i % 3;
-            
-            for (int r = 0; r < 3; r++)
-              {
-               for (int c = 0; c < 3; c++)
-                 { 
-                  resetValues[i][r][c] = theTable.getValueAt(r,c); 
-
-                  if ((resetValues[i][r][c] != null) &&
-                      (! resetValues[i][r][c].equals("")))
-                    { continue; }
-                  
-                  String evalStr = "(find-all-facts ((?f possible)) " +
-                                       "(and (eq ?f:row " + (r + (rowGroup * 3) + 1) + ") " +
-                                            "(eq ?f:column " + (c + (colGroup * 3) + 1) + ")))";
-                                        
-                  PrimitiveValue pv = clips.eval(evalStr);
-                  
-                  if (pv.size() != 1) continue;
-                  
-                  PrimitiveValue fv = pv.get(0);
-                  
-                  theTable.setValueAt(" " + fv.getFactSlot("value") + " ",r,c);
-                 }         
-              }
-           }
-
-         /*===============================================*/
-         /* Any cells that have not been assigned a value */
-         /* are given a '?' for their content.            */
-         /*===============================================*/
-         
-         for (int i = 0; i < 9; i++)
-           {
-            JTable theTable = (JTable) mainGrid.getComponent(i);
-
-            for (int r = 0; r < 3; r++)
-              {
-               for (int c = 0; c < 3; c++)
-                 { 
-                  if ((theTable.getValueAt(r,c) == null) ||
-                      (theTable.getValueAt(r,c).equals("")))
-                    { theTable.setValueAt("?",r,c);  }
-                 }         
-              }
-           }
+         runSudoku();
         }
 
       /*===============================*/
@@ -454,6 +438,83 @@ class SudokuDemo implements ActionListener, FocusListener, KeyListener
          JOptionPane.showMessageDialog(jfrm,messageStr,sudokuResources.getString("SolutionTechniques"),JOptionPane.PLAIN_MESSAGE);
         }
      } 
+     
+   /**************/
+   /* updateGrid */
+   /**************/  
+   private void updateGrid() throws Exception
+     { 
+      /*===================================*/
+      /* Retrieve the solution from CLIPS. */
+      /*===================================*/
+ 
+      for (int i = 0; i < 9; i++)
+        {
+         JTable theTable = (JTable) mainGrid.getComponent(i);
+         int rowGroup = i / 3;
+         int colGroup = i % 3;
+            
+         for (int r = 0; r < 3; r++)
+           {
+            for (int c = 0; c < 3; c++)
+              { 
+               resetValues[i][r][c] = theTable.getValueAt(r,c); 
+
+               if ((resetValues[i][r][c] != null) &&
+                   (! resetValues[i][r][c].equals("")))
+                 { continue; }
+                  
+               String evalStr = "(find-all-facts ((?f possible)) " +
+                                    "(and (eq ?f:row " + (r + (rowGroup * 3) + 1) + ") " +
+                                         "(eq ?f:column " + (c + (colGroup * 3) + 1) + ")))";
+                                        
+               PrimitiveValue pv = clips.eval(evalStr);
+                  
+               if (pv.size() != 1) continue;
+                  
+               PrimitiveValue fv = pv.get(0);
+                  
+               theTable.setValueAt(" " + fv.getFactSlot("value") + " ",r,c);
+              }         
+           }
+        }
+
+      /*===============================================*/
+      /* Any cells that have not been assigned a value */
+      /* are given a '?' for their content.            */
+      /*===============================================*/
+         
+      for (int i = 0; i < 9; i++)
+        {
+         JTable theTable = (JTable) mainGrid.getComponent(i);
+
+         for (int r = 0; r < 3; r++)
+           {
+            for (int c = 0; c < 3; c++)
+              { 
+               if ((theTable.getValueAt(r,c) == null) ||
+                   (theTable.getValueAt(r,c).equals("")))
+                 { theTable.setValueAt("?",r,c);  }
+              }         
+           }
+        }
+
+      /*===================================*/
+      /* Update the status of the buttons. */
+      /*===================================*/
+
+      jfrm.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+         
+      solved = true;
+      clearButton.setEnabled(true);
+      resetButton.setEnabled(true);
+      solveButton.setEnabled(false);
+      techniquesButton.setEnabled(true);
+           
+      executionThread = null;
+      
+      isExecuting = false;
+     }     
 
    /*#######################*/
    /* FocusListener Methods */
@@ -525,7 +586,7 @@ class SudokuDemo implements ActionListener, FocusListener, KeyListener
       /* puzzle is in solution state.    */
       /*=================================*/
       
-      if (solved) return;
+      if (solved || isExecuting) return;
       
       /*=================================================*/
       /* If a cell isn't selected, ignore the typed key. */

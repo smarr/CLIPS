@@ -47,6 +47,9 @@ class WineDemo implements ActionListener
    ResourceBundle wineResources;
 
    Environment clips;
+   
+   boolean isExecuting = false;
+   Thread executionThread;
 
    class WeightCellRenderer extends JProgressBar implements TableCellRenderer 
      {
@@ -297,6 +300,8 @@ class WineDemo implements ActionListener
      { 
       String item;
       
+      if (isExecuting) return;
+      
       clips.reset();      
             
       item = preferredColorNames[preferredColor.getSelectedIndex()];
@@ -402,8 +407,39 @@ class WineDemo implements ActionListener
       else
         { clips.assertString("(attribute (name tastiness) (value unknown))"); }
       
-      clips.run();
+      Runnable runThread = 
+         new Runnable()
+           {
+            public void run()
+              {
+               clips.run();
+               
+               SwingUtilities.invokeLater(
+                  new Runnable()
+                    {
+                     public void run()
+                       {
+                        try 
+                          { updateWines(); }
+                        catch (Exception e)
+                          { e.printStackTrace(); }
+                       }
+                    });
+              }
+           };
       
+      isExecuting = true;
+      
+      executionThread = new Thread(runThread);
+      
+      executionThread.start();
+     }
+     
+   /***************/
+   /* updateWines */
+   /***************/  
+   private void updateWines() throws Exception
+     { 
       String evalStr = "(WINES::get-wine-list)";
                                        
       PrimitiveValue pv = clips.eval(evalStr);
@@ -422,7 +458,11 @@ class WineDemo implements ActionListener
         }  
         
       jfrm.pack();
-     }
+      
+      executionThread = null;
+      
+      isExecuting = false;
+     }     
      
    /********/
    /* main */

@@ -188,7 +188,7 @@
           limbs is no) 
          (then type.animal is snake))
    (question (variable limbs)
-             (query "Does your animal have limbs?"))
+             (query limbs.query))
    (rule (if family is stationary and
           spikes is yes) 
          (then type.animal is sea.anemone))
@@ -341,4 +341,3 @@
    (question (variable domesticated)
              (query domesticated.query))
    (answer (prefix "I think your animal is a ") (variable type.animal) (postfix ".")))
-
