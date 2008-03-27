@@ -44,6 +44,9 @@
 /*                                                           */    
 /*            Changed the EX_MATH compilation flag to        */
 /*            EXTENDED_MATH_FUNCTIONS.                       */
+/*                                                           */
+/*            Removed VOID definition because of conflict    */
+/*            with Windows.h header file.                    */
 /*                                                           */    
 /*************************************************************/
 
@@ -128,7 +131,6 @@
 /* Some definitions for use with declarations. */
 /***********************************************/
 
-#define VOID     void
 #define VOID_ARG void
 #define STD_SIZE size_t
 

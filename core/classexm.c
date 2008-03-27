@@ -237,7 +237,7 @@ globle void EnvDescribeClass(
         maxSlotNameLength = 16;
       if (maxOverrideMessageLength > 12)
         maxOverrideMessageLength = 12;
-#if WIN_MVC
+#if WIN_MVC || WIN_BTC
       gensprintf(slotNamePrintFormat,"%%-%Id.%Ids : ",maxSlotNameLength,maxSlotNameLength);
       gensprintf(overrideMessagePrintFormat,"%%-%Id.%Ids ",maxOverrideMessageLength,
                                               maxOverrideMessageLength);

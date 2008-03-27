@@ -193,15 +193,15 @@ typedef struct  LINE {
 typedef struct  {
         short   t_nrow;                 /* Number of rows.              */
         short   t_ncol;                 /* Number of columns.           */
-        VOID    (*t_open)(void);        /* Open terminal at the start.  */
-        VOID    (*t_close)(void);       /* Close terminal at end.       */
+        void    (*t_open)(void);        /* Open terminal at the start.  */
+        void    (*t_close)(void);       /* Close terminal at end.       */
         int     (*t_getchar)(void);     /* Get character from keyboard. */
-        VOID    (*t_putchar)(int);      /* Put character to display.    */
-        VOID    (*t_flush)(void);       /* Flush output buffers.        */
-        VOID    (*t_move)(int,int);     /* Move the cursor, origin 0.   */
-        VOID    (*t_eeol)(void);        /* Erase to end of line.        */
-        VOID    (*t_eeop)(void);        /* Erase to end of page.        */
-        VOID    (*t_beep)(void);        /* Beep.                        */
+        void    (*t_putchar)(int);      /* Put character to display.    */
+        void    (*t_flush)(void);       /* Flush output buffers.        */
+        void    (*t_move)(int,int);     /* Move the cursor, origin 0.   */
+        void    (*t_eeol)(void);        /* Erase to end of line.        */
+        void    (*t_eeop)(void);        /* Erase to end of page.        */
+        void    (*t_beep)(void);        /* Beep.                        */
 }       TERM;
 
 
@@ -285,10 +285,10 @@ LOCALE int ffwopen(char *);
 LOCALE int ffclose(void);
 LOCALE int ffputline(char [],int);
 LOCALE int ffgetline(char [],int);
-LOCALE VOID ttopen(void);
-LOCALE VOID ttclose(void);
-LOCALE VOID ttputc(int);
-LOCALE VOID ttflush(void);
+LOCALE void ttopen(void);
+LOCALE void ttclose(void);
+LOCALE void ttputc(int);
+LOCALE void ttflush(void);
 LOCALE int ttgetc(void);
 
 #if VAX_VMS
@@ -302,7 +302,7 @@ LOCALE int parse_esc_seq(void);
 #define LOCALE extern
 #endif
 
-LOCALE VOID edinit(void *,char []);
+LOCALE void edinit(void *,char []);
 LOCALE int execute(void *,int,int,int);
 LOCALE int getkey(void);
 LOCALE int getctl(void);
@@ -313,12 +313,12 @@ LOCALE int ctlxlp(void *,int,int);
 LOCALE int ctlxrp(void *,int,int);
 LOCALE int ctlxe(void *,int,int);
 LOCALE int ctrlg(void *,int,int);
-LOCALE VOID full_cleanup(void *);
+LOCALE void full_cleanup(void *);
 LOCALE int kill_all_buffers(void *,BUFFER **);
 LOCALE int kill_all_windows(void *);
 LOCALE int spec_clear(void *,BUFFER *);
-LOCALE VOID EditCommand(void *);
-LOCALE VOID EditorFunctionDefinition(void *);
+LOCALE void EditCommand(void *);
+LOCALE void EditorFunctionDefinition(void *);
 
 #ifndef _EDMAIN_SOURCE_
 
@@ -361,8 +361,8 @@ LOCALE int buffer_getc(void *,char *);
 LOCALE int buffer_ungetc(void *,int,char *);
 LOCALE int query_cmp(void *,char *);
 LOCALE int print_cmp(void *,char *,char *);
-LOCALE VOID init_cmp_router(void *);
-LOCALE VOID kill_cmp_router(void *);
+LOCALE void init_cmp_router(void *);
+LOCALE void kill_cmp_router(void *);
 LOCALE int setfillcol(void *,int,int);
 LOCALE int showcpos(void *,int,int);
 LOCALE int getccol(int);
@@ -415,13 +415,13 @@ LOCALE int anycb(void);
 LOCALE BUFFER *bfind(void *,char *,int,int);
 LOCALE int bclear(void *,BUFFER *);
 LOCALE LINE *lalloc(void *,int);
-LOCALE VOID lfree(void *,LINE *);
-LOCALE VOID lchange(int);
+LOCALE void lfree(void *,LINE *);
+LOCALE void lchange(int);
 LOCALE int linsert(void *,int,int);
 LOCALE int lnewline(void *);
 LOCALE int ldelete(void *,long,int);
 LOCALE int ldelnewline(void *);
-LOCALE VOID kdelete(void *);
+LOCALE void kdelete(void *);
 LOCALE int kinsert(void *,int);
 LOCALE int kremove(int);
 LOCALE int reposition(void *,int,int);
@@ -435,23 +435,23 @@ LOCALE int splitwind(void *,int,int);
 LOCALE int enlargewind(void *,int,int);
 LOCALE int shrinkwind(void *,int,int);
 LOCALE WINDOW *wpopup(void *);
-LOCALE VOID vtinit(void *);
-LOCALE VOID vttidy(void);
-LOCALE VOID vtmove(int,int);
-LOCALE VOID vtputc(int);
-LOCALE VOID vteeol(void);
-LOCALE VOID update(void);
-LOCALE VOID updateline(int,char [],char []);
-LOCALE VOID modeline(WINDOW *);
-LOCALE VOID movecursor(int,int);
-LOCALE VOID mlerase(void);
+LOCALE void vtinit(void *);
+LOCALE void vttidy(void);
+LOCALE void vtmove(int,int);
+LOCALE void vtputc(int);
+LOCALE void vteeol(void);
+LOCALE void update(void);
+LOCALE void updateline(int,char [],char []);
+LOCALE void modeline(WINDOW *);
+LOCALE void movecursor(int,int);
+LOCALE void mlerase(void);
 LOCALE int mlyesno(void *,char *);
 LOCALE int mlreply(void *,char *,char *,int);
-LOCALE VOID mlwrite(char *,...);
-LOCALE VOID mlputs(char *);
-LOCALE VOID mlputi(int,int);
-LOCALE VOID mlputli(long,int);
-LOCALE VOID kill_video_buffers(void *);
+LOCALE void mlwrite(char *,...);
+LOCALE void mlputs(char *);
+LOCALE void mlputi(int,int);
+LOCALE void mlputli(long,int);
+LOCALE void kill_video_buffers(void *);
 
 #ifndef _EDSTRUCT_SOURCE_
 extern int     mpresf;

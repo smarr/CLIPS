@@ -122,12 +122,14 @@ struct lists
 #define BFORMAT "%d%1s%12s%s"   /*Format string for sscanf*/
 #define LIT_DELIM ('$')
 
+/*
 #if WIN_BTC
 #define OPEN_READ "rb"
 #else
 #define OPEN_READ "r"
 #endif
-
+*/
+#define OPEN_READ "r"
 
 #define TEXTPRO_DATA 8
 

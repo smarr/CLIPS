@@ -196,7 +196,10 @@ static int GetcFile(
 
    fptr = FindFptr(theEnv,logicalName);
 
-   theChar = getc(fptr);
+   if (fptr == stdin)
+     { theChar = gengetchar(theEnv); }
+   else
+     { theChar = getc(fptr); }
 
    /*=================================================*/
    /* The following code prevents Control-D on UNIX   */
@@ -219,7 +222,11 @@ static int UngetcFile(
    FILE *fptr;
 
    fptr = FindFptr(theEnv,logicalName);
-   return(ungetc(ch,fptr));
+   
+   if (fptr == stdin)
+     { return(genungetchar(theEnv,ch)); }
+   else
+     { return(ungetc(ch,fptr)); }
   }
 
 /*********************************************************/

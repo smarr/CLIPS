@@ -98,6 +98,8 @@
    LOCALE char                       *genstrncat(char *,const char *,size_t);
    LOCALE void                        SetJmpBuffer(void *,jmp_buf *);
    LOCALE void                        genprintfile(void *,FILE *,char *);
+   LOCALE int                         gengetchar(void *);
+   LOCALE int                         genungetchar(void *,int);
    
 #if WIN_BTC
    LOCALE __int64 _RTLENTRY _EXPFUNC  strtoll(const char *,char **,int);
