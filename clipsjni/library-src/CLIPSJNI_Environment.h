@@ -161,6 +161,14 @@ JNIEXPORT void JNICALL Java_CLIPSJNI_Environment_commandLoop
 
 /*
  * Class:     CLIPSJNI_Environment
+ * Method:    getInputBufferCount
+ * Signature: ()J
+ */
+JNIEXPORT jlong JNICALL Java_CLIPSJNI_Environment_getInputBufferCount
+  (JNIEnv *, jobject, jlong);
+
+/*
+ * Class:     CLIPSJNI_Environment
  * Method:    addRouter
  * Signature: (JLjava/lang/String;ILCLIPSJNI/Router;)Z
  */

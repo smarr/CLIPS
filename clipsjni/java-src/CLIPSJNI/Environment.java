@@ -1,8 +1,6 @@
 
 package CLIPSJNI;
 
-import CLIPSJNI.Router;
-
 public class Environment
   {
    private static final String CLIPSJNI_VERSION = "0.1";
@@ -302,6 +300,19 @@ public class Environment
    public void commandLoop()
      {
       commandLoop(theEnvironment);
+     }
+
+   /************************/
+   /* getInputBufferCount: */
+   /************************/
+   private native long getInputBufferCount(long env);
+
+   /************************/
+   /* getInputBufferCount: */
+   /************************/
+   public long getInputBufferCount()
+     {
+      return getInputBufferCount(theEnvironment);
      }
 
    /**************/
