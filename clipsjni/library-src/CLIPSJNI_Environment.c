@@ -641,11 +641,12 @@ JNIEXPORT jobject JNICALL Java_CLIPSJNI_Environment_eval(
   {
    DATA_OBJECT theDO;
    jobject result = NULL;
+   const char *cEvalStr;
    void *theCLIPSEnv = JLongToPointer(clipsEnv);
 
    SetEnvironmentContext(theCLIPSEnv,(void *) env);
    
-   const char *cEvalStr = (*env)->GetStringUTFChars(env,evalStr,NULL);
+   cEvalStr = (*env)->GetStringUTFChars(env,evalStr,NULL);
    
    EnvEval(theCLIPSEnv,(char *) cEvalStr,&theDO);
 
