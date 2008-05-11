@@ -8,21 +8,21 @@ import java.awt.event.*;
  
 import CLIPSJNI.*;
 
-class CLIPSTerminal
+class CLIPSTerminal implements ActionListener
   {  
    private JFrame jfrm;
          
    private Environment clips;
    
    private Thread executionThread;
+
+   private JTextAreaCommandPromptRouter jta;
       
    /***************/
    /* CLIPSTerminal */
    /***************/
    CLIPSTerminal()
      {  
-      JTextAreaRouter jta;
-      
       /*===================================*/
       /* Create a new JFrame container and */
       /* assign a layout manager to it.    */
@@ -49,7 +49,11 @@ class CLIPSTerminal
  
       clips = new Environment();
       try
-        { jta = new JTextAreaRouter(clips); }
+        { 
+         jta = new JTextAreaCommandPromptRouter(clips); 
+         jta.getJTextArea().setFont(new Font("Monospaced", Font.PLAIN, 12));
+         jta.getJTextArea().setMargin(new Insets(5,5,5,0));
+        }
       catch (Exception e)
         { 
          e.printStackTrace();
@@ -70,19 +74,84 @@ class CLIPSTerminal
       
       jfrm.getContentPane().add(jscrlp); 
             
+      /*=================================================*/
+      /* Get KeyStroke for copy/paste keyboard commands. */
+      /*=================================================*/
+
+      KeyStroke copy = KeyStroke.getKeyStroke(KeyEvent.VK_C,KeyEvent.CTRL_MASK);
+      KeyStroke paste = KeyStroke.getKeyStroke(KeyEvent.VK_V,KeyEvent.CTRL_MASK);
+
+      /*==========================================================*/
+      /* Override copy/paste for the JTextAreaCommandPromptRouter */
+      /* so that we can later define our own menu accelerators.   */
+      /*==========================================================*/
+
+      String actionKey = "none";
+      InputMap map = jta.getJTextArea().getInputMap();
+      map.put(copy,actionKey);
+      map.put(paste,actionKey);
+
+      /*======================*/
+      /* Create the menu bar. */
+      /*======================*/
+      
+      JMenuBar jmb = new JMenuBar();
+      
+      JMenu jmEdit = new JMenu("Edit");
+      JMenuItem jmiCopy = new JMenuItem("Copy",KeyEvent.VK_C);
+      JMenuItem jmiPaste = new JMenuItem("Paste",KeyEvent.VK_V);
+      
+      jmiCopy.setAccelerator(copy);
+      jmiPaste.setAccelerator(paste);
+      
+      jmiCopy.addActionListener(this);
+      jmiPaste.addActionListener(this);
+      
+      jmEdit.add(jmiCopy);
+      jmEdit.add(jmiPaste);
+      jmb.add(jmEdit);
+      
+      jfrm.setJMenuBar(jmb);
+      
       /*====================*/
       /* Display the frame. */
       /*====================*/
 
       jfrm.pack();
       jfrm.setVisible(true);  
-      
-      /*======================================*/
-      /* Start the CLIPS command loop thread. */
-      /*======================================*/
-      
-      startCLIPS();
      }  
+     
+   /*########################*/
+   /* ActionListener Methods */
+   /*########################*/
+
+   /*******************/
+   /* actionPerformed */
+   /*******************/  
+   public void actionPerformed(
+     ActionEvent ae) 
+     {
+      try
+        { onActionPerformed(ae); }
+      catch (Exception e)
+        { e.printStackTrace(); }
+     }
+
+   /*********************/
+   /* onActionPerformed */
+   /*********************/  
+   public void onActionPerformed(
+     ActionEvent ae) throws Exception 
+     {      
+      /*==========================*/
+      /* Handle the Clear button. */
+      /*==========================*/
+
+      if (ae.getActionCommand().equals("Copy"))  
+        { jta.copy(); }
+      else if (ae.getActionCommand().equals("Paste"))  
+        { jta.paste(); }
+     }
      
    /********/
    /* main */
@@ -99,21 +168,4 @@ class CLIPSTerminal
            public void run() { new CLIPSTerminal(); }  
           });   
      }  
-  
-   /**************/
-   /* startCLIPS */
-   /**************/  
-   public void startCLIPS()
-     {
-      Runnable runThread = 
-         new Runnable()
-           {
-            public void run()
-              { clips.commandLoop(); }
-           };
-      
-      executionThread = new Thread(runThread);
-      
-      executionThread.start();
-     }
   }

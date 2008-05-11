@@ -302,6 +302,33 @@ public class Environment
       commandLoop(theEnvironment);
      }
 
+   /*******************/
+   /* getInputBuffer: */
+   /*******************/
+   private native String getInputBuffer(long env);
+
+   /*******************/
+   /* getInputBuffer: */
+   /*******************/
+   public String getInputBuffer()
+     {
+      return getInputBuffer(theEnvironment);
+     }
+
+   /*******************/
+   /* setInputBuffer: */
+   /*******************/
+   private native void setInputBuffer(long env,String theString);
+
+   /*******************/
+   /* setInputBuffer: */
+   /*******************/
+   public void setInputBuffer(
+     String theString)
+     {
+      setInputBuffer(theEnvironment,theString);
+     }
+
    /************************/
    /* getInputBufferCount: */
    /************************/
@@ -313,6 +340,100 @@ public class Environment
    public long getInputBufferCount()
      {
       return getInputBufferCount(theEnvironment);
+     }
+
+   /************************/
+   /* setInputBufferCount: */
+   /************************/
+   private native long setInputBufferCount(long env,long theValue);
+
+   /************************/
+   /* setInputBufferCount: */
+   /************************/
+   public long setInputBufferCount(
+     long theValue)
+     {
+      return setInputBufferCount(theEnvironment,theValue);
+     }
+
+   /**********************/
+   /* expandInputBuffer: */
+   /**********************/
+   private native void expandInputBuffer(long env,char theChar);
+
+   /**********************/
+   /* expandInputBuffer: */
+   /**********************/
+   public void expandInputBuffer(
+     char theChar)
+     {
+      expandInputBuffer(theEnvironment,theChar);
+     }
+
+   /**********************/
+   /* appendInputBuffer: */
+   /**********************/
+   private native void appendInputBuffer(long env,String theString);
+
+   /**********************/
+   /* appendInputBuffer: */
+   /**********************/
+   public void appendInputBuffer(
+     String theString)
+     {
+      appendInputBuffer(theEnvironment,theString);
+     }
+
+   /*******************************/
+   /* inputBufferContainsCommand: */
+   /*******************************/
+   private native boolean inputBufferContainsCommand(long env);
+
+   /*******************************/
+   /* inputBufferContainsCommand: */
+   /*******************************/
+   public boolean inputBufferContainsCommand()
+     {
+      return inputBufferContainsCommand(theEnvironment);
+     }
+
+   /*****************************/
+   /* commandLoopOnceThenBatch: */
+   /*****************************/
+   private native void commandLoopOnceThenBatch(long env);
+    
+   /*****************************/
+   /* commandLoopOnceThenBatch: */
+   /*****************************/
+   public void commandLoopOnceThenBatch()
+     {
+      commandLoopOnceThenBatch(theEnvironment);
+     }
+
+   /****************/
+   /* printBanner: */
+   /****************/
+   private native void printBanner(long env);
+    
+   /****************/
+   /* printBanner: */
+   /****************/
+   public void printBanner()
+     {
+      printBanner(theEnvironment);
+     }
+
+   /****************/
+   /* printPrompt: */
+   /****************/
+   private native void printPrompt(long env);
+    
+   /****************/
+   /* printPrompt: */
+   /****************/
+   public void printPrompt()
+     {
+      printPrompt(theEnvironment);
      }
 
    /**************/

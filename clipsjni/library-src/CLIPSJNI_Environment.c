@@ -1125,6 +1125,108 @@ JNIEXPORT void JNICALL Java_CLIPSJNI_Environment_commandLoop(
    CommandLoop(JLongToPointer(clipsEnv));
   }
 
+/****************************************************************/
+/* Java_CLIPSJNI_Environment_commandLoopOnceThenBatch: Native   */
+/*   function for the CLIPSJNI commandLoopOnceThenBatch method. */
+/*                                                              */
+/* Class:     CLIPSJNI_Environment                              */
+/* Method:    commandLoopOnceThenBatch                          */
+/* Signature: (J)V                                              */
+/****************************************************************/
+JNIEXPORT void JNICALL Java_CLIPSJNI_Environment_commandLoopOnceThenBatch(
+  JNIEnv *env,
+  jobject obj,
+  jlong clipsEnv)
+  {
+   SetEnvironmentContext(JLongToPointer(clipsEnv),(void *) env);
+
+   CommandLoopOnceThenBatch(JLongToPointer(clipsEnv));
+  }
+
+/***************************************************/
+/* Java_CLIPSJNI_Environment_printBanner: Native   */
+/*   function for the CLIPSJNI printBanner method. */
+/*                                                 */
+/* Class:     CLIPSJNI_Environment                 */
+/* Method:    printBanner                          */
+/* Signature: (J)V                                 */
+/***************************************************/
+JNIEXPORT void JNICALL Java_CLIPSJNI_Environment_printBanner(
+  JNIEnv *env,
+  jobject obj,
+  jlong clipsEnv)
+  {
+   SetEnvironmentContext(JLongToPointer(clipsEnv),(void *) env);
+
+   PrintBanner(JLongToPointer(clipsEnv));
+  }
+
+/***************************************************/
+/* Java_CLIPSJNI_Environment_printPrompt: Native   */
+/*   function for the CLIPSJNI printPrompt method. */
+/*                                                 */
+/* Class:     CLIPSJNI_Environment                 */
+/* Method:    printPrompt                          */
+/* Signature: (J)V                                 */
+/***************************************************/
+JNIEXPORT void JNICALL Java_CLIPSJNI_Environment_printPrompt(
+  JNIEnv *env,
+  jobject obj,
+  jlong clipsEnv)
+  {
+   SetEnvironmentContext(JLongToPointer(clipsEnv),(void *) env);
+
+   PrintPrompt(JLongToPointer(clipsEnv));
+  }
+
+/******************************************************/
+/* Java_CLIPSJNI_Environment_getInputBuffer: Native   */
+/*   function for the CLIPSJNI getInputBuffer method. */
+/*                                                    */
+/* Class:     CLIPSJNI_Environment                    */
+/* Method:    getInputBuffer                          */
+/* Signature: (J)Ljava/lang/String;                   */
+/******************************************************/
+JNIEXPORT jstring JNICALL Java_CLIPSJNI_Environment_getInputBuffer(
+  JNIEnv *env, 
+  jobject obj, 
+  jlong clipsEnv)
+  {
+   char *command;
+   
+   SetEnvironmentContext(JLongToPointer(clipsEnv),(void *) env);
+
+   command = GetCommandString(JLongToPointer(clipsEnv));
+   
+   if (command == NULL)
+     { return (*env)->NewStringUTF(env,""); }
+     
+   return (*env)->NewStringUTF(env,GetCommandString(JLongToPointer(clipsEnv)));
+  }
+
+/******************************************************/
+/* Java_CLIPSJNI_Environment_setInputBuffer: Native   */
+/*   function for the CLIPSJNI setInputBuffer method. */
+/*                                                    */
+/* Class:     CLIPSJNI_Environment                    */
+/* Method:    setInputBuffer                          */
+/* Signature: (JLjava/lang/String;)V                  */
+/******************************************************/
+JNIEXPORT void JNICALL Java_CLIPSJNI_Environment_setInputBuffer(
+  JNIEnv *env, 
+  jobject obj,
+  jlong clipsEnv,
+  jstring command)
+  {
+   const char *cCommand = (*env)->GetStringUTFChars(env,command,NULL);
+
+   SetEnvironmentContext(JLongToPointer(clipsEnv),(void *) env);
+
+   SetCommandString(JLongToPointer(clipsEnv),(char *) cCommand);
+   
+   (*env)->ReleaseStringUTFChars(env,command,cCommand);
+  }
+
 /***********************************************************/
 /* Java_CLIPSJNI_Environment_getInputBufferCount: Native   */
 /*   function for the CLIPSJNI getInputBufferCount method. */
@@ -1142,8 +1244,92 @@ JNIEXPORT jlong JNICALL Java_CLIPSJNI_Environment_getInputBufferCount(
 
    return RouterData(JLongToPointer(clipsEnv))->CommandBufferInputCount;
   }
+
+/***********************************************************/
+/* Java_CLIPSJNI_Environment_setInputBufferCount: Native   */
+/*   function for the CLIPSJNI setInputBufferCount method. */
+/*                                                         */
+/* Class:     CLIPSJNI_Environment                         */
+/* Method:    setInputBufferCount                          */
+/* Signature: (JJ)J                                        */
+/***********************************************************/
+JNIEXPORT jlong JNICALL Java_CLIPSJNI_Environment_setInputBufferCount(
+  JNIEnv *env,
+  jobject obj,
+  jlong clipsEnv,
+  jlong theValue)
+  {
+   jlong rv;
+   
+   SetEnvironmentContext(JLongToPointer(clipsEnv),(void *) env);
+
+   rv = RouterData(JLongToPointer(clipsEnv))->CommandBufferInputCount;
+   
+   RouterData(JLongToPointer(clipsEnv))->CommandBufferInputCount = theValue;
+   
+   return rv;
+  }
+
+/*********************************************************/
+/* Java_CLIPSJNI_Environment_appendInputBuffer: Native   */
+/*   function for the CLIPSJNI appendInputBuffer method. */
+/*                                                       */
+/* Class:     CLIPSJNI_Environment                       */
+/* Method:    appendInputBuffer                          */
+/* Signature: (JLjava/lang/String;)V                     */
+/*********************************************************/
+JNIEXPORT void JNICALL Java_CLIPSJNI_Environment_appendInputBuffer(
+  JNIEnv *env,
+  jobject obj,
+  jlong clipsEnv,
+  jstring commandString)
+  {
+   const char *cCommandString = (*env)->GetStringUTFChars(env,commandString,NULL);
+   
+   SetEnvironmentContext(JLongToPointer(clipsEnv),(void *) env);
+   
+   AppendCommandString(JLongToPointer(clipsEnv),(char *) cCommandString);
+
+   (*env)->ReleaseStringUTFChars(env,commandString,cCommandString);
+  }
+
+/*********************************************************/
+/* Java_CLIPSJNI_Environment_expandInputBuffer: Native   */
+/*   function for the CLIPSJNI expandInputBuffer method. */
+/*                                                       */
+/* Class:     CLIPSJNI_Environment                       */
+/* Method:    expandInputBuffer                          */
+/* Signature: (JC)V                                      */
+/*********************************************************/
+JNIEXPORT void JNICALL Java_CLIPSJNI_Environment_expandInputBuffer(
+  JNIEnv *env,
+  jobject obj,
+  jlong clipsEnv,
+  jchar theChar)
+  {
+   SetEnvironmentContext(JLongToPointer(clipsEnv),(void *) env);
+   
+   ExpandCommandString(JLongToPointer(clipsEnv),(int) theChar);
+  }
+
+/******************************************************************/
+/* Java_CLIPSJNI_Environment_inputBufferContainsCommand: Native   */
+/*   function for the CLIPSJNI inputBufferContainsCommand method. */
+/*                                                                */
+/* Class:     CLIPSJNI_Environment                                */
+/* Method:    inputBufferContainsCommand                          */
+/* Signature: (J)Z                                                */
+/******************************************************************/
+JNIEXPORT jboolean JNICALL Java_CLIPSJNI_Environment_inputBufferContainsCommand(
+  JNIEnv *env,
+  jobject obj, 
+  jlong clipsEnv)
+  {
+   SetEnvironmentContext(JLongToPointer(clipsEnv),(void *) env);
   
-  
+   return (jboolean) CommandCompleteAndNotEmpty(JLongToPointer(clipsEnv));
+  }
+
 /*******************************************************/
 /* Java_CLIPSJNI_Environment_addRouter: Native         */
 /*   function for the CLIPSJNI addRouter method.       */

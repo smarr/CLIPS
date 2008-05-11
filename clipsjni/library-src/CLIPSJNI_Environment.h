@@ -161,10 +161,82 @@ JNIEXPORT void JNICALL Java_CLIPSJNI_Environment_commandLoop
 
 /*
  * Class:     CLIPSJNI_Environment
+ * Method:    getInputBuffer
+ * Signature: (J)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_CLIPSJNI_Environment_getInputBuffer
+  (JNIEnv *, jobject, jlong);
+
+/*
+ * Class:     CLIPSJNI_Environment
+ * Method:    setInputBuffer
+ * Signature: (JLjava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_CLIPSJNI_Environment_setInputBuffer
+  (JNIEnv *, jobject, jlong, jstring);
+
+/*
+ * Class:     CLIPSJNI_Environment
  * Method:    getInputBufferCount
- * Signature: ()J
+ * Signature: (J)J
  */
 JNIEXPORT jlong JNICALL Java_CLIPSJNI_Environment_getInputBufferCount
+  (JNIEnv *, jobject, jlong);
+
+/*
+ * Class:     CLIPSJNI_Environment
+ * Method:    setInputBufferCount
+ * Signature: (JJ)J
+ */
+JNIEXPORT jlong JNICALL Java_CLIPSJNI_Environment_setInputBufferCount
+  (JNIEnv *, jobject, jlong, jlong);
+
+/*
+ * Class:     CLIPSJNI_Environment
+ * Method:    expandInputBuffer
+ * Signature: (JC)V
+ */
+JNIEXPORT void JNICALL Java_CLIPSJNI_Environment_expandInputBuffer
+  (JNIEnv *, jobject, jlong, jchar);
+
+/*
+ * Class:     CLIPSJNI_Environment
+ * Method:    appendInputBuffer
+ * Signature: (JLjava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_CLIPSJNI_Environment_appendInputBuffer
+  (JNIEnv *, jobject, jlong, jstring);
+
+/*
+ * Class:     CLIPSJNI_Environment
+ * Method:    inputBufferContainsCommand
+ * Signature: (J)Z
+ */
+JNIEXPORT jboolean JNICALL Java_CLIPSJNI_Environment_inputBufferContainsCommand
+  (JNIEnv *, jobject, jlong);
+
+/*
+ * Class:     CLIPSJNI_Environment
+ * Method:    commandLoopOnceThenBatch
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_CLIPSJNI_Environment_commandLoopOnceThenBatch
+  (JNIEnv *, jobject, jlong);
+
+/*
+ * Class:     CLIPSJNI_Environment
+ * Method:    printBanner
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_CLIPSJNI_Environment_printBanner
+  (JNIEnv *, jobject, jlong);
+
+/*
+ * Class:     CLIPSJNI_Environment
+ * Method:    printPrompt
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_CLIPSJNI_Environment_printPrompt
   (JNIEnv *, jobject, jlong);
 
 /*

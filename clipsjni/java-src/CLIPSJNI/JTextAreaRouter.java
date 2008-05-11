@@ -10,9 +10,9 @@ import java.io.InputStreamReader;
 
 public class JTextAreaRouter implements Router, KeyListener
   {  
-   private Environment clips;
-   private JTextArea jta;
-   private StringBuffer buffer; 
+   protected Environment clips;
+   protected JTextArea jta;
+   protected StringBuffer buffer; 
    private boolean expectingInput;
    private int charInput;
    private long bufferInputCount;
@@ -24,6 +24,12 @@ public class JTextAreaRouter implements Router, KeyListener
    private int curChar;
    private int char2;
    private int char3;
+   
+   private int maxLines;
+   
+   String readInputBuffer;
+   int readInputLength;
+   int readInputPosition;
       
    /*******************/
    /* JTextAreaRouter */
@@ -35,10 +41,7 @@ public class JTextAreaRouter implements Router, KeyListener
       expectingInput = false;
       
       jta = new JTextArea();
-      
-      jta.setFont(new Font("Monospaced", Font.PLAIN, 12));
       jta.setEditable(false);
-      jta.setMargin(new Insets(5,5,5,0));
       jta.addKeyListener(this);
       
       buffer = new StringBuffer(); 
@@ -47,6 +50,12 @@ public class JTextAreaRouter implements Router, KeyListener
       numChar = 0;
       curChar = 0;
       theReader = new InputStreamReader(System.in,"UTF-8");
+      
+      maxLines = 1000;
+      
+      readInputBuffer = null;
+      readInputLength = 0;
+      readInputPosition = 0;
      }  
   
   /* Should following methods be public? */
@@ -59,10 +68,10 @@ public class JTextAreaRouter implements Router, KeyListener
    public void keyPressed(KeyEvent e) 
      {
       /* if (! expectingInput) return; */
-
-      /* if (e.getID() != KeyEvent.KEY_TYPED) return; */
       
-      /* if ((e.getModifiers() & (KeyEvent.ALT_MASK | KeyEvent.CTRL_MASK | KeyEvent.META_MASK)) != 0) return; */
+      if (e.getID() != KeyEvent.KEY_PRESSED) return;
+      
+      if ((e.getModifiers() & (KeyEvent.ALT_MASK | KeyEvent.CTRL_MASK | KeyEvent.META_MASK)) != 0) return;
 
       e.consume();
      }
@@ -71,9 +80,9 @@ public class JTextAreaRouter implements Router, KeyListener
      { 
       /* if (! expectingInput) return; */
 
-      /* if (e.getID() != KeyEvent.KEY_TYPED) return; */
+      if (e.getID() != KeyEvent.KEY_RELEASED) return;
       
-      /* if ((e.getModifiers() & (KeyEvent.ALT_MASK | KeyEvent.CTRL_MASK | KeyEvent.META_MASK)) != 0) return; */
+      if ((e.getModifiers() & (KeyEvent.ALT_MASK | KeyEvent.CTRL_MASK | KeyEvent.META_MASK)) != 0) return;
 
       e.consume();
      }
@@ -88,7 +97,7 @@ public class JTextAreaRouter implements Router, KeyListener
       
          if (id != KeyEvent.KEY_TYPED) return;
 
-         /* if ((e.getModifiers() & (KeyEvent.ALT_MASK | KeyEvent.CTRL_MASK | KeyEvent.META_MASK)) != 0) return; */
+         if ((e.getModifiers() & (KeyEvent.ALT_MASK | KeyEvent.CTRL_MASK | KeyEvent.META_MASK)) != 0) return;
                   
          char c = e.getKeyChar();
 
@@ -109,11 +118,11 @@ public class JTextAreaRouter implements Router, KeyListener
            }
          
          e.consume();
-         
+                  
          notify();
         }
      }
-
+     
    /****************/
    /* getPriority: */
    /****************/
@@ -157,7 +166,45 @@ public class JTextAreaRouter implements Router, KeyListener
      String routerName,
      String printString)
      {
+      readInputBuffer = null;
+      readInputLength = 0;
+      readInputPosition = 0;
+
       bufferAppend(printString);
+     }
+
+   /***********************/
+   /* setReadInputBuffer: */
+   /***********************/
+   public synchronized void setReadInputBuffer(
+     String bufferString)
+     {
+      if (! expectingInput) return;
+      
+      if (readInputBuffer == null)
+        { 
+         readInputBuffer = bufferString; 
+         readInputLength = readInputBuffer.length();
+         readInputPosition = 0;
+        }
+      else
+        {
+         readInputBuffer = readInputBuffer.concat(bufferString);
+         readInputLength = readInputBuffer.length();
+        }
+        
+      if (readInputPosition < readInputLength)
+        {
+         charInput = readInputBuffer.charAt(readInputPosition++);
+
+         notify();
+        }
+      else
+        {
+         readInputBuffer = null; 
+         readInputLength = 0;
+         readInputPosition = 0;
+        }
      }
   
    /*****************/
@@ -197,6 +244,18 @@ public class JTextAreaRouter implements Router, KeyListener
      {    
       jta.append(buffer.toString());
       buffer = new StringBuffer(); 
+      
+      if (jta.getLineCount() > maxLines)
+        {
+         try
+           {
+            int beginOffset = jta.getLineStartOffset(0);
+            int endOffset = jta.getLineStartOffset(jta.getLineCount() - maxLines);
+            jta.replaceRange("",beginOffset,endOffset);
+           }
+         catch (Exception e)
+           { e.printStackTrace(); }
+        }
      }
      
    /************/
@@ -206,6 +265,7 @@ public class JTextAreaRouter implements Router, KeyListener
      String routerName)
      {
       int rv = -1;
+      int readInputChar = -1;
       
       if (ungotten)
         {
@@ -224,43 +284,56 @@ public class JTextAreaRouter implements Router, KeyListener
          return rv;
         }
 
-      synchronized(this)
+      if ((readInputBuffer != null) &&
+          (readInputPosition < readInputLength))
+        { charInput = readInputBuffer.charAt(readInputPosition++); }
+      else
         {
-         expectingInput = true;
-         bufferInputCount = clips.getInputBufferCount();
-         try
-           { 
-            wait(); 
-            
-            if (charInput <= 127)
+         synchronized(this)
+           {
+            expectingInput = true;
+            bufferInputCount = clips.getInputBufferCount();
+            try
               { 
-               numChar = 1;
-               curChar = 1;
-               return charInput; 
+               wait(); 
+               expectingInput = false;
               }
-            else if ((charInput > 127) && (charInput < 2048)) 
-              {
-               numChar = 2;
-               curChar = 1;
-               char2 = ((charInput & 0x3F) | 0x80);
-               charInput = (((charInput >> 6) & 0x1F) | 0xC0);
-               return charInput;
-              }
-            else
-              {
-               numChar = 3;
-               curChar = 1;
-               char2 = (((charInput >> 6) & 0x3F) | 0x80);
-               char3 = ((charInput & 0x3F) | 0x80);
-               charInput = (((charInput >> 12) & 0x0F) | 0xE0);
-               return charInput;
-              }
+            catch (Exception e)
+              { e.printStackTrace(); }       
            }
-         catch (Exception e)
-           { e.printStackTrace(); }       
         }
-      
-      return -1;
+           
+      if ((readInputBuffer != null) && 
+          (readInputPosition >= readInputLength))
+        {
+         readInputBuffer = null;
+         readInputPosition = 0;
+         readInputLength = 0;
+        }
+        
+      if (charInput <= 127)
+        { 
+         numChar = 1;
+         curChar = 1;
+         return charInput; 
+        }
+      else if ((charInput > 127) && (charInput < 2048)) 
+        {
+         numChar = 2;
+         curChar = 1;
+         char2 = ((charInput & 0x3F) | 0x80);
+         charInput = (((charInput >> 6) & 0x1F) | 0xC0);
+         return charInput;
+        }
+      else
+        {
+         numChar = 3;
+         curChar = 1;
+         char2 = (((charInput >> 6) & 0x3F) | 0x80);
+         char3 = ((charInput & 0x3F) | 0x80);
+         charInput = (((charInput >> 12) & 0x0F) | 0xE0);
+         return charInput;
+        }
      }
 
    /**************/
