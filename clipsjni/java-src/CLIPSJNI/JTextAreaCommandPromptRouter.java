@@ -2,21 +2,26 @@ package CLIPSJNI;
 
 import java.awt.Toolkit;
 import javax.swing.*; 
+import javax.swing.event.CaretEvent; 
+import javax.swing.event.CaretListener; 
 import java.awt.event.*; 
 
 import java.util.List;
 import java.util.ArrayList;
 
-public class JTextAreaCommandPromptRouter extends JTextAreaRouter
+public class JTextAreaCommandPromptRouter extends JTextAreaRouter implements CaretListener
   { 
    private Thread executionThread;
    private boolean isExecuting = false;
    
-   static final int DEFAULT_COMMAND_MAX = 10;
+   static final int DEFAULT_COMMAND_MAX = 25;
    
    int maxCommandCount;
    int currentCommandCount;
    int currentCommand;
+   
+   private int caretOffset;
+   
    ArrayList<String> commandHistory;
    
    /********************************/
@@ -33,10 +38,13 @@ public class JTextAreaCommandPromptRouter extends JTextAreaRouter
       theEnv.setInputBufferCount(0);
       
       jta.getCaret().setVisible(true);
+      jta.addCaretListener(this);
       
       maxCommandCount = DEFAULT_COMMAND_MAX;
       currentCommandCount = 1;
       currentCommand = 0;
+      
+      caretOffset = 0;
       
       commandHistory = new ArrayList<String>(DEFAULT_COMMAND_MAX); 
       commandHistory.add(new String(""));
@@ -80,9 +88,87 @@ public class JTextAreaCommandPromptRouter extends JTextAreaRouter
            else
              { switchCommand(currentCommand,currentCommand - 1); }
           }
-
         }
         
+      /*============================*/
+      /* Handle the left arrow key. */
+      /*============================*/
+      
+      else if ((kc == KeyEvent.VK_LEFT) || (kc == KeyEvent.VK_KP_LEFT))
+        { 
+         String theCommand = clips.getInputBuffer();
+         int commandSize = (int) clips.getInputBufferCount();
+
+         /*=======================================================*/
+         /* The caret can only be moved left if it is not already */
+         /* at the beginning of the current command.              */
+         /*=======================================================*/
+         
+         if (caretOffset < commandSize)
+           {
+            /*=============================================*/
+            /* Move the caret back at least one character. */
+            /*=============================================*/
+            
+            caretOffset++;
+            
+            /*=====================================================*/
+            /* If the shift key is down, continue moving the caret */
+            /* back until the beginning of the line is reached.    */
+            /*=====================================================*/
+            
+            if ((e.getModifiers() & KeyEvent.SHIFT_MASK) != 0)
+              { 
+               while ((caretOffset < commandSize) &&
+                      (theCommand.charAt(commandSize - (caretOffset + 1)) != '\n'))
+                 { caretOffset++; }
+              }
+              
+            /*=====================================*/
+            /* Move the caret to its new position. */
+            /*=====================================*/
+            
+            jta.getCaret().setDot(jta.getText().length() - caretOffset);
+           }
+        }
+      else if ((kc == KeyEvent.VK_RIGHT) || (kc == KeyEvent.VK_KP_RIGHT))
+        { 
+         /*==================================================*/
+         /* The caret can only be moved right if it is not   */
+         /* already at the beginning of the current command. */
+         /*==================================================*/
+
+         if (caretOffset > 0)
+           {
+            String theCommand = clips.getInputBuffer();
+            int commandSize = (int) clips.getInputBufferCount();
+
+            /*================================================*/
+            /* Move the caret forward at least one character. */
+            /*================================================*/
+            
+            caretOffset--;
+            
+            /*=====================================================*/
+            /* If the shift key is down, continue moving the caret */
+            /* forward until the end of the line is reached.       */
+            /*=====================================================*/
+
+            if ((e.getModifiers() & KeyEvent.SHIFT_MASK) != 0)
+              { 
+               while ((caretOffset > 0) &&
+                     (theCommand.charAt(commandSize - caretOffset) != '\n'))
+                { caretOffset--; }
+              }
+              
+            /*=====================================*/
+            /* Move the caret to its new position. */
+            /*=====================================*/
+            
+            jta.getCaret().setDot(jta.getText().length() - caretOffset);
+           }
+        }
+
       e.consume();
      }
      
@@ -256,6 +342,18 @@ public class JTextAreaCommandPromptRouter extends JTextAreaRouter
         }
      }
 
+   /**********/
+   /* print: */
+   /**********/
+   public void print(
+     String routerName,
+     String printString)
+     {
+      caretOffset = 0;
+
+      super.print(routerName,printString);
+     }
+
    /********/
    /* copy */
    /********/
@@ -344,8 +442,6 @@ public class JTextAreaCommandPromptRouter extends JTextAreaRouter
          clips.expandInputBuffer((char) (((theChar >> 6) & 0x3F) | 0x80));
          clips.expandInputBuffer((char) ((theChar & 0x3F) | 0x80));
         }
-        
-      /* System.out.println("inputBufferCount = " + clips.getInputBufferCount()); */
      }
 
    /**********************/
@@ -432,9 +528,7 @@ public class JTextAreaCommandPromptRouter extends JTextAreaRouter
       commandHistory.add(0,new String(""));
       currentCommand = 0;
       currentCommandCount++;
-      
-      System.out.println("updateCommandHistory currentCommand = 0");
-      
+            
       /*=============================================*/
       /* Remove commands at the end of the command   */
       /* history if the maximum number of remembered */
@@ -455,8 +549,6 @@ public class JTextAreaCommandPromptRouter extends JTextAreaRouter
      int oldCommand,
      int newCommand)
      {
-      System.out.println("Switching old = " + oldCommand + " new = " + newCommand);
-      
       /*=============================================*/
       /* Remove the current command from the window. */
       /*=============================================*/
@@ -473,7 +565,7 @@ public class JTextAreaCommandPromptRouter extends JTextAreaRouter
       /* any edits the user made.                     */
       /*==============================================*/
       
-      commandHistory.set(oldCommand,commandHistory.get(newCommand));
+      commandHistory.set(oldCommand,theCommand);
          
       /*======================*/
       /* Use the new command. */
@@ -483,6 +575,20 @@ public class JTextAreaCommandPromptRouter extends JTextAreaRouter
       jta.append(commandHistory.get(newCommand));
       
       currentCommand = newCommand;
+      
+      caretOffset = 0;
+     }
+
+   /**********************/
+   /* showCommandHistory */
+   /**********************/  
+   private void showCommandHistory()
+     {
+      System.out.println("------------");
+      for (int i = 0; i < commandHistory.size(); i++)
+        {
+         System.out.println(i + " " + commandHistory.get(i));
+        }
      }
 
    /******************/
@@ -490,6 +596,8 @@ public class JTextAreaCommandPromptRouter extends JTextAreaRouter
    /******************/  
    public void executeCommand()
      {
+      caretOffset = 0;
+      
       setExecuting(true);
       
       Runnable runThread = 
@@ -507,4 +615,59 @@ public class JTextAreaCommandPromptRouter extends JTextAreaRouter
       executionThread.start();
      }
 
+   /*#######################*/
+   /* CaretListener Methods */
+   /*#######################*/
+
+   /***************/
+   /* caretUpdate */
+   /***************/  
+   public void caretUpdate(
+     CaretEvent e) 
+     {
+      caretUpdateAction(e.getDot(), e.getMark()); 
+     }
+    
+   /*********************/
+   /* caretUpdateAction */
+   /*********************/  
+   protected void caretUpdateAction(
+     final int dot,
+     final int mark) 
+     {
+      SwingUtilities.invokeLater(new Runnable() 
+        {
+         public void run()
+           {
+            /*==============================================*/
+            /* Attempting to move the caret outside of the  */
+            /* text for the current command is not allowed. */
+            /*==============================================*/
+            
+            if (dot == mark) 
+              { 
+               
+               int tl = jta.getText().length();
+               int il = (int) clips.getInputBufferCount();
+               
+               if (dot < (tl -il))
+                 {
+                  caretOffset = il;
+                  jta.getCaret().setDot(tl-il);
+                 }
+               else
+                 { caretOffset = tl - dot; }
+
+               jta.getCaret().setVisible(true);
+              }
+              
+            /*======================================*/
+            /* If text is selected, hide the caret. */
+            /*======================================*/
+            
+            else
+              { jta.getCaret().setVisible(false); }
+           }
+        });
+     }    
   }
