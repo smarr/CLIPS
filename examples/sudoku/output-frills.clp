@@ -50,6 +50,8 @@
    
    =>
    
+   (assert (position-printed ?r ?c))
+   
    (if (> ?s 3)
       then
       (if (> ?v 9)
@@ -66,13 +68,13 @@
 
 (defrule print-position-value-not-found
 
+   (declare (salience -5))
+
    (phase initial-output | final-output)
    
    (print-position ?r ?c)
    
-   (not (and (possible (row ?r) (column ?c) (value ?v))
-   
-             (not (possible (row ?r) (column ?c) (value ~?v)))))
+   (not (position-printed ?r ?c))
              
    (size ?s)
    

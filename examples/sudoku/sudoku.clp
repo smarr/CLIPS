@@ -37,6 +37,11 @@
    (slot size)
    (slot value))
    
+(deftemplate iterate-rc
+   (slot row)
+   (slot column)
+   (slot index))
+   
 (deffacts values
    (size-value (size 1) (value 1))
    (size-value (size 2) (value 2))
@@ -110,6 +115,25 @@
    
    (assert (priority 1)))
 
+
+;;; ****************
+;;; expand-any-start
+;;; ****************
+
+(defrule expand-any-start
+
+   (declare (salience 10))
+
+   (phase expand-any)
+   
+   ?f <- (possible (row ?r) (column ?c) (value any) (group ?g) (id ?id))
+  
+   (not (possible (value any) (id ?id2&:(< ?id2 ?id))))
+      
+   =>
+   
+   (assert (iterate-rc (row ?r) (column ?c) (index 1))))
+
 ;;; **********
 ;;; expand-any
 ;;; **********
@@ -120,23 +144,23 @@
 
    (phase expand-any)
    
-   ?f <- (possible (row ?r) (column ?c) (value any) (group ?g) (id ?id))
+   (possible (row ?r) (column ?c) (value any) (group ?g) (id ?id))
   
    (not (possible (value any) (id ?id2&:(< ?id2 ?id))))
    
    (size ?s)
    
+   ?f <- (iterate-rc (row ?r) (column ?c) (index ?v))
+   
    (size-value (size ?as&:(<= ?as ?s)) (value ?v))
    
    (not (possible (row ?r) (column ?c) (value ?v)))
-  
-   (not (and (size-value (value ?v2&:(< ?v2 ?v)))
-               
-             (not (possible (row ?r) (column ?c) (value ?v2)))))
-   
+     
    =>
    
-   (assert (possible (row ?r) (column ?c) (value ?v) (group ?g) (id ?id))))
+   (assert (possible (row ?r) (column ?c) (value ?v) (group ?g) (id ?id)))
+   
+   (modify ?f (index (+ ?v 1))))
    
 ;;; *****************
 ;;; position-expanded
@@ -148,17 +172,17 @@
 
    (phase expand-any)
    
-   ?f <- (possible (row ?r) (column ?c) (value any) (group ?g) (id ?id))
+   ?f1 <- (possible (row ?r) (column ?c) (value any) (group ?g) (id ?id))
      
    (size ?s)
    
-   (not (and (size-value (size ?as&:(<= ?as ?s)) (value ?v))
+   ?f2 <- (iterate-rc (row ?r) (column ?c) (index ?v))
    
-             (not (possible (row ?r) (column ?c) (value ?v)))))
+   (not (size-value (size ?as&:(<= ?as ?s)) (value ?v)))
 
    =>
    
-   (retract ?f))
+   (retract ?f1 ?f2))
    
 ;;; ###########
 ;;; PHASE RULES

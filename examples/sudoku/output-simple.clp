@@ -48,6 +48,8 @@
    
    =>
    
+   (assert (position-printed ?r ?c))
+   
    (printout t "   row: " ?r " column: " ?c " value: " ?v crlf))
    
 ;;; ******************************
@@ -56,13 +58,13 @@
 
 (defrule print-position-value-not-found
 
+   (declare (salience -5))
+   
    (phase initial-output | final-output)
    
    (print-position ?r ?c)
    
-   (not (and (possible (row ?r) (column ?c) (value ?v))
-   
-             (not (possible (row ?r) (column ?c) (value ~?v)))))
+   (not (position-printed ?r ?c))
              
    (size ?s)
    
