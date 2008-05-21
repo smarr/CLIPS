@@ -25,7 +25,7 @@
       (default floor)) 
    (slot holding 
       (type SYMBOL) 
-      (default nothing)))
+      (default blank)))
 
 (deftemplate thing 
    (slot name 
