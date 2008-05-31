@@ -79,11 +79,11 @@
 #endif
 
 #ifndef CREATION_DATE_STRING
-#define CREATION_DATE_STRING "3/26/08"
+#define CREATION_DATE_STRING "5/31/08"
 #endif
 
 #ifndef BANNER_STRING
-#define BANNER_STRING "         CLIPS (Quicksilver Beta 3/26/08)\n"
+#define BANNER_STRING "         CLIPS (Quicksilver Beta 5/31/08)\n"
 #endif
 
 /*************************/

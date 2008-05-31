@@ -634,6 +634,7 @@ globle unsigned long HashMultifield(
             break;
 
           case FLOAT:
+            fis.liv = 0;
             fis.fv = ValueToDouble(fieldPtr[i].value);
             count += (fis.liv * (i + 29))  +
                      (unsigned long) ValueToDouble(fieldPtr[i].value);

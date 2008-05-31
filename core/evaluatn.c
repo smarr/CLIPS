@@ -991,6 +991,7 @@ unsigned long GetAtomicHashValue(
    switch (type)
      {
       case FLOAT:
+        fis.liv = 0;
         fis.fv = ValueToDouble(value);
         tvalue = fis.liv;
         break;

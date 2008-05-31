@@ -820,6 +820,7 @@ globle unsigned long HashExternalAddress(
       unsigned uv;
      } fis;
  
+   fis.uv = 0;
    fis.vv = theExternalAddress;
    tally = (fis.uv / 256);
    
