@@ -1,3 +1,7 @@
+;;; Version 1.2
+;;; 
+;;; JRules Changes
+
 ;;; Version 1.1
 ;;;
 ;;; Added Unique Rectangles
@@ -5,40 +9,6 @@
 ;;; #######################
 ;;; DEFTEMPLATES & DEFFACTS
 ;;; #######################
-
-(deffacts techniques
-   (technique (name Naked-Single) (priority 1))
-   (technique (name Hidden-Single) (priority 2))
-   (technique (name Locked-Candidate-Single-Line) (priority 3))
-   (technique (name Locked-Candidate-Multiple-Lines) (priority 4))
-   (technique (name Naked-Pairs) (priority 5))
-   (technique (name Hidden-Pairs) (priority 6))
-   (technique (name X-Wing) (priority 7))
-   (technique (name Naked-Triples) (priority 8))
-   (technique (name Hidden-Triples) (priority 9))
-   (technique (name XY-Wing) (priority 10))
-   (technique (name Swordfish) (priority 11))
-   (technique (name Duplicate-Color) (priority 12))
-   (technique (name Color-Conjugate-Pair) (priority 13))
-   (technique (name Multi-Color-Type-1) (priority 14))
-   (technique (name Multi-Color-Type-2) (priority 15))
-   (technique (name Forced-Chain-Convergence) (priority 16))
-   (technique (name Forced-Chain-XY) (priority 17))
-   (technique (name Unique-Rectangle) (priority 18)))
-
-(deffacts color-pairs
-   (color-pair green magenta)
-   (color-pair magenta green)
-   (color-pair orange azure)
-   (color-pair azure orange)
-   (color-pair violet chartruese)
-   (color-pair chartruese violet)
-   (color-pair aquamarine fuchsia)   
-   (color-pair fuchsia aquamarine)   
-   (color-pair yellow blue)
-   (color-pair blue yellow)
-   (color-pair red cyan)
-   (color-pair cyan red))
 
 (deftemplate position-value-color
    (slot row)
@@ -57,6 +27,38 @@
    (slot group)
    (slot id)
    (slot value))
+
+;;; ####################
+;;; INITIALIZATION RULES
+;;; ####################
+
+
+;;; *********************
+;;; initialize-techniques
+;;; *********************
+
+(defrule initialize-techniques
+   
+   =>
+   
+   (assert (technique (name Naked-Single) (rank 1)))
+   (assert (technique (name Hidden-Single) (rank 2)))
+   (assert (technique (name Locked-Candidate-Single-Line) (rank 3)))
+   (assert (technique (name Locked-Candidate-Multiple-Lines) (rank 4)))
+   (assert (technique (name Naked-Pairs) (rank 5)))
+   (assert (technique (name Hidden-Pairs) (rank 6)))
+   (assert (technique (name X-Wing) (rank 7)))
+   (assert (technique (name Naked-Triples) (rank 8)))
+   (assert (technique (name Hidden-Triples) (rank 9)))
+   (assert (technique (name XY-Wing) (rank 10)))
+   (assert (technique (name Swordfish) (rank 11)))
+   (assert (technique (name Duplicate-Color) (rank 12)))
+   (assert (technique (name Color-Conjugate-Pair) (rank 13)))
+   (assert (technique (name Multi-Color-Type-1) (rank 14)))
+   (assert (technique (name Multi-Color-Type-2) (rank 15)))
+   (assert (technique (name Forced-Chain-Convergence) (rank 16)))
+   (assert (technique (name Forced-Chain-XY) (rank 17)))
+   (assert (technique (name Unique-Rectangle) (rank 18))))
    
 ;;; #################
 ;;; ELIMINATION RULES
@@ -66,7 +68,7 @@
 ;;; remove-colors
 ;;; *************
 
-(defrule remove-colors
+(defrule remove-colors ""
 
    (declare (salience 20))
 
@@ -82,7 +84,7 @@
 ;;; remove-chains
 ;;; *************
 
-(defrule remove-chains
+(defrule remove-chains ""
 
    (declare (salience 20))
 
@@ -93,33 +95,79 @@
    =>
    
    (retract ?f))
- 
-;;; *********
-;;; eliminate
-;;; *********
 
-(defrule eliminate
+;;; ***************
+;;; remove-unsolved
+;;; ***************
+   
+(defrule remove-unsolved
+   
+   (declare (salience 20))
+
+   ?f <- (unsolved (row ?r) (column ?c))
+   
+   (possible (row ?r) (column ?c) (value ?v))
+   
+   (not (possible (row ?r) (column ?c) (value ~?v)))
+   
+   =>
+         
+   (retract ?f))
+ 
+;;; **********************
+;;; eliminate-not-employed
+;;; **********************
+
+(defrule eliminate-not-employed
 
    (declare (salience 10))
 
    (phase elimination)
    
-   ?f1 <- (impossible (id ?id) (value ?v) (priority ?p) (reason ?r))
+   ?f1 <- (impossible (id ?id) (value ?v) (rank ?p) (reason ?r))
    
    (not (impossible (id ?id2&:(< ?id2 ?id))))
    
    (not (impossible (id ?id) (value ?v2&:(< ?v2 ?v))))
    
-   (not (impossible (id ?id) (value ?v) (priority ?p2&:(< ?p2 ?p))))
+   (not (impossible (id ?id) (value ?v) (rank ?p2&:(< ?p2 ?p))))
    
    ?f2 <- (possible (id ?id) (value ?v))
+   
+   (not (technique-employed (rank ?p)))
 
    =>
    
    (retract ?f1 ?f2)
    
-   (assert (technique-employed (priority ?p) (reason ?r))))
-      
+   (assert (technique-employed (rank ?p) (reason ?r))))
+
+;;; ******************
+;;; eliminate-employed
+;;; ******************
+
+(defrule eliminate-employed
+
+   (declare (salience 10))
+
+   (phase elimination)
+   
+   ?f1 <- (impossible (id ?id) (value ?v) (rank ?p) (reason ?r))
+   
+   (not (impossible (id ?id2&:(< ?id2 ?id))))
+   
+   (not (impossible (id ?id) (value ?v2&:(< ?v2 ?v))))
+   
+   (not (impossible (id ?id) (value ?v) (rank ?p2&:(< ?p2 ?p))))
+   
+   ?f2 <- (possible (id ?id) (value ?v))
+   
+   (exists (technique-employed (rank ?p)))
+
+   =>
+   
+   (retract ?f1 ?f2))
+  
 ;;; ************
 ;;; remove-extra
 ;;; ************
@@ -170,9 +218,9 @@
 
 (defrule naked-single-group
    
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
-   (technique (name Naked-Single) (priority ?p))
+   (technique (name Naked-Single) (rank ?p))
    
    (possible (value ?v) (group ?g) (id ?id))
    
@@ -180,9 +228,11 @@
    
    (possible (value ?v) (group ?g) (id ?id2&~?id))
    
+   (not (impossible (id ?id2) (value ?v) (rank ?p)))
+   
    =>
    
-   (assert (impossible (id ?id2) (value ?v) (priority ?p) (reason "Naked Single"))))
+   (assert (impossible (id ?id2) (value ?v) (rank ?p) (reason "Naked Single"))))
    
 ;;; ****************
 ;;; naked-single-row
@@ -190,9 +240,9 @@
 
 (defrule naked-single-row
    
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
-   (technique (name Naked-Single) (priority ?p))
+   (technique (name Naked-Single) (rank ?p))
    
    (possible (value ?v) (row ?r) (id ?id))
    
@@ -200,9 +250,11 @@
    
    (possible (value ?v) (row ?r) (id ?id2&~?id))
    
+   (not (impossible (id ?id2) (value ?v) (rank ?p)))
+
    =>
    
-   (assert (impossible (id ?id2) (value ?v) (priority ?p) (reason "Naked Single"))))
+   (assert (impossible (id ?id2) (value ?v) (rank ?p) (reason "Naked Single"))))
    
 ;;; *******************
 ;;; naked-single-column
@@ -210,9 +262,9 @@
 
 (defrule naked-single-column
    
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
-   (technique (name Naked-Single) (priority ?p))
+   (technique (name Naked-Single) (rank ?p))
    
    (possible (value ?v) (column ?c) (id ?id))
    
@@ -220,9 +272,11 @@
    
    (possible (value ?v) (column ?c) (id ?id2&~?id))
    
+   (not (impossible (id ?id2) (value ?v) (rank ?p)))
+
    =>
    
-   (assert (impossible (id ?id2) (value ?v) (priority ?p) (reason "Naked Single"))))
+   (assert (impossible (id ?id2) (value ?v) (rank ?p) (reason "Naked Single"))))
 
 ;;; ##############
 ;;; Hidden Singles
@@ -234,9 +288,9 @@
 
 (defrule hidden-single-group
    
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
-   (technique (name Hidden-Single) (priority ?p))
+   (technique (name Hidden-Single) (rank ?p))
    
    (possible (value ?v) (group ?g) (id ?id))
    
@@ -244,9 +298,11 @@
    
    (possible (value ?v2&~?v) (group ?g) (id ?id))
    
+   (not (impossible (id ?id) (value ?v2) (rank ?p)))
+
    =>
    
-   (assert (impossible (id ?id) (value ?v2) (priority ?p) (reason "Hidden Single"))))
+   (assert (impossible (id ?id) (value ?v2) (rank ?p) (reason "Hidden Single"))))
    
 ;;; *****************
 ;;; hidden-single-row
@@ -254,9 +310,9 @@
 
 (defrule hidden-single-row
    
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
-   (technique (name Hidden-Single) (priority ?p))
+   (technique (name Hidden-Single) (rank ?p))
    
    (possible (value ?v) (row ?r) (id ?id))
    
@@ -264,9 +320,11 @@
    
    (possible (value ?v2&~?v) (row ?r) (id ?id))
    
+   (not (impossible (id ?id) (value ?v2) (rank ?p)))
+
    =>
    
-   (assert (impossible (id ?id) (value ?v2) (priority ?p) (reason "Hidden Single"))))
+   (assert (impossible (id ?id) (value ?v2) (rank ?p) (reason "Hidden Single"))))
    
 ;;; ********************
 ;;; hidden-single-column
@@ -274,9 +332,9 @@
 
 (defrule hidden-single-column
    
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
-   (technique (name Hidden-Single) (priority ?p))
+   (technique (name Hidden-Single) (rank ?p))
    
    (possible (value ?v) (column ?c) (id ?id))
    
@@ -284,9 +342,11 @@
    
    (possible (value ?v2&~?v) (column ?c) (id ?id))
    
+   (not (impossible (id ?id) (value ?v2) (rank ?p)))
+
    =>
    
-   (assert (impossible (id ?id) (value ?v2) (priority ?p) (reason "Hidden Single"))))
+   (assert (impossible (id ?id) (value ?v2) (rank ?p) (reason "Hidden Single"))))
 
 ;;; ############################
 ;;; Locked Candidate Single Line
@@ -298,9 +358,9 @@
 
 (defrule locked-candidate-single-line-row
    
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
-   (technique (name Locked-Candidate-Single-Line) (priority ?p))
+   (technique (name Locked-Candidate-Single-Line) (rank ?p))
    
    (possible (value ?v) (row ?r) (group ?g))
    
@@ -308,9 +368,11 @@
    
    (possible (value ?v) (row ?r) (group ~?g) (id ?id))
    
+   (not (impossible (id ?id) (value ?v) (rank ?p)))
+
    =>
    
-   (assert (impossible (id ?id) (value ?v) (priority ?p) (reason "Locked Candidate Single Line"))))
+   (assert (impossible (id ?id) (value ?v) (rank ?p) (reason "Locked Candidate Single Line"))))
 
 ;;; ***********************************
 ;;; locked-candidate-single-line-column
@@ -318,9 +380,9 @@
 
 (defrule locked-candidate-single-line-column
    
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
-   (technique (name Locked-Candidate-Single-Line) (priority ?p))
+   (technique (name Locked-Candidate-Single-Line) (rank ?p))
    
    (possible (value ?v) (column ?c) (group ?g))
    
@@ -328,9 +390,11 @@
    
    (possible (value ?v) (column ?c) (group ~?g) (id ?id))
    
+   (not (impossible (id ?id) (value ?v) (rank ?p)))
+
    =>
    
-   (assert (impossible (id ?id) (value ?v) (priority ?p) (reason "Locked Candidate Single Line"))))
+   (assert (impossible (id ?id) (value ?v) (rank ?p) (reason "Locked Candidate Single Line"))))
 
 ;;; ###############################
 ;;; Locked Candidate Multiple Lines
@@ -342,9 +406,9 @@
 
 (defrule locked-candidates-multiple-lines-row
 
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
-   (technique (name Locked-Candidate-Multiple-Lines) (priority ?p))
+   (technique (name Locked-Candidate-Multiple-Lines) (rank ?p))
    
    (possible (value ?v) (row ?r) (group ?g))
    
@@ -352,9 +416,11 @@
    
    (possible (value ?v) (row ~?r) (group ?g) (id ?id))
    
+   (not (impossible (id ?id) (value ?v) (rank ?p)))
+
    =>
    
-   (assert (impossible (id ?id) (value ?v) (priority ?p) (reason "Locked Candidate Multiple Lines"))))
+   (assert (impossible (id ?id) (value ?v) (rank ?p) (reason "Locked Candidate Multiple Lines"))))
 
 ;;; **************************************
 ;;; locked-candidate-multiple-lines-column
@@ -362,9 +428,9 @@
 
 (defrule locked-candidate-multiple-lines-column
 
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
-   (technique (name Locked-Candidate-Multiple-Lines) (priority ?p))
+   (technique (name Locked-Candidate-Multiple-Lines) (rank ?p))
    
    (possible (value ?v) (column ?c) (group ?g))
    
@@ -372,9 +438,11 @@
    
    (possible (value ?v) (column ~?c) (group ?g) (id ?id))
    
+   (not (impossible (id ?id) (value ?v) (rank ?p)))
+
    =>
    
-   (assert (impossible (id ?id) (value ?v) (priority ?p) (reason "Locked Candidate Multiple Lines"))))
+   (assert (impossible (id ?id) (value ?v) (rank ?p) (reason "Locked Candidate Multiple Lines"))))
 
 
 ;;; ###########
@@ -387,9 +455,9 @@
 
 (defrule naked-pairs-row
 
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
-   (technique (name Naked-Pairs) (priority ?p))
+   (technique (name Naked-Pairs) (rank ?p))
    
    (possible (value ?v1) (row ?r) (column ?c1))
    
@@ -405,9 +473,11 @@
 
    (possible (value ?v& ?v1 | ?v2) (row ?r) (column ~?c1&~?c2) (id ?id))
 
+   (not (impossible (id ?id) (value ?v) (rank ?p)))
+
    =>
    
-   (assert (impossible (id ?id) (value ?v) (priority ?p) (reason "Naked Pairs"))))
+   (assert (impossible (id ?id) (value ?v) (rank ?p) (reason "Naked Pairs"))))
 
 ;;; ******************
 ;;; naked-pairs-column
@@ -415,9 +485,9 @@
 
 (defrule naked-pairs-column
 
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
-   (technique (name Naked-Pairs) (priority ?p))
+   (technique (name Naked-Pairs) (rank ?p))
 
    (possible (value ?v1) (row ?r1) (column ?c))
    
@@ -433,9 +503,11 @@
 
    (possible (value ?v& ?v1 | ?v2) (row ~?r1&~?r2) (column ?c) (id ?id))
 
+   (not (impossible (id ?id) (value ?v) (rank ?p)))
+
    =>
    
-   (assert (impossible (id ?id) (value ?v) (priority ?p) (reason "Naked Pairs"))))
+   (assert (impossible (id ?id) (value ?v) (rank ?p) (reason "Naked Pairs"))))
 
 ;;; *****************
 ;;; naked-pairs-group
@@ -443,9 +515,9 @@
 
 (defrule naked-pairs-group
 
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
-   (technique (name Naked-Pairs) (priority ?p))
+   (technique (name Naked-Pairs) (rank ?p))
 
    (possible (value ?v1) (group ?g) (id ?id1))
    
@@ -461,9 +533,11 @@
 
    (possible (value ?v& ?v1 | ?v2) (group ?g) (id ?id&~?id2&~?id1))
 
+   (not (impossible (id ?id) (value ?v) (rank ?p)))
+
    =>
    
-   (assert (impossible (id ?id) (value ?v) (priority ?p) (reason "Naked Pairs"))))
+   (assert (impossible (id ?id) (value ?v) (rank ?p) (reason "Naked Pairs"))))
 
 ;;; ############
 ;;; Hidden Pairs
@@ -475,9 +549,9 @@
 
 (defrule hidden-pairs-row
 
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
-   (technique (name Hidden-Pairs) (priority ?p))
+   (technique (name Hidden-Pairs) (rank ?p))
    
    (possible (value ?v1) (row ?r) (column ?c1))
    
@@ -487,13 +561,15 @@
    
    (possible (value ?v2) (row ?r) (column ?c2))
    
-   (not (possible (value ?v1 | ?v2) (row ?r) (column ?c3&~?c2&~?c1)))
+   (not (possible (value ?v1 | ?v2) (row ?r) (column ~?c2&~?c1)))
 
    (possible (value ?v&~?v1&~?v2) (row ?r) (column ?c1 | ?c2) (id ?id))
 
+   (not (impossible (id ?id) (value ?v) (rank ?p)))
+
    =>
    
-   (assert (impossible (id ?id) (value ?v) (priority ?p) (reason "Hidden Pairs"))))
+   (assert (impossible (id ?id) (value ?v) (rank ?p) (reason "Hidden Pairs"))))
 
 ;;; *******************
 ;;; hidden-pairs-column
@@ -501,9 +577,9 @@
 
 (defrule hidden-pairs-column
 
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
-   (technique (name Hidden-Pairs) (priority ?p))
+   (technique (name Hidden-Pairs) (rank ?p))
    
    (possible (value ?v1) (row ?r1) (column ?c))
    
@@ -513,13 +589,15 @@
    
    (possible (value ?v2) (row ?r2) (column ?c))
    
-   (not (possible (value ?v1 | ?v2) (row ?r3&~?r2&~?r1) (column ?c)))
+   (not (possible (value ?v1 | ?v2) (row ~?r2&~?r1) (column ?c)))
 
    (possible (value ?v&~?v1&~?v2) (row ?r1 | ?r2) (column ?c) (id ?id))
 
+   (not (impossible (id ?id) (value ?v) (rank ?p)))
+
    =>
    
-   (assert (impossible (id ?id) (value ?v) (priority ?p) (reason "Hidden Pairs"))))
+   (assert (impossible (id ?id) (value ?v) (rank ?p) (reason "Hidden Pairs"))))
 
 
 ;;; ******************
@@ -528,9 +606,9 @@
 
 (defrule hidden-pairs-group
 
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
-   (technique (name Hidden-Pairs) (priority ?p))
+   (technique (name Hidden-Pairs) (rank ?p))
    
    (possible (value ?v1) (group ?g) (id ?id1))
    
@@ -540,13 +618,15 @@
    
    (possible (value ?v2) (id ?id2))
    
-   (not (possible (value ?v1 | ?v2) (group ?g) (id ?id3&~?id2&~?id1)))
+   (not (possible (value ?v1 | ?v2) (group ?g) (id ~?id2&~?id1)))
 
    (possible (value ?v&~?v1&~?v2) (id ?id&?id1 | ?id2))
 
+   (not (impossible (id ?id) (value ?v) (rank ?p)))
+
    =>
    
-   (assert (impossible (id ?id) (value ?v) (priority ?p) (reason "Hidden Pairs"))))
+   (assert (impossible (id ?id) (value ?v) (rank ?p) (reason "Hidden Pairs"))))
 
 
 ;;; ######
@@ -559,9 +639,9 @@
 
 (defrule X-Wing-Row
    
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
-   (technique (name X-Wing) (priority ?p))
+   (technique (name X-Wing) (rank ?p))
    
    (possible (value ?v) (row ?r1) (column ?c1))
    
@@ -577,9 +657,11 @@
    
    (possible (value ?v) (row ~?r1&~?r2) (column ?c1 | ?c2) (id ?id))
    
+   (not (impossible (id ?id) (value ?v) (rank ?p)))
+
    =>
    
-   (assert (impossible (id ?id) (value ?v) (priority ?p) (reason "X Wing"))))
+   (assert (impossible (id ?id) (value ?v) (rank ?p) (reason "X Wing"))))
 
 ;;; *************
 ;;; X-Wing-Column
@@ -587,9 +669,9 @@
 
 (defrule X-Wing-Column
    
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
-   (technique (name X-Wing) (priority ?p))
+   (technique (name X-Wing) (rank ?p))
    
    (possible (value ?v) (row ?r1) (column ?c1))
    
@@ -605,9 +687,11 @@
    
    (possible (value ?v) (row ?r1 | ?r2) (column ~?c1&~?c2) (id ?id))
    
+   (not (impossible (id ?id) (value ?v) (rank ?p)))
+
    =>
    
-   (assert (impossible (id ?id) (value ?v) (priority ?p) (reason "X Wing"))))
+   (assert (impossible (id ?id) (value ?v) (rank ?p) (reason "X Wing"))))
 
 ;;; #############
 ;;; Naked Triples
@@ -621,9 +705,9 @@
    
    (declare (salience 10))
    
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
-   (technique (name Naked-Triples) (priority ?p))
+   (technique (name Naked-Triples) (rank ?p))
 
    (size ?s)
    
@@ -632,6 +716,8 @@
    (size-value (size ?sv2&:(<= ?sv2 ?s)) (value ?v2&:(> ?v2 ?v1)))
 
    (size-value (size ?sv3&:(<= ?sv3 ?s)) (value ?v3&:(> ?v3 ?v2)))
+
+   (not (impossible (id ?id) (value ?v) (rank ?p)))
 
    =>
    
@@ -643,9 +729,9 @@
 
 (defrule naked-triples-row
 
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
-   (technique (name Naked-Triples) (priority ?p))
+   (technique (name Naked-Triples) (rank ?p))
    
    (triple ?v1 ?v2 ?v3)
    
@@ -663,9 +749,11 @@
    
    (possible (value ?v& ?v1 | ?v2 | ?v3) (row ?r) (id ?id&~?id1&~?id2&~?id3))
 
+   (not (impossible (id ?id) (value ?v) (rank ?p)))
+
    =>
    
-   (assert (impossible (id ?id) (value ?v) (priority ?p) (reason "Naked Triples"))))
+   (assert (impossible (id ?id) (value ?v) (rank ?p) (reason "Naked Triples"))))
 
 ;;; ********************
 ;;; naked-triples-column
@@ -673,9 +761,9 @@
 
 (defrule naked-triples-column
 
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
-   (technique (name Naked-Triples) (priority ?p))
+   (technique (name Naked-Triples) (rank ?p))
    
    (triple ?v1 ?v2 ?v3)
    
@@ -693,9 +781,11 @@
    
    (possible (value ?v& ?v1 | ?v2 | ?v3) (column ?c) (id ?id&~?id1&~?id2&~?id3))
 
+   (not (impossible (id ?id) (value ?v) (rank ?p)))
+
    =>
    
-   (assert (impossible (id ?id) (value ?v) (priority ?p) (reason "Naked Triples"))))
+   (assert (impossible (id ?id) (value ?v) (rank ?p) (reason "Naked Triples"))))
 
 ;;; *******************
 ;;; naked-triples-group
@@ -703,9 +793,9 @@
 
 (defrule naked-triples-group
 
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
-   (technique (name Naked-Triples) (priority ?p))
+   (technique (name Naked-Triples) (rank ?p))
    
    (triple ?v1 ?v2 ?v3)
    
@@ -723,9 +813,11 @@
    
    (possible (value ?v& ?v1 | ?v2 | ?v3) (group ?g) (id ?id&~?id1&~?id2&~?id3))
 
+   (not (impossible (id ?id) (value ?v) (rank ?p)))
+
    =>
    
-   (assert (impossible (id ?id) (value ?v) (priority ?p) (reason "Naked Triples"))))
+   (assert (impossible (id ?id) (value ?v) (rank ?p) (reason "Naked Triples"))))
 
 ;;; ##############
 ;;; Hidden Triples
@@ -737,9 +829,9 @@
 
 (defrule hidden-triples-row
 
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
-   (technique (name Hidden-Triples) (priority ?p))
+   (technique (name Hidden-Triples) (rank ?p))
    
    (triple ?v1 ?v2 ?v3)
    
@@ -753,9 +845,11 @@
    
    (possible (value ?v&~?v1&~?v2&~?v3) (row ?r) (column ?c1 | ?c2 | ?c3) (id ?id))
 
+   (not (impossible (id ?id) (value ?v) (rank ?p)))
+
    =>
    
-   (assert (impossible (id ?id) (value ?v) (priority ?p) (reason "Hidden Triples"))))
+   (assert (impossible (id ?id) (value ?v) (rank ?p) (reason "Hidden Triples"))))
 
 ;;; *********************
 ;;; hidden-triples-column
@@ -763,9 +857,9 @@
 
 (defrule hidden-triples-column
 
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
-   (technique (name Hidden-Triples) (priority ?p))
+   (technique (name Hidden-Triples) (rank ?p))
    
    (triple ?v1 ?v2 ?v3)
    
@@ -779,9 +873,11 @@
    
    (possible (value ?v&~?v1&~?v2&~?v3) (row ?r1 | ?r2 | ?r3) (column ?c) (id ?id))
 
+   (not (impossible (id ?id) (value ?v) (rank ?p)))
+
    =>
    
-   (assert (impossible (id ?id) (value ?v) (priority ?p) (reason "Hidden Triples"))))
+   (assert (impossible (id ?id) (value ?v) (rank ?p) (reason "Hidden Triples"))))
 
 ;;; ********************
 ;;; hidden-triples-group
@@ -789,9 +885,9 @@
 
 (defrule hidden-triples-group
 
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
-   (technique (name Hidden-Triples) (priority ?p))
+   (technique (name Hidden-Triples) (rank ?p))
    
    (triple ?v1 ?v2 ?v3)
    
@@ -805,9 +901,11 @@
    
    (possible (value ?v&~?v1&~?v2&~?v3) (id ?id& ?id1 | ?id2 | ?id3))
 
+   (not (impossible (id ?id) (value ?v) (rank ?p)))
+
    =>
    
-   (assert (impossible (id ?id) (value ?v) (priority ?p) (reason "Hidden Triples"))))
+   (assert (impossible (id ?id) (value ?v) (rank ?p) (reason "Hidden Triples"))))
 
 ;;; #########
 ;;; Swordfish
@@ -819,9 +917,9 @@
 
 (defrule swordfish-row
 
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
-   (technique (name Swordfish) (priority ?p))
+   (technique (name Swordfish) (rank ?p))
    
    (triple ?c1 ?c2 ?c3)
    
@@ -839,9 +937,11 @@
    
    (possible (value ?v) (row ~?r1&~?r2&~?r3) (column ?c1 | ?c2 | ?c3) (id ?id))
 
+   (not (impossible (id ?id) (value ?v) (rank ?p)))
+
    =>
    
-   (assert (impossible (id ?id) (value ?v) (priority ?p) (reason "Swordfish"))))
+   (assert (impossible (id ?id) (value ?v) (rank ?p) (reason "Swordfish"))))
 
 ;;; ****************
 ;;; swordfish-column
@@ -849,9 +949,9 @@
 
 (defrule swordfish-column
 
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
-   (technique (name Swordfish) (priority ?p))
+   (technique (name Swordfish) (rank ?p))
    
    (triple ?r1 ?r2 ?r3)
    
@@ -869,9 +969,11 @@
    
    (possible (value ?v) (row ?r1 | ?r2 | ?r3) (column ~?c1&~?c2&~?c3) (id ?id))
 
+   (not (impossible (id ?id) (value ?v) (rank ?p)))
+
    =>
    
-   (assert (impossible (id ?id) (value ?v) (priority ?p) (reason "Swordfish"))))
+   (assert (impossible (id ?id) (value ?v) (rank ?p) (reason "Swordfish"))))
 
 ;;; #######
 ;;; XY-Wing
@@ -883,9 +985,9 @@
  
 (defrule XY-Wing
 
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
-   (technique (name XY-Wing) (priority ?p))
+   (technique (name XY-Wing) (rank ?p))
    
    (possible (value ?x) (row ?r1) (column ?c1) (group ?g1) (id ?id1))
    
@@ -913,13 +1015,46 @@
 
    (test (and (or (= ?r2 ?r4) (= ?c2 ?c4) (= ?g2 ?g4))
               (or (= ?r3 ?r4) (= ?c3 ?c4) (= ?g3 ?g4))))
+
+   (not (impossible (id ?id) (value ?z) (rank ?p)))
+
    =>
    
-   (assert (impossible (id ?id) (value ?z) (priority ?p) (reason "XY-Wing"))))
+   (assert (impossible (id ?id) (value ?z) (rank ?p) (reason "XY-Wing"))))
 
 ;;; ######
 ;;; Colors
 ;;; ######
+
+;;; **********************
+;;; initialize-color-pairs
+;;; **********************
+
+(defrule initialize-color-pairs
+  
+  (phase match)
+   
+  (rank (value ?p) (process yes))
+
+  (technique (name Duplicate-Color | Color-Conjugate-Pair | Multi-Color-Type-1  | Multi-Color-Type-2) 
+             (rank ?p))
+  
+  (not (color-pair))
+
+  =>
+  
+  (assert (color-pair green magenta))
+  (assert (color-pair magenta green))
+  (assert (color-pair orange azure))
+  (assert (color-pair azure orange))
+  (assert (color-pair violet chartruese))
+  (assert (color-pair chartruese violet))
+  (assert (color-pair aquamarine fuchsia))   
+  (assert (color-pair fuchsia aquamarine))  
+  (assert (color-pair yellow blue))
+  (assert (color-pair blue yellow))
+  (assert (color-pair red cyan))
+  (assert (color-pair cyan red)))
 
 ;;; *********
 ;;; color-row
@@ -931,10 +1066,10 @@
    
    (phase match)
    
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
    (technique (name Duplicate-Color | Color-Conjugate-Pair | Multi-Color-Type-1  | Multi-Color-Type-2) 
-              (priority ?p))
+              (rank ?p))
 
    (possible (row ?r) (column ?c1) (group ?g1) (id ?id1) (value ?v))
 
@@ -947,7 +1082,7 @@
    ;; Don't use a color previously used for this value.
 
    (not (position-value-color (value ?v)
-                              (color ?color1 | color2)))
+                              (color ?color1 | ?color2)))
    
    ;; Don't try to color the position if it's already colored. 
    
@@ -956,7 +1091,7 @@
                               (value ?v)))
 
    =>
-   
+  
    (assert (position-value-color (row ?r)
                                  (column ?c1)
                                  (group ?g1)
@@ -981,10 +1116,10 @@
    
    (phase match)
    
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
    (technique (name Duplicate-Color | Color-Conjugate-Pair | Multi-Color-Type-1 | Multi-Color-Type-2) 
-              (priority ?p))
+              (rank ?p))
 
    (possible (row ?r1) (column ?c) (group ?g1) (id ?id1) (value ?v))
 
@@ -997,7 +1132,7 @@
    ;; Don't use a color previously used for this value.
 
    (not (position-value-color (value ?v)
-                              (color ?color1 | color2)))
+                              (color ?color1 | ?color2)))
    
    ;; Don't try to color the position if it's already colored. 
    
@@ -1029,10 +1164,10 @@
 
    (phase match)
 
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
    (technique (name Duplicate-Color | Color-Conjugate-Pair | Multi-Color-Type-1 | Multi-Color-Type-2) 
-              (priority ?p))
+              (rank ?p))
 
    (position-value-color (row ?r) (column ?c1) (value ?v) (color ?color1))
                                     
@@ -1045,7 +1180,7 @@
    (color-pair ?color1 ?color2)
    
    =>
-
+   
    (assert (position-value-color (row ?r)
                                  (column ?c2)
                                  (group ?g)
@@ -1061,10 +1196,10 @@
 
    (phase match)
 
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
    (technique (name Duplicate-Color | Color-Conjugate-Pair | Multi-Color-Type-1 | Multi-Color-Type-2) 
-              (priority ?p))
+              (rank ?p))
 
    (position-value-color (row ?r1) (column ?c) (value ?v) (color ?color1))
                                     
@@ -1093,10 +1228,10 @@
 
    (phase match)
    
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
    (technique (name Duplicate-Color | Color-Conjugate-Pair | Multi-Color-Type-1 | Multi-Color-Type-2) 
-              (priority ?p))
+              (rank ?p))
 
    (position-value-color (column ?c1) (row ?r1) (group ?g) (id ?id1) (value ?v) (color ?color1))
                                     
@@ -1127,9 +1262,9 @@
 
 (defrule duplicate-color-in-row
 
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
-   (technique (name Duplicate-Color) (priority ?p))
+   (technique (name Duplicate-Color) (rank ?p))
 
    (position-value-color (row ?r)
                          (column ?c1)
@@ -1143,11 +1278,12 @@
                          (value ?v)
                          (color ?color))
 
+   (not (impossible (id ?id1) (value ?v) (rank ?p)))
+
    =>
+
+   (assert (impossible (id ?id1) (value ?v) (rank ?p) (reason "Duplicate Color"))))
    
-   (assert (impossible (id ?id1) (value ?v) (priority ?p) (reason "Duplicate Color")))
-   
-   (assert (impossible (id ?id2) (value ?v) (priority ?p) (reason "Duplicate Color"))))
    
 ;;; *************************
 ;;; duplicate-color-in-column
@@ -1155,9 +1291,9 @@
 
 (defrule duplicate-color-in-column
 
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
-   (technique (name Duplicate-Color) (priority ?p))
+   (technique (name Duplicate-Color) (rank ?p))
 
    (position-value-color (row ?r1)
                          (column ?c)
@@ -1171,11 +1307,11 @@
                          (value ?v)
                          (color ?color))
 
+   (not (impossible (id ?id1) (value ?v) (rank ?p)))
+
    =>
    
-   (assert (impossible (id ?id1) (value ?v) (priority ?p) (reason "Duplicate Color")))
-   
-   (assert (impossible (id ?id2) (value ?v) (priority ?p) (reason "Duplicate Color"))))
+   (assert (impossible (id ?id1) (value ?v) (rank ?p) (reason "Duplicate Color"))))
    
 ;;; ************************
 ;;; duplicate-color-in-group
@@ -1183,9 +1319,9 @@
 
 (defrule duplicate-color-in-group
 
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
-   (technique (name Duplicate-Color) (priority ?p))
+   (technique (name Duplicate-Color) (rank ?p))
 
    (position-value-color (group ?g)
                          (id ?id1)
@@ -1197,11 +1333,11 @@
                          (value ?v)
                          (color ?color))
 
+   (not (impossible (id ?id1) (value ?v) (rank ?p)))
+
    =>
-   
-   (assert (impossible (id ?id1) (value ?v) (priority ?p) (reason "Duplicate Color")))
-   
-   (assert (impossible (id ?id2) (value ?v) (priority ?p) (reason "Duplicate Color"))))
+
+   (assert (impossible (id ?id1) (value ?v) (rank ?p) (reason "Duplicate Color"))))
 
 ;;; ####################
 ;;; Color-Conjugate-Pair
@@ -1213,9 +1349,9 @@
 
 (defrule color-conjugate-pair
 
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
-   (technique (name Color-Conjugate-Pair) (priority ?p))
+   (technique (name Color-Conjugate-Pair) (rank ?p))
 
    (color-pair ?color1 ?color2) 
 
@@ -1232,10 +1368,12 @@
                          (color ?color2))
                          
    (possible (row ?r) (column ?c) (id ?id&~?id2&~?id1) (value ?v))
+
+   (not (impossible (id ?id) (value ?v) (rank ?p)))
                         
    =>
       
-   (assert (impossible (id ?id) (value ?v) (priority ?p) (reason "Color Conjugate Pairs"))))
+   (assert (impossible (id ?id) (value ?v) (rank ?p) (reason "Color Conjugate Pairs"))))
    
 ;;; ##################
 ;;; Multi-Color-Type-1
@@ -1243,9 +1381,9 @@
    
 (defrule multi-color-type-1
 
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
-   (technique (name Multi-Color-Type-1) (priority ?p))
+   (technique (name Multi-Color-Type-1) (rank ?p))
 
    (color-pair ?color1 ?color2) 
    
@@ -1285,9 +1423,11 @@
                          (value ?v)
                          (color ?other-color))
    
+   (not (impossible (id ?id) (value ?v) (rank ?p)))
+
    =>
 
-   (assert (impossible (id ?id) (value ?v) (priority ?p) (reason "Multi Color Type 1"))))
+   (assert (impossible (id ?id) (value ?v) (rank ?p) (reason "Multi Color Type 1"))))
  
 ;;; ##################
 ;;; Multi-Color-Type-2
@@ -1295,9 +1435,9 @@
    
 (defrule multi-color-type-2
 
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
-   (technique (name Multi-Color-Type-2) (priority ?p))
+   (technique (name Multi-Color-Type-2) (rank ?p))
 
    (color-pair ?color1 ?color2) 
    
@@ -1336,9 +1476,11 @@
    (test (and (or (= ?r3 ?r5) (= ?c3 ?c5) (= ?g3 ?g5))
               (or (= ?r4 ?r5) (= ?c4 ?c5) (= ?g4 ?g5))))
    
+   (not (impossible (id ?id) (value ?v) (rank ?p)))
+
    =>
    
-   (assert (impossible (id ?id) (value ?v) (priority ?p) (reason "Multi Color Type 2"))))
+   (assert (impossible (id ?id) (value ?v) (rank ?p) (reason "Multi Color Type 2"))))
 
 ;;; #############
 ;;; Forced Chains
@@ -1352,15 +1494,18 @@
 
    (declare (salience -10))
 
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
-   (technique (name Forced-Chain-Convergence | Forced-Chain-XY) (priority ?p))
+   (technique (name Forced-Chain-Convergence | Forced-Chain-XY) (rank ?p))
 
    (possible (row ?r) (column ?c) (group ?g) (id ?id) (value ?v1))
    
    (possible (id ?id) (value ?v2&~?v1))
    
    (not (possible (id ?id) (value ~?v1&~?v2)))
+   
+   (not (chain (start-row ?r) (start-column ?c) (start-value ?v1) 
+               (row ?r) (column ?c) (value ?v1)))
    
    =>
    
@@ -1371,16 +1516,7 @@
                   (column ?c)
                   (group ?g)
                   (id ?id)
-                  (value ?v1)))
-                  
-   (assert (chain (start-row ?r)
-                  (start-column ?c)
-                  (start-value ?v2)
-                  (row ?r)
-                  (column ?c)
-                  (group ?g)
-                  (id ?id)
-                  (value ?v2))))  
+                  (value ?v1))))
 
 ;;; ******************
 ;;; continue-chain-row
@@ -1390,17 +1526,20 @@
 
    (declare (salience -10))
 
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
-   (technique (name Forced-Chain-Convergence | Forced-Chain-XY) (priority ?p))
+   (technique (name Forced-Chain-Convergence | Forced-Chain-XY) (rank ?p))
 
-   ?f <- (chain (row ?r) (column ?c1) (value ?v1))
+   ?f <- (chain (row ?r) (column ?c1) (value ?v1) (start-row ?sr) (start-column ?sc) (start-value ?sv))
           
    (possible (row ?r) (column ?c2&~?c1) (value ?v1))
    
    (possible (row ?r) (column ?c2) (group ?g) (id ?id) (value ?v2&~?v1))
    
-   (not (possible (row ?r) (column ?c2) (value ?v3&~?v2&~?v1)))
+   (not (possible (row ?r) (column ?c2) (value ~?v2&~?v1)))
+   
+   (not (chain (row ?r) (column ?c2) (value ?v2) 
+               (start-row ?sr) (start-column ?sc) (start-value ?sv)))
                  
    =>
    
@@ -1417,18 +1556,21 @@
 
    (declare (salience -10))
 
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
-   (technique (name Forced-Chain-Convergence | Forced-Chain-XY) (priority ?p))
+   (technique (name Forced-Chain-Convergence | Forced-Chain-XY) (rank ?p))
 
-   ?f <- (chain (row ?r1) (column ?c) (value ?v1))
+   ?f <- (chain (row ?r1) (column ?c) (value ?v1) (start-row ?sr) (start-column ?sc) (start-value ?sv))
           
    (possible (row ?r2&~?r1) (column ?c) (value ?v1))
    
    (possible (row ?r2) (column ?c) (group ?g) (id ?id) (value ?v2&~?v1))
    
-   (not (possible (row ?r2) (column ?c) (value ?v3&~?v2&~?v1)))
+   (not (possible (row ?r2) (column ?c) (value ~?v2&~?v1)))
                  
+   (not (chain (row ?r2) (column ?c) (value ?v2) 
+               (start-row ?sr) (start-column ?sc) (start-value ?sv)))
+
    =>
    
    (duplicate ?f (row ?r2)
@@ -1444,18 +1586,21 @@
 
    (declare (salience -10))
 
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
-   (technique (name Forced-Chain-Convergence | Forced-Chain-XY) (priority ?p))
+   (technique (name Forced-Chain-Convergence | Forced-Chain-XY) (rank ?p))
 
-   ?f <- (chain (group ?g) (id ?id1) (value ?v1))
+   ?f <- (chain (group ?g) (id ?id1) (value ?v1) (start-row ?sr) (start-column ?sc) (start-value ?sv))
           
    (possible (row ?r) (column ?c) (group ?g) (id ?id2&~?id1) (value ?v1))
    
    (possible (id ?id2) (value ?v2&~?v1))
    
-   (not (possible (id ?id2) (value ?v3&~?v2&~?v1)))
+   (not (possible (id ?id2) (value ~?v2&~?v1)))
                  
+   (not (chain (row ?r) (column ?c) (value ?v2) 
+               (start-row ?sr) (start-column ?sc) (start-value ?sv)))
+
    =>
    
    (duplicate ?f (row ?r)
@@ -1469,9 +1614,9 @@
 
 (defrule forced-chain-convergence
 
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
-   (technique (name Forced-Chain-Convergence) (priority ?p))
+   (technique (name Forced-Chain-Convergence) (rank ?p))
 
    (chain (start-row ?r1)
           (start-column ?c1)
@@ -1489,9 +1634,11 @@
                  
    (possible (row ?r2) (column ?c2) (id ?id) (value ?v3&~?v2))
 
+   (not (impossible (id ?id) (value ?v3) (rank ?p)))
+
    =>
    
-   (assert (impossible (id ?id) (value ?v3) (priority ?p) (reason "Forced Chain Convergence"))))
+   (assert (impossible (id ?id) (value ?v3) (rank ?p) (reason "Forced Chain Convergence"))))
 
 ;;; ***************
 ;;; forced-chain-XY
@@ -1499,9 +1646,9 @@
 
 (defrule forced-chain-XY
 
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
-   (technique (name Forced-Chain-XY) (priority ?p))
+   (technique (name Forced-Chain-XY) (rank ?p))
 
    (chain (start-row ?r1) (start-column ?c1) (start-value ?v1)
           (row ?r1) (column ?c1) (value ?v1) (id ?id1) (group ?g1))
@@ -1521,9 +1668,11 @@
    (test (and (or (= ?g1 ?g3) (= ?r1 ?r3) (= ?c1 ?c3))
               (or (= ?g2 ?g3) (= ?r2 ?r3) (= ?c2 ?c3))))
 
+   (not (impossible (id ?id) (value ?v1) (rank ?p)))
+
    =>
    
-   (assert (impossible (id ?id) (value ?v1) (priority ?p) (reason "Forced Chain XY"))))
+   (assert (impossible (id ?id) (value ?v1) (rank ?p) (reason "Forced Chain XY"))))
    
 ;;; ################
 ;;; Unique-Rectangle
@@ -1535,9 +1684,9 @@
 
 (defrule Unique-Rectangle-Row
    
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
-   (technique (name Unique-Rectangle) (priority ?p))
+   (technique (name Unique-Rectangle) (rank ?p))
    
    (possible (value ?v1) (group ?g1) (row ?r1) (column ?c1))
 
@@ -1547,7 +1696,7 @@
    
    (possible (value ?v1) (group ?g1) (row ?r1) (column ?c2&~?c1))
 
-   (possible (value ?v2&~?v1) (group ?g1) (row ?r1) (column ?c2&~?c1))
+   (possible (value ?v2) (group ?g1) (row ?r1) (column ?c2))
 
    (not (possible (value ~?v2&~?v1) (row ?r1) (column ?c2)))
    
@@ -1563,11 +1712,11 @@
    
    (possible (value ~?v2&~?v1) (group ?g2) (row ?r2) (column ?c2)) 
    
+   (not (impossible (id ?id1) (value ?v1) (rank ?p)))
+   
    =>
    
-   (assert (impossible (id ?id1) (value ?v1) (priority ?p) (reason "Unique Rectangle")))
-
-   (assert (impossible (id ?id2) (value ?v2) (priority ?p) (reason "Unique Rectangle"))))
+   (assert (impossible (id ?id1) (value ?v1) (rank ?p) (reason "Unique Rectangle"))))
    
 ;;; ***********************
 ;;; Unique-Rectangle-Column
@@ -1575,9 +1724,9 @@
 
 (defrule Unique-Rectangle-Column
    
-   (priority ?p)
+   (rank (value ?p) (process yes))
 
-   (technique (name Unique-Rectangle) (priority ?p))
+   (technique (name Unique-Rectangle) (rank ?p))
    
    (possible (value ?v1) (group ?g1) (row ?r1) (column ?c1))
 
@@ -1587,7 +1736,7 @@
    
    (possible (value ?v1) (group ?g1) (row ?r2&~?r1) (column ?c1))
 
-   (possible (value ?v2&~?v1) (group ?g1) (row ?r2&~?r1) (column ?c1))
+   (possible (value ?v2) (group ?g1) (row ?r2) (column ?c1))
 
    (not (possible (value ~?v2&~?v1) (row ?r2) (column ?c1)))
    
@@ -1603,9 +1752,9 @@
    
    (possible (value ~?v2&~?v1) (group ?g2) (row ?r2) (column ?c2)) 
    
+   (not (impossible (id ?id1) (value ?v1) (rank ?p)))
+
    =>
    
-   (assert (impossible (id ?id1) (value ?v1) (priority ?p) (reason "Unique Rectangle")))
-
-   (assert (impossible (id ?id2) (value ?v2) (priority ?p) (reason "Unique Rectangle"))))
+   (assert (impossible (id ?id1) (value ?v1) (rank ?p) (reason "Unique Rectangle"))))
 

@@ -1,4 +1,44 @@
-;;; Coloring solves this one.
+;;; The puzzle is: 
+;;;
+;;;    9 * *  2 * *  * 7 *
+;;;    * 6 8  1 7 *  2 * *
+;;;    * 4 *  * * *  * * *
+;;;
+;;;    * 9 *  * 4 *  * * 1
+;;;    * 5 *  * * *  * 3 *
+;;;    7 * *  * 8 *  * 4 *
+;;;
+;;;    * * *  * * *  * 8 *
+;;;    * * 6  * 9 5  4 1 *
+;;;    * 8 *  * * 3  * * 5
+;;;
+;;; The solution is: 
+;;;
+;;;    9 3 1  2 5 8  6 7 4
+;;;    5 6 8  1 7 4  2 9 3
+;;;    2 4 7  9 3 6  1 5 8
+;;;
+;;;    6 9 3  5 4 7  8 2 1
+;;;    8 5 4  6 1 2  9 3 7
+;;;    7 1 2  3 8 9  5 4 6
+;;;
+;;;    4 2 5  7 6 1  3 8 9
+;;;    3 7 6  8 9 5  4 1 2
+;;;    1 8 9  4 2 3  7 6 5
+;;;
+;;; Rules used:
+;;;
+;;;    Naked Single
+;;;    Hidden Single
+;;;    Locked Candidate Single Line
+;;;    Locked Candidate Multiple Lines
+;;;    Naked Pairs
+;;;    Hidden Pairs
+;;;    Naked Triples
+;;;    Hidden Triples
+;;;    Swordfish
+;;;    Duplicate Color
+
 (defrule grid-values
 
    ?f <- (phase grid-values)

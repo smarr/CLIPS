@@ -1,3 +1,9 @@
+;;; Version 1.2
+;;; 
+;;; JRules Changes
+
+;;; Reference Material
+;;;
 ;;; http://www.angusj.com/sudoku/hints
 ;;; http://www.scanraid.com/BasicStrategies.htm
 ;;; http://www.sudokuoftheday.com/pages/techniques-overview
@@ -19,20 +25,17 @@
 (deftemplate impossible
    (slot id)
    (slot value)
-   (slot priority)
+   (slot rank)
    (slot reason))
    
 (deftemplate technique-employed
    (slot reason)
-   (slot priority))
+   (slot rank))
 
 (deftemplate technique
    (slot name)
-   (slot priority))
+   (slot rank))
    
-(deffacts startup
-   (phase grid-values))
-
 (deftemplate size-value
    (slot size)
    (slot value))
@@ -42,36 +45,53 @@
    (slot column)
    (slot index))
    
-(deffacts values
-   (size-value (size 1) (value 1))
-   (size-value (size 2) (value 2))
-   (size-value (size 2) (value 3))
-   (size-value (size 2) (value 4))
-   (size-value (size 3) (value 5))
-   (size-value (size 3) (value 6))
-   (size-value (size 3) (value 7))
-   (size-value (size 3) (value 8))
-   (size-value (size 3) (value 9))
-   (size-value (size 4) (value 10))
-   (size-value (size 4) (value 11))
-   (size-value (size 4) (value 12))
-   (size-value (size 4) (value 13))
-   (size-value (size 4) (value 14))
-   (size-value (size 4) (value 15))
-   (size-value (size 4) (value 16))
-   (size-value (size 5) (value 17))
-   (size-value (size 5) (value 18))
-   (size-value (size 5) (value 19))
-   (size-value (size 5) (value 20))
-   (size-value (size 5) (value 21))
-   (size-value (size 5) (value 22))
-   (size-value (size 5) (value 23))
-   (size-value (size 5) (value 24))
-   (size-value (size 5) (value 25)))
+(deftemplate rank
+   (slot value)
+   (slot process))
    
+(deftemplate unsolved
+   (slot row)
+   (slot column))
+      
 ;;; ###########
 ;;; SETUP RULES
 ;;; ###########
+
+;;; **********
+;;; initialize
+;;; **********
+
+(defrule initialize
+
+   =>
+
+   (assert (phase grid-values))
+
+   (assert (size-value (size 1) (value 1)))
+   (assert (size-value (size 2) (value 2)))
+   (assert (size-value (size 2) (value 3)))
+   (assert (size-value (size 2) (value 4)))
+   (assert (size-value (size 3) (value 5)))
+   (assert (size-value (size 3) (value 6)))
+   (assert (size-value (size 3) (value 7)))
+   (assert (size-value (size 3) (value 8)))
+   (assert (size-value (size 3) (value 9)))
+   (assert (size-value (size 4) (value 10)))
+   (assert (size-value (size 4) (value 11)))
+   (assert (size-value (size 4) (value 12)))
+   (assert (size-value (size 4) (value 13)))
+   (assert (size-value (size 4) (value 14)))
+   (assert (size-value (size 4) (value 15)))
+   (assert (size-value (size 4) (value 16)))
+   (assert (size-value (size 5) (value 17)))
+   (assert (size-value (size 5) (value 18)))
+   (assert (size-value (size 5) (value 19)))
+   (assert (size-value (size 5) (value 20)))
+   (assert (size-value (size 5) (value 21)))
+   (assert (size-value (size 5) (value 22)))
+   (assert (size-value (size 5) (value 23)))
+   (assert (size-value (size 5) (value 24)))
+   (assert (size-value (size 5) (value 25))))
 
 ;;; ***********
 ;;; stress-test
@@ -85,17 +105,17 @@
    
    (stress-test)
    
-   (priority ?last)
+   (rank (value ?last))
    
-   (not (priority ?p&:(> ?p ?last)))
+   (not (rank (value ?p&:(> ?p ?last))))
    
-   (technique (priority ?next&:(> ?next ?last)))
+   (technique (rank ?next&:(> ?next ?last)))
    
-   (not (technique (priority ?p&:(> ?p ?last)&:(< ?p ?next))))
+   (not (technique (rank ?p&:(> ?p ?last)&:(< ?p ?next))))
    
    =>
    
-   (assert (priority ?next)))
+   (assert (rank (value ?next) (process yes))))
    
 ;;; *****************
 ;;; enable-techniques
@@ -111,9 +131,11 @@
    
    (not (possible (value any)))
    
+   (not (rank))
+   
    =>
    
-   (assert (priority 1)))
+   (assert (rank (value 1) (process yes))))
 
 
 ;;; ****************
@@ -126,12 +148,12 @@
 
    (phase expand-any)
    
-   ?f <- (possible (row ?r) (column ?c) (value any) (group ?g) (id ?id))
+   (possible (row ?r) (column ?c) (value any) (id ?id))
   
    (not (possible (value any) (id ?id2&:(< ?id2 ?id))))
       
    =>
-   
+      
    (assert (iterate-rc (row ?r) (column ?c) (index 1))))
 
 ;;; **********
@@ -172,7 +194,7 @@
 
    (phase expand-any)
    
-   ?f1 <- (possible (row ?r) (column ?c) (value any) (group ?g) (id ?id))
+   ?f1 <- (possible (row ?r) (column ?c) (value any))
      
    (size ?s)
    
@@ -181,6 +203,8 @@
    (not (size-value (size ?as&:(<= ?as ?s)) (value ?v)))
 
    =>
+   
+   (assert (unsolved (row ?r) (column ?c)))
    
    (retract ?f1 ?f2))
    
@@ -241,11 +265,11 @@
    
    (assert (phase elimination)))
 
-;;; *************
-;;; next-priority
-;;; *************
+;;; ******************
+;;; next-rank-unsolved
+;;; ******************
 
-(defrule next-priority
+(defrule next-rank-unsolved
 
    (declare (salience -20))
    
@@ -253,17 +277,45 @@
    
    (not (impossible))
    
-   (priority ?last)
+   (rank (value ?last))
    
-   (not (priority ?p&:(> ?p ?last)))
+   (not (rank (value ?p&:(> ?p ?last))))
    
-   (technique (priority ?next&:(> ?next ?last)))
+   (technique (rank ?next&:(> ?next ?last)))
    
-   (not (technique (priority ?p&:(> ?p ?last)&:(< ?p ?next))))
+   (not (technique (rank ?p&:(> ?p ?last)&:(< ?p ?next))))
+   
+   (exists (unsolved))
+      
+   =>
+      
+   (assert (rank (value ?next) (process yes))))
+
+;;; **********************
+;;; next-rank-not-unsolved
+;;; **********************
+
+(defrule next-rank-not-unsolved
+
+   (declare (salience -20))
+
+   (phase match)
+   
+   (not (impossible))
+   
+   (rank (value ?last))
+   
+   (not (rank (value ?p&:(> ?p ?last))))
+   
+   (technique (rank ?next&:(> ?next ?last)))
+   
+   (not (technique (rank ?p&:(> ?p ?last)&:(< ?p ?next))))
+   
+   (not (unsolved))
    
    =>
-   
-   (assert (priority ?next)))
+      
+   (assert (rank (value ?next) (process no))))
 
 ;;; ************
 ;;; begin-output
@@ -277,11 +329,11 @@
    
    (not (impossible))
    
-   (priority ?last)
+   (rank (value ?last))
    
-   (not (priority ?p&:(> ?p ?last)))
+   (not (rank (value ?p&:(> ?p ?last))))
 
-   (not (technique (priority ?next&:(> ?next ?last))))
+   (not (technique (rank ?next&:(> ?next ?last))))
    
    =>
    

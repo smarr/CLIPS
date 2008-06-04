@@ -1,3 +1,40 @@
+;;; The puzzle is: 
+;;;
+;;;    * 6 1  * * 4  8 2 *
+;;;    * 2 *  9 * *  * * *
+;;;    * * 3  * 8 *  * * *
+;;;
+;;;    * * *  5 4 *  3 * 7
+;;;    6 5 *  * * *  * 8 4
+;;;    7 * 4  * 6 8  * * *
+;;;
+;;;    * * *  * 3 *  7 * *
+;;;    * * *  * * 9  * 3 *
+;;;    * 9 8  4 * *  6 5 *
+;;;
+;;; The solution is: 
+;;;
+;;;    9 6 1  3 7 4  8 2 5
+;;;    8 2 7  9 5 6  4 1 3
+;;;    5 4 3  2 8 1  9 7 6
+;;;
+;;;    1 8 9  5 4 2  3 6 7
+;;;    6 5 2  7 9 3  1 8 4
+;;;    7 3 4  1 6 8  5 9 2
+;;;
+;;;    2 1 6  8 3 5  7 4 9
+;;;    4 7 5  6 1 9  2 3 8
+;;;    3 9 8  4 2 7  6 5 1
+;;;
+;;; Rules used:
+;;;
+;;;    Naked Single
+;;;    Hidden Single
+;;;    Locked Candidate Single Line
+;;;    Locked Candidate Multiple Lines
+;;;    Hidden Pairs
+;;;    X Wing
+
 (defrule grid-values
 
    ?f <- (phase grid-values)

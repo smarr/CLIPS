@@ -186,9 +186,9 @@
 
    (phase list-rules)
       
-   ?f <- (technique-employed (priority ?p) (reason ?reason))
+   ?f <- (technique-employed (rank ?p) (reason ?reason))
    
-   (not (technique-employed (priority ?p2&:(< ?p2 ?p))))
+   (not (technique-employed (rank ?p2&:(< ?p2 ?p))))
       
    =>
    

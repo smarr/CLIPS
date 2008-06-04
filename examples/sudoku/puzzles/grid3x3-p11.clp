@@ -1,3 +1,42 @@
+;;; The puzzle is: 
+;;;
+;;;    8 * *  * 1 *  * 5 4
+;;;    7 * *  * 4 *  6 * *
+;;;    2 * *  5 * *  * * *
+;;;
+;;;    * * *  * * 1  * 9 *
+;;;    3 * 7  * * *  4 * 8
+;;;    * 5 *  4 * *  * * *
+;;;
+;;;    * * *  * * 3  * * 2
+;;;    * * 1  * 7 *  * * 9
+;;;    9 2 *  * 6 *  * * 7
+;;;
+;;; The solution is: 
+;;;
+;;;    8 3 6  7 1 2  9 5 4
+;;;    7 1 5  8 4 9  6 2 3
+;;;    2 4 9  5 3 6  8 7 1
+;;;
+;;;    4 6 2  3 8 1  7 9 5
+;;;    3 9 7  6 2 5  4 1 8
+;;;    1 5 8  4 9 7  2 3 6
+;;;
+;;;    6 7 4  9 5 3  1 8 2
+;;;    5 8 1  2 7 4  3 6 9
+;;;    9 2 3  1 6 8  5 4 7
+;;;
+;;; Rules used:
+;;;
+;;;    Naked Single
+;;;    Hidden Single
+;;;    Locked Candidate Single Line
+;;;    Locked Candidate Multiple Lines
+;;;    Naked Pairs
+;;;    Naked Triples
+;;;    XY-Wing
+;;;    Swordfish
+
 (defrule grid-values
 
    ?f <- (phase grid-values)
