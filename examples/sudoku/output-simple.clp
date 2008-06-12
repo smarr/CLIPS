@@ -70,6 +70,8 @@
    
    =>
    
+   (assert (position-printed ?r ?c))
+   
    (printout t "   row: " ?r " column: " ?c " value: *" crlf))
    
 ;;; ********************
@@ -84,11 +86,13 @@
    
    (size ?s)
    
-   ?f <- (print-position ?r ?c&~=(* ?s ?s))
+   ?f1 <- (print-position ?r ?c&~=(* ?s ?s))
+   
+   ?f2 <- (position-printed ?r ?c)
       
    =>
    
-   (retract ?f)
+   (retract ?f1 ?f2)
    
    (assert (print-position ?r (+ 1 ?c))))
 
@@ -104,11 +108,13 @@
    
    (size ?s)
    
-   ?f <- (print-position ?r&~=(* ?s ?s) =(* ?s ?s))
+   ?f1 <- (print-position ?r&~=(* ?s ?s) ?c&=(* ?s ?s))
       
+   ?f2 <- (position-printed ?r ?c)
+   
    =>
       
-   (retract ?f)
+   (retract ?f1 ?f2)
    
    (assert (print-position (+ 1 ?r) 1)))
    
@@ -124,7 +130,9 @@
    
    (size ?s)
 
-   ?f2 <- (print-position =(* ?s ?s) =(* ?s ?s))
+   ?f2 <- (print-position ?r&=(* ?s ?s) ?c&=(* ?s ?s))
+   
+   ?f3 <- (position-printed ?r ?c)
    
    (exists (technique-employed))
       
@@ -132,7 +140,7 @@
    
    (printout t crlf crlf "Rules used:" crlf crlf)
    
-   (retract ?f1 ?f2)
+   (retract ?f1 ?f2 ?f3)
    
    (assert (phase list-rules)))
    
@@ -148,7 +156,9 @@
    
    (size ?s)
    
-   ?f <- (print-position =(* ?s ?s) =(* ?s ?s))
+   ?f1 <- (print-position ?r&=(* ?s ?s) ?c&=(* ?s ?s))
+   
+   ?f2 <- (position-printed ?r ?c)
    
    (not (technique-employed))
       
@@ -156,7 +166,7 @@
    
    (printout t crlf)
    
-   (retract ?f))
+   (retract ?f1 ?f2))
 
 ;;; *******************
 ;;; initial-output-done
@@ -170,13 +180,15 @@
    
    (size ?s)
    
-   ?f1 <- (print-position =(* ?s ?s) =(* ?s ?s))
-      
+   ?f1 <- (print-position ?r&=(* ?s ?s) ?c&=(* ?s ?s))
+   
+   ?f2 <- (position-printed ?r ?c)
+         
    =>
    
    (printout t crlf)
    
-   (retract ?f1))
+   (retract ?f1 ?f2))
       
 ;;; *********
 ;;; list-rule

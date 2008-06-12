@@ -104,6 +104,8 @@
    
    (declare (salience 20))
 
+   (phase elimination)
+
    ?f <- (unsolved (row ?r) (column ?c))
    
    (possible (row ?r) (column ?c) (value ?v))
@@ -218,6 +220,8 @@
 
 (defrule naked-single-group
    
+   (phase match)
+
    (rank (value ?p) (process yes))
 
    (technique (name Naked-Single) (rank ?p))
@@ -240,6 +244,8 @@
 
 (defrule naked-single-row
    
+   (phase match)
+
    (rank (value ?p) (process yes))
 
    (technique (name Naked-Single) (rank ?p))
@@ -262,6 +268,8 @@
 
 (defrule naked-single-column
    
+   (phase match)
+
    (rank (value ?p) (process yes))
 
    (technique (name Naked-Single) (rank ?p))
@@ -288,6 +296,8 @@
 
 (defrule hidden-single-group
    
+   (phase match)
+
    (rank (value ?p) (process yes))
 
    (technique (name Hidden-Single) (rank ?p))
@@ -310,6 +320,8 @@
 
 (defrule hidden-single-row
    
+   (phase match)
+
    (rank (value ?p) (process yes))
 
    (technique (name Hidden-Single) (rank ?p))
@@ -332,6 +344,8 @@
 
 (defrule hidden-single-column
    
+   (phase match)
+
    (rank (value ?p) (process yes))
 
    (technique (name Hidden-Single) (rank ?p))
@@ -357,7 +371,9 @@
 ;;; ********************************
 
 (defrule locked-candidate-single-line-row
-   
+
+   (phase match)
+
    (rank (value ?p) (process yes))
 
    (technique (name Locked-Candidate-Single-Line) (rank ?p))
@@ -379,7 +395,9 @@
 ;;; ***********************************
 
 (defrule locked-candidate-single-line-column
-   
+
+   (phase match)
+
    (rank (value ?p) (process yes))
 
    (technique (name Locked-Candidate-Single-Line) (rank ?p))
@@ -406,6 +424,8 @@
 
 (defrule locked-candidates-multiple-lines-row
 
+   (phase match)
+
    (rank (value ?p) (process yes))
 
    (technique (name Locked-Candidate-Multiple-Lines) (rank ?p))
@@ -427,6 +447,8 @@
 ;;; **************************************
 
 (defrule locked-candidate-multiple-lines-column
+
+   (phase match)
 
    (rank (value ?p) (process yes))
 
@@ -454,6 +476,8 @@
 ;;; ***************
 
 (defrule naked-pairs-row
+
+   (phase match)
 
    (rank (value ?p) (process yes))
 
@@ -485,6 +509,8 @@
 
 (defrule naked-pairs-column
 
+   (phase match)
+
    (rank (value ?p) (process yes))
 
    (technique (name Naked-Pairs) (rank ?p))
@@ -514,6 +540,8 @@
 ;;; *****************
 
 (defrule naked-pairs-group
+
+   (phase match)
 
    (rank (value ?p) (process yes))
 
@@ -549,6 +577,8 @@
 
 (defrule hidden-pairs-row
 
+   (phase match)
+
    (rank (value ?p) (process yes))
 
    (technique (name Hidden-Pairs) (rank ?p))
@@ -576,6 +606,8 @@
 ;;; *******************
 
 (defrule hidden-pairs-column
+
+   (phase match)
 
    (rank (value ?p) (process yes))
 
@@ -605,6 +637,8 @@
 ;;; ******************
 
 (defrule hidden-pairs-group
+
+   (phase match)
 
    (rank (value ?p) (process yes))
 
@@ -638,7 +672,9 @@
 ;;; **********
 
 (defrule X-Wing-Row
-   
+
+   (phase match)
+
    (rank (value ?p) (process yes))
 
    (technique (name X-Wing) (rank ?p))
@@ -668,7 +704,9 @@
 ;;; *************
 
 (defrule X-Wing-Column
-   
+
+   (phase match)
+
    (rank (value ?p) (process yes))
 
    (technique (name X-Wing) (rank ?p))
@@ -703,8 +741,6 @@
 
 (defrule generate-triples
    
-   (declare (salience 10))
-   
    (rank (value ?p) (process yes))
 
    (technique (name Naked-Triples) (rank ?p))
@@ -717,8 +753,6 @@
 
    (size-value (size ?sv3&:(<= ?sv3 ?s)) (value ?v3&:(> ?v3 ?v2)))
 
-   (not (impossible (id ?id) (value ?v) (rank ?p)))
-
    =>
    
    (assert (triple ?v1 ?v2 ?v3)))
@@ -728,6 +762,8 @@
 ;;; *****************
 
 (defrule naked-triples-row
+
+   (phase match)
 
    (rank (value ?p) (process yes))
 
@@ -761,6 +797,8 @@
 
 (defrule naked-triples-column
 
+   (phase match)
+
    (rank (value ?p) (process yes))
 
    (technique (name Naked-Triples) (rank ?p))
@@ -792,6 +830,8 @@
 ;;; *******************
 
 (defrule naked-triples-group
+
+   (phase match)
 
    (rank (value ?p) (process yes))
 
@@ -829,6 +869,8 @@
 
 (defrule hidden-triples-row
 
+   (phase match)
+
    (rank (value ?p) (process yes))
 
    (technique (name Hidden-Triples) (rank ?p))
@@ -857,6 +899,8 @@
 
 (defrule hidden-triples-column
 
+   (phase match)
+
    (rank (value ?p) (process yes))
 
    (technique (name Hidden-Triples) (rank ?p))
@@ -884,6 +928,8 @@
 ;;; ********************
 
 (defrule hidden-triples-group
+
+   (phase match)
 
    (rank (value ?p) (process yes))
 
@@ -917,6 +963,8 @@
 
 (defrule swordfish-row
 
+   (phase match)
+
    (rank (value ?p) (process yes))
 
    (technique (name Swordfish) (rank ?p))
@@ -948,6 +996,8 @@
 ;;; ****************
 
 (defrule swordfish-column
+
+   (phase match)
 
    (rank (value ?p) (process yes))
 
@@ -984,6 +1034,8 @@
 ;;; *******
  
 (defrule XY-Wing
+
+   (phase match)
 
    (rank (value ?p) (process yes))
 
@@ -1039,7 +1091,7 @@
   (technique (name Duplicate-Color | Color-Conjugate-Pair | Multi-Color-Type-1  | Multi-Color-Type-2) 
              (rank ?p))
   
-  (not (color-pair))
+  (not (color-pair ? ?))
 
   =>
   
@@ -1262,6 +1314,8 @@
 
 (defrule duplicate-color-in-row
 
+   (phase match)
+
    (rank (value ?p) (process yes))
 
    (technique (name Duplicate-Color) (rank ?p))
@@ -1291,6 +1345,8 @@
 
 (defrule duplicate-color-in-column
 
+   (phase match)
+
    (rank (value ?p) (process yes))
 
    (technique (name Duplicate-Color) (rank ?p))
@@ -1318,6 +1374,8 @@
 ;;; ************************
 
 (defrule duplicate-color-in-group
+
+   (phase match)
 
    (rank (value ?p) (process yes))
 
@@ -1348,6 +1406,8 @@
 ;;; ********************
 
 (defrule color-conjugate-pair
+
+   (phase match)
 
    (rank (value ?p) (process yes))
 
@@ -1380,6 +1440,8 @@
 ;;; ##################
    
 (defrule multi-color-type-1
+
+   (phase match)
 
    (rank (value ?p) (process yes))
 
@@ -1434,6 +1496,8 @@
 ;;; ##################
    
 (defrule multi-color-type-2
+
+   (phase match)
 
    (rank (value ?p) (process yes))
 
@@ -1493,6 +1557,8 @@
 (defrule start-chain
 
    (declare (salience -10))
+   
+   (phase match)
 
    (rank (value ?p) (process yes))
 
@@ -1525,12 +1591,14 @@
 (defrule continue-chain-row
 
    (declare (salience -10))
+   
+   (phase match)
 
    (rank (value ?p) (process yes))
 
    (technique (name Forced-Chain-Convergence | Forced-Chain-XY) (rank ?p))
 
-   ?f <- (chain (row ?r) (column ?c1) (value ?v1) (start-row ?sr) (start-column ?sc) (start-value ?sv))
+   (chain (row ?r) (column ?c1) (value ?v1) (start-row ?sr) (start-column ?sc) (start-value ?sv))
           
    (possible (row ?r) (column ?c2&~?c1) (value ?v1))
    
@@ -1543,10 +1611,14 @@
                  
    =>
    
-   (duplicate ?f (column ?c2)
-                 (group ?g)
-                 (id ?id)
-                 (value ?v2)))
+   (assert (chain (start-row ?sr)
+                  (start-column ?sc)
+                  (start-value ?sv)
+                  (column ?c2)
+                  (row ?r)
+                  (group ?g)
+                  (id ?id)
+                  (value ?v2))))
 
 ;;; *********************
 ;;; continue-chain-column
@@ -1555,12 +1627,14 @@
 (defrule continue-chain-column
 
    (declare (salience -10))
+   
+   (phase match)
 
    (rank (value ?p) (process yes))
 
    (technique (name Forced-Chain-Convergence | Forced-Chain-XY) (rank ?p))
-
-   ?f <- (chain (row ?r1) (column ?c) (value ?v1) (start-row ?sr) (start-column ?sc) (start-value ?sv))
+   
+   (chain (row ?r1) (column ?c) (value ?v1) (start-row ?sr) (start-column ?sc) (start-value ?sv))
           
    (possible (row ?r2&~?r1) (column ?c) (value ?v1))
    
@@ -1572,12 +1646,16 @@
                (start-row ?sr) (start-column ?sc) (start-value ?sv)))
 
    =>
-   
-   (duplicate ?f (row ?r2)
-                 (group ?g)
-                 (id ?id)
-                 (value ?v2)))
 
+   (assert (chain (start-row ?sr)
+                  (start-column ?sc)
+                  (start-value ?sv)
+                  (row ?r2)
+                  (column ?c)
+                  (group ?g)
+                  (id ?id)
+                  (value ?v2))))
+   
 ;;; ********************
 ;;; continue-chain-group
 ;;; ********************
@@ -1585,12 +1663,14 @@
 (defrule continue-chain-group
 
    (declare (salience -10))
+   
+   (phase match)
 
    (rank (value ?p) (process yes))
 
    (technique (name Forced-Chain-Convergence | Forced-Chain-XY) (rank ?p))
 
-   ?f <- (chain (group ?g) (id ?id1) (value ?v1) (start-row ?sr) (start-column ?sc) (start-value ?sv))
+   (chain (group ?g) (id ?id1) (value ?v1) (start-row ?sr) (start-column ?sc) (start-value ?sv))
           
    (possible (row ?r) (column ?c) (group ?g) (id ?id2&~?id1) (value ?v1))
    
@@ -1602,17 +1682,23 @@
                (start-row ?sr) (start-column ?sc) (start-value ?sv)))
 
    =>
-   
-   (duplicate ?f (row ?r)
-                 (column ?c)
-                 (id ?id2)
-                 (value ?v2)))
+
+   (assert (chain (start-row ?sr)
+                  (start-column ?sc)
+                  (start-value ?sv)
+                  (row ?r)
+                  (column ?c)
+                  (group ?g)
+                  (id ?id2)
+                  (value ?v2))))
 
 ;;; ************************
 ;;; forced-chain-convergence
 ;;; ************************
 
 (defrule forced-chain-convergence
+
+   (phase match)
 
    (rank (value ?p) (process yes))
 
@@ -1645,6 +1731,8 @@
 ;;; ***************
 
 (defrule forced-chain-XY
+
+   (phase match)
 
    (rank (value ?p) (process yes))
 
@@ -1683,7 +1771,9 @@
 ;;; ********************
 
 (defrule Unique-Rectangle-Row
-   
+
+   (phase match)
+
    (rank (value ?p) (process yes))
 
    (technique (name Unique-Rectangle) (rank ?p))
@@ -1724,6 +1814,8 @@
 
 (defrule Unique-Rectangle-Column
    
+   (phase match)
+
    (rank (value ?p) (process yes))
 
    (technique (name Unique-Rectangle) (rank ?p))
