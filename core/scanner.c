@@ -30,6 +30,7 @@
 #define _STDIO_INCLUDED_
 #include <string.h>
 #include <limits.h>
+#include <errno.h>
 
 #include "setup.h"
 #include "constant.h"
@@ -722,12 +723,13 @@ static void ScanNumber(
      }
    else
      {
+      errno = 0;
 #if WIN_MVC
       lvalue = _strtoi64(ScannerData(theEnv)->GlobalString,NULL,10);
 #else
       lvalue = strtoll(ScannerData(theEnv)->GlobalString,NULL,10);
 #endif
-      if ((lvalue == LLONG_MAX) || (lvalue == LLONG_MIN))
+      if (errno)
         {
          PrintWarningID(theEnv,"SCANNER",1,FALSE);
          EnvPrintRouter(theEnv,WWARNING,"Over or underflow of long long integer.\n");

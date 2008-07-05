@@ -45,11 +45,6 @@
 #include <dos.h>
 #endif
 
-#if WIN_BTC
-#define LLONG_MAX 0x7fffffffffffffffLL
-#define LLONG_MIN (~LLONG_MAX)
-#endif
-
 #ifdef LOCALE
 #undef LOCALE
 #endif
