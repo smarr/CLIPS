@@ -38,7 +38,9 @@
 ;;; *********************
 
 (defrule initialize-techniques
-   
+  
+  (declare (salience 10))
+
    =>
    
    (assert (technique (name Naked-Single) (rank 1)))
