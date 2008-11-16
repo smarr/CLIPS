@@ -49,6 +49,7 @@
    LOCALE long long                      MemUsedCommand(void *);
    LOCALE long long                      MemRequestsCommand(void *);
    LOCALE void                           OptionsCommand(void *);
+   LOCALE void                          *OperatingSystemFunction(void *);
    LOCALE void                           ExpandFuncCall(void *,DATA_OBJECT *);
    LOCALE void                           DummyExpandFuncMultifield(void *,DATA_OBJECT *);
    LOCALE void                          *CauseEvaluationError(void *);

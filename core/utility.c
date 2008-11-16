@@ -420,17 +420,12 @@ globle char *AppendToString(
    /*=========================================*/
 
    length = strlen(appendStr);
-   if (length + *oldPos + 1 > *oldMax)
-     {
-      oldStr = (char *) genrealloc(theEnv,oldStr,*oldMax,length + *oldPos + 1);
-      *oldMax = length + *oldPos + 1;
-     }
 
    /*==============================================================*/
    /* Return NULL if the old string was not successfully expanded. */
    /*==============================================================*/
 
-   if (oldStr == NULL) { return(NULL); }
+   if ((oldStr = EnlargeString(theEnv,length,oldStr,oldPos,oldMax)) == NULL) { return(NULL); }
 
    /*===============================================*/
    /* Append the new string to the expanded string. */
@@ -442,6 +437,84 @@ globle char *AppendToString(
    /*============================================================*/
    /* Return the expanded string containing the appended string. */
    /*============================================================*/
+
+   return(oldStr);
+  }
+
+/**********************************************************/
+/* InsertInString: Inserts a string within another string */
+/*   (expanding the other string if necessary).           */
+/**********************************************************/
+globle char *InsertInString(
+  void *theEnv,
+  char *insertStr,
+  size_t position,
+  char *oldStr,
+  size_t *oldPos,
+  size_t *oldMax)
+  {
+   size_t length;
+
+   /*=========================================*/
+   /* Expand the old string so it can contain */
+   /* the new string (if necessary).          */
+   /*=========================================*/
+
+   length = strlen(insertStr);
+
+   /*==============================================================*/
+   /* Return NULL if the old string was not successfully expanded. */
+   /*==============================================================*/
+
+   if ((oldStr = EnlargeString(theEnv,length,oldStr,oldPos,oldMax)) == NULL) { return(NULL); }
+
+   /*================================================================*/
+   /* Shift the contents to the right of insertion point so that the */
+   /* new text does not overwrite what is currently in the string.   */
+   /*================================================================*/
+   
+   memmove(&oldStr[position],&oldStr[position+length],*oldPos - position);
+
+   /*===============================================*/
+   /* Insert the new string in the expanded string. */
+   /*===============================================*/
+
+   genstrncpy(&oldStr[*oldPos],insertStr,length);
+   *oldPos += (int) length;
+
+   /*============================================================*/
+   /* Return the expanded string containing the appended string. */
+   /*============================================================*/
+
+   return(oldStr);
+  }
+  
+/*******************************************************************/
+/* EnlargeString: Enlarges a string by the specified amount.       */
+/*******************************************************************/
+globle char *EnlargeString(
+  void *theEnv,
+  size_t length,
+  char *oldStr,
+  size_t *oldPos,
+  size_t *oldMax)
+  {
+   /*=========================================*/
+   /* Expand the old string so it can contain */
+   /* the new string (if necessary).          */
+   /*=========================================*/
+
+   if (length + *oldPos + 1 > *oldMax)
+     {
+      oldStr = (char *) genrealloc(theEnv,oldStr,*oldMax,length + *oldPos + 1);
+      *oldMax = length + *oldPos + 1;
+     }
+
+   /*==============================================================*/
+   /* Return NULL if the old string was not successfully expanded. */
+   /*==============================================================*/
+
+   if (oldStr == NULL) { return(NULL); }
 
    return(oldStr);
   }

@@ -94,7 +94,9 @@ struct utilityData
    LOCALE char                          *AppendStrings(void *,char *,char *);
    LOCALE char                          *StringPrintForm(void *,char *);
    LOCALE char                          *AppendToString(void *,char *,char *,size_t *,size_t *);
+   LOCALE char                          *InsertInString(void *,char *,size_t,char *,size_t *,size_t *);
    LOCALE char                          *AppendNToString(void *,char *,char *,size_t,size_t *,size_t *);
+   LOCALE char                          *EnlargeString(void *,size_t,char *,size_t *,size_t *);
    LOCALE char                          *ExpandStringWithChar(void *,int,char *,size_t *,size_t *,size_t);
    LOCALE struct callFunctionItem       *AddFunctionToCallList(void *,char *,int,void (*)(void *),
                                                                struct callFunctionItem *,intBool);

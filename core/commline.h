@@ -64,6 +64,7 @@ struct commandLineData
    LOCALE void                           FlushCommandString(void *);
    LOCALE void                           SetCommandString(void *,char *);
    LOCALE void                           AppendCommandString(void *,char *);
+   LOCALE void                           InsertCommandString(void *,char *,unsigned);
    LOCALE char                          *GetCommandString(void *);
    LOCALE int                            CompleteCommand(char *);
    LOCALE void                           CommandLoop(void *);
