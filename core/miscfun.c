@@ -810,23 +810,23 @@ globle void *OperatingSystemFunction(
 #endif
 
 #if UNIX_V
-   return(EnvAddSymbol(theEnv,"UNIX_V")); Ã
+   return(EnvAddSymbol(theEnv,"UNIX-V"));
 #endif
 
 #if UNIX_7
-   return(EnvAddSymbol(theEnv,"UNIX_7")); Ã
+   return(EnvAddSymbol(theEnv,"UNIX-7"));
 #endif
 
 #if LINUX
-   return(EnvAddSymbol(theEnv,"LINUX")); Ã
+   return(EnvAddSymbol(theEnv,"LINUX"));
 #endif
 
 #if DARWIN
-   return(EnvAddSymbol(theEnv,"DARWIN")); Ã
+   return(EnvAddSymbol(theEnv,"DARWIN"));
 #endif
 
 #if MAC_XCD || MAC_MCW
-   return(EnvAddSymbol(theEnv,"MAC_OS_X"));
+   return(EnvAddSymbol(theEnv,"MAC-OS-X"));
 #endif
 
 #if IBM && (! WINDOW_INTERFACE)
