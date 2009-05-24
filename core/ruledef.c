@@ -372,7 +372,9 @@ globle void AddBetaMemoriesToJoin(
    if ((theNode->leftMemory != NULL) || (theNode->rightMemory != NULL))
      { return; }
 
-   if ((! theNode->firstJoin) || theNode->patternIsExists)
+   //if ((! theNode->firstJoin) || theNode->patternIsExists)
+
+   if ((! theNode->firstJoin) || theNode->patternIsExists || theNode-> patternIsNegated || theNode->joinFromTheRight)
      {
       if (theNode->leftHash == NULL)
         {
@@ -393,7 +395,8 @@ globle void AddBetaMemoriesToJoin(
          theNode->leftMemory->last = NULL;
         }
 
-      if (theNode->firstJoin && theNode->patternIsExists)
+ //     if (theNode->firstJoin && theNode->patternIsExists)
+      if (theNode->firstJoin && (theNode->patternIsExists || theNode-> patternIsNegated || theNode->joinFromTheRight))
         {
          theNode->leftMemory->beta[0] = CreateEmptyPartialMatch(theEnv); 
          theNode->leftMemory->beta[0]->owner = theNode;
