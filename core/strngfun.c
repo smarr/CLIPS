@@ -510,7 +510,7 @@ globle void *SubStringFunction(
    /* end, return a null string.       */
    /*==================================*/
 
-   if (start > end)
+   if ((start > end) || (length == 0))
      { return((void *) EnvAddSymbol(theEnv,"")); }
 
    /*=============================================*/
