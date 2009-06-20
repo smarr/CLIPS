@@ -1066,7 +1066,7 @@ static void SaveSingleInstanceBinary(
       Write out the number of slot-overrides
       ====================================== */
    fwrite((void *) &theInstance->cls->instanceSlotCount,
-          (int) sizeof(unsigned),1,bsaveFP);
+          (int) sizeof(short),1,bsaveFP);
 
    /* =========================================
       Write out the slot names and value counts
@@ -1326,7 +1326,7 @@ static intBool LoadSingleBinaryInstance(
   {
    SYMBOL_HN *instanceName,
              *className;
-   int slotCount;
+   short slotCount;
    DEFCLASS *theDefclass;
    INSTANCE_TYPE *newInstance;
    struct bsaveSlotValue *bsArray;
@@ -1352,7 +1352,7 @@ static intBool LoadSingleBinaryInstance(
    /* ==================
       Get the slot count
       ================== */
-   BufferedRead(theEnv,(void *) &slotCount,(unsigned long) sizeof(unsigned));
+   BufferedRead(theEnv,(void *) &slotCount,(unsigned long) sizeof(short));
 
    /* =============================
       Make sure the defclass exists
