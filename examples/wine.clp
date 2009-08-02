@@ -105,7 +105,7 @@
             (the-question "Is the main component of the meal meat, fish, or poultry? ")
             (valid-answers meat fish poultry unknown))
   (question (attribute has-turkey)
-            (precursors main-component is turkey)
+            (precursors main-component is poultry)
             (the-question "Does the meal have turkey in it? ")
             (valid-answers yes no unknown))
   (question (attribute has-sauce)
