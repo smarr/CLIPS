@@ -1635,7 +1635,7 @@ int IntGetAgendaList()
   item_list = (String *)calloc(maxItems,sizeof(String));
   while(act_ptr != NULL)
       {
-      /*name = GetActivationName((VOID*)act_ptr);*/
+      /*name = GetActivationName((void*)act_ptr);*/
       EnvGetActivationPPForm(theEnv,buffer,MAX_CHAR_IN_BUF - 1,act_ptr);
       item_list[itemCount] = balloc(strlen(buffer) + 1, char);
       strcpy(item_list[itemCount++],buffer);
@@ -1712,7 +1712,7 @@ static void AgendaFire(
   act_ptr = (struct activation *) EnvGetNextActivation(theEnv,NULL);
   for (i = 0; i < current->list_index ; i++)
     act_ptr = (struct activation *) EnvGetNextActivation(theEnv,act_ptr);
-  MoveActivationToTop(theEnv,(VOID*)act_ptr);
+  MoveActivationToTop(theEnv,(void*)act_ptr);
   MoveEndOfFile(dialog_text, &TheEvent);
   SetCommandString(theEnv,"(run 1)\n");
   EnvPrintRouter(theEnv,"wclips","(run 1)\n");
@@ -2411,7 +2411,7 @@ int IntGetDefruleLis()
    
    while(rule_ptr != NULL)
      {
-      name = EnvGetDefruleName(theEnv,(VOID*) rule_ptr);
+      name = EnvGetDefruleName(theEnv,(void*) rule_ptr);
       item_list[itemCount] = balloc(strlen(name) + 1,char);
       strcpy(item_list[itemCount], name);
       itemCount++;
@@ -2420,7 +2420,7 @@ int IntGetDefruleLis()
          maxItems = 2*maxItems;
          item_list = (String *)realloc(item_list,maxItems * sizeof(String));
         } 
-      rule_ptr = (struct defrule *) EnvGetNextDefrule(theEnv, (VOID*)rule_ptr);
+      rule_ptr = (struct defrule *) EnvGetNextDefrule(theEnv, (void*)rule_ptr);
      }
      
    item_list[itemCount] = NULL;
@@ -2595,7 +2595,7 @@ int IntGetFactList()
          maxItems = 2 * (maxItems);
          item_list = (String*)realloc(item_list,maxItems * sizeof(String));
        }
-      fact_ptr = (struct deffacts *) EnvGetNextDeffacts(theEnv,(VOID*)fact_ptr);
+      fact_ptr = (struct deffacts *) EnvGetNextDeffacts(theEnv,(void*)fact_ptr);
       }
     item_list[itemCount] = NULL;
     sortList(item_list,itemCount);
@@ -2701,7 +2701,7 @@ int IntGetDeftemplateList()
          maxItems = 2 * maxItems;
          item_list = (String*)realloc(item_list,maxItems * sizeof(String));
        }
-      dtmpl_ptr = (struct deftemplate *) EnvGetNextDeftemplate(theEnv,(VOID*)dtmpl_ptr);
+      dtmpl_ptr = (struct deftemplate *) EnvGetNextDeftemplate(theEnv,(void*)dtmpl_ptr);
     }
   item_list[itemCount] = NULL;
   sortList(item_list,itemCount);
@@ -2800,7 +2800,7 @@ int IntGetDeffunctionList()
   item_list = (String *)calloc(maxItems,sizeof(String));
   while(dfunc_ptr != NULL)
    {
-     name = EnvGetDeffunctionName(theEnv,(VOID *) dfunc_ptr);
+     name = EnvGetDeffunctionName(theEnv,(void *) dfunc_ptr);
      item_list[itemCount] = balloc(strlen(name) + 1, char); 
      strcpy(item_list[itemCount++],name);
      if(itemCount == (maxItems - 1))
@@ -2808,7 +2808,7 @@ int IntGetDeffunctionList()
           maxItems = maxItems * 2;
           item_list = (String *)realloc(item_list,maxItems * sizeof(String));
         }
-     dfunc_ptr = (DEFFUNCTION *) EnvGetNextDeffunction(theEnv,(VOID*)dfunc_ptr);  
+     dfunc_ptr = (DEFFUNCTION *) EnvGetNextDeffunction(theEnv,(void*)dfunc_ptr);  
    }
   item_list[itemCount] = NULL;
   sortList(item_list,itemCount);
@@ -2915,7 +2915,7 @@ int IntGetDefgenericList()
          maxItems = maxItems * 2;
          item_list = (String *)realloc(item_list,maxItems*sizeof(String));
         }
-      generic_func_ptr = (struct generic_func *) EnvGetNextDefgeneric(theEnv,(VOID*)generic_func_ptr);
+      generic_func_ptr = (struct generic_func *) EnvGetNextDefgeneric(theEnv,(void*)generic_func_ptr);
      }
    item_list[itemCount] = NULL;
    sortList(item_list,itemCount);
@@ -3003,7 +3003,7 @@ static void DefgenericWatchCallback(
   XtPointer call_data)
   {
    void *theEnv = GetCurrentEnvironment();
-  VOID* defgenericPtr = NULL;
+  void* defgenericPtr = NULL;
   Widget list_widget = (Widget)client_data;
   XawListReturnStruct *current = XawListShowCurrent(list_widget);
 
@@ -3329,7 +3329,7 @@ int IntGetDefmethodList(
   char *Aname)
   {
    void *theEnv = GetCurrentEnvironment();
-   VOID *genrc_ptr;
+   void *genrc_ptr;
    unsigned theIndex;
    char buf[61];
    register int itemCount = 0;
@@ -3384,7 +3384,7 @@ int IntGetDefinstancesList()
   item_list = (String*)calloc(maxItems,sizeof(String));
   while( definstance_ptr != NULL)
    {
-      name = EnvGetDefinstancesName(theEnv, (VOID*)definstance_ptr);
+      name = EnvGetDefinstancesName(theEnv, (void*)definstance_ptr);
       item_list[itemCount] = balloc(strlen(name) + 1, char);
       strcpy(item_list[itemCount++],name);
       if(itemCount == (maxItems - 1))
@@ -3392,7 +3392,7 @@ int IntGetDefinstancesList()
          maxItems = maxItems * 2;
          item_list = (String*)realloc(item_list,maxItems * sizeof(String));
        }
-      definstance_ptr = (struct definstance *)  EnvGetNextDefinstances(theEnv,(VOID*)definstance_ptr);
+      definstance_ptr = (struct definstance *)  EnvGetNextDefinstances(theEnv,(void*)definstance_ptr);
    }
   item_list[itemCount] = NULL;
   sortList(item_list,itemCount);
@@ -3497,7 +3497,7 @@ int IntGetDefclassList()
          maxItems = maxItems * 2;
          item_list = (String*)realloc(item_list,maxItems * sizeof(String));
        }
-      cls_ptr = (struct cls *) EnvGetNextDefclass(theEnv,(VOID*)cls_ptr);
+      cls_ptr = (struct cls *) EnvGetNextDefclass(theEnv,(void*)cls_ptr);
     }
    item_list[itemCount] = NULL;
    sortList(item_list,itemCount);  
@@ -3770,7 +3770,7 @@ int IntGetDefmessgHndlerList(
 char *name)
 {
    void *theEnv = GetCurrentEnvironment();
-   VOID *defclass_ptr;
+   void *defclass_ptr;
    unsigned theIndex;
    char *buf1,*buf2;
    unsigned int maxItems = 20;
@@ -4315,7 +4315,7 @@ static void  DefruleBreakPointCallback(
   {
    void *theEnv = GetCurrentEnvironment();
    Boolean OnOff = False;
-   VOID *defrulePtr;
+   void *defrulePtr;
    Widget list_widget = (Widget)client_data;
    XawListReturnStruct *current = XawListShowCurrent(list_widget);
 
@@ -4351,7 +4351,7 @@ static void   DefruleActivationCallback(
   XtPointer call_data)
   {
    void *theEnv = GetCurrentEnvironment();
-  VOID *defrulePtr;
+  void *defrulePtr;
   Widget list_widget = (Widget)client_data;
   XawListReturnStruct *current = XawListShowCurrent(list_widget);
 
@@ -4374,7 +4374,7 @@ static void   DefruleFiringsCallback(
   XtPointer call_data)
   {
    void *theEnv = GetCurrentEnvironment();
-   VOID *defrulePtr;
+   void *defrulePtr;
    Widget list_widget = (Widget)client_data;
    XawListReturnStruct *current = XawListShowCurrent(list_widget);
 
@@ -4396,7 +4396,7 @@ static void DefruleMngrCheckboxesCallback(
   XtPointer call_data)
   {
    void *theEnv = GetCurrentEnvironment();
-   VOID *defrulePtr;
+   void *defrulePtr;
    Widget *CheckBoxes = (Widget*)client_data;
    XawListReturnStruct *current = XawListShowCurrent(w);
 
@@ -4424,7 +4424,7 @@ static void   WatchInstancesCallback(
   XtPointer call_data)
   {
    void *theEnv = GetCurrentEnvironment();
-   VOID *defclassPtr;
+   void *defclassPtr;
    Widget list_widget = (Widget)client_data;
    XawListReturnStruct *current = XawListShowCurrent(list_widget);
 
@@ -4446,7 +4446,7 @@ static void   WatchSlotCallback(
   XtPointer call_data)
   {
    void *theEnv = GetCurrentEnvironment();
-   VOID *defclassPtr;
+   void *defclassPtr;
    Widget list_widget = (Widget)client_data;
    XawListReturnStruct *current = XawListShowCurrent(list_widget);
 
@@ -4518,7 +4518,7 @@ static void DeftemplateMngrCheckboxCallback(
   XtPointer call_data)
   {
    void *theEnv = GetCurrentEnvironment();
-   VOID* deftemplatePtr = NULL;
+   void* deftemplatePtr = NULL;
    Widget checkbox = (Widget)client_data;
    XawListReturnStruct *current = XawListShowCurrent(w);
 
@@ -4543,7 +4543,7 @@ static void DeffunctionWatchCallback(
   XtPointer call_data)
   {
    void *theEnv = GetCurrentEnvironment();
-  VOID* deffunctionPtr = NULL;
+  void* deffunctionPtr = NULL;
   Widget list_widget = (Widget)client_data;
   XawListReturnStruct *current = XawListShowCurrent(list_widget);
 
@@ -4567,7 +4567,7 @@ static void DeffunctionMngrCheckboxCallback(
   XtPointer call_data)
   {
    void *theEnv = GetCurrentEnvironment();
-   VOID *deffunctionPtr = NULL;
+   void *deffunctionPtr = NULL;
    Widget checkbox = (Widget)client_data;
    XawListReturnStruct *current = XawListShowCurrent(w);
 
@@ -4592,7 +4592,7 @@ static void DefmessHdlrMngrWatchCallback(
   XtPointer call_data)
   {
    void *theEnv = GetCurrentEnvironment();
-   VOID *defclassPtr = NULL;
+   void *defclassPtr = NULL;
    char *buf1,buf2[20];
    unsigned i,j = 0,theIndex;
    Widget list_widget = (Widget)client_data;
@@ -4641,7 +4641,7 @@ static void DefmessHdlrMngrCheckBoxCallback(
   XtPointer call_data)
   {
    void *theEnv = GetCurrentEnvironment();
-   VOID* defclassPtr = NULL;
+   void* defclassPtr = NULL;
    char *buf1;
    char buf2[20];
    unsigned i,j =  0, theIndex;

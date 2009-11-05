@@ -342,7 +342,7 @@ int XclipsExit(
 int PrintChangedAgenda()
   {
    void *theEnv = GetCurrentEnvironment();
-   VOID *rule_ptr;
+   void *rule_ptr;
    char buffer[MAX_CHAR_IN_BUF];
    char *name, labelBuffer[MAX_CHAR_IN_BUF];
    Window AgendaWin;
@@ -402,7 +402,7 @@ int PrintChangedAgenda()
 int PrintChangedFacts()
   {
    void *theEnv = GetCurrentEnvironment();
-  VOID *fact_ptr;
+  void *fact_ptr;
   char buffer[MAX_CHAR_IN_BUF];
   char *name,labelBuffer[MAX_CHAR_IN_BUF];
   Window FactWin;
@@ -457,7 +457,7 @@ int PrintChangedInstances()
   {
    void *theEnv = GetCurrentEnvironment();
    int n = 0;
-   VOID *instancePtr;
+   void *instancePtr;
    char buffer[MAX_CHAR_IN_BUF];
    char *name, labelBuffer[MAX_CHAR_IN_BUF];
    Window InstanceWin;
@@ -488,13 +488,13 @@ int PrintChangedInstances()
    XtSetValues(instances_text,TheArgs,n);
    XawAsciiSourceFreeString(XawTextGetSource(instances_text));
    /* Print the new instance list */
-   instancePtr = (VOID *) EnvGetNextInstance(theEnv,NULL);
+   instancePtr = (void *) EnvGetNextInstance(theEnv,NULL);
    while (instancePtr != NULL)
      {
       EnvGetInstancePPForm(theEnv,buffer,MAX_CHAR_IN_BUF - 1,instancePtr);
       EnvPrintRouter(theEnv,"xinstances",buffer);
       EnvPrintRouter(theEnv,"xinstances","\n");
-      instancePtr = (VOID *) EnvGetNextInstance(theEnv,instancePtr);
+      instancePtr = (void *) EnvGetNextInstance(theEnv,instancePtr);
      }
   
    return 0;
@@ -509,7 +509,7 @@ int PrintChangedInstances()
 int PrintChangedGlobals()
   {
    void *theEnv = GetCurrentEnvironment();
-   VOID *dgPtr;
+   void *dgPtr;
    int n;
    char *buffer;
    char *name,labelBuffer[MAX_CHAR_IN_BUF];
@@ -565,7 +565,7 @@ int PrintChangedGlobals()
 int PrintChangedFocus()
   {
    void *theEnv = GetCurrentEnvironment();
-   VOID *FocusPtr;
+   void *FocusPtr;
    int n;
    char *buffer;
 
