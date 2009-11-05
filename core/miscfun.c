@@ -810,11 +810,11 @@ globle void *OperatingSystemFunction(
 #endif
 
 #if UNIX_V
-   return(EnvAddSymbol(theEnv,"UNIX-V")); Ã
+   return(EnvAddSymbol(theEnv,"UNIX-V"));
 #endif
 
 #if UNIX_7
-   return(EnvAddSymbol(theEnv,"UNIX-7")); Ã
+   return(EnvAddSymbol(theEnv,"UNIX-7"));
 #endif
 
 #if LINUX
