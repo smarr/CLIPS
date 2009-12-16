@@ -342,6 +342,13 @@ static void SlotToCode(
 
    fprintf(theFile,",");
    PrintHashedExpressionReference(theEnv,theFile,theSlot->defaultList,imageID,maxIndices);
+   
+   /*============*/
+   /* Facet List */
+   /*============*/
+   
+   fprintf(theFile,",");
+   PrintHashedExpressionReference(theEnv,theFile,theSlot->facetList,imageID,maxIndices);
    fprintf(theFile,",");
 
    /*===========*/
