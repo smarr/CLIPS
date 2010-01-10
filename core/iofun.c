@@ -120,6 +120,7 @@ globle void IOFunctionDefinitions(
    EnvDefineFunction2(theEnv,"open",       'b', OpenFunction,  "OpenFunction", "23*k");
    EnvDefineFunction2(theEnv,"close",      'b', CloseFunction, "CloseFunction", "*1");
    EnvDefineFunction2(theEnv,"get-char",   'i', GetCharFunction, "GetCharFunction", "*1");
+   EnvDefineFunction2(theEnv,"put-char",   'v', PTIEF PutCharFunction, "PutCharFunction", "12");
    EnvDefineFunction2(theEnv,"remove",   'b', RemoveFunction,  "RemoveFunction", "11k");
    EnvDefineFunction2(theEnv,"rename",   'b', RenameFunction, "RenameFunction", "22k");
    EnvDefineFunction2(theEnv,"format",   's', PTIEF FormatFunction, "FormatFunction", "2**us");
@@ -594,6 +595,71 @@ globle int GetCharFunction(
      }
 
    return(EnvGetcRouter(theEnv,logicalName));
+  }
+
+/***************************************/
+/* PutCharFunction: H/L access routine */
+/*   for the put-char function.        */
+/***************************************/
+globle void PutCharFunction(
+  void *theEnv)
+  {
+   int numberOfArguments;
+   char *logicalName;
+   DATA_OBJECT theValue;
+   long long theChar;
+   FILE *theFile;
+
+   if ((numberOfArguments = EnvArgRangeCheck(theEnv,"put-char",1,2)) == -1)
+     { return; }
+     
+   /*=======================*/
+   /* Get the logical name. */
+   /*=======================*/
+   
+   if (numberOfArguments == 1)
+     { logicalName = "stdout"; }
+   else
+     {
+      logicalName = GetLogicalName(theEnv,1,"stdout");
+      if (logicalName == NULL)
+        {
+         IllegalLogicalNameMessage(theEnv,"put-char");
+         SetHaltExecution(theEnv,TRUE);
+         SetEvaluationError(theEnv,TRUE);
+         return;
+        }
+     }
+
+   if (QueryRouters(theEnv,logicalName) == FALSE)
+     {
+      UnrecognizedRouterMessage(theEnv,logicalName);
+      SetHaltExecution(theEnv,TRUE);
+      SetEvaluationError(theEnv,TRUE);
+      return;
+     }
+
+   /*===========================*/
+   /* Get the character to put. */
+   /*===========================*/
+   
+   if (numberOfArguments == 1)
+     { if (EnvArgTypeCheck(theEnv,"put-char",1,INTEGER,&theValue) == FALSE) return; }
+   else
+     { if (EnvArgTypeCheck(theEnv,"put-char",2,INTEGER,&theValue) == FALSE) return; }
+     
+   theChar = DOToLong(theValue);
+   
+   /*===================================================*/
+   /* If the "fast load" option is being used, then the */
+   /* logical name is actually a pointer to a file and  */
+   /* we can bypass the router and directly output the  */
+   /* value.                                            */
+   /*===================================================*/
+      
+   theFile = FindFptr(theEnv,logicalName);
+   if (theFile != NULL)
+     { putc((int) theChar,theFile); }
   }
 
 /****************************************/

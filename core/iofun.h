@@ -44,6 +44,7 @@
    LOCALE int                            OpenFunction(void *);
    LOCALE int                            CloseFunction(void *);
    LOCALE int                            GetCharFunction(void *);
+   LOCALE void                           PutCharFunction(void *);
    LOCALE void                           ReadlineFunction(void *,DATA_OBJECT_PTR);
    LOCALE void                          *FormatFunction(void *);
    LOCALE int                            RemoveFunction(void *);
