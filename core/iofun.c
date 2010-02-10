@@ -33,6 +33,8 @@
 /*            printout command to perform the same function  */
 /*            as crlf.                                       */
 /*                                                           */
+/*            Added a+, w+, rb, ab, r+b, w+b, and a+b modes  */
+/*            for the open function.                         */
 /*************************************************************/
 
 #define _IOFUN_SOURCE_
@@ -494,14 +496,21 @@ globle int OpenFunction(
    /*=====================================*/
 
    if ((strcmp(accessMode,"r") != 0) &&
-       (strcmp(accessMode,"r+") != 0) &&
        (strcmp(accessMode,"w") != 0) &&
        (strcmp(accessMode,"a") != 0) &&
-       (strcmp(accessMode,"wb") != 0))
+       (strcmp(accessMode,"r+") != 0) &&
+       (strcmp(accessMode,"w+") != 0) &&
+       (strcmp(accessMode,"a+") != 0) &&
+       (strcmp(accessMode,"rb") != 0) &&
+       (strcmp(accessMode,"wb") != 0) &&
+       (strcmp(accessMode,"ab") != 0) &&
+       (strcmp(accessMode,"r+b") != 0) &&
+       (strcmp(accessMode,"w+b") != 0) &&
+       (strcmp(accessMode,"a+b") != 0))
      {
       SetHaltExecution(theEnv,TRUE);
       SetEvaluationError(theEnv,TRUE);
-      ExpectedTypeError1(theEnv,"open",3,"string with value \"r\", \"r+\", \"w\", \"wb\", or \"a\"");
+      ExpectedTypeError1(theEnv,"open",3,"string with value \"r\", \"w\", \"a\", \"r+\", \"w+\", \"rb\", \"wb\", \"ab\", \"r+b\", or \"w+b\"");
       return(0);
      }
 
