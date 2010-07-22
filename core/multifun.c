@@ -145,6 +145,7 @@ globle void MultifieldFunctionDefinitions(
    AddFunctionParser(theEnv,"foreach",ForeachParser);
 #endif
    FuncSeqOvlFlags(theEnv,"progn$",FALSE,FALSE);
+   FuncSeqOvlFlags(theEnv,"foreach",FALSE,FALSE);
    EnvDefineFunction2(theEnv,"(get-progn$-field)", 'u', PTIEF GetMvPrognField, "GetMvPrognField", "00");
    EnvDefineFunction2(theEnv,"(get-progn$-index)", 'l', PTIEF GetMvPrognIndex, "GetMvPrognIndex", "00");
 #endif
@@ -1250,7 +1251,8 @@ static void ReplaceMvPrognFieldVars(
         }
       else if (theExp->argList != NULL)
         {
-         if ((theExp->type == FCALL) && (theExp->value == (void *) FindFunction(theEnv,"progn$")))
+         if ((theExp->type == FCALL) && ((theExp->value == (void *) FindFunction(theEnv,"progn$")) ||
+                                        (theExp->value == (void *) FindFunction(theEnv,"foreach")) ))
            ReplaceMvPrognFieldVars(theEnv,fieldVar,theExp->argList,depth+1);
          else
            ReplaceMvPrognFieldVars(theEnv,fieldVar,theExp->argList,depth);
