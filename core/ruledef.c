@@ -320,7 +320,7 @@ globle void DefruleRunTimeInitialize(
   struct joinLink *leftPrime)
   {
    struct defmodule *theModule;
-   struct defrule *theRule;
+   struct defrule *theRule, *theDisjunct;
 
    DefruleData(theEnv)->RightPrimeJoins = rightPrime;
    DefruleData(theEnv)->LeftPrimeJoins = leftPrime;   
@@ -335,7 +335,12 @@ globle void DefruleRunTimeInitialize(
       for (theRule = EnvGetNextDefrule(theEnv,NULL);
            theRule != NULL;
            theRule = EnvGetNextDefrule(theEnv,theRule))
-        { AddBetaMemoriesToRule(theEnv,theRule->lastJoin); }
+        { 
+         for (theDisjunct = theRule;
+              theDisjunct != NULL;
+              theDisjunct = theDisjunct->disjunct)
+           { AddBetaMemoriesToRule(theEnv,theDisjunct->lastJoin); }
+        }
      }
      
    RestoreCurrentModule(theEnv);
