@@ -320,7 +320,7 @@ static void WriteNeededBitMaps(
    BITMAP_HN **bitMapArray;
    BITMAP_HN *bitMapPtr;
    unsigned long int numberOfUsedBitMaps = 0, size = 0;
-   char tempSize;
+   unsigned short tempSize;
 
    /*=================================*/
    /* Get a copy of the bitmap table. */
@@ -341,7 +341,7 @@ static void WriteNeededBitMaps(
          if (bitMapPtr->neededBitMap)
            {
             numberOfUsedBitMaps++;
-            size += (unsigned long) (bitMapPtr->size + 1);
+            size += (unsigned long) (bitMapPtr->size + sizeof(unsigned short));
            }
         }
      }
@@ -361,8 +361,8 @@ static void WriteNeededBitMaps(
         {
          if (bitMapPtr->neededBitMap)
            {
-            tempSize = (char) bitMapPtr->size;
-            GenWrite((void *) &tempSize,(unsigned long) sizeof(char),fp);
+            tempSize = (unsigned short) bitMapPtr->size;
+            GenWrite((void *) &tempSize,(unsigned long) sizeof(unsigned short),fp);
             GenWrite((void *) bitMapPtr->contents,(unsigned long) bitMapPtr->size,fp);
            }
         }
@@ -534,6 +534,7 @@ static void ReadNeededBitMaps(
    char *bitMapStorage, *bitMapPtr;
    unsigned long space;
    long i;
+   unsigned short *tempSize;
 
    /*=======================================*/
    /* Determine the number of bitmaps to be */
@@ -564,8 +565,9 @@ static void ReadNeededBitMaps(
    bitMapPtr = bitMapStorage;
    for (i = 0; i < SymbolData(theEnv)->NumberOfBitMaps; i++)
      {
-      SymbolData(theEnv)->BitMapArray[i] = (BITMAP_HN *) EnvAddBitMap(theEnv,bitMapPtr+1,*bitMapPtr);
-      bitMapPtr += *bitMapPtr + 1;
+      tempSize = (unsigned short *) bitMapPtr;
+      SymbolData(theEnv)->BitMapArray[i] = (BITMAP_HN *) EnvAddBitMap(theEnv,bitMapPtr+sizeof(unsigned short),*tempSize);
+      bitMapPtr += *tempSize + sizeof(unsigned short);
      }
 
    /*=========================*/
