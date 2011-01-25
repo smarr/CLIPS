@@ -246,7 +246,7 @@ globle int EnvBload(
            {
             EnvPrintRouter(theEnv,WDIALOG,"\nSkipping ");
             EnvPrintRouter(theEnv,WDIALOG,constructBuffer);
-            EnvPrintRouter(theEnv,WDIALOG," constructs because of unavailibility\n");
+            EnvPrintRouter(theEnv,WDIALOG," constructs because of unavailability\n");
            }
         }
      }
