@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*              CLIPS Version 6.20  01/31/02           */
+   /*              CLIPS Version 6.10  04/09/97           */
    /*                                                     */
    /*                                                     */
    /*******************************************************/
@@ -10,12 +10,15 @@
 /* Purpose: Definstances Construct Compiler Code             */
 /*                                                           */
 /* Principal Programmer(s):                                  */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Contributing Programmer(s):                               */
 /*                                                           */
 /* Revision History:                                         */
 /*                                                           */
+/* Who               |     Date    | Description             */
+/* ------------------+-------------+------------------------ */
+/* M.Giordano        | 23-Mar-2000 | Mods made for TLS       */
 /*************************************************************/
 
 /* =========================================
@@ -28,7 +31,6 @@
 #if DEFINSTANCES_CONSTRUCT && CONSTRUCT_COMPILER && (! RUN_TIME)
 
 #include "conscomp.h"
-#include "envrnmnt.h"
 #include "defins.h"
 
 #define _DFINSCMP_SOURCE_
@@ -36,15 +38,34 @@
 
 /* =========================================
    *****************************************
+                   CONSTANTS
+   =========================================
+   ***************************************** */
+
+/* =========================================
+   *****************************************
+               MACROS AND TYPES
+   =========================================
+   ***************************************** */
+
+/* =========================================
+   *****************************************
       INTERNALLY VISIBLE FUNCTION HEADERS
    =========================================
    ***************************************** */
 
-static void ReadyDefinstancesForCode(void *);
-static int DefinstancesToCode(void *,char *,char *,char *,int,FILE *,int,int);
-static void CloseDefinstancesFiles(void *,FILE *,FILE *,int);
-static void DefinstancesModuleToCode(void *,FILE *,struct defmodule *,int,int);
-static void SingleDefinstancesToCode(void *,FILE *,DEFINSTANCES *,int,int,int);
+static void ReadyDefinstancesForCode(void);
+static int DefinstancesToCode(char *,int,FILE *,int,int);
+static void CloseDefinstancesFiles(FILE *,FILE *,int);
+static void DefinstancesModuleToCode(FILE *,struct defmodule *,int,int);
+static void SingleDefinstancesToCode(FILE *,DEFINSTANCES *,int,int,int);
+
+/* =========================================
+   *****************************************
+      INTERNALLY VISIBLE GLOBAL VARIABLES
+   =========================================
+   ***************************************** */
+Thread static struct CodeGeneratorItem *DefinstancesCodeItem;
 
 /* =========================================
    *****************************************
@@ -61,10 +82,9 @@ static void SingleDefinstancesToCode(void *,FILE *,DEFINSTANCES *,int,int,int);
   SIDE EFFECTS : Code generator item initialized
   NOTES        : None
  ***************************************************/
-globle void SetupDefinstancesCompiler(
-  void *theEnv)
+globle void SetupDefinstancesCompiler()
   {
-   DefinstancesData(theEnv)->DefinstancesCodeItem = AddCodeGeneratorItem(theEnv,"definstances",0,ReadyDefinstancesForCode,
+   DefinstancesCodeItem = AddCodeGeneratorItem("definstances",0,ReadyDefinstancesForCode,
                                                NULL,DefinstancesToCode,2);
   }
 
@@ -83,14 +103,13 @@ globle void SetupDefinstancesCompiler(
   NOTES        : None
  ****************************************************/
 globle void DefinstancesCModuleReference(
-  void *theEnv,
   FILE *theFile,
   int count,
   int imageID,
   int maxIndices)
   {
    fprintf(theFile,"MIHS &%s%d_%d[%d]",
-                      ModulePrefix(DefinstancesData(theEnv)->DefinstancesCodeItem),
+                      ModulePrefix(DefinstancesCodeItem),
                       imageID,
                       (count / maxIndices) + 1,
                       (count % maxIndices));
@@ -111,10 +130,9 @@ globle void DefinstancesCModuleReference(
   SIDE EFFECTS : BsaveIndices set
   NOTES        : None
  ***************************************************/
-static void ReadyDefinstancesForCode(
-  void *theEnv)
+static void ReadyDefinstancesForCode()
   {
-   MarkConstructBsaveIDs(theEnv,DefinstancesData(theEnv)->DefinstancesModuleIndex);
+   MarkConstructBsaveIDs(DefinstancesModuleIndex);
   }
 
 /*******************************************************
@@ -133,10 +151,7 @@ static void ReadyDefinstancesForCode(
   NOTES        : None
  *******************************************************/
 static int DefinstancesToCode(
-  void *theEnv,
   char *fileName,
-  char *pathName,
-  char *fileNameBuffer,
   int fileID,
   FILE *headerFP,
   int imageID,
@@ -158,56 +173,56 @@ static int DefinstancesToCode(
       Loop through all the modules and all the definstances writing
       their C code representation to the file as they are traversed
       ============================================================= */
-   theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,NULL);
+   theModule = (struct defmodule *) GetNextDefmodule(NULL);
 
    while (theModule != NULL)
      {
-      EnvSetCurrentModule(theEnv,(void *) theModule);
+      SetCurrentModule((void *) theModule);
 
-      moduleFile = OpenFileIfNeeded(theEnv,moduleFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
+      moduleFile = OpenFileIfNeeded(moduleFile,fileName,fileID,imageID,&fileCount,
                                     moduleArrayVersion,headerFP,
-                                    "DEFINSTANCES_MODULE",ModulePrefix(DefinstancesData(theEnv)->DefinstancesCodeItem),
+                                    "DEFINSTANCES_MODULE",ModulePrefix(DefinstancesCodeItem),
                                     FALSE,NULL);
 
       if (moduleFile == NULL)
         {
-         CloseDefinstancesFiles(theEnv,moduleFile,definstancesFile,maxIndices);
+         CloseDefinstancesFiles(moduleFile,definstancesFile,maxIndices);
          return(0);
         }
 
-      DefinstancesModuleToCode(theEnv,moduleFile,theModule,imageID,maxIndices);
-      moduleFile = CloseFileIfNeeded(theEnv,moduleFile,&moduleArrayCount,&moduleArrayVersion,
+      DefinstancesModuleToCode(moduleFile,theModule,imageID,maxIndices);
+      moduleFile = CloseFileIfNeeded(moduleFile,&moduleArrayCount,&moduleArrayVersion,
                                      maxIndices,NULL,NULL);
 
-      theDefinstances = (DEFINSTANCES *) EnvGetNextDefinstances(theEnv,NULL);
+      theDefinstances = (DEFINSTANCES *) GetNextDefinstances(NULL);
 
       while (theDefinstances != NULL)
         {
-         definstancesFile = OpenFileIfNeeded(theEnv,definstancesFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
+         definstancesFile = OpenFileIfNeeded(definstancesFile,fileName,fileID,imageID,&fileCount,
                                              definstancesArrayVersion,headerFP,
-                                             "DEFINSTANCES",ConstructPrefix(DefinstancesData(theEnv)->DefinstancesCodeItem),
+                                             "DEFINSTANCES",ConstructPrefix(DefinstancesCodeItem),
                                              FALSE,NULL);
          if (definstancesFile == NULL)
            {
-            CloseDefinstancesFiles(theEnv,moduleFile,definstancesFile,maxIndices);
+            CloseDefinstancesFiles(moduleFile,definstancesFile,maxIndices);
             return(0);
            }
 
-         SingleDefinstancesToCode(theEnv,definstancesFile,theDefinstances,imageID,
+         SingleDefinstancesToCode(definstancesFile,theDefinstances,imageID,
                                   maxIndices,moduleCount);
          definstancesArrayCount++;
-         definstancesFile = CloseFileIfNeeded(theEnv,definstancesFile,&definstancesArrayCount,
+         definstancesFile = CloseFileIfNeeded(definstancesFile,&definstancesArrayCount,
                                               &definstancesArrayVersion,maxIndices,NULL,NULL);
 
-         theDefinstances = (DEFINSTANCES *) EnvGetNextDefinstances(theEnv,theDefinstances);
+         theDefinstances = (DEFINSTANCES *) GetNextDefinstances(theDefinstances);
         }
 
-      theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,theModule);
+      theModule = (struct defmodule *) GetNextDefmodule(theModule);
       moduleCount++;
       moduleArrayCount++;
      }
 
-   CloseDefinstancesFiles(theEnv,moduleFile,definstancesFile,maxIndices);
+   CloseDefinstancesFiles(moduleFile,definstancesFile,maxIndices);
 
    return(1);
   }
@@ -225,7 +240,6 @@ static int DefinstancesToCode(
   NOTES        : None
  ***************************************************/
 static void CloseDefinstancesFiles(
-  void *theEnv,
   FILE *moduleFile,
   FILE *definstancesFile,
   int maxIndices)
@@ -236,14 +250,14 @@ static void CloseDefinstancesFiles(
    if (definstancesFile != NULL)
      {
       count = maxIndices;
-      CloseFileIfNeeded(theEnv,definstancesFile,&count,&arrayVersion,
+      CloseFileIfNeeded(definstancesFile,&count,&arrayVersion,
                                          maxIndices,NULL,NULL);
      }
 
    if (moduleFile != NULL)
      {
       count = maxIndices;
-      CloseFileIfNeeded(theEnv,moduleFile,&count,&arrayVersion,maxIndices,NULL,NULL);
+      CloseFileIfNeeded(moduleFile,&count,&arrayVersion,maxIndices,NULL,NULL);
      }
   }
 
@@ -261,15 +275,14 @@ static void CloseDefinstancesFiles(
   NOTES        : None
  ***************************************************/
 static void DefinstancesModuleToCode(
-  void *theEnv,
   FILE *theFile,
   struct defmodule *theModule,
   int imageID,
   int maxIndices)
   {
    fprintf(theFile,"{");
-   ConstructModuleToCode(theEnv,theFile,theModule,imageID,maxIndices,
-                         DefinstancesData(theEnv)->DefinstancesModuleIndex,ConstructPrefix(DefinstancesData(theEnv)->DefinstancesCodeItem));
+   ConstructModuleToCode(theFile,theModule,imageID,maxIndices,
+                         DefinstancesModuleIndex,ConstructPrefix(DefinstancesCodeItem));
    fprintf(theFile,"}");
   }
 
@@ -288,7 +301,6 @@ static void DefinstancesModuleToCode(
   NOTES        : None
  ***************************************************/
 static void SingleDefinstancesToCode(
-  void *theEnv,
   FILE *theFile,
   DEFINSTANCES *theDefinstances,
   int imageID,
@@ -300,16 +312,26 @@ static void SingleDefinstancesToCode(
       =================== */
 
    fprintf(theFile,"{");
-   ConstructHeaderToCode(theEnv,theFile,&theDefinstances->header,imageID,maxIndices,moduleCount,
-                         ModulePrefix(DefinstancesData(theEnv)->DefinstancesCodeItem),
-                         ConstructPrefix(DefinstancesData(theEnv)->DefinstancesCodeItem));
+   ConstructHeaderToCode(theFile,&theDefinstances->header,imageID,maxIndices,moduleCount,
+                         ModulePrefix(DefinstancesCodeItem),
+                         ConstructPrefix(DefinstancesCodeItem));
 
    /* ==========================
       Definstances specific data
       ========================== */
    fprintf(theFile,",0,");
-   ExpressionToCode(theEnv,theFile,theDefinstances->mkinstance);
+   ExpressionToCode(theFile,theDefinstances->mkinstance);
    fprintf(theFile,"}");
   }
 
 #endif
+
+/***************************************************
+  NAME         :
+  DESCRIPTION  :
+  INPUTS       :
+  RETURNS      :
+  SIDE EFFECTS :
+  NOTES        :
+ ***************************************************/
+

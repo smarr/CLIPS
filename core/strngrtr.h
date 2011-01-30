@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.20  01/31/02            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*            STRING I/O ROUTER HEADER FILE            */
    /*******************************************************/
@@ -27,25 +27,6 @@
 #include <stdio.h>
 #endif
 
-#define STRING_ROUTER_DATA 48
-
-struct stringRouter
-  {
-   char *name;
-   char *str;
-   size_t currentPosition;
-   size_t maximumPosition;
-   int readWriteType;
-   struct stringRouter *next;
-  };
-
-struct stringRouterData
-  { 
-   struct stringRouter *ListOfStringRouters;
-  };
-
-#define StringRouterData(theEnv) ((struct stringRouterData *) GetEnvironmentData(theEnv,STRING_ROUTER_DATA))
-
 #ifdef LOCALE
 #undef LOCALE
 #endif
@@ -60,13 +41,18 @@ struct stringRouterData
 /* I/O ROUTER DEFINITIONS */
 /**************************/
 
-   LOCALE void                           InitializeStringRouter(void *);
-   LOCALE int                            OpenStringSource(void *,char *,char *,size_t);
-   LOCALE int                            OpenTextSource(void *,char *,char *,size_t,size_t);
-   LOCALE int                            CloseStringSource(void *,char *);
-   LOCALE int                            OpenStringDestination(void *,char *,char *,size_t);
-   LOCALE int                            CloseStringDestination(void *,char *);
+   LOCALE void                           InitializeStringRouter(void);
+   LOCALE DllExport int                  OpenStringSource(char *,char *,int);
+   LOCALE int                            OpenTextSource(char *,char *,int,int);
+   LOCALE DllExport int                  CloseStringSource(char *);
+   LOCALE int                            OpenStringDestination(char *,char *,int);
+   LOCALE int                            CloseStringDestination(char *);
 
 #endif
 
 
+
+
+
+
+

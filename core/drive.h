@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.30  10/19/06            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*                  DRIVE HEADER FILE                  */
    /*******************************************************/
@@ -17,10 +17,6 @@
 /* Contributing Programmer(s):                               */
 /*                                                           */
 /* Revision History:                                         */
-/*                                                           */
-/*      6.24: Renamed BOOLEAN macro type to intBool.         */
-/*                                                           */
-/*      6.30: Split out functions to improve performance.    */
 /*                                                           */
 /*************************************************************/
 
@@ -48,18 +44,18 @@
 #define LOCALE extern
 #endif
 
-   void                           NetworkAssert(void *,struct partialMatch *,struct joinNode *);
-   intBool                        EvaluateJoinExpression(void *,struct expr *,struct joinNode *);
-   void                           NetworkAssertLeft(void *,struct partialMatch *,struct joinNode *);
-   void                           NetworkAssertRight(void *,struct partialMatch *,struct joinNode *);
-   void                           PPDrive(void *,struct partialMatch *,struct partialMatch *,struct joinNode *);
-   unsigned long                  BetaMemoryHashValue(void *,struct expr *,struct partialMatch *,struct partialMatch *,struct joinNode *);
-   intBool                        EvaluateSecondaryNetworkTest(void *,struct partialMatch *,struct joinNode *);
-   void                           EPMDrive(void *,struct partialMatch *,struct joinNode *);
-   
+   void                           NetworkAssert(struct partialMatch *,struct joinNode *,int);
+   void                           PNLDrive(struct joinNode *,struct partialMatch *);
+   BOOLEAN                        EvaluateJoinExpression(struct expr *,struct partialMatch *,struct partialMatch *,struct joinNode *);
+
+#ifndef _DRIVE_SOURCE_
+   extern Thread int                     JoinOperationInProgress;
+#endif
+
 #endif
 
 
 
 
 
+

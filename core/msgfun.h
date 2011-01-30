@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*               CLIPS Version 6.24  06/05/06          */
+   /*               CLIPS Version 6.10  04/09/97          */
    /*                                                     */
    /*                                                     */
    /*******************************************************/
@@ -10,13 +10,11 @@
 /* Purpose: Message-passing support functions                */
 /*                                                           */
 /* Principal Programmer(s):                                  */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Contributing Programmer(s):                               */
 /*                                                           */
 /* Revision History:                                         */
-/*                                                           */
-/*      6.24: Renamed BOOLEAN macro type to intBool.         */
 /*                                                           */
 /*************************************************************/
 
@@ -25,8 +23,8 @@
 
 typedef struct handlerSlotReference
   {
-   long classID;
-   long slotID;
+   unsigned short classID;
+   unsigned slotID;
   } HANDLER_SLOT_REFERENCE;
 
 #ifndef _H_object
@@ -59,36 +57,46 @@ typedef struct handlerSlotReference
 #define LOCALE extern
 #endif
 
-   LOCALE void             UnboundHandlerErr(void *);
-   LOCALE void             PrintNoHandlerError(void *,char *);
-   LOCALE int              CheckHandlerArgCount(void *);
-   LOCALE void             SlotAccessViolationError(void *,char *,intBool,void *);
-   LOCALE void             SlotVisibilityViolationError(void *,SLOT_DESC *,DEFCLASS *);
+LOCALE void UnboundHandlerErr(void);
+LOCALE void PrintNoHandlerError(char *);
+LOCALE int CheckHandlerArgCount(void);
+LOCALE void SlotAccessViolationError(char *,BOOLEAN,void *);
+LOCALE void SlotVisibilityViolationError(SLOT_DESC *,DEFCLASS *);
 
 #if ! RUN_TIME
-   LOCALE void             NewSystemHandler(void *,char *,char *,char *,int);
-   LOCALE HANDLER         *InsertHandlerHeader(void *,DEFCLASS *,SYMBOL_HN *,int);
+LOCALE void NewSystemHandler(char *,char *,char *,int);
+LOCALE HANDLER *InsertHandlerHeader(DEFCLASS *,SYMBOL_HN *,int);
 #endif
 
 #if (! BLOAD_ONLY) && (! RUN_TIME)
-   LOCALE HANDLER         *NewHandler(void);
-   LOCALE int              HandlersExecuting(DEFCLASS *);
-   LOCALE int              DeleteHandler(void *,DEFCLASS *,SYMBOL_HN *,int,int);
-   LOCALE void             DeallocateMarkedHandlers(void *,DEFCLASS *);
+LOCALE HANDLER *NewHandler(void);
+LOCALE int HandlersExecuting(DEFCLASS *);
+LOCALE int DeleteHandler(DEFCLASS *,SYMBOL_HN *,int,int);
+LOCALE void DeallocateMarkedHandlers(DEFCLASS *);
 #endif
-   LOCALE unsigned         HandlerType(void *,char *,char *);
-   LOCALE int              CheckCurrentMessage(void *,char *,int);
-   LOCALE void             PrintHandler(void *,char *,HANDLER *,int);
-   LOCALE HANDLER         *FindHandlerByAddress(DEFCLASS *,SYMBOL_HN *,unsigned);
-   LOCALE int              FindHandlerByIndex(DEFCLASS *,SYMBOL_HN *,unsigned);
-   LOCALE int              FindHandlerNameGroup(DEFCLASS *,SYMBOL_HN *);
-   LOCALE void             HandlerDeleteError(void *,char *);
+LOCALE int HandlerType(char *,char *);
+LOCALE int CheckCurrentMessage(char *,int);
+LOCALE void PrintHandler(char *,HANDLER *,int);
+LOCALE HANDLER *FindHandlerByAddress(DEFCLASS *,SYMBOL_HN *,unsigned);
+LOCALE int FindHandlerByIndex(DEFCLASS *,SYMBOL_HN *,unsigned);
+LOCALE int FindHandlerNameGroup(DEFCLASS *,SYMBOL_HN *);
+LOCALE void HandlerDeleteError(char *);
 
 #if DEBUGGING_FUNCTIONS
-   LOCALE void             DisplayCore(void *,char *,HANDLER_LINK *,int);
-   LOCALE HANDLER_LINK    *FindPreviewApplicableHandlers(void *,DEFCLASS *,SYMBOL_HN *);
-   LOCALE void             WatchMessage(void *,char *,char *);
-   LOCALE void             WatchHandler(void *,char *,HANDLER_LINK *,char *);
+LOCALE void DisplayCore(char *,HANDLER_LINK *,int);
+LOCALE HANDLER_LINK *FindPreviewApplicableHandlers(DEFCLASS *,SYMBOL_HN *);
+LOCALE void WatchMessage(char *,char *);
+LOCALE void WatchHandler(char *,HANDLER_LINK *,char *);
+#endif
+
+
+#ifndef _MSGFUN_SOURCE_
+extern Thread SYMBOL_HN *INIT_SYMBOL,*DELETE_SYMBOL;
+extern Thread char *hndquals[];
+
+#if DEBUGGING_FUNCTIONS
+extern Thread int WatchHandlers,WatchMessages;
+#endif
 #endif
 
 #endif
@@ -99,3 +107,4 @@ typedef struct handlerSlotReference
 
 
 
+

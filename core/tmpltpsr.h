@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.20  01/31/02            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*            DEFTEMPLATE PARSER HEADER FILE           */
    /*******************************************************/
@@ -39,10 +39,14 @@
 #define LOCALE extern
 #endif
 
-   LOCALE int                            ParseDeftemplate(void *,char *);
-   LOCALE void                           InstallDeftemplate(void *,struct deftemplate *);
+   LOCALE int                            ParseDeftemplate(char *);
+   LOCALE void                           InstallDeftemplate(struct deftemplate *);
 
 #endif
 
 
 
+
+
+
+

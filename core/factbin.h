@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.20  01/31/02            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*            FACT BLOAD/BSAVE HEADER FILE             */
    /*******************************************************/
@@ -24,16 +24,6 @@
 
 #include "factbld.h"
 
-#define FACTBIN_DATA 62
-
-struct factBinaryData
-  { 
-   struct factPatternNode *FactPatternArray;
-   long NumberOfPatterns;
-  };
-  
-#define FactBinaryData(theEnv) ((struct factBinaryData *) GetEnvironmentData(theEnv,FACTBIN_DATA))
-
 #ifdef LOCALE
 #undef LOCALE
 #endif
@@ -44,10 +34,15 @@ struct factBinaryData
 #define LOCALE extern
 #endif
 
-   LOCALE void                           FactBinarySetup(void *);
+   LOCALE void                           FactBinarySetup(void);
+
+#ifndef _FACTBIN_SOURCE_
+   extern Thread struct factPatternNode  *FactPatternArray;
+#endif
 
 #define BsaveFactPatternIndex(patPtr) ((patPtr == NULL) ? -1L : ((struct factPatternNode *) patPtr)->bsaveID)
-#define BloadFactPatternPointer(i) ((struct factPatternNode *) ((i == -1L) ? NULL : &FactBinaryData(theEnv)->FactPatternArray[i]))
+#define BloadFactPatternPointer(i) ((struct factPatternNode *) ((i == -1L) ? NULL : &FactPatternArray[i]))
 
 #endif
 
+

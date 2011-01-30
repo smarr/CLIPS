@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*               CLIPS Version 6.24  05/17/06          */
+   /*               CLIPS Version 6.10  04/09/97          */
    /*                                                     */
    /*                                                     */
    /*******************************************************/
@@ -10,23 +10,18 @@
 /* Purpose:                                                  */
 /*                                                           */
 /* Principal Programmer(s):                                  */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Contributing Programmer(s):                               */
 /*                                                           */
 /* Revision History:                                         */
-/*                                                           */
-/*      6.24: Converted INSTANCE_PATTERN_MATCHING to         */
-/*            DEFRULE_CONSTRUCT.                             */
-/*                                                           */
-/*            Renamed BOOLEAN macro type to intBool.         */
 /*                                                           */
 /*************************************************************/
 
 #ifndef _H_objrtmch
 #define _H_objrtmch
 
-#if DEFRULE_CONSTRUCT && OBJECT_SYSTEM
+#if INSTANCE_PATTERN_MATCHING
 
 #define OBJECT_ASSERT  1
 #define OBJECT_RETRACT 2
@@ -57,7 +52,7 @@ typedef struct classBitMap
    char map[1];
   } CLASS_BITMAP;
 
-#define ClassBitMapSize(bmp) ((sizeof(CLASS_BITMAP) + \
+#define ClassBitMapSize(bmp) ((int) (sizeof(CLASS_BITMAP) + \
                                      (sizeof(char) * (bmp->maxid / BITS_PER_BYTE))))
 
 typedef struct slotBitMap
@@ -66,7 +61,7 @@ typedef struct slotBitMap
    char map[1];
   } SLOT_BITMAP;
 
-#define SlotBitMapSize(bmp) ((sizeof(SLOT_BITMAP) + \
+#define SlotBitMapSize(bmp) ((int) (sizeof(SLOT_BITMAP) + \
                                      (sizeof(char) * (bmp->maxid / BITS_PER_BYTE))))
 
 typedef struct objectAlphaNode OBJECT_ALPHA_NODE;
@@ -76,11 +71,10 @@ typedef struct objectPatternNode
    unsigned blocked        : 1;
    unsigned multifieldNode : 1;
    unsigned endSlot        : 1;
-   unsigned selector       : 1;
    unsigned whichField     : 8;
-   unsigned short leaveFields;
-   unsigned long long matchTimeTag;
-   int slotNameID;
+   unsigned leaveFields    : 8;
+   unsigned long matchTimeTag;
+   unsigned slotNameID;
    EXPRESSION *networkTest;
    struct objectPatternNode *nextLevel;
    struct objectPatternNode *lastLevel;
@@ -93,21 +87,13 @@ typedef struct objectPatternNode
 struct objectAlphaNode
   {
    struct patternNodeHeader header;
-   unsigned long long matchTimeTag;
+   unsigned long matchTimeTag;
    BITMAP_HN *classbmp,*slotbmp;
    OBJECT_PATTERN_NODE *patternNode;
    struct objectAlphaNode *nxtInGroup,
                           *nxtTerminal;
    long bsaveID;
   };
-
-typedef struct objectMatchAction
-  {
-   int type;
-   INSTANCE_TYPE *ins;
-   SLOT_BITMAP *slotNameIDs;
-   struct objectMatchAction *nxt;
-  } OBJECT_MATCH_ACTION;
 
 #ifdef LOCALE
 #undef LOCALE
@@ -119,15 +105,14 @@ typedef struct objectMatchAction
 #define LOCALE extern
 #endif
 
-   LOCALE void                  ObjectMatchDelay(void *,DATA_OBJECT *);
-   LOCALE intBool               SetDelayObjectPatternMatching(void *,int);
-   LOCALE intBool               GetDelayObjectPatternMatching(void *);
-   LOCALE OBJECT_PATTERN_NODE  *ObjectNetworkPointer(void *);
-   LOCALE OBJECT_ALPHA_NODE    *ObjectNetworkTerminalPointer(void *);
-   LOCALE void                  SetObjectNetworkPointer(void *,OBJECT_PATTERN_NODE *);
-   LOCALE void                  SetObjectNetworkTerminalPointer(void *,OBJECT_ALPHA_NODE *);
-   LOCALE void                  ObjectNetworkAction(void *,int,INSTANCE_TYPE *,int);
-   LOCALE void                  ResetObjectMatchTimeTags(void *);
+LOCALE void ObjectMatchDelay(DATA_OBJECT *);
+LOCALE BOOLEAN SetDelayObjectPatternMatching(int);
+LOCALE BOOLEAN GetDelayObjectPatternMatching(void);
+LOCALE OBJECT_PATTERN_NODE *ObjectNetworkPointer(void);
+LOCALE OBJECT_ALPHA_NODE *ObjectNetworkTerminalPointer(void);
+LOCALE void SetObjectNetworkPointer(OBJECT_PATTERN_NODE *);
+LOCALE void SetObjectNetworkTerminalPointer(OBJECT_ALPHA_NODE *);
+LOCALE void ObjectNetworkAction(int,INSTANCE_TYPE *,int);
 
 #endif
 
@@ -135,3 +120,7 @@ typedef struct objectMatchAction
 
 
 
+
+
+
+

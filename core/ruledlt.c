@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.30  10/19/06            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*                 RULE DELETION MODULE                */
    /*******************************************************/
@@ -18,12 +18,9 @@
 /*                                                           */
 /* Revision History:                                         */
 /*                                                           */
-/*      6.24: Removed DYNAMIC_SALIENCE compilation flag.     */
-/*                                                           */
-/*            Renamed BOOLEAN macro type to intBool.         */
-/*                                                           */
-/*      6.30: Added support for hashed alpha memories.       */
-/*                                                           */
+/* Who               |     Date    | Description             */
+/* ------------------+-------------+------------------------ */
+/* M.Giordano        | 23-Mar-2000 | Mods made for TLS       */
 /*************************************************************/
 
 #define _RULEDLT_SOURCE_
@@ -38,7 +35,6 @@
 
 #include "memalloc.h"
 #include "engine.h"
-#include "envrnmnt.h"
 #include "reteutil.h"
 #include "pattern.h"
 #include "agenda.h"
@@ -57,10 +53,18 @@
 /***************************************/
 
 #if (! RUN_TIME) && (! BLOAD_ONLY)
-   static void                    RemoveIntranetworkLink(void *,struct joinNode *);
+   static void                    RemoveIntranetworkLink(struct joinNode *);
+   static void                    DetachJoins(struct defrule *);
 #endif
-   static void                    DetachJoins(void *,struct joinNode *,intBool);
-   static void                    DetachJoinsDriver(void *,struct defrule *,intBool);
+
+/****************************************/
+/* GLOBAL INTERNAL VARIABLE DEFINITIONS */
+/****************************************/
+
+#if DEBUGGING_FUNCTIONS
+   Thread globle int                     DeletedRuleDebugFlags = FALSE;
+#endif
+
 
 /**********************************************************************/
 /* ReturnDefrule: Returns a defrule data structure and its associated */
@@ -70,17 +74,16 @@
 /*   are only deallocated for the first disjunct).                    */
 /**********************************************************************/
 globle void ReturnDefrule(
-  void *theEnv,
   void *vWaste)
   {
-#if (MAC_MCW || WIN_MCW) && (RUN_TIME || BLOAD_ONLY)
-#pragma unused(theEnv,vWaste)
+#if (MAC_MPW || MAC_MCW) && (RUN_TIME || BLOAD_ONLY)
+#pragma unused(vWaste)
 #endif
 
 #if (! RUN_TIME) && (! BLOAD_ONLY)
    struct defrule *waste = (struct defrule *) vWaste;
    int first = TRUE;
-   struct defrule *nextPtr, *tmpPtr;
+   struct defrule *nextPtr;
 
    if (waste == NULL) return;
 
@@ -90,10 +93,10 @@ globle void ReturnDefrule(
    /*======================================*/
 
 #if DEBUGGING_FUNCTIONS
-   DefruleData(theEnv)->DeletedRuleDebugFlags = 0;
-   if (waste->afterBreakpoint) BitwiseSet(DefruleData(theEnv)->DeletedRuleDebugFlags,0);
-   if (waste->watchActivation) BitwiseSet(DefruleData(theEnv)->DeletedRuleDebugFlags,1);
-   if (waste->watchFiring) BitwiseSet(DefruleData(theEnv)->DeletedRuleDebugFlags,2);
+   DeletedRuleDebugFlags = 0;
+   if (waste->afterBreakpoint) BitwiseSet(DeletedRuleDebugFlags,0);
+   if (waste->watchActivation) BitwiseSet(DeletedRuleDebugFlags,1);
+   if (waste->watchFiring) BitwiseSet(DeletedRuleDebugFlags,2);
 #endif
 
    /*================================*/
@@ -101,7 +104,7 @@ globle void ReturnDefrule(
    /* activations added by the rule. */
    /*================================*/
 
-   ClearRuleFromAgenda(theEnv,waste);
+   ClearRuleFromAgenda(waste);
 
    /*======================*/
    /* Get rid of the rule. */
@@ -113,7 +116,7 @@ globle void ReturnDefrule(
       /* Remove the rule's joins from the join network. */
       /*================================================*/
 
-      DetachJoinsDriver(theEnv,waste,FALSE);
+      DetachJoins(waste);
 
       /*=============================================*/
       /* If this is the first disjunct, get rid of   */
@@ -122,24 +125,18 @@ globle void ReturnDefrule(
 
       if (first)
         {
+#if DYNAMIC_SALIENCE
          if (waste->dynamicSalience != NULL)
           {
-           ExpressionDeinstall(theEnv,waste->dynamicSalience);
-           ReturnPackedExpression(theEnv,waste->dynamicSalience);
+           ExpressionDeinstall(waste->dynamicSalience);
+           ReturnPackedExpression(waste->dynamicSalience);
            waste->dynamicSalience = NULL;
           }
+#endif
          if (waste->header.ppForm != NULL)
            {
-            rm(theEnv,waste->header.ppForm,strlen(waste->header.ppForm) + 1);
+            rm(waste->header.ppForm,(int) strlen(waste->header.ppForm) + 1);
             waste->header.ppForm = NULL;
-            
-            /*=======================================================*/
-            /* All of the rule disjuncts share the same pretty print */
-            /* form, so we want to avoid deleting it again.          */
-            /*=======================================================*/
-            
-            for (tmpPtr = waste->disjunct; tmpPtr != NULL; tmpPtr = tmpPtr->disjunct)
-              { tmpPtr->header.ppForm = NULL; }
            }
 
          first = FALSE;
@@ -150,13 +147,13 @@ globle void ReturnDefrule(
       /*===========================*/
       
       if (waste->header.usrData != NULL)
-        { ClearUserDataList(theEnv,waste->header.usrData); }
+        { ClearUserDataList(waste->header.usrData); }
         
       /*===========================================*/
       /* Decrement the count for the defrule name. */
       /*===========================================*/
 
-      DecrementSymbolCount(theEnv,waste->header.name);
+      DecrementSymbolCount(waste->header.name);
 
       /*========================================*/
       /* Get rid of the the rule's RHS actions. */
@@ -164,8 +161,8 @@ globle void ReturnDefrule(
 
       if (waste->actions != NULL)
         {
-         ExpressionDeinstall(theEnv,waste->actions);
-         ReturnPackedExpression(theEnv,waste->actions);
+         ExpressionDeinstall(waste->actions);
+         ReturnPackedExpression(waste->actions);
         }
 
       /*===============================*/
@@ -173,7 +170,7 @@ globle void ReturnDefrule(
       /*===============================*/
 
       nextPtr = waste->disjunct;
-      rtn_struct(theEnv,defrule,waste);
+      rtn_struct(defrule,waste);
       waste = nextPtr;
      }
 
@@ -181,78 +178,27 @@ globle void ReturnDefrule(
    /* Free up partial matches. */
    /*==========================*/
 
-   if (EngineData(theEnv)->ExecutingRule == NULL) FlushGarbagePartialMatches(theEnv);
+   if (ExecutingRule == NULL) FlushGarbagePartialMatches();
 #endif
   }
 
-/********************************************************/
-/* DestroyDefrule: Action used to remove defrules       */
-/*   as a result of DestroyEnvironment.                 */
-/********************************************************/
-globle void DestroyDefrule(
-  void *theEnv,
-  void *vTheDefrule)
-  {
-   struct defrule *theDefrule = (struct defrule *) vTheDefrule;
-   struct defrule *nextDisjunct, *tmpPtr;
-   int first = TRUE;
-   
-   if (theDefrule == NULL) return;
-   
-   while (theDefrule != NULL)
-     {
-      DetachJoinsDriver(theEnv,theDefrule,TRUE);
-
-      if (first)
-        {
-#if (! BLOAD_ONLY) && (! RUN_TIME)
-         if (theDefrule->dynamicSalience != NULL)
-           { ReturnPackedExpression(theEnv,theDefrule->dynamicSalience); }
-
-         if (theDefrule->header.ppForm != NULL)
-           { 
-            rm(theEnv,theDefrule->header.ppForm,strlen(theDefrule->header.ppForm) + 1);
-            
-            /*=======================================================*/
-            /* All of the rule disjuncts share the same pretty print */
-            /* form, so we want to avoid deleting it again.          */
-            /*=======================================================*/
-            
-            for (tmpPtr = theDefrule->disjunct; tmpPtr != NULL; tmpPtr = tmpPtr->disjunct)
-              { tmpPtr->header.ppForm = NULL; }
-           }
-#endif
-
-         first = FALSE;
-        }
-     
-      if (theDefrule->header.usrData != NULL)
-        { ClearUserDataList(theEnv,theDefrule->header.usrData); }
-        
-#if (! BLOAD_ONLY) && (! RUN_TIME)
-      if (theDefrule->actions != NULL)
-        { ReturnPackedExpression(theEnv,theDefrule->actions); }
-#endif
-     
-      nextDisjunct = theDefrule->disjunct;
-      
-#if (! BLOAD_ONLY) && (! RUN_TIME)
-      rtn_struct(theEnv,defrule,theDefrule);
-#endif
-
-      theDefrule = nextDisjunct;
-     }
-  }
+#if (! RUN_TIME) && (! BLOAD_ONLY)
 
 /**********************************************************************/
-/* DetachJoinsDriver:                           */
+/* DetachJoins: Removes a join node and all of its parent nodes from  */
+/*   the join network. Nodes are only removed if they are no required */
+/*   by other rules (the same join can be shared by multiple rules).  */
+/*   Any partial matches associated with the join are also removed.   */
+/*   A rule's joins are typically removed by removing the bottom most */
+/*   join used by the rule and then removing any parent joins which   */
+/*   are not shared by other rules.                                   */
 /**********************************************************************/
-static void DetachJoinsDriver(
-  void *theEnv,
-  struct defrule *theRule,
-  intBool destroy)
+static void DetachJoins(
+  struct defrule *theRule)
   {
    struct joinNode *join;
+   struct joinNode *prevJoin;
+   struct joinNode *joinPtr, *lastJoin, *rightJoin;
 
    /*==================================*/
    /* Find the last join for the rule. */
@@ -270,37 +216,14 @@ static void DetachJoinsDriver(
    /*===================================================*/
 
    join->ruleToActivate = NULL;
-   if (join->nextLinks != NULL) return;
-   
-   DetachJoins(theEnv,join,destroy);
-  }
-   
-/**********************************************************************/
-/* DetachJoins: Removes a join node and all of its parent nodes from  */
-/*   the join network. Nodes are only removed if they are no required */
-/*   by other rules (the same join can be shared by multiple rules).  */
-/*   Any partial matches associated with the join are also removed.   */
-/*   A rule's joins are typically removed by removing the bottom most */
-/*   join used by the rule and then removing any parent joins which   */
-/*   are not shared by other rules.                                   */
-/**********************************************************************/
-static void DetachJoins(
-  void *theEnv,
-  struct joinNode *join,
-  intBool destroy)
-  {
-   struct joinNode *prevJoin, *rightJoin;
-   struct joinLink *lastLink, *theLink;
-   int lastMark;
-   
+   if (join->nextLevel != NULL) return;
+
    /*===========================*/
    /* Begin removing the joins. */
    /*===========================*/
 
    while (join != NULL)
-     { 
-      if (join->marked) return;
-
+     {
       /*==========================================================*/
       /* Remember the join "above" this join (the one that enters */
       /* from the left). If the join is entered from the right by */
@@ -318,142 +241,60 @@ static void DetachJoins(
       /* any structures associated with the pattern that */
       /* are no longer needed.                           */
       /*=================================================*/
-      
-#if (! RUN_TIME) && (! BLOAD_ONLY)
-      if (! destroy)
-        {
-         if ((join->rightSideEntryStructure != NULL) && (join->joinFromTheRight == FALSE))
-           { RemoveIntranetworkLink(theEnv,join); }
-        }
-#endif
-        
+
+      if ((join->rightSideEntryStructure != NULL) && (join->joinFromTheRight == FALSE))
+        { RemoveIntranetworkLink(join); }
+
       /*======================================*/
       /* Remove any partial matches contained */
       /* in the beta memory of the join.      */
       /*======================================*/
-      
-      if (destroy)
-        { 
-         DestroyBetaMemory(theEnv,join,LHS); 
-         DestroyBetaMemory(theEnv,join,RHS); 
-        }
-      else
-        {
-         FlushBetaMemory(theEnv,join,LHS);
-         FlushBetaMemory(theEnv,join,RHS);
-        }
-      
-      ReturnLeftMemory(theEnv,join);
-      ReturnRightMemory(theEnv,join);
+
+      FlushAlphaBetaMemory(join->beta);
+      join->beta = NULL;
 
       /*===================================*/
       /* Remove the expressions associated */
       /* with the join.                    */
       /*===================================*/
-      
-#if (! RUN_TIME) && (! BLOAD_ONLY)
-      if (! destroy)
-        { 
-         RemoveHashedExpression(theEnv,join->networkTest); 
-         RemoveHashedExpression(theEnv,join->secondaryNetworkTest); 
-         RemoveHashedExpression(theEnv,join->leftHash); 
-         RemoveHashedExpression(theEnv,join->rightHash); 
-        }
-#endif
 
-      /*============================*/
-      /* Fix the right prime links. */
-      /*============================*/
-      
-      if (join->firstJoin && (join->rightSideEntryStructure == NULL))
-        {
-         lastLink = NULL;
-         
-         theLink = DefruleData(theEnv)->RightPrimeJoins;
-         while (theLink != NULL)
-           {
-            if (theLink->join == join)
-              {
-               if (lastLink == NULL)
-                 { DefruleData(theEnv)->RightPrimeJoins = theLink->next; }
-               else
-                 { lastLink->next = theLink->next; }
-
-#if (! RUN_TIME) && (! BLOAD_ONLY)
-               rtn_struct(theEnv,joinLink,theLink);
-#endif
-
-               theLink = NULL;
-              }
-            else
-              {
-               lastLink = theLink;
-               theLink = lastLink->next;
-              }
-           }
-        }
-
-      /*===========================*/
-      /* Fix the left prime links. */
-      /*===========================*/
-      
-      if (join->firstJoin && (join->patternIsNegated || join->joinFromTheRight) && (! join->patternIsExists))
-        {
-         lastLink = NULL;
-         theLink = DefruleData(theEnv)->LeftPrimeJoins;
-         while (theLink != NULL)
-           {
-            if (theLink->join == join)
-              {
-               if (lastLink == NULL)
-                 { DefruleData(theEnv)->LeftPrimeJoins = theLink->next; }
-               else
-                 { lastLink->next = theLink->next; }
-
-#if (! RUN_TIME) && (! BLOAD_ONLY)
-               rtn_struct(theEnv,joinLink,theLink);
-#endif
-
-               theLink = NULL;
-              }
-            else
-              {
-               lastLink = theLink;
-               theLink = theLink->next;
-              }
-           }
-        }
+      RemoveHashedExpression(join->networkTest);
 
       /*==================================================*/
       /* Remove the link to the join from the join above. */
       /*==================================================*/
 
-      if (prevJoin != NULL)
+      if (prevJoin == NULL)
         {
-         lastLink = NULL;
-         theLink = prevJoin->nextLinks;
-         while (theLink != NULL)
-           {
-            if (theLink->join == join)
-              {
-               if (lastLink == NULL)
-                 { prevJoin->nextLinks = theLink->next; }
-               else
-                 { lastLink->next = theLink->next; }
-                 
-#if (! RUN_TIME) && (! BLOAD_ONLY)
-               rtn_struct(theEnv,joinLink,theLink);
-#endif
-
-               theLink = NULL;
-              }
-            else
-              {
-               lastLink = theLink;
-               theLink = theLink->next;
-              }
-            }
+         rtn_struct(joinNode,join);
+         return;
         }
+
+      lastJoin = NULL;
+      joinPtr = prevJoin->nextLevel;
+      while (joinPtr != NULL)
+        {
+         if (joinPtr == join)
+           {
+            if (lastJoin == NULL)
+              { prevJoin->nextLevel = joinPtr->rightDriveNode; }
+            else
+              { lastJoin->rightDriveNode = joinPtr->rightDriveNode; }
+
+            joinPtr = NULL;
+           }
+         else
+           {
+            lastJoin = joinPtr;
+            joinPtr = joinPtr->rightDriveNode;
+           }
+         }
+
+      /*==================*/
+      /* Delete the join. */
+      /*==================*/
+
+      rtn_struct(joinNode,join);
 
       /*==========================================*/
       /* Remove the right join link if it exists. */
@@ -461,51 +302,9 @@ static void DetachJoins(
 
       if (rightJoin != NULL)
         {
-         lastLink = NULL;
-         theLink = rightJoin->nextLinks;
-         while (theLink != NULL)
-           {
-            if (theLink->join == join)
-              {
-               if (lastLink == NULL)
-                 { rightJoin->nextLinks = theLink->next; }
-               else
-                 { lastLink->next = theLink->next; }
-                 
-#if (! RUN_TIME) && (! BLOAD_ONLY)
-               rtn_struct(theEnv,joinLink,theLink);
-#endif
-               theLink = NULL;
-              }
-            else
-              {
-               lastLink = theLink;
-               theLink = theLink->next;
-              }
-            }
-            
-         if ((rightJoin->nextLinks == NULL) &&
-             (rightJoin->ruleToActivate == NULL))
-           { 
-            if (prevJoin != NULL)
-              {
-               lastMark = prevJoin->marked;  
-               prevJoin->marked = TRUE; 
-               DetachJoins(theEnv,rightJoin,destroy);
-               prevJoin->marked = lastMark;
-              }
-            else
-              { DetachJoins(theEnv,rightJoin,destroy); }
-           }
+         rightJoin->nextLevel = NULL;
+         prevJoin = rightJoin;
         }
-        
-      /*==================*/
-      /* Delete the join. */
-      /*==================*/
-
-#if (! RUN_TIME) && (! BLOAD_ONLY)
-      rtn_struct(theEnv,joinNode,join);
-#endif
 
       /*===========================================================*/
       /* Move on to the next join to be removed. All the joins of  */
@@ -516,18 +315,14 @@ static void DetachJoins(
       /* to the join which enters join B from the left.            */
       /*===========================================================*/
 
-      if (prevJoin == NULL)
-        { return; }
-      else if (prevJoin->ruleToActivate != NULL)
-        { return; }
-      else if (prevJoin->nextLinks == NULL)
+      if (prevJoin->ruleToActivate != NULL)
+        { join = NULL; }
+      else if (prevJoin->nextLevel == NULL)
         { join = prevJoin; }
       else
-        { return; }
+        { join = NULL; }
      }
   }
-
-#if (! RUN_TIME) && (! BLOAD_ONLY)
 
 /***********************************************************************/
 /* RemoveIntranetworkLink: Removes the link between a join node in the */
@@ -536,7 +331,6 @@ static void DetachJoins(
 /*   any other joins, it is removed using the function DetachPattern.  */
 /***********************************************************************/
 static void RemoveIntranetworkLink(
-  void *theEnv,
   struct joinNode *join)
   {
    struct patternNodeHeader *patternPtr;
@@ -582,7 +376,7 @@ static void RemoveIntranetworkLink(
    /*===================================================*/
 
    if (patternPtr->entryJoin == NULL)
-     { DetachPattern(theEnv,(int) join->rhsType,patternPtr); }
+     { DetachPattern((int) join->rhsType,patternPtr); }
   }
 
 #endif /* (! RUN_TIME) && (! BLOAD_ONLY) */
@@ -591,3 +385,4 @@ static void RemoveIntranetworkLink(
 
 
 
+

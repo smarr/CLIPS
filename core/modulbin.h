@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.20  01/31/02            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*           DEFMODULE BSAVE/BLOAD HEADER FILE         */
    /*******************************************************/
@@ -13,7 +13,7 @@
 /*      Gary D. Riley                                        */
 /*                                                           */
 /* Contributing Programmer(s):                               */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Revision History:                                         */
 /*                                                           */
@@ -29,7 +29,7 @@
 
 struct bsaveDefmodule
   {
-   unsigned long name;
+   long name;
    long importList;
    long exportList;
    long next;
@@ -51,7 +51,7 @@ struct bsavePortItem
    long next;
   };
 
-#define ModulePointer(i) ((struct defmodule *) (&DefmoduleData(theEnv)->DefmoduleArray[i]))
+#define ModulePointer(i) ((struct defmodule *) (&DefmoduleArray[i]))
 
 #ifdef LOCALE
 #undef LOCALE
@@ -63,9 +63,9 @@ struct bsavePortItem
 #define LOCALE extern
 #endif
 
-   LOCALE void                           DefmoduleBinarySetup(void *);
+   LOCALE void                           DefmoduleBinarySetup(void);
    LOCALE void                           UpdateDefmoduleItemHeader
-                                                 (void *,struct bsaveDefmoduleItemHeader *,
+                                                 (struct bsaveDefmoduleItemHeader *,
                                                   struct defmoduleItemHeader *,int,void *);
 
 #if BLOAD_AND_BSAVE
@@ -74,7 +74,16 @@ struct bsavePortItem
                                                   struct defmoduleItemHeader *);
 #endif
 
+#ifndef _MODULBIN_SOURCE_
+   extern Thread struct defmodule            *DefmoduleArray;
+#endif
+
 #endif
 
 
 
+
+
+
+
+

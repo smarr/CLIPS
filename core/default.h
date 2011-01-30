@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.24  06/05/06            */
+   /*             CLIPS Version 6.10  04/13/98            */
    /*                                                     */
    /*            DEFAULT ATTRIBUTE HEADER FILE            */
    /*******************************************************/
@@ -17,9 +17,6 @@
 /* Contributing Programmer(s):                               */
 /*                                                           */
 /* Revision History:                                         */
-/*                                                           */
-/*      6.24: Support for deftemplate-slot-default-value     */
-/*            function.                                      */ 
 /*                                                           */
 /*************************************************************/
 
@@ -43,10 +40,12 @@
 #define LOCALE extern
 #endif
 
-   LOCALE void                           DeriveDefaultFromConstraints(void *,CONSTRAINT_RECORD *,DATA_OBJECT *,int,int);
-   LOCALE struct expr                   *ParseDefault(void *,char *,int,int,int,int *,int *,int *);
+   LOCALE void                           DeriveDefaultFromConstraints(CONSTRAINT_RECORD *,DATA_OBJECT *,int);
+   LOCALE struct expr                   *ParseDefault(char *,int,int,int,int *,int *,int *);
 
 #endif
 
 
 
+
+

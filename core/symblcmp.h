@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.20  01/31/02            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*        SYMBOL CONSTRUCT COMPILER HEADER FILE        */
    /*******************************************************/
@@ -13,7 +13,7 @@
 /*                                                           */
 /* Principal Programmer(s):                                  */
 /*      Gary D. Riley                                        */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Contributing Programmer(s):                               */
 /*                                                           */
@@ -43,12 +43,18 @@
 #define LOCALE extern
 #endif
 
-   LOCALE void                     PrintSymbolReference(void *,FILE *,SYMBOL_HN *);
-   LOCALE void                     PrintFloatReference(void *,FILE *,FLOAT_HN *);
-   LOCALE void                     PrintIntegerReference(void *,FILE *,INTEGER_HN *);
-   LOCALE void                     PrintBitMapReference(void *,FILE *,BITMAP_HN *);
-   LOCALE void                     AtomicValuesToCode(void *,char *,char *,char *);
+   LOCALE void                     PrintSymbolReference(FILE *,SYMBOL_HN *);
+   LOCALE void                     PrintFloatReference(FILE *,FLOAT_HN *);
+   LOCALE void                     PrintIntegerReference(FILE *,INTEGER_HN *);
+   LOCALE void                     PrintBitMapReference(FILE *,BITMAP_HN *);
+   LOCALE void                     AtomicValuesToCode(char *);
 
 #endif
 
 
+
+
+
+
+
+

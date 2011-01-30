@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.20  01/31/02            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*       DEFGLOBAL CONSTRUCT COMPILER HEADER FILE      */
    /*******************************************************/
@@ -32,9 +32,9 @@
 #define LOCALE extern
 #endif
 
-   LOCALE void                           DefglobalCompilerSetup(void *);
-   LOCALE void                           DefglobalCModuleReference(void *,FILE *,int,int,int);
-   LOCALE void                           DefglobalCConstructReference(void *,FILE *,void *,int,int);
+   LOCALE void                           DefglobalCompilerSetup(void);
+   LOCALE void                           DefglobalCModuleReference(FILE *,int,int,int);
+   LOCALE void                           DefglobalCConstructReference(FILE *,void *,int,int);
 
 #endif
-
+

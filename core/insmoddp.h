@@ -1,23 +1,20 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*               CLIPS Version 6.24  05/17/06          */
+   /*               CLIPS Version 6.10  04/09/97          */
    /*                                                     */
-   /*           INSTANCE MODIFY AND DUPLICATE MODULE      */
+   /*                                                     */
    /*******************************************************/
 
 /*************************************************************/
 /* Purpose:                                                  */
 /*                                                           */
 /* Principal Programmer(s):                                  */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Contributing Programmer(s):                               */
 /*                                                           */
 /* Revision History:                                         */
-/*                                                           */
-/*      6.24: Converted INSTANCE_PATTERN_MATCHING to         */
-/*            DEFRULE_CONSTRUCT.                             */
 /*                                                           */
 /*************************************************************/
 
@@ -44,25 +41,25 @@
 #endif
 
 #if (! RUN_TIME)
-LOCALE void SetupInstanceModDupCommands(void *);
+LOCALE void SetupInstanceModDupCommands(void);
 #endif
 
-LOCALE void ModifyInstance(void *,DATA_OBJECT *);
-LOCALE void MsgModifyInstance(void *,DATA_OBJECT *);
-LOCALE void DuplicateInstance(void *,DATA_OBJECT *);
-LOCALE void MsgDuplicateInstance(void *,DATA_OBJECT *);
+LOCALE void ModifyInstance(DATA_OBJECT *);
+LOCALE void MsgModifyInstance(DATA_OBJECT *);
+LOCALE void DuplicateInstance(DATA_OBJECT *);
+LOCALE void MsgDuplicateInstance(DATA_OBJECT *);
 
-#if DEFRULE_CONSTRUCT && OBJECT_SYSTEM
-LOCALE void InactiveModifyInstance(void *,DATA_OBJECT *);
-LOCALE void InactiveMsgModifyInstance(void *,DATA_OBJECT *);
-LOCALE void InactiveDuplicateInstance(void *,DATA_OBJECT *);
-LOCALE void InactiveMsgDuplicateInstance(void *,DATA_OBJECT *);
+#if INSTANCE_PATTERN_MATCHING
+LOCALE void InactiveModifyInstance(DATA_OBJECT *);
+LOCALE void InactiveMsgModifyInstance(DATA_OBJECT *);
+LOCALE void InactiveDuplicateInstance(DATA_OBJECT *);
+LOCALE void InactiveMsgDuplicateInstance(DATA_OBJECT *);
 #endif
 
-LOCALE void DirectModifyMsgHandler(void *,DATA_OBJECT *);
-LOCALE void MsgModifyMsgHandler(void *,DATA_OBJECT *);
-LOCALE void DirectDuplicateMsgHandler(void *,DATA_OBJECT *);
-LOCALE void MsgDuplicateMsgHandler(void *,DATA_OBJECT *);
+LOCALE void DirectModifyMsgHandler(DATA_OBJECT *);
+LOCALE void MsgModifyMsgHandler(DATA_OBJECT *);
+LOCALE void DirectDuplicateMsgHandler(DATA_OBJECT *);
+LOCALE void MsgDuplicateMsgHandler(DATA_OBJECT *);
 
 #ifndef _INSMODDP_SOURCE_
 #endif
@@ -75,3 +72,4 @@ LOCALE void MsgDuplicateMsgHandler(void *,DATA_OBJECT *);
 
 
 
+

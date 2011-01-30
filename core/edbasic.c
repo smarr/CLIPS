@@ -1,10 +1,7 @@
-   /*******************************************************/
-   /*      "C" Language Integrated Production System      */
-   /*                                                     */
-   /*              CLIPS Version 6.21  06/15/03           */
-   /*                                                     */
-   /*                                                     */
-   /*******************************************************/
+/*   CLIPS Version 6.10  04/09/97 */
+/* Who               |     Date    | Description             */
+/* ------------------+-------------+------------------------ */
+/* M.Giordano        | 23-Mar-2000 | Mods made for TLS       */
 
 #include "setup.h"
 
@@ -42,12 +39,11 @@ static int	newmode[3];		/* New TTY mode bits		*/
 static short	iochan;		 	/* TTY I/O channel		*/
 #endif
 
-#if     WIN_MVC || WIN_BTC || WIN_GCC
+#if     IBM_MSC || IBM_TBC || IBM_ZTC || IBM_ICB || IBM_SC || IBM_GCC
 #include	<dos.h>
 #endif
 
-#if     UNIX_7 || UNIX_V || LINUX || DARWIN
-#include <sys/ioctl.h>
+#if     UNIX_7 || UNIX_V
 #include	<sgtty.h>		/* for stty/gtty functions */
 static struct  sgttyb  ostate;		        /* saved tty state */
 static struct  sgttyb  nstate;		        /* values for editor mode */
@@ -71,17 +67,16 @@ static struct  sgttyb  nstate;		        /* values for editor mode */
  * beginning of the current line.
  * Trivial.
  */
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int gotobol(
-  void *theEnv,
-  int f,
-  int n)
-  {
-   curwp->w_doto  = 0;
-   return (TRUE);
-  }
+int f,
+int n)
+{
+        curwp->w_doto  = 0;
+        return (TRUE);
+}
 
 /*
  * Move the cursor backwards by "n" characters. If "n" is less than zero call
@@ -90,44 +85,39 @@ globle int gotobol(
  * line pointer for dot changes.
  */
 globle int backchar(
-  void *theEnv,
-  int f,
-  int n)
-  {
-   register LINE   *lp;
+int f,
+int n)
+{
+        register LINE   *lp;
 
-   if (n < 0)
-     return (forwchar(theEnv,f, -n));
-   while (n--)
-     {
-      if (curwp->w_doto == 0) 
-        {
-         if ((lp=lback(curwp->w_dotp)) == curbp->b_linep)
-           { return (FALSE); }
-         curwp->w_dotp  = lp;
-         curwp->w_doto  = llength(lp);
-         curwp->w_flag |= WFMOVE;
+        if (n < 0)
+                return (forwchar(f, -n));
+        while (n--) {
+                if (curwp->w_doto == 0) {
+                        if ((lp=lback(curwp->w_dotp)) == curbp->b_linep)
+                                return (FALSE);
+                        curwp->w_dotp  = lp;
+                        curwp->w_doto  = llength(lp);
+                        curwp->w_flag |= WFMOVE;
+                } else
+                        curwp->w_doto--;
         }
-      else
-        { curwp->w_doto--; }
-     }
-   return (TRUE);
-  }
+        return (TRUE);
+}
 
 /*
  * Move the cursor to the end of the current line. Trivial. No errors.
  */
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int gotoeol(
-  void *theEnv,
-  int f,
-  int n)
-  {
-   curwp->w_doto  = llength(curwp->w_dotp);
-   return (TRUE);
-  }
+int f,
+int n)
+{
+        curwp->w_doto  = llength(curwp->w_dotp);
+        return (TRUE);
+}
 
 /*
  * Move the cursor forwwards by "n" characters. If "n" is less than zero call
@@ -136,12 +126,11 @@ globle int gotoeol(
  * buffer. Set the flag if the line pointer for dot changes.
  */
 globle int forwchar(
-  void *theEnv,
-  int f,
-  int n)
-  {
+int f,
+int n)
+{
         if (n < 0)
-                return (backchar(theEnv,f, -n));
+                return (backchar(f, -n));
         while (n--) {
                 if (curwp->w_doto == llength(curwp->w_dotp)) {
                         if (curwp->w_dotp == curbp->b_linep)
@@ -153,45 +142,43 @@ globle int forwchar(
                         curwp->w_doto++;
         }
         return (TRUE);
-   }
+}
 
 /*
  * Goto the beginning of the buffer. Massive adjustment of dot. This is
  * considered to be hard motion; it really isn't if the original value of dot
  * is the same as the new value of dot. Normally bound to "M-<".
  */
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int gotobob(
-  void *theEnv,
-  int f,
-  int n)
-  {
-   curwp->w_dotp  = lforw(curbp->b_linep);
-   curwp->w_doto  = 0;
-   curwp->w_flag |= WFHARD;
-   return (TRUE);
-  }
+int f,
+int n)
+{
+        curwp->w_dotp  = lforw(curbp->b_linep);
+        curwp->w_doto  = 0;
+        curwp->w_flag |= WFHARD;
+        return (TRUE);
+}
 
 /*
  * Move to the end of the buffer. Dot is always put at the end of the file
  * (ZJ). The standard screen code does most of the hard parts of update.
  * Bound to "M->".
  */
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int gotoeob(
-  void *theEnv,
-  int f,
-  int n)
-  {
-   curwp->w_dotp  = curbp->b_linep;
-   curwp->w_doto  = 0;
-   curwp->w_flag |= WFHARD;
-   return (TRUE);
-  }
+int f,
+int n)
+{
+        curwp->w_dotp  = curbp->b_linep;
+        curwp->w_doto  = 0;
+        curwp->w_flag |= WFHARD;
+        return (TRUE);
+}
 
 /*
  * Move forward by full lines. If the number of lines to move is less than
@@ -200,14 +187,13 @@ globle int gotoeob(
  * possible.
  */
 globle int forwline(
-  void *theEnv,
-  int f,
-  int n)
-  {
+int f,
+int n)
+{
         register LINE   *dlp;
 
         if (n < 0)
-                return (backline(theEnv,f, -n));
+                return (backline(f, -n));
         if ((lastflag&CFCPCN) == 0)             /* Reset goal if last   */
                 curgoal = curcol;               /* not C-P or C-N       */
         thisflag |= CFCPCN;
@@ -218,7 +204,7 @@ globle int forwline(
         curwp->w_doto  = getgoal(dlp);
         curwp->w_flag |= WFMOVE;
         return (TRUE);
-  }
+}
 
 /*
  * This function is like "forwline", but goes backwards. The scheme is exactly
@@ -227,14 +213,13 @@ globle int forwline(
  * motion. No errors are possible. Bound to "C-P".
  */
 globle int backline(
-  void *theEnv,
-  int f,
-  int n)
-  {
+int f,
+int n)
+{
         register LINE   *dlp;
 
         if (n < 0)
-                return (forwline(theEnv,f, -n));
+                return (forwline(f, -n));
         if ((lastflag&CFCPCN) == 0)             /* Reset goal if the    */
                 curgoal = curcol;               /* last isn't C-P, C-N  */
         thisflag |= CFCPCN;
@@ -245,7 +230,7 @@ globle int backline(
         curwp->w_doto  = getgoal(dlp);
         curwp->w_flag |= WFMOVE;
         return (TRUE);
-  }
+}
 
 /*
  * This routine, given a pointer to a LINE, and the current cursor goal
@@ -285,10 +270,9 @@ LINE   *dlp)
  * this zaps the top line in the display window, we have to do a hard update.
  */
 globle int forwpage(
-  void *theEnv,
-  int f,
-  int n)
-  {
+int f,
+int n)
+{
         register LINE   *lp;
 
         if (f == FALSE) {
@@ -296,7 +280,7 @@ globle int forwpage(
                 if (n <= 0)                     /* Forget the overlap   */
                         n = 1;                  /* if tiny window.      */
         } else if (n < 0)
-                return (backpage(theEnv,f, -n));
+                return (backpage(f, -n));
 #if     CVMVAS
         else                                    /* Convert from pages   */
                 n *= curwp->w_ntrows;           /* to lines.            */
@@ -309,7 +293,7 @@ globle int forwpage(
         curwp->w_doto  = 0;
         curwp->w_flag |= WFHARD;
         return (TRUE);
-  }
+}
 
 /*
  * This command is like "forwpage", but it goes backwards. The "2", like
@@ -318,10 +302,9 @@ globle int forwpage(
  * reason.
  */
 globle int backpage(
-  void *theEnv,
-  int f,
-  int n)
-  {
+int f,
+int n)
+{
         register LINE   *lp;
 
         if (f == FALSE) {
@@ -329,7 +312,7 @@ globle int backpage(
                 if (n <= 0)                     /* Don't blow up if the */
                         n = 1;                  /* window is tiny.      */
         } else if (n < 0)
-                return (forwpage(theEnv,f, -n));
+                return (forwpage(f, -n));
 #if     CVMVAS
         else                                    /* Convert from pages   */
                 n *= curwp->w_ntrows;           /* to lines.            */
@@ -342,25 +325,24 @@ globle int backpage(
         curwp->w_doto  = 0;
         curwp->w_flag |= WFHARD;
         return (TRUE);
-  }
+}
 
 /*
  * Set the mark in the current window to the value of "." in the window. No
  * errors are possible. Bound to "M-.".
  */
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int setmark(
-  void *theEnv,
-  int f,
-  int n)
-  {
-   curwp->w_markp = curwp->w_dotp;
-   curwp->w_marko = curwp->w_doto;
-   mlwrite("[Mark set]");
-   return (TRUE);
-  }
+int f,
+int n)
+{
+        curwp->w_markp = curwp->w_dotp;
+        curwp->w_marko = curwp->w_doto;
+        mlwrite("[Mark set]");
+        return (TRUE);
+}
 
 /*
  * Swap the values of "." and "mark" in the current window. This is pretty
@@ -368,32 +350,29 @@ globle int setmark(
  * that moves the mark about. The only possible error is "no mark". Bound to
  * "C-X C-X".
  */
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int swapmark(
-  void *theEnv,
-  int f,
-  int n)
-  {
-   register LINE   *odotp;
-   register int    odoto;
+int f,
+int n)
+{
+        register LINE   *odotp;
+        register int    odoto;
 
-   if (curwp->w_markp == NULL) 
-     {
-      mlwrite("No mark in this window");
-      return (FALSE);
-     }
-
-   odotp = curwp->w_dotp;
-   odoto = curwp->w_doto;
-   curwp->w_dotp  = curwp->w_markp;
-   curwp->w_doto  = curwp->w_marko;
-   curwp->w_markp = odotp;
-   curwp->w_marko = odoto;
-   curwp->w_flag |= WFMOVE;
-   return (TRUE);
-  }
+        if (curwp->w_markp == NULL) {
+                mlwrite("No mark in this window");
+                return (FALSE);
+        }
+        odotp = curwp->w_dotp;
+        odoto = curwp->w_doto;
+        curwp->w_dotp  = curwp->w_markp;
+        curwp->w_doto  = curwp->w_marko;
+        curwp->w_markp = odotp;
+        curwp->w_marko = odoto;
+        curwp->w_flag |= WFMOVE;
+        return (TRUE);
+}
 
 /* =======================================================================
  *                            WORD FUNCTIONS
@@ -413,109 +392,105 @@ globle int swapmark(
  *      NOTE:  This function may leaving trailing blanks.
  * Returns TRUE on success, FALSE on errors.
  */
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
-globle int wrapword(
-  void *theEnv)
-  {
+globle int wrapword()
+{
         register int cnt, oldp;
         oldp = (int) curwp->w_dotp;
         cnt = -1;
         do {
                 cnt++;
-                if (! backchar(theEnv,0, 1))
+                if (! backchar(0, 1))
                         return(FALSE);
         }
         while (! inword());
-        if (! backword(theEnv,0, 1))
+        if (! backword(0, 1))
                 return(FALSE);
         if (oldp == (int) (curwp->w_dotp && curwp->w_doto)) {
-                if (! backdel(theEnv,0, 1))
+                if (! backdel(0, 1))
                         return(FALSE);
-                if (! newline(theEnv,0, 1))
+                if (! newline(0, 1))
                         return(FALSE);
         }
-        return(forwword(theEnv,0, 1) && forwchar(theEnv,0, cnt));
-  }
+        return(forwword(0, 1) && forwchar(0, cnt));
+}
 
 /*
  * Move the cursor backward by "n" words. All of the details of motion are
  * performed by the "backchar" and "forwchar" routines. Error if you try to
  * move beyond the buffers.
  */
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int backword(
-  void *theEnv,
-  int f,
-  int n)
-  {
+int f,
+int n)
+{
         if (n < 0)
-                return (forwword(theEnv,f, -n));
-        if (backchar(theEnv,FALSE, 1) == FALSE)
+                return (forwword(f, -n));
+        if (backchar(FALSE, 1) == FALSE)
                 return (FALSE);
         while (n--) {
                 while (inword() == FALSE) {
-                        if (backchar(theEnv,FALSE, 1) == FALSE)
+                        if (backchar(FALSE, 1) == FALSE)
                                 return (FALSE);
                 }
                 while (inword() != FALSE) {
-                        if (backchar(theEnv,FALSE, 1) == FALSE)
+                        if (backchar(FALSE, 1) == FALSE)
                                 return (FALSE);
                 }
         }
-        return (forwchar(theEnv,FALSE, 1));
-  }
+        return (forwchar(FALSE, 1));
+}
 
 /*
  * Move the cursor forward by the specified number of words. All of the motion
  * is done by "forwchar". Error if you try and move beyond the buffer's end.
  */
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int forwword(
-  void *theEnv,
-  int f,
-  int n)
-  {
+int f,
+int n)
+{
         if (n < 0)
-                return (backword(theEnv,f, -n));
+                return (backword(f, -n));
         while (n--) {
                 while (inword() == FALSE) {
-                        if (forwchar(theEnv,FALSE, 1) == FALSE)
+                        if (forwchar(FALSE, 1) == FALSE)
                                 return (FALSE);
                 }
                 while (inword() != FALSE) {
-                        if (forwchar(theEnv,FALSE, 1) == FALSE)
+                        if (forwchar(FALSE, 1) == FALSE)
                                 return (FALSE);
                 }
         }
         return (TRUE);
-  }
+}
 
 /*
  * Move the cursor forward by the specified number of words. As you move,
  * convert any characters to upper case. Error if you try and move beyond the
  * end of the buffer. Bound to "M-U".
  */
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int upperword(
-  void *theEnv,
-  int f,
-  int n)
-  {
+int f,
+int n)
+{
         register int    c;
 
         if (n < 0)
                 return (FALSE);
         while (n--) {
                 while (inword() == FALSE) {
-                        if (forwchar(theEnv,FALSE, 1) == FALSE)
+                        if (forwchar(FALSE, 1) == FALSE)
                                 return (FALSE);
                 }
                 while (inword() != FALSE) {
@@ -525,33 +500,32 @@ globle int upperword(
                                 lputc(curwp->w_dotp, curwp->w_doto, c);
                                 lchange(WFHARD);
                         }
-                        if (forwchar(theEnv,FALSE, 1) == FALSE)
+                        if (forwchar(FALSE, 1) == FALSE)
                                 return (FALSE);
                 }
         }
         return (TRUE);
-  }
+}
 
 /*
  * Move the cursor forward by the specified number of words. As you move
  * convert characters to lower case. Error if you try and move over the end of
  * the buffer. Bound to "M-L".
  */
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int lowerword(
-  void *theEnv,
-  int f,
-  int n)
-  {
+int f,
+int n)
+{
         register int    c;
 
         if (n < 0)
                 return (FALSE);
         while (n--) {
                 while (inword() == FALSE) {
-                        if (forwchar(theEnv,FALSE, 1) == FALSE)
+                        if (forwchar(FALSE, 1) == FALSE)
                                 return (FALSE);
                 }
                 while (inword() != FALSE) {
@@ -561,12 +535,12 @@ globle int lowerword(
                                 lputc(curwp->w_dotp, curwp->w_doto, c);
                                 lchange(WFHARD);
                         }
-                        if (forwchar(theEnv,FALSE, 1) == FALSE)
+                        if (forwchar(FALSE, 1) == FALSE)
                                 return (FALSE);
                 }
         }
         return (TRUE);
-  }
+}
 
 /*
  * Move the cursor forward by the specified number of words. As you move
@@ -574,21 +548,20 @@ globle int lowerword(
  * characters to lower case. Error if you try and move past the end of the
  * buffer. Bound to "M-C".
  */
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int capword(
-  void *theEnv,
-  int f,
-  int n)
-  {
+int f,
+int n)
+{
         register int    c;
 
         if (n < 0)
                 return (FALSE);
         while (n--) {
                 while (inword() == FALSE) {
-                        if (forwchar(theEnv,FALSE, 1) == FALSE)
+                        if (forwchar(FALSE, 1) == FALSE)
                                 return (FALSE);
                 }
                 if (inword() != FALSE) {
@@ -598,7 +571,7 @@ globle int capword(
                                 lputc(curwp->w_dotp, curwp->w_doto, c);
                                 lchange(WFHARD);
                         }
-                        if (forwchar(theEnv,FALSE, 1) == FALSE)
+                        if (forwchar(FALSE, 1) == FALSE)
                                 return (FALSE);
                         while (inword() != FALSE) {
                                 c = lgetc(curwp->w_dotp, curwp->w_doto);
@@ -607,27 +580,26 @@ globle int capword(
                                         lputc(curwp->w_dotp, curwp->w_doto, c);
                                         lchange(WFHARD);
                                 }
-                                if (forwchar(theEnv,FALSE, 1) == FALSE)
+                                if (forwchar(FALSE, 1) == FALSE)
                                         return (FALSE);
                         }
                 }
         }
         return (TRUE);
-  }
+}
 
 /*
  * Kill forward by "n" words. Remember the location of dot. Move forward by
  * the right number of words. Put dot back where it was and issue the kill
  * command for the right number of characters. Bound to "M-D".
  */
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int delfword(
-  void *theEnv,
-  int f,
-  int n)
-  {
+int f,
+int n)
+{
         register int    size;
         register LINE   *dotp;
         register int    doto;
@@ -636,7 +608,7 @@ globle int delfword(
                 return (FALSE);
 
         if ((lastflag&CFKILL) == 0)             /* Clear kill buffer if */
-                kdelete(theEnv);                      /* last wasn't a kill.  */
+                kdelete();                      /* last wasn't a kill.  */
         thisflag |= CFKILL;
 
         dotp = curwp->w_dotp;
@@ -644,62 +616,61 @@ globle int delfword(
         size = 0;
         while (n--) {
                 while (inword() == FALSE) {
-                        if (forwchar(theEnv,FALSE, 1) == FALSE)
+                        if (forwchar(FALSE, 1) == FALSE)
                                 return (FALSE);
                         ++size;
                 }
                 while (inword() != FALSE) {
-                        if (forwchar(theEnv,FALSE, 1) == FALSE)
+                        if (forwchar(FALSE, 1) == FALSE)
                                 return (FALSE);
                         ++size;
                 }
         }
         curwp->w_dotp = dotp;
         curwp->w_doto = doto;
-        return (ldelete(theEnv,(long) size, TRUE));
-  }
+        return (ldelete((long) size, TRUE));
+}
 
 /*
  * Kill backwards by "n" words. Move backwards by the desired number of words,
  * counting the characters. When dot is finally moved to its resting place,
  * fire off the kill command. Bound to "M-Rubout" and to "M-Backspace".
  */
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int delbword(
-  void *theEnv,
-  int f,
-  int n)
-  {
+int f,
+int n)
+{
         register int    size;
 
         if (n < 0)
                 return (FALSE);
-        if (backchar(theEnv,FALSE, 1) == FALSE)
+        if (backchar(FALSE, 1) == FALSE)
                 return (FALSE);
 
         if ((lastflag&CFKILL) == 0)             /* Clear kill buffer if */
-                kdelete(theEnv);                      /* last wasn't a kill.  */
+                kdelete();                      /* last wasn't a kill.  */
         thisflag |= CFKILL;
 
         size = 0;
         while (n--) {
                 while (inword() == FALSE) {
-                        if (backchar(theEnv,FALSE, 1) == FALSE)
+                        if (backchar(FALSE, 1) == FALSE)
                                 return (FALSE);
                         ++size;
                 }
                 while (inword() != FALSE) {
-                        if (backchar(theEnv,FALSE, 1) == FALSE)
+                        if (backchar(FALSE, 1) == FALSE)
                                 return (FALSE);
                         ++size;
                 }
         }
-        if (forwchar(theEnv,FALSE, 1) == FALSE)
+        if (forwchar(FALSE, 1) == FALSE)
                 return (FALSE);
-        return (ldelete(theEnv,(long) size, TRUE));
-  }
+        return (ldelete((long) size, TRUE));
+}
 
 /*
  * Return TRUE if the character at dot is a character that is considered
@@ -741,26 +712,25 @@ globle int inword()
  * Move "." to the start, and kill the characters.
  * Bound to "C-W".
  */
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int killregion(
-  void *theEnv,
-  int f,
-  int n)
-  {
-   register int    s;
-   REGION          region;
+int f,
+int n)
+{
+        register int    s;
+        REGION          region;
 
-   if ((s=getregion(&region)) != TRUE)
-     { return (s); }
-   if ((lastflag&CFKILL) == 0)             /* This is a kill type  */
-     { kdelete(theEnv); }                    /* command, so do magic */
-   thisflag |= CFKILL;                     /* kill buffer stuff.   */
-   curwp->w_dotp = region.r_linep;
-   curwp->w_doto = region.r_offset;
-   return (ldelete(theEnv,region.r_size, TRUE));
-  }
+        if ((s=getregion(&region)) != TRUE)
+                return (s);
+        if ((lastflag&CFKILL) == 0)             /* This is a kill type  */
+                kdelete();                      /* command, so do magic */
+        thisflag |= CFKILL;                     /* kill buffer stuff.   */
+        curwp->w_dotp = region.r_linep;
+        curwp->w_doto = region.r_offset;
+        return (ldelete(region.r_size, TRUE));
+}
 
 /*
  * Copy all of the characters in the
@@ -768,14 +738,13 @@ globle int killregion(
  * at all. This is a bit like a kill region followed
  * by a yank. Bound to "M-W".
  */
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int copyregion(
-  void *theEnv,
-  int f,
-  int n)
-  {
+int f,
+int n)
+{
         register LINE   *linep;
         register int    loffs;
         register int    s;
@@ -784,25 +753,25 @@ globle int copyregion(
         if ((s=getregion(&region)) != TRUE)
                 return (s);
         if ((lastflag&CFKILL) == 0)             /* Kill type command.   */
-                kdelete(theEnv);
+                kdelete();
         thisflag |= CFKILL;
         linep = region.r_linep;                 /* Current line.        */
         loffs = region.r_offset;                /* Current offset.      */
         while (region.r_size--) {
                 if (loffs == llength(linep)) {  /* End of line.         */
-                        if ((s=kinsert(theEnv,'\n')) != TRUE)
+                        if ((s=kinsert('\n')) != TRUE)
                                 return (s);
                         linep = lforw(linep);
                         loffs = 0;
                 } else {                        /* Middle of line.      */
-                        if ((s=kinsert(theEnv,lgetc(linep, loffs))) != TRUE)
+                        if ((s=kinsert(lgetc(linep, loffs))) != TRUE)
                                 return (s);
                         ++loffs;
                 }
         }
         mlwrite("Region copied to buffer");
         return (TRUE);
-  }
+}
 
 /*
  * Lower case region. Zap all of the upper
@@ -812,14 +781,13 @@ globle int copyregion(
  * redisplay is done in all buffers. Bound to
  * "C-X C-L".
  */
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int lowerregion(
-  void *theEnv,
-  int f,
-  int n)
-  {
+int f,
+int n)
+{
         register LINE   *linep;
         register int    loffs;
         register int    c;
@@ -843,7 +811,7 @@ globle int lowerregion(
                 }
         }
         return (TRUE);
-  }
+}
 
 /*
  * Upper case region. Zap all of the lower
@@ -853,14 +821,13 @@ globle int lowerregion(
  * redisplay is done in all buffers. Bound to
  * "C-X C-L".
  */
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int upperregion(
-  void *theEnv,
-  int f,
-  int n)
-  {
+int f,
+int n)
+{
         register LINE   *linep;
         register int    loffs;
         register int    c;
@@ -884,7 +851,7 @@ globle int upperregion(
                 }
         }
         return (TRUE);
-  }
+}
 
 /*
  * This routine figures out the
@@ -965,21 +932,20 @@ REGION *rp)
  * Changed calling code to "C-X C-V" to be
  * more like the Zmacs editor on Symbolics. CJC 7/28/86
  */
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int fileread(
-  void *theEnv,
-  int f,
-  int n)
-  {
-   register int    s;
-   char            fname[NFILEN];
+int f,
+int n)
+{
+        register int    s;
+        char            fname[NFILEN];
 
-   if ((s=mlreply(theEnv,"Visit file: ", fname, NFILEN)) != TRUE)
-     { return (s); }
-   return (readin(theEnv,fname));
-  }
+        if ((s=mlreply("Visit file: ", fname, NFILEN)) != TRUE)
+                return (s);
+        return (readin(fname));
+}
 
 /*
  * Select a file for editing.
@@ -993,26 +959,24 @@ globle int fileread(
  * Changed calling code to "C-X C-F" (Find File) to be
  * more like the Zmacs editor on Symbolics. CJC 7/28/86
  */
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int filevisit(
-  void *theEnv,
-  int f,
-  int n)
-  {
+int f,
+int n)
+{
         register int    s;
         char            fname[NFILEN];
 
-        if ((s=mlreply(theEnv,"Find file: ", fname, NFILEN)) != TRUE)
+        if ((s=mlreply("Find file: ", fname, NFILEN)) != TRUE)
                 return (s);
-	filevisit_guts(theEnv,fname);
+	filevisit_guts(fname);
 	return(TRUE);
-  }
+}
 
 globle int filevisit_guts(
-  void *theEnv,
-  char fname[])
+char fname[])
 {
         register BUFFER *bp;
         register WINDOW *wp;
@@ -1060,8 +1024,8 @@ globle int filevisit_guts(
                 }
         }
         makename(bname, fname);                 /* New buffer name.     */
-        while ((bp=bfind(theEnv,bname, FALSE, 0)) != NULL) {
-                s = mlreply(theEnv,"Buffer name: ", bname, NBUFN);
+        while ((bp=bfind(bname, FALSE, 0)) != NULL) {
+                s = mlreply("Buffer name: ", bname, NBUFN);
                 if (s == ABORT)                 /* ^G to just quit      */
                         return (s);
                 if (s == FALSE) {               /* CR to clobber it     */
@@ -1069,7 +1033,7 @@ globle int filevisit_guts(
                         break;
                 }
         }
-        if (bp==NULL && (bp=bfind(theEnv,bname, TRUE, 0))==NULL) {
+        if (bp==NULL && (bp=bfind(bname, TRUE, 0))==NULL) {
                 mlwrite("Cannot create buffer");
                 return (FALSE);
         }
@@ -1079,12 +1043,12 @@ globle int filevisit_guts(
                 curbp->b_markp = curwp->w_markp;
                 curbp->b_marko = curwp->w_marko;
         }
-        genstrcpy(lastbufn, curbp->b_bname);       /* Set last buufer name */
+        strcpy(lastbufn, curbp->b_bname);       /* Set last buufer name */
 
         curbp = bp;                             /* Switch to it.        */
         curwp->w_bufp = bp;
         curbp->b_nwnd++;
-        return (readin(theEnv,fname));                 /* Read it in.          */
+        return (readin(fname));                 /* Read it in.          */
 }
 
 /*
@@ -1096,8 +1060,7 @@ globle int filevisit_guts(
  * an argument.
  */
 globle int readin(
-  void *theEnv,
-  char    fname[])
+char    fname[])
 {
         register LINE   *lp1;
         register LINE   *lp2;
@@ -1110,10 +1073,10 @@ globle int readin(
         char            line[NLINE];
 
         bp = curbp;                             /* Cheap.               */
-        if ((s=bclear(theEnv,bp)) != TRUE)             /* Might be old.        */
+        if ((s=bclear(bp)) != TRUE)             /* Might be old.        */
                 return (s);
         bp->b_flag &= ~(BFTEMP|BFCHG);
-        genstrcpy(bp->b_fname, fname);
+        strcpy(bp->b_fname, fname);
         if ((s=ffropen(fname)) == FIOERR)       /* Hard file open.      */
                 goto out;
         if (s == FIOFNF) {                      /* File not found.      */
@@ -1124,7 +1087,7 @@ globle int readin(
         nline = 0;
         while ((s=ffgetline(line, NLINE)) == FIOSUC) {
                 nbytes = strlen(line);
-                if ((lp1=lalloc(theEnv,nbytes)) == NULL) {
+                if ((lp1=lalloc(nbytes)) == NULL) {
                         s = FIOERR;             /* Keep message on the  */
                         break;                  /* display.             */
                 }
@@ -1183,11 +1146,11 @@ char    fname[])
                 --cp1;
 #endif
 
-#if     WIN_MVC || WIN_BTC || WIN_GCC
+#if     IBM_MSC || IBM_TBC || IBM_ZTC || IBM_ICB || IBM_SC || IBM_GCC
         while (cp1!=&fname[0] && cp1[-1]!=':' && cp1[-1]!='\\')
                 --cp1;
 #endif
-#if     UNIX_7 || UNIX_V || LINUX || DARWIN
+#if     UNIX_7 || UNIX_V
         while (cp1!=&fname[0] && cp1[-1]!='/')
                 --cp1;
 #endif
@@ -1209,28 +1172,27 @@ char    fname[])
  *
  * Modified to allow current file name as default. CJC 7/28/86
  */
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int filewrite(
-  void *theEnv,
-  int f,
-  int n)
-  {
+int f,
+int n)
+{
         register WINDOW *wp;
         register int    s;
         char            fname[NFILEN];
         char            prompt[NFILEN + 15];
 
-        gensprintf(prompt,"Write file [%s]: ",curbp->b_fname);
-        if ((s=mlreply(theEnv,prompt, fname, NFILEN)) != TRUE) {
+        sprintf(prompt,"Write file [%s]: ",curbp->b_fname);
+        if ((s=mlreply(prompt, fname, NFILEN)) != TRUE) {
                 if (s == FALSE)
-                   genstrcpy(fname, curbp->b_fname);
+                   strcpy(fname, curbp->b_fname);
                 else
                    return (s);
                 }
         if ((s=writeout(fname)) == TRUE) {
-                genstrcpy(curbp->b_fname, fname);
+                strcpy(curbp->b_fname, fname);
                 curbp->b_flag &= ~BFCHG;
                 wp = wheadp;                    /* Update mode lines.   */
                 while (wp != NULL) {
@@ -1240,7 +1202,7 @@ globle int filewrite(
                 }
         }
         return (s);
-  }
+}
 
 /*
  * Save the contents of the current
@@ -1250,14 +1212,13 @@ globle int filewrite(
  * name for the buffer. Bound to "C-X C-S". May
  * get called by "C-Z".
  */
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int filesave(
-  void *theEnv,
-  int f,
-  int n)
-  {
+int f,
+int n)
+{
         register WINDOW *wp;
         register int    s;
 
@@ -1277,7 +1238,7 @@ globle int filesave(
                 }
         }
         return (s);
-  }
+}
 
 /*
  * This function performs the details of file
@@ -1331,24 +1292,23 @@ char    *fn)
  * Bound to "C-X C-R" for Rename buffer!
  * Changed 7/28/86 by CJC.
  */
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int filename(
-  void *theEnv,
-  int f,
-  int n)
-  {
+int f,
+int n)
+{
         register WINDOW *wp;
         register int    s;
         char            fname[NFILEN];
 
-        if ((s=mlreply(theEnv,"Name: ", fname, NFILEN)) == ABORT)
+        if ((s=mlreply("Name: ", fname, NFILEN)) == ABORT)
                 return (s);
         if (s == FALSE)
-                genstrcpy(curbp->b_fname, "");
+                strcpy(curbp->b_fname, "");
         else
-                genstrcpy(curbp->b_fname, fname);
+                strcpy(curbp->b_fname, fname);
         wp = wheadp;                            /* Update mode lines.   */
         while (wp != NULL) {
                 if (wp->w_bufp == curbp)
@@ -1356,14 +1316,14 @@ globle int filename(
                 wp = wp->w_wndp;
         }
         return (TRUE);
-  }
+}
 
 /* =======================================================================
  *                   Low level File I/O commands
  * =======================================================================
  */
 
-static FILE    *ffp;                 /* File pointer, all functions. */
+Thread static FILE    *ffp;                 /* File pointer, all functions. */
 
 /*
  * The routines in this section do the low level read and write of ASCII
@@ -1408,7 +1368,7 @@ char    *fn)
  */
 globle int ffclose()
 {
-#if     UNIX_7 || UNIX_V || LINUX || DARWIN
+#if     UNIX_7 || UNIX_V
         if (fclose(ffp) != FALSE) {
                 mlwrite("Error closing file");
                 return(FIOERR);
@@ -1500,7 +1460,7 @@ int nbuf)
  * On VMS, it translates SYS$INPUT until it finds the terminal, then assigns
  * a channel to it and sets it raw.
  */
-globle void ttopen()
+globle VOID ttopen()
 {
 #if	VAX_VMS
 	struct  dsc$descriptor  idsc;
@@ -1545,15 +1505,12 @@ globle void ttopen()
 		exit(status);
 #endif
 
-#if	UNIX_7 || UNIX_V || LINUX || DARWIN
-        ioctl(1,TIOCGETP,&ostate);
-        ioctl(1,TIOCGETP,&nstate);
-	/* gtty(1, &ostate);	*/		/* save old state */
-	/* gtty(1, &nstate);	*/ 		/* get base of new state */
+#if	UNIX_7 || UNIX_V
+	gtty(1, &ostate);			/* save old state */
+	gtty(1, &nstate);			/* get base of new state */
 	nstate.sg_flags |= RAW;
 	nstate.sg_flags &= ~(ECHO|CRMOD);	/* no echo for now... */
-	/* stty(1, &nstate);	*/		/* set mode */
-        ioctl(1,TIOCSETP,&nstate);
+	stty(1, &nstate);			/* set mode */
 #endif
 }
 
@@ -1561,7 +1518,7 @@ globle void ttopen()
  * This function gets called just before we go back home to the command
  * interpreter. On VMS it puts the terminal back in a reasonable state.
  */
-globle void ttclose()
+globle VOID ttclose()
 {
 #if	VAX_VMS
 	int	status;
@@ -1577,9 +1534,12 @@ globle void ttclose()
 		exit(status);
 #endif
 
-#if	UNIX_7 || UNIX_V || LINUX || DARWIN
-	/* stty(1, &ostate); */
-        ioctl(1,TIOCSETP,&ostate);
+#if	UNIX_7 || UNIX_V
+	stty(1, &ostate);
+#endif
+
+#if	IBM_ZTC || IBM_SC
+	disp_close();
 #endif
 }
 
@@ -1588,10 +1548,10 @@ globle void ttclose()
  * we just put the characters in the big array, after checking for overflow.
  * Ditto on MS-DOS (use the very very raw console output routine).
  */
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
-globle void ttputc(
+globle VOID ttputc(
 int c)
 {
 #if	VAX_VMS
@@ -1600,7 +1560,7 @@ int c)
 	obuf[nobuf++] = c;
 #endif
 
-#if	UNIX_7 || UNIX_V || LINUX || DARWIN
+#if	UNIX_7 || UNIX_V
 	fputc(c, stdout);
 #endif
 }
@@ -1609,7 +1569,7 @@ int c)
  * Flush terminal buffer. Does real work where the terminal output is buffered
  * up. A no-operation on systems where byte at a time terminal I/O is done.
  */
-globle void ttflush()
+globle VOID ttflush()
 {
 #if	VAX_VMS
 	int	status;
@@ -1626,7 +1586,7 @@ globle void ttflush()
 
 #endif
 
-#if	UNIX_7 || UNIX_V || LINUX || DARWIN
+#if	UNIX_7 || UNIX_V
 	fflush(stdout);
 #endif
 }
@@ -1681,11 +1641,11 @@ globle int ttgetc()
         return (ibuf[ibufi++] & 0xFF);	  /* Allow multinational  */
 #endif
 
-#if     WIN_MVC || WIN_BTC || WIN_GCC
+#if     IBM_MSC || IBM_TBC || IBM_ZTC || IBM_ICB || IBM_SC || IBM_GCC
 	return (fgetc(stdin));           /* NOTE: This won't really work */
 #endif                              /* See file EDTERM.C for good code */
 
-#if	UNIX_7 || UNIX_V || LINUX || DARWIN
+#if	UNIX_7 || UNIX_V
 	return(fgetc(stdin));
 #endif
 }
@@ -1749,3 +1709,4 @@ globle int parse_esc_seq() {
 
 
 
+

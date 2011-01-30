@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.24  05/17/06            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*          FACT RETE ACCESS FUNCTIONS MODULE          */
    /*******************************************************/
@@ -15,12 +15,10 @@
 /* Contributing Programmer(s):                               */
 /*                                                           */
 /* Revision History:                                         */
-/*      6.23: Correction for FalseSymbol/TrueSymbol. DR0859  */
 /*                                                           */
-/*      6.24: Removed INCREMENTAL_RESET compilation flag.    */
-/*                                                           */
-/*            Renamed BOOLEAN macro type to intBool.         */
-/*                                                           */
+/* Who               |     Date    | Description             */
+/* ------------------+-------------+------------------------ */
+/* M.Giordano        | 23-Mar-2000 | Mods made for TLS       */
 /*************************************************************/
 
 #define _FACTRETE_SOURCE_
@@ -35,26 +33,24 @@
 #include "memalloc.h"
 #include "extnfunc.h"
 #include "router.h"
+#if INCREMENTAL_RESET
 #include "incrrset.h"
+#endif
 #include "reteutil.h"
 #include "drive.h"
-#include "engine.h"
 #include "factgen.h"
 #include "factmch.h"
-#include "envrnmnt.h"
-
 #include "factrete.h"
 
 /***************************************************************/
 /* FactPNGetVar1: Fact pattern network function for extracting */
 /*   a variable's value. This is the most generalized routine. */
 /***************************************************************/
-globle intBool FactPNGetVar1(
-  void *theEnv,
+globle BOOLEAN FactPNGetVar1(
   void *theValue,
   DATA_OBJECT_PTR returnValue)
   {
-   unsigned short theField, theSlot;
+   int theField, theSlot;
    struct fact *factPtr;
    struct field *fieldPtr;
    struct multifieldMarker *marks;
@@ -72,8 +68,8 @@ globle intBool FactPNGetVar1(
    /* Get the pointer to the fact from the partial match. */
    /*=====================================================*/
 
-   factPtr = FactData(theEnv)->CurrentPatternFact;
-   marks = FactData(theEnv)->CurrentPatternMarks;
+   factPtr = CurrentPatternFact;
+   marks = CurrentPatternMarks;
 
    /*==========================================================*/
    /* Determine if we want to retrieve the fact address of the */
@@ -99,8 +95,8 @@ globle intBool FactPNGetVar1(
       returnValue->value = fieldPtr->value;
       if (returnValue->type == MULTIFIELD)
         {
-         SetpDOBegin(returnValue,1);
-         SetpDOEnd(returnValue,((struct multifield *) fieldPtr->value)->multifieldLength);
+         returnValue->begin = 0;
+         returnValue->end = ((struct multifield *) fieldPtr->value)->multifieldLength - 1;
         }
 
       return(TRUE);
@@ -125,7 +121,7 @@ globle intBool FactPNGetVar1(
    /*==========================================================*/
 
    extent = -1;
-   theField = AdjustFieldPosition(theEnv,marks,theField,theSlot,&extent);
+   theField = AdjustFieldPosition(marks,theField,theSlot,&extent);
 
    /*=============================================================*/
    /* If a range of values are being retrieved (i.e. a multifield */
@@ -160,8 +156,7 @@ globle intBool FactPNGetVar1(
 /*   for extracting a variable's value. The value */
 /*   extracted is from a single field slot.       */
 /**************************************************/
-globle intBool FactPNGetVar2(
-  void *theEnv,
+globle BOOLEAN FactPNGetVar2(
   void *theValue,
   DATA_OBJECT_PTR returnValue)
   {
@@ -179,7 +174,7 @@ globle intBool FactPNGetVar2(
    /* Get the pointer to the fact. */
    /*==============================*/
 
-   factPtr = FactData(theEnv)->CurrentPatternFact;
+   factPtr = CurrentPatternFact;
 
    /*============================================*/
    /* Extract the value from the specified slot. */
@@ -198,8 +193,7 @@ globle intBool FactPNGetVar2(
 /*   variable's value. The value extracted is from a multifield  */
 /*   slot that contains at most one multifield variable.         */
 /*****************************************************************/
-globle intBool FactPNGetVar3(
-  void *theEnv,
+globle BOOLEAN FactPNGetVar3(
   void *theValue,
   DATA_OBJECT_PTR returnValue)
   {
@@ -218,7 +212,7 @@ globle intBool FactPNGetVar3(
    /* Get the pointer to the fact. */
    /*==============================*/
 
-   factPtr = FactData(theEnv)->CurrentPatternFact;
+   factPtr = CurrentPatternFact;
 
    /*============================================================*/
    /* Get the multifield value from which the data is retrieved. */
@@ -235,8 +229,8 @@ globle intBool FactPNGetVar3(
      {
       returnValue->type = MULTIFIELD;
       returnValue->value = (void *) segmentPtr;
-      returnValue->begin = (long) hack->beginOffset;
-      returnValue->end = (long) (segmentPtr->multifieldLength - (hack->endOffset + 1));
+      returnValue->begin = hack->beginOffset;
+      returnValue->end = segmentPtr->multifieldLength - (hack->endOffset + 1);
       return(TRUE);
      }
 
@@ -260,15 +254,14 @@ globle intBool FactPNGetVar3(
 /*   comparing a value stored in a single field slot  */
 /*   to a constant for either equality or inequality. */
 /******************************************************/
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
-globle intBool FactPNConstant1(
-  void *theEnv,
+globle BOOLEAN FactPNConstant1(
   void *theValue,
   DATA_OBJECT_PTR returnValue)
   {
-#if MAC_MCW || WIN_MCW || MAC_XCD
+#if MAC_MPW || MAC_MCW || IBM_MCW
 #pragma unused(returnValue)
 #endif
    struct factConstantPN1Call *hack;
@@ -285,7 +278,7 @@ globle intBool FactPNConstant1(
    /* Extract the value from the specified slot. */
    /*============================================*/
 
-   fieldPtr = &FactData(theEnv)->CurrentPatternFact->theProposition.theFields[hack->whichSlot];
+   fieldPtr = &CurrentPatternFact->theProposition.theFields[hack->whichSlot];
 
    /*====================================*/
    /* Compare the value to the constant. */
@@ -304,15 +297,14 @@ globle intBool FactPNConstant1(
 /*   no multifields to its right (thus it can be retrieved      */
 /*   relative to the beginning).                                */
 /****************************************************************/
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
-globle intBool FactPNConstant2(
-  void *theEnv,
+globle BOOLEAN FactPNConstant2(
   void *theValue,
   DATA_OBJECT_PTR returnValue)
   {
-#if MAC_MCW || WIN_MCW || MAC_XCD
+#if MAC_MPW || MAC_MCW || IBM_MCW
 #pragma unused(returnValue)
 #endif
    struct factConstantPN2Call *hack;
@@ -333,7 +325,7 @@ globle intBool FactPNConstant2(
    /* multifield slots.                                        */
    /*==========================================================*/
 
-   fieldPtr = &FactData(theEnv)->CurrentPatternFact->theProposition.theFields[hack->whichSlot];
+   fieldPtr = &CurrentPatternFact->theProposition.theFields[hack->whichSlot];
 
    if (fieldPtr->type == MULTIFIELD)
      {
@@ -362,12 +354,11 @@ globle intBool FactPNConstant2(
 /* FactJNGetVar1: Fact join network function for extracting a */
 /*   variable's value. This is the most generalized routine.  */
 /**************************************************************/
-globle intBool FactJNGetVar1(
-  void *theEnv,
+globle BOOLEAN FactJNGetVar1(
   void *theValue,
   DATA_OBJECT_PTR returnValue)
   {
-   unsigned short theField, theSlot;
+   int theField, theSlot;
    struct fact *factPtr;
    struct field *fieldPtr;
    struct multifieldMarker *marks;
@@ -385,30 +376,20 @@ globle intBool FactJNGetVar1(
    /* Get the pointer to the fact from the partial match. */
    /*=====================================================*/
 
-   if (hack->lhs)
+   if (GlobalRHSBinds == NULL)
      {
-      factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv)->GlobalLHSBinds,hack->whichPattern)->matchingItem;
-      marks = get_nth_pm_match(EngineData(theEnv)->GlobalLHSBinds,hack->whichPattern)->markers;
+      factPtr = (struct fact *) get_nth_pm_match(GlobalLHSBinds,hack->whichPattern)->matchingItem;
+      marks = get_nth_pm_match(GlobalLHSBinds,hack->whichPattern)->markers;
      }
-   else if (hack->rhs)
+   else if ((GlobalJoin->depth - 1) == hack->whichPattern)
      {
-      factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv)->GlobalRHSBinds,hack->whichPattern)->matchingItem;
-      marks = get_nth_pm_match(EngineData(theEnv)->GlobalRHSBinds,hack->whichPattern)->markers;
-     }
-   else if (EngineData(theEnv)->GlobalRHSBinds == NULL)
-     {
-      factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv)->GlobalLHSBinds,hack->whichPattern)->matchingItem;
-      marks = get_nth_pm_match(EngineData(theEnv)->GlobalLHSBinds,hack->whichPattern)->markers;
-     }
-   else if ((((unsigned short) (EngineData(theEnv)->GlobalJoin->depth - 1))) == hack->whichPattern)
-     {
-      factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv)->GlobalRHSBinds,0)->matchingItem;
-      marks = get_nth_pm_match(EngineData(theEnv)->GlobalRHSBinds,0)->markers;
+      factPtr = (struct fact *) get_nth_pm_match(GlobalRHSBinds,0)->matchingItem;
+      marks = get_nth_pm_match(GlobalRHSBinds,0)->markers;
      }
    else
      {
-      factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv)->GlobalLHSBinds,hack->whichPattern)->matchingItem;
-      marks = get_nth_pm_match(EngineData(theEnv)->GlobalLHSBinds,hack->whichPattern)->markers;
+      factPtr = (struct fact *) get_nth_pm_match(GlobalLHSBinds,hack->whichPattern)->matchingItem;
+      marks = get_nth_pm_match(GlobalLHSBinds,hack->whichPattern)->markers;
      }
 
    /*==========================================================*/
@@ -435,8 +416,8 @@ globle intBool FactJNGetVar1(
       returnValue->value = fieldPtr->value;
       if (returnValue->type == MULTIFIELD)
         {
-         SetpDOBegin(returnValue,1);
-         SetpDOEnd(returnValue,((struct multifield *) fieldPtr->value)->multifieldLength);
+         returnValue->begin = 0;
+         returnValue->end = ((struct multifield *) fieldPtr->value)->multifieldLength - 1;
         }
 
       return(TRUE);
@@ -468,7 +449,7 @@ globle intBool FactJNGetVar1(
    /*==========================================================*/
 
    extent = -1;
-   theField = AdjustFieldPosition(theEnv,marks,theField,theSlot,&extent);
+   theField = AdjustFieldPosition(marks,theField,theSlot,&extent);
 
    /*=============================================================*/
    /* If a range of values are being retrieved (i.e. a multifield */
@@ -503,8 +484,7 @@ globle intBool FactJNGetVar1(
 /*   extracting a variable's value. The value    */
 /*   extracted is from a single field slot.      */
 /*************************************************/
-globle intBool FactJNGetVar2(
-  void *theEnv,
+globle BOOLEAN FactJNGetVar2(
   void *theValue,
   DATA_OBJECT_PTR returnValue)
   {
@@ -522,16 +502,12 @@ globle intBool FactJNGetVar2(
    /* Get the pointer to the fact from the partial match. */
    /*=====================================================*/
 
-   if (hack->lhs)
-     { factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv)->GlobalLHSBinds,hack->whichPattern)->matchingItem; }
-   else if (hack->rhs)
-     { factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv)->GlobalRHSBinds,hack->whichPattern)->matchingItem; }
-   else if (EngineData(theEnv)->GlobalRHSBinds == NULL)
-     { factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv)->GlobalLHSBinds,hack->whichPattern)->matchingItem; }
-   else if (((unsigned short) (EngineData(theEnv)->GlobalJoin->depth - 1)) == hack->whichPattern)
-	 { factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv)->GlobalRHSBinds,0)->matchingItem; }
+   if (GlobalRHSBinds == NULL)
+     { factPtr = (struct fact *) get_nth_pm_match(GlobalLHSBinds,hack->whichPattern)->matchingItem; }
+   else if ((GlobalJoin->depth - 1) == hack->whichPattern)
+     { factPtr = (struct fact *) get_nth_pm_match(GlobalRHSBinds,0)->matchingItem; }
    else
-     { factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv)->GlobalLHSBinds,hack->whichPattern)->matchingItem; }
+     { factPtr = (struct fact *) get_nth_pm_match(GlobalLHSBinds,hack->whichPattern)->matchingItem; }
 
    /*============================================*/
    /* Extract the value from the specified slot. */
@@ -550,8 +526,7 @@ globle intBool FactJNGetVar2(
 /*   variable's value. The value extracted is from a multifield */
 /*   slot that contains at most one multifield variable.        */
 /****************************************************************/
-globle intBool FactJNGetVar3(
-  void *theEnv,
+globle BOOLEAN FactJNGetVar3(
   void *theValue,
   DATA_OBJECT_PTR returnValue)
   {
@@ -570,16 +545,12 @@ globle intBool FactJNGetVar3(
    /* Get the pointer to the fact from the partial match. */
    /*=====================================================*/
 
-   if (hack->lhs)
-     { factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv)->GlobalLHSBinds,hack->whichPattern)->matchingItem; }
-   else if (hack->rhs)
-     { factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv)->GlobalRHSBinds,hack->whichPattern)->matchingItem; }
-   else if (EngineData(theEnv)->GlobalRHSBinds == NULL)
-     { factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv)->GlobalLHSBinds,hack->whichPattern)->matchingItem; }
-   else if (((unsigned short) (EngineData(theEnv)->GlobalJoin->depth - 1)) == hack->whichPattern)
-     { factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv)->GlobalRHSBinds,0)->matchingItem; }
+   if (GlobalRHSBinds == NULL)
+     { factPtr = (struct fact *) get_nth_pm_match(GlobalLHSBinds,hack->whichPattern)->matchingItem; }
+   else if ((GlobalJoin->depth - 1) == hack->whichPattern)
+     { factPtr = (struct fact *) get_nth_pm_match(GlobalRHSBinds,0)->matchingItem; }
    else
-     { factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv)->GlobalLHSBinds,hack->whichPattern)->matchingItem; }
+     { factPtr = (struct fact *) get_nth_pm_match(GlobalLHSBinds,hack->whichPattern)->matchingItem; }
 
    /*============================================================*/
    /* Get the multifield value from which the data is retrieved. */
@@ -597,7 +568,7 @@ globle intBool FactJNGetVar3(
       returnValue->type = MULTIFIELD;
       returnValue->value = (void *) segmentPtr;
       returnValue->begin = hack->beginOffset;
-      returnValue->end = (long) (segmentPtr->multifieldLength - (hack->endOffset + 1));
+      returnValue->end = segmentPtr->multifieldLength - (hack->endOffset + 1);
       return(TRUE);
      }
 
@@ -620,22 +591,21 @@ globle intBool FactJNGetVar3(
 /* FactSlotLength: Determines if the length of a    */
 /*  multifield slot falls within a specified range. */
 /****************************************************/
-globle intBool FactSlotLength(
-  void *theEnv,
+globle BOOLEAN FactSlotLength(
   void *theValue,
   DATA_OBJECT_PTR returnValue)
   {
    struct factCheckLengthPNCall *hack;
    struct multifield *segmentPtr;
-   long extraOffset = 0;
+   int extraOffset = 0;
    struct multifieldMarker *tempMark;
 
    returnValue->type = SYMBOL;
-   returnValue->value = EnvFalseSymbol(theEnv);
+   returnValue->value = FalseSymbol;
 
    hack = (struct factCheckLengthPNCall *) ValueToBitMap(theValue);
 
-   for (tempMark = FactData(theEnv)->CurrentPatternMarks;
+   for (tempMark = CurrentPatternMarks;
         tempMark != NULL;
         tempMark = tempMark->next)
      {
@@ -643,7 +613,7 @@ globle intBool FactSlotLength(
       extraOffset += ((tempMark->endPosition - tempMark->startPosition) + 1);
      }
 
-   segmentPtr = (struct multifield *) FactData(theEnv)->CurrentPatternFact->theProposition.theFields[hack->whichSlot].value;
+   segmentPtr = (struct multifield *) CurrentPatternFact->theProposition.theFields[hack->whichSlot].value;
 
    if (segmentPtr->multifieldLength < (hack->minLength + extraOffset))
      { return(FALSE); }
@@ -651,7 +621,7 @@ globle intBool FactSlotLength(
    if (hack->exactly && (segmentPtr->multifieldLength > (hack->minLength + extraOffset)))
      { return(FALSE); }
 
-   returnValue->value = EnvTrueSymbol(theEnv);
+   returnValue->value = TrueSymbol;
    return(TRUE);
   }
 
@@ -659,15 +629,14 @@ globle intBool FactSlotLength(
 /* FactJNCompVars1: Fact join network routine for comparing */
 /*   the values of two single field slots.                  */
 /************************************************************/
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int FactJNCompVars1(
-  void *theEnv,
   void *theValue,
   DATA_OBJECT *theResult)
   {
-#if MAC_MCW || WIN_MCW || MAC_XCD
+#if MAC_MPW || MAC_MCW || IBM_MCW
 #pragma unused(theResult)
 #endif
    int p1, e1, p2, e2;
@@ -684,15 +653,14 @@ globle int FactJNCompVars1(
    /* Extract the fact pointers for the two patterns. */
    /*=================================================*/
 
-   p1 = (int) hack->pattern1;
-   p2 = (int) hack->pattern2;
+   p1 = GlobalJoin->depth - 1;
+   p2 = ((int) hack->pattern2) - 1;
 
-   fact1 = (struct fact *) EngineData(theEnv)->GlobalRHSBinds->binds[p1].gm.theMatch->matchingItem;
-
-   if (hack->p2rhs)
-     { fact2 = (struct fact *) EngineData(theEnv)->GlobalRHSBinds->binds[p2].gm.theMatch->matchingItem; }
-   else 
-     { fact2 = (struct fact *) EngineData(theEnv)->GlobalLHSBinds->binds[p2].gm.theMatch->matchingItem; }
+   fact1 = (struct fact *) GlobalRHSBinds->binds[0].gm.theMatch->matchingItem;
+   if (p1 != p2)
+     { fact2 = (struct fact *) GlobalLHSBinds->binds[p2].gm.theMatch->matchingItem; }
+   else
+     { fact2 = fact1; }
 
    /*=====================*/
    /* Compare the values. */
@@ -719,15 +687,14 @@ globle int FactJNCompVars1(
 /*   This function is provided so that variable comparisons of   */
 /*   implied deftemplates will be faster.                        */
 /*****************************************************************/
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int FactJNCompVars2(
-  void *theEnv,
   void *theValue,
   DATA_OBJECT *theResult)
   {
-#if MAC_MCW || WIN_MCW || MAC_XCD
+#if MAC_MPW || MAC_MCW || IBM_MCW
 #pragma unused(theResult)
 #endif
    int p1, s1, p2, s2;
@@ -746,17 +713,16 @@ globle int FactJNCompVars2(
    /* Extract the fact pointers for the two patterns. */
    /*=================================================*/
 
-   p1 = (int) hack->pattern1;
-   p2 = (int) hack->pattern2;
+   p1 = GlobalJoin->depth - 1;
+   p2 = ((int) hack->pattern2) - 1;
    s1 = (int) hack->slot1;
    s2 = (int) hack->slot2;
 
-   fact1 = (struct fact *) EngineData(theEnv)->GlobalRHSBinds->binds[p1].gm.theMatch->matchingItem;
-     
-   if (hack->p2rhs)
-     { fact2 = (struct fact *) EngineData(theEnv)->GlobalRHSBinds->binds[p2].gm.theMatch->matchingItem; }
-   else 
-     { fact2 = (struct fact *) EngineData(theEnv)->GlobalLHSBinds->binds[p2].gm.theMatch->matchingItem; }
+   fact1 = (struct fact *) GlobalRHSBinds->binds[0].gm.theMatch->matchingItem;
+   if (p1 != p2)
+     { fact2 = (struct fact *) GlobalLHSBinds->binds[p2].gm.theMatch->matchingItem; }
+   else
+     { fact2 = fact1; }
 
    /*======================*/
    /* Retrieve the values. */
@@ -804,7 +770,6 @@ globle int FactJNCompVars2(
 /*   comparing the values of two single field slots. */
 /*****************************************************/
 globle int FactPNCompVars1(
-  void *theEnv,
   void *theValue,
   DATA_OBJECT *theResult)
   {
@@ -817,8 +782,8 @@ globle int FactPNCompVars1(
    /*========================================*/
 
    hack = (struct factCompVarsPN1Call *) ValueToBitMap(theValue);
-   fieldPtr1 = &FactData(theEnv)->CurrentPatternFact->theProposition.theFields[hack->field1];
-   fieldPtr2 = &FactData(theEnv)->CurrentPatternFact->theProposition.theFields[hack->field2];
+   fieldPtr1 = &CurrentPatternFact->theProposition.theFields[hack->field1];
+   fieldPtr2 = &CurrentPatternFact->theProposition.theFields[hack->field2];
 
    /*=====================*/
    /* Compare the values. */
@@ -829,8 +794,8 @@ globle int FactPNCompVars1(
    else rv = (int) hack->pass;
 
    theResult->type = SYMBOL;
-   if (rv) theResult->value = EnvTrueSymbol(theEnv);
-   else theResult->value = EnvFalseSymbol(theEnv);
+   if (rv) theResult->value = TrueSymbol;
+   else theResult->value = FalseSymbol;
 
    return(rv);
   }
@@ -851,20 +816,13 @@ globle int FactPNCompVars1(
 /*   variable ?z) would be 8 since $?x binds to 2 fields and $?y binds   */
 /*   to 3 fields.                                                        */
 /*************************************************************************/
-#if WIN_BTC
-#pragma argsused
-#endif
-globle unsigned short AdjustFieldPosition(
-  void *theEnv,
+globle int AdjustFieldPosition(
   struct multifieldMarker *markList,
-  unsigned short whichField,
-  unsigned short whichSlot,
+  int whichField,
+  int whichSlot,
   int *extent)
   {
-   unsigned short actualIndex;
-#if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
-#endif
+   int actualIndex;
 
    actualIndex = whichField;
    for (;
@@ -904,7 +862,7 @@ globle unsigned short AdjustFieldPosition(
       /* of fields taken up by the preceding multifield variable. */
       /*==========================================================*/
 
-      actualIndex += (unsigned short) (markList->endPosition - markList->startPosition);
+      actualIndex += (markList->endPosition - markList->startPosition);
      }
 
    /*=======================================*/
@@ -919,21 +877,20 @@ globle unsigned short AdjustFieldPosition(
 /*   number of multifield functions for grouping a   */
 /*   series of valuesinto a single multifield value. */
 /*****************************************************/
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int FactStoreMultifield(
-  void *theEnv,
   void *theValue,
   DATA_OBJECT *theResult)
   {
-#if MAC_MCW || WIN_MCW || MAC_XCD
+#if MAC_MPW || MAC_MCW || IBM_MCW
 #pragma unused(theValue)
 #endif
-
-   StoreInMultifield(theEnv,theResult,GetFirstArgument(),FALSE);
+   StoreInMultifield(theResult,GetFirstArgument(),FALSE);
    return(TRUE);
   }
 
 #endif /* DEFTEMPLATE_CONSTRUCT && DEFRULE_CONSTRUCT */
 
+

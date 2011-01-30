@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.22  06/15/04            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*            DEFGLOBAL CONSTRUCTS-TO-C MODULE         */
    /*******************************************************/
@@ -14,10 +14,13 @@
 /*      Gary D. Riley                                        */
 /*                                                           */
 /* Contributing Programmer(s):                               */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Revision History:                                         */
 /*                                                           */
+/* Who               |     Date    | Description             */
+/* ------------------+-------------+------------------------ */
+/* M.Giordano        | 23-Mar-2000 | Mods made for TLS       */
 /*************************************************************/
 
 #define _GLOBLCMP_SOURCE_
@@ -31,31 +34,35 @@
 
 #include "conscomp.h"
 #include "globldef.h"
-#include "envrnmnt.h"
+
 #include "globlcmp.h"
 
 /***************************************/
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static int                     ConstructToCode(void *,char *,char *,char *,int,FILE *,int,int);
-   static void                    DefglobalToCode(void *,FILE *,struct defglobal *,
+   static int                     ConstructToCode(char *,int,FILE *,int,int);
+   static void                    DefglobalToCode(FILE *,struct defglobal *,
                                                  int,int,int);
-   static void                    DefglobalModuleToCode(void *,FILE *,struct defmodule *,int,int,int);
-   static void                    CloseDefglobalFiles(void *,FILE *,FILE *,int);
-   static void                    BeforeDefglobalsToCode(void *);
-   static void                    InitDefglobalsCode(void *,FILE *,int,int);
+   static void                    DefglobalModuleToCode(FILE *,struct defmodule *,int,int,int);
+   static void                    CloseDefglobalFiles(FILE *,FILE *,int);
+   static void                    BeforeDefglobalsToCode(void);
+   static void                    InitDefglobalsCode(FILE *,int,int);
+
+/***************************************/
+/* LOCAL INTERNAL VARIABLE DEFINITIONS */
+/***************************************/
+
+   Thread static struct CodeGeneratorItem *DefglobalCodeItem;
 
 /***************************************************************/
 /* DefglobalCompilerSetup: Initializes the defglobal construct */
 /*    for use with the constructs-to-c command.                */
 /***************************************************************/
-globle void DefglobalCompilerSetup(
-  void *theEnv)
+globle void DefglobalCompilerSetup()
   {
-   DefglobalData(theEnv)->DefglobalCodeItem = 
-      AddCodeGeneratorItem(theEnv,"defglobal",0,BeforeDefglobalsToCode,
-                           InitDefglobalsCode,ConstructToCode,2);
+   DefglobalCodeItem = AddCodeGeneratorItem("defglobal",0,BeforeDefglobalsToCode,
+                                            InitDefglobalsCode,ConstructToCode,2);
   }
 
 /**************************************************************/
@@ -63,31 +70,28 @@ globle void DefglobalCompilerSetup(
 /*   which will be used for pointer references when the data  */
 /*   structures are written to a file as C code               */
 /**************************************************************/
-static void BeforeDefglobalsToCode(
-  void *theEnv)
+static void BeforeDefglobalsToCode()
   {
-   MarkConstructBsaveIDs(theEnv,DefglobalData(theEnv)->DefglobalModuleIndex);
+   MarkConstructBsaveIDs(DefglobalModuleIndex);
   }
 
 /*************************************************/
 /* InitDefglobalsCode: Writes out initialization */
 /*   code for defglobals for a run-time module.  */
 /*************************************************/
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 static void InitDefglobalsCode(
-  void *theEnv,
   FILE *initFP,
   int imageID,
   int maxIndices)
   {
-#if MAC_MCW || WIN_MCW || MAC_XCD
+#if MAC_MPW || MAC_MCW || IBM_MCW
 #pragma unused(maxIndices)
 #pragma unused(imageID)
-#pragma unused(theEnv)
 #endif
-   fprintf(initFP,"   ResetDefglobals(theEnv);\n");
+   fprintf(initFP,"   ResetDefglobals();\n");
   }
 
 /***********************************************************/
@@ -95,10 +99,7 @@ static void InitDefglobalsCode(
 /*   module created using the constructs-to-c function.    */
 /***********************************************************/
 static int ConstructToCode(
-  void *theEnv,
   char *fileName,
-  char *pathName,
-  char *fileNameBuffer,
   int fileID,
   FILE *headerFP,
   int imageID,
@@ -122,44 +123,44 @@ static int ConstructToCode(
    /*  C code representation to the file as they are traversed.         */
    /*===================================================================*/
 
-   for (theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,NULL);
+   for (theModule = (struct defmodule *) GetNextDefmodule(NULL);
         theModule != NULL;
-        theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,theModule))
+        theModule = (struct defmodule *) GetNextDefmodule(theModule))
      {
-      EnvSetCurrentModule(theEnv,(void *) theModule);
+      SetCurrentModule((void *) theModule);
 
-      moduleFile = OpenFileIfNeeded(theEnv,moduleFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
+      moduleFile = OpenFileIfNeeded(moduleFile,fileName,fileID,imageID,&fileCount,
                                     moduleArrayVersion,headerFP,
-                                    "struct defglobalModule",ModulePrefix(DefglobalData(theEnv)->DefglobalCodeItem),
+                                    "struct defglobalModule",ModulePrefix(DefglobalCodeItem),
                                     FALSE,NULL);
 
       if (moduleFile == NULL)
         {
-         CloseDefglobalFiles(theEnv,moduleFile,defglobalFile,maxIndices);
+         CloseDefglobalFiles(moduleFile,defglobalFile,maxIndices);
          return(0);
         }
 
-      DefglobalModuleToCode(theEnv,moduleFile,theModule,imageID,maxIndices,moduleCount);
-      moduleFile = CloseFileIfNeeded(theEnv,moduleFile,&moduleArrayCount,&moduleArrayVersion,
+      DefglobalModuleToCode(moduleFile,theModule,imageID,maxIndices,moduleCount);
+      moduleFile = CloseFileIfNeeded(moduleFile,&moduleArrayCount,&moduleArrayVersion,
                                      maxIndices,NULL,NULL);
 
-      for (theDefglobal = (struct defglobal *) EnvGetNextDefglobal(theEnv,NULL);
+      for (theDefglobal = (struct defglobal *) GetNextDefglobal(NULL);
            theDefglobal != NULL;
-           theDefglobal = (struct defglobal *) EnvGetNextDefglobal(theEnv,theDefglobal))
+           theDefglobal = (struct defglobal *) GetNextDefglobal(theDefglobal))
         {
-         defglobalFile = OpenFileIfNeeded(theEnv,defglobalFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
+         defglobalFile = OpenFileIfNeeded(defglobalFile,fileName,fileID,imageID,&fileCount,
                                          defglobalArrayVersion,headerFP,
-                                         "struct defglobal",ConstructPrefix(DefglobalData(theEnv)->DefglobalCodeItem),
+                                         "struct defglobal",ConstructPrefix(DefglobalCodeItem),
                                          FALSE,NULL);
          if (defglobalFile == NULL)
            {
-            CloseDefglobalFiles(theEnv,moduleFile,defglobalFile,maxIndices);
+            CloseDefglobalFiles(moduleFile,defglobalFile,maxIndices);
             return(0);
            }
 
-         DefglobalToCode(theEnv,defglobalFile,theDefglobal,imageID,maxIndices,moduleCount);
+         DefglobalToCode(defglobalFile,theDefglobal,imageID,maxIndices,moduleCount);
          defglobalArrayCount++;
-         defglobalFile = CloseFileIfNeeded(theEnv,defglobalFile,&defglobalArrayCount,
+         defglobalFile = CloseFileIfNeeded(defglobalFile,&defglobalArrayCount,
                                            &defglobalArrayVersion,maxIndices,NULL,NULL);
         }
 
@@ -167,7 +168,7 @@ static int ConstructToCode(
       moduleArrayCount++;
      }
 
-   CloseDefglobalFiles(theEnv,moduleFile,defglobalFile,maxIndices);
+   CloseDefglobalFiles(moduleFile,defglobalFile,maxIndices);
 
    return(1);
   }
@@ -178,7 +179,6 @@ static int ConstructToCode(
 /*   the defglobals have all been written to the files.   */
 /**********************************************************/
 static void CloseDefglobalFiles(
-  void *theEnv,
   FILE *moduleFile,
   FILE *defglobalFile,
   int maxIndices)
@@ -189,13 +189,13 @@ static void CloseDefglobalFiles(
    if (defglobalFile != NULL)
      {
       count = maxIndices;
-      CloseFileIfNeeded(theEnv,defglobalFile,&count,&arrayVersion,maxIndices,NULL,NULL);
+      CloseFileIfNeeded(defglobalFile,&count,&arrayVersion,maxIndices,NULL,NULL);
      }
 
    if (moduleFile != NULL)
      {
       count = maxIndices;
-      CloseFileIfNeeded(theEnv,moduleFile,&count,&arrayVersion,maxIndices,NULL,NULL);
+      CloseFileIfNeeded(moduleFile,&count,&arrayVersion,maxIndices,NULL,NULL);
      }
   }
 
@@ -203,25 +203,24 @@ static void CloseDefglobalFiles(
 /* DefglobalModuleToCode: Writes the C code representation */
 /*   of a single defglobal module to the specified file.   */
 /***********************************************************/
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 static void DefglobalModuleToCode(
-  void *theEnv,
   FILE *theFile,
   struct defmodule *theModule,
   int imageID,
   int maxIndices,
   int moduleCount)
   {
-#if MAC_MCW || WIN_MCW || MAC_XCD
+#if MAC_MPW || MAC_MCW || IBM_MCW
 #pragma unused(moduleCount)
 #endif
 
    fprintf(theFile,"{");
 
-   ConstructModuleToCode(theEnv,theFile,theModule,imageID,maxIndices,
-                                  DefglobalData(theEnv)->DefglobalModuleIndex,ConstructPrefix(DefglobalData(theEnv)->DefglobalCodeItem));
+   ConstructModuleToCode(theFile,theModule,imageID,maxIndices,
+                                  DefglobalModuleIndex,ConstructPrefix(DefglobalCodeItem));
 
    fprintf(theFile,"}");
   }
@@ -231,7 +230,6 @@ static void DefglobalModuleToCode(
 /*   single defglobal construct to the specified file.    */
 /**********************************************************/
 static void DefglobalToCode(
-  void *theEnv,
   FILE *theFile,
   struct defglobal *theDefglobal,
   int imageID,
@@ -244,9 +242,9 @@ static void DefglobalToCode(
 
    fprintf(theFile,"{");
 
-   ConstructHeaderToCode(theEnv,theFile,&theDefglobal->header,imageID,maxIndices,
-                         moduleCount,ModulePrefix(DefglobalData(theEnv)->DefglobalCodeItem),
-                         ConstructPrefix(DefglobalData(theEnv)->DefglobalCodeItem));
+   ConstructHeaderToCode(theFile,&theDefglobal->header,imageID,maxIndices,
+                         moduleCount,ModulePrefix(DefglobalCodeItem),
+                         ConstructPrefix(DefglobalCodeItem));
 
    fprintf(theFile,",");
 
@@ -267,7 +265,7 @@ static void DefglobalToCode(
    /*=====================*/
 
    fprintf(theFile,",");
-   PrintHashedExpressionReference(theEnv,theFile,theDefglobal->initial,imageID,maxIndices);
+   PrintHashedExpressionReference(theFile,theDefglobal->initial,imageID,maxIndices);
 
    fprintf(theFile,"}");
   }
@@ -277,14 +275,13 @@ static void DefglobalToCode(
 /*   of a reference to a defglobal module data structure.      */
 /***************************************************************/
 globle void DefglobalCModuleReference(
-  void *theEnv,
   FILE *theFile,
   int count,
   int imageID,
   int maxIndices)
   {
    fprintf(theFile,"MIHS &%s%d_%d[%d]",
-                      ModulePrefix(DefglobalData(theEnv)->DefglobalCodeItem),
+                      ModulePrefix(DefglobalCodeItem),
                       imageID,
                       (count / maxIndices) + 1,
                       (count % maxIndices));
@@ -295,7 +292,6 @@ globle void DefglobalCModuleReference(
 /*   of a reference to a defglobal data structure.                */
 /******************************************************************/
 globle void DefglobalCConstructReference(
-  void *theEnv,
   FILE *theFile,
   void *vTheGlobal,
   int imageID,
@@ -307,7 +303,7 @@ globle void DefglobalCConstructReference(
      { fprintf(theFile,"NULL"); }
    else
      {
-      fprintf(theFile,"&%s%d_%ld[%ld]",ConstructPrefix(DefglobalData(theEnv)->DefglobalCodeItem),
+      fprintf(theFile,"&%s%d_%ld[%ld]",ConstructPrefix(DefglobalCodeItem),
                       imageID,
                       (theGlobal->header.bsaveID / maxIndices) + 1,
                       theGlobal->header.bsaveID % maxIndices);
@@ -318,3 +314,4 @@ globle void DefglobalCConstructReference(
 #endif /* DEFGLOBAL_CONSTRUCT && CONSTRUCT_COMPILER && (! RUN_TIME) */
 
 
+

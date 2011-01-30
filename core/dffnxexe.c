@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.23  01/31/05            */
+   /*               CLIPS Version 6.10  04/09/97          */
    /*                                                     */
    /*                                                     */
    /*******************************************************/
@@ -10,13 +10,15 @@
 /* Purpose: Deffunction Execution Routines                   */
 /*                                                           */
 /* Principal Programmer(s):                                  */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Contributing Programmer(s):                               */
 /*                                                           */
 /* Revision History:                                         */
-/*      6.23: Correction for FalseSymbol/TrueSymbol. DR0859  */
 /*                                                           */
+/* Who               |     Date    | Description             */
+/* ------------------+-------------+------------------------ */
+/* M.Giordano        | 23-Mar-2000 | Mods made for TLS       */
 /*************************************************************/
 
 /* =========================================
@@ -34,7 +36,6 @@
 #endif
 
 #include "constrct.h"
-#include "envrnmnt.h"
 #include "prcdrfun.h"
 #include "prccode.h"
 #include "proflfun.h"
@@ -55,15 +56,34 @@
 
 /* =========================================
    *****************************************
+               MACROS AND TYPES
+   =========================================
+   ***************************************** */
+
+/* =========================================
+   *****************************************
       INTERNALLY VISIBLE FUNCTION HEADERS
    =========================================
    ***************************************** */
 
-static void UnboundDeffunctionErr(void *);
+static void UnboundDeffunctionErr(void);
 
 #if DEBUGGING_FUNCTIONS
-static void WatchDeffunction(void *,char *);
+static void WatchDeffunction(char *);
 #endif
+
+/* =========================================
+   *****************************************
+      EXTERNALLY VISIBLE GLOBAL VARIABLES
+   =========================================
+   ***************************************** */
+Thread globle DEFFUNCTION *ExecutingDeffunction = NULL;
+
+/* =========================================
+   *****************************************
+      INTERNALLY VISIBLE GLOBAL VARIABLES
+   =========================================
+   ***************************************** */
 
 /* =========================================
    *****************************************
@@ -80,10 +100,9 @@ static void WatchDeffunction(void *,char *);
   RETURNS      : Nothing useful
   SIDE EFFECTS : Deffunction executed and result
                  stored in data object buffer
-  NOTES        : Used in EvaluateExpression(theEnv,)
+  NOTES        : Used in EvaluateExpression()
  ****************************************************/
 globle void CallDeffunction(
-  void *theEnv,
   DEFFUNCTION *dptr,
   EXPRESSION *args,
   DATA_OBJECT *result)
@@ -95,60 +114,60 @@ globle void CallDeffunction(
 #endif
 
    result->type = SYMBOL;
-   result->value = EnvFalseSymbol(theEnv);
-   EvaluationData(theEnv)->EvaluationError = FALSE;
-   if (EvaluationData(theEnv)->HaltExecution)
+   result->value = FalseSymbol;
+   EvaluationError = FALSE;
+   if (HaltExecution)
      return;
-   oldce = ExecutingConstruct(theEnv);
-   SetExecutingConstruct(theEnv,TRUE);
-   previouslyExecutingDeffunction = DeffunctionData(theEnv)->ExecutingDeffunction;
-   DeffunctionData(theEnv)->ExecutingDeffunction = dptr;
-   EvaluationData(theEnv)->CurrentEvaluationDepth++;
+   oldce = ExecutingConstruct();
+   SetExecutingConstruct(TRUE);
+   previouslyExecutingDeffunction = ExecutingDeffunction;
+   ExecutingDeffunction = dptr;
+   CurrentEvaluationDepth++;
    dptr->executing++;
-   PushProcParameters(theEnv,args,CountArguments(args),EnvGetDeffunctionName(theEnv,(void *) dptr),
+   PushProcParameters(args,CountArguments(args),GetDeffunctionName((void *) dptr),
                       "deffunction",UnboundDeffunctionErr);
-   if (EvaluationData(theEnv)->EvaluationError)
+   if (EvaluationError)
      {
       dptr->executing--;
-      DeffunctionData(theEnv)->ExecutingDeffunction = previouslyExecutingDeffunction;
-      EvaluationData(theEnv)->CurrentEvaluationDepth--;
-      PeriodicCleanup(theEnv,FALSE,TRUE);
-      SetExecutingConstruct(theEnv,oldce);
+      ExecutingDeffunction = previouslyExecutingDeffunction;
+      CurrentEvaluationDepth--;
+      PeriodicCleanup(FALSE,TRUE);
+      SetExecutingConstruct(oldce);
       return;
      }
 
 #if DEBUGGING_FUNCTIONS
    if (dptr->trace)
-     WatchDeffunction(theEnv,BEGIN_TRACE);
+     WatchDeffunction(BEGIN_TRACE);
 #endif
 
 #if PROFILING_FUNCTIONS
-   StartProfile(theEnv,&profileFrame,
+   StartProfile(&profileFrame,
                 &dptr->header.usrData,
-                ProfileFunctionData(theEnv)->ProfileConstructs);
+                ProfileConstructs);
 #endif
 
-   EvaluateProcActions(theEnv,dptr->header.whichModule->theModule,
+   EvaluateProcActions(dptr->header.whichModule->theModule,
                        dptr->code,dptr->numberOfLocalVars,
                        result,UnboundDeffunctionErr);
 
 #if PROFILING_FUNCTIONS
-    EndProfile(theEnv,&profileFrame);
+    EndProfile(&profileFrame);
 #endif
 
 #if DEBUGGING_FUNCTIONS
    if (dptr->trace)
-     WatchDeffunction(theEnv,END_TRACE);
+     WatchDeffunction(END_TRACE);
 #endif
-   ProcedureFunctionData(theEnv)->ReturnFlag = FALSE;
+   ReturnFlag = FALSE;
 
    dptr->executing--;
-   PopProcParameters(theEnv);
-   DeffunctionData(theEnv)->ExecutingDeffunction = previouslyExecutingDeffunction;
-   EvaluationData(theEnv)->CurrentEvaluationDepth--;
-   PropagateReturnValue(theEnv,result);
-   PeriodicCleanup(theEnv,FALSE,TRUE);
-   SetExecutingConstruct(theEnv,oldce);
+   PopProcParameters();
+   ExecutingDeffunction = previouslyExecutingDeffunction;
+   CurrentEvaluationDepth--;
+   PropagateReturnValue(result);
+   PeriodicCleanup(FALSE,TRUE);
+   SetExecutingConstruct(oldce);
   }
 
 /* =========================================
@@ -167,12 +186,11 @@ globle void CallDeffunction(
   SIDE EFFECTS : Error synopsis printed to WERROR
   NOTES        : None
  *******************************************************/
-static void UnboundDeffunctionErr(
-  void *theEnv)
+static void UnboundDeffunctionErr()
   {
-   EnvPrintRouter(theEnv,WERROR,"deffunction ");
-   EnvPrintRouter(theEnv,WERROR,EnvGetDeffunctionName(theEnv,(void *) DeffunctionData(theEnv)->ExecutingDeffunction));
-   EnvPrintRouter(theEnv,WERROR,".\n");
+   PrintRouter(WERROR,"deffunction ");
+   PrintRouter(WERROR,GetDeffunctionName((void *) ExecutingDeffunction));
+   PrintRouter(WERROR,".\n");
   }
 
 #if DEBUGGING_FUNCTIONS
@@ -190,22 +208,31 @@ static void UnboundDeffunctionErr(
   NOTES        : None
  ***************************************************/
 static void WatchDeffunction(
-  void *theEnv,
   char *tstring)
   {
-   EnvPrintRouter(theEnv,WTRACE,"DFN ");
-   EnvPrintRouter(theEnv,WTRACE,tstring);
-   if (DeffunctionData(theEnv)->ExecutingDeffunction->header.whichModule->theModule != ((struct defmodule *) EnvGetCurrentModule(theEnv)))
+   PrintRouter(WTRACE,"DFN ");
+   PrintRouter(WTRACE,tstring);
+   if (ExecutingDeffunction->header.whichModule->theModule != ((struct defmodule *) GetCurrentModule()))
      {
-      EnvPrintRouter(theEnv,WTRACE,EnvGetDefmoduleName(theEnv,(void *)
-                        DeffunctionData(theEnv)->ExecutingDeffunction->header.whichModule->theModule));
-      EnvPrintRouter(theEnv,WTRACE,"::");
+      PrintRouter(WTRACE,GetDefmoduleName((void *)
+                        ExecutingDeffunction->header.whichModule->theModule));
+      PrintRouter(WTRACE,"::");
      }
-   EnvPrintRouter(theEnv,WTRACE,ValueToString(DeffunctionData(theEnv)->ExecutingDeffunction->header.name));
-   EnvPrintRouter(theEnv,WTRACE," ED:");
-   PrintLongInteger(theEnv,WTRACE,(long long) EvaluationData(theEnv)->CurrentEvaluationDepth);
-   PrintProcParamArray(theEnv,WTRACE);
+   PrintRouter(WTRACE,ValueToString(ExecutingDeffunction->header.name));
+   PrintRouter(WTRACE," ED:");
+   PrintLongInteger(WTRACE,(long) CurrentEvaluationDepth);
+   PrintProcParamArray(WTRACE);
   }
 
 #endif
 #endif
+
+/***************************************************
+  NAME         :
+  DESCRIPTION  :
+  INPUTS       :
+  RETURNS      :
+  SIDE EFFECTS :
+  NOTES        :
+ ***************************************************/
+

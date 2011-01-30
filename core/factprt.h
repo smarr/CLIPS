@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.20  01/31/02            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*         FACT RETE PRINT FUNCTIONS HEADER FILE       */
    /*******************************************************/
@@ -32,19 +32,24 @@
 #define LOCALE extern
 #endif
 
-   LOCALE void                           PrintFactJNCompVars1(void *,char *,void *);
-   LOCALE void                           PrintFactJNCompVars2(void *,char *,void *);
-   LOCALE void                           PrintFactPNCompVars1(void *,char *,void *);
-   LOCALE void                           PrintFactJNGetVar1(void *,char *,void *);
-   LOCALE void                           PrintFactJNGetVar2(void *,char *,void *);
-   LOCALE void                           PrintFactJNGetVar3(void *,char *,void *);
-   LOCALE void                           PrintFactPNGetVar1(void *,char *,void *);
-   LOCALE void                           PrintFactPNGetVar2(void *,char *,void *);
-   LOCALE void                           PrintFactPNGetVar3(void *,char *,void *);
-   LOCALE void                           PrintFactSlotLength(void *,char *,void *);
-   LOCALE void                           PrintFactPNConstant1(void *,char *,void *);
-   LOCALE void                           PrintFactPNConstant2(void *,char *,void *);
+   LOCALE void                           PrintFactJNCompVars1(char *,void *);
+   LOCALE void                           PrintFactJNCompVars2(char *,void *);
+   LOCALE void                           PrintFactPNCompVars1(char *,void *);
+   LOCALE void                           PrintFactJNGetVar1(char *,void *);
+   LOCALE void                           PrintFactJNGetVar2(char *,void *);
+   LOCALE void                           PrintFactJNGetVar3(char *,void *);
+   LOCALE void                           PrintFactPNGetVar1(char *,void *);
+   LOCALE void                           PrintFactPNGetVar2(char *,void *);
+   LOCALE void                           PrintFactPNGetVar3(char *,void *);
+   LOCALE void                           PrintFactSlotLength(char *,void *);
+   LOCALE void                           PrintFactPNConstant1(char *,void *);
+   LOCALE void                           PrintFactPNConstant2(char *,void *);
 
 #endif
 
 
+
+
+
+
+

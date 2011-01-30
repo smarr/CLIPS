@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.30  03/06/08            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*                    SCANNER MODULE                   */
    /*******************************************************/
@@ -15,12 +15,13 @@
 /*                                                           */
 /* Contributing Programmer(s):                               */
 /*      Chris Culbert                                        */
-/*      Brian Dantes                                         */
+/*      Brian Donnell                                        */
 /*                                                           */
 /* Revision History:                                         */
 /*                                                           */
-/*      6.30: Added UTF-8 support.                           */
-/*                                                           */
+/* Who               |     Date    | Description             */
+/* ------------------+-------------+------------------------ */
+/* M.Giordano        | 23-Mar-2000 | Mods made for TLS       */
 /*************************************************************/
 
 #define _SCANNER_SOURCE_
@@ -30,16 +31,13 @@
 #define _STDIO_INCLUDED_
 #include <string.h>
 #include <limits.h>
-#include <errno.h>
 
 #include "setup.h"
 #include "constant.h"
-#include "envrnmnt.h"
 #include "router.h"
 #include "symbol.h"
 #include "utility.h"
 #include "memalloc.h"
-#include "sysdep.h"
 
 #include "scanner.h"
 
@@ -49,31 +47,24 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static void                   *ScanSymbol(void *,char *,int,unsigned short *);
-   static void                   *ScanString(void *,char *);
-   static void                    ScanNumber(void *,char *,struct token *);
-   static void                    DeallocateScannerData(void *);
+   static void                   *ScanSymbol(char *,int,int *);
+   static void                   *ScanString(char *);
+   static void                    ScanNumber(char *,struct token *);
 
-/************************************************/
-/* InitializeScannerData: Allocates environment */
-/*    data for scanner routines.                */
-/************************************************/
-globle void InitializeScannerData(
-  void *theEnv)
-  {
-   AllocateEnvironmentData(theEnv,SCANNER_DATA,sizeof(struct scannerData),DeallocateScannerData);
-  }
-  
-/**************************************************/
-/* DeallocateScannerData: Deallocates environment */
-/*    data for scanner routines.                  */
-/**************************************************/
-static void DeallocateScannerData(
-  void *theEnv)
-  {
-   if (ScannerData(theEnv)->GlobalMax !=  0)
-     { genfree(theEnv,ScannerData(theEnv)->GlobalString,ScannerData(theEnv)->GlobalMax); }
-  }
+/***************************************/
+/* LOCAL INTERNAL VARIABLE DEFINITIONS */
+/***************************************/
+
+   Thread static char            *GlobalString = NULL;
+   Thread static int              GlobalMax = 0;
+   Thread static int              GlobalPos = 0;
+   Thread static long             LineCount = 0;
+
+/***************************************/
+/* LOCAL INTERNAL VARIABLE DEFINITIONS */
+/***************************************/
+
+   Thread globle int              IgnoreCompletionErrors = FALSE;
 
 /***********************************************************************/
 /* GetToken: Reads next token from the input stream. The pointer to    */
@@ -84,12 +75,11 @@ static void DeallocateScannerData(
 /*   and the pretty print representation.                              */
 /***********************************************************************/
 globle void GetToken(
- void *theEnv,
  char *logicalName,
  struct token *theToken)
  {
    int inchar;
-   unsigned short type;
+   int type;
 
    /*=======================================*/
    /* Set Unknown default values for token. */
@@ -98,15 +88,15 @@ globle void GetToken(
    theToken->type = UNKNOWN_VALUE;
    theToken->value = NULL;
    theToken->printForm = "unknown";
-   ScannerData(theEnv)->GlobalPos = 0;
-   ScannerData(theEnv)->GlobalMax = 0;
+   GlobalPos = 0;
+   GlobalMax = 0;
 
    /*==============================================*/
    /* Remove all white space before processing the */
    /* GetToken() request.                          */
    /*==============================================*/
 
-   inchar = EnvGetcRouter(theEnv,logicalName);
+   inchar = GetcRouter(logicalName);
    while ((inchar == ' ') || (inchar == '\n') || (inchar == '\f') ||
           (inchar == '\r') || (inchar == ';') || (inchar == '\t'))
      {
@@ -116,22 +106,22 @@ globle void GetToken(
 
       if (inchar == ';')
         {
-         inchar = EnvGetcRouter(theEnv,logicalName);
+         inchar = GetcRouter(logicalName);
          while ((inchar != '\n') && (inchar != '\r') && (inchar != EOF) )
-           { inchar = EnvGetcRouter(theEnv,logicalName); }
+           { inchar = GetcRouter(logicalName); }
         }
-      inchar = EnvGetcRouter(theEnv,logicalName);
+      inchar = GetcRouter(logicalName);
      }
 
    /*==========================*/
    /* Process Symbolic Tokens. */
    /*==========================*/
 
-   if (isalpha(inchar) || IsUTF8MultiByteStart(inchar))
+   if (isalpha(inchar))
      {
       theToken->type = SYMBOL;
-      EnvUngetcRouter(theEnv,inchar,logicalName);
-      theToken->value = (void *) ScanSymbol(theEnv,logicalName,0,&type);
+      UngetcRouter(inchar,logicalName);
+      theToken->value = (void *) ScanSymbol(logicalName,0,&type);
       theToken->printForm = ValueToString(theToken->value);
      }
 
@@ -141,8 +131,8 @@ globle void GetToken(
 
    else if (isdigit(inchar))
      {
-      EnvUngetcRouter(theEnv,inchar,logicalName);
-      ScanNumber(theEnv,logicalName,theToken);
+      UngetcRouter(inchar,logicalName);
+      ScanNumber(logicalName,theToken);
      }
 
    else switch (inchar)
@@ -152,9 +142,9 @@ globle void GetToken(
       /*========================*/
 
       case '"':
-         theToken->value = (void *) ScanString(theEnv,logicalName);
+         theToken->value = (void *) ScanString(logicalName);
          theToken->type = STRING;
-         theToken->printForm = StringPrintForm(theEnv,ValueToString(theToken->value));
+         theToken->printForm = StringPrintForm(ValueToString(theToken->value));
          break;
 
       /*=======================================*/
@@ -164,8 +154,8 @@ globle void GetToken(
       case '-':
       case '.':
       case '+':
-         EnvUngetcRouter(theEnv,inchar,logicalName);
-         ScanNumber(theEnv,logicalName,theToken);
+         UngetcRouter(inchar,logicalName);
+         ScanNumber(logicalName,theToken);
          break;
 
       /*===================================*/
@@ -173,41 +163,41 @@ globle void GetToken(
       /*===================================*/
 
        case '?':
-          inchar = EnvGetcRouter(theEnv,logicalName);
-          if (isalpha(inchar) || IsUTF8MultiByteStart(inchar)
+          inchar = GetcRouter(logicalName);
+          if (isalpha(inchar)
 #if DEFGLOBAL_CONSTRUCT
               || (inchar == '*'))
 #else
               )
 #endif
             {
-             EnvUngetcRouter(theEnv,inchar,logicalName);
-             theToken->value = (void *) ScanSymbol(theEnv,logicalName,0,&type);
+             UngetcRouter(inchar,logicalName);
+             theToken->value = (void *) ScanSymbol(logicalName,0,&type);
              theToken->type = SF_VARIABLE;
 #if DEFGLOBAL_CONSTRUCT
              if ((ValueToString(theToken->value)[0] == '*') &&
                  (((int) strlen(ValueToString(theToken->value))) > 1) &&
                  (ValueToString(theToken->value)[strlen(ValueToString(theToken->value)) - 1] == '*'))
                {
-                size_t count;
+                int count;
 
                 theToken->type = GBL_VARIABLE;
-                theToken->printForm = AppendStrings(theEnv,"?",ValueToString(theToken->value));
-                count = strlen(ScannerData(theEnv)->GlobalString);
-                ScannerData(theEnv)->GlobalString[count-1] = EOS;
-                theToken->value = EnvAddSymbol(theEnv,ScannerData(theEnv)->GlobalString+1);
-                ScannerData(theEnv)->GlobalString[count-1] = (char) inchar;
+                theToken->printForm = AppendStrings("?",ValueToString(theToken->value));
+                count = strlen(GlobalString);
+                GlobalString[count-1] = EOS;
+                theToken->value = AddSymbol(GlobalString+1);
+                GlobalString[count-1] = (char) inchar;
 
                }
              else
 #endif
-             theToken->printForm = AppendStrings(theEnv,"?",ValueToString(theToken->value));
+             theToken->printForm = AppendStrings("?",ValueToString(theToken->value));
             }
           else
             {
              theToken->type = SF_WILDCARD;
-             theToken->value = (void *) EnvAddSymbol(theEnv,"?");
-             EnvUngetcRouter(theEnv,inchar,logicalName);
+             theToken->value = (void *) AddSymbol("?");
+             UngetcRouter(inchar,logicalName);
              theToken->printForm = "?";
             }
           break;
@@ -217,51 +207,51 @@ globle void GetToken(
       /*=====================================*/
 
       case '$':
-         if ((inchar = EnvGetcRouter(theEnv,logicalName)) == '?')
+         if ((inchar = GetcRouter(logicalName)) == '?')
            {
-            inchar = EnvGetcRouter(theEnv,logicalName);
-            if (isalpha(inchar) || IsUTF8MultiByteStart(inchar)
+            inchar = GetcRouter(logicalName);
+            if (isalpha(inchar)
 #if DEFGLOBAL_CONSTRUCT
                  || (inchar == '*'))
 #else
                  )
 #endif
               {
-               EnvUngetcRouter(theEnv,inchar,logicalName);
-               theToken->value = (void *) ScanSymbol(theEnv,logicalName,0,&type);
+               UngetcRouter(inchar,logicalName);
+               theToken->value = (void *) ScanSymbol(logicalName,0,&type);
                theToken->type = MF_VARIABLE;
 #if DEFGLOBAL_CONSTRUCT
              if ((ValueToString(theToken->value)[0] == '*') &&
                  ((int) (strlen(ValueToString(theToken->value))) > 1) &&
                  (ValueToString(theToken->value)[strlen(ValueToString(theToken->value)) - 1] == '*'))
                {
-                size_t count;
+                int count;
 
                 theToken->type = MF_GBL_VARIABLE;
-                theToken->printForm = AppendStrings(theEnv,"$?",ValueToString(theToken->value));
-                count = strlen(ScannerData(theEnv)->GlobalString);
-                ScannerData(theEnv)->GlobalString[count-1] = EOS;
-                theToken->value = EnvAddSymbol(theEnv,ScannerData(theEnv)->GlobalString+1);
-                ScannerData(theEnv)->GlobalString[count-1] = (char) inchar;
+                theToken->printForm = AppendStrings("$?",ValueToString(theToken->value));
+                count = strlen(GlobalString);
+                GlobalString[count-1] = EOS;
+                theToken->value = AddSymbol(GlobalString+1);
+                GlobalString[count-1] = (char) inchar;
                }
              else
 #endif
-               theToken->printForm = AppendStrings(theEnv,"$?",ValueToString(theToken->value));
+               theToken->printForm = AppendStrings("$?",ValueToString(theToken->value));
               }
             else
               {
                theToken->type = MF_WILDCARD;
-               theToken->value = (void *) EnvAddSymbol(theEnv,"$?");
+               theToken->value = (void *) AddSymbol("$?");
                theToken->printForm = "$?";
-               EnvUngetcRouter(theEnv,inchar,logicalName);
+               UngetcRouter(inchar,logicalName);
               }
            }
          else
            {
             theToken->type = SYMBOL;
-            ScannerData(theEnv)->GlobalString = ExpandStringWithChar(theEnv,'$',ScannerData(theEnv)->GlobalString,&ScannerData(theEnv)->GlobalPos,&ScannerData(theEnv)->GlobalMax,ScannerData(theEnv)->GlobalMax+80);
-            EnvUngetcRouter(theEnv,inchar,logicalName);
-            theToken->value = (void *) ScanSymbol(theEnv,logicalName,1,&type);
+            GlobalString = ExpandStringWithChar('$',GlobalString,&GlobalPos,&GlobalMax,GlobalMax+80);
+            UngetcRouter(inchar,logicalName);
+            theToken->value = (void *) ScanSymbol(logicalName,1,&type);
             theToken->printForm = ValueToString(theToken->value);
            }
          break;
@@ -272,8 +262,8 @@ globle void GetToken(
 
       case '<':
          theToken->type = SYMBOL;
-         ScannerData(theEnv)->GlobalString = ExpandStringWithChar(theEnv,'<',ScannerData(theEnv)->GlobalString,&ScannerData(theEnv)->GlobalPos,&ScannerData(theEnv)->GlobalMax,ScannerData(theEnv)->GlobalMax+80);
-         theToken->value = (void *) ScanSymbol(theEnv,logicalName,1,&type);
+         GlobalString = ExpandStringWithChar('<',GlobalString,&GlobalPos,&GlobalMax,GlobalMax+80);
+         theToken->value = (void *) ScanSymbol(logicalName,1,&type);
          theToken->printForm = ValueToString(theToken->value);
          break;
 
@@ -283,31 +273,31 @@ globle void GetToken(
 
       case '(':
          theToken->type = LPAREN;
-         theToken->value = (void *) EnvAddSymbol(theEnv,"(");
+         theToken->value = (void *) AddSymbol("(");
          theToken->printForm = "(";
          break;
 
       case ')':
          theToken->type= RPAREN;
-         theToken->value = (void *) EnvAddSymbol(theEnv,")");
+         theToken->value = (void *) AddSymbol(")");
          theToken->printForm = ")";
          break;
 
       case '~':
          theToken->type = NOT_CONSTRAINT;
-         theToken->value = (void *) EnvAddSymbol(theEnv,"~");
+         theToken->value = (void *) AddSymbol("~");
          theToken->printForm = "~";
          break;
 
       case '|':
          theToken->type = OR_CONSTRAINT;
-         theToken->value = (void *) EnvAddSymbol(theEnv,"|");
+         theToken->value = (void *) AddSymbol("|");
          theToken->printForm = "|";
          break;
 
       case '&':
          theToken->type =  AND_CONSTRAINT;
-         theToken->value = (void *) EnvAddSymbol(theEnv,"&");
+         theToken->value = (void *) AddSymbol("&");
          theToken->printForm = "&";
          break;
 
@@ -319,7 +309,7 @@ globle void GetToken(
       case 0:
       case 3:
          theToken->type = STOP;
-         theToken->value = (void *) EnvAddSymbol(theEnv,"stop");
+         theToken->value = (void *) AddSymbol("stop");
          theToken->printForm = "";
          break;
 
@@ -330,8 +320,8 @@ globle void GetToken(
       default:
          if (isprint(inchar))
            {
-            EnvUngetcRouter(theEnv,inchar,logicalName);
-            theToken->value = (void *) ScanSymbol(theEnv,logicalName,0,&type);
+            UngetcRouter(inchar,logicalName);
+            theToken->value = (void *) ScanSymbol(logicalName,0,&type);
             theToken->type = type;
             theToken->printForm = ValueToString(theToken->value);
            }
@@ -347,24 +337,22 @@ globle void GetToken(
 #if (! RUN_TIME) && (! BLOAD_ONLY)
    if (theToken->type == INSTANCE_NAME)
      {
-      SavePPBuffer(theEnv,"[");
-      SavePPBuffer(theEnv,theToken->printForm);
-      SavePPBuffer(theEnv,"]");
+      SavePPBuffer("[");
+      SavePPBuffer(theToken->printForm);
+      SavePPBuffer("]");
      }
    else
-     { SavePPBuffer(theEnv,theToken->printForm); }
+     { SavePPBuffer(theToken->printForm); }
 #endif
 
    /*=========================================================*/
    /* Return the temporary memory used in scanning the token. */
    /*=========================================================*/
 
-   if (ScannerData(theEnv)->GlobalString != NULL)
+   if (GlobalString != NULL)
      {
-      rm(theEnv,ScannerData(theEnv)->GlobalString,ScannerData(theEnv)->GlobalMax);
-      ScannerData(theEnv)->GlobalString = NULL;
-      ScannerData(theEnv)->GlobalMax = 0;
-      ScannerData(theEnv)->GlobalPos = 0;
+      rm(GlobalString,GlobalMax);
+      GlobalString = NULL;
      }
 
    return;
@@ -374,10 +362,9 @@ globle void GetToken(
 /* ScanSymbol: Scans a symbol token. */
 /*************************************/
 static void *ScanSymbol(
-  void *theEnv,
   char *logicalName,
   int count,
-  unsigned short *type)
+  int *type)
   {
    int inchar;
 #if OBJECT_SYSTEM
@@ -389,19 +376,18 @@ static void *ScanSymbol(
    /* symbol until a delimiter is found.  */
    /*=====================================*/
 
-   inchar = EnvGetcRouter(theEnv,logicalName);
+   inchar = GetcRouter(logicalName);
    while ( (inchar != '<') && (inchar != '"') &&
            (inchar != '(') && (inchar != ')') &&
            (inchar != '&') && (inchar != '|') && (inchar != '~') &&
            (inchar != ' ') && (inchar != ';') &&
-           (isprint(inchar) ||
-            IsUTF8MultiByteStart(inchar) || 
-            IsUTF8MultiByteContinuation(inchar)))
+           isprint(inchar) )
      {
-      ScannerData(theEnv)->GlobalString = ExpandStringWithChar(theEnv,inchar,ScannerData(theEnv)->GlobalString,&ScannerData(theEnv)->GlobalPos,&ScannerData(theEnv)->GlobalMax,ScannerData(theEnv)->GlobalMax+80);
+      GlobalString = ExpandStringWithChar(inchar,GlobalString,&GlobalPos,&GlobalMax,GlobalMax+80);
+
 
       count++;
-      inchar = EnvGetcRouter(theEnv,logicalName);
+      inchar = GetcRouter(logicalName);
      }
 
    /*===================================================*/
@@ -410,7 +396,7 @@ static void *ScanSymbol(
    /* of the next token.                                */
    /*===================================================*/
 
-   EnvUngetcRouter(theEnv,inchar,logicalName);
+   UngetcRouter(inchar,logicalName);
 
    /*====================================================*/
    /* Add the symbol to the symbol table and return the  */
@@ -422,7 +408,7 @@ static void *ScanSymbol(
 #if OBJECT_SYSTEM
    if (count > 2)
      {
-      if ((ScannerData(theEnv)->GlobalString[0] == '[') ? (ScannerData(theEnv)->GlobalString[count-1] == ']') : FALSE)
+      if ((GlobalString[0] == '[') ? (GlobalString[count-1] == ']') : FALSE)
         {
          *type = INSTANCE_NAME;
          inchar = ']';
@@ -430,21 +416,21 @@ static void *ScanSymbol(
       else
         {
          *type = SYMBOL;
-         return(EnvAddSymbol(theEnv,ScannerData(theEnv)->GlobalString));
+         return(AddSymbol(GlobalString));
         }
-      ScannerData(theEnv)->GlobalString[count-1] = EOS;
-      symbol = EnvAddSymbol(theEnv,ScannerData(theEnv)->GlobalString+1);
-      ScannerData(theEnv)->GlobalString[count-1] = (char) inchar;
+      GlobalString[count-1] = EOS;
+      symbol = AddSymbol(GlobalString+1);
+      GlobalString[count-1] = (char) inchar;
       return(symbol);
      }
    else
      {
       *type = SYMBOL;
-      return(EnvAddSymbol(theEnv,ScannerData(theEnv)->GlobalString));
+      return(AddSymbol(GlobalString));
      }
 #else
    *type = SYMBOL;
-   return(EnvAddSymbol(theEnv,ScannerData(theEnv)->GlobalString));
+   return(AddSymbol(GlobalString));
 #endif
   }
 
@@ -452,12 +438,10 @@ static void *ScanSymbol(
 /* ScanString: Scans a string token. */
 /*************************************/
 static void *ScanString(
-  void *theEnv,
   char *logicalName)
   {
    int inchar;
-   size_t pos = 0;
-   size_t max = 0;
+   int pos = 0, max = 0;
    char *theString = NULL;
    void *thePtr;
 
@@ -466,21 +450,18 @@ static void *ScanString(
    /* until the " delimiter is found.            */
    /*============================================*/
 
-   inchar = EnvGetcRouter(theEnv,logicalName);
+   inchar = GetcRouter(logicalName);
    while ((inchar != '"') && (inchar != EOF))
      {
       if (inchar == '\\')
-        { inchar = EnvGetcRouter(theEnv,logicalName); }
+        { inchar = GetcRouter(logicalName); }
 
-      theString = ExpandStringWithChar(theEnv,inchar,theString,&pos,&max,max+80);
-      inchar = EnvGetcRouter(theEnv,logicalName);
+      theString = ExpandStringWithChar(inchar,theString,&pos,&max,max+80);
+      inchar = GetcRouter(logicalName);
      }
 
-   if ((inchar == EOF) && (ScannerData(theEnv)->IgnoreCompletionErrors == FALSE))
-     { 
-      PrintErrorID(theEnv,"SCANNER",1,TRUE);
-      EnvPrintRouter(theEnv,WERROR,"Encountered End-Of-File while scanning a string\n"); 
-     }
+   if ((inchar == EOF) && (IgnoreCompletionErrors == FALSE))
+     { PrintRouter(WERROR,"\nEncountered End-Of-File while scanning a string\n"); }
 
    /*===============================================*/
    /* Add the string to the symbol table and return */
@@ -488,11 +469,11 @@ static void *ScanString(
    /*===============================================*/
 
    if (theString == NULL)
-     { thePtr = EnvAddSymbol(theEnv,""); }
+     { thePtr = AddSymbol(""); }
    else
      {
-      thePtr = EnvAddSymbol(theEnv,theString);
-      rm(theEnv,theString,max);
+      thePtr = AddSymbol(theString);
+      rm(theString,max);
      }
 
    return(thePtr);
@@ -502,7 +483,6 @@ static void *ScanString(
 /* ScanNumber: Scans a numeric token. */
 /**************************************/
 static void ScanNumber(
-  void *theEnv,
   char *logicalName,
   struct token *theToken)
   {
@@ -511,8 +491,8 @@ static void ScanNumber(
    int digitFound = FALSE;
    int processFloat = FALSE;
    double fvalue;
-   long long lvalue;
-   unsigned short type;
+   long lvalue;
+   int type;
 
    /* Phases:              */
    /*  -1 = sign           */
@@ -523,7 +503,7 @@ static void ScanNumber(
    /*   5 = done           */
    /*   9 = error          */
 
-   inchar = EnvGetcRouter(theEnv,logicalName);
+   inchar = GetcRouter(logicalName);
    phase = -1;
 
    while ((phase != 5) && (phase != 9))
@@ -534,26 +514,26 @@ static void ScanNumber(
            {
             phase = 0;
             digitFound = TRUE;
-            ScannerData(theEnv)->GlobalString = ExpandStringWithChar(theEnv,inchar,ScannerData(theEnv)->GlobalString,&ScannerData(theEnv)->GlobalPos,&ScannerData(theEnv)->GlobalMax,ScannerData(theEnv)->GlobalMax+80);
+            GlobalString = ExpandStringWithChar(inchar,GlobalString,&GlobalPos,&GlobalMax,GlobalMax+80);
             count++;
            }
          else if ((inchar == '+') || (inchar == '-'))
            {
             phase = 0;
-            ScannerData(theEnv)->GlobalString = ExpandStringWithChar(theEnv,inchar,ScannerData(theEnv)->GlobalString,&ScannerData(theEnv)->GlobalPos,&ScannerData(theEnv)->GlobalMax,ScannerData(theEnv)->GlobalMax+80);
+            GlobalString = ExpandStringWithChar(inchar,GlobalString,&GlobalPos,&GlobalMax,GlobalMax+80);
             count++;
            }
          else if (inchar == '.')
            {
             processFloat = TRUE;
-            ScannerData(theEnv)->GlobalString = ExpandStringWithChar(theEnv,inchar,ScannerData(theEnv)->GlobalString,&ScannerData(theEnv)->GlobalPos,&ScannerData(theEnv)->GlobalMax,ScannerData(theEnv)->GlobalMax+80);
+            GlobalString = ExpandStringWithChar(inchar,GlobalString,&GlobalPos,&GlobalMax,GlobalMax+80);
             count++;
             phase = 1;
            }
          else if ((inchar == 'E') || (inchar == 'e'))
            {
             processFloat = TRUE;
-            ScannerData(theEnv)->GlobalString = ExpandStringWithChar(theEnv,inchar,ScannerData(theEnv)->GlobalString,&ScannerData(theEnv)->GlobalPos,&ScannerData(theEnv)->GlobalMax,ScannerData(theEnv)->GlobalMax+80);
+            GlobalString = ExpandStringWithChar(inchar,GlobalString,&GlobalPos,&GlobalMax,GlobalMax+80);
             count++;
             phase = 2;
            }
@@ -566,7 +546,7 @@ static void ScanNumber(
          else
            {
             phase = 9;
-            ScannerData(theEnv)->GlobalString = ExpandStringWithChar(theEnv,inchar,ScannerData(theEnv)->GlobalString,&ScannerData(theEnv)->GlobalPos,&ScannerData(theEnv)->GlobalMax,ScannerData(theEnv)->GlobalMax+80);
+            GlobalString = ExpandStringWithChar(inchar,GlobalString,&GlobalPos,&GlobalMax,GlobalMax+80);
             count++;
            }
         }
@@ -575,20 +555,20 @@ static void ScanNumber(
          if (isdigit(inchar))
            {
             digitFound = TRUE;
-            ScannerData(theEnv)->GlobalString = ExpandStringWithChar(theEnv,inchar,ScannerData(theEnv)->GlobalString,&ScannerData(theEnv)->GlobalPos,&ScannerData(theEnv)->GlobalMax,ScannerData(theEnv)->GlobalMax+80);
+            GlobalString = ExpandStringWithChar(inchar,GlobalString,&GlobalPos,&GlobalMax,GlobalMax+80);
             count++;
            }
          else if (inchar == '.')
            {
             processFloat = TRUE;
-            ScannerData(theEnv)->GlobalString = ExpandStringWithChar(theEnv,inchar,ScannerData(theEnv)->GlobalString,&ScannerData(theEnv)->GlobalPos,&ScannerData(theEnv)->GlobalMax,ScannerData(theEnv)->GlobalMax+80);
+            GlobalString = ExpandStringWithChar(inchar,GlobalString,&GlobalPos,&GlobalMax,GlobalMax+80);
             count++;
             phase = 1;
            }
          else if ((inchar == 'E') || (inchar == 'e'))
            {
             processFloat = TRUE;
-            ScannerData(theEnv)->GlobalString = ExpandStringWithChar(theEnv,inchar,ScannerData(theEnv)->GlobalString,&ScannerData(theEnv)->GlobalPos,&ScannerData(theEnv)->GlobalMax,ScannerData(theEnv)->GlobalMax+80);
+            GlobalString = ExpandStringWithChar(inchar,GlobalString,&GlobalPos,&GlobalMax,GlobalMax+80);
             count++;
             phase = 2;
            }
@@ -596,12 +576,12 @@ static void ScanNumber(
                    (inchar == '(') || (inchar == ')') ||
                    (inchar == '&') || (inchar == '|') || (inchar == '~') ||
                    (inchar == ' ') || (inchar == ';') ||
-                   ((isprint(inchar) == 0) && (! IsUTF8MultiByteStart(inchar))) )
+                   (isprint(inchar) == 0) )
            { phase = 5; }
          else
            {
             phase = 9;
-            ScannerData(theEnv)->GlobalString = ExpandStringWithChar(theEnv,inchar,ScannerData(theEnv)->GlobalString,&ScannerData(theEnv)->GlobalPos,&ScannerData(theEnv)->GlobalMax,ScannerData(theEnv)->GlobalMax+80);
+            GlobalString = ExpandStringWithChar(inchar,GlobalString,&GlobalPos,&GlobalMax,GlobalMax+80);
             count++;
            }
         }
@@ -610,12 +590,12 @@ static void ScanNumber(
          if (isdigit(inchar))
            {
             digitFound = TRUE;
-            ScannerData(theEnv)->GlobalString = ExpandStringWithChar(theEnv,inchar,ScannerData(theEnv)->GlobalString,&ScannerData(theEnv)->GlobalPos,&ScannerData(theEnv)->GlobalMax,ScannerData(theEnv)->GlobalMax+80);
+            GlobalString = ExpandStringWithChar(inchar,GlobalString,&GlobalPos,&GlobalMax,GlobalMax+80);
             count++;
            }
          else if ((inchar == 'E') || (inchar == 'e'))
            {
-            ScannerData(theEnv)->GlobalString = ExpandStringWithChar(theEnv,inchar,ScannerData(theEnv)->GlobalString,&ScannerData(theEnv)->GlobalPos,&ScannerData(theEnv)->GlobalMax,ScannerData(theEnv)->GlobalMax+80);
+            GlobalString = ExpandStringWithChar(inchar,GlobalString,&GlobalPos,&GlobalMax,GlobalMax+80);
             count++;
             phase = 2;
            }
@@ -623,12 +603,12 @@ static void ScanNumber(
                    (inchar == '(') || (inchar == ')') ||
                    (inchar == '&') || (inchar == '|') || (inchar == '~') ||
                    (inchar == ' ') || (inchar == ';') ||
-                   ((isprint(inchar) == 0) && (! IsUTF8MultiByteStart(inchar))) )
+                   (isprint(inchar) == 0) )
            { phase = 5; }
          else
            {
             phase = 9;
-            ScannerData(theEnv)->GlobalString = ExpandStringWithChar(theEnv,inchar,ScannerData(theEnv)->GlobalString,&ScannerData(theEnv)->GlobalPos,&ScannerData(theEnv)->GlobalMax,ScannerData(theEnv)->GlobalMax+80);
+            GlobalString = ExpandStringWithChar(inchar,GlobalString,&GlobalPos,&GlobalMax,GlobalMax+80);
             count++;
            }
         }
@@ -636,13 +616,13 @@ static void ScanNumber(
         {
          if (isdigit(inchar))
            {
-            ScannerData(theEnv)->GlobalString = ExpandStringWithChar(theEnv,inchar,ScannerData(theEnv)->GlobalString,&ScannerData(theEnv)->GlobalPos,&ScannerData(theEnv)->GlobalMax,ScannerData(theEnv)->GlobalMax+80);
+            GlobalString = ExpandStringWithChar(inchar,GlobalString,&GlobalPos,&GlobalMax,GlobalMax+80);
             count++;
             phase = 3;
            }
          else if ((inchar == '+') || (inchar == '-'))
            {
-            ScannerData(theEnv)->GlobalString = ExpandStringWithChar(theEnv,inchar,ScannerData(theEnv)->GlobalString,&ScannerData(theEnv)->GlobalPos,&ScannerData(theEnv)->GlobalMax,ScannerData(theEnv)->GlobalMax+80);
+            GlobalString = ExpandStringWithChar(inchar,GlobalString,&GlobalPos,&GlobalMax,GlobalMax+80);
             count++;
             phase = 3;
            }
@@ -650,7 +630,7 @@ static void ScanNumber(
                    (inchar == '(') || (inchar == ')') ||
                    (inchar == '&') || (inchar == '|') || (inchar == '~') ||
                    (inchar == ' ') || (inchar == ';') ||
-                   ((isprint(inchar) == 0) && (! IsUTF8MultiByteStart(inchar))) )
+                   (isprint(inchar) == 0) )
            {
             digitFound = FALSE;
             phase = 5;
@@ -658,7 +638,7 @@ static void ScanNumber(
          else
            {
             phase = 9;
-            ScannerData(theEnv)->GlobalString = ExpandStringWithChar(theEnv,inchar,ScannerData(theEnv)->GlobalString,&ScannerData(theEnv)->GlobalPos,&ScannerData(theEnv)->GlobalMax,ScannerData(theEnv)->GlobalMax+80);
+            GlobalString = ExpandStringWithChar(inchar,GlobalString,&GlobalPos,&GlobalMax,GlobalMax+80);
             count++;
            }
         }
@@ -666,34 +646,34 @@ static void ScanNumber(
         {
          if (isdigit(inchar))
            {
-            ScannerData(theEnv)->GlobalString = ExpandStringWithChar(theEnv,inchar,ScannerData(theEnv)->GlobalString,&ScannerData(theEnv)->GlobalPos,&ScannerData(theEnv)->GlobalMax,ScannerData(theEnv)->GlobalMax+80);
+            GlobalString = ExpandStringWithChar(inchar,GlobalString,&GlobalPos,&GlobalMax,GlobalMax+80);
             count++;
            }
          else if ( (inchar == '<') || (inchar == '"') ||
                    (inchar == '(') || (inchar == ')') ||
                    (inchar == '&') || (inchar == '|') || (inchar == '~') ||
                    (inchar == ' ') || (inchar == ';') ||
-                   ((isprint(inchar) == 0) && (! IsUTF8MultiByteStart(inchar))) )
+                   (isprint(inchar) == 0) )
            {
-            if ((ScannerData(theEnv)->GlobalString[count-1] == '+') || (ScannerData(theEnv)->GlobalString[count-1] == '-'))
+            if ((GlobalString[count-1] == '+') || (GlobalString[count-1] == '-'))
               { digitFound = FALSE; }
             phase = 5;
            }
          else
            {
             phase = 9;
-            ScannerData(theEnv)->GlobalString = ExpandStringWithChar(theEnv,inchar,ScannerData(theEnv)->GlobalString,&ScannerData(theEnv)->GlobalPos,&ScannerData(theEnv)->GlobalMax,ScannerData(theEnv)->GlobalMax+80);
+            GlobalString = ExpandStringWithChar(inchar,GlobalString,&GlobalPos,&GlobalMax,GlobalMax+80);
             count++;
            }
         }
 
       if ((phase != 5) && (phase != 9))
-        { inchar = EnvGetcRouter(theEnv,logicalName); }
+        { inchar = GetcRouter(logicalName); }
      }
 
    if (phase == 9)
      {
-      theToken->value = (void *) ScanSymbol(theEnv,logicalName,count,&type);
+      theToken->value = (void *) ScanSymbol(logicalName,count,&type);
       theToken->type = type;
       theToken->printForm = ValueToString(theToken->value);
       return;
@@ -704,39 +684,34 @@ static void ScanNumber(
    /* and return the number.                */
    /*=======================================*/
 
-   EnvUngetcRouter(theEnv,inchar,logicalName);
+   UngetcRouter(inchar,logicalName);
 
    if (! digitFound)
      {
       theToken->type = SYMBOL;
-      theToken->value = (void *) EnvAddSymbol(theEnv,ScannerData(theEnv)->GlobalString);
+      theToken->value = (void *) AddSymbol(GlobalString);
       theToken->printForm = ValueToString(theToken->value);
       return;
      }
 
    if (processFloat)
      {
-      fvalue = atof(ScannerData(theEnv)->GlobalString);
+      fvalue = atof(GlobalString);
       theToken->type = FLOAT;
-      theToken->value = (void *) EnvAddDouble(theEnv,fvalue);
-      theToken->printForm = FloatToString(theEnv,ValueToDouble(theToken->value));
+      theToken->value = (void *) AddDouble(fvalue);
+      theToken->printForm = FloatToString(ValueToDouble(theToken->value));
      }
    else
      {
-      errno = 0;
-#if WIN_MVC
-      lvalue = _strtoi64(ScannerData(theEnv)->GlobalString,NULL,10);
-#else
-      lvalue = strtoll(ScannerData(theEnv)->GlobalString,NULL,10);
-#endif
-      if (errno)
+      lvalue = atol(GlobalString);
+      if ((lvalue == LONG_MAX) || (lvalue == LONG_MIN))
         {
-         PrintWarningID(theEnv,"SCANNER",1,FALSE);
-         EnvPrintRouter(theEnv,WWARNING,"Over or underflow of long long integer.\n");
+         PrintWarningID("SCANNER",1,FALSE);
+         PrintRouter(WWARNING,"Over or underflow of long integer.\n");
         }
       theToken->type = INTEGER;
-      theToken->value = (void *) EnvAddLong(theEnv,lvalue);
-      theToken->printForm = LongIntegerToString(theEnv,ValueToLong(theToken->value));
+      theToken->value = (void *) AddLong(lvalue);
+      theToken->printForm = LongIntegerToString(ValueToLong(theToken->value));
      }
 
    return;
@@ -758,37 +733,34 @@ globle void CopyToken(
 /* ResetLineCount: Resets the scanner's */
 /*   line count to zero.                */
 /****************************************/
-globle void ResetLineCount(
-  void *theEnv)
+globle void ResetLineCount()
   {
-   ScannerData(theEnv)->LineCount = 0;
+   LineCount = 0;
   }
 
 /****************************************************/
 /* GettLineCount: Returns the scanner's line count. */
 /****************************************************/
-globle long GetLineCount(
-  void *theEnv)
+globle long GetLineCount()
   {
-   return(ScannerData(theEnv)->LineCount);
+   return(LineCount);
   }
 
 /**********************************/
 /* IncrementLineCount: Increments */
 /*   the scanner's line count.    */
 /**********************************/
-globle void IncrementLineCount(
-  void *theEnv)
+globle void IncrementLineCount()
   {
-   ScannerData(theEnv)->LineCount++;
+   LineCount++;
   }
 
 /**********************************/
 /* DecrementLineCount: Decrements */
 /*   the scanner's line count.    */
 /**********************************/
-globle void DecrementLineCount(
-  void *theEnv)
+globle void DecrementLineCount()
   {
-   ScannerData(theEnv)->LineCount--;
+   LineCount--;
   }
+

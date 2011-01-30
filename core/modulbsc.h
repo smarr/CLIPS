@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.20  01/31/02            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*         DEFMODULE BASIC COMMANDS HEADER FILE        */
    /*******************************************************/
@@ -15,7 +15,7 @@
 /*      Gary D. Riley                                        */
 /*                                                           */
 /* Contributing Programmer(s):                               */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Revision History:                                         */
 /*                                                           */
@@ -38,15 +38,14 @@
 #define LOCALE extern
 #endif
 
-#define GetDefmoduleList(a) EnvGetDefmoduleList(GetCurrentEnvironment(),a)
-#define ListDefmodules(a) EnvListDefmodules(GetCurrentEnvironment(),a)
-
-   LOCALE void                           DefmoduleBasicCommands(void *);
-   LOCALE void                           EnvGetDefmoduleList(void *,DATA_OBJECT_PTR);
-   LOCALE void                           PPDefmoduleCommand(void *);
-   LOCALE int                            PPDefmodule(void *,char *,char *);
-   LOCALE void                           ListDefmodulesCommand(void *);
-   LOCALE void                           EnvListDefmodules(void *,char *);
+   LOCALE void                           DefmoduleBasicCommands(void);
+   LOCALE void                           GetDefmoduleList(DATA_OBJECT_PTR);
+   LOCALE void                           PPDefmoduleCommand(void);
+   LOCALE int                            PPDefmodule(char *,char *);
+   LOCALE void                           ListDefmodulesCommand(void);
+   LOCALE void                           ListDefmodules(char *);
 
 #endif
 
+
+

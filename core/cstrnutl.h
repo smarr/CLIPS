@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.20  01/31/02            */
+   /*             CLIPS Version 6.10  04/13/98            */
    /*                                                     */
    /*            CONSTRAINT UTILITY HEADER FILE           */
    /*******************************************************/
@@ -14,7 +14,7 @@
 /*      Gary D. Riley                                        */
 /*                                                           */
 /* Contributing Programmer(s):                               */
-/*      Brian Dantes                                         */
+/*      Brian Donnell                                        */
 /*                                                           */
 /* Revision History:                                         */
 /*                                                           */
@@ -42,16 +42,19 @@
 #include <stdio.h>
 #endif
 
-   LOCALE struct constraintRecord       *GetConstraintRecord(void *);
-   LOCALE int                            CompareNumbers(void *,int,void *,int,void *);
-   LOCALE struct constraintRecord       *CopyConstraintRecord(void *,CONSTRAINT_RECORD *);
+   LOCALE struct constraintRecord       *GetConstraintRecord(void);
+   LOCALE int                            CompareNumbers(int,void *,int,void *);
+   LOCALE struct constraintRecord       *CopyConstraintRecord(CONSTRAINT_RECORD *);
    LOCALE int                            SetConstraintType(int,CONSTRAINT_RECORD *);
    LOCALE void                           SetAnyAllowedFlags(CONSTRAINT_RECORD *,int);
    LOCALE void                           SetAnyRestrictionFlags(CONSTRAINT_RECORD *,int);
-   LOCALE CONSTRAINT_RECORD             *ArgumentTypeToConstraintRecord(void *,int);
-   LOCALE CONSTRAINT_RECORD             *FunctionCallToConstraintRecord(void *,void *);
-   LOCALE CONSTRAINT_RECORD             *ExpressionToConstraintRecord(void *,struct expr *);
+   LOCALE CONSTRAINT_RECORD             *ArgumentTypeToConstraintRecord(int);
+   LOCALE CONSTRAINT_RECORD             *FunctionCallToConstraintRecord(void *);
+   LOCALE CONSTRAINT_RECORD             *ExpressionToConstraintRecord(struct expr *);
 
 #endif
 
 
+
+
+

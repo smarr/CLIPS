@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.20  01/31/02            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*             DEFGLOBAL BINARY HEADER FILE            */
    /*******************************************************/
@@ -13,7 +13,7 @@
 /*      Gary D. Riley                                        */
 /*                                                           */
 /* Contributing Programmer(s):                               */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Revision History:                                         */
 /*                                                           */
@@ -38,19 +38,7 @@ struct bsaveDefglobalModule
    struct bsaveDefmoduleItemHeader header;
   };
 
-#define GLOBLBIN_DATA 60
-
-struct defglobalBinaryData
-  { 
-   struct defglobal *DefglobalArray;
-   long NumberOfDefglobals;
-   struct defglobalModule *ModuleArray;
-   long NumberOfDefglobalModules;
-  };
-  
-#define DefglobalBinaryData(theEnv) ((struct defglobalBinaryData *) GetEnvironmentData(theEnv,GLOBLBIN_DATA))
-
-#define DefglobalPointer(i) ((struct defglobal *) (&DefglobalBinaryData(theEnv)->DefglobalArray[i]))
+#define DefglobalPointer(i) ((struct defglobal *) (&DefglobalArray[i]))
 
 #ifdef LOCALE
 #undef LOCALE
@@ -62,13 +50,17 @@ struct defglobalBinaryData
 #define LOCALE extern
 #endif
 
-   LOCALE void                           DefglobalBinarySetup(void *);
-   LOCALE void                          *BloadDefglobalModuleReference(void *,int);
+   LOCALE void                           DefglobalBinarySetup(void);
+   LOCALE void                          *BloadDefglobalModuleReference(int);
 
 #ifndef _GLOBLBIN_SOURCE_
-   extern struct defglobal *DefglobalArray;
+   extern Thread struct defglobal *DefglobalArray;
 #endif
 #endif
 
 
 
+
+
+
+

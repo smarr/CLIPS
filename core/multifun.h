@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.24  06/05/06            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*           MULTIFIELD FUNCTIONS HEADER FILE          */
    /*******************************************************/
@@ -10,15 +10,11 @@
 /* Purpose:                                                  */
 /*                                                           */
 /* Principal Programmer(s):                                  */
-/*      Gary Riley and Brian Dantes                          */
+/*      Gary Riley and Brian Donnell                         */
 /*                                                           */
 /* Contributing Programmer(s):                               */
 /*                                                           */
 /* Revision History:                                         */
-/*                                                           */
-/*      6.24: Renamed BOOLEAN macro type to intBool.         */
-/*                                                           */
-/*            Moved ImplodeMultifield to multifld.c.         */
 /*                                                           */
 /*************************************************************/
 
@@ -39,40 +35,39 @@
 #define LOCALE extern
 #endif
 
-   LOCALE void                    MultifieldFunctionDefinitions(void *);
-#if MULTIFIELD_FUNCTIONS
-   LOCALE void                    DeleteFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                    MVDeleteFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                    ReplaceFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                    MVReplaceFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                    DeleteMemberFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                    ReplaceMemberFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                    InsertFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                    ExplodeFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                   *ImplodeFunction(void *);
-   LOCALE void                    SubseqFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                    MVSubseqFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                    FirstFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                    RestFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                    NthFunction(void *,DATA_OBJECT_PTR);
-   LOCALE intBool                 SubsetpFunction(void *);
-   LOCALE void                    MemberFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                    MultifieldPrognFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                    ForeachFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                    GetMvPrognField(void *,DATA_OBJECT_PTR);
-   LOCALE long                    GetMvPrognIndex(void *);
-   LOCALE intBool                 FindDOsInSegment(DATA_OBJECT_PTR,int,DATA_OBJECT_PTR,
-                                                   long *,long *,long *,int);
+#if ! RUN_TIME
+   LOCALE void                    MultifieldFunctionDefinitions(void);
 #endif
-   LOCALE int                     ReplaceMultiValueField(void *,struct dataObject *,
+#if MULTIFIELD_FUNCTIONS
+   LOCALE void                    DeleteFunction(DATA_OBJECT_PTR);
+   LOCALE void                    MVDeleteFunction(DATA_OBJECT_PTR);
+   LOCALE void                    ReplaceFunction(DATA_OBJECT_PTR);
+   LOCALE void                    MVReplaceFunction(DATA_OBJECT_PTR);
+   LOCALE void                    DeleteMemberFunction(DATA_OBJECT_PTR);
+   LOCALE void                    ReplaceMemberFunction(DATA_OBJECT_PTR);
+   LOCALE void                    InsertFunction(DATA_OBJECT_PTR);
+   LOCALE void                    ExplodeFunction(DATA_OBJECT_PTR);
+   LOCALE void                   *ImplodeFunction(void);
+   LOCALE void                    SubseqFunction(DATA_OBJECT_PTR);
+   LOCALE void                    MVSubseqFunction(DATA_OBJECT_PTR);
+   LOCALE void                    FirstFunction(DATA_OBJECT_PTR);
+   LOCALE void                    RestFunction(DATA_OBJECT_PTR);
+   LOCALE void                    NthFunction(DATA_OBJECT_PTR);
+   LOCALE BOOLEAN                 SubsetpFunction(void);
+   LOCALE void                    MemberFunction(DATA_OBJECT_PTR);
+   LOCALE void                    MultifieldPrognFunction(DATA_OBJECT_PTR);
+   LOCALE void                    GetMvPrognField(DATA_OBJECT_PTR);
+   LOCALE long                    GetMvPrognIndex(void);
+#endif
+   LOCALE int                     ReplaceMultiValueField(struct dataObject *,
                                                          struct dataObject *,
-                                                         long,long,
-                                                         struct dataObject *,char *);
-   LOCALE int                     InsertMultiValueField(void *,struct dataObject *,
+                                                         long,long,struct dataObject *,char *);
+   LOCALE int                     InsertMultiValueField(struct dataObject *,
                                                         struct dataObject *,
                                                         long,struct dataObject *,char *);
-   LOCALE int                     DeleteMultiValueField(void *,struct dataObject *,struct dataObject *,
+   LOCALE int                     DeleteMultiValueField(struct dataObject *,struct dataObject *,
                                                         long,long,char *);
 
 #endif
 
+

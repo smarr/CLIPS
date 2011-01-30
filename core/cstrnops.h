@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.20  01/31/02            */
+   /*             CLIPS Version 6.10  04/13/98            */
    /*                                                     */
    /*           CONSTRAINT OPERATIONS HEADER FILE         */
    /*******************************************************/
@@ -42,12 +42,13 @@
 #define LOCALE extern
 #endif
 
-   LOCALE struct constraintRecord       *IntersectConstraints(void *,struct constraintRecord *,struct constraintRecord *);
+   LOCALE struct constraintRecord       *IntersectConstraints(struct constraintRecord *,struct constraintRecord *);
 #if (! BLOAD_ONLY)
-   LOCALE struct constraintRecord       *UnionConstraints(void *,struct constraintRecord *,struct constraintRecord *);
-   LOCALE void                           RemoveConstantFromConstraint(void *,int,void *,CONSTRAINT_RECORD *);
+   LOCALE struct constraintRecord       *UnionConstraints(struct constraintRecord *,struct constraintRecord *);
+   LOCALE void                           RemoveConstantFromConstraint(int,void *,CONSTRAINT_RECORD *);
 #endif
 
 #endif
 
 #endif
+

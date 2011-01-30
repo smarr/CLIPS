@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*               CLIPS Version 6.20  01/31/02          */
+   /*               CLIPS Version 6.10  04/09/97          */
    /*                                                     */
    /*                                                     */
    /*******************************************************/
@@ -10,7 +10,7 @@
 /* Purpose:                                                  */
 /*                                                           */
 /* Principal Programmer(s):                                  */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Contributing Programmer(s):                               */
 /*                                                           */
@@ -25,35 +25,6 @@
 #include "object.h"
 #endif
 
-#ifndef _H_msgpass
-#include "msgpass.h"
-#endif
-
-#define MESSAGE_HANDLER_DATA 32
-
-struct messageHandlerData
-  { 
-   ENTITY_RECORD HandlerGetInfo;
-   ENTITY_RECORD HandlerPutInfo;
-   SYMBOL_HN *INIT_SYMBOL;
-   SYMBOL_HN *DELETE_SYMBOL;
-   SYMBOL_HN *CREATE_SYMBOL;
-#if DEBUGGING_FUNCTIONS
-   unsigned WatchHandlers;
-   unsigned WatchMessages;
-#endif
-   char *hndquals[4];
-   SYMBOL_HN *SELF_SYMBOL;
-   SYMBOL_HN *CurrentMessageName;
-   HANDLER_LINK *CurrentCore;
-   HANDLER_LINK *TopOfCore;
-   HANDLER_LINK *NextInCore;
-   HANDLER_LINK *OldCore;
-  };
-
-#define MessageHandlerData(theEnv) ((struct messageHandlerData *) GetEnvironmentData(theEnv,MESSAGE_HANDLER_DATA))
-
-
 #ifdef LOCALE
 #undef LOCALE
 #endif
@@ -67,42 +38,32 @@ struct messageHandlerData
 #define INIT_STRING   "init"
 #define DELETE_STRING "delete"
 #define PRINT_STRING  "print"
-#define CREATE_STRING "create"
 
-#define FindDefmessageHandler(a,b,c) EnvFindDefmessageHandler(GetCurrentEnvironment(),a,b,c)
-#define GetDefmessageHandlerName(a,b) EnvGetDefmessageHandlerName(GetCurrentEnvironment(),a,b)
-#define GetDefmessageHandlerPPForm(a,b) EnvGetDefmessageHandlerPPForm(GetCurrentEnvironment(),a,b)
-#define GetDefmessageHandlerType(a,b) EnvGetDefmessageHandlerType(GetCurrentEnvironment(),a,b)
-#define GetDefmessageHandlerWatch(a,b) EnvGetDefmessageHandlerWatch(GetCurrentEnvironment(),a,b)
-#define GetNextDefmessageHandler(a,b) EnvGetNextDefmessageHandler(GetCurrentEnvironment(),a,b)
-#define IsDefmessageHandlerDeletable(a,b) EnvIsDefmessageHandlerDeletable(GetCurrentEnvironment(),a,b)
-#define ListDefmessageHandlers(a,b,c) EnvListDefmessageHandlers(GetCurrentEnvironment(),a,b,c)
-#define PreviewSend(a,b,c) EnvPreviewSend(GetCurrentEnvironment(),a,b,c)
-#define SetDefmessageHandlerWatch(a,b,c) EnvSetDefmessageHandlerWatch(GetCurrentEnvironment(),a,b,c)
-#define UndefmessageHandler(a,b) EnvUndefmessageHandler(GetCurrentEnvironment(),a,b)
-   
-   LOCALE void             SetupMessageHandlers(void *);
-   LOCALE char            *EnvGetDefmessageHandlerName(void *,void *,int);
-   LOCALE char            *EnvGetDefmessageHandlerType(void *,void *,int);
-   LOCALE int              EnvGetNextDefmessageHandler(void *,void *,int);
-   LOCALE HANDLER         *GetDefmessageHandlerPointer(void *,int);
+LOCALE void SetupMessageHandlers(void);
+LOCALE char *GetDefmessageHandlerName(void *,unsigned);
+LOCALE char *GetDefmessageHandlerType(void *,unsigned);
+LOCALE unsigned GetNextDefmessageHandler(void *,unsigned);
+LOCALE HANDLER *GetDefmessageHandlerPointer(void *,unsigned);
 #if DEBUGGING_FUNCTIONS
-   LOCALE unsigned         EnvGetDefmessageHandlerWatch(void *,void *,int);
-   LOCALE void             EnvSetDefmessageHandlerWatch(void *,int,void *,int);
+LOCALE BOOLEAN GetDefmessageHandlerWatch(void *,unsigned);
+LOCALE void SetDefmessageHandlerWatch(int,void *,unsigned);
 #endif
-   LOCALE unsigned         EnvFindDefmessageHandler(void *,void *,char *,char *); 
-   LOCALE int              EnvIsDefmessageHandlerDeletable(void *,void *,int);
-   LOCALE void             UndefmessageHandlerCommand(void *);
-   LOCALE int              EnvUndefmessageHandler(void *,void *,int);
+LOCALE unsigned FindDefmessageHandler(void *,char *,char *);
+LOCALE int IsDefmessageHandlerDeletable(void *,unsigned);
+LOCALE void UndefmessageHandlerCommand(void);
+LOCALE int UndefmessageHandler(void *,unsigned);
 
 #if DEBUGGING_FUNCTIONS
-   LOCALE void             PPDefmessageHandlerCommand(void *);
-   LOCALE void             ListDefmessageHandlersCommand(void *);
-   LOCALE void             PreviewSendCommand(void *); 
-   LOCALE char            *EnvGetDefmessageHandlerPPForm(void *,void *,int);
-   LOCALE void             EnvListDefmessageHandlers(void *,char *,void *,int);
-   LOCALE void             EnvPreviewSend(void *,char *,void *,char *);
-   LOCALE long             DisplayHandlersInLinks(void *,char *,PACKED_CLASS_LINKS *,int);
+LOCALE void PPDefmessageHandlerCommand(void);
+LOCALE void ListDefmessageHandlersCommand(void);
+LOCALE void PreviewSendCommand(void);
+LOCALE char *GetDefmessageHandlerPPForm(void *,unsigned);
+LOCALE void ListDefmessageHandlers(char *,void *,int);
+LOCALE void PreviewSend(char *,void *,char *);
+LOCALE long DisplayHandlersInLinks(char *,PACKED_CLASS_LINKS *,unsigned);
+#endif
+
+#ifndef _MSGCOM_SOURCE_
 #endif
 
 #endif
@@ -111,3 +72,4 @@ struct messageHandlerData
 
 
 
+

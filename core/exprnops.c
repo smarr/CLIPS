@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.24  06/05/06            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*             EXPRESSION OPERATIONS MODULE            */
    /*******************************************************/
@@ -14,12 +14,13 @@
 /*      Gary D. Riley                                        */
 /*                                                           */
 /* Contributing Programmer(s):                               */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Revision History:                                         */
 /*                                                           */
-/*      6.24: Renamed BOOLEAN macro type to intBool.         */
-/*                                                           */
+/* Who               |     Date    | Description             */
+/* ------------------+-------------+------------------------ */
+/* M.Giordano        | 23-Mar-2000 | Mods made for TLS       */
 /*************************************************************/
 
 #define _EXPRNOPS_SOURCE_
@@ -33,7 +34,6 @@
 #include <ctype.h>
 
 #include "memalloc.h"
-#include "envrnmnt.h"
 #include "router.h"
 #include "extnfunc.h"
 #include "cstrnchk.h"
@@ -75,7 +75,6 @@
 /*     z - fact address, integer, or symbol (*)               */
 /**************************************************************/
 globle int CheckArgumentAgainstRestriction(
-  void *theEnv,
   struct expr *theExpression,
   int theRestriction)
   {
@@ -86,24 +85,24 @@ globle int CheckArgumentAgainstRestriction(
    /* argument passed to the function.            */
    /*=============================================*/
 
-   cr1 = ExpressionToConstraintRecord(theEnv,theExpression);
+   cr1 = ExpressionToConstraintRecord(theExpression);
 
    /*================================================*/
    /* Generate a constraint record based on the type */
    /* of argument expected by the function.          */
    /*================================================*/
 
-   cr2 = ArgumentTypeToConstraintRecord(theEnv,theRestriction);
+   cr2 = ArgumentTypeToConstraintRecord(theRestriction);
 
    /*===============================================*/
    /* Intersect the two constraint records and then */
    /* discard them.                                 */
    /*===============================================*/
 
-   cr3 = IntersectConstraints(theEnv,cr1,cr2);
+   cr3 = IntersectConstraints(cr1,cr2);
 
-   RemoveConstraint(theEnv,cr1);
-   RemoveConstraint(theEnv,cr2);
+   RemoveConstraint(cr1);
+   RemoveConstraint(cr2);
 
    /*====================================================*/
    /* If the intersection of the two constraint records  */
@@ -113,7 +112,7 @@ globle int CheckArgumentAgainstRestriction(
 
    if (UnmatchableConstraint(cr3))
      {
-      RemoveConstraint(theEnv,cr3);
+      RemoveConstraint(cr3);
       return(TRUE);
      }
 
@@ -121,7 +120,7 @@ globle int CheckArgumentAgainstRestriction(
    /* The argument satisfies the function restrictions. */
    /*===================================================*/
 
-   RemoveConstraint(theEnv,cr3);
+   RemoveConstraint(cr3);
    return(FALSE);
   }
 
@@ -131,7 +130,7 @@ globle int CheckArgumentAgainstRestriction(
 /* ConstantExpression: Returns TRUE if the expression */
 /*   is a constant, otherwise FALSE.                  */
 /************************************************************/
-globle intBool ConstantExpression(
+globle BOOLEAN ConstantExpression(
   struct expr *testPtr)
   {
    while (testPtr != NULL)
@@ -152,7 +151,7 @@ globle intBool ConstantExpression(
 /* ConstantType: Returns TRUE if the type */
 /*   is a constant, otherwise FALSE.      */
 /************************************************/
-globle intBool ConstantType(
+globle BOOLEAN ConstantType(
   int theType)
   {
    switch (theType)
@@ -175,7 +174,7 @@ globle intBool ConstantType(
 /* IdenticalExpression: Determines if two expressions are identical. Returns */
 /*   TRUE if the expressions are identical, otherwise FALSE is returned.     */
 /*****************************************************************************/
-globle intBool IdenticalExpression(
+globle BOOLEAN IdenticalExpression(
   struct expr *firstList,
   struct expr *secondList)
   {
@@ -245,22 +244,21 @@ globle int CountArguments(
 /* CopyExpresssion: Copies an expression. */
 /******************************************/
 globle struct expr *CopyExpression(
-  void *theEnv,
   struct expr *original)
   {
    struct expr *topLevel, *next, *last;
 
    if (original == NULL) return(NULL);
 
-   topLevel = GenConstant(theEnv,original->type,original->value);
-   topLevel->argList = CopyExpression(theEnv,original->argList);
+   topLevel = GenConstant(original->type,original->value);
+   topLevel->argList = CopyExpression(original->argList);
 
    last = topLevel;
    original = original->nextArg;
    while (original != NULL)
      {
-      next = GenConstant(theEnv,original->type,original->value);
-      next->argList = CopyExpression(theEnv,original->argList);
+      next = GenConstant(original->type,original->value);
+      next->argList = CopyExpression(original->argList);
 
       last->nextArg = next;
       last = next;
@@ -275,9 +273,9 @@ globle struct expr *CopyExpression(
 /*   contains any variables. Returns TRUE if the expression */
 /*   contains any variables, otherwise FALSE is returned.   */
 /************************************************************/
-globle intBool ExpressionContainsVariables(
+globle BOOLEAN ExpressionContainsVariables(
   struct expr *theExpression,
-  intBool globalsAreVariables)
+  BOOLEAN globalsAreVariables)
   {
    while (theExpression != NULL)
      {
@@ -325,16 +323,15 @@ globle long ExpressionSize(
 /*   value of type string, symbol, or number.   */
 /************************************************/
 globle struct expr *GenConstant(
-  void *theEnv,
-  unsigned short type,
+  int type,
   void *value)
   {
    struct expr *top;
 
-   top = get_struct(theEnv,expr);
+   top = get_struct(expr);
    top->nextArg = NULL;
    top->argList = NULL;
-   top->type = type;
+   top->type = (short) type;
    top->value = value;
 
    return(top);
@@ -344,7 +341,6 @@ globle struct expr *GenConstant(
 /* PrintExpression: Pretty prints an expression. */
 /*************************************************/
 globle void PrintExpression(
-  void *theEnv,
   char *fileid,
   struct expr *theExpression)
   {
@@ -359,34 +355,34 @@ globle void PrintExpression(
         {
          case SF_VARIABLE:
          case GBL_VARIABLE:
-            EnvPrintRouter(theEnv,fileid,"?");
-            EnvPrintRouter(theEnv,fileid,ValueToString(theExpression->value));
+            PrintRouter(fileid,"?");
+            PrintRouter(fileid,ValueToString(theExpression->value));
             break;
 
          case MF_VARIABLE:
          case MF_GBL_VARIABLE:
-            EnvPrintRouter(theEnv,fileid,"$?");
-            EnvPrintRouter(theEnv,fileid,ValueToString(theExpression->value));
+            PrintRouter(fileid,"$?");
+            PrintRouter(fileid,ValueToString(theExpression->value));
             break;
 
          case FCALL:
-           EnvPrintRouter(theEnv,fileid,"(");
-           EnvPrintRouter(theEnv,fileid,ValueToString(ExpressionFunctionCallName(theExpression)));
-           if (theExpression->argList != NULL) { EnvPrintRouter(theEnv,fileid," "); }
-           PrintExpression(theEnv,fileid,theExpression->argList);
-           EnvPrintRouter(theEnv,fileid,")");
+           PrintRouter(fileid,"(");
+           PrintRouter(fileid,ValueToString(ExpressionFunctionCallName(theExpression)));
+           if (theExpression->argList != NULL) { PrintRouter(fileid," "); }
+           PrintExpression(fileid,theExpression->argList);
+           PrintRouter(fileid,")");
            break;
 
          default:
-           oldExpression = EvaluationData(theEnv)->CurrentExpression;
-           EvaluationData(theEnv)->CurrentExpression = theExpression;
-           PrintAtom(theEnv,fileid,theExpression->type,theExpression->value);
-           EvaluationData(theEnv)->CurrentExpression = oldExpression;
+           oldExpression = CurrentExpression;
+           CurrentExpression = theExpression;
+           PrintAtom(fileid,theExpression->type,theExpression->value);
+           CurrentExpression = oldExpression;
            break;
         }
 
       theExpression = theExpression->nextArg;
-      if (theExpression != NULL) EnvPrintRouter(theEnv,fileid," ");
+      if (theExpression != NULL) PrintRouter(fileid," ");
      }
 
    return;
@@ -402,7 +398,6 @@ globle void PrintExpression(
 /*   expressions to the list of arguments for the other and expression). */
 /*************************************************************************/
 globle struct expr *CombineExpressions(
-  void *theEnv,
   struct expr *expr1,
   struct expr *expr2)
   {
@@ -426,13 +421,13 @@ globle struct expr *CombineExpressions(
    /* 2nd expression in the argument list of the 1st expression. */
    /*============================================================*/
 
-   if ((expr1->value == ExpressionData(theEnv)->PTR_AND) &&
-       (expr2->value != ExpressionData(theEnv)->PTR_AND))
+   if ((expr1->value == PTR_AND) &&
+       (expr2->value != PTR_AND))
      {
       tempPtr = expr1->argList;
       if (tempPtr == NULL)
         {
-         rtn_struct(theEnv,expr,expr1);
+         rtn_struct(expr,expr1);
          return(expr2);
         }
 
@@ -449,13 +444,13 @@ globle struct expr *CombineExpressions(
    /* 1st expression in the argument list of the 2nd expression. */
    /*============================================================*/
 
-   if ((expr1->value != ExpressionData(theEnv)->PTR_AND) &&
-       (expr2->value == ExpressionData(theEnv)->PTR_AND))
+   if ((expr1->value != PTR_AND) &&
+       (expr2->value == PTR_AND))
      {
       tempPtr = expr2->argList;
       if (tempPtr == NULL)
         {
-         rtn_struct(theEnv,expr,expr2);
+         rtn_struct(expr,expr2);
          return(expr1);
         }
 
@@ -471,13 +466,13 @@ globle struct expr *CombineExpressions(
    /* and throw away the extraneous "and" expression.           */
    /*===========================================================*/
 
-   if ((expr1->value == ExpressionData(theEnv)->PTR_AND) &&
-       (expr2->value == ExpressionData(theEnv)->PTR_AND))
+   if ((expr1->value == PTR_AND) &&
+       (expr2->value == PTR_AND))
      {
       tempPtr = expr1->argList;
       if (tempPtr == NULL)
         {
-         rtn_struct(theEnv,expr,expr1);
+         rtn_struct(expr,expr1);
          return(expr2);
         }
 
@@ -485,7 +480,7 @@ globle struct expr *CombineExpressions(
         { tempPtr = tempPtr->nextArg; }
 
       tempPtr->nextArg = expr2->argList;
-      rtn_struct(theEnv,expr,expr2);
+      rtn_struct(expr,expr2);
 
       return(expr1);
      }
@@ -496,7 +491,7 @@ globle struct expr *CombineExpressions(
    /* to the argument list of that "and" expression.      */
    /*=====================================================*/
 
-   tempPtr = GenConstant(theEnv,FCALL,ExpressionData(theEnv)->PTR_AND);
+   tempPtr = GenConstant(FCALL,PTR_AND);
    tempPtr->argList = expr1;
    expr1->nextArg = expr2;
    return(tempPtr);
@@ -540,3 +535,4 @@ globle struct expr *AppendExpressions(
    return(expr1);
   }
 
+

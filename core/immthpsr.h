@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*               CLIPS Version 6.20  01/31/02          */
+  /*               CLIPS Version 6.10  04/09/97          */
    /*                                                     */
    /*                                                     */
    /*******************************************************/
@@ -10,7 +10,7 @@
 /* Purpose:                                                  */
 /*                                                           */
 /* Principal Programmer(s):                                  */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Contributing Programmer(s):                               */
 /*                                                           */
@@ -35,7 +35,7 @@
 #define LOCALE extern
 #endif
 
-LOCALE void AddImplicitMethods(void *,DEFGENERIC *);
+LOCALE void AddImplicitMethods(DEFGENERIC *);
 
 #ifndef _IMMTHPSR_SOURCE_
 #endif
@@ -47,3 +47,4 @@ LOCALE void AddImplicitMethods(void *,DEFGENERIC *);
 
 
 
+

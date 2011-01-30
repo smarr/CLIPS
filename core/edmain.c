@@ -1,24 +1,4 @@
-   /*******************************************************/
-   /*      "C" Language Integrated Production System      */
-   /*                                                     */
-   /*              CLIPS Version 6.24  06/02/06           */
-   /*                                                     */
-   /*                                                     */
-   /*******************************************************/
-   
-/*************************************************************/
-/* Purpose:                                                  */
-/*                                                           */
-/* Principal Programmer(s):                                  */
-/*                                                           */
-/* Contributing Programmer(s):                               */
-/*                                                           */
-/* Revision History:                                         */
-/*                                                           */
-/*      6.24: Corrected code generating compilation warnings */
-/*            with run-time programs.                        */
-/*                                                           */
-/*************************************************************/
+/*   CLIPS Version 6.10  04/09/97 */
 
 /*
  * This program is in public domain; written by Dave G. Conroy.
@@ -50,6 +30,9 @@
  *        compiling and editor entry and exit clean up.
  *        Massive rearranging of code and general clean up.
  */
+/* Who               |     Date    | Description             */
+/* ------------------+-------------+------------------------ */
+/* M.Giordano        | 23-Mar-2000 | Mods made for TLS       */
 
 #include "setup.h"
 
@@ -72,28 +55,28 @@
 
 #define EXIT	-999
 
-globle int     currow;                  /* Working cursor row           */
-globle int     curcol;                  /* Working cursor column        */
-globle int     fillcol;                 /* Current fill column          */
-globle int     thisflag;                /* Flags, this command          */
-globle int     lastflag;                /* Flags, last command          */
-globle int     curgoal;                 /* Goal column                  */
-globle BUFFER  *curbp;                  /* Current buffer               */
-globle WINDOW  *curwp;                  /* Current window               */
-globle BUFFER  *bheadp = NULL;          /* BUFFER listhead              */
-globle WINDOW  *wheadp;                 /* WINDOW listhead              */
-globle BUFFER  *blistp;                 /* Buffer list BUFFER           */
-globle short   kbdm[NKBDM] = {CTLX|')'};/* Macro                        */
-globle short   *kbdmip;                 /* Input  for above             */
-globle short   *kbdmop;                 /* Output for above             */
-globle char    pat[NPAT];               /* Pattern                      */
-globle char    lastbufn[NBUFN];         /* Last buffer name             */
-globle BUFFER *CompileBufferp;          /* CLIPS Compile Output Buffer  */
+Thread globle int     currow;                  /* Working cursor row           */
+Thread globle int     curcol;                  /* Working cursor column        */
+Thread globle int     fillcol;                 /* Current fill column          */
+Thread globle int     thisflag;                /* Flags, this command          */
+Thread globle int     lastflag;                /* Flags, last command          */
+Thread globle int     curgoal;                 /* Goal column                  */
+Thread globle BUFFER  *curbp;                  /* Current buffer               */
+Thread globle WINDOW  *curwp;                  /* Current window               */
+Thread globle BUFFER  *bheadp = NULL;          /* BUFFER listhead              */
+Thread globle WINDOW  *wheadp;                 /* WINDOW listhead              */
+Thread globle BUFFER  *blistp;                 /* Buffer list BUFFER           */
+Thread globle short   kbdm[NKBDM] = {CTLX|')'};/* Macro                        */
+Thread globle short   *kbdmip;                 /* Input  for above             */
+Thread globle short   *kbdmop;                 /* Output for above             */
+Thread globle char    pat[NPAT];               /* Pattern                      */
+Thread globle char    lastbufn[NBUFN];         /* Last buffer name             */
+Thread globle BUFFER *CompileBufferp;          /* CLIPS Compile Output Buffer  */
 
 
 typedef struct  {
         short   k_code;                 /* Key code                     */
-        int     (*k_fp)(void *,int,int);       /* Routine to handle it         */
+        int     (*k_fp)(int,int);       /* Routine to handle it         */
 }       KEYTAB;
 
 
@@ -103,7 +86,7 @@ typedef struct  {
  * characters of the command. This expains the funny location of the
  * control-X commands.
  */
-globle KEYTAB keytab[] = {
+Thread globle KEYTAB keytab[] = {
         { COTL|'@',setmark },
         { COTL|'A',gotobol },
         { COTL|'B',backchar },
@@ -186,10 +169,9 @@ globle KEYTAB keytab[] = {
 
 #define NKEYTAB (sizeof(keytab)/sizeof(keytab[0]))
 
-static void PerformEditCommand(void *);
+static VOID PerformEditCommand(void);
 
-static void PerformEditCommand(
-  void *theEnv)
+static VOID PerformEditCommand()
 {
         register int    c;
         register int    f;
@@ -205,11 +187,11 @@ static void PerformEditCommand(
    /* Get the file name. */
    /*====================*/
 
-   if ((num_a = EnvArgCountCheck(theEnv,"edit",NO_MORE_THAN,1)) == -1) return;
+   if ((num_a = ArgCountCheck("edit",NO_MORE_THAN,1)) == -1) return;
 
    if (num_a == 1)
      {
-      if (EnvArgTypeCheck(theEnv,"edit",1,SYMBOL_OR_STRING,&arg_ptr) == FALSE) return;
+      if (ArgTypeCheck("edit",1,SYMBOL_OR_STRING,&arg_ptr) == FALSE) return;
       fileName = DOToString(arg_ptr);
      }
 
@@ -219,18 +201,18 @@ static void PerformEditCommand(
 	/* Initial entry, set up buffers and pointers */
 	/**********************************************/
 
-        genstrcpy(bname, "main");                  /* Work out the name of */
+        strcpy(bname, "main");                  /* Work out the name of */
         if (num_a > 0)                     /* the default buffer.  */
                 makename(bname,fileName);
-        edinit(theEnv,bname);                          /* Buffers, windows.    */
-        vtinit(theEnv);                               /* Displays.            */
+        edinit(bname);                          /* Buffers, windows.    */
+        vtinit();                               /* Displays.            */
         if (num_a > 0) {
                 update();                       /* You have to update   */
-                readin(theEnv,fileName);             /* in case "[New file]" */
+                readin(fileName);             /* in case "[New file]" */
                 }
 
-	init_cmp_router(theEnv);			/* Prepare the compile  */
-        EnvDeactivateRouter(theEnv,"cmp_router");		/* router.              */
+	init_cmp_router();			/* Prepare the compile  */
+        DeactivateRouter("cmp_router");		/* router.              */
         }
    else {
 
@@ -241,7 +223,7 @@ static void PerformEditCommand(
 	(*term.t_open)();
 
         if (num_a > 0) {
-           filevisit_guts(theEnv,fileName);
+           filevisit_guts(fileName);
            }
         }
 
@@ -307,7 +289,7 @@ loop:
                 c = CTLX | getctl();
         if (kbdmip != NULL) {                   /* Save macro strokes.  */
                 if (c!=(CTLX|')') && kbdmip>&kbdm[NKBDM-6]) {
-                        ctrlg(theEnv,FALSE, 0);
+                        ctrlg(FALSE, 0);
                         goto loop;
                 }
                 if (f != FALSE) {
@@ -316,7 +298,7 @@ loop:
                 }
                 *kbdmip++ = c;
         }
-        rtn_flag = execute(theEnv,c, f, n);                /* Do it.               */
+        rtn_flag = execute(c, f, n);                /* Do it.               */
         if(rtn_flag == EXIT)
            return;
 	else
@@ -328,16 +310,15 @@ loop:
  * as an argument, because the main routine may have been told to read in a
  * file by default, and we want the buffer name to be right.
  */
-globle void edinit(
-  void *theEnv,
-  char bname[])
+globle VOID edinit(
+char    bname[])
 {
         register BUFFER *bp;
         register WINDOW *wp;
 
-        bp     = bfind(theEnv,bname, TRUE, 0);              /* First buffer        */
-        blistp = bfind(theEnv,"[List]", TRUE, BFTEMP);      /* Buffer list buffer  */
-        wp     = (WINDOW *) genalloc(theEnv,(unsigned) sizeof(WINDOW));  /* First window        */
+        bp     = bfind(bname, TRUE, 0);              /* First buffer        */
+        blistp = bfind("[List]", TRUE, BFTEMP);      /* Buffer list buffer  */
+        wp     = (WINDOW *) genalloc((unsigned) sizeof(WINDOW));  /* First window        */
         curbp  = bp;                            /* Make this current    */
         wheadp = wp;
         curwp  = wp;
@@ -356,7 +337,7 @@ globle void edinit(
 
         /* Secret Buffer for CLIPS Compile output */
 
-        CompileBufferp = bfind(theEnv,"[Compilations]",TRUE,BFTEMP);
+        CompileBufferp = bfind("[Compilations]",TRUE,BFTEMP);
 }
 
 /*
@@ -366,10 +347,9 @@ globle void edinit(
  * look at it. Return the status of command.
  */
 globle int execute(
-  void *theEnv,
-  int c,
-  int f,
-  int n)
+int c,
+int f,
+int n)
 {
         register KEYTAB *ktp;
         register int    status;
@@ -378,7 +358,7 @@ globle int execute(
         while (ktp < &keytab[NKEYTAB]) {
                 if (ktp->k_code == c) {
                         thisflag = 0;
-                        status   = (*ktp->k_fp)(theEnv,f, n);
+                        status   = (*ktp->k_fp)(f, n);
                         lastflag = thisflag;
                         return (status);
                 }
@@ -390,7 +370,7 @@ globle int execute(
          * negative, and we are now past fill column, perform word wrap.
          */
         if (c == ' ' && fillcol > 0 && n>=0 && getccol(FALSE) > fillcol)
-                wrapword(theEnv);
+                wrapword();
 
         if ((c>=0x20 && c<=0x7E)                /* Self inserting.      */
         ||  (c>=0xA0 && c<=0xFE)) {
@@ -399,7 +379,7 @@ globle int execute(
                         return (n<0 ? FALSE : TRUE);
                 }
                 thisflag = 0;                   /* For the future.      */
-                status   = linsert(theEnv,n, c);
+                status   = linsert(n, c);
                 lastflag = thisflag;
                 return (status);
         }
@@ -419,7 +399,7 @@ globle int getkey()
         c = (*term.t_getchar)();
 	if ((c & META) == META) return(c);
 
-#if WIN_MVC || WIN_BTC || WIN_GCC
+#if IBM_MSC || IBM_TBC || IBM_ZTC || IBM_ICB || IBM_SC || IBM_GCC
 	if (c > 255) {
          switch (c) {
             case UP_ARROW    :
@@ -480,36 +460,34 @@ globle int getctl()
  * changed do a write current buffer and exit emacs, otherwise simply exit.
  */
 globle int quickexit(
-  void *theEnv,
-  int f,
-  int n)
-  {
-   if ((curbp->b_flag&BFCHG) != 0          /* Changed.             */
+int f,
+int n)
+{
+        if ((curbp->b_flag&BFCHG) != 0          /* Changed.             */
         && (curbp->b_flag&BFTEMP) == 0)         /* Real.                */
-     filesave(theEnv,f, n);
-   return(edquit(theEnv,f, n));                     /* conditionally quit   */
-  }
+                filesave(f, n);
+        return(edquit(f, n));                     /* conditionally quit   */
+}
 
 /*
  * Quit command. If an argument, always quit. Otherwise confirm if a buffer
  * has been changed and not written out. Normally bound to "C-X C-C".
  */
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int edquit(
-  void *theEnv,
-  int f,
-  int n)
-  {
+int f,
+int n)
+{
         register int    s;
 
         if (f != FALSE                          /* Argument forces it.  */
         || anycb() == FALSE                     /* All buffers clean.   */
                                                 /* User says it's OK.   */
-        || (s=mlyesno(theEnv,"Modified Buffers! Quit")) == TRUE) {
+        || (s=mlyesno("Modified Buffers! Quit")) == TRUE) {
                 vttidy();
-                full_cleanup(theEnv);
+                full_cleanup();
                 return(EXIT);
         }
         return (s);
@@ -521,75 +499,69 @@ globle int edquit(
  * Connected to "C-X Q".
  */
 
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int temp_quit(
-  void *theEnv,
-  int f,
-  int n)
-  {
+int f,
+int n)
+{
    vttidy();
    return(EXIT);
-  }
+}
 
 /*
  * Begin a keyboard macro.
  * Error if not at the top level in keyboard processing. Set up variables and
  * return.
  */
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int ctlxlp(
-  void *theEnv,
-  int f,
-  int n)
-  {
-   if (kbdmip!=NULL || kbdmop!=NULL) 
-     {
-      mlwrite("Not now");
-      return (FALSE);
-     }
-   mlwrite("[Start macro]");
-   kbdmip = &kbdm[0];
-   return (TRUE);
-  }
+int f,
+int n)
+{
+        if (kbdmip!=NULL || kbdmop!=NULL) {
+                mlwrite("Not now");
+                return (FALSE);
+        }
+        mlwrite("[Start macro]");
+        kbdmip = &kbdm[0];
+        return (TRUE);
+}
 
 /*
  * End keyboard macro. Check for the same limit conditions as the above
  * routine. Set up the variables and return to the caller.
  */
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int ctlxrp(
-  void *theEnv,
-  int f,
-  int n)
-  {
-   if (kbdmip == NULL)
-     {
-      mlwrite("Not now");
-      return (FALSE);
-     }
-   mlwrite("[End macro]");
-   kbdmip = NULL;
-   return (TRUE);
-  }
+int f,
+int n)
+{
+        if (kbdmip == NULL) {
+                mlwrite("Not now");
+                return (FALSE);
+        }
+        mlwrite("[End macro]");
+        kbdmip = NULL;
+        return (TRUE);
+}
 
 /*
  * Execute a macro.
  * The command argument is the number of times to loop. Quit as soon as a
  * command gets an error. Return TRUE if all ok, else FALSE.
  */
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int ctlxe(
-  void *theEnv,
-  int f,
-  int n)
+int f,
+int n)
 {
         register int    c;
         register int    af;
@@ -613,7 +585,7 @@ globle int ctlxe(
                                 c  = *kbdmop++;
                         }
                         s = TRUE;
-                } while (c!=(CTLX|')') && (s=execute(theEnv,c, af, an))==TRUE);
+                } while (c!=(CTLX|')') && (s=execute(c, af, an))==TRUE);
                 kbdmop = NULL;
         } while (s==TRUE && --n);
         return (s);
@@ -624,36 +596,33 @@ globle int ctlxe(
  * Beep the beeper. Kill off any keyboard macro, etc., that is in progress.
  * Sometimes called as a routine, to do general aborting of stuff.
  */
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int ctrlg(
-  void *theEnv,
-  int f,
-  int n)
-  {
-   (*term.t_beep)();
-   if (kbdmip != NULL)
-     {
-      kbdm[0] = (CTLX|')');
-      kbdmip  = NULL;
-     }
-   return (ABORT);
-  }
+int f,
+int n)
+{
+        (*term.t_beep)();
+        if (kbdmip != NULL) {
+                kbdm[0] = (CTLX|')');
+                kbdmip  = NULL;
+        }
+        return (ABORT);
+}
 
-globle void full_cleanup(
-  void *theEnv)
+globle VOID full_cleanup()
 {
 
 /*   Clear all data structures */
 
-   kill_all_buffers(theEnv,&bheadp);     /* Clear all existing buffers   */
+   kill_all_buffers(&bheadp);     /* Clear all existing buffers   */
 
-   kill_all_windows(theEnv);           /* Clear all windows            */
+   kill_all_windows();           /* Clear all windows            */
 
-   kill_video_buffers(theEnv);	 /* Kill special video buffers   */
+   kill_video_buffers();	 /* Kill special video buffers   */
 
-   kill_cmp_router(theEnv);		 /* Get rid of special router    */
+   kill_cmp_router();		 /* Get rid of special router    */
 
 /*   Clear all global pointers */
 
@@ -676,28 +645,26 @@ globle void full_cleanup(
  */
 
 globle int kill_all_buffers(
-  void *theEnv,
-  BUFFER **top_buf)
-  {
+BUFFER **top_buf)
+{
    register BUFFER *bp;
 
    bp = *top_buf;
    while(bp != NULL) {
-        spec_clear(theEnv,bp);                         /* Blow text away.      */
+        spec_clear(bp);                         /* Blow text away.      */
 
-        genfree(theEnv,(void *) bp->b_linep,           /* And free pointer     */
+        genfree((VOID *) bp->b_linep,           /* And free pointer     */
 	        (unsigned)  sizeof(LINE)+ bp->b_linep->l_size);
 
         *top_buf = bp->b_bufp;                       /* Find next buffer     */
-        genfree(theEnv,(void *) bp, (unsigned) sizeof(BUFFER));   /* Release buffer block */
+        genfree((VOID *) bp, (unsigned) sizeof(BUFFER));   /* Release buffer block */
 	bp = *top_buf;
         }
 
    return (TRUE);
 }
 
-globle int kill_all_windows(
-  void *theEnv)
+globle int kill_all_windows()
 {
    register WINDOW *wp;
    register WINDOW *wp1;
@@ -705,7 +672,7 @@ globle int kill_all_windows(
    wp = wheadp;
    while(wp != NULL) {
         wp1 = wp->w_wndp;
-        genfree(theEnv,(void *) wp, (unsigned) sizeof(WINDOW));
+        genfree((VOID *) wp, (unsigned) sizeof(WINDOW));
 	wp  = wp1;
         }
 
@@ -718,14 +685,13 @@ globle int kill_all_windows(
  */
 
 globle int spec_clear(
-  void *theEnv,
-  BUFFER *bp)
+BUFFER *bp)
 {
         register LINE   *lp;
 
         bp->b_flag  &= ~BFCHG;                  /* Not changed          */
         while ((lp=lforw(bp->b_linep)) != bp->b_linep)
-                lfree(theEnv,lp);
+                lfree(lp);
         bp->b_dotp  = bp->b_linep;              /* Fix "."              */
         bp->b_doto  = 0;
         bp->b_markp = NULL;                     /* Invalidate "mark"    */
@@ -733,49 +699,30 @@ globle int spec_clear(
         return (TRUE);
 }
 
-globle void EditCommand(
-  void *theEnv)
+globle VOID EditCommand()
   {
-   void (*redrawScreenFunction)(void *);
-   void (*pauseEnvFunction)(void *);
-   void (*continueEnvFunction)(void *,int);
-      
-   redrawScreenFunction = GetRedrawFunction(theEnv);
-   pauseEnvFunction = GetPauseEnvFunction(theEnv);
-   continueEnvFunction = GetContinueEnvFunction(theEnv);
-   
-   if (pauseEnvFunction != NULL) (*pauseEnvFunction)(theEnv) ;
-   PerformEditCommand(theEnv);
-   if (continueEnvFunction != NULL) (*continueEnvFunction)(theEnv,0) ;
-   if (redrawScreenFunction != NULL) (*redrawScreenFunction)(theEnv) ;
+   if (PauseEnvFunction != NULL) (*PauseEnvFunction)() ;
+   PerformEditCommand();
+   if (ContinueEnvFunction != NULL) (*ContinueEnvFunction)(0) ;
+   if (RedrawScreenFunction != NULL) (*RedrawScreenFunction)() ;
   }
 
 /*******************************************/
 /* EditorFunctionDefinition:               */
 /*******************************************/
-globle void EditorFunctionDefinition(
-  void *theEnv)
+globle VOID EditorFunctionDefinition()
   {
-   EnvDefineFunction2(theEnv,"edit",'v', PTIEF EditCommand,"EditCommand", "*1k");
+   DefineFunction2("edit",'v', (int (*)(VOID_ARG)) EditCommand,"EditCommand", "*1k");
   }
 
 #else
 
-globle void EditCommand(void *);
-globle void EditorFunctionDefinition(void *);
-
-globle void EditCommand(
-  void *theEnv)
+globle VOID EditCommand()
   {
    /* Empty Stub */
   }
 
-globle void EditorFunctionDefinition(
-  void *theEnv)
-  {       
-  }
-
+#endif
 #endif
 
-#endif
-
+

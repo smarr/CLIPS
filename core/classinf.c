@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.24  07/01/05            */
+   /*               CLIPS Version 6.10  04/13/98          */
    /*                                                     */
    /*        CLASS INFO PROGRAMMATIC ACCESS MODULE        */
    /*******************************************************/
@@ -10,24 +10,15 @@
 /* Purpose: Class Information Interface Support Routines      */
 /*                                                            */
 /* Principal Programmer(s):                                   */
-/*      Brian L. Dantes                                       */
+/*      Brian L. Donnell                                      */
 /*                                                            */
 /* Contributing Programmer(s):                                */
 /*                                                            */
 /* Revision History:                                          */
-/*      6.23: Correction for FalseSymbol/TrueSymbol. DR0859   */
 /*                                                            */
-/*            Changed name of variable exp to theExp          */
-/*            because of Unix compiler warnings of shadowed   */
-/*            definitions.                                    */
-/*                                                            */
-/*      6.24: Added allowed-classes slot facet.               */
-/*                                                            */
-/*            Converted INSTANCE_PATTERN_MATCHING to          */
-/*            DEFRULE_CONSTRUCT.                              */
-/*                                                            */
-/*            Renamed BOOLEAN macro type to intBool.          */
-/*                                                            */
+/* Who               |     Date    | Description              */
+/* ------------------+-------------+------------------------  */
+/* M.Giordano        | 23-Mar-2000 | Mods made for TLS        */
 /**************************************************************/
 
 /* =========================================
@@ -51,10 +42,8 @@
 #include "classexm.h"
 #include "classfun.h"
 #include "classini.h"
-#include "envrnmnt.h"
 #include "memalloc.h"
 #include "insfun.h"
-#include "msgcom.h"
 #include "msgfun.h"
 #include "multifld.h"
 #include "prntutil.h"
@@ -64,14 +53,38 @@
 
 /* =========================================
    *****************************************
+                   CONSTANTS
+   =========================================
+   ***************************************** */
+
+/* =========================================
+   *****************************************
       INTERNALLY VISIBLE FUNCTION HEADERS
    =========================================
    ***************************************** */
 
-static void SlotInfoSupportFunction(void *,DATA_OBJECT *,char *,void (*)(void *,void *,char *,DATA_OBJECT *));
-static unsigned CountSubclasses(DEFCLASS *,int,int);
-static unsigned StoreSubclasses(void *,unsigned,DEFCLASS *,int,int,short);
-static SLOT_DESC *SlotInfoSlot(void *,DATA_OBJECT *,DEFCLASS *,char *,char *);
+static void SlotInfoSupportFunction(DATA_OBJECT *,char *,void (*)(void *,char *,DATA_OBJECT *));
+static int CountSubclasses(DEFCLASS *,int,int);
+static int StoreSubclasses(void *,int,DEFCLASS *,int,int,short);
+static SLOT_DESC *SlotInfoSlot(DATA_OBJECT *,DEFCLASS *,char *,char *);
+
+/* =========================================
+   *****************************************
+      EXTERNALLY VISIBLE GLOBAL VARIABLES
+   =========================================
+   ***************************************** */
+
+/* =========================================
+   *****************************************
+      INTERNALLY VISIBLE GLOBAL VARIABLES
+   =========================================
+   ***************************************** */
+
+/* =========================================
+   *****************************************
+          EXTERNALLY VISIBLE FUNCTIONS
+   =========================================
+   ***************************************** */
 
 /*********************************************************************
   NAME         : ClassAbstractPCommand
@@ -81,24 +94,23 @@ static SLOT_DESC *SlotInfoSlot(void *,DATA_OBJECT *,DEFCLASS *,char *,char *);
   SIDE EFFECTS : None
   NOTES        : Syntax: (class-abstractp <class>)
  *********************************************************************/
-globle int ClassAbstractPCommand(
-  void *theEnv)
+globle int ClassAbstractPCommand()
   {
    DATA_OBJECT tmp;
    DEFCLASS *cls;
-   
-   if (EnvArgTypeCheck(theEnv,"class-abstractp",1,SYMBOL,&tmp) == FALSE)
+
+   if (ArgTypeCheck("class-abstractp",1,SYMBOL,&tmp) == FALSE)
      return(FALSE);
-   cls = LookupDefclassByMdlOrScope(theEnv,DOToString(tmp));
+   cls = LookupDefclassByMdlOrScope(DOToString(tmp));
    if (cls == NULL)
      {
-      ClassExistError(theEnv,"class-abstractp",ValueToString(tmp.value));
+      ClassExistError("class-abstractp",ValueToString(tmp.value));
       return(FALSE);
      }
-   return(EnvClassAbstractP(theEnv,(void *) cls));
+   return(ClassAbstractP((void *) cls));
   }
 
-#if DEFRULE_CONSTRUCT
+#if INSTANCE_PATTERN_MATCHING
 
 /*****************************************************************
   NAME         : ClassReactivePCommand
@@ -110,21 +122,20 @@ globle int ClassAbstractPCommand(
   SIDE EFFECTS : None
   NOTES        : Syntax: (class-reactivep <class>)
  *****************************************************************/
-globle int ClassReactivePCommand(
-  void *theEnv)
+globle int ClassReactivePCommand()
   {
    DATA_OBJECT tmp;
    DEFCLASS *cls;
-   
-   if (EnvArgTypeCheck(theEnv,"class-reactivep",1,SYMBOL,&tmp) == FALSE)
+
+   if (ArgTypeCheck("class-reactivep",1,SYMBOL,&tmp) == FALSE)
      return(FALSE);
-   cls = LookupDefclassByMdlOrScope(theEnv,DOToString(tmp));
+   cls = LookupDefclassByMdlOrScope(DOToString(tmp));
    if (cls == NULL)
      {
-      ClassExistError(theEnv,"class-reactivep",ValueToString(tmp.value));
+      ClassExistError("class-reactivep",ValueToString(tmp.value));
       return(FALSE);
      }
-   return(EnvClassReactiveP(theEnv,(void *) cls));
+   return(ClassReactiveP((void *) cls));
   }
 
 #endif
@@ -144,7 +155,6 @@ globle int ClassReactivePCommand(
   NOTES        : None
  ***********************************************************/
 globle void *ClassInfoFnxArgs(
-  void *theEnv,
   char *fnx,
   int *inhp)
   {
@@ -152,30 +162,30 @@ globle void *ClassInfoFnxArgs(
    DATA_OBJECT tmp;
 
    *inhp = 0;
-   if (EnvRtnArgCount(theEnv) == 0)
+   if (RtnArgCount() == 0)
      {
-      ExpectedCountError(theEnv,fnx,AT_LEAST,1);
-      SetEvaluationError(theEnv,TRUE);
+      ExpectedCountError(fnx,AT_LEAST,1);
+      SetEvaluationError(TRUE);
       return(NULL);
      }
-   if (EnvArgTypeCheck(theEnv,fnx,1,SYMBOL,&tmp) == FALSE)
+   if (ArgTypeCheck(fnx,1,SYMBOL,&tmp) == FALSE)
      return(NULL);
-   clsptr = (void *) LookupDefclassByMdlOrScope(theEnv,DOToString(tmp));
+   clsptr = (void *) LookupDefclassByMdlOrScope(DOToString(tmp));
    if (clsptr == NULL)
      {
-      ClassExistError(theEnv,fnx,ValueToString(tmp.value));
+      ClassExistError(fnx,ValueToString(tmp.value));
       return(NULL);
      }
-   if (EnvRtnArgCount(theEnv) == 2)
+   if (RtnArgCount() == 2)
      {
-      if (EnvArgTypeCheck(theEnv,fnx,2,SYMBOL,&tmp) == FALSE)
+      if (ArgTypeCheck(fnx,2,SYMBOL,&tmp) == FALSE)
         return(NULL);
       if (strcmp(ValueToString(tmp.value),"inherit") == 0)
         *inhp = 1;
       else
         {
-         SyntaxErrorMessage(theEnv,fnx);
-         SetEvaluationError(theEnv,TRUE);
+         SyntaxErrorMessage(fnx);
+         SetEvaluationError(TRUE);
          return(NULL);
         }
      }
@@ -193,19 +203,18 @@ globle void *ClassInfoFnxArgs(
   NOTES        : Syntax: (class-slots <class> [inherit])
  ********************************************************************/
 globle void ClassSlotsCommand(
-  void *theEnv,
   DATA_OBJECT *result)
   {
    int inhp;
    void *clsptr;
-   
-   clsptr = ClassInfoFnxArgs(theEnv,"class-slots",&inhp);
+
+   clsptr = ClassInfoFnxArgs("class-slots",&inhp);
    if (clsptr == NULL)
      {
-      EnvSetMultifieldErrorValue(theEnv,result);
+      SetMultifieldErrorValue(result);
       return;
      }
-   EnvClassSlots(theEnv,clsptr,result,inhp);
+   ClassSlots(clsptr,result,inhp);
   }
 
 /************************************************************************
@@ -219,19 +228,18 @@ globle void ClassSlotsCommand(
   NOTES        : Syntax: (class-superclasses <class> [inherit])
  ************************************************************************/
 globle void ClassSuperclassesCommand(
-  void *theEnv,
   DATA_OBJECT *result)
   {
    int inhp;
    void *clsptr;
-   
-   clsptr = ClassInfoFnxArgs(theEnv,"class-superclasses",&inhp);
+
+   clsptr = ClassInfoFnxArgs("class-superclasses",&inhp);
    if (clsptr == NULL)
      {
-      EnvSetMultifieldErrorValue(theEnv,result);
+      SetMultifieldErrorValue(result);
       return;
      }
-   EnvClassSuperclasses(theEnv,clsptr,result,inhp);
+   ClassSuperclasses(clsptr,result,inhp);
   }
 
 /************************************************************************
@@ -245,19 +253,18 @@ globle void ClassSuperclassesCommand(
   NOTES        : Syntax: (class-subclasses <class> [inherit])
  ************************************************************************/
 globle void ClassSubclassesCommand(
-  void *theEnv,
   DATA_OBJECT *result)
   {
    int inhp;
    void *clsptr;
-     
-   clsptr = ClassInfoFnxArgs(theEnv,"class-subclasses",&inhp);
+
+   clsptr = ClassInfoFnxArgs("class-subclasses",&inhp);
    if (clsptr == NULL)
      {
-      EnvSetMultifieldErrorValue(theEnv,result);
+      SetMultifieldErrorValue(result);
       return;
      }
-   EnvClassSubclasses(theEnv,clsptr,result,inhp);
+   ClassSubclasses(clsptr,result,inhp);
   }
 
 /***********************************************************************
@@ -271,23 +278,22 @@ globle void ClassSubclassesCommand(
   NOTES        : Syntax: (get-defmessage-handler-list <class> [inherit])
  ***********************************************************************/
 globle void GetDefmessageHandlersListCmd(
-  void *theEnv,
   DATA_OBJECT *result)
   {
    int inhp;
    void *clsptr;
-   
-   if (EnvRtnArgCount(theEnv) == 0)
-      EnvGetDefmessageHandlerList(theEnv,NULL,result,0);
+
+   if (RtnArgCount () == 0)
+      GetDefmessageHandlerList(NULL,result,0);
    else
      {
-      clsptr = ClassInfoFnxArgs(theEnv,"get-defmessage-handler-list",&inhp);
+      clsptr = ClassInfoFnxArgs("get-defmessage-handler-list",&inhp);
       if (clsptr == NULL)
         {
-         EnvSetMultifieldErrorValue(theEnv,result);
+         SetMultifieldErrorValue(result);
          return;
         }
-      EnvGetDefmessageHandlerList(theEnv,clsptr,result,inhp);
+      GetDefmessageHandlerList(clsptr,result,inhp);
      }
   }
 
@@ -295,104 +301,75 @@ globle void GetDefmessageHandlersListCmd(
  Slot Information Access Functions
  *********************************/
 globle void SlotFacetsCommand(
-  void *theEnv,
   DATA_OBJECT *result)
   {
-   SlotInfoSupportFunction(theEnv,result,"slot-facets",EnvSlotFacets);
+   SlotInfoSupportFunction(result,"slot-facets",SlotFacets);
   }
 
 globle void SlotSourcesCommand(
-  void *theEnv,
   DATA_OBJECT *result)
-  {   
-   SlotInfoSupportFunction(theEnv,result,"slot-sources",EnvSlotSources);
+  {
+   SlotInfoSupportFunction(result,"slot-sources",SlotSources);
   }
 
 globle void SlotTypesCommand(
-  void *theEnv,
   DATA_OBJECT *result)
   {
-   SlotInfoSupportFunction(theEnv,result,"slot-types",EnvSlotTypes);
+   SlotInfoSupportFunction(result,"slot-types",SlotTypes);
   }
 
 globle void SlotAllowedValuesCommand(
-  void *theEnv,
   DATA_OBJECT *result)
   {
-   SlotInfoSupportFunction(theEnv,result,"slot-allowed-values",EnvSlotAllowedValues);
-  }
-
-globle void SlotAllowedClassesCommand(
-  void *theEnv,
-  DATA_OBJECT *result)
-  {
-   SlotInfoSupportFunction(theEnv,result,"slot-allowed-classes",EnvSlotAllowedClasses);
+   SlotInfoSupportFunction(result,"slot-allowed-values",SlotAllowedValues);
   }
 
 globle void SlotRangeCommand(
-  void *theEnv,
   DATA_OBJECT *result)
   {
-   SlotInfoSupportFunction(theEnv,result,"slot-range",EnvSlotRange);
+   SlotInfoSupportFunction(result,"slot-range",SlotRange);
   }
 
 globle void SlotCardinalityCommand(
-  void *theEnv,
   DATA_OBJECT *result)
   {
-   SlotInfoSupportFunction(theEnv,result,"slot-cardinality",EnvSlotCardinality);
+   SlotInfoSupportFunction(result,"slot-cardinality",SlotCardinality);
   }
 
 /********************************************************************
-  NAME         : EnvClassAbstractP
+  NAME         : ClassAbstractP
   DESCRIPTION  : Determines if a class is abstract or not
   INPUTS       : Generic pointer to class
   RETURNS      : 1 if class is abstract, 0 otherwise
   SIDE EFFECTS : None
   NOTES        : None
  ********************************************************************/
-#if WIN_BTC
-#pragma argsused
-#endif
-globle intBool EnvClassAbstractP(
-  void *theEnv,
+globle BOOLEAN ClassAbstractP(
   void *clsptr)
   {
-#if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
-#endif
-
    return(((DEFCLASS *) clsptr)->abstract);
   }
 
-#if DEFRULE_CONSTRUCT
+#if INSTANCE_PATTERN_MATCHING
 
 /********************************************************************
-  NAME         : EnvClassReactiveP
+  NAME         : ClassReactiveP
   DESCRIPTION  : Determines if a class is reactive or not
   INPUTS       : Generic pointer to class
   RETURNS      : 1 if class is reactive, 0 otherwise
   SIDE EFFECTS : None
   NOTES        : None
  ********************************************************************/
-#if WIN_BTC
-#pragma argsused
-#endif
-globle intBool EnvClassReactiveP(
-  void *theEnv,
+globle BOOLEAN ClassReactiveP(
   void *clsptr)
   {
-#if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
-#endif
-
    return(((DEFCLASS *) clsptr)->reactive);
   }
 
 #endif
 
 /********************************************************************
-  NAME         : EnvClassSlots
+  NAME         : ClassSlots
   DESCRIPTION  : Groups slot info for a class into a multifield value
                    for dynamic perusal
   INPUTS       : 1) Generic pointer to class
@@ -403,22 +380,21 @@ globle intBool EnvClassReactiveP(
                     the slots of the class
   NOTES        : None
  ********************************************************************/
-globle void EnvClassSlots(
-  void *theEnv,
+globle void ClassSlots(
   void *clsptr,
   DATA_OBJECT *result,
   int inhp)
   {
-   long size;
+   long size; /* 6.04 Bug Fix */
    register DEFCLASS *cls;
-   long i;
+   register long i; /* 6.04 Bug Fix */
 
    cls = (DEFCLASS *) clsptr;
    size = inhp ? cls->instanceSlotCount : cls->slotCount;
    result->type = MULTIFIELD;
-   SetpDOBegin(result,1);
-   SetpDOEnd(result,size);
-   result->value = (void *) EnvCreateMultifield(theEnv,size);
+   result->begin = 0;
+   result->end = size - 1;
+   result->value = (void *) CreateMultifield(size);
    if (size == 0)
      return;
    if (inhp)
@@ -440,7 +416,7 @@ globle void EnvClassSlots(
   }
 
 /************************************************************************
-  NAME         : EnvGetDefmessageHandlerList
+  NAME         : GetDefmessageHandlerList
   DESCRIPTION  : Groups handler info for a class into a multifield value
                    for dynamic perusal
   INPUTS       : 1) Generic pointer to class (NULL to get handlers for
@@ -452,32 +428,30 @@ globle void EnvClassSlots(
                     the message-handlers of the class
   NOTES        : None
  ************************************************************************/
-globle void EnvGetDefmessageHandlerList(
-  void *theEnv,
+globle void GetDefmessageHandlerList(
   void *clsptr,
   DATA_OBJECT *result,
   int inhp)
   {
    DEFCLASS *cls,*svcls,*svnxt,*supcls;
-   long j;
-   register int classi,classiLimit;
-   unsigned long i, sublen, len;
+   register int j,classi,classiLimit;
+   long i,len,sublen;
 
    if (clsptr == NULL)
      {
       inhp = 0;
-      cls = (DEFCLASS *) EnvGetNextDefclass(theEnv,NULL);
-      svnxt = (DEFCLASS *) EnvGetNextDefclass(theEnv,(void *) cls);
+      cls = (DEFCLASS *) GetNextDefclass(NULL);
+      svnxt = (DEFCLASS *) GetNextDefclass((void *) cls);
      }
    else
      {
       cls = (DEFCLASS *) clsptr;
-      svnxt = (DEFCLASS *) EnvGetNextDefclass(theEnv,(void *) cls);
+      svnxt = (DEFCLASS *) GetNextDefclass((void *) cls);
       SetNextDefclass((void *) cls,NULL);
      }
    for (svcls = cls , i = 0 ;
         cls != NULL ;
-        cls = (DEFCLASS *) EnvGetNextDefclass(theEnv,(void *) cls))
+        cls = (DEFCLASS *) GetNextDefclass((void *) cls))
      {
       classiLimit = inhp ? cls->allSuperclasses.classCount : 1;
       for (classi = 0 ; classi < classiLimit ; classi++)
@@ -485,12 +459,12 @@ globle void EnvGetDefmessageHandlerList(
      }
    len = i * 3;
    result->type = MULTIFIELD;
-   SetpDOBegin(result,1);
-   SetpDOEnd(result,len);
-   result->value = (void *) EnvCreateMultifield(theEnv,len);
+   result->begin = 0;
+   result->end = len - 1;
+   result->value = (void *) CreateMultifield(len);
    for (cls = svcls , sublen = 0 ;
         cls != NULL ;
-        cls = (DEFCLASS *) EnvGetNextDefclass(theEnv,(void *) cls))
+        cls = (DEFCLASS *) GetNextDefclass((void *) cls))
      {
       classiLimit = inhp ? cls->allSuperclasses.classCount : 1;
       for (classi = 0 ; classi < classiLimit ; classi++)
@@ -507,7 +481,7 @@ globle void EnvGetDefmessageHandlerList(
             SetMFType(result->value,i,SYMBOL);
             SetMFValue(result->value,i++,supcls->handlers[j].name);
             SetMFType(result->value,i,SYMBOL);
-            SetMFValue(result->value,i++,EnvAddSymbol(theEnv,MessageHandlerData(theEnv)->hndquals[supcls->handlers[j].type]));
+            SetMFValue(result->value,i++,AddSymbol(hndquals[supcls->handlers[j].type]));
            }
          sublen += supcls->handlerCount * 3;
         }
@@ -517,7 +491,7 @@ globle void EnvGetDefmessageHandlerList(
   }
 
 /***************************************************************************
-  NAME         : EnvClassSuperclasses
+  NAME         : ClassSuperclasses
   DESCRIPTION  : Groups the names of superclasses into a multifield
                    value for dynamic perusal
   INPUTS       : 1) Generic pointer to class
@@ -528,15 +502,14 @@ globle void EnvGetDefmessageHandlerList(
                     the superclasses of the class
   NOTES        : None
  ***************************************************************************/
-globle void EnvClassSuperclasses(
-  void *theEnv,
+globle void ClassSuperclasses(
   void *clsptr,
   DATA_OBJECT *result,
   int inhp)
   {
    PACKED_CLASS_LINKS *plinks;
-   unsigned offset;
-   long i,j;
+   int offset;
+   register unsigned i,j;
 
    if (inhp)
      {
@@ -550,8 +523,8 @@ globle void EnvClassSuperclasses(
      }
    result->type = MULTIFIELD;
    result->begin = 0;
-   SetpDOEnd(result,plinks->classCount - offset);
-   result->value = (void *) EnvCreateMultifield(theEnv,result->end + 1U);
+   result->end = plinks->classCount - offset - 1;
+   result->value = (void *) CreateMultifield(result->end + 1);
    if (result->end == -1)
      return;
    for (i = offset , j = 1 ; i < plinks->classCount ; i++ , j++)
@@ -562,7 +535,7 @@ globle void EnvClassSuperclasses(
   }
 
 /**************************************************************************
-  NAME         : EnvClassSubclasses
+  NAME         : ClassSubclasses
   DESCRIPTION  : Groups the names of subclasses for a class into a
                    multifield value for dynamic perusal
   INPUTS       : 1) Generic pointer to class
@@ -573,29 +546,27 @@ globle void EnvClassSuperclasses(
                     the subclasses of the class
   NOTES        : None
  **************************************************************************/
-globle void EnvClassSubclasses(
-  void *theEnv,
+globle void ClassSubclasses(
   void *clsptr,
   DATA_OBJECT *result,
   int inhp)
   {
-   register unsigned i;
-   register int id;
+   register int i,id;
 
-   if ((id = GetTraversalID(theEnv)) == -1)
+   if ((id = GetTraversalID()) == -1)
      return;
    i = CountSubclasses((DEFCLASS *) clsptr,inhp,id);
-   ReleaseTraversalID(theEnv);
+   ReleaseTraversalID();
    result->type = MULTIFIELD;
    result->begin = 0;
-   SetpDOEnd(result,i);
-   result->value = (void *) EnvCreateMultifield(theEnv,i);
+   result->end = i - 1;
+   result->value = (void *) CreateMultifield(i);
    if (i == 0)
      return;
-   if ((id = GetTraversalID(theEnv)) == -1)
+   if ((id = GetTraversalID()) == -1)
      return;
    StoreSubclasses(result->value,1,(DEFCLASS *) clsptr,inhp,id,TRUE);
-   ReleaseTraversalID(theEnv);
+   ReleaseTraversalID();
   }
 
 /**************************************************************************
@@ -611,28 +582,26 @@ globle void EnvClassSubclasses(
   NOTES        : None
  **************************************************************************/
 globle void ClassSubclassAddresses(
-  void *theEnv,
   void *clsptr,
   DATA_OBJECT *result,
   int inhp)
   {
-   register unsigned i;
-   register int id;
+   register int i,id;
 
-   if ((id = GetTraversalID(theEnv)) == -1)
+   if ((id = GetTraversalID()) == -1)
      return;
    i = CountSubclasses((DEFCLASS *) clsptr,inhp,id);
-   ReleaseTraversalID(theEnv);
+   ReleaseTraversalID();
    result->type = MULTIFIELD;
    result->begin = 0;
-   SetpDOEnd(result,i);
-   result->value = (void *) EnvCreateMultifield(theEnv,i);
+   result->end = i - 1;
+   result->value = (void *) CreateMultifield(i);
    if (i == 0)
      return;
-   if ((id = GetTraversalID(theEnv)) == -1)
+   if ((id = GetTraversalID()) == -1)
      return;
    StoreSubclasses(result->value,1,(DEFCLASS *) clsptr,inhp,id,FALSE);
-   ReleaseTraversalID(theEnv);
+   ReleaseTraversalID();
   }
 /**************************************************************************
   NAME         : Slot...  Slot information access functions
@@ -648,8 +617,7 @@ globle void ClassSubclassAddresses(
   NOTES        : None
  **************************************************************************/
 
-globle void EnvSlotFacets(
-  void *theEnv,
+globle void SlotFacets(
   void *clsptr,
   char *sname,
   DATA_OBJECT *result)
@@ -657,101 +625,60 @@ globle void EnvSlotFacets(
    register int i;
    register SLOT_DESC *sp;
 
-   if ((sp = SlotInfoSlot(theEnv,result,(DEFCLASS *) clsptr,sname,"slot-facets")) == NULL)
+   if ((sp = SlotInfoSlot(result,(DEFCLASS *) clsptr,sname,"slot-facets")) == NULL)
      return;
-#if DEFRULE_CONSTRUCT
+#if INSTANCE_PATTERN_MATCHING
    result->end = 9;
-   result->value = (void *) EnvCreateMultifield(theEnv,10L);
+   result->value = (void *) CreateMultifield(10L);
    for (i = 1 ; i <= 10 ; i++)
      SetMFType(result->value,i,SYMBOL);
 #else
    result->end = 8;
-   result->value = (void *) EnvCreateMultifield(theEnv,9L);
+   result->value = (void *) CreateMultifield(9L);
    for (i = 1 ; i <= 9 ; i++)
      SetMFType(result->value,i,SYMBOL);
 #endif
-   if (sp->multiple)
-     SetMFValue(result->value,1,EnvAddSymbol(theEnv,"MLT"));
-   else
-     SetMFValue(result->value,1,EnvAddSymbol(theEnv,"SGL"));
-
+   SetMFValue(result->value,1,AddSymbol(sp->multiple ? "MLT" : "SGL"));
    if (sp->noDefault)
-     SetMFValue(result->value,2,EnvAddSymbol(theEnv,"NIL"));
+     SetMFValue(result->value,2,AddSymbol("NIL"));
    else
-     {
-      if (sp->dynamicDefault)
-        SetMFValue(result->value,2,EnvAddSymbol(theEnv,"DYN"));
-      else
-        SetMFValue(result->value,2,EnvAddSymbol(theEnv,"STC"));
-     }
-   
-   if (sp->noInherit)    
-     SetMFValue(result->value,3,EnvAddSymbol(theEnv,"NIL"));
-   else
-     SetMFValue(result->value,3,EnvAddSymbol(theEnv,"INH"));
-   
+     SetMFValue(result->value,2,AddSymbol(sp->dynamicDefault ? "DYN" : "STC"));
+   SetMFValue(result->value,3,AddSymbol(sp->noInherit ? "NIL" : "INH"));
    if (sp->initializeOnly)
-     SetMFValue(result->value,4,EnvAddSymbol(theEnv,"INT"));
+     SetMFValue(result->value,4,AddSymbol("INT"));
    else if (sp->noWrite)
-     SetMFValue(result->value,4,EnvAddSymbol(theEnv,"R"));
+     SetMFValue(result->value,4,AddSymbol("R"));
    else
-     SetMFValue(result->value,4,EnvAddSymbol(theEnv,"RW"));
-
-   if (sp->shared)     
-     SetMFValue(result->value,5,EnvAddSymbol(theEnv,"SHR"));
-   else
-     SetMFValue(result->value,5,EnvAddSymbol(theEnv,"LCL"));
-
-#if DEFRULE_CONSTRUCT
-   if (sp->reactive)   
-     SetMFValue(result->value,6,EnvAddSymbol(theEnv,"RCT"));
-   else
-     SetMFValue(result->value,6,EnvAddSymbol(theEnv,"NIL"));
-   
-   if (sp->composite)
-     SetMFValue(result->value,7,EnvAddSymbol(theEnv,"CMP"));
-   else
-     SetMFValue(result->value,7,EnvAddSymbol(theEnv,"EXC"));
-
-   if (sp->publicVisibility)   
-     SetMFValue(result->value,8,EnvAddSymbol(theEnv,"PUB"));
-   else
-     SetMFValue(result->value,8,EnvAddSymbol(theEnv,"PRV"));
-   
-   SetMFValue(result->value,9,EnvAddSymbol(theEnv,GetCreateAccessorString((void *) sp)));
-   SetMFValue(result->value,10,sp->noWrite ? EnvAddSymbol(theEnv,"NIL") : (void *) sp->overrideMessage);
+     SetMFValue(result->value,4,AddSymbol("RW"));
+   SetMFValue(result->value,5,AddSymbol(sp->shared ? "SHR" : "LCL"));
+#if INSTANCE_PATTERN_MATCHING
+   SetMFValue(result->value,6,AddSymbol(sp->reactive ? "RCT" : "NIL"));
+   SetMFValue(result->value,7,AddSymbol(sp->composite ? "CMP" : "EXC"));
+   SetMFValue(result->value,8,AddSymbol(sp->publicVisibility ? "PUB" : "PRV"));
+   SetMFValue(result->value,9,AddSymbol(GetCreateAccessorString((void *) sp)));
+   SetMFValue(result->value,10,sp->noWrite ? AddSymbol("NIL") : (void *) sp->overrideMessage);
 #else
-   if (sp->composite)
-     SetMFValue(result->value,6,EnvAddSymbol(theEnv,"CMP"));
-   else
-     SetMFValue(result->value,6,EnvAddSymbol(theEnv,"EXC"));
-
-   if (sp->publicVisibility)
-     SetMFValue(result->value,7,EnvAddSymbol(theEnv,"PUB"));
-   else
-     SetMFValue(result->value,7,EnvAddSymbol(theEnv,"PRV"));
-
-   SetMFValue(result->value,8,EnvAddSymbol(theEnv,GetCreateAccessorString((void *) sp)));
-   SetMFValue(result->value,9,sp->noWrite ? EnvAddSymbol(theEnv,"NIL") : (void *) sp->overrideMessage);
+   SetMFValue(result->value,6,AddSymbol(sp->composite ? "CMP" : "EXC"));
+   SetMFValue(result->value,7,AddSymbol(sp->publicVisibility ? "PUB" : "PRV"));
+   SetMFValue(result->value,8,AddSymbol(GetCreateAccessorString((void *) sp)));
+   SetMFValue(result->value,9,sp->noWrite ? AddSymbol("NIL") : (void *) sp->overrideMessage);
 #endif
   }
 
-globle void EnvSlotSources(
-  void *theEnv,
+globle void SlotSources(
   void *clsptr,
   char *sname,
   DATA_OBJECT *result)
   {
-   register unsigned i;
-   register int classi;
+   register int i,classi;
    register SLOT_DESC *sp,*csp;
    CLASS_LINK *ctop,*ctmp;
    DEFCLASS *cls;
 
-   if ((sp = SlotInfoSlot(theEnv,result,(DEFCLASS *) clsptr,sname,"slot-sources")) == NULL)
+   if ((sp = SlotInfoSlot(result,(DEFCLASS *) clsptr,sname,"slot-sources")) == NULL)
      return;
    i = 1;
-   ctop = get_struct(theEnv,classLink);
+   ctop = get_struct(classLink);
    ctop->cls = sp->cls;
    ctop->nxt = NULL;
    if (sp->composite)
@@ -762,7 +689,7 @@ globle void EnvSlotSources(
          csp = FindClassSlot(cls,sp->slotName->name);
          if ((csp != NULL) ? (csp->noInherit == 0) : FALSE)
            {
-            ctmp = get_struct(theEnv,classLink);
+            ctmp = get_struct(classLink);
             ctmp->cls = cls;
             ctmp->nxt = ctop;
             ctop = ctmp;
@@ -772,28 +699,28 @@ globle void EnvSlotSources(
            }
         }
      }
-   SetpDOEnd(result,i);
-   result->value = (void *) EnvCreateMultifield(theEnv,i);
+   result->end = i - 1;
+   result->value = (void *) CreateMultifield(i);
    for (ctmp = ctop , i = 1 ; ctmp != NULL ; ctmp = ctmp->nxt , i++)
      {
       SetMFType(result->value,i,SYMBOL);
       SetMFValue(result->value,i,GetDefclassNamePointer((void *) ctmp->cls));
      }
-   DeleteClassLinks(theEnv,ctop);
+   DeleteClassLinks(ctop);
   }
 
-globle void EnvSlotTypes(
-  void *theEnv,
+globle void SlotTypes(
   void *clsptr,
   char *sname,
   DATA_OBJECT *result)
   {
-   register unsigned i,j;
+   register int i,j;
    register SLOT_DESC *sp;
    char typemap[2];
-   unsigned msize;
+   int msize;
 
-   if ((sp = SlotInfoSlot(theEnv,result,(DEFCLASS *) clsptr,sname,"slot-types")) == NULL)
+   if ((sp = SlotInfoSlot(result,(DEFCLASS *) clsptr,sname,"slot-types"))
+== NULL)
      return;
    if ((sp->constraint != NULL) ? sp->constraint->anyAllowed : TRUE)
      {
@@ -846,8 +773,8 @@ globle void EnvSlotTypes(
          SetBitMap(typemap,FACT_ADDRESS);
         }
      }
-   SetpDOEnd(result,msize);
-   result->value = EnvCreateMultifield(theEnv,msize);
+   result->end = msize - 1;
+   result->value = CreateMultifield(msize);
    i = 1;
    j = 0;
    while (i <= msize)
@@ -857,91 +784,58 @@ globle void EnvSlotTypes(
         SetMFType(result->value,i,SYMBOL);
         SetMFValue(result->value,i,
                    (void *) GetDefclassNamePointer((void *)
-DefclassData(theEnv)->PrimitiveClassMap[j]));
+PrimitiveClassMap[j]));
         i++;
        }
       j++;
      }
   }
 
-globle void EnvSlotAllowedValues(
-  void *theEnv,
+globle void SlotAllowedValues(
   void *clsptr,
   char *sname,
   DATA_OBJECT *result)
   {
    register int i;
    register SLOT_DESC *sp;
-   register EXPRESSION *theExp;
+   register EXPRESSION *exp;
 
-   if ((sp = SlotInfoSlot(theEnv,result,(DEFCLASS *) clsptr,sname,"slot-allowed-values")) == NULL)
+   if ((sp = SlotInfoSlot(result,(DEFCLASS *) clsptr,sname,"slot-allowed-values")) == NULL)
      return;
    if ((sp->constraint != NULL) ? (sp->constraint->restrictionList == NULL) : TRUE)
      {
       result->type = SYMBOL;
-      result->value = EnvFalseSymbol(theEnv);
+      result->value = FalseSymbol;
       return;
      }
    result->end = ExpressionSize(sp->constraint->restrictionList) - 1;
-   result->value = EnvCreateMultifield(theEnv,(unsigned long) (result->end + 1));
+   result->value = CreateMultifield(result->end + 1);
    i = 1;
-   theExp = sp->constraint->restrictionList;
-   while (theExp != NULL)
+   exp = sp->constraint->restrictionList;
+   while (exp != NULL)
      {
-      SetMFType(result->value,i,theExp->type);
-      SetMFValue(result->value,i,theExp->value);
-      theExp = theExp->nextArg;
+      SetMFType(result->value,i,exp->type);
+      SetMFValue(result->value,i,exp->value);
+      exp = exp->nextArg;
       i++;
      }
   }
 
-globle void EnvSlotAllowedClasses(
-  void *theEnv,
-  void *clsptr,
-  char *sname,
-  DATA_OBJECT *result)
-  {
-   register int i;
-   register SLOT_DESC *sp;
-   register EXPRESSION *theExp;
-
-   if ((sp = SlotInfoSlot(theEnv,result,(DEFCLASS *) clsptr,sname,"slot-allowed-classes")) == NULL)
-     return;
-   if ((sp->constraint != NULL) ? (sp->constraint->classList == NULL) : TRUE)
-     {
-      result->type = SYMBOL;
-      result->value = EnvFalseSymbol(theEnv);
-      return;
-     }
-   result->end = ExpressionSize(sp->constraint->classList) - 1;
-   result->value = EnvCreateMultifield(theEnv,(unsigned long) (result->end + 1));
-   i = 1;
-   theExp = sp->constraint->classList;
-   while (theExp != NULL)
-     {
-      SetMFType(result->value,i,theExp->type);
-      SetMFValue(result->value,i,theExp->value);
-      theExp = theExp->nextArg;
-      i++;
-     }
-  }
-
-globle void EnvSlotRange(
-  void *theEnv,
+globle void SlotRange(
   void *clsptr,
   char *sname,
   DATA_OBJECT *result)
   {
    register SLOT_DESC *sp;
 
-   if ((sp = SlotInfoSlot(theEnv,result,(DEFCLASS *) clsptr,sname,"slot-range")) == NULL)
+   if ((sp = SlotInfoSlot(result,(DEFCLASS *) clsptr,sname,"slot-range")) == NULL)
      return;
    if ((sp->constraint == NULL) ? FALSE :
        (sp->constraint->anyAllowed || sp->constraint->floatsAllowed ||
         sp->constraint->integersAllowed))
      {
       result->end = 1;
-      result->value = EnvCreateMultifield(theEnv,2L);
+      result->value = CreateMultifield(2L);
       SetMFType(result->value,1,sp->constraint->minValue->type);
       SetMFValue(result->value,1,sp->constraint->minValue->value);
       SetMFType(result->value,2,sp->constraint->maxValue->type);
@@ -950,28 +844,27 @@ globle void EnvSlotRange(
    else
      {
       result->type = SYMBOL;
-      result->value = EnvFalseSymbol(theEnv);
+      result->value = FalseSymbol;
       return;
      }
   }
 
-globle void EnvSlotCardinality(
-  void *theEnv,
+globle void SlotCardinality(
   void *clsptr,
   char *sname,
   DATA_OBJECT *result)
   {
    register SLOT_DESC *sp;
 
-   if ((sp = SlotInfoSlot(theEnv,result,(DEFCLASS *) clsptr,sname,"slot-cardinality")) == NULL)
+   if ((sp = SlotInfoSlot(result,(DEFCLASS *) clsptr,sname,"slot-cardinality")) == NULL)
      return;
    if (sp->multiple == 0)
      {
-      EnvSetMultifieldErrorValue(theEnv,result);
+      SetMultifieldErrorValue(result);
       return;
      }
    result->end = 1;
-   result->value = EnvCreateMultifield(theEnv,2L);
+   result->value = CreateMultifield(2L);
    if (sp->constraint != NULL)
      {
       SetMFType(result->value,1,sp->constraint->minFields->type);
@@ -982,9 +875,9 @@ globle void EnvSlotCardinality(
    else
      {
       SetMFType(result->value,1,INTEGER);
-      SetMFValue(result->value,1,SymbolData(theEnv)->Zero);
+      SetMFValue(result->value,1,Zero);
       SetMFType(result->value,2,SYMBOL);
-      SetMFValue(result->value,2,SymbolData(theEnv)->PositiveInfinity);
+      SetMFValue(result->value,2,PositiveInfinity);
      }
   }
 
@@ -1007,21 +900,20 @@ globle void EnvSlotCardinality(
   NOTES        : None
  *****************************************************/
 static void SlotInfoSupportFunction(
-  void *theEnv,
   DATA_OBJECT *result,
   char *fnxname,
-  void (*fnx)(void *,void *,char *,DATA_OBJECT *))
+  void (*fnx)(void *,char *,DATA_OBJECT *))
   {
    SYMBOL_HN *ssym;
    DEFCLASS *cls;
 
-   ssym = CheckClassAndSlot(theEnv,fnxname,&cls);
+   ssym = CheckClassAndSlot(fnxname,&cls);
    if (ssym == NULL)
      {
-      EnvSetMultifieldErrorValue(theEnv,result);
+      SetMultifieldErrorValue(result);
       return;
      }
-   (*fnx)(theEnv,(void *) cls,ValueToString(ssym),result);
+   (*fnx)((void *) cls,ValueToString(ssym),result);
   }
 
 /*****************************************************************
@@ -1035,12 +927,12 @@ static void SlotInfoSupportFunction(
   SIDE EFFECTS : None
   NOTES        : None
  *****************************************************************/
-static unsigned CountSubclasses(
+static int CountSubclasses(
   DEFCLASS *cls,
   int inhp,
   int tvid)
   {
-   long i,cnt;
+   register unsigned i,cnt;
    register DEFCLASS *subcls;
 
    for (cnt = 0 , i = 0 ; i < cls->directSubclasses.classCount ; i++)
@@ -1070,15 +962,15 @@ static unsigned CountSubclasses(
   SIDE EFFECTS : Multifield set with subclass names
   NOTES        : Assumes multifield is big enough to hold subclasses
  *********************************************************************/
-static unsigned StoreSubclasses(
+static int StoreSubclasses(
   void *mfval,
-  unsigned si,
+  int si,
   DEFCLASS *cls,
   int inhp,
   int tvid,
   short storeName)
   {
-   long i,classi;
+   register unsigned i,classi;
    register DEFCLASS *subcls;
 
    for (i = si , classi = 0 ; classi < cls->directSubclasses.classCount ; classi++)
@@ -1099,7 +991,7 @@ static unsigned StoreSubclasses(
            }
            
          if (inhp && (subcls->directSubclasses.classCount != 0))
-           i += StoreSubclasses(mfval,i,subcls,inhp,tvid,storeName);
+           i += StoreSubclasses(mfval,(int) i,subcls,inhp,tvid,storeName);
         }
      }
    return(i - si);
@@ -1120,7 +1012,6 @@ static unsigned StoreSubclasses(
   NOTES        : None
  *********************************************************/
 static SLOT_DESC *SlotInfoSlot(
-  void *theEnv,
   DATA_OBJECT *result,
   DEFCLASS *cls,
   char *sname,
@@ -1129,18 +1020,18 @@ static SLOT_DESC *SlotInfoSlot(
    SYMBOL_HN *ssym;
    int i;
 
-   if ((ssym = FindSymbolHN(theEnv,sname)) == NULL)
+   if ((ssym = FindSymbol(sname)) == NULL)
      {
-      SetEvaluationError(theEnv,TRUE);
-      EnvSetMultifieldErrorValue(theEnv,result);
+      SetEvaluationError(TRUE);
+      SetMultifieldErrorValue(result);
       return(NULL);
      }
-   i = FindInstanceTemplateSlot(theEnv,cls,ssym);
+   i = FindInstanceTemplateSlot(cls,ssym);
    if (i == -1)
      {
-      SlotExistError(theEnv,sname,fnxname);
-      SetEvaluationError(theEnv,TRUE);
-      EnvSetMultifieldErrorValue(theEnv,result);
+      SlotExistError(sname,fnxname);
+      SetEvaluationError(TRUE);
+      SetMultifieldErrorValue(result);
       return(NULL);
      }
    result->type = MULTIFIELD;
@@ -1149,3 +1040,13 @@ static SLOT_DESC *SlotInfoSlot(
   }
 
 #endif
+
+/***************************************************
+  NAME         :
+  DESCRIPTION  :
+  INPUTS       :
+  RETURNS      :
+  SIDE EFFECTS :
+  NOTES        :
+ ***************************************************/
+

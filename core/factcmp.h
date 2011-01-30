@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.20  01/31/02            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*          FACT CONSTRUCT COMPILER HEADER FILE        */
    /*******************************************************/
@@ -39,7 +39,8 @@
 #define LOCALE extern
 #endif
 
-   LOCALE void                           FactPatternsCompilerSetup(void *);
-   LOCALE void                           FactPatternNodeReference(void *,void *,FILE *,int,int);
+   LOCALE void                           FactPatternsCompilerSetup(void);
+   LOCALE void                           FactPatternNodeReference(void *,FILE *,int,int);
 
 #endif
+

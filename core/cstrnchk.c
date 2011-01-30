@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.24  07/01/05            */
+   /*             CLIPS Version 6.10  04/13/98            */
    /*                                                     */
    /*             CONSTRAINT CHECKING MODULE              */
    /*******************************************************/
@@ -14,17 +14,13 @@
 /*      Gary D. Riley                                        */
 /*                                                           */
 /* Contributing Programmer(s):                               */
-/*      Brian Dantes                                         */
+/*      Brian Donnell                                        */
 /*                                                           */
 /* Revision History:                                         */
-/*      6.23: Changed name of variable exp to theExp         */
-/*            because of Unix compiler warnings of shadowed  */
-/*            definitions.                                   */
 /*                                                           */
-/*      6.24: Added allowed-classes slot facet.              */
-/*                                                           */
-/*            Renamed BOOLEAN macro type to intBool.         */
-/*                                                           */
+/* Who               |     Date    | Description             */
+/* ------------------+-------------+------------------------ */
+/* M.Giordano        | 23-Mar-2000 | Mods made for TLS       */
 /*************************************************************/
 
 #define _CSTRNCHK_SOURCE_
@@ -37,15 +33,8 @@
 
 #include "router.h"
 #include "multifld.h"
-#include "envrnmnt.h"
 #include "extnfunc.h"
 #include "cstrnutl.h"
-#if OBJECT_SYSTEM
-#include "inscom.h"
-#include "insfun.h"
-#include "classcom.h"
-#include "classexm.h"
-#endif
 
 #include "cstrnchk.h"
 
@@ -53,11 +42,11 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static intBool                 CheckRangeAgainstCardinalityConstraint(void *,int,int,CONSTRAINT_RECORD *);
+   static BOOLEAN                 CheckRangeAgainstCardinalityConstraint(int,int,CONSTRAINT_RECORD *);
    static int                     CheckFunctionReturnType(int,CONSTRAINT_RECORD *);
-   static intBool                 CheckTypeConstraint(int,CONSTRAINT_RECORD *);
-   static intBool                 CheckRangeConstraint(void *,int,void *,CONSTRAINT_RECORD *);
-   static void                    PrintRange(void *,char *,CONSTRAINT_RECORD *);
+   static BOOLEAN                 CheckTypeConstraint(int,CONSTRAINT_RECORD *);
+   static BOOLEAN                 CheckRangeConstraint(int,void *,CONSTRAINT_RECORD *);
+   static void                    PrintRange(char *,CONSTRAINT_RECORD *);
 
 /******************************************************/
 /* CheckFunctionReturnType: Checks a functions return */
@@ -140,7 +129,7 @@ static int CheckFunctionReturnType(
 /*   data type satisfies the type constraint fields */
 /*   of aconstraint record.                         */
 /****************************************************/
-static intBool CheckTypeConstraint(
+static BOOLEAN CheckTypeConstraint(
   int type,
   CONSTRAINT_RECORD *constraints)
   {
@@ -187,8 +176,7 @@ static intBool CheckTypeConstraint(
 /*   falls within the range of allowed cardinalities    */
 /*   for a constraint record.                           */
 /********************************************************/
-globle intBool CheckCardinalityConstraint(
-  void *theEnv,
+globle BOOLEAN CheckCardinalityConstraint(
   long number,
   CONSTRAINT_RECORD *constraints)
   {
@@ -206,7 +194,7 @@ globle intBool CheckCardinalityConstraint(
 
    if (constraints->minFields != NULL)
      {
-      if (constraints->minFields->value != SymbolData(theEnv)->NegativeInfinity)
+      if (constraints->minFields->value != NegativeInfinity)
         {
          if (number < ValueToLong(constraints->minFields->value))
            { return(FALSE); }
@@ -220,7 +208,7 @@ globle intBool CheckCardinalityConstraint(
 
    if (constraints->maxFields != NULL)
      {
-      if (constraints->maxFields->value != SymbolData(theEnv)->PositiveInfinity)
+      if (constraints->maxFields->value != PositiveInfinity)
         {
          if (number > ValueToLong(constraints->maxFields->value))
            { return(FALSE); }
@@ -241,8 +229,7 @@ globle intBool CheckCardinalityConstraint(
 /*   least one of the numbers in the range is within the allowed */
 /*   cardinality, otherwise FALSE is returned.                   */
 /*****************************************************************/
-static intBool CheckRangeAgainstCardinalityConstraint(
-  void *theEnv,
+static BOOLEAN CheckRangeAgainstCardinalityConstraint(
   int min,
   int max,
   CONSTRAINT_RECORD *constraints)
@@ -263,7 +250,7 @@ static intBool CheckRangeAgainstCardinalityConstraint(
 
    if (constraints->maxFields != NULL)
      {
-      if (constraints->maxFields->value != SymbolData(theEnv)->PositiveInfinity)
+      if (constraints->maxFields->value != PositiveInfinity)
         {
          if (min > ValueToLong(constraints->maxFields->value))
            { return(FALSE); }
@@ -280,7 +267,7 @@ static intBool CheckRangeAgainstCardinalityConstraint(
 
    if ((constraints->minFields != NULL) && (max != -1))
      {
-      if (constraints->minFields->value != SymbolData(theEnv)->NegativeInfinity)
+      if (constraints->minFields->value != NegativeInfinity)
         {
          if (max < ValueToLong(constraints->minFields->value))
            { return(FALSE); }
@@ -301,7 +288,7 @@ static intBool CheckRangeAgainstCardinalityConstraint(
 /*   record. Returns TRUE if the constraints are satisfied, otherwise */
 /*   FALSE is returned.                                               */
 /**********************************************************************/
-globle intBool CheckAllowedValuesConstraint(
+globle BOOLEAN CheckAllowedValuesConstraint(
   int type,
   void *vPtr,
   CONSTRAINT_RECORD *constraints)
@@ -378,100 +365,11 @@ globle intBool CheckAllowedValuesConstraint(
    return(FALSE);
   }
 
-/**********************************************************************/
-/* CheckAllowedClassesConstraint: Determines if a primitive data type */
-/*   satisfies the allowed-classes constraint fields of a constraint  */
-/*   record. Returns TRUE if the constraints are satisfied, otherwise */
-/*   FALSE is returned.                                               */
-/**********************************************************************/
-globle intBool CheckAllowedClassesConstraint(
-  void *theEnv,
-  int type,
-  void *vPtr,
-  CONSTRAINT_RECORD *constraints)
-  {
-#if OBJECT_SYSTEM
-   struct expr *tmpPtr;
-   INSTANCE_TYPE *ins;
-   DEFCLASS *insClass, *cmpClass;
-
-   /*=========================================*/
-   /* If the constraint record is NULL, there */
-   /* is no allowed-classes restriction.      */
-   /*=========================================*/
-
-   if (constraints == NULL) return(TRUE);
-
-   /*======================================*/
-   /* The constraint is satisfied if there */
-   /* aren't any class restrictions.       */
-   /*======================================*/
-   
-   if (constraints->classList == NULL)
-     { return(TRUE); }
-
-   /*==================================*/
-   /* Class restrictions only apply to */
-   /* instances and instance names.    */
-   /*==================================*/
-    
-   if ((type != INSTANCE_ADDRESS) && (type != INSTANCE_NAME))
-     { return(TRUE); }
-
-   /*=============================================*/
-   /* If an instance name is specified, determine */
-   /* whether the instance exists.                */
-   /*=============================================*/
-   
-   if (type == INSTANCE_ADDRESS)
-     { ins = (INSTANCE_TYPE *) vPtr; }
-   else
-     { ins = FindInstanceBySymbol(theEnv,(SYMBOL_HN *) vPtr); }
-    
-   if (ins == NULL)
-     { return(FALSE); }
-   
-   /*======================================================*/
-   /* Search through the class list to see if the instance */
-   /* belongs to one of the allowed classes in the list.   */
-   /*======================================================*/
-
-   insClass = (DEFCLASS *) EnvGetInstanceClass(theEnv,ins);
-   for (tmpPtr = constraints->classList;
-        tmpPtr != NULL;
-        tmpPtr = tmpPtr->nextArg)
-     {
-      cmpClass = (DEFCLASS *) EnvFindDefclass(theEnv,ValueToString(tmpPtr->value));
-      if (cmpClass == NULL) continue;
-      if (cmpClass == insClass) return(TRUE);
-      if (EnvSubclassP(theEnv,insClass,cmpClass)) return(TRUE);
-     }
-
-   /*=========================================================*/
-   /* If a parent class wasn't found in the list, then return */
-   /* FALSE because the constraint has been violated.         */
-   /*=========================================================*/
-
-   return(FALSE);
-#else
-
-#if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
-#pragma unused(type)
-#pragma unused(vPtr)
-#pragma unused(constraints)
-#endif
-
-   return(TRUE);
-#endif     
-  }
-
 /*************************************************************/
 /* CheckRangeConstraint: Determines if a primitive data type */
 /*   satisfies the range constraint of a constraint record.  */
 /*************************************************************/
-static intBool CheckRangeConstraint(
-  void *theEnv,
+static BOOLEAN CheckRangeConstraint(
   int type,
   void *vPtr,
   CONSTRAINT_RECORD *constraints)
@@ -504,12 +402,12 @@ static intBool CheckRangeConstraint(
 
    while (minList != NULL)
      {
-      if (CompareNumbers(theEnv,type,vPtr,minList->type,minList->value) == LESS_THAN)
+      if (CompareNumbers(type,vPtr,minList->type,minList->value) == LESS_THAN)
         {
          minList = minList->nextArg;
          maxList = maxList->nextArg;
         }
-      else if (CompareNumbers(theEnv,type,vPtr,maxList->type,maxList->value) == GREATER_THAN)
+      else if (CompareNumbers(type,vPtr,maxList->type,maxList->value) == GREATER_THAN)
         {
          minList = minList->nextArg;
          maxList = maxList->nextArg;
@@ -531,7 +429,6 @@ static intBool CheckRangeConstraint(
 /*   error message for constraint violations.   */
 /************************************************/
 globle void ConstraintViolationErrorMessage(
-  void *theEnv,
   char *theWhat,
   char *thePlace,
   int command,
@@ -556,14 +453,14 @@ globle void ConstraintViolationErrorMessage(
 
       if (violationType == FUNCTION_RETURN_TYPE_VIOLATION)
         {
-         PrintErrorID(theEnv,"CSTRNCHK",1,TRUE);
-         EnvPrintRouter(theEnv,WERROR,"The function return value ");
+         PrintErrorID("CSTRNCHK",1,TRUE);
+         PrintRouter(WERROR,"The function return value ");
         }
       else if (theWhat != NULL)
         {
-         PrintErrorID(theEnv,"CSTRNCHK",1,TRUE);
-         EnvPrintRouter(theEnv,WERROR,theWhat);
-         EnvPrintRouter(theEnv,WERROR," ");
+         PrintErrorID("CSTRNCHK",1,TRUE);
+         PrintRouter(WERROR,theWhat);
+         PrintRouter(WERROR," ");
         }
 
       /*=======================================*/
@@ -573,10 +470,10 @@ globle void ConstraintViolationErrorMessage(
 
       if (thePlace != NULL)
         {
-         EnvPrintRouter(theEnv,WERROR,"found in ");
-         if (command) EnvPrintRouter(theEnv,WERROR,"the ");
-         EnvPrintRouter(theEnv,WERROR,thePlace);
-         if (command) EnvPrintRouter(theEnv,WERROR," command");
+         PrintRouter(WERROR,"found in ");
+         if (command) PrintRouter(WERROR,"the ");
+         PrintRouter(WERROR,thePlace);
+         if (command) PrintRouter(WERROR," command");
         }
 
       /*================================================*/
@@ -586,8 +483,8 @@ globle void ConstraintViolationErrorMessage(
 
       if (thePattern > 0)
         {
-         EnvPrintRouter(theEnv,WERROR,"found in CE #");
-         PrintLongInteger(theEnv,WERROR,(long int) thePattern);
+         PrintRouter(WERROR,"found in CE #");
+         PrintLongInteger(WERROR,(long int) thePattern);
         }
      }
 
@@ -597,18 +494,16 @@ globle void ConstraintViolationErrorMessage(
 
    if ((violationType == TYPE_VIOLATION) ||
        (violationType == FUNCTION_RETURN_TYPE_VIOLATION))
-     { EnvPrintRouter(theEnv,WERROR,"\ndoes not match the allowed types"); }
+     { PrintRouter(WERROR,"\ndoes not match the allowed types"); }
    else if (violationType == RANGE_VIOLATION)
      {
-      EnvPrintRouter(theEnv,WERROR,"\ndoes not fall in the allowed range ");
-      PrintRange(theEnv,WERROR,theConstraint);
+      PrintRouter(WERROR,"\ndoes not fall in the allowed range ");
+      PrintRange(WERROR,theConstraint);
      }
    else if (violationType == ALLOWED_VALUES_VIOLATION)
-     { EnvPrintRouter(theEnv,WERROR,"\ndoes not match the allowed values"); }
+     { PrintRouter(WERROR,"\ndoes not match the allowed values"); }
    else if (violationType == CARDINALITY_VIOLATION)
-     { EnvPrintRouter(theEnv,WERROR,"\ndoes not satisfy the cardinality restrictions"); }
-   else if (violationType == ALLOWED_CLASSES_VIOLATION)
-     { EnvPrintRouter(theEnv,WERROR,"\ndoes not match the allowed classes"); }
+     { PrintRouter(WERROR,"\ndoes not satisfy the cardinality restrictions"); }
 
    /*==============================================*/
    /* Print either the slot name or field position */
@@ -617,16 +512,16 @@ globle void ConstraintViolationErrorMessage(
 
    if (theSlot != NULL)
      {
-      EnvPrintRouter(theEnv,WERROR," for slot ");
-      EnvPrintRouter(theEnv,WERROR,ValueToString(theSlot));
+      PrintRouter(WERROR," for slot ");
+      PrintRouter(WERROR,ValueToString(theSlot));
      }
    else if (theField > 0)
      {
-      EnvPrintRouter(theEnv,WERROR," for field #");
-      PrintLongInteger(theEnv,WERROR,(long long) theField);
+      PrintRouter(WERROR," for field #");
+      PrintLongInteger(WERROR,(long) theField);
      }
 
-   EnvPrintRouter(theEnv,WERROR,".\n");
+   PrintRouter(WERROR,".\n");
   }
 
 /********************************************************************/
@@ -634,17 +529,16 @@ globle void ConstraintViolationErrorMessage(
 /*   For example, 8 to +00 (eight to positive infinity).            */
 /********************************************************************/
 static void PrintRange(
-  void *theEnv,
   char *logicalName,
   CONSTRAINT_RECORD *theConstraint)
   {
-   if (theConstraint->minValue->value == SymbolData(theEnv)->NegativeInfinity)
-     { EnvPrintRouter(theEnv,logicalName,ValueToString(SymbolData(theEnv)->NegativeInfinity)); }
-   else PrintExpression(theEnv,logicalName,theConstraint->minValue);
-   EnvPrintRouter(theEnv,logicalName," to ");
-   if (theConstraint->maxValue->value == SymbolData(theEnv)->PositiveInfinity)
-     { EnvPrintRouter(theEnv,logicalName,ValueToString(SymbolData(theEnv)->PositiveInfinity)); }
-   else PrintExpression(theEnv,logicalName,theConstraint->maxValue);
+   if (theConstraint->minValue->value == NegativeInfinity)
+     { PrintRouter(logicalName,ValueToString(NegativeInfinity)); }
+   else PrintExpression(logicalName,theConstraint->minValue);
+   PrintRouter(logicalName," to ");
+   if (theConstraint->maxValue->value == PositiveInfinity)
+     { PrintRouter(logicalName,ValueToString(PositiveInfinity)); }
+   else PrintExpression(logicalName,theConstraint->maxValue);
   }
 
 /*************************************************************/
@@ -653,7 +547,6 @@ static void PrintRange(
 /*   the data object satisfies the constraint record.        */
 /*************************************************************/
 globle int ConstraintCheckDataObject(
-  void *theEnv,
   DATA_OBJECT *theData,
   CONSTRAINT_RECORD *theConstraints)
   {
@@ -665,14 +558,14 @@ globle int ConstraintCheckDataObject(
 
    if (theData->type == MULTIFIELD)
      {
-      if (CheckCardinalityConstraint(theEnv,(theData->end - theData->begin) + 1,
+      if (CheckCardinalityConstraint((theData->end - theData->begin) + 1,
                                      theConstraints) == FALSE)
         { return(CARDINALITY_VIOLATION); }
 
       theMultifield = ((struct multifield *) theData->value)->theFields;
       for (i = theData->begin; i <= theData->end; i++)
         {
-         if ((rv = ConstraintCheckValue(theEnv,theMultifield[i].type,
+         if ((rv = ConstraintCheckValue(theMultifield[i].type,
                                         theMultifield[i].value,
                                         theConstraints)) != NO_VIOLATION)
            { return(rv); }
@@ -681,10 +574,10 @@ globle int ConstraintCheckDataObject(
       return(NO_VIOLATION);
      }
 
-   if (CheckCardinalityConstraint(theEnv,1L,theConstraints) == FALSE)
+   if (CheckCardinalityConstraint(1L,theConstraints) == FALSE)
     { return(CARDINALITY_VIOLATION); }
 
-   return(ConstraintCheckValue(theEnv,theData->type,theData->value,theConstraints));
+   return(ConstraintCheckValue(theData->type,theData->value,theConstraints));
   }
 
 /****************************************************************/
@@ -692,7 +585,6 @@ globle int ConstraintCheckDataObject(
 /*   determines if the value satisfies the constraint record.   */
 /****************************************************************/
 globle int ConstraintCheckValue(
-  void *theEnv,
   int theType,
   void *theValue,
   CONSTRAINT_RECORD *theConstraints)
@@ -703,10 +595,7 @@ globle int ConstraintCheckValue(
    else if (CheckAllowedValuesConstraint(theType,theValue,theConstraints) == FALSE)
      { return(ALLOWED_VALUES_VIOLATION); }
 
-   else if (CheckAllowedClassesConstraint(theEnv,theType,theValue,theConstraints) == FALSE)
-     { return(ALLOWED_CLASSES_VIOLATION); }
-
-   else if (CheckRangeConstraint(theEnv,theType,theValue,theConstraints) == FALSE)
+   else if (CheckRangeConstraint(theType,theValue,theConstraints) == FALSE)
      { return(RANGE_VIOLATION); }
 
    else if (theType == FCALL)
@@ -723,11 +612,10 @@ globle int ConstraintCheckValue(
 /* links for constraint conflicts (argList is not followed).        */
 /********************************************************************/
 globle int ConstraintCheckExpressionChain(
-  void *theEnv,
   struct expr *theExpression,
   CONSTRAINT_RECORD *theConstraints)
   {
-   struct expr *theExp;
+   struct expr *exp;
    int min = 0, max = 0, vCode;
 
    /*===========================================================*/
@@ -736,13 +624,13 @@ globle int ConstraintCheckExpressionChain(
    /* positive infinity).                                       */
    /*===========================================================*/
 
-   for (theExp = theExpression ; theExp != NULL ; theExp = theExp->nextArg)
+   for (exp = theExpression ; exp != NULL ; exp = exp->nextArg)
      {
-      if (ConstantType(theExp->type)) min++;
-      else if (theExp->type == FCALL)
+      if (ConstantType(exp->type)) min++;
+      else if (exp->type == FCALL)
         {
-         if ((ExpressionFunctionType(theExp) != 'm') &&
-             (ExpressionFunctionType(theExp) != 'u')) min++;
+         if ((ExpressionFunctionType(exp) != 'm') &&
+             (ExpressionFunctionType(exp) != 'u')) min++;
          else max = -1;
         }
       else max = -1;
@@ -753,16 +641,16 @@ globle int ConstraintCheckExpressionChain(
    /*====================================*/
 
    if (max == 0) max = min;
-   if (CheckRangeAgainstCardinalityConstraint(theEnv,min,max,theConstraints) == FALSE)
+   if (CheckRangeAgainstCardinalityConstraint(min,max,theConstraints) == FALSE)
      { return(CARDINALITY_VIOLATION); }
 
    /*========================================*/
    /* Check for other constraint violations. */
    /*========================================*/
 
-   for (theExp = theExpression ; theExp != NULL ; theExp = theExp->nextArg)
+   for (exp = theExpression ; exp != NULL ; exp = exp->nextArg)
      {
-      vCode = ConstraintCheckValue(theEnv,theExp->type,theExp->value,theConstraints);
+      vCode = ConstraintCheckValue(exp->type,exp->value,theConstraints);
       if (vCode != NO_VIOLATION)
         return(vCode);
      }
@@ -778,7 +666,6 @@ globle int ConstraintCheckExpressionChain(
 /*   conflicts are found, otherwise FALSE.         */
 /***************************************************/
 globle int ConstraintCheckExpression(
-  void *theEnv,
   struct expr *theExpression,
   CONSTRAINT_RECORD *theConstraints)
   {
@@ -788,11 +675,11 @@ globle int ConstraintCheckExpression(
 
    while (theExpression != NULL)
      {
-      rv = ConstraintCheckValue(theEnv,theExpression->type,
+      rv = ConstraintCheckValue(theExpression->type,
                                 theExpression->value,
                                 theConstraints);
       if (rv != NO_VIOLATION) return(rv);
-      rv = ConstraintCheckExpression(theEnv,theExpression->argList,theConstraints);
+      rv = ConstraintCheckExpression(theExpression->argList,theConstraints);
       if (rv != NO_VIOLATION) return(rv);
       theExpression = theExpression->nextArg;
      }
@@ -808,7 +695,7 @@ globle int ConstraintCheckExpression(
 /* UnmatchableConstraint: Determines if a constraint */
 /*  record can still be satisfied by some value.     */
 /*****************************************************/
-globle intBool UnmatchableConstraint(
+globle BOOLEAN UnmatchableConstraint(
   CONSTRAINT_RECORD *theConstraint)
   {
    if (theConstraint == NULL) return(FALSE);
@@ -831,3 +718,6 @@ globle intBool UnmatchableConstraint(
 
 #endif /* (! RUN_TIME) */
 
+
+
+

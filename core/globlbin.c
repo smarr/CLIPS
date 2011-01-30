@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.21  06/15/03            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*            DEFGLOBAL BSAVE/BLOAD MODULE             */
    /*******************************************************/
@@ -14,10 +14,13 @@
 /*      Gary D. Riley                                        */
 /*                                                           */
 /* Contributing Programmer(s):                               */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Revision History:                                         */
 /*                                                           */
+/* Who               |     Date    | Description             */
+/* ------------------+-------------+------------------------ */
+/* M.Giordano        | 23-Mar-2000 | Mods made for TLS       */
 /*************************************************************/
 
 #define _GLOBLBIN_SOURCE_
@@ -36,7 +39,6 @@
 #include "bsave.h"
 #include "moduldef.h"
 #include "globlbsc.h"
-#include "envrnmnt.h"
 
 #include "globlbin.h"
 
@@ -45,67 +47,51 @@
 /***************************************/
 
 #if BLOAD_AND_BSAVE
-   static void                    BsaveFind(void *);
-   static void                    BsaveStorage(void *,FILE *);
-   static void                    BsaveBinaryItem(void *,FILE *);
+   static void                    BsaveFind(void);
+   static void                    BsaveStorage(FILE *);
+   static void                    BsaveBinaryItem(FILE *);
 #endif
-   static void                    BloadStorageDefglobals(void *);
-   static void                    BloadBinaryItem(void *);
-   static void                    UpdateDefglobalModule(void *,void *,long);
-   static void                    UpdateDefglobal(void *,void *,long);
-   static void                    ClearBload(void *);
-   static void                    DeallocateDefglobalBloadData(void *);
+   static void                    BloadStorageDefglobals(void);
+   static void                    BloadBinaryItem(void);
+   static void                    UpdateDefglobalModule(void *,long);
+   static void                    UpdateDefglobal(void *,long);
+   static void                    ClearBload(void);
+
+/****************************************/
+/* GLOBAL INTERNAL VARIABLE DEFINITIONS */
+/****************************************/
+
+   Thread globle struct defglobal                 *DefglobalArray = NULL;
+
+/***************************************/
+/* LOCAL INTERNAL VARIABLE DEFINITIONS */
+/***************************************/
+
+   Thread static long                              NumberOfDefglobals = 0;
+   Thread static struct defglobalModule           *ModuleArray;
+   Thread static long                              NumberOfDefglobalModules;
 
 /*********************************************/
 /* DefglobalBinarySetup: Installs the binary */
 /*   save/load feature for the defglobals.   */
 /*********************************************/
-globle void DefglobalBinarySetup(
-  void *theEnv)
+globle void DefglobalBinarySetup()
   {
-   AllocateEnvironmentData(theEnv,GLOBLBIN_DATA,sizeof(struct defglobalBinaryData),DeallocateDefglobalBloadData);
 #if (BLOAD_AND_BSAVE || BLOAD)
-   AddAfterBloadFunction(theEnv,"defglobal",ResetDefglobals,50);
+   AddAfterBloadFunction("defglobal",ResetDefglobals,50);
 #endif
 
 #if BLOAD_AND_BSAVE
-   AddBinaryItem(theEnv,"defglobal",0,BsaveFind,NULL,
+   AddBinaryItem("defglobal",0,BsaveFind,NULL,
                              BsaveStorage,BsaveBinaryItem,
                              BloadStorageDefglobals,BloadBinaryItem,
                              ClearBload);
 #endif
 
 #if (BLOAD || BLOAD_ONLY)
-   AddBinaryItem(theEnv,"defglobal",0,NULL,NULL,NULL,NULL,
+   AddBinaryItem("defglobal",0,NULL,NULL,NULL,NULL,
                              BloadStorageDefglobals,BloadBinaryItem,
                              ClearBload);
-#endif
-  }
-
-/*********************************************************/
-/* DeallocateDefglobalBloadData: Deallocates environment */
-/*    data for the defglobal bsave functionality.        */
-/*********************************************************/
-static void DeallocateDefglobalBloadData(
-  void *theEnv)
-  {
-#if (BLOAD || BLOAD_ONLY || BLOAD_AND_BSAVE) && (! RUN_TIME)
-   size_t space;
-   long i;
-
-   for (i = 0; i < DefglobalBinaryData(theEnv)->NumberOfDefglobals; i++)
-     {
-      if (DefglobalBinaryData(theEnv)->DefglobalArray[i].current.type == MULTIFIELD)
-        { ReturnMultifield(theEnv,(struct multifield *) DefglobalBinaryData(theEnv)->DefglobalArray[i].current.value); }
-     }
-
-   space = DefglobalBinaryData(theEnv)->NumberOfDefglobals * sizeof(struct defglobal);
-   if (space != 0) 
-     { genfree(theEnv,(void *) DefglobalBinaryData(theEnv)->DefglobalArray,space); }
-
-   space =  DefglobalBinaryData(theEnv)->NumberOfDefglobalModules * sizeof(struct defglobalModule);
-   if (space != 0) 
-     { genfree(theEnv,(void *) DefglobalBinaryData(theEnv)->ModuleArray,space); }
 #endif
   }
 
@@ -116,8 +102,7 @@ static void DeallocateDefglobalBloadData(
 /*   which must be saved in the binary image for    */
 /*   the defglobals in the current environment.     */
 /****************************************************/
-static void BsaveFind(
-  void *theEnv)
+static void BsaveFind()
   {
    struct defglobal *defglobalPtr;
    struct defmodule *theModule;
@@ -128,20 +113,23 @@ static void BsaveFind(
    /* in the process of saving the binary image.            */
    /*=======================================================*/
 
-   SaveBloadCount(theEnv,DefglobalBinaryData(theEnv)->NumberOfDefglobalModules);
-   SaveBloadCount(theEnv,DefglobalBinaryData(theEnv)->NumberOfDefglobals);
+   if (Bloaded())
+     {
+      SaveBloadCount(NumberOfDefglobalModules);
+      SaveBloadCount(NumberOfDefglobals);
+     }
 
    /*============================================*/
    /* Set the count of defglobals and defglobals */
    /* module data structures to zero.            */
    /*============================================*/
 
-   DefglobalBinaryData(theEnv)->NumberOfDefglobals = 0;
-   DefglobalBinaryData(theEnv)->NumberOfDefglobalModules = 0;
+   NumberOfDefglobals = 0;
+   NumberOfDefglobalModules = 0;
 
-   for (theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,NULL);
+   for (theModule = (struct defmodule *) GetNextDefmodule(NULL);
         theModule != NULL;
-        theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,theModule))
+        theModule = (struct defmodule *) GetNextDefmodule(theModule))
      {
       /*================================================*/
       /* Set the current module to the module being     */
@@ -149,22 +137,22 @@ static void BsaveFind(
       /* modules encountered.                           */
       /*================================================*/
 
-      EnvSetCurrentModule(theEnv,(void *) theModule);
-      DefglobalBinaryData(theEnv)->NumberOfDefglobalModules++;
+      SetCurrentModule((void *) theModule);
+      NumberOfDefglobalModules++;
 
       /*====================================================*/
       /* Loop through each defglobal in the current module. */
       /*====================================================*/
 
-      for (defglobalPtr = (struct defglobal *) EnvGetNextDefglobal(theEnv,NULL);
+      for (defglobalPtr = (struct defglobal *) GetNextDefglobal(NULL);
            defglobalPtr != NULL;
-           defglobalPtr = (struct defglobal *) EnvGetNextDefglobal(theEnv,defglobalPtr))
+           defglobalPtr = (struct defglobal *) GetNextDefglobal(defglobalPtr))
         {
          /*======================================================*/
          /* Initialize the construct header for the binary save. */
          /*======================================================*/
 
-         MarkConstructHeaderNeededItems(&defglobalPtr->header,DefglobalBinaryData(theEnv)->NumberOfDefglobals++);
+         MarkConstructHeaderNeededItems(&defglobalPtr->header,NumberOfDefglobals++);
         }
      }
   }
@@ -174,10 +162,9 @@ static void BsaveFind(
 /*   all defglobal structures to the binary file     */
 /*****************************************************/
 static void BsaveStorage(
-  void *theEnv,
   FILE *fp)
   {
-   size_t space;
+   unsigned long space;
 
    /*===========================================================*/
    /* Only two data structures are saved as part of a defglobal */
@@ -186,9 +173,9 @@ static void BsaveStorage(
    /*===========================================================*/
 
    space = sizeof(long) * 2;
-   GenWrite(&space,sizeof(size_t),fp);
-   GenWrite(&DefglobalBinaryData(theEnv)->NumberOfDefglobals,sizeof(long int),fp);
-   GenWrite(&DefglobalBinaryData(theEnv)->NumberOfDefglobalModules,sizeof(long int),fp);
+   GenWrite(&space,(unsigned long) sizeof(unsigned long int),fp);
+   GenWrite(&NumberOfDefglobals,(unsigned long) sizeof(long int),fp);
+   GenWrite(&NumberOfDefglobalModules,(unsigned long) sizeof(long int),fp);
   }
 
 /*********************************************/
@@ -196,10 +183,9 @@ static void BsaveStorage(
 /*   structures to the binary file           */
 /*********************************************/
 static void BsaveBinaryItem(
-  void *theEnv,
   FILE *fp)
   {
-   size_t space;
+   unsigned long int space;
    struct defglobal *theDefglobal;
    struct bsaveDefglobal newDefglobal;
    struct defmodule *theModule;
@@ -211,48 +197,48 @@ static void BsaveBinaryItem(
    /* and defglobalModule data structures in the binary image. */
    /*==========================================================*/
 
-   space = DefglobalBinaryData(theEnv)->NumberOfDefglobals * sizeof(struct bsaveDefglobal) +
-           (DefglobalBinaryData(theEnv)->NumberOfDefglobalModules * sizeof(struct bsaveDefglobalModule));
-   GenWrite(&space,sizeof(size_t),fp);
+   space = NumberOfDefglobals * sizeof(struct bsaveDefglobal) +
+           (NumberOfDefglobalModules * sizeof(struct bsaveDefglobalModule));
+   GenWrite(&space,(unsigned long) sizeof(unsigned long int),fp);
 
    /*=================================================*/
    /* Write out each defglobal module data structure. */
    /*=================================================*/
 
-   DefglobalBinaryData(theEnv)->NumberOfDefglobals = 0;
-   for (theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,NULL);
+   NumberOfDefglobals = 0;
+   for (theModule = (struct defmodule *) GetNextDefmodule(NULL);
         theModule != NULL;
-        theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,theModule))
+        theModule = (struct defmodule *) GetNextDefmodule(theModule))
      {
-      EnvSetCurrentModule(theEnv,(void *) theModule);
+      SetCurrentModule((void *) theModule);
 
       theModuleItem = (struct defglobalModule *)
-                      GetModuleItem(theEnv,NULL,FindModuleItem(theEnv,"defglobal")->moduleIndex);
+                      GetModuleItem(NULL,FindModuleItem("defglobal")->moduleIndex);
       AssignBsaveDefmdlItemHdrVals(&tempDefglobalModule.header,
                                            &theModuleItem->header);
-      GenWrite(&tempDefglobalModule,sizeof(struct bsaveDefglobalModule),fp);
+      GenWrite(&tempDefglobalModule,(unsigned long) sizeof(struct bsaveDefglobalModule),fp);
      }
 
    /*===========================*/
    /* Write out each defglobal. */
    /*===========================*/
 
-   DefglobalBinaryData(theEnv)->NumberOfDefglobals = 0;
-   for (theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,NULL);
+   NumberOfDefglobals = 0;
+   for (theModule = (struct defmodule *) GetNextDefmodule(NULL);
         theModule != NULL;
-        theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,theModule))
+        theModule = (struct defmodule *) GetNextDefmodule(theModule))
      {
-      EnvSetCurrentModule(theEnv,(void *) theModule);
+      SetCurrentModule((void *) theModule);
 
-      for (theDefglobal = (struct defglobal *) EnvGetNextDefglobal(theEnv,NULL);
+      for (theDefglobal = (struct defglobal *) GetNextDefglobal(NULL);
            theDefglobal != NULL;
-           theDefglobal = (struct defglobal *) EnvGetNextDefglobal(theEnv,theDefglobal))
+           theDefglobal = (struct defglobal *) GetNextDefglobal(theDefglobal))
         {
          AssignBsaveConstructHeaderVals(&newDefglobal.header,
                                           &theDefglobal->header);
-         newDefglobal.initial = HashedExpressionIndex(theEnv,theDefglobal->initial);
+         newDefglobal.initial = HashedExpressionIndex(theDefglobal->initial);
 
-         GenWrite(&newDefglobal,sizeof(struct bsaveDefglobal),fp);
+         GenWrite(&newDefglobal,(unsigned long) sizeof(struct bsaveDefglobal),fp);
         }
      }
 
@@ -263,8 +249,11 @@ static void BsaveBinaryItem(
    /* (these were overwritten by the binary save).                */
    /*=============================================================*/
 
-   RestoreBloadCount(theEnv,&DefglobalBinaryData(theEnv)->NumberOfDefglobalModules);
-   RestoreBloadCount(theEnv,&DefglobalBinaryData(theEnv)->NumberOfDefglobals);
+   if (Bloaded())
+     {
+      RestoreBloadCount(&NumberOfDefglobalModules);
+      RestoreBloadCount(&NumberOfDefglobals);
+     }
   }
 
 #endif /* BLOAD_AND_BSAVE */
@@ -273,57 +262,55 @@ static void BsaveBinaryItem(
 /* BloadStorageDefglobals: Allocates space for */
 /*   the defglobals used by this binary image. */
 /***********************************************/
-static void BloadStorageDefglobals(
-  void *theEnv)
+static void BloadStorageDefglobals()
   {
-   size_t space;
+   unsigned long int space;
 
    /*=======================================================*/
    /* Determine the number of defglobal and defglobalModule */
    /* data structures to be read.                           */
    /*=======================================================*/
 
-   GenReadBinary(theEnv,&space,sizeof(size_t));
-   GenReadBinary(theEnv,&DefglobalBinaryData(theEnv)->NumberOfDefglobals,sizeof(long int));
-   GenReadBinary(theEnv,&DefglobalBinaryData(theEnv)->NumberOfDefglobalModules,sizeof(long int));
+   GenRead(&space,(unsigned long) sizeof(unsigned long int));
+   GenRead(&NumberOfDefglobals,(unsigned long) sizeof(long int));
+   GenRead(&NumberOfDefglobalModules,(unsigned long) sizeof(long int));
 
    /*===================================*/
    /* Allocate the space needed for the */
    /* defglobalModule data structures.  */
    /*===================================*/
 
-   if (DefglobalBinaryData(theEnv)->NumberOfDefglobalModules == 0)
+   if (NumberOfDefglobalModules == 0)
      {
-      DefglobalBinaryData(theEnv)->DefglobalArray = NULL;
-      DefglobalBinaryData(theEnv)->ModuleArray = NULL;
+      DefglobalArray = NULL;
+      ModuleArray = NULL;
      }
 
-   space = DefglobalBinaryData(theEnv)->NumberOfDefglobalModules * sizeof(struct defglobalModule);
-   DefglobalBinaryData(theEnv)->ModuleArray = (struct defglobalModule *) genalloc(theEnv,space);
+   space = NumberOfDefglobalModules * sizeof(struct defglobalModule);
+   ModuleArray = (struct defglobalModule *) genlongalloc(space);
 
    /*===================================*/
    /* Allocate the space needed for the */
    /* defglobal data structures.        */
    /*===================================*/
 
-   if (DefglobalBinaryData(theEnv)->NumberOfDefglobals == 0)
+   if (NumberOfDefglobals == 0)
      {
-      DefglobalBinaryData(theEnv)->DefglobalArray = NULL;
+      DefglobalArray = NULL;
       return;
      }
 
-   space = (DefglobalBinaryData(theEnv)->NumberOfDefglobals * sizeof(struct defglobal));
-   DefglobalBinaryData(theEnv)->DefglobalArray = (struct defglobal *) genalloc(theEnv,space);
+   space = (unsigned long) (NumberOfDefglobals * sizeof(struct defglobal));
+   DefglobalArray = (struct defglobal *) genlongalloc(space);
   }
 
 /******************************************************/
 /* BloadBinaryItem: Loads and refreshes the defglobal */
 /*   constructs used by this binary image.            */
 /******************************************************/
-static void BloadBinaryItem(
-  void *theEnv)
+static void BloadBinaryItem()
   {
-   size_t space;
+   unsigned long int space;
 
    /*======================================================*/
    /* Read in the amount of space used by the binary image */
@@ -331,15 +318,15 @@ static void BloadBinaryItem(
    /* is not available in the version being run).          */
    /*======================================================*/
 
-   GenReadBinary(theEnv,&space,sizeof(size_t));
+   GenRead(&space,(unsigned long) sizeof(unsigned long int));
 
    /*=============================================*/
    /* Read in the defglobalModule data structures */
    /* and refresh the pointers.                   */
    /*=============================================*/
 
-   BloadandRefresh(theEnv,DefglobalBinaryData(theEnv)->NumberOfDefglobalModules,
-                   sizeof(struct bsaveDefglobalModule),
+   BloadandRefresh(NumberOfDefglobalModules,
+                   (unsigned) sizeof(struct bsaveDefglobalModule),
                    UpdateDefglobalModule);
 
    /*=======================================*/
@@ -347,8 +334,8 @@ static void BloadBinaryItem(
    /* and refresh the pointers.             */
    /*=======================================*/
 
-   BloadandRefresh(theEnv,DefglobalBinaryData(theEnv)->NumberOfDefglobals,
-                   sizeof(struct bsaveDefglobal),
+   BloadandRefresh(NumberOfDefglobals,
+                   (unsigned) sizeof(struct bsaveDefglobal),
                    UpdateDefglobal);
   }
 
@@ -357,7 +344,6 @@ static void BloadBinaryItem(
 /*   for defglobal module data structures.      */
 /************************************************/
 static void UpdateDefglobalModule(
-  void *theEnv,
   void *buf,
   long obji)
   {
@@ -365,9 +351,9 @@ static void UpdateDefglobalModule(
 
    bdmPtr = (struct bsaveDefglobalModule *) buf;
 
-   UpdateDefmoduleItemHeader(theEnv,&bdmPtr->header,&DefglobalBinaryData(theEnv)->ModuleArray[obji].header,
+   UpdateDefmoduleItemHeader(&bdmPtr->header,&ModuleArray[obji].header,
                              (int) sizeof(struct defglobal),
-                             (void *) DefglobalBinaryData(theEnv)->DefglobalArray);
+                             (void *) DefglobalArray);
   }
 
 /******************************************/
@@ -375,22 +361,21 @@ static void UpdateDefglobalModule(
 /*   for defglobal data structures.       */
 /******************************************/
 static void UpdateDefglobal(
-  void *theEnv,
   void *buf,
   long obji)
   {
    struct bsaveDefglobal *bdp;
 
    bdp = (struct bsaveDefglobal *) buf;
-   UpdateConstructHeader(theEnv,&bdp->header,&DefglobalBinaryData(theEnv)->DefglobalArray[obji].header,
-                         (int) sizeof(struct defglobalModule),(void *) DefglobalBinaryData(theEnv)->ModuleArray,
-                         (int) sizeof(struct defglobal),(void *) DefglobalBinaryData(theEnv)->DefglobalArray);
+   UpdateConstructHeader(&bdp->header,&DefglobalArray[obji].header,
+                         (int) sizeof(struct defglobalModule),(void *) ModuleArray,
+                         (int) sizeof(struct defglobal),(void *) DefglobalArray);
 
 #if DEBUGGING_FUNCTIONS
-   DefglobalBinaryData(theEnv)->DefglobalArray[obji].watch = WatchGlobals;
+   DefglobalArray[obji].watch = WatchGlobals;
 #endif
-   DefglobalBinaryData(theEnv)->DefglobalArray[obji].initial = HashedExpressionPointer(bdp->initial);
-   DefglobalBinaryData(theEnv)->DefglobalArray[obji].current.type = RVOID;
+   DefglobalArray[obji].initial = HashedExpressionPointer(bdp->initial);
+   DefglobalArray[obji].current.type = RVOID;
 
   }
 
@@ -398,11 +383,10 @@ static void UpdateDefglobal(
 /* ClearBload: Defglobal clear routine */
 /*   when a binary load is in effect.  */
 /***************************************/
-static void ClearBload(
-  void *theEnv)
+static void ClearBload()
   {
    long i;
-   size_t space;
+   unsigned long space;
 
    /*=======================================================*/
    /* Decrement in use counters for atomic values contained */
@@ -410,30 +394,28 @@ static void ClearBload(
    /* structures used to store the defglobal's value.       */
    /*=======================================================*/
 
-   for (i = 0; i < DefglobalBinaryData(theEnv)->NumberOfDefglobals; i++)
+   for (i = 0; i < NumberOfDefglobals; i++)
      {
-      UnmarkConstructHeader(theEnv,&DefglobalBinaryData(theEnv)->DefglobalArray[i].header);
+      UnmarkConstructHeader(&DefglobalArray[i].header);
 
-      ValueDeinstall(theEnv,&(DefglobalBinaryData(theEnv)->DefglobalArray[i].current));
-      if (DefglobalBinaryData(theEnv)->DefglobalArray[i].current.type == MULTIFIELD)
-        { ReturnMultifield(theEnv,(struct multifield *) DefglobalBinaryData(theEnv)->DefglobalArray[i].current.value); }
+      ValueDeinstall(&(DefglobalArray[i].current));
+      if (DefglobalArray[i].current.type == MULTIFIELD)
+        { ReturnMultifield((struct multifield *) DefglobalArray[i].current.value); }
      }
 
    /*==============================================================*/
    /* Deallocate the space used for the defglobal data structures. */
    /*==============================================================*/
 
-   space = DefglobalBinaryData(theEnv)->NumberOfDefglobals * sizeof(struct defglobal);
-   if (space != 0) genfree(theEnv,(void *) DefglobalBinaryData(theEnv)->DefglobalArray,space);
-   DefglobalBinaryData(theEnv)->NumberOfDefglobals = 0;
-   
+   space = NumberOfDefglobals * sizeof(struct defglobal);
+   if (space != 0) genlongfree((void *) DefglobalArray,space);
+
    /*=====================================================================*/
    /* Deallocate the space used for the defglobal module data structures. */
    /*=====================================================================*/
 
-   space = DefglobalBinaryData(theEnv)->NumberOfDefglobalModules * sizeof(struct defglobalModule);
-   if (space != 0) genfree(theEnv,(void *) DefglobalBinaryData(theEnv)->ModuleArray,space);
-   DefglobalBinaryData(theEnv)->NumberOfDefglobalModules = 0;
+   space =  NumberOfDefglobalModules * sizeof(struct defglobalModule);
+   if (space != 0) genlongfree((void *) ModuleArray,space);
   }
 
 /********************************************************/
@@ -441,13 +423,13 @@ static void ClearBload(
 /*   module pointer for using with the bload function.  */
 /********************************************************/
 globle void *BloadDefglobalModuleReference(
-  void *theEnv,
-  int theIndex)
+  int index)
   {
-   return ((void *) &DefglobalBinaryData(theEnv)->ModuleArray[theIndex]);
+   return ((void *) &ModuleArray[index]);
   }
 
 #endif /* DEFGLOBAL_CONSTRUCT && (BLOAD || BLOAD_AND_BSAVE || BLOAD_ONLY) && (! RUN_TIME) */
 
 
 
+

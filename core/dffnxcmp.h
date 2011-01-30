@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*               CLIPS Version 6.20  01/31/02          */
+   /*               CLIPS Version 6.10  04/09/97          */
    /*                                                     */
    /*                                                     */
    /*******************************************************/
@@ -10,7 +10,7 @@
 /* Purpose: Deffunction Construct Compiler Code              */
 /*                                                           */
 /* Principal Programmer(s):                                  */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Contributing Programmer(s):                               */
 /*                                                           */
@@ -40,12 +40,14 @@
 #define LOCALE extern
 #endif
 
-LOCALE void SetupDeffunctionCompiler(void *);
-LOCALE void PrintDeffunctionReference(void *,FILE *,DEFFUNCTION *,int,int);
-LOCALE void DeffunctionCModuleReference(void *,FILE *,int,int,int);
+LOCALE void SetupDeffunctionCompiler(void);
+LOCALE void PrintDeffunctionReference(FILE *,DEFFUNCTION *,int,int);
+LOCALE void DeffunctionCModuleReference(FILE *,int,int,int);
 
 #endif
 
 #endif
 
 
+
+

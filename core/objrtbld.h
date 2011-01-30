@@ -1,30 +1,27 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*               CLIPS Version 6.24  05/17/06          */
+   /*               CLIPS Version 6.10  04/09/97          */
    /*                                                     */
-   /*          OBJECT PATTERN MATCHER MODULE              */
+   /*                                                     */
    /*******************************************************/
 
 /*************************************************************/
 /* Purpose:                                                  */
 /*                                                           */
 /* Principal Programmer(s):                                  */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Contributing Programmer(s):                               */
 /*                                                           */
 /* Revision History:                                         */
-/*                                                           */
-/*      6.24: Converted INSTANCE_PATTERN_MATCHING to         */
-/*            DEFRULE_CONSTRUCT.                             */
 /*                                                           */
 /*************************************************************/
 
 #ifndef _H_objrtbld
 #define _H_objrtbld
 
-#if DEFRULE_CONSTRUCT && OBJECT_SYSTEM
+#if INSTANCE_PATTERN_MATCHING
 
 #ifdef LOCALE
 #undef LOCALE
@@ -36,7 +33,7 @@
 #define LOCALE extern
 #endif
 
-LOCALE void SetupObjectPatternStuff(void *);
+LOCALE void SetupObjectPatternStuff(void);
 
 #endif
 
@@ -44,3 +41,7 @@ LOCALE void SetupObjectPatternStuff(void *);
 
 
 
+
+
+
+

@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.20  01/31/02            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*                FACT BUILD HEADER FILE               */
    /*******************************************************/
@@ -37,9 +37,9 @@ struct factPatternNode
   {
    struct patternNodeHeader header;
    long bsaveID;
-   unsigned short whichField;
-   unsigned short whichSlot;
-   unsigned short leaveFields;
+   unsigned int whichField : 8;
+   unsigned int whichSlot : 8;
+   unsigned int leaveFields : 8;
    struct expr *networkTest;
    struct factPatternNode *nextLevel;
    struct factPatternNode *lastLevel;
@@ -53,8 +53,11 @@ struct factPatternNode
 #define LOCALE extern
 #endif
 
-   LOCALE void                           InitializeFactPatterns(void *);
-   LOCALE void                           DestroyFactPatternNetwork(void *,
-                                                                   struct factPatternNode *);
+   LOCALE void                           InitializeFactPatterns(void);
+
+#ifndef _FACTBLD_SOURCE_
+   extern Thread globle struct patternEntityRecord     FactInfo;
+#endif
 
 #endif
+

@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.30  10/19/06            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*                  MATCH HEADER FILE                  */
    /*******************************************************/
@@ -15,8 +15,6 @@
 /* Contributing Programmer(s):                               */
 /*                                                           */
 /* Revision History:                                         */
-/*                                                           */
-/*      6.30: Added support for hashed alpha memories.       */
 /*                                                           */
 /*************************************************************/
 
@@ -67,26 +65,14 @@ struct genericMatch
 /************************************************************/
 struct partialMatch
   {
-   unsigned int betaMemory  :  1;
-   unsigned int busy        :  1;
-   unsigned int rhsMemory   :  1;
-   unsigned short bcount; 
-   unsigned long hashValue;
-   void *owner;
-   void *marker;
-   void *dependents;
-   struct partialMatch *nextInMemory;
-   struct partialMatch *prevInMemory;
-   struct partialMatch *children;
-   struct partialMatch *rightParent;
-   struct partialMatch *nextRightChild;
-   struct partialMatch *prevRightChild;
-   struct partialMatch *leftParent;
-   struct partialMatch *nextLeftChild;
-   struct partialMatch *prevLeftChild;
-   struct partialMatch *blockList;
-   struct partialMatch *nextBlocked;
-   struct partialMatch *prevBlocked;
+   unsigned int betaMemory  : 1;
+   unsigned int busy        : 1;
+   unsigned int activationf : 1;
+   unsigned int dependentsf : 1;
+   unsigned int notOriginf  : 1;
+   unsigned int counterf    : 1;
+   unsigned int bcount      : 9;
+   struct partialMatch *next;
    struct genericMatch binds[1];
   };
 
@@ -98,7 +84,6 @@ struct alphaMatch
    struct patternEntity *matchingItem;
    struct multifieldMarker *markers;
    struct alphaMatch *next;
-   unsigned long bucket;
   };
 
 /************************************************************/
@@ -133,3 +118,4 @@ struct multifieldMarker
 
 
 
+

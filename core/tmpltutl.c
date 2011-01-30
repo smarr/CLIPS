@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.24  06/05/06            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*            DEFTEMPLATE UTILITIES MODULE             */
    /*******************************************************/
@@ -13,20 +13,13 @@
 /*      Gary D. Riley                                        */
 /*                                                           */
 /* Contributing Programmer(s):                               */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Revision History:                                         */
-/*      6.23: Added support for templates maintaining their  */
-/*            own list of facts.                             */
 /*                                                           */
-/*      6.24: Renamed BOOLEAN macro type to intBool.         */
-/*                                                           */
-/*            Added additional arguments to                  */
-/*            InvalidDeftemplateSlotMessage function.        */
-/*                                                           */
-/*            Added additional arguments to                  */
-/*            PrintTemplateFact function.                    */
-/*                                                           */
+/* Who               |     Date    | Description             */
+/* ------------------+-------------+------------------------ */
+/* M.Giordano        | 23-Mar-2000 | Mods made for TLS       */
 /*************************************************************/
 
 #define  _TMPLTUTL_SOURCE_
@@ -47,12 +40,10 @@
 #include "router.h"
 #include "argacces.h"
 #include "cstrnchk.h"
-#include "envrnmnt.h"
 #include "tmpltfun.h"
 #include "tmpltpsr.h"
 #include "modulutl.h"
 #include "watch.h"
-#include "sysdep.h"
 #include "tmpltbsc.h"
 #include "tmpltdef.h"
 
@@ -64,17 +55,15 @@
 /*   in its corresponding deftemplate.                  */
 /********************************************************/
 globle void InvalidDeftemplateSlotMessage(
-  void *theEnv,
   char *slotName,
-  char *deftemplateName,
-  int printCR)
+  char *deftemplateName)
   {
-   PrintErrorID(theEnv,"TMPLTDEF",1,printCR);
-   EnvPrintRouter(theEnv,WERROR,"Invalid slot ");
-   EnvPrintRouter(theEnv,WERROR,slotName);
-   EnvPrintRouter(theEnv,WERROR," not defined in corresponding deftemplate ");
-   EnvPrintRouter(theEnv,WERROR,deftemplateName);
-   EnvPrintRouter(theEnv,WERROR,".\n");
+   PrintErrorID("TMPLTDEF",1,TRUE);
+   PrintRouter(WERROR,"Invalid slot ");
+   PrintRouter(WERROR,slotName);
+   PrintRouter(WERROR," not defined in corresponding deftemplate ");
+   PrintRouter(WERROR,deftemplateName);
+   PrintRouter(WERROR,".\n");
   }
 
 /**********************************************************/
@@ -83,13 +72,12 @@ globle void InvalidDeftemplateSlotMessage(
 /*   value into a single field slot.                      */
 /**********************************************************/
 globle void SingleFieldSlotCardinalityError(
-  void *theEnv,
   char *slotName)
   {
-   PrintErrorID(theEnv,"TMPLTDEF",2,TRUE);
-   EnvPrintRouter(theEnv,WERROR,"The single field slot ");
-   EnvPrintRouter(theEnv,WERROR,slotName);
-   EnvPrintRouter(theEnv,WERROR," can only contain a single field value.\n");
+   PrintErrorID("TMPLTDEF",2,TRUE);
+   PrintRouter(WERROR,"The single field slot ");
+   PrintRouter(WERROR,slotName);
+   PrintRouter(WERROR," can only contain a single field value.\n");
   }
 
 /**********************************************************************/
@@ -97,21 +85,20 @@ globle void SingleFieldSlotCardinalityError(
 /*   being placed into a single field slot of a deftemplate fact.     */
 /**********************************************************************/
 globle void MultiIntoSingleFieldSlotError(
-  void *theEnv,
   struct templateSlot *theSlot,
   struct deftemplate *theDeftemplate)
   {
-   PrintErrorID(theEnv,"TMPLTFUN",2,TRUE);
-   EnvPrintRouter(theEnv,WERROR,"Attempted to assert a multifield value \n");
-   EnvPrintRouter(theEnv,WERROR,"into the single field slot ");
-   if (theSlot != NULL) EnvPrintRouter(theEnv,WERROR,theSlot->slotName->contents);
-   else EnvPrintRouter(theEnv,WERROR,"<<unknown>>");
-   EnvPrintRouter(theEnv,WERROR," of deftemplate ");
-   if (theDeftemplate != NULL) EnvPrintRouter(theEnv,WERROR,theDeftemplate->header.name->contents);
-   else EnvPrintRouter(theEnv,WERROR,"<<unknown>>");
-   EnvPrintRouter(theEnv,WERROR,".\n");
+   PrintErrorID("TMPLTFUN",2,TRUE);
+   PrintRouter(WERROR,"Attempted to assert a multifield value \n");
+   PrintRouter(WERROR,"into the single field slot ");
+   if (theSlot != NULL) PrintRouter(WERROR,theSlot->slotName->contents);
+   else PrintRouter(WERROR,"<<unknown>>");
+   PrintRouter(WERROR," of deftemplate ");
+   if (theDeftemplate != NULL) PrintRouter(WERROR,theDeftemplate->header.name->contents);
+   else PrintRouter(WERROR,"<<unknown>>");
+   PrintRouter(WERROR,".\n");
 
-   SetEvaluationError(theEnv,TRUE);
+   SetEvaluationError(TRUE);
   }
 
 /**************************************************************/
@@ -119,7 +106,6 @@ globle void MultiIntoSingleFieldSlotError(
 /*   deftemplate type, allowed-..., or range specifications.  */
 /**************************************************************/
 globle void CheckTemplateFact(
-  void *theEnv,
   struct fact *theFact)
   {
    struct field *sublist;
@@ -130,7 +116,7 @@ globle void CheckTemplateFact(
    char thePlace[20];
    int rv;
 
-   if (! EnvGetDynamicConstraintChecking(theEnv)) return;
+   if (! GetDynamicConstraintChecking()) return;
 
    sublist = theFact->theProposition.theFields;
 
@@ -168,8 +154,8 @@ globle void CheckTemplateFact(
         {
          theData.type = MULTIFIELD;
          theData.value = (void *) sublist[i].value;
-         SetDOBegin(theData,1);
-         SetDOEnd(theData,((struct multifield *) sublist[i].value)->multifieldLength);
+         theData.begin = 0;
+         theData.end = ((struct multifield *) sublist[i].value)->multifieldLength-1;
          i++;
         }
 
@@ -178,18 +164,18 @@ globle void CheckTemplateFact(
       /* if a constraint violation occurred.         */
       /*=============================================*/
 
-      rv = ConstraintCheckDataObject(theEnv,&theData,slotPtr->constraints);
+      rv = ConstraintCheckDataObject(&theData,slotPtr->constraints);
       if (rv != NO_VIOLATION)
         {
-         gensprintf(thePlace,"fact f-%-5lld ",theFact->factIndex);
+         sprintf(thePlace,"fact f-%-5ld ",theFact->factIndex);
 
-         PrintErrorID(theEnv,"CSTRNCHK",1,TRUE);
-         EnvPrintRouter(theEnv,WERROR,"Slot value ");
-         PrintDataObject(theEnv,WERROR,&theData);
-         EnvPrintRouter(theEnv,WERROR," ");
-         ConstraintViolationErrorMessage(theEnv,NULL,thePlace,FALSE,0,slotPtr->slotName,
+         PrintErrorID("CSTRNCHK",1,TRUE);
+         PrintRouter(WERROR,"Slot value ");
+         PrintDataObject(WERROR,&theData);
+         PrintRouter(WERROR," ");
+         ConstraintViolationErrorMessage(NULL,thePlace,FALSE,0,slotPtr->slotName,
                                          0,rv,slotPtr->constraints,TRUE);
-         SetHaltExecution(theEnv,TRUE);
+         SetHaltExecution(TRUE);
          return;
         }
      }
@@ -202,8 +188,7 @@ globle void CheckTemplateFact(
 /*   result of an assert, modify, or duplicate command. This checking  */
 /*   is performed statically (i.e. when the command is being parsed).  */
 /***********************************************************************/
-globle intBool CheckRHSSlotTypes(
-  void *theEnv,
+globle BOOLEAN CheckRHSSlotTypes(
   struct expr *rhsSlots,
   struct templateSlot *slotPtr,
   char *thePlace)
@@ -211,13 +196,13 @@ globle intBool CheckRHSSlotTypes(
    int rv;
    char *theName;
 
-   if (EnvGetStaticConstraintChecking(theEnv) == FALSE) return(TRUE);
-      rv = ConstraintCheckExpressionChain(theEnv,rhsSlots,slotPtr->constraints);
+   if (GetStaticConstraintChecking() == FALSE) return(TRUE);
+      rv = ConstraintCheckExpressionChain(rhsSlots,slotPtr->constraints);
       if (rv != NO_VIOLATION)
         {
          if (rv != CARDINALITY_VIOLATION) theName = "A literal slot value";
          else theName = "Literal slot values";
-         ConstraintViolationErrorMessage(theEnv,theName,thePlace,TRUE,0,
+         ConstraintViolationErrorMessage(theName,thePlace,TRUE,0,
                                          slotPtr->slotName,0,rv,slotPtr->constraints,TRUE);
          return(0);
         }
@@ -275,19 +260,14 @@ globle int FindSlotPosition(
 /*   otherwise FALSE.                                        */
 /*******************************************************************/
 globle void PrintTemplateFact(
-  void *theEnv,
   char *logicalName,
-  struct fact *theFact,
-  int seperateLines,
-  int ignoreDefaults)
+  struct fact *theFact)
   {
    struct field *sublist;
    int i;
    struct deftemplate *theDeftemplate;
    struct templateSlot *slotPtr;
-   DATA_OBJECT tempDO;
-   int slotPrinted = FALSE;
-   
+
    /*==============================*/
    /* Initialize some information. */
    /*==============================*/
@@ -299,8 +279,9 @@ globle void PrintTemplateFact(
    /* Print the relation name of the deftemplate. */
    /*=============================================*/
 
-   EnvPrintRouter(theEnv,logicalName,"(");
-   EnvPrintRouter(theEnv,logicalName,theDeftemplate->header.name->contents);
+   PrintRouter(logicalName,"(");
+   PrintRouter(logicalName,theDeftemplate->header.name->contents);
+   if (theDeftemplate->slotList != NULL) PrintRouter(logicalName," ");
 
    /*===================================================*/
    /* Print each of the field slots of the deftemplate. */
@@ -310,52 +291,14 @@ globle void PrintTemplateFact(
 
    i = 0;
    while (slotPtr != NULL)
-     {         
-      /*=================================================*/
-      /* If we're ignoring slots with their original     */
-      /* default value, check to see if the fact's slot  */
-      /* value differs from the deftemplate default.     */
-      /*=================================================*/
-      
-      if (ignoreDefaults && (slotPtr->defaultDynamic == FALSE))
-        {
-         DeftemplateSlotDefault(theEnv,theDeftemplate,slotPtr,&tempDO,TRUE);
-         
-         if (slotPtr->multislot == FALSE)
-           {
-            if ((GetType(tempDO) == sublist[i].type) &&
-                (GetValue(tempDO) == sublist[i].value))
-              {     
-               i++;
-               slotPtr = slotPtr->next;
-               continue;
-              }
-           }
-         else if (MultifieldsEqual((struct multifield*) GetValue(tempDO),
-                                   (struct multifield *) sublist[i].value))
-           {
-            i++;
-            slotPtr = slotPtr->next;
-            continue;
-           }
-        }
-        
+     {
       /*===========================================*/
-      /* Print the opening parenthesis of the slot */
+      /* Print the closing parenthesis of the slot */
       /* and the slot name.                        */
       /*===========================================*/
-     
-      if (! slotPrinted) 
-        { 
-         slotPrinted = TRUE;
-         EnvPrintRouter(theEnv,logicalName," "); 
-        }
 
-      if (seperateLines)
-        { EnvPrintRouter(theEnv,logicalName,"\n   "); }
-
-      EnvPrintRouter(theEnv,logicalName,"(");
-      EnvPrintRouter(theEnv,logicalName,slotPtr->slotName->contents);
+      PrintRouter(logicalName,"(");
+      PrintRouter(logicalName,slotPtr->slotName->contents);
 
       /*======================================================*/
       /* Print the value of the slot for a single field slot. */
@@ -363,8 +306,8 @@ globle void PrintTemplateFact(
 
       if (slotPtr->multislot == FALSE)
         {
-         EnvPrintRouter(theEnv,logicalName," ");
-         PrintAtom(theEnv,logicalName,sublist[i].type,sublist[i].value);
+         PrintRouter(logicalName," ");
+         PrintAtom(logicalName,sublist[i].type,sublist[i].value);
         }
 
       /*==========================================================*/
@@ -378,9 +321,9 @@ globle void PrintTemplateFact(
          theSegment = (struct multifield *) sublist[i].value;
          if (theSegment->multifieldLength > 0)
            {
-            EnvPrintRouter(theEnv,logicalName," ");
-            PrintMultifield(theEnv,logicalName,(struct multifield *) sublist[i].value,
-                            0,(long) theSegment->multifieldLength-1,FALSE);
+            PrintRouter(logicalName," ");
+            PrintMultifield(logicalName,(struct multifield *) sublist[i].value,
+                            0,theSegment->multifieldLength-1,FALSE);
            }
         }
 
@@ -389,19 +332,18 @@ globle void PrintTemplateFact(
       /*============================================*/
 
       i++;
-      EnvPrintRouter(theEnv,logicalName,")");
+      PrintRouter(logicalName,")");
       slotPtr = slotPtr->next;
-      if (slotPtr != NULL) EnvPrintRouter(theEnv,logicalName," ");
+      if (slotPtr != NULL) PrintRouter(logicalName," ");
      }
 
-   EnvPrintRouter(theEnv,logicalName,")");
+   PrintRouter(logicalName,")");
   }
 
 /***************************************************************************/
 /* UpdateDeftemplateScope: Updates the scope flag of all the deftemplates. */
 /***************************************************************************/
-globle void UpdateDeftemplateScope(
-  void *theEnv)
+globle void UpdateDeftemplateScope()
   {
    struct deftemplate *theDeftemplate;
    int moduleCount;
@@ -412,27 +354,27 @@ globle void UpdateDeftemplateScope(
    /* Loop through all of the modules. */
    /*==================================*/
 
-   for (theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,NULL);
+   for (theModule = (struct defmodule *) GetNextDefmodule(NULL);
         theModule != NULL;
-        theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,theModule))
+        theModule = (struct defmodule *) GetNextDefmodule(theModule))
      {
       /*======================================================*/
       /* Loop through each of the deftemplates in the module. */
       /*======================================================*/
 
       theItem = (struct defmoduleItemHeader *)
-                GetModuleItem(theEnv,theModule,DeftemplateData(theEnv)->DeftemplateModuleIndex);
+                GetModuleItem(theModule,DeftemplateModuleIndex);
 
       for (theDeftemplate = (struct deftemplate *) theItem->firstItem;
            theDeftemplate != NULL ;
-           theDeftemplate = (struct deftemplate *) EnvGetNextDeftemplate(theEnv,theDeftemplate))
+           theDeftemplate = (struct deftemplate *) GetNextDeftemplate(theDeftemplate))
         {
          /*=======================================*/
          /* If the deftemplate can be seen by the */
          /* current module, then it is in scope.  */
          /*=======================================*/
 
-         if (FindImportedConstruct(theEnv,"deftemplate",theModule,
+         if (FindImportedConstruct("deftemplate",theModule,
                                    ValueToString(theDeftemplate->header.name),
                                    &moduleCount,TRUE,NULL) != NULL)
            { theDeftemplate->inScope = TRUE; }
@@ -448,7 +390,7 @@ globle void UpdateDeftemplateScope(
 globle struct templateSlot *FindSlot(
   struct deftemplate *theDeftemplate,
   SYMBOL_HN *name,
-  short *whichOne)
+  int *whichOne)
   {
    struct templateSlot *slotPtr;
 
@@ -473,13 +415,12 @@ globle struct templateSlot *FindSlot(
 /*   and adds it to the list of deftemplates.               */
 /************************************************************/
 globle struct deftemplate *CreateImpliedDeftemplate(
-  void *theEnv,
   SYMBOL_HN *deftemplateName,
   int setFlag)
   {
    struct deftemplate *newDeftemplate;
 
-   newDeftemplate = get_struct(theEnv,deftemplate);
+   newDeftemplate = get_struct(deftemplate);
    newDeftemplate->header.name = deftemplateName;
    newDeftemplate->header.ppForm = NULL;
    newDeftemplate->header.usrData = NULL;
@@ -488,22 +429,20 @@ globle struct deftemplate *CreateImpliedDeftemplate(
    newDeftemplate->numberOfSlots = 0;
    newDeftemplate->inScope = 1;
    newDeftemplate->patternNetwork = NULL;
-   newDeftemplate->factList = NULL;
-   newDeftemplate->lastFact = NULL;
    newDeftemplate->busyCount = 0;
    newDeftemplate->watch = FALSE;
    newDeftemplate->header.next = NULL;
 
 #if DEBUGGING_FUNCTIONS
-   if (EnvGetWatchItem(theEnv,"facts"))
-     { EnvSetDeftemplateWatch(theEnv,ON,(void *) newDeftemplate); }
+   if (GetWatchItem("facts"))
+     { SetDeftemplateWatch(ON,(void *) newDeftemplate); }
 #endif
 
    newDeftemplate->header.whichModule = (struct defmoduleItemHeader *)
-                                        GetModuleItem(theEnv,NULL,DeftemplateData(theEnv)->DeftemplateModuleIndex);
+                                        GetModuleItem(NULL,DeftemplateModuleIndex);
 
    AddConstructToModule(&newDeftemplate->header);
-   InstallDeftemplate(theEnv,newDeftemplate);
+   InstallDeftemplate(newDeftemplate);
 
    return(newDeftemplate);
   }
@@ -511,4 +450,4 @@ globle struct deftemplate *CreateImpliedDeftemplate(
 #endif
 
 #endif /* DEFTEMPLATE_CONSTRUCT */
-
+

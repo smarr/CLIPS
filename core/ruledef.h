@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.30  10/19/06            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*                 DEFRULE HEADER FILE                 */
    /*******************************************************/
@@ -15,23 +15,9 @@
 /*      Gary D. Riley                                        */
 /*                                                           */
 /* Contributing Programmer(s):                               */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Revision History:                                         */
-/*                                                           */
-/*      6.24: Removed DYNAMIC_SALIENCE and                   */
-/*            LOGICAL_DEPENDENCIES compilation flags.        */
-/*                                                           */
-/*            Renamed BOOLEAN macro type to intBool.         */
-/*                                                           */
-/*      6.30: Added support for hashed alpha memories.       */
-/*                                                           */
-/*            Added additional developer statistics to help  */
-/*            analyze join network performance.              */
-/*                                                           */
-/*            Added salience groups to improve performance   */
-/*            with large numbers of activations of different */
-/*            saliences.                                     */
 /*                                                           */
 /*************************************************************/
 
@@ -43,9 +29,6 @@
 struct defrule;
 struct defruleModule;
 
-#ifndef _H_conscomp
-#include "conscomp.h"
-#endif
 #ifndef _H_symbol
 #include "symbol.h"
 #endif
@@ -74,6 +57,7 @@ struct defruleModule;
 #include "network.h"
 #endif
 
+
 struct defrule
   {
    struct constructHeader header;
@@ -85,9 +69,13 @@ struct defrule
    unsigned int watchFiring     :  1;
    unsigned int autoFocus       :  1;
    unsigned int executing       :  1;
+#if DYNAMIC_SALIENCE
    struct expr *dynamicSalience;
+#endif
    struct expr *actions;
+#if LOGICAL_DEPENDENCIES
    struct joinNode *logicalJoin;
+#endif
    struct joinNode *lastJoin;
    struct defrule *disjunct;
   };
@@ -95,43 +83,12 @@ struct defrule
 struct defruleModule
   {
    struct defmoduleItemHeader header;
-   struct salienceGroup *groupings;
    struct activation *agenda;
   };
 
-#ifndef ALPHA_MEMORY_HASH_SIZE
-#define ALPHA_MEMORY_HASH_SIZE       63559L
-#endif
-
-#define DEFRULE_DATA 16
-
-struct defruleData
-  { 
-   struct construct *DefruleConstruct;
-   int DefruleModuleIndex;
-   long long CurrentEntityTimeTag;
-   struct alphaMemoryHash **AlphaMemoryTable;
-   intBool BetaMemoryResizingFlag;
-   struct joinLink *RightPrimeJoins;
-   struct joinLink *LeftPrimeJoins;
-
-#if DEBUGGING_FUNCTIONS
-    unsigned WatchRules;
-    int DeletedRuleDebugFlags;
-#endif
-#if DEVELOPER && (! RUN_TIME) && (! BLOAD_ONLY)
-    unsigned WatchRuleAnalysis;
-#endif
-#if CONSTRUCT_COMPILER && (! RUN_TIME)
-   struct CodeGeneratorItem *DefruleCodeItem;
-#endif
-  };
-
-#define EnvGetDefruleName(theEnv,x) GetConstructNameString((struct constructHeader *) x)
-#define EnvGetDefrulePPForm(theEnv,x) GetConstructPPForm(theEnv,(struct constructHeader *) x)
-#define EnvDefruleModule(theEnv,x) GetConstructModuleName((struct constructHeader *) x)
-
-#define DefruleData(theEnv) ((struct defruleData *) GetEnvironmentData(theEnv,DEFRULE_DATA))
+#define GetDefruleName(x) GetConstructNameString((struct constructHeader *) x)
+#define GetDefrulePPForm(x) GetConstructPPForm((struct constructHeader *) x)
+#define DefruleModule(x) GetConstructModuleName((struct constructHeader *) x)
 
 #define GetPreviousJoin(theJoin) \
    (((theJoin)->joinFromTheRight) ? \
@@ -152,25 +109,19 @@ struct defruleData
 #define LOCALE extern
 #endif
 
-#define DefruleModule(x) GetConstructModuleName((struct constructHeader *) x)
-#define FindDefrule(a) EnvFindDefrule(GetCurrentEnvironment(),a)
-#define GetDefruleName(x) GetConstructNameString((struct constructHeader *) x)
-#define GetDefrulePPForm(x) GetConstructPPForm(GetCurrentEnvironment(),(struct constructHeader *) x)
-#define GetNextDefrule(a) EnvGetNextDefrule(GetCurrentEnvironment(),a)
-#define IsDefruleDeletable(a) EnvIsDefruleDeletable(GetCurrentEnvironment(),a)
+   LOCALE void                           InitializeDefrules(void);
+   LOCALE void                          *FindDefrule(char *);
+   LOCALE void                          *GetNextDefrule(void *);
+   LOCALE struct defruleModule          *GetDefruleModuleItem(struct defmodule *);
+   LOCALE BOOLEAN                        IsDefruleDeletable(void *);
 
-   LOCALE void                           InitializeDefrules(void *);
-   LOCALE void                          *EnvFindDefrule(void *,char *);
-   LOCALE void                          *EnvGetNextDefrule(void *,void *);
-   LOCALE struct defruleModule          *GetDefruleModuleItem(void *,struct defmodule *);
-   LOCALE intBool                        EnvIsDefruleDeletable(void *,void *);
-#if RUN_TIME
-   LOCALE void                           DefruleRunTimeInitialize(void *,struct joinLink *,struct joinLink *);
-#endif
-#if RUN_TIME || BLOAD_ONLY || BLOAD || BLOAD_AND_BSAVE
-   LOCALE void                           AddBetaMemoriesToJoin(void *,struct joinNode *);
+#ifndef _RULEDEF_SOURCE_
+   extern Thread struct construct              *DefruleConstruct;
+   extern Thread int                            DefruleModuleIndex;
+   extern Thread long                           CurrentEntityTimeTag;
 #endif
 
 #endif
 
 
+

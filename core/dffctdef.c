@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.24  06/02/06            */
+   /*             CLIPS Version 6.10  04/13/98            */
    /*                                                     */
    /*              DEFFACTS DEFINITION MODULE             */
    /*******************************************************/
@@ -15,15 +15,13 @@
 /*      Gary D. Riley                                        */
 /*                                                           */
 /* Contributing Programmer(s):                               */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Revision History:                                         */
 /*                                                           */
-/*      6.24: Renamed BOOLEAN macro type to intBool.         */
-/*                                                           */
-/*            Corrected code to remove run-time program      */
-/*            compiler warning.                              */
-/*                                                           */
+/* Who               |     Date    | Description             */
+/* ------------------+-------------+------------------------ */
+/* M.Giordano        | 23-Mar-2000 | Mods made for TLS       */
 /*************************************************************/
 
 #define _DFFCTDEF_SOURCE_
@@ -38,7 +36,6 @@
 #include "memalloc.h"
 #include "dffctpsr.h"
 #include "dffctbsc.h"
-#include "envrnmnt.h"
 
 #if BLOAD || BLOAD_ONLY || BLOAD_AND_BSAVE
 #include "bload.h"
@@ -51,147 +48,74 @@
 
 #include "dffctdef.h"
 
+/****************************************/
+/* GLOBAL INTERNAL VARIABLE DEFINITIONS */
+/****************************************/
+
+   Thread globle struct construct       *DeffactsConstruct;
+   Thread globle int                     DeffactsModuleIndex;
+
 /***************************************/
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static void                   *AllocateModule(void *);
-   static void                    ReturnModule(void *,void *);
-   static void                    ReturnDeffacts(void *,void *);
-   static void                    InitializeDeffactsModules(void *);
-   static void                    DeallocateDeffactsData(void *);
-#if ! RUN_TIME
-   static void                    DestroyDeffactsAction(void *,struct constructHeader *,void *);
-#endif
+   static void                   *AllocateModule(void);
+   static void                    ReturnModule(void *);
+   static void                    ReturnDeffacts(void *);
+   static void                    InitializeDeffactsModules(void);
 
 /***********************************************************/
 /* InitializeDeffacts: Initializes the deffacts construct. */
 /***********************************************************/
-globle void InitializeDeffacts(  
-  void *theEnv)
+globle void InitializeDeffacts()
   {
-   AllocateEnvironmentData(theEnv,DEFFACTS_DATA,sizeof(struct deffactsData),DeallocateDeffactsData);
-  
-   InitializeDeffactsModules(theEnv);
+   InitializeDeffactsModules();
 
-   DeffactsBasicCommands(theEnv);
+   DeffactsBasicCommands();
 
-   DeffactsData(theEnv)->DeffactsConstruct =
-      AddConstruct(theEnv,"deffacts","deffacts",ParseDeffacts,EnvFindDeffacts,
+   DeffactsConstruct =
+      AddConstruct("deffacts","deffacts",ParseDeffacts,FindDeffacts,
                    GetConstructNamePointer,GetConstructPPForm,
-                   GetConstructModuleItem,EnvGetNextDeffacts,SetNextConstruct,
-                   EnvIsDeffactsDeletable,EnvUndeffacts,ReturnDeffacts);
+                   GetConstructModuleItem,GetNextDeffacts,SetNextConstruct,
+                   IsDeffactsDeletable,Undeffacts,ReturnDeffacts);
   }
-  
-/***************************************************/
-/* DeallocateDeffactsData: Deallocates environment */
-/*    data for the deffacts construct.             */
-/***************************************************/
-static void DeallocateDeffactsData(
-  void *theEnv)
-  {
-#if ! RUN_TIME
-   struct deffactsModule *theModuleItem;
-   void *theModule;
-
-#if BLOAD || BLOAD_AND_BSAVE
-   if (Bloaded(theEnv)) return;
-#endif
-
-   DoForAllConstructs(theEnv,DestroyDeffactsAction,DeffactsData(theEnv)->DeffactsModuleIndex,FALSE,NULL); 
-
-   for (theModule = EnvGetNextDefmodule(theEnv,NULL);
-        theModule != NULL;
-        theModule = EnvGetNextDefmodule(theEnv,theModule))
-     {
-      theModuleItem = (struct deffactsModule *)
-                      GetModuleItem(theEnv,(struct defmodule *) theModule,
-                                    DeffactsData(theEnv)->DeffactsModuleIndex);
-      rtn_struct(theEnv,deffactsModule,theModuleItem);
-     }
-#else
-#if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
-#endif
-#endif
-  }
-  
-#if ! RUN_TIME
-/*********************************************************/
-/* DestroyDeffactsAction: Action used to remove deffacts */
-/*   as a result of DestroyEnvironment.                  */
-/*********************************************************/
-#if WIN_BTC
-#pragma argsused
-#endif
-static void DestroyDeffactsAction(
-  void *theEnv,
-  struct constructHeader *theConstruct,
-  void *buffer)
-  {
-#if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(buffer)
-#endif
-#if (! BLOAD_ONLY) && (! RUN_TIME)
-   struct deffacts *theDeffacts = (struct deffacts *) theConstruct;
-   
-   if (theDeffacts == NULL) return;
-
-   ReturnPackedExpression(theEnv,theDeffacts->assertList);
-   
-   DestroyConstructHeader(theEnv,&theDeffacts->header);
-
-   rtn_struct(theEnv,deffacts,theDeffacts);
-#else
-#if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv,theConstruct)
-#endif
-#endif
-  }
-#endif
 
 /*******************************************************/
 /* InitializeDeffactsModules: Initializes the deffacts */
 /*   construct for use with the defmodule construct.   */
 /*******************************************************/
-static void InitializeDeffactsModules(  
-  void *theEnv)
+static void InitializeDeffactsModules()
   {
-   DeffactsData(theEnv)->DeffactsModuleIndex = 
-      RegisterModuleItem(theEnv,"deffacts",
-                         AllocateModule,
-                         ReturnModule,
+   DeffactsModuleIndex = RegisterModuleItem("deffacts",
+                                    AllocateModule,
+                                    ReturnModule,
 #if BLOAD_AND_BSAVE || BLOAD || BLOAD_ONLY
-                         BloadDeffactsModuleReference,
+                                    BloadDeffactsModuleReference,
 #else
-                         NULL,
+                                    NULL,
 #endif
 #if CONSTRUCT_COMPILER && (! RUN_TIME)
-                         DeffactsCModuleReference,
+                                    DeffactsCModuleReference,
 #else
-                         NULL,
+                                    NULL,
 #endif
-                         EnvFindDeffacts);
+                                    FindDeffacts);
   }
 
 /************************************************/
 /* AllocateModule: Allocates a deffacts module. */
 /************************************************/
-static void *AllocateModule(
-  void *theEnv)
-  {
-   return((void *) get_struct(theEnv,deffactsModule)); 
-  }
+static void *AllocateModule()
+  { return((void *) get_struct(deffactsModule)); }
 
-/************************************************/
+/**********************************************/
 /* ReturnModule: Deallocates a deffacts module. */
-/************************************************/
+/**********************************************/
 static void ReturnModule(
-  void *theEnv,
   void *theItem)
   {
-   FreeConstructHeaderModule(theEnv,(struct defmoduleItemHeader *) theItem,DeffactsData(theEnv)->DeffactsConstruct);
-   rtn_struct(theEnv,deffactsModule,theItem);
+   FreeConstructHeaderModule((struct defmoduleItemHeader *) theItem,DeffactsConstruct);
+   rtn_struct(deffactsModule,theItem);
   }
 
 /*************************************************************/
@@ -199,57 +123,48 @@ static void ReturnModule(
 /*  item for the specified deffacts or defmodule.            */
 /*************************************************************/
 globle struct deffactsModule *GetDeffactsModuleItem(
-  void *theEnv,
   struct defmodule *theModule)
-  { 
-   return((struct deffactsModule *) GetConstructModuleItemByIndex(theEnv,theModule,DeffactsData(theEnv)->DeffactsModuleIndex)); 
-  }
+  { return((struct deffactsModule *) GetConstructModuleItemByIndex(theModule,DeffactsModuleIndex)); }
 
-/**************************************************/
-/* EnvFindDeffacts: Searches for a deffact in the */
-/*   list of deffacts. Returns a pointer to the   */
-/*   deffact if found, otherwise NULL.            */
-/**************************************************/
-globle void *EnvFindDeffacts(
-  void *theEnv,
+/*****************************************************************/
+/* FindDeffacts: Searches for a deffact in the list of deffacts. */
+/*   Returns a pointer to the deffact if found, otherwise NULL.  */
+/*****************************************************************/
+globle void *FindDeffacts(
   char *deffactsName)
-  { 
-   return(FindNamedConstruct(theEnv,deffactsName,DeffactsData(theEnv)->DeffactsConstruct)); 
-  }
+  { return(FindNamedConstruct(deffactsName,DeffactsConstruct)); }
 
-/*********************************************************/
-/* EnvGetNextDeffacts: If passed a NULL pointer, returns */
-/*   the first deffacts in the ListOfDeffacts. Otherwise */
-/*   returns the next deffacts following the deffacts    */
-/*   passed as an argument.                              */
-/*********************************************************/
-globle void *EnvGetNextDeffacts(
-  void *theEnv,
+/****************************************************************/
+/* GetNextDeffacts: If passed a NULL pointer, returns the first */
+/*   deffacts in the ListOfDeffacts. Otherwise returns the next */
+/*   deffacts following the deffacts passed as an argument.     */
+/****************************************************************/
+globle void *GetNextDeffacts(
   void *deffactsPtr)
-  {
-   return((void *) GetNextConstructItem(theEnv,(struct constructHeader *) deffactsPtr,DeffactsData(theEnv)->DeffactsModuleIndex)); 
-  }
+  { return((void *) GetNextConstructItem((struct constructHeader *) deffactsPtr,DeffactsModuleIndex)); }
 
-/********************************************************/
-/* EnvIsDeffactsDeletable: Returns TRUE if a particular */
-/*   deffacts can be deleted, otherwise returns FALSE.  */
-/********************************************************/
-#if WIN_BTC
+/*******************************************************/
+/* IsDeffactsDeletable: Returns TRUE if a particular   */
+/*   deffacts can be deleted, otherwise returns FALSE. */
+/*******************************************************/
+#if IBM_TBC
 #pragma argsused
 #endif
-globle intBool EnvIsDeffactsDeletable(
-  void *theEnv,
+globle BOOLEAN IsDeffactsDeletable(
   void *ptr)
   {
-#if MAC_MCW || WIN_MCW || MAC_XCD
+#if MAC_MPW || MAC_MCW || IBM_MCW
 #pragma unused(ptr)
 #endif
-   if (! ConstructsDeletable(theEnv))
-     { return FALSE; }
-
-   if (ConstructData(theEnv)->ResetInProgress) return(FALSE);
-
+#if BLOAD_ONLY || RUN_TIME
+   return(FALSE);
+#else
+#if BLOAD || BLOAD_AND_BSAVE
+   if (Bloaded()) return(FALSE);
+#endif
+   if (ResetInProgress) return(FALSE);
    return(TRUE);
+#endif
   }
 
 /***********************************************************/
@@ -257,11 +172,10 @@ globle intBool EnvIsDeffactsDeletable(
 /*   with a deffacts construct to the pool of free memory. */
 /***********************************************************/
 static void ReturnDeffacts(
-  void *theEnv,
   void *vTheDeffacts)
   {
-#if (MAC_MCW || WIN_MCW) && (RUN_TIME || BLOAD_ONLY)
-#pragma unused(theEnv,vTheDeffacts)
+#if (MAC_MPW || MAC_MCW) && (RUN_TIME || BLOAD_ONLY)
+#pragma unused(vTheDeffacts)
 #endif
 
 #if (! BLOAD_ONLY) && (! RUN_TIME)
@@ -269,15 +183,16 @@ static void ReturnDeffacts(
 
    if (theDeffacts == NULL) return;
 
-   ExpressionDeinstall(theEnv,theDeffacts->assertList);
-   ReturnPackedExpression(theEnv,theDeffacts->assertList);
+   ExpressionDeinstall(theDeffacts->assertList);
+   ReturnPackedExpression(theDeffacts->assertList);
 
-   DeinstallConstructHeader(theEnv,&theDeffacts->header);
+   DeinstallConstructHeader(&theDeffacts->header);
 
-   rtn_struct(theEnv,deffacts,theDeffacts);
+   rtn_struct(deffacts,theDeffacts);
 #endif
   }
-  
+
 #endif /* DEFFACTS_CONSTRUCT */
 
 
+

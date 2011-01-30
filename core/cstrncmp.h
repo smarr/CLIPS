@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.20  01/31/02            */
+   /*             CLIPS Version 6.10  04/13/98            */
    /*                                                     */
    /*          CONSTRAINT CONSTRUCTS-TO-C HEADER          */
    /*******************************************************/
@@ -44,9 +44,13 @@
 #include <stdio.h>
 #endif
 
-   LOCALE void                           PrintConstraintReference(void *,FILE *,CONSTRAINT_RECORD *,int,int);
+   LOCALE void                           PrintConstraintReference(FILE *,CONSTRAINT_RECORD *,int,int);
    LOCALE void                           ConstraintRecordToCode(FILE *,CONSTRAINT_RECORD *);
-   LOCALE int                            ConstraintsToCode(void *,char *,char *,char *,int,FILE *,int,int);
+   LOCALE int                            ConstraintsToCode(char *,int,FILE *,int,int);
 
 #endif
 
+
+
+
+

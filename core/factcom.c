@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.24  06/05/06            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*                FACT COMMANDS MODULE                 */
    /*******************************************************/
@@ -15,16 +15,13 @@
 /*      Gary D. Riley                                        */
 /*                                                           */
 /* Contributing Programmer(s):                               */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Revision History:                                         */
-/*      6.23: Correction for FalseSymbol/TrueSymbol. DR0859  */
 /*                                                           */
-/*      6.24: Added environment parameter to GenClose.       */
-/*            Added environment parameter to GenOpen.        */
-/*                                                           */
-/*            Renamed BOOLEAN macro type to intBool.         */
-/*                                                           */
+/* Who               |     Date    | Description             */
+/* ------------------+-------------+------------------------ */
+/* M.Giordano        | 23-Mar-2000 | Mods made for TLS       */
 /*************************************************************/
 
 #include <stdio.h>
@@ -38,7 +35,6 @@
 #define _FACTCOM_SOURCE_
 
 #include "memalloc.h"
-#include "envrnmnt.h"
 #include "exprnpsr.h"
 #include "factmngr.h"
 #include "argacces.h"
@@ -56,7 +52,6 @@
 #include "strngrtr.h"
 #include "tmpltdef.h"
 #include "tmpltfun.h"
-#include "sysdep.h"
 
 #if BLOAD_AND_BSAVE || BLOAD || BLOAD_ONLY
 #include "bload.h"
@@ -72,46 +67,43 @@
 /***************************************/
 
 #if (! RUN_TIME)
-   static struct expr            *AssertParse(void *,struct expr *,char *);
+   static struct expr            *AssertParse(struct expr *,char *);
 #endif
 #if DEBUGGING_FUNCTIONS
-   static long long               GetFactsArgument(void *,int,int);
+   static long int                GetFactsArgument(int,int);
 #endif
-   static struct expr            *StandardLoadFact(void *,char *,struct token *);
-   static DATA_OBJECT_PTR         GetSaveFactsDeftemplateNames(void *,struct expr *,int,int *,int *);
+   static struct expr            *StandardLoadFact(char *,struct token *);
+   static DATA_OBJECT_PTR         GetSaveFactsDeftemplateNames(struct expr *,int,int *,int *);
 
 /***************************************/
 /* FactCommandDefinitions: Initializes */
 /*   fact commands and functions.      */
 /***************************************/
-globle void FactCommandDefinitions(
-  void *theEnv)
+globle void FactCommandDefinitions()
   {
 #if ! RUN_TIME
 #if DEBUGGING_FUNCTIONS
-   EnvDefineFunction2(theEnv,"facts", 'v', PTIEF FactsCommand,        "FactsCommand", "*4iu");
+   DefineFunction2("facts", 'v', PTIF FactsCommand,        "FactsCommand", "*4iu");
 #endif
 
-   EnvDefineFunction(theEnv,"assert", 'u', PTIEF AssertCommand,  "AssertCommand");
-   EnvDefineFunction2(theEnv,"retract", 'v', PTIEF RetractCommand, "RetractCommand","1*z");
-   EnvDefineFunction2(theEnv,"assert-string", 'u', PTIEF AssertStringFunction,   "AssertStringFunction", "11s");
-   EnvDefineFunction2(theEnv,"str-assert", 'u', PTIEF AssertStringFunction,   "AssertStringFunction", "11s");
+   DefineFunction("assert", 'u', PTIF AssertCommand,  "AssertCommand");
+   DefineFunction2("retract", 'v', PTIF RetractCommand, "RetractCommand","1*z");
+   DefineFunction2("assert-string", 'u', PTIF AssertStringFunction,   "AssertStringFunction", "11s");
+   DefineFunction2("str-assert", 'u', PTIF AssertStringFunction,   "AssertStringFunction", "11s");
 
-   EnvDefineFunction2(theEnv,"get-fact-duplication",'b',
+   DefineFunction2("get-fact-duplication",'b',
                    GetFactDuplicationCommand,"GetFactDuplicationCommand", "00");
-   EnvDefineFunction2(theEnv,"set-fact-duplication",'b',
+   DefineFunction2("set-fact-duplication",'b',
                    SetFactDuplicationCommand,"SetFactDuplicationCommand", "11");
 
-   EnvDefineFunction2(theEnv,"save-facts", 'b', PTIEF SaveFactsCommand, "SaveFactsCommand", "1*wk");
-   EnvDefineFunction2(theEnv,"load-facts", 'b', PTIEF LoadFactsCommand, "LoadFactsCommand", "11k");
-   EnvDefineFunction2(theEnv,"fact-index", 'g', PTIEF FactIndexFunction,"FactIndexFunction", "11y");
-
-   AddFunctionParser(theEnv,"assert",AssertParse);
-   FuncSeqOvlFlags(theEnv,"assert",FALSE,FALSE);
-#else
-#if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+   DefineFunction2("save-facts", 'b', PTIF SaveFactsCommand, "SaveFactsCommand", "1*wk");
+   DefineFunction2("load-facts", 'b', PTIF LoadFactsCommand, "LoadFactsCommand", "11k");
+   DefineFunction2("fact-index", 'l', PTIF FactIndexFunction,"FactIndexFunction", "11y");
 #endif
+
+#if (! RUN_TIME)
+   AddFunctionParser("assert",AssertParse);
+   FuncSeqOvlFlags("assert",FALSE,FALSE);
 #endif
   }
 
@@ -120,7 +112,6 @@ globle void FactCommandDefinitions(
 /*   for the assert function.          */
 /***************************************/
 globle void AssertCommand(
-  void *theEnv,
   DATA_OBJECT_PTR rv)
   {
    struct deftemplate *theDeftemplate;
@@ -132,13 +123,13 @@ globle void AssertCommand(
    int error = FALSE;
    int i;
    struct fact *theFact;
-   
+
    /*===================================================*/
    /* Set the default return value to the symbol FALSE. */
    /*===================================================*/
 
    SetpType(rv,SYMBOL);
-   SetpValue(rv,EnvFalseSymbol(theEnv));
+   SetpValue(rv,FalseSymbol);
 
    /*================================*/
    /* Get the deftemplate associated */
@@ -155,16 +146,16 @@ globle void AssertCommand(
 
    if (theDeftemplate->implied == FALSE)
      {
-      newFact = CreateFactBySize(theEnv,theDeftemplate->numberOfSlots);
+      newFact = CreateFactBySize((int) theDeftemplate->numberOfSlots);
       slotPtr = theDeftemplate->slotList;
      }
    else
      {
-      newFact = CreateFactBySize(theEnv,1);
+      newFact = CreateFactBySize(1);
       if (theExpression->nextArg == NULL)
         {
          newFact->theProposition.theFields[0].type = MULTIFIELD;
-         newFact->theProposition.theFields[0].value = CreateMultifield2(theEnv,0L);
+         newFact->theProposition.theFields[0].value = CreateMultifield2(0L);
         }
       slotPtr = NULL;
      }
@@ -187,7 +178,7 @@ globle void AssertCommand(
       /* Evaluate the expression to be stored in the slot. */
       /*===================================================*/
 
-      EvaluateExpression(theEnv,theExpression,&theValue);
+      EvaluateExpression(theExpression,&theValue);
 
       /*============================================================*/
       /* A multifield value can't be stored in a single field slot. */
@@ -197,9 +188,9 @@ globle void AssertCommand(
           (slotPtr->multislot == FALSE) && (theValue.type == MULTIFIELD) :
           FALSE)
         {
-         MultiIntoSingleFieldSlotError(theEnv,slotPtr,theDeftemplate);
+         MultiIntoSingleFieldSlotError(slotPtr,theDeftemplate);
          theValue.type = SYMBOL;
-         theValue.value = EnvFalseSymbol(theEnv);
+         theValue.value = FalseSymbol;
          error = TRUE;
         }
 
@@ -207,7 +198,7 @@ globle void AssertCommand(
       /* Store the value in the slot. */
       /*==============================*/
 
-      theField[i].type = theValue.type;
+      theField[i].type = (short) theValue.type;
       theField[i].value = theValue.value;
 
       /*========================================*/
@@ -224,7 +215,7 @@ globle void AssertCommand(
 
    if (error)
      {
-      ReturnFact(theEnv,newFact);
+      ReturnFact(newFact);
       return;
      }
 
@@ -232,7 +223,7 @@ globle void AssertCommand(
    /* Add the fact to the fact-list. */
    /*================================*/
 
-   theFact = (struct fact *) EnvAssert(theEnv,(void *) newFact);
+   theFact = (struct fact *) Assert((void *) newFact);
 
    /*========================================*/
    /* The asserted fact is the return value. */
@@ -251,10 +242,9 @@ globle void AssertCommand(
 /* RetractCommand: H/L access routine   */
 /*   for the retract command.           */
 /****************************************/
-globle void RetractCommand(
-  void *theEnv)
+globle void RetractCommand()
   {
-   long long factIndex;
+   long int factIndex;
    struct fact *ptr;
    struct expr *theArgument;
    DATA_OBJECT theResult;
@@ -272,7 +262,7 @@ globle void RetractCommand(
       /* Evaluate the argument. */
       /*========================*/
 
-      EvaluateExpression(theEnv,theArgument,&theResult);
+      EvaluateExpression(theArgument,&theResult);
 
       /*===============================================*/
       /* If the argument evaluates to an integer, then */
@@ -289,7 +279,7 @@ globle void RetractCommand(
          factIndex = ValueToLong(theResult.value);
          if (factIndex < 0)
            {
-            ExpectedTypeError1(theEnv,"retract",argNumber,"fact-address, fact-index, or the symbol *");
+            ExpectedTypeError1("retract",argNumber,"fact-address, fact-index, or the symbol *");
             return;
            }
 
@@ -297,7 +287,7 @@ globle void RetractCommand(
          /* See if a fact with the specified index exists. */
          /*================================================*/
 
-         ptr = FindIndexedFact(theEnv,factIndex);
+         ptr = FindIndexedFact(factIndex);
 
          /*=====================================*/
          /* If the fact exists then retract it, */
@@ -305,12 +295,12 @@ globle void RetractCommand(
          /*=====================================*/
 
          if (ptr != NULL)
-           { EnvRetract(theEnv,(void *) ptr); }
+           { Retract((void *) ptr); }
          else
            {
             char tempBuffer[20];
-            gensprintf(tempBuffer,"f-%lld",factIndex);
-            CantFindItemErrorMessage(theEnv,"fact",tempBuffer);
+            sprintf(tempBuffer,"f-%ld",factIndex);
+            CantFindItemErrorMessage("fact",tempBuffer);
            }
         }
 
@@ -320,7 +310,7 @@ globle void RetractCommand(
       /*===============================================*/
 
       else if (theResult.type == FACT_ADDRESS)
-        { EnvRetract(theEnv,theResult.value); }
+        { Retract(theResult.value); }
 
       /*============================================*/
       /* Otherwise if the argument evaluates to the */
@@ -330,7 +320,7 @@ globle void RetractCommand(
       else if ((theResult.type == SYMBOL) ?
                (strcmp(ValueToString(theResult.value),"*") == 0) : FALSE)
         {
-         RemoveAllFacts(theEnv);
+         RemoveAllFacts();
          return;
         }
 
@@ -341,8 +331,8 @@ globle void RetractCommand(
 
       else
         {
-         ExpectedTypeError1(theEnv,"retract",argNumber,"fact-address, fact-index, or the symbol *");
-         SetEvaluationError(theEnv,TRUE);
+         ExpectedTypeError1("retract",argNumber,"fact-address, fact-index, or the symbol *");
+         SetEvaluationError(TRUE);
         }
      }
   }
@@ -351,8 +341,7 @@ globle void RetractCommand(
 /* SetFactDuplicationCommand: H/L access routine   */
 /*   for the set-fact-duplication command.         */
 /***************************************************/
-globle int SetFactDuplicationCommand(
-  void *theEnv)
+globle int SetFactDuplicationCommand()
   {
    int oldValue;
    DATA_OBJECT theValue;
@@ -361,30 +350,30 @@ globle int SetFactDuplicationCommand(
    /* Get the old value of the fact duplication behavior. */
    /*=====================================================*/
 
-   oldValue = EnvGetFactDuplication(theEnv);
+   oldValue = GetFactDuplication();
 
    /*============================================*/
    /* Check for the correct number of arguments. */
    /*============================================*/
 
-   if (EnvArgCountCheck(theEnv,"set-fact-duplication",EXACTLY,1) == -1)
+   if (ArgCountCheck("set-fact-duplication",EXACTLY,1) == -1)
      { return(oldValue); }
 
    /*========================*/
    /* Evaluate the argument. */
    /*========================*/
 
-   EnvRtnUnknown(theEnv,1,&theValue);
+   RtnUnknown(1,&theValue);
 
    /*===============================================================*/
    /* If the argument evaluated to FALSE, then the fact duplication */
    /* behavior is disabled, otherwise it is enabled.                */
    /*===============================================================*/
 
-   if ((theValue.value == EnvFalseSymbol(theEnv)) && (theValue.type == SYMBOL))
-     { EnvSetFactDuplication(theEnv,FALSE); }
+   if ((theValue.value == FalseSymbol) && (theValue.type == SYMBOL))
+     { SetFactDuplication(FALSE); }
    else
-     { EnvSetFactDuplication(theEnv,TRUE); }
+     { SetFactDuplication(TRUE); }
 
    /*========================================================*/
    /* Return the old value of the fact duplication behavior. */
@@ -397,8 +386,7 @@ globle int SetFactDuplicationCommand(
 /* GetFactDuplicationCommand: H/L access routine   */
 /*   for the get-fact-duplication command.         */
 /***************************************************/
-globle int GetFactDuplicationCommand(
-  void *theEnv)
+globle int GetFactDuplicationCommand()
   {
    int currentValue;
 
@@ -406,13 +394,13 @@ globle int GetFactDuplicationCommand(
    /* Get the current value of the fact duplication behavior. */
    /*=========================================================*/
 
-   currentValue = EnvGetFactDuplication(theEnv);
+   currentValue = GetFactDuplication();
 
    /*============================================*/
    /* Check for the correct number of arguments. */
    /*============================================*/
 
-   if (EnvArgCountCheck(theEnv,"get-fact-duplication",EXACTLY,0) == -1)
+   if (ArgCountCheck("get-fact-duplication",EXACTLY,0) == -1)
      { return(currentValue); }
 
    /*============================================================*/
@@ -426,8 +414,7 @@ globle int GetFactDuplicationCommand(
 /* FactIndexFunction: H/L access routine   */
 /*   for the fact-index function.          */
 /*******************************************/
-globle long long FactIndexFunction(
-  void *theEnv)
+globle long int FactIndexFunction()
   {
    DATA_OBJECT item;
 
@@ -435,13 +422,13 @@ globle long long FactIndexFunction(
    /* Check for the correct number of arguments. */
    /*============================================*/
 
-   if (EnvArgCountCheck(theEnv,"fact-index",EXACTLY,1) == -1) return(-1LL);
+   if (ArgCountCheck("fact-index",EXACTLY,1) == -1) return(-1L);
 
    /*========================*/
    /* Evaluate the argument. */
    /*========================*/
 
-   EnvRtnUnknown(theEnv,1,&item);
+   RtnUnknown(1,&item);
 
    /*======================================*/
    /* The argument must be a fact address. */
@@ -449,7 +436,7 @@ globle long long FactIndexFunction(
 
    if (GetType(item) != FACT_ADDRESS)
      {
-      ExpectedTypeError1(theEnv,"fact-index",1,"fact-address");
+      ExpectedTypeError1("fact-index",1,"fact-address");
       return(-1L);
      }
 
@@ -459,9 +446,9 @@ globle long long FactIndexFunction(
    /* return -1 for the fact index.                  */
    /*================================================*/
 
-   if (((struct fact *) GetValue(item))->garbage) return(-1LL);
+   if (((struct fact *) GetValue(item))->garbage) return(-1L);
 
-   return (EnvFactIndex(theEnv,GetValue(item)));
+   return (FactIndex(GetValue(item)));
   }
 
 #if DEBUGGING_FUNCTIONS
@@ -470,11 +457,10 @@ globle long long FactIndexFunction(
 /* FactsCommand: H/L access routine   */
 /*   for the facts command.           */
 /**************************************/
-globle void FactsCommand(
-  void *theEnv)
+globle void FactsCommand()
   {
    int argumentCount;
-   long long start = UNSPECIFIED, end = UNSPECIFIED, max = UNSPECIFIED;
+   long int start = UNSPECIFIED, end = UNSPECIFIED, max = UNSPECIFIED;
    struct defmodule *theModule;
    DATA_OBJECT theValue;
    int argOffset;
@@ -483,14 +469,14 @@ globle void FactsCommand(
    /* Determine the number of arguments to the facts command. */
    /*=========================================================*/
 
-   if ((argumentCount = EnvArgCountCheck(theEnv,"facts",NO_MORE_THAN,4)) == -1) return;
+   if ((argumentCount = ArgCountCheck("facts",NO_MORE_THAN,4)) == -1) return;
 
    /*==================================*/
    /* The default module for the facts */
    /* command is the current module.   */
    /*==================================*/
 
-   theModule = ((struct defmodule *) EnvGetCurrentModule(theEnv));
+   theModule = ((struct defmodule *) GetCurrentModule());
 
    /*==========================================*/
    /* If no arguments were specified, then use */
@@ -499,7 +485,7 @@ globle void FactsCommand(
 
    if (argumentCount == 0)
      {
-      EnvFacts(theEnv,WDISPLAY,theModule,start,end,max);
+      Facts(WDISPLAY,theModule,(long) start,(long) end,(long) max);
       return;
      }
 
@@ -508,7 +494,7 @@ globle void FactsCommand(
    /* or start index was specified as the first argument.    */
    /*========================================================*/
 
-   EnvRtnUnknown(theEnv,1,&theValue);
+   RtnUnknown(1,&theValue);
 
    /*===============================================*/
    /* If the first argument is a symbol, then check */
@@ -517,15 +503,15 @@ globle void FactsCommand(
 
    if (theValue.type == SYMBOL)
      {
-      theModule = (struct defmodule *) EnvFindDefmodule(theEnv,ValueToString(theValue.value));
+      theModule = (struct defmodule *) FindDefmodule(ValueToString(theValue.value));
       if ((theModule == NULL) && (strcmp(ValueToString(theValue.value),"*") != 0))
         {
-         SetEvaluationError(theEnv,TRUE);
-         CantFindItemErrorMessage(theEnv,"defmodule",ValueToString(theValue.value));
+         SetEvaluationError(TRUE);
+         CantFindItemErrorMessage("defmodule",ValueToString(theValue.value));
          return;
         }
 
-      if ((start = GetFactsArgument(theEnv,2,argumentCount)) == INVALID) return;
+      if ((start = GetFactsArgument(2,argumentCount)) == INVALID) return;
 
       argOffset = 1;
      }
@@ -540,9 +526,9 @@ globle void FactsCommand(
       start = DOToLong(theValue);
       if (start < 0)
         {
-         ExpectedTypeError1(theEnv,"facts",1,"symbol or positive number");
-         SetHaltExecution(theEnv,TRUE);
-         SetEvaluationError(theEnv,TRUE);
+         ExpectedTypeError1("facts",1,"symbol or positive number");
+         SetHaltExecution(TRUE);
+         SetEvaluationError(TRUE);
          return;
         }
       argOffset = 0;
@@ -554,9 +540,9 @@ globle void FactsCommand(
 
    else
      {
-      ExpectedTypeError1(theEnv,"facts",1,"symbol or positive number");
-      SetHaltExecution(theEnv,TRUE);
-      SetEvaluationError(theEnv,TRUE);
+      ExpectedTypeError1("facts",1,"symbol or positive number");
+      SetHaltExecution(TRUE);
+      SetEvaluationError(TRUE);
       return;
      }
 
@@ -564,26 +550,25 @@ globle void FactsCommand(
    /* Get the other arguments. */
    /*==========================*/
 
-   if ((end = GetFactsArgument(theEnv,2 + argOffset,argumentCount)) == INVALID) return;
-   if ((max = GetFactsArgument(theEnv,3 + argOffset,argumentCount)) == INVALID) return;
+   if ((end = GetFactsArgument(2 + argOffset,argumentCount)) == INVALID) return;
+   if ((max = GetFactsArgument(3 + argOffset,argumentCount)) == INVALID) return;
 
    /*=================*/
    /* List the facts. */
    /*=================*/
 
-   EnvFacts(theEnv,WDISPLAY,theModule,start,end,max);
+   Facts(WDISPLAY,theModule,(long) start,(long) end,(long) max);
   }
 
-/*****************************************************/
-/* EnvFacts: C access routine for the facts command. */
-/*****************************************************/
-globle void EnvFacts(
-  void *theEnv,
+/**************************************************/
+/* Facts: C access routine for the facts command. */
+/**************************************************/
+globle void Facts(
   char *logicalName,
   void *vTheModule,
-  long long start,
-  long long end,
-  long long max)
+  long start,
+  long end,
+  long max)
   {
    struct fact *factPtr;
    long count = 0;
@@ -594,7 +579,7 @@ globle void EnvFacts(
    /* Save the current module. */
    /*==========================*/
 
-   oldModule = ((struct defmodule *) EnvGetCurrentModule(theEnv));
+   oldModule = ((struct defmodule *) GetCurrentModule());
 
    /*=========================================================*/
    /* Determine if facts from all modules are to be displayed */
@@ -602,14 +587,14 @@ globle void EnvFacts(
    /*=========================================================*/
 
    if (theModule == NULL) allModules = TRUE;
-   else EnvSetCurrentModule(theEnv,(void *) theModule);
+   else SetCurrentModule((void *) theModule);
 
    /*=====================================*/
    /* Get the first fact to be displayed. */
    /*=====================================*/
 
-   if (allModules) factPtr = (struct fact *) EnvGetNextFact(theEnv,NULL);
-   else factPtr = (struct fact *) GetNextFactInScope(theEnv,NULL);
+   if (allModules) factPtr = (struct fact *) GetNextFact(NULL);
+   else factPtr = (struct fact *) GetNextFactInScope(NULL);
 
    /*===============================*/
    /* Display facts until there are */
@@ -623,9 +608,9 @@ globle void EnvFacts(
       /* flag has been set (normally by user action).     */
       /*==================================================*/
 
-      if (GetHaltExecution(theEnv) == TRUE)
+      if (GetHaltExecution() == TRUE)
         {
-         EnvSetCurrentModule(theEnv,(void *) oldModule);
+         SetCurrentModule((void *) oldModule);
          return;
         }
 
@@ -636,8 +621,8 @@ globle void EnvFacts(
 
       if ((factPtr->factIndex > end) && (end != UNSPECIFIED))
         {
-         PrintTally(theEnv,logicalName,count,"fact","facts");
-         EnvSetCurrentModule(theEnv,(void *) oldModule);
+         PrintTally(logicalName,count,"fact","facts");
+         SetCurrentModule((void *) oldModule);
          return;
         }
 
@@ -648,8 +633,8 @@ globle void EnvFacts(
 
       if (max == 0)
         {
-         PrintTally(theEnv,logicalName,count,"fact","facts");
-         EnvSetCurrentModule(theEnv,(void *) oldModule);
+         PrintTally(logicalName,count,"fact","facts");
+         SetCurrentModule((void *) oldModule);
          return;
         }
 
@@ -660,8 +645,8 @@ globle void EnvFacts(
 
       if (factPtr->factIndex >= start)
         {
-         PrintFactWithIdentifier(theEnv,logicalName,factPtr);
-         EnvPrintRouter(theEnv,logicalName,"\n");
+         PrintFactWithIdentifier(logicalName,factPtr);
+         PrintRouter(logicalName,"\n");
          count++;
          if (max > 0) max--;
         }
@@ -670,21 +655,21 @@ globle void EnvFacts(
       /* Proceed to the next fact to be listed. */
       /*========================================*/
 
-      if (allModules) factPtr = (struct fact *) EnvGetNextFact(theEnv,factPtr);
-      else factPtr = (struct fact *) GetNextFactInScope(theEnv,factPtr);
+      if (allModules) factPtr = (struct fact *) GetNextFact(factPtr);
+      else factPtr = (struct fact *) GetNextFactInScope(factPtr);
      }
 
    /*===================================================*/
    /* Print the total of the number of facts displayed. */
    /*===================================================*/
 
-   PrintTally(theEnv,logicalName,count,"fact","facts");
+   PrintTally(logicalName,count,"fact","facts");
 
    /*=============================*/
    /* Restore the current module. */
    /*=============================*/
 
-   EnvSetCurrentModule(theEnv,(void *) oldModule);
+   SetCurrentModule((void *) oldModule);
   }
 
 /****************************************************************/
@@ -693,25 +678,24 @@ globle void EnvFacts(
 /*  A return value of -2 indicates that the value specified is  */
 /*  invalid.                                                    */
 /****************************************************************/
-static long long GetFactsArgument(
-  void *theEnv,
+static long int GetFactsArgument(
   int whichOne,
   int argumentCount)
   {
-   long long factIndex;
+   long int factIndex;
    DATA_OBJECT theValue;
 
    if (whichOne > argumentCount) return(UNSPECIFIED);
 
-   if (EnvArgTypeCheck(theEnv,"facts",whichOne,INTEGER,&theValue) == FALSE) return(INVALID);
+   if (ArgTypeCheck("facts",whichOne,INTEGER,&theValue) == FALSE) return(INVALID);
 
    factIndex = DOToLong(theValue);
 
    if (factIndex < 0)
      {
-      ExpectedTypeError1(theEnv,"facts",whichOne,"positive number");
-      SetHaltExecution(theEnv,TRUE);
-      SetEvaluationError(theEnv,TRUE);
+      ExpectedTypeError1("facts",whichOne,"positive number");
+      SetHaltExecution(TRUE);
+      SetEvaluationError(TRUE);
       return(INVALID);
      }
 
@@ -725,7 +709,6 @@ static long long GetFactsArgument(
 /*   for the assert-string function.          */
 /**********************************************/
 globle void AssertStringFunction(
-  void *theEnv,
   DATA_OBJECT_PTR returnValue)
   {
    DATA_OBJECT argPtr;
@@ -736,15 +719,15 @@ globle void AssertStringFunction(
    /*===================================================*/
 
    SetpType(returnValue,SYMBOL);
-   SetpValue(returnValue,EnvFalseSymbol(theEnv));
+   SetpValue(returnValue,FalseSymbol);
 
    /*=====================================================*/
    /* Check for the correct number and type of arguments. */
    /*=====================================================*/
 
-   if (EnvArgCountCheck(theEnv,"assert-string",EXACTLY,1) == -1) return;
+   if (ArgCountCheck("assert-string",EXACTLY,1) == -1) return;
 
-   if (EnvArgTypeCheck(theEnv,"assert-string",1,STRING,&argPtr) == FALSE)
+   if (ArgTypeCheck("assert-string",1,STRING,&argPtr) == FALSE)
      { return; }
 
    /*==========================================*/
@@ -752,7 +735,7 @@ globle void AssertStringFunction(
    /* string to a fact and then assert it.     */
    /*==========================================*/
 
-   theFact = (struct fact *) EnvAssertString(theEnv,DOToString(argPtr));
+   theFact = (struct fact *) AssertString(DOToString(argPtr));
    if (theFact != NULL)
      {
       SetpType(returnValue,FACT_ADDRESS);
@@ -766,8 +749,7 @@ globle void AssertStringFunction(
 /* SaveFactsCommand: H/L access routine   */
 /*   for the save-facts command.          */
 /******************************************/
-globle int SaveFactsCommand(
-  void *theEnv)
+globle int SaveFactsCommand()
   {
    char *fileName;
    int numArgs, saveCode = LOCAL_SAVE;
@@ -779,13 +761,13 @@ globle int SaveFactsCommand(
    /* Check for the correct number of arguments. */
    /*============================================*/
 
-   if ((numArgs = EnvArgCountCheck(theEnv,"save-facts",AT_LEAST,1)) == -1) return(FALSE);
+   if ((numArgs = ArgCountCheck("save-facts",AT_LEAST,1)) == -1) return(FALSE);
 
    /*=================================================*/
    /* Get the file name to which facts will be saved. */
    /*=================================================*/
 
-   if ((fileName = GetFileName(theEnv,"save-facts",1)) == NULL) return(FALSE);
+   if ((fileName = GetFileName("save-facts",1)) == NULL) return(FALSE);
 
    /*=============================================================*/
    /* If specified, the second argument to save-facts indicates   */
@@ -795,7 +777,7 @@ globle int SaveFactsCommand(
 
    if (numArgs > 1)
      {
-      if (EnvArgTypeCheck(theEnv,"save-facts",2,SYMBOL,&theValue) == FALSE) return(FALSE);
+      if (ArgTypeCheck("save-facts",2,SYMBOL,&theValue) == FALSE) return(FALSE);
 
       argument = DOToString(theValue);
 
@@ -805,7 +787,7 @@ globle int SaveFactsCommand(
         { saveCode = VISIBLE_SAVE; }
       else
         {
-         ExpectedTypeError1(theEnv,"save-facts",2,"symbol with value local or visible");
+         ExpectedTypeError1("save-facts",2,"symbol with value local or visible");
          return(FALSE);
         }
      }
@@ -822,7 +804,7 @@ globle int SaveFactsCommand(
    /* Call the SaveFacts driver routine. */
    /*====================================*/
 
-   if (EnvSaveFacts(theEnv,fileName,saveCode,theList) == FALSE)
+   if (SaveFacts(fileName,saveCode,theList) == FALSE)
      { return(FALSE); }
 
    return(TRUE);
@@ -832,8 +814,7 @@ globle int SaveFactsCommand(
 /* LoadFactsCommand: H/L access routine   */
 /*   for the load-facts command.          */
 /******************************************/
-globle int LoadFactsCommand(
-  void *theEnv)
+globle int LoadFactsCommand()
   {
    char *fileName;
 
@@ -841,28 +822,27 @@ globle int LoadFactsCommand(
    /* Check for the correct number of arguments. */
    /*============================================*/
 
-   if (EnvArgCountCheck(theEnv,"load-facts",EXACTLY,1) == -1) return(FALSE);
+   if (ArgCountCheck("load-facts",EXACTLY,1) == -1) return(FALSE);
 
    /*====================================================*/
    /* Get the file name from which facts will be loaded. */
    /*====================================================*/
 
-   if ((fileName = GetFileName(theEnv,"load-facts",1)) == NULL) return(FALSE);
+   if ((fileName = GetFileName("load-facts",1)) == NULL) return(FALSE);
 
    /*====================================*/
    /* Call the LoadFacts driver routine. */
    /*====================================*/
 
-   if (EnvLoadFacts(theEnv,fileName) == FALSE) return(FALSE);
+   if (LoadFacts(fileName) == FALSE) return(FALSE);
 
    return(TRUE);
   }
 
-/**************************************************************/
-/* EnvSaveFacts: C access routine for the save-facts command. */
-/**************************************************************/
-globle intBool EnvSaveFacts(
-  void *theEnv,
+/***********************************************************/
+/* SaveFacts: C access routine for the save-facts command. */
+/***********************************************************/
+globle BOOLEAN SaveFacts(
   char *fileName,
   int saveCode,
   struct expr *theList)
@@ -878,39 +858,39 @@ globle intBool EnvSaveFacts(
    /* Open the file. Use either "fast save" or I/O Router. */
    /*======================================================*/
 
-   if ((filePtr = GenOpen(theEnv,fileName,"w")) == NULL)
+   if ((filePtr = fopen(fileName,"w")) == NULL)
      {
-      OpenErrorMessage(theEnv,"save-facts",fileName);
+      OpenErrorMessage("save-facts",fileName);
       return(FALSE);
      }
 
-   SetFastSave(theEnv,filePtr);
+   SetFastSave(filePtr);
 
    /*===========================================*/
    /* Set the print flags so that addresses and */
    /* strings are printed properly to the file. */
    /*===========================================*/
 
-   tempValue1 = PrintUtilityData(theEnv)->PreserveEscapedCharacters;
-   PrintUtilityData(theEnv)->PreserveEscapedCharacters = TRUE;
-   tempValue2 = PrintUtilityData(theEnv)->AddressesToStrings;
-   PrintUtilityData(theEnv)->AddressesToStrings = TRUE;
-   tempValue3 = PrintUtilityData(theEnv)->InstanceAddressesToNames;
-   PrintUtilityData(theEnv)->InstanceAddressesToNames = TRUE;
+   tempValue1 = PreserveEscapedCharacters;
+   PreserveEscapedCharacters = TRUE;
+   tempValue2 = AddressesToStrings;
+   AddressesToStrings = TRUE;
+   tempValue3 = InstanceAddressesToNames;
+   InstanceAddressesToNames = TRUE;
 
    /*===================================================*/
    /* Determine the list of specific facts to be saved. */
    /*===================================================*/
 
-   theDOArray = GetSaveFactsDeftemplateNames(theEnv,theList,saveCode,&count,&error);
+   theDOArray = GetSaveFactsDeftemplateNames(theList,saveCode,&count,&error);
 
    if (error)
      {
-      PrintUtilityData(theEnv)->PreserveEscapedCharacters = tempValue1;
-      PrintUtilityData(theEnv)->AddressesToStrings = tempValue2;
-      PrintUtilityData(theEnv)->InstanceAddressesToNames = tempValue3;
-      GenClose(theEnv,filePtr);
-      SetFastSave(theEnv,NULL);
+      PreserveEscapedCharacters = tempValue1;
+      AddressesToStrings = tempValue2;
+      InstanceAddressesToNames = tempValue3;
+      fclose(filePtr);
+      SetFastSave(NULL);
       return(FALSE);
      }
 
@@ -918,11 +898,11 @@ globle intBool EnvSaveFacts(
    /* Save the facts. */
    /*=================*/
 
-   theModule = ((struct defmodule *) EnvGetCurrentModule(theEnv));
+   theModule = ((struct defmodule *) GetCurrentModule());
 
-   for (theFact = (struct fact *) GetNextFactInScope(theEnv,NULL);
+   for (theFact = (struct fact *) GetNextFactInScope(NULL);
         theFact != NULL;
-        theFact = (struct fact *) GetNextFactInScope(theEnv,theFact))
+        theFact = (struct fact *) GetNextFactInScope(theFact))
      {
       /*===========================================================*/
       /* If we're doing a local save and the facts's corresponding */
@@ -969,8 +949,8 @@ globle intBool EnvSaveFacts(
 
       if (printFact)
         {
-         PrintFact(theEnv,(char *) filePtr,theFact,FALSE,FALSE);
-         EnvPrintRouter(theEnv,(char *) filePtr,"\n");
+         PrintFact((char *) filePtr,theFact);
+         PrintRouter((char *) filePtr,"\n");
         }
      }
 
@@ -978,22 +958,22 @@ globle intBool EnvSaveFacts(
    /* Restore the print flags. */
    /*==========================*/
 
-   PrintUtilityData(theEnv)->PreserveEscapedCharacters = tempValue1;
-   PrintUtilityData(theEnv)->AddressesToStrings = tempValue2;
-   PrintUtilityData(theEnv)->InstanceAddressesToNames = tempValue3;
+   PreserveEscapedCharacters = tempValue1;
+   AddressesToStrings = tempValue2;
+   InstanceAddressesToNames = tempValue3;
 
    /*=================*/
    /* Close the file. */
    /*=================*/
 
-   GenClose(theEnv,filePtr);
-   SetFastSave(theEnv,NULL);
+   fclose(filePtr);
+   SetFastSave(NULL);
 
    /*==================================*/
    /* Free the deftemplate name array. */
    /*==================================*/
 
-   if (theList != NULL) rm3(theEnv,theDOArray,(long) sizeof(DATA_OBJECT) * count);
+   if (theList != NULL) rm3(theDOArray,(long) sizeof(DATA_OBJECT) * count);
 
    /*===================================*/
    /* Return TRUE to indicate no errors */
@@ -1008,7 +988,6 @@ globle intBool EnvSaveFacts(
 /*   names for saving specific facts with the save-facts command.  */
 /*******************************************************************/
 static DATA_OBJECT_PTR GetSaveFactsDeftemplateNames(
-  void *theEnv,
   struct expr *theList,
   int saveCode,
   int *count,
@@ -1017,7 +996,7 @@ static DATA_OBJECT_PTR GetSaveFactsDeftemplateNames(
    struct expr *tempList;
    DATA_OBJECT_PTR theDOArray;
    int i, tempCount;
-   struct deftemplate *theDeftemplate = NULL;
+   struct deftemplate *theDeftemplate;
 
    /*=============================*/
    /* Initialize the error state. */
@@ -1050,7 +1029,7 @@ static DATA_OBJECT_PTR GetSaveFactsDeftemplateNames(
    /* Allocate the storage for the name list. */
    /*=========================================*/
 
-   theDOArray = (DATA_OBJECT_PTR) gm3(theEnv,(long) sizeof(DATA_OBJECT) * *count);
+   theDOArray = (DATA_OBJECT_PTR) gm3((long) sizeof(DATA_OBJECT) * *count);
 
    /*=====================================*/
    /* Loop through each of the arguments. */
@@ -1064,12 +1043,12 @@ static DATA_OBJECT_PTR GetSaveFactsDeftemplateNames(
       /* Evaluate the argument. */
       /*========================*/
 
-      EvaluateExpression(theEnv,tempList,&theDOArray[i]);
+      EvaluateExpression(tempList,&theDOArray[i]);
 
-      if (EvaluationData(theEnv)->EvaluationError)
+      if (EvaluationError)
         {
          *error = TRUE;
-         rm3(theEnv,theDOArray,(long) sizeof(DATA_OBJECT) * *count);
+         rm3(theDOArray,(long) sizeof(DATA_OBJECT) * *count);
          return(NULL);
         }
 
@@ -1080,8 +1059,8 @@ static DATA_OBJECT_PTR GetSaveFactsDeftemplateNames(
       if (theDOArray[i].type != SYMBOL)
         {
          *error = TRUE;
-         ExpectedTypeError1(theEnv,"save-facts",3+i,"symbol");
-         rm3(theEnv,theDOArray,(long) sizeof(DATA_OBJECT) * *count);
+         ExpectedTypeError1("save-facts",3+i,"symbol");
+         rm3(theDOArray,(long) sizeof(DATA_OBJECT) * *count);
          return(NULL);
         }
 
@@ -1094,26 +1073,26 @@ static DATA_OBJECT_PTR GetSaveFactsDeftemplateNames(
       if (saveCode == LOCAL_SAVE)
         {
          theDeftemplate = (struct deftemplate *)
-                         EnvFindDeftemplate(theEnv,ValueToString(theDOArray[i].value));
+                         FindDeftemplate(ValueToString(theDOArray[i].value));
          if (theDeftemplate == NULL)
            {
             *error = TRUE;
-            ExpectedTypeError1(theEnv,"save-facts",3+i,"local deftemplate name");
-            rm3(theEnv,theDOArray,(long) sizeof(DATA_OBJECT) * *count);
+            ExpectedTypeError1("save-facts",3+i,"local deftemplate name");
+            rm3(theDOArray,(long) sizeof(DATA_OBJECT) * *count);
             return(NULL);
            }
         }
       else if (saveCode == VISIBLE_SAVE)
         {
          theDeftemplate = (struct deftemplate *)
-           FindImportedConstruct(theEnv,"deftemplate",NULL,
+           FindImportedConstruct("deftemplate",NULL,
                                  ValueToString(theDOArray[i].value),
                                  &tempCount,TRUE,NULL);
          if (theDeftemplate == NULL)
            {
             *error = TRUE;
-            ExpectedTypeError1(theEnv,"save-facts",3+i,"visible deftemplate name");
-            rm3(theEnv,theDOArray,(long) sizeof(DATA_OBJECT) * *count);
+            ExpectedTypeError1("save-facts",3+i,"visible deftemplate name");
+            rm3(theDOArray,(long) sizeof(DATA_OBJECT) * *count);
             return(NULL);
            }
         }
@@ -1134,11 +1113,10 @@ static DATA_OBJECT_PTR GetSaveFactsDeftemplateNames(
    return(theDOArray);
   }
 
-/**************************************************************/
-/* EnvLoadFacts: C access routine for the load-facts command. */
-/**************************************************************/
-globle intBool EnvLoadFacts(
-  void *theEnv,
+/***********************************************************/
+/* LoadFacts: C access routine for the load-facts command. */
+/***********************************************************/
+globle BOOLEAN LoadFacts(
   char *fileName)
   {
    FILE *filePtr;
@@ -1150,13 +1128,13 @@ globle intBool EnvLoadFacts(
    /* Open the file. Use either "fast save" or I/O Router. */
    /*======================================================*/
 
-   if ((filePtr = GenOpen(theEnv,fileName,"r")) == NULL)
+   if ((filePtr = fopen(fileName,"r")) == NULL)
      {
-      OpenErrorMessage(theEnv,"load-facts",fileName);
+      OpenErrorMessage("load-facts",fileName);
       return(FALSE);
      }
 
-   SetFastLoad(theEnv,filePtr);
+   SetFastLoad(filePtr);
 
    /*=================*/
    /* Load the facts. */
@@ -1165,33 +1143,32 @@ globle intBool EnvLoadFacts(
    theToken.type = LPAREN;
    while (theToken.type != STOP)
      {
-      testPtr = StandardLoadFact(theEnv,(char *) filePtr,&theToken);
+      testPtr = StandardLoadFact((char *) filePtr,&theToken);
       if (testPtr == NULL) theToken.type = STOP;
-      else EvaluateExpression(theEnv,testPtr,&rv);
-      ReturnExpression(theEnv,testPtr);
+      else EvaluateExpression(testPtr,&rv);
+      ReturnExpression(testPtr);
      }
 
    /*=================*/
    /* Close the file. */
    /*=================*/
 
-   SetFastLoad(theEnv,NULL);
-   GenClose(theEnv,filePtr);
+   SetFastLoad(NULL);
+   fclose(filePtr);
 
    /*================================================*/
    /* Return TRUE if no error occurred while loading */
    /* the facts, otherwise return FALSE.             */
    /*================================================*/
 
-   if (EvaluationData(theEnv)->EvaluationError) return(FALSE);
+   if (EvaluationError) return(FALSE);
    return(TRUE);
   }
 
-/*********************************************/
-/* EnvLoadFactsFromString: C access routine. */
-/*********************************************/
-globle intBool EnvLoadFactsFromString(
-  void *theEnv,
+/***********************************************************/
+/* LoadFactsFromString: C access routine                   */
+/***********************************************************/
+globle BOOLEAN LoadFactsFromString(
   char *theString,
   int theMax)
   {
@@ -1204,8 +1181,8 @@ globle intBool EnvLoadFactsFromString(
    /* Initialize string router */
    /*==========================*/
 
-   if ((theMax == -1) ? (!OpenStringSource(theEnv,theStrRouter,theString,0)) :
-                        (!OpenTextSource(theEnv,theStrRouter,theString,0,(unsigned) theMax)))
+   if ((theMax == -1) ? (!OpenStringSource(theStrRouter,theString,0)) :
+                        (!OpenTextSource(theStrRouter,theString,0,theMax)))
      return(FALSE);
 
    /*=================*/
@@ -1215,24 +1192,24 @@ globle intBool EnvLoadFactsFromString(
    theToken.type = LPAREN;
    while (theToken.type != STOP)
      {
-      testPtr = StandardLoadFact(theEnv,theStrRouter,&theToken);
+      testPtr = StandardLoadFact(theStrRouter,&theToken);
       if (testPtr == NULL) theToken.type = STOP;
-      else EvaluateExpression(theEnv,testPtr,&rv);
-      ReturnExpression(theEnv,testPtr);
+      else EvaluateExpression(testPtr,&rv);
+      ReturnExpression(testPtr);
      }
 
    /*=================*/
    /* Close router.   */
    /*=================*/
 
-   CloseStringSource(theEnv,theStrRouter);
+   CloseStringSource(theStrRouter);
 
    /*================================================*/
    /* Return TRUE if no error occurred while loading */
    /* the facts, otherwise return FALSE.             */
    /*================================================*/
 
-   if (EvaluationData(theEnv)->EvaluationError) return(FALSE);
+   if (EvaluationError) return(FALSE);
    return(TRUE);
   }
 
@@ -1240,31 +1217,30 @@ globle intBool EnvLoadFactsFromString(
 /* StandardLoadFact: Loads a single fact from the specified logical name. */
 /**************************************************************************/
 static struct expr *StandardLoadFact(
-  void *theEnv,
   char *logicalName,
   struct token *theToken)
   {
    int error = FALSE;
    struct expr *temp;
 
-   GetToken(theEnv,logicalName,theToken);
+   GetToken(logicalName,theToken);
    if (theToken->type != LPAREN) return(NULL);
 
-   temp = GenConstant(theEnv,FCALL,FindFunction(theEnv,"assert"));
-   temp->argList = GetRHSPattern(theEnv,logicalName,theToken,&error,
+   temp = GenConstant(FCALL,FindFunction("assert"));
+   temp->argList = GetRHSPattern(logicalName,theToken,&error,
                                   TRUE,FALSE,TRUE,RPAREN);
 
    if (error == TRUE)
      {
-      EnvPrintRouter(theEnv,WERROR,"Function load-facts encountered an error\n");
-      SetEvaluationError(theEnv,TRUE);
-      ReturnExpression(theEnv,temp);
+      PrintRouter(WERROR,"Function load-facts encountered an error\n");
+      SetEvaluationError(TRUE);
+      ReturnExpression(temp);
       return(NULL);
      }
 
    if (ExpressionContainsVariables(temp,TRUE))
      {
-      ReturnExpression(theEnv,temp);
+      ReturnExpression(temp);
       return(NULL);
      }
 
@@ -1277,7 +1253,6 @@ static struct expr *StandardLoadFact(
 /* AssertParse: Driver routine for parsing the assert function. */
 /****************************************************************/
 static struct expr *AssertParse(
-  void *theEnv,
   struct expr *top,
   char *logicalName)
   {
@@ -1285,11 +1260,11 @@ static struct expr *AssertParse(
    struct expr *rv;
    struct token theToken;
 
-   ReturnExpression(theEnv,top);
-   SavePPBuffer(theEnv," ");
-   IncrementIndentDepth(theEnv,8);
-   rv = BuildRHSAssert(theEnv,logicalName,&theToken,&error,TRUE,TRUE,"assert command");
-   DecrementIndentDepth(theEnv,8);
+   ReturnExpression(top);
+   SavePPBuffer(" ");
+   IncrementIndentDepth(8);
+   rv = BuildRHSAssert(logicalName,&theToken,&error,TRUE,TRUE,"assert command");
+   DecrementIndentDepth(8);
    return(rv);
   }
 
@@ -1298,3 +1273,4 @@ static struct expr *AssertParse(
 #endif /* DEFTEMPLATE_CONSTRUCT */
 
 
+

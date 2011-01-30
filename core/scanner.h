@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.20  01/31/02            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*                 SCANNER HEADER FILE                 */
    /*******************************************************/
@@ -40,34 +40,26 @@ struct token;
 
 struct token
   {
-   unsigned short type;
+   int type;
    void *value;
    char *printForm;
   };
 
-#define SCANNER_DATA 57
+#define print_rep printForm
 
-struct scannerData
-  { 
-   char *GlobalString;
-   size_t GlobalMax;
-   size_t GlobalPos;
-   long LineCount;
-   int IgnoreCompletionErrors;
-  };
-
-#define ScannerData(theEnv) ((struct scannerData *) GetEnvironmentData(theEnv,SCANNER_DATA))
-
-   LOCALE void                           InitializeScannerData(void *);
-   LOCALE void                           GetToken(void *,char *,struct token *);
+   LOCALE void                           GetToken(char *,struct token *);
    LOCALE void                           CopyToken(struct token *,struct token *);
-   LOCALE void                           ResetLineCount(void *);
-   LOCALE long                           GetLineCount(void *);
-   LOCALE void                           IncrementLineCount(void *);
-   LOCALE void                           DecrementLineCount(void *);
+   LOCALE void                           ResetLineCount(void);
+   LOCALE long                           GetLineCount(void);
+   LOCALE void                           IncrementLineCount(void);
+   LOCALE void                           DecrementLineCount(void);
 
+#ifndef _SCANNER_SOURCE_
+   extern Thread int                            IgnoreCompletionErrors;
+#endif
 #endif
 
 
 
 
+

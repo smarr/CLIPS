@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.24  06/05/06            */
+   /*             CLIPS Version 6.10  04/13/98            */
    /*                                                     */
    /*                COMMAND LINE MODULE                  */
    /*******************************************************/
@@ -14,19 +14,13 @@
 /*      Gary D. Riley                                        */
 /*                                                           */
 /* Contributing Programmer(s):                               */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Revision History:                                         */
 /*                                                           */
-/*      6.24: Renamed BOOLEAN macro type to intBool.         */
-/*                                                           */
-/*            Refactored several functions and added         */
-/*            additional functions for use by an interface   */
-/*            layered on top of CLIPS.                       */
-/*                                                           */
-/*      6.30: Local variables set with the bind function     */
-/*            persist until a reset/clear command is issued. */
-/*                                                           */
+/* Who               |     Date    | Description             */
+/* ------------------+-------------+------------------------ */
+/* M.Giordano        | 23-Mar-2000 | Mods made for TLS       */
 /*************************************************************/
 
 #define _COMMLINE_SOURCE_
@@ -39,21 +33,19 @@
 #include "setup.h"
 #include "constant.h"
 
-#include "argacces.h"
-#include "constrct.h"
-#include "cstrcpsr.h"
-#include "envrnmnt.h"
-#include "exprnpsr.h"
-#include "filecom.h"
+#include "symbol.h"
 #include "memalloc.h"
+#include "scanner.h"
+#include "exprnpsr.h"
+#include "argacces.h"
+#include "router.h"
+#include "strngrtr.h"
+#include "constrct.h"
 #include "prcdrfun.h"
 #include "prcdrpsr.h"
-#include "router.h"
-#include "scanner.h"
-#include "strngrtr.h"
-#include "symbol.h"
-#include "sysdep.h"
 #include "utility.h"
+#include "filecom.h"
+#include "cstrcpsr.h"
 
 #include "commline.h"
 
@@ -65,46 +57,29 @@
    static int                     DoString(char *,int,int *);
    static int                     DoComment(char *,int);
    static int                     DoWhiteSpace(char *,int);
-   static int                     DefaultGetNextEvent(void *);
+   static void                    DefaultGetNextEvent(void);
 #endif
-   static void                    DeallocateCommandLineData(void *);
 
-/****************************************************/
-/* InitializeCommandLineData: Allocates environment */
-/*    data for command line functionality.          */
-/****************************************************/
-globle void InitializeCommandLineData(
-  void *theEnv)
-  {
-   AllocateEnvironmentData(theEnv,COMMANDLINE_DATA,sizeof(struct commandLineData),DeallocateCommandLineData);
+/****************************************/
+/* GLOBAL INTERNAL VARIABLE DEFINITIONS */
+/****************************************/
 
-#if ! RUN_TIME   
-   CommandLineData(theEnv)->BannerString = BANNER_STRING;
-   CommandLineData(theEnv)->EventFunction = DefaultGetNextEvent;
-#endif
-  }
-  
-/*******************************************************/
-/* DeallocateCommandLineData: Deallocates environment */
-/*    data for the command line functionality.        */
-/******************************************************/
-static void DeallocateCommandLineData(
-  void *theEnv)
-  {
-#if ! RUN_TIME
-   if (CommandLineData(theEnv)->CommandString != NULL) 
-     { rm(theEnv,CommandLineData(theEnv)->CommandString,CommandLineData(theEnv)->MaximumCharacters); }
-     
-   if (CommandLineData(theEnv)->CurrentCommand != NULL) 
-     { ReturnExpression(theEnv,CommandLineData(theEnv)->CurrentCommand); }
-#else
-#if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
-#endif
-#endif
-  }
+   Thread globle int               EvaluatingTopLevelCommand = FALSE;
+
+/***************************************/
+/* LOCAL INTERNAL VARIABLE DEFINITIONS */
+/***************************************/
 
 #if ! RUN_TIME
+
+   Thread static char             *CommandString = NULL;
+   Thread static int               MaximumCharacters = 0;
+   Thread static int               ParsingTopLevelCommand = FALSE;
+   Thread static char             *BannerString = BANNER_STRING;
+
+   Thread static int              (*EventFunction)(void) =
+                                           (int (*)(void)) DefaultGetNextEvent;
+   Thread static int              (*AfterPromptFunction)(void) = NULL;
 
 /***************************************************/
 /* ExpandCommandString: Appends a character to the */
@@ -115,48 +90,44 @@ static void DeallocateCommandLineData(
 /*   string's length.                              */
 /***************************************************/
 globle int ExpandCommandString(
-  void *theEnv,
   int inchar)
   {
-   size_t k;
+   register int k;
 
-   k = RouterData(theEnv)->CommandBufferInputCount;
-   CommandLineData(theEnv)->CommandString = ExpandStringWithChar(theEnv,inchar,CommandLineData(theEnv)->CommandString,&RouterData(theEnv)->CommandBufferInputCount,
-                                        &CommandLineData(theEnv)->MaximumCharacters,CommandLineData(theEnv)->MaximumCharacters+80);
-   return((RouterData(theEnv)->CommandBufferInputCount != k) ? TRUE : FALSE);
+   k = CommandBufferInputCount;
+   CommandString = ExpandStringWithChar(inchar,CommandString,&CommandBufferInputCount,
+                                        &MaximumCharacters,MaximumCharacters+80);
+   return((CommandBufferInputCount != k) ? TRUE : FALSE);
   }
 
 /******************************************************************/
 /* FlushCommandString: Empties the contents of the CommandString. */
 /******************************************************************/
-globle void FlushCommandString(
-  void *theEnv)
+globle void FlushCommandString()
   {
-   if (CommandLineData(theEnv)->CommandString != NULL) rm(theEnv,CommandLineData(theEnv)->CommandString,CommandLineData(theEnv)->MaximumCharacters);
-   CommandLineData(theEnv)->CommandString = NULL;
-   CommandLineData(theEnv)->MaximumCharacters = 0;
-   RouterData(theEnv)->CommandBufferInputCount = 0;
-   RouterData(theEnv)->AwaitingInput = TRUE;
+   if (CommandString != NULL) rm(CommandString,MaximumCharacters);
+   CommandString = NULL;
+   MaximumCharacters = 0;
+   CommandBufferInputCount = 0;
   }
 
 /*********************************************************************************/
 /* SetCommandString: Sets the contents of the CommandString to a specific value. */
 /*********************************************************************************/
 globle void SetCommandString(
-  void *theEnv,
   char *str)
   {
-   size_t length;
+   int length;
 
-   FlushCommandString(theEnv);
+   FlushCommandString();
    length = strlen(str);
-   CommandLineData(theEnv)->CommandString = (char *)
-                   genrealloc(theEnv,CommandLineData(theEnv)->CommandString,(unsigned) CommandLineData(theEnv)->MaximumCharacters,
-                              (unsigned) CommandLineData(theEnv)->MaximumCharacters + length + 1);
+   CommandString = (char *)
+                   genrealloc(CommandString,(unsigned) MaximumCharacters,
+                              (unsigned) MaximumCharacters + length + 1);
 
-   genstrcpy(CommandLineData(theEnv)->CommandString,str);
-   CommandLineData(theEnv)->MaximumCharacters += (length + 1);
-   RouterData(theEnv)->CommandBufferInputCount += (int) length;
+   strcpy(CommandString,str);
+   MaximumCharacters += (length + 1);
+   CommandBufferInputCount += length;
   }
 
 /*************************************************************/
@@ -164,63 +135,46 @@ globle void SetCommandString(
 /*   to a specific value up to N characters.                 */
 /*************************************************************/
 globle void SetNCommandString(
-  void *theEnv,
   char *str,
-  unsigned length)
+  int length)
   {
-   FlushCommandString(theEnv);
-   CommandLineData(theEnv)->CommandString = (char *)
-                   genrealloc(theEnv,CommandLineData(theEnv)->CommandString,(unsigned) CommandLineData(theEnv)->MaximumCharacters,
-                              (unsigned) CommandLineData(theEnv)->MaximumCharacters + length + 1);
+   FlushCommandString();
+   CommandString = (char *)
+                   genrealloc(CommandString,(unsigned) MaximumCharacters,
+                              (unsigned) MaximumCharacters + length + 1);
 
-   genstrncpy(CommandLineData(theEnv)->CommandString,str,length);
-   CommandLineData(theEnv)->CommandString[CommandLineData(theEnv)->MaximumCharacters + length] = 0;
-   CommandLineData(theEnv)->MaximumCharacters += (length + 1);
-   RouterData(theEnv)->CommandBufferInputCount += (int) length;
+   strncpy(CommandString,str,length);
+   CommandString[MaximumCharacters + length] = 0;
+   MaximumCharacters += (length + 1);
+   CommandBufferInputCount += length;
   }
 
 /******************************************************************************/
 /* AppendCommandString: Appends a value to the contents of the CommandString. */
 /******************************************************************************/
 globle void AppendCommandString(
-  void *theEnv,
   char *str)
   {
-   CommandLineData(theEnv)->CommandString = AppendToString(theEnv,str,CommandLineData(theEnv)->CommandString,&RouterData(theEnv)->CommandBufferInputCount,&CommandLineData(theEnv)->MaximumCharacters);
+   CommandString = AppendToString(str,CommandString,&CommandBufferInputCount,&MaximumCharacters);
   }
 
-/******************************************************************************/
-/* InsertCommandString: Inserts a value in the contents of the CommandString. */
-/******************************************************************************/
-globle void InsertCommandString(
-  void *theEnv,
-  char *str,
-  unsigned int position)
-  {
-   CommandLineData(theEnv)->CommandString = 
-      InsertInString(theEnv,str,position,CommandLineData(theEnv)->CommandString,
-                     &RouterData(theEnv)->CommandBufferInputCount,&CommandLineData(theEnv)->MaximumCharacters);
-  }
-  
 /************************************************************/
 /* AppendNCommandString: Appends a value up to N characters */
 /*   to the contents of the CommandString.                  */
 /************************************************************/
 globle void AppendNCommandString(
-  void *theEnv,
   char *str,
-  unsigned length)
+  int length)
   {
-   CommandLineData(theEnv)->CommandString = AppendNToString(theEnv,str,CommandLineData(theEnv)->CommandString,length,&RouterData(theEnv)->CommandBufferInputCount,&CommandLineData(theEnv)->MaximumCharacters);
+   CommandString = AppendNToString(str,CommandString,length,&CommandBufferInputCount,&MaximumCharacters);
   }
 
 /*****************************************************************************/
 /* GetCommandString: Returns a pointer to the contents of the CommandString. */
 /*****************************************************************************/
-globle char *GetCommandString(
-  void *theEnv)
+globle char *GetCommandString()
   {
-   return(CommandLineData(theEnv)->CommandString);
+   return(CommandString);
   }
 
 /**************************************************************************/
@@ -348,7 +302,7 @@ globle int CompleteCommand(
          default:
            if (depth == 0)
              {
-              if (isprint(inchar) || IsUTF8MultiByteStart(inchar))
+              if (isprint(inchar))
                 {
                  while ((inchar = mstring[i++]) != EOS)
                    {
@@ -481,18 +435,16 @@ static int DoWhiteSpace(
 /*   executes them. The command loop will bypass the EventFunction  */
 /*   if there is an active batch file.                              */
 /********************************************************************/
-globle void CommandLoop(
-  void *theEnv)
+globle void CommandLoop()
   {
    int inchar;
 
-   EnvPrintRouter(theEnv,WPROMPT,CommandLineData(theEnv)->BannerString);
-   SetHaltExecution(theEnv,FALSE);
-   SetEvaluationError(theEnv,FALSE);
-   PeriodicCleanup(theEnv,TRUE,FALSE);
-   PrintPrompt(theEnv);
-   RouterData(theEnv)->CommandBufferInputCount = 0;
-   RouterData(theEnv)->AwaitingInput = TRUE;
+   PrintRouter(WPROMPT,BannerString);
+   SetHaltExecution(FALSE);
+   SetEvaluationError(FALSE);
+   PeriodicCleanup(TRUE,FALSE);
+   PrintPrompt();
+   CommandBufferInputCount = 0;
 
    while (TRUE)
      {
@@ -502,32 +454,32 @@ globle void CommandLoop(
       /* event function.                                   */
       /*===================================================*/
 
-      if (BatchActive(theEnv) == TRUE)
+      if (BatchActive() == TRUE)
         {
-         inchar = LLGetcBatch(theEnv,"stdin",TRUE);
+         inchar = LLGetcBatch("stdin",TRUE);
          if (inchar == EOF)
-           { (*CommandLineData(theEnv)->EventFunction)(theEnv); }
+           { (*EventFunction)(); }
          else
-           { ExpandCommandString(theEnv,(char) inchar); }
+           { ExpandCommandString((char) inchar); }
         }
       else
-        { (*CommandLineData(theEnv)->EventFunction)(theEnv); }
+        { (*EventFunction)(); }
 
       /*=================================================*/
       /* If execution was halted, then remove everything */
       /* from the command buffer.                        */
       /*=================================================*/
 
-      if (GetHaltExecution(theEnv) == TRUE)
+      if (GetHaltExecution() == TRUE)
         {
-         SetHaltExecution(theEnv,FALSE);
-         SetEvaluationError(theEnv,FALSE);
-         FlushCommandString(theEnv);
+         SetHaltExecution(FALSE);
+         SetEvaluationError(FALSE);
+         FlushCommandString();
 #if ! WINDOW_INTERFACE
          fflush(stdin);
 #endif
-         EnvPrintRouter(theEnv,WPROMPT,"\n");
-         PrintPrompt(theEnv);
+         PrintRouter(WPROMPT,"\n");
+         PrintPrompt();
         }
 
       /*=========================================*/
@@ -535,168 +487,32 @@ globle void CommandLoop(
       /* buffer, then execute it.                */
       /*=========================================*/
 
-      ExecuteIfCommandComplete(theEnv);
-     }
-  }
-  
-/***********************************************************/
-/* CommandLoopBatch: Loop which waits for commands from a  */
-/*   batch file and then executes them. Returns when there */
-/*   are no longer any active batch files.                 */
-/***********************************************************/
-globle void CommandLoopBatch(
-  void *theEnv)
-  {
-   SetHaltExecution(theEnv,FALSE);
-   SetEvaluationError(theEnv,FALSE);
-   PeriodicCleanup(theEnv,TRUE,FALSE);
-   PrintPrompt(theEnv);
-   RouterData(theEnv)->CommandBufferInputCount = 0;
-   RouterData(theEnv)->AwaitingInput = TRUE;
-
-   CommandLoopBatchDriver(theEnv);
-  }
-
-/************************************************************/
-/* CommandLoopOnceThenBatch: Loop which waits for commands  */
-/*   from a batch file and then executes them. Returns when */
-/*   there are no longer any active batch files.            */
-/************************************************************/
-globle void CommandLoopOnceThenBatch(
-  void *theEnv)
-  {
-   if (! ExecuteIfCommandComplete(theEnv)) return;
-
-   CommandLoopBatchDriver(theEnv);
-  }
-  
-/*********************************************************/
-/* CommandLoopBatchDriver: Loop which waits for commands */
-/*   from a batch file and then executes them. Returns   */
-/*   when there are no longer any active batch files.    */
-/*********************************************************/
-globle void CommandLoopBatchDriver(
-  void *theEnv)
-  {
-   int inchar;
-
-   while (TRUE)
-     {
-      if (GetHaltCommandLoopBatch(theEnv) == TRUE)
-        { 
-         CloseAllBatchSources(theEnv);
-         SetHaltCommandLoopBatch(theEnv,FALSE);
-        }
-        
-      /*===================================================*/
-      /* If a batch file is active, grab the command input */
-      /* directly from the batch file, otherwise call the  */
-      /* event function.                                   */
-      /*===================================================*/
-
-      if (BatchActive(theEnv) == TRUE)
+      if ((CompleteCommand(CommandString) != 0) && (CommandBufferInputCount > 0))
         {
-         inchar = LLGetcBatch(theEnv,"stdin",TRUE);
-         if (inchar == EOF)
-           { return; }
-         else
-           { ExpandCommandString(theEnv,(char) inchar); }
+         FlushPPBuffer();
+         SetPPBufferStatus(OFF);
+         CommandBufferInputCount = -1;
+         RouteCommand(CommandString,TRUE);
+         FlushPPBuffer();
+         SetHaltExecution(FALSE);
+         SetEvaluationError(FALSE);
+         FlushCommandString();
+         FlushBindList();
+         PeriodicCleanup(TRUE,FALSE);
+         PrintPrompt();
         }
-      else
-        { return; }
-
-      /*=================================================*/
-      /* If execution was halted, then remove everything */
-      /* from the command buffer.                        */
-      /*=================================================*/
-
-      if (GetHaltExecution(theEnv) == TRUE)
-        {
-         SetHaltExecution(theEnv,FALSE);
-         SetEvaluationError(theEnv,FALSE);
-         FlushCommandString(theEnv);
-#if ! WINDOW_INTERFACE
-         fflush(stdin);
-#endif
-         EnvPrintRouter(theEnv,WPROMPT,"\n");
-         PrintPrompt(theEnv);
-        }
-
-      /*=========================================*/
-      /* If a complete command is in the command */
-      /* buffer, then execute it.                */
-      /*=========================================*/
-
-      ExecuteIfCommandComplete(theEnv);
      }
   }
 
-/**********************************************************/
-/* ExecuteIfCommandComplete: Checks to determine if there */
-/*   is a completed command and if so executes it.        */
-/**********************************************************/
-globle intBool ExecuteIfCommandComplete(
-  void *theEnv)
-  {
-   if ((CompleteCommand(CommandLineData(theEnv)->CommandString) == 0) || 
-       (RouterData(theEnv)->CommandBufferInputCount == 0) ||
-       (RouterData(theEnv)->AwaitingInput == FALSE))
-     { return FALSE; }
-     
-   if (CommandLineData(theEnv)->BeforeCommandExecutionFunction != NULL)
-     { 
-      if (! (*CommandLineData(theEnv)->BeforeCommandExecutionFunction)(theEnv))
-        { return FALSE; }
-     }
-       
-   FlushPPBuffer(theEnv);
-   SetPPBufferStatus(theEnv,OFF);
-   RouterData(theEnv)->CommandBufferInputCount = 0;
-   RouterData(theEnv)->AwaitingInput = FALSE;
-   RouteCommand(theEnv,CommandLineData(theEnv)->CommandString,TRUE);
-   FlushPPBuffer(theEnv);
-   SetHaltExecution(theEnv,FALSE);
-   SetEvaluationError(theEnv,FALSE);
-   FlushCommandString(theEnv);
-   PeriodicCleanup(theEnv,TRUE,FALSE);
-   PrintPrompt(theEnv);
-         
-   return TRUE;
-  }
-
-/*******************************************/
-/* CommandCompleteAndNotEmpty: */
-/*******************************************/
-globle intBool CommandCompleteAndNotEmpty(
-  void *theEnv)
-  {
-   if ((CompleteCommand(CommandLineData(theEnv)->CommandString) == 0) || 
-       (RouterData(theEnv)->CommandBufferInputCount == 0) ||
-       (RouterData(theEnv)->AwaitingInput == FALSE))
-     { return FALSE; }
-     
-   return TRUE;
-  }
-       
 /*******************************************/
 /* PrintPrompt: Prints the command prompt. */
 /*******************************************/
-globle void PrintPrompt(
-   void *theEnv)
+globle void PrintPrompt()
    {
-    EnvPrintRouter(theEnv,WPROMPT,COMMAND_PROMPT);
+    PrintRouter(WPROMPT,COMMAND_PROMPT);
 
-    if (CommandLineData(theEnv)->AfterPromptFunction != NULL)
-      { (*CommandLineData(theEnv)->AfterPromptFunction)(theEnv); }
-   }
-
-/*****************************************/
-/* PrintBanner: Prints the CLIPS banner. */
-/*****************************************/
-globle void PrintBanner(
-   void *theEnv)
-   {
-    EnvPrintRouter(theEnv,WPROMPT,CommandLineData(theEnv)->BannerString);
+    if (AfterPromptFunction != NULL)
+      { (*AfterPromptFunction)(); }
    }
 
 /************************************************/
@@ -704,28 +520,15 @@ globle void PrintBanner(
 /*   value of AfterPromptFunction.              */
 /************************************************/
 globle void SetAfterPromptFunction(
-  void *theEnv,
-  int (*funptr)(void *))
+  int (*funptr)(void))
   {
-   CommandLineData(theEnv)->AfterPromptFunction = funptr;
+   AfterPromptFunction = funptr;
   }
 
-/***********************************************************/
-/* SetBeforeCommandExecutionFunction: Replaces the current */
-/*   value of BeforeCommandExecutionFunction.              */
-/***********************************************************/
-globle void SetBeforeCommandExecutionFunction(
-  void *theEnv,
-  int (*funptr)(void *))
-  {
-   CommandLineData(theEnv)->BeforeCommandExecutionFunction = funptr;
-  }
-  
 /************************************************/
 /* RouteCommand: Processes a completed command. */
 /************************************************/
-globle intBool RouteCommand(
-  void *theEnv,
+globle BOOLEAN RouteCommand(
   char *command,
   int printResult)
   {
@@ -742,9 +545,9 @@ globle intBool RouteCommand(
    /* first token from that source.          */
    /*========================================*/
 
-   OpenStringSource(theEnv,"command",command,0);
+   OpenStringSource("command",command,0);
 
-   GetToken(theEnv,"command",&theToken);
+   GetToken("command",&theToken);
 
    /*=====================*/
    /* Evaluate constants. */
@@ -754,31 +557,29 @@ globle intBool RouteCommand(
        (theToken.type == FLOAT) || (theToken.type == INTEGER) ||
        (theToken.type == INSTANCE_NAME))
      {
-      CloseStringSource(theEnv,"command");
+      CloseStringSource("command");
       if (printResult)
         {
-         PrintAtom(theEnv,"stdout",theToken.type,theToken.value);
-         EnvPrintRouter(theEnv,"stdout","\n");
+         PrintAtom("stdout",theToken.type,theToken.value);
+         PrintRouter("stdout","\n");
         }
       return(1);
      }
 
-   /*=====================*/
-   /* Evaluate variables. */
-   /*=====================*/
+   /*============================*/
+   /* Evaluate global variables. */
+   /*============================*/
 
-   if ((theToken.type == GBL_VARIABLE) ||
-       (theToken.type == SF_VARIABLE) ||
-       (theToken.type == MF_VARIABLE))
+   if (theToken.type == GBL_VARIABLE)
      {
-      CloseStringSource(theEnv,"command");
-      top = GenConstant(theEnv,theToken.type,theToken.value);
-      EvaluateExpression(theEnv,top,&result);
-      rtn_struct(theEnv,expr,top);
+      CloseStringSource("command");
+      top = GenConstant(theToken.type,theToken.value);
+      EvaluateExpression(top,&result);
+      rtn_struct(expr,top);
       if (printResult)
         {
-         PrintDataObject(theEnv,"stdout",&result);
-         EnvPrintRouter(theEnv,"stdout","\n");
+         PrintDataObject("stdout",&result);
+         PrintRouter("stdout","\n");
         }
       return(1);
      }
@@ -791,9 +592,9 @@ globle intBool RouteCommand(
 
    if (theToken.type != LPAREN)
      {
-      PrintErrorID(theEnv,"COMMLINE",1,FALSE);
-      EnvPrintRouter(theEnv,WERROR,"Expected a '(', constant, or variable\n");
-      CloseStringSource(theEnv,"command");
+      PrintErrorID("COMMLINE",1,FALSE);
+      PrintRouter(WERROR,"Expected a '(', constant, or global variable\n");
+      CloseStringSource("command");
       return(0);
      }
 
@@ -801,12 +602,12 @@ globle intBool RouteCommand(
    /* The next token must be a function name or construct type. */
    /*===========================================================*/
 
-   GetToken(theEnv,"command",&theToken);
+   GetToken("command",&theToken);
    if (theToken.type != SYMBOL)
      {
-      PrintErrorID(theEnv,"COMMLINE",2,FALSE);
-      EnvPrintRouter(theEnv,WERROR,"Expected a command.\n");
-      CloseStringSource(theEnv,"command");
+      PrintErrorID("COMMLINE",2,FALSE);
+      PrintRouter(WERROR,"Expected a command.\n");
+      CloseStringSource("command");
       return(0);
      }
 
@@ -820,17 +621,17 @@ globle intBool RouteCommand(
    {
     int errorFlag;
 
-    errorFlag = ParseConstruct(theEnv,commandName,"command");
+    errorFlag = ParseConstruct(commandName,"command");
     if (errorFlag != -1)
       {
-       CloseStringSource(theEnv,"command");
+       CloseStringSource("command");
        if (errorFlag == 1)
          {
-          EnvPrintRouter(theEnv,WERROR,"\nERROR:\n");
-          PrintInChunks(theEnv,WERROR,GetPPBuffer(theEnv));
-          EnvPrintRouter(theEnv,WERROR,"\n");
+          PrintRouter(WERROR,"\nERROR:\n");
+          PrintInChunks(WERROR,GetPPBuffer());
+          PrintRouter(WERROR,"\n");
          }
-       DestroyPPBuffer(theEnv);
+       DestroyPPBuffer();
        return(errorFlag);
       }
    }
@@ -840,38 +641,33 @@ globle intBool RouteCommand(
    /* Parse a function call. */
    /*========================*/
 
-   CommandLineData(theEnv)->ParsingTopLevelCommand = TRUE;
-   top = Function2Parse(theEnv,"command",commandName);
-   CommandLineData(theEnv)->ParsingTopLevelCommand = FALSE;
-   ClearParsedBindNames(theEnv);
+   ParsingTopLevelCommand = TRUE;
+   top = Function2Parse("command",commandName);
+   ParsingTopLevelCommand = FALSE;
+   ClearParsedBindNames();
 
    /*================================*/
    /* Close the string input source. */
    /*================================*/
 
-   CloseStringSource(theEnv,"command");
+   CloseStringSource("command");
 
    /*=========================*/
    /* Evaluate function call. */
    /*=========================*/
 
    if (top == NULL) return(0);
-   
-   ExpressionInstall(theEnv,top);
-   
-   CommandLineData(theEnv)->EvaluatingTopLevelCommand = TRUE;
-   CommandLineData(theEnv)->CurrentCommand = top;
-   EvaluateExpression(theEnv,top,&result);
-   CommandLineData(theEnv)->CurrentCommand = NULL;
-   CommandLineData(theEnv)->EvaluatingTopLevelCommand = FALSE;
-   
-   ExpressionDeinstall(theEnv,top);
-   ReturnExpression(theEnv,top);
-   
+   EvaluatingTopLevelCommand = TRUE;
+   ExpressionInstall(top);
+   EvaluateExpression(top,&result);
+   ExpressionDeinstall(top);
+   EvaluatingTopLevelCommand = FALSE;
+   ReturnExpression(top);
+
    if ((result.type != RVOID) && printResult)
      {
-      PrintDataObject(theEnv,"stdout",&result);
-      EnvPrintRouter(theEnv,"stdout","\n");
+      PrintDataObject("stdout",&result);
+      PrintRouter("stdout","\n");
      }
 
    return(1);
@@ -883,30 +679,27 @@ globle intBool RouteCommand(
 /*   character and then calling ExpandCommandString to add the   */
 /*   character to the CommandString.                             */
 /*****************************************************************/
-static int DefaultGetNextEvent(
-  void *theEnv)
+static void DefaultGetNextEvent()
   {
    int inchar;
 
-   inchar = EnvGetcRouter(theEnv,"stdin");
+   inchar = GetcRouter("stdin");
 
    if (inchar == EOF) inchar = '\n';
 
-   ExpandCommandString(theEnv,(char) inchar);
-   
-   return 0;
+   ExpandCommandString((char) inchar);
   }
 
 /*************************************/
 /* SetEventFunction: Replaces the    */
 /*   current value of EventFunction. */
 /*************************************/
-globle int (*SetEventFunction(void *theEnv,int (*theFunction)(void *)))(void *)
+globle int (*SetEventFunction(int (*theFunction)(void)))(void)
   {
-   int (*tmp_ptr)(void *);
+   int (*tmp_ptr)(void);
 
-   tmp_ptr = CommandLineData(theEnv)->EventFunction;
-   CommandLineData(theEnv)->EventFunction = theFunction;
+   tmp_ptr = EventFunction;
+   EventFunction = theFunction;
    return(tmp_ptr);
   }
 
@@ -914,10 +707,9 @@ globle int (*SetEventFunction(void *theEnv,int (*theFunction)(void *)))(void *)
 /* TopLevelCommand: Indicates whether a */
 /*   top-level command is being parsed. */
 /****************************************/
-globle intBool TopLevelCommand(
-  void *theEnv)
+globle BOOLEAN TopLevelCommand()
   {
-   return(CommandLineData(theEnv)->ParsingTopLevelCommand);
+   return(ParsingTopLevelCommand);
   }
 
 /***********************************************************/
@@ -925,15 +717,14 @@ globle intBool TopLevelCommand(
 /*   string if it is a valid token for command completion. */
 /***********************************************************/
 globle char *GetCommandCompletionString(
-  void *theEnv,
   char *theString,
-  size_t maxPosition)
+  int maxPosition)
   {
    struct token lastToken;
    struct token theToken;
    char lastChar;
    char *rs;
-   size_t length;
+   int length;
 
    /*=========================*/
    /* Get the command string. */
@@ -956,17 +747,17 @@ globle char *GetCommandCompletionString(
    /* Find the last token in the command string. */
    /*============================================*/
 
-   OpenTextSource(theEnv,"CommandCompletion",theString,0,maxPosition);
-   ScannerData(theEnv)->IgnoreCompletionErrors = TRUE;
-   GetToken(theEnv,"CommandCompletion",&theToken);
+   OpenTextSource("CommandCompletion",theString,0,maxPosition);
+   IgnoreCompletionErrors = TRUE;
+   GetToken("CommandCompletion",&theToken);
    CopyToken(&lastToken,&theToken);
    while (theToken.type != STOP)
      {
       CopyToken(&lastToken,&theToken);
-      GetToken(theEnv,"CommandCompletion",&theToken);
+      GetToken("CommandCompletion",&theToken);
      }
-   CloseStringSource(theEnv,"CommandCompletion");
-   ScannerData(theEnv)->IgnoreCompletionErrors = FALSE;
+   CloseStringSource("CommandCompletion");
+   IgnoreCompletionErrors = FALSE;
 
    /*===============================================*/
    /* Determine if the last token can be completed. */
@@ -988,7 +779,7 @@ globle char *GetCommandCompletionString(
    else if (lastToken.type == STRING)
      {
       length = strlen(ValueToString(lastToken.value));
-      return(GetCommandCompletionString(theEnv,ValueToString(lastToken.value),length));
+      return(GetCommandCompletionString(ValueToString(lastToken.value),length));
      }
    else if ((lastToken.type == FLOAT) || (lastToken.type == INTEGER))
      { return(NULL); }
@@ -996,24 +787,8 @@ globle char *GetCommandCompletionString(
    return("");
   }
 
-/****************************************************************/
-/* SetHaltCommandLoopBatch: Sets the HaltCommandLoopBatch flag. */
-/****************************************************************/
-globle void SetHaltCommandLoopBatch(
-  void *theEnv,
-  int value)
-  { 
-   CommandLineData(theEnv)->HaltCommandLoopBatch = value; 
-  }
-
-/*******************************************************************/
-/* GetHaltCommandLoopBatch: Returns the HaltCommandLoopBatch flag. */
-/*******************************************************************/
-globle int GetHaltCommandLoopBatch(
-  void *theEnv)
-  {
-   return(CommandLineData(theEnv)->HaltCommandLoopBatch);
-  }
-
 #endif
 
+
+
+

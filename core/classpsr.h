@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*               CLIPS Version 6.30  03/04/08          */
+   /*               CLIPS Version 6.10  04/13/98          */
    /*                                                     */
    /*                                                     */
    /*******************************************************/
@@ -10,15 +10,12 @@
 /* Purpose:                                                  */
 /*                                                           */
 /* Principal Programmer(s):                                  */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Contributing Programmer(s):                               */
 /*                                                           */
 /* Revision History:                                         */
 /*                                                           */
-/*      6.30: Added support to allow CreateClassScopeMap to   */
-/*            be used by other functions.                     */
-/*                                                            */
 /*************************************************************/
 
 #ifndef _H_classpsr
@@ -36,11 +33,7 @@
 #define LOCALE extern
 #endif
 
-LOCALE int ParseDefclass(void *,char *);
-
-#if DEFMODULE_CONSTRUCT
-LOCALE void *CreateClassScopeMap(void *,DEFCLASS *);
-#endif
+LOCALE int ParseDefclass(char *);
 
 #endif
 
@@ -48,3 +41,6 @@ LOCALE void *CreateClassScopeMap(void *,DEFCLASS *);
 
 
 
+
+
+

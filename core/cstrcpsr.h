@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.20  01/31/02            */
+   /*             CLIPS Version 6.10  04/13/98            */
    /*                                                     */
    /*              CONSTRUCT PARSER MODULE                */
    /*******************************************************/
@@ -43,21 +43,19 @@
 #define LOCALE extern
 #endif
 
-#if ALLOW_ENVIRONMENT_GLOBALS
-   LOCALE int                            Load(char *);
+   LOCALE DllExport int                  Load(char *);
+   LOCALE DllExport int                  LoadConstructsFromLogicalName(char *);
+   LOCALE int                            ParseConstruct(char *,char *);
+   LOCALE void                           RemoveConstructFromModule(struct constructHeader *);
+   LOCALE struct symbolHashNode         *GetConstructNameAndComment(char *,
+                                         struct token *,char *,void *(*)(char *),
+                                         int (*)(void *),char *,int,int,int);
+   LOCALE void                           ImportExportConflictMessage(char *,char *,char *,char *);
+
+#ifndef _CSTRCPSR_SOURCE_
+   extern Thread int                         CheckSyntaxMode;
 #endif
 
-   LOCALE int                            EnvLoad(void *,char *);
-   LOCALE int                            LoadConstructsFromLogicalName(void *,char *);
-   LOCALE int                            ParseConstruct(void *,char *,char *);
-   LOCALE void                           RemoveConstructFromModule(void *,struct constructHeader *);
-   LOCALE struct symbolHashNode         *GetConstructNameAndComment(void *,char *,
-                                         struct token *,char *,
-                                         void *(*)(void *,char *),
-                                         int (*)(void *,void *),
-                                         char *,int,int,int);
-   LOCALE void                           ImportExportConflictMessage(void *,char *,char *,char *,char *);
-
 #endif
 
 
@@ -66,3 +64,4 @@
 
 
 
+

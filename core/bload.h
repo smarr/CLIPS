@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*               CLIPS Version 6.24  06/05/06          */
+   /*               CLIPS Version 6.10  04/13/98          */
    /*                                                     */
    /*                 BLOAD HEADER FILE                   */
    /*******************************************************/
@@ -11,22 +11,17 @@
 /*                                                           */
 /* Principal Programmer(s):                                  */
 /*      Gary D. Riley                                        */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Contributing Programmer(s):                               */
 /*                                                           */
 /* Revision History:                                         */
-/*                                                           */
-/*      6.24: Renamed BOOLEAN macro type to intBool.         */
 /*                                                           */
 /*************************************************************/
 
 #ifndef _H_bload
 #define _H_bload
 
-#ifndef _H_utility
-#include "utility.h"
-#endif
 #ifndef _H_extnfunc
 #include "extnfunc.h"
 #endif
@@ -43,22 +38,6 @@
 #include "symblbin.h"
 #endif
 
-#define BLOAD_DATA 38
-
-struct bloadData
-  { 
-   char *BinaryPrefixID;
-   char *BinaryVersionID;
-   struct FunctionDefinition **FunctionArray;
-   int BloadActive;
-   struct callFunctionItem *BeforeBloadFunctions;
-   struct callFunctionItem *AfterBloadFunctions;
-   struct callFunctionItem *ClearBloadReadyFunctions;
-   struct callFunctionItem *AbortBloadFunctions;
-  };
-
-#define BloadData(theEnv) ((struct bloadData *) GetEnvironmentData(theEnv,BLOAD_DATA))
-
 #ifdef LOCALE
 #undef LOCALE
 #endif
@@ -68,21 +47,26 @@ struct bloadData
 #define LOCALE extern
 #endif
 
-#define FunctionPointer(i) ((struct FunctionDefinition *) (((i) == -1L) ? NULL : BloadData(theEnv)->FunctionArray[i]))
+#define FunctionPointer(i) ((struct FunctionDefinition *) (((i) == -1L) ? NULL : FunctionArray[i]))
 
-#define Bload(a) EnvBload(GetCurrentEnvironment(),a)
+   LOCALE int                     BloadCommand(void);
+   LOCALE DllExport BOOLEAN       Bload(char *);
+   LOCALE void                    BloadandRefresh(long,unsigned,void (*)(void *,long));
+   LOCALE BOOLEAN                 Bloaded(void);
+   LOCALE void                    AddBeforeBloadFunction(char *,void (*)(void),int);
+   LOCALE void                    AddAfterBloadFunction(char *,void (*)(void),int);
+   LOCALE void                    AddBloadReadyFunction(char *,int (*)(void),int);
+   LOCALE void                    AddClearBloadReadyFunction(char *,int (*)(void),int);
+   LOCALE void                    AddAbortBloadFunction(char *,void (*)(void),int);
+   LOCALE void                    CannotLoadWithBloadMessage(char *);
 
-   LOCALE void                    InitializeBloadData(void *);
-   LOCALE int                     BloadCommand(void *);
-   LOCALE intBool                 EnvBload(void *,char *);
-   LOCALE void                    BloadandRefresh(void *,long,size_t,void (*)(void *,void *,long));
-   LOCALE intBool                 Bloaded(void *);
-   LOCALE void                    AddBeforeBloadFunction(void *,char *,void (*)(void *),int);
-   LOCALE void                    AddAfterBloadFunction(void *,char *,void (*)(void *),int);
-   LOCALE void                    AddBloadReadyFunction(void *,char *,int (*)(void),int);
-   LOCALE void                    AddClearBloadReadyFunction(void *,char *,int (*)(void *),int);
-   LOCALE void                    AddAbortBloadFunction(void *,char *,void (*)(void *),int);
-   LOCALE void                    CannotLoadWithBloadMessage(void *,char *);
+#ifndef _BLOAD_SOURCE_
+   extern Thread char                                  *BinaryPrefixID;
+   extern Thread char                                  *BinaryVersionID;
+   extern Thread struct FunctionDefinition            **FunctionArray;
+#endif
 
 #endif
 
+
+

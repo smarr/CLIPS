@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.24  06/05/06            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*             DEFGLOBAL PARSER HEADER FILE            */
    /*******************************************************/
@@ -15,8 +15,6 @@
 /* Contributing Programmer(s):                               */
 /*                                                           */
 /* Revision History:                                         */
-/*                                                           */
-/*      6.24: Renamed BOOLEAN macro type to intBool.         */
 /*                                                           */
 /*************************************************************/
 
@@ -42,11 +40,16 @@ struct defglobal;
 #define LOCALE extern
 #endif
 
-   LOCALE intBool                 ParseDefglobal(void *,char *);
-   LOCALE intBool                 ReplaceGlobalVariable(void *,struct expr *);
-   LOCALE void                    GlobalReferenceErrorMessage(void *,char *);
+   LOCALE DllExport BOOLEAN       ParseDefglobal(char *);
+   LOCALE BOOLEAN                 ReplaceGlobalVariable(struct expr *);
+   LOCALE void                    GlobalReferenceErrorMessage(char *);
 
 #endif
 
 
 
+
+
+
+
+

@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.30  10/19/06            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*            EXTERNAL FUNCTIONS HEADER FILE           */
    /*******************************************************/
@@ -16,11 +16,6 @@
 /* Contributing Programmer(s):                               */
 /*                                                           */
 /* Revision History:                                         */
-/*                                                           */
-/*      6.24: Renamed BOOLEAN macro type to intBool.         */
-/*                                                           */
-/*      6.30: Added support for passing context information  */ 
-/*            to user defined functions.                     */
 /*                                                           */
 /*************************************************************/
 
@@ -43,15 +38,13 @@ struct FunctionDefinition
    char *actualFunctionName;
    char returnValueType;
    int (*functionPointer)(void);
-   struct expr *(*parser)(void *,struct expr *,char *);
+   struct expr *(*parser)(struct expr *,char *);
    char *restrictions;
    short int overloadable;
    short int sequenceuseok;
-   short int environmentAware;
    short int bsaveIndex;
    struct FunctionDefinition *next;
    struct userData *usrData;
-   void *context;
   };
 
 #define ValueFunctionType(target) (((struct FunctionDefinition *) target)->returnValueType)
@@ -61,21 +54,6 @@ struct FunctionDefinition
 #define ExpressionFunctionRealName(target) (((struct FunctionDefinition *) ((target)->value))->actualFunctionName)
 
 #define PTIF (int (*)(void))
-#define PTIEF (int (*)(void *))
-
-/*==================*/
-/* ENVIRONMENT DATA */
-/*==================*/
-
-#define EXTERNAL_FUNCTION_DATA 50
-
-struct externalFunctionData
-  { 
-   struct FunctionDefinition *ListOfFunctions;
-   struct FunctionHash **FunctionHashtable;
-  };
-
-#define ExternalFunctionData(theEnv) ((struct externalFunctionData *) GetEnvironmentData(theEnv,EXTERNAL_FUNCTION_DATA))
 
 #ifdef LOCALE
 #undef LOCALE
@@ -94,37 +72,24 @@ struct FunctionHash
    struct FunctionHash *next;
   };
 
-#define SIZE_FUNCTION_HASH 517
+#define SIZE_FUNCTION_HASH 51
 #endif
 
    LOCALE int                            DefineFunction(char *,int,int (*)(void),char *);
    LOCALE int                            DefineFunction2(char *,int,int (*)(void),char *,char *);
-
-   LOCALE void                           InitializeExternalFunctionData(void *);
-   LOCALE int                            EnvDefineFunction(void *,char *,int,
-                                                           int (*)(void *),char *);
-   LOCALE int                            EnvDefineFunction2(void *,char *,int,
-                                                            int (*)(void *),char *,char *);
-   LOCALE int                            EnvDefineFunctionWithContext(void *,char *,int,
-                                                           int (*)(void *),char *,void *);
-   LOCALE int                            EnvDefineFunction2WithContext(void *,char *,int,
-                                                            int (*)(void *),char *,char *,void *);
-   LOCALE int                            DefineFunction3(void *,char *,int,
-                                                         int (*)(void *),char *,char *,intBool,void *);
-   LOCALE int                            AddFunctionParser(void *,char *,
-                                                           struct expr *(*)( void *,struct expr *,char *));
-   LOCALE int                            RemoveFunctionParser(void *,char *);
-   LOCALE int                            FuncSeqOvlFlags(void *,char *,int,int);
-   LOCALE struct FunctionDefinition     *GetFunctionList(void *);
-   LOCALE void                           InstallFunctionList(void *,struct FunctionDefinition *);
-   LOCALE struct FunctionDefinition     *FindFunction(void *,char *);
+   LOCALE int                            AddFunctionParser(char *,struct expr *(*)(struct expr *,char *));
+   LOCALE int                            RemoveFunctionParser(char *);
+   LOCALE int                            FuncSeqOvlFlags(char *,int,int);
+   LOCALE struct FunctionDefinition     *GetFunctionList(void);
+   LOCALE void                           InstallFunctionList(struct FunctionDefinition *);
+   LOCALE struct FunctionDefinition     *FindFunction(char *);
    LOCALE int                            GetNthRestriction(struct FunctionDefinition *,int);
    LOCALE char                          *GetArgumentTypeName(int);
-   LOCALE int                            UndefineFunction(void *,char *);
-   LOCALE int                            GetMinimumArgs(struct FunctionDefinition *);
-   LOCALE int                            GetMaximumArgs(struct FunctionDefinition *);
+   LOCALE int                            UndefineFunction(char *);
 
 #endif
 
 
 
+
+

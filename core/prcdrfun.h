@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.24  06/05/06            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*          PROCEDURAL FUNCTIONS HEADER FILE           */
    /*******************************************************/
@@ -11,13 +11,11 @@
 /*                                                           */
 /* Principal Programmer(s):                                  */
 /*      Gary D. Riley                                        */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Contributing Programmer(s):                               */
 /*                                                           */
 /* Revision History:                                         */
-/*                                                           */
-/*      6.24: Renamed BOOLEAN macro type to intBool.         */
 /*                                                           */
 /*************************************************************/
 
@@ -39,36 +37,23 @@
 #define LOCALE extern
 #endif
 
-typedef struct loopCounterStack
-  {
-   long long loopCounter;
-   struct loopCounterStack *nxt;
-  } LOOP_COUNTER_STACK;
+   LOCALE void                           ProceduralFunctionDefinitions(void);
+   LOCALE void                           WhileFunction(DATA_OBJECT_PTR);
+   LOCALE void                           LoopForCountFunction(DATA_OBJECT_PTR);
+   LOCALE long                           GetLoopCount(void);
+   LOCALE void                           IfFunction(DATA_OBJECT_PTR);
+   LOCALE void                           BindFunction(DATA_OBJECT_PTR);
+   LOCALE void                           PrognFunction(DATA_OBJECT_PTR);
+   LOCALE void                           ReturnFunction(DATA_OBJECT_PTR);
+   LOCALE void                           BreakFunction(void);
+   LOCALE void                           SwitchFunction(DATA_OBJECT_PTR);
+   LOCALE BOOLEAN                        GetBoundVariable(struct dataObject *,struct symbolHashNode *);
+   LOCALE void                           FlushBindList(void);
 
-#define PRCDRFUN_DATA 13
-
-struct procedureFunctionData
-  { 
-   int ReturnFlag;
-   int BreakFlag;
-   LOOP_COUNTER_STACK *LoopCounterStack;
-   struct dataObject *BindList;
-  };
-
-#define ProcedureFunctionData(theEnv) ((struct procedureFunctionData *) GetEnvironmentData(theEnv,PRCDRFUN_DATA))
-
-   LOCALE void                           ProceduralFunctionDefinitions(void *);
-   LOCALE void                           WhileFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                           LoopForCountFunction(void *,DATA_OBJECT_PTR);
-   LOCALE long long                      GetLoopCount(void *);
-   LOCALE void                           IfFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                           BindFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                           PrognFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                           ReturnFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                           BreakFunction(void *);
-   LOCALE void                           SwitchFunction(void *,DATA_OBJECT_PTR);
-   LOCALE intBool                        GetBoundVariable(void *,struct dataObject *,struct symbolHashNode *);
-   LOCALE void                           FlushBindList(void *);
+#ifndef _PRCDRFUN_SOURCE
+   extern Thread int                            ReturnFlag;
+   extern Thread int                            BreakFlag;
+#endif
 
 #endif
 
@@ -77,3 +62,4 @@ struct procedureFunctionData
 
 
 
+

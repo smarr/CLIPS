@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.24  07/01/05            */
+   /*             CLIPS Version 6.10  04/13/98            */
    /*                                                     */
    /*             CONSTRAINT UTILITY MODULE               */
    /*******************************************************/
@@ -14,11 +14,13 @@
 /*      Gary D. Riley                                        */
 /*                                                           */
 /* Contributing Programmer(s):                               */
-/*      Brian Dantes                                         */
+/*      Brian Donnell                                        */
 /*                                                           */
 /* Revision History:                                         */
-/*      6.24: Added allowed-classes slot facet.              */
 /*                                                           */
+/* Who               |     Date    | Description             */
+/* ------------------+-------------+------------------------ */
+/* M.Giordano        | 23-Mar-2000 | Mods made for TLS       */
 /*************************************************************/
 
 #define _CSTRNUTL_SOURCE_
@@ -30,7 +32,6 @@
 #include "setup.h"
 
 #include "constant.h"
-#include "envrnmnt.h"
 #include "memalloc.h"
 #include "router.h"
 #include "extnfunc.h"
@@ -44,13 +45,12 @@
 /* GetConstraintRecord: Creates and initializes */
 /*   the values of a constraint record.         */
 /************************************************/
-globle struct constraintRecord *GetConstraintRecord(
-  void *theEnv)
+globle struct constraintRecord *GetConstraintRecord()
   {
    CONSTRAINT_RECORD *constraints;
    unsigned i;
 
-   constraints = get_struct(theEnv,constraintRecord);
+   constraints = get_struct(constraintRecord);
 
    for (i = 0 ; i < sizeof(CONSTRAINT_RECORD) ; i++)
      { ((char *) constraints)[i] = '\0'; }
@@ -65,14 +65,12 @@ globle struct constraintRecord *GetConstraintRecord(
    constraints->stringRestriction = FALSE;
    constraints->floatRestriction = FALSE;
    constraints->integerRestriction = FALSE;
-   constraints->classRestriction = FALSE;
    constraints->instanceNameRestriction = FALSE;
-   constraints->classList = NULL;
    constraints->restrictionList = NULL;
-   constraints->minValue = GenConstant(theEnv,SYMBOL,SymbolData(theEnv)->NegativeInfinity);
-   constraints->maxValue = GenConstant(theEnv,SYMBOL,SymbolData(theEnv)->PositiveInfinity);
-   constraints->minFields = GenConstant(theEnv,INTEGER,SymbolData(theEnv)->Zero);
-   constraints->maxFields = GenConstant(theEnv,SYMBOL,SymbolData(theEnv)->PositiveInfinity);
+   constraints->minValue = GenConstant(SYMBOL,NegativeInfinity);
+   constraints->maxValue = GenConstant(SYMBOL,PositiveInfinity);
+   constraints->minFields = GenConstant(INTEGER,Zero);
+   constraints->maxFields = GenConstant(SYMBOL,PositiveInfinity);
    constraints->bucket = -1;
    constraints->count = 0;
    constraints->multifield = NULL;
@@ -121,14 +119,13 @@ globle void SetAnyAllowedFlags(
 /* CopyConstraintRecord: Copies a constraint record. */
 /*****************************************************/
 globle struct constraintRecord *CopyConstraintRecord(
-  void *theEnv,
   CONSTRAINT_RECORD *sourceConstraint)
   {
    CONSTRAINT_RECORD *theConstraint;
 
    if (sourceConstraint == NULL) return(NULL);
 
-   theConstraint = get_struct(theEnv,constraintRecord);
+   theConstraint = get_struct(constraintRecord);
 
    theConstraint->anyAllowed = sourceConstraint->anyAllowed;
    theConstraint->symbolsAllowed = sourceConstraint->symbolsAllowed;
@@ -147,17 +144,15 @@ globle struct constraintRecord *CopyConstraintRecord(
    theConstraint->stringRestriction = sourceConstraint->stringRestriction;
    theConstraint->floatRestriction = sourceConstraint->floatRestriction;
    theConstraint->integerRestriction = sourceConstraint->integerRestriction;
-   theConstraint->classRestriction = sourceConstraint->classRestriction;
    theConstraint->instanceNameRestriction = sourceConstraint->instanceNameRestriction;
-   theConstraint->classList = CopyExpression(theEnv,sourceConstraint->classList);
-   theConstraint->restrictionList = CopyExpression(theEnv,sourceConstraint->restrictionList);
-   theConstraint->minValue = CopyExpression(theEnv,sourceConstraint->minValue);
-   theConstraint->maxValue = CopyExpression(theEnv,sourceConstraint->maxValue);
-   theConstraint->minFields = CopyExpression(theEnv,sourceConstraint->minFields);
-   theConstraint->maxFields = CopyExpression(theEnv,sourceConstraint->maxFields);
+   theConstraint->restrictionList = CopyExpression(sourceConstraint->restrictionList);
+   theConstraint->minValue = CopyExpression(sourceConstraint->minValue);
+   theConstraint->maxValue = CopyExpression(sourceConstraint->maxValue);
+   theConstraint->minFields = CopyExpression(sourceConstraint->minFields);
+   theConstraint->maxFields = CopyExpression(sourceConstraint->maxFields);
    theConstraint->bucket = -1;
    theConstraint->count = 0;
-   theConstraint->multifield = CopyConstraintRecord(theEnv,sourceConstraint->multifield);
+   theConstraint->multifield = CopyConstraintRecord(sourceConstraint->multifield);
    theConstraint->next = NULL;
 
    return(theConstraint);
@@ -298,7 +293,6 @@ globle int SetConstraintType(
 /*   than, less than or equal).                              */
 /*************************************************************/
 globle int CompareNumbers(
-  void *theEnv,
   int type1,
   void *vptr1,
   int type2,
@@ -316,13 +310,13 @@ globle int CompareNumbers(
    /* and negative infinity.                */
    /*=======================================*/
 
-   if (vptr1 == SymbolData(theEnv)->PositiveInfinity) return(GREATER_THAN);
+   if (vptr1 == PositiveInfinity) return(GREATER_THAN);
 
-   if (vptr1 == SymbolData(theEnv)->NegativeInfinity) return(LESS_THAN);
+   if (vptr1 == NegativeInfinity) return(LESS_THAN);
 
-   if (vptr2 == SymbolData(theEnv)->PositiveInfinity) return(LESS_THAN);
+   if (vptr2 == PositiveInfinity) return(LESS_THAN);
 
-   if (vptr2 == SymbolData(theEnv)->NegativeInfinity) return(GREATER_THAN);
+   if (vptr2 == NegativeInfinity) return(GREATER_THAN);
 
    /*=======================*/
    /* Compare two integers. */
@@ -395,7 +389,6 @@ globle int CompareNumbers(
 /*   allowed types SYMBOL and allow-values BLUE.                */
 /****************************************************************/
 globle CONSTRAINT_RECORD *ExpressionToConstraintRecord(
-  void *theEnv,
   struct expr *theExpression)
   {
    CONSTRAINT_RECORD *rv;
@@ -407,7 +400,7 @@ globle CONSTRAINT_RECORD *ExpressionToConstraintRecord(
 
    if (theExpression == NULL)
      {
-      rv = GetConstraintRecord(theEnv);
+      rv = GetConstraintRecord();
       rv->anyAllowed = FALSE;
       return(rv);
      }
@@ -427,18 +420,18 @@ globle CONSTRAINT_RECORD *ExpressionToConstraintRecord(
        (theExpression->type == GBL_VARIABLE) ||
        (theExpression->type == MF_GBL_VARIABLE))
      {
-      rv = GetConstraintRecord(theEnv);
+      rv = GetConstraintRecord();
       rv->multifieldsAllowed = TRUE;
       return(rv);
      }
    else if (theExpression->type == FCALL)
-     { return(FunctionCallToConstraintRecord(theEnv,theExpression->value)); }
+     { return(FunctionCallToConstraintRecord(theExpression->value)); }
 
    /*============================================*/
    /* Convert a constant to a constraint record. */
    /*============================================*/
 
-   rv = GetConstraintRecord(theEnv);
+   rv = GetConstraintRecord();
    rv->anyAllowed = FALSE;
 
    if (theExpression->type == FLOAT)
@@ -471,7 +464,7 @@ globle CONSTRAINT_RECORD *ExpressionToConstraintRecord(
 
    if (rv->floatsAllowed || rv->integersAllowed || rv->symbolsAllowed ||
        rv->stringsAllowed || rv->instanceNamesAllowed)
-     { rv->restrictionList = GenConstant(theEnv,theExpression->type,theExpression->value); }
+     { rv->restrictionList = GenConstant(theExpression->type,theExpression->value); }
 
    return(rv);
   }
@@ -483,12 +476,11 @@ globle CONSTRAINT_RECORD *ExpressionToConstraintRecord(
 /*   record with allowed types INTEGER and FLOAT.      */
 /*******************************************************/
 globle CONSTRAINT_RECORD *FunctionCallToConstraintRecord(
-  void *theEnv,
   void *theFunction)
   {
    CONSTRAINT_RECORD *rv;
 
-   rv = GetConstraintRecord(theEnv);
+   rv = GetConstraintRecord();
    rv->anyAllowed = FALSE;
 
    switch ((char) ValueFunctionType(theFunction))
@@ -503,7 +495,6 @@ globle CONSTRAINT_RECORD *FunctionCallToConstraintRecord(
         break;
 
       case 'i':
-      case 'g':
       case 'l':
         rv->integersAllowed = TRUE;
         break;
@@ -566,12 +557,11 @@ globle CONSTRAINT_RECORD *FunctionCallToConstraintRecord(
 /*   to a constraint record.                           */
 /*******************************************************/
 globle CONSTRAINT_RECORD *ArgumentTypeToConstraintRecord(
-  void *theEnv,
   int theRestriction)
   {
    CONSTRAINT_RECORD *rv;
 
-   rv = GetConstraintRecord(theEnv);
+   rv = GetConstraintRecord();
    rv->anyAllowed = FALSE;
 
    switch (theRestriction)
@@ -684,3 +674,4 @@ globle CONSTRAINT_RECORD *ArgumentTypeToConstraintRecord(
 
 
 
+

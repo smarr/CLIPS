@@ -1,10 +1,4 @@
-   /*******************************************************/
-   /*      "C" Language Integrated Production System      */
-   /*                                                     */
-   /*             CLIPS Version 6.21  06/15/03            */
-   /*                                                     */
-   /*                  EMACS HEADER FILE                  */
-   /*******************************************************/
+/*   CLIPS Version 6.10  04/09/97 */
 
 /*
  * This file is the general header file for all parts of the MicroEMACS
@@ -29,34 +23,33 @@
 #include "router.h"
 #include "scanner.h"
 #include "symbol.h"
-#include "sysdep.h"
 
-#if     VAX_VMS
+#if     VMS
 #define ANSI    1                       /* Normally used for VAX VMS    */
 #define VT52    0                       /* VT52 terminal (Zenith).      */
 #define TERMCAP 0                       /* Use TERMCAP                  */
-#define IBM_PC  0                       /* Standard IBM PC BIOS         */
+#define IBM_PC  0			/* Standard IBM PC BIOS         */
 #endif
 
-#if     UNIX_7 || UNIX_V || LINUX || DARWIN
+#if     UNIX_7 || UNIX_V
+#define ANSI    0                       /* Normally used for VAX VMS    */
+#define VT52    0                       /* VT52 terminal (Zenith).      */
+#define TERMCAP 1                       /* Use TERMCAP                  */
+#define IBM_PC  0			/* Standard IBM PC BIOS         */
+#endif
+
+#if     IBM_MSC || IBM_TBC || IBM_ZTC || IBM_ICB
+#define ANSI    0                       /* Normally used for VAX VMS    */
+#define VT52    0                       /* VT52 terminal (Zenith).      */
+#define TERMCAP 0                       /* Use TERMCAP                  */
+#define IBM_PC  1			/* Standard IBM PC BIOS         */
+#endif
+
+#if     IBM_GCC
 #define ANSI    0                       /* Normally used for VAX VMS    */
 #define VT52    0                       /* VT52 terminal (Zenith).      */
 #define TERMCAP 1                       /* Use TERMCAP                  */
 #define IBM_PC  0                       /* Standard IBM PC BIOS         */
-#endif
-
-#if     WIN_MVC || WIN_BTC
-#define ANSI    0                       /* Normally used for VAX VMS    */
-#define VT52    0                       /* VT52 terminal (Zenith).      */
-#define TERMCAP 0                       /* Use TERMCAP                  */
-#define IBM_PC  1                       /* Standard IBM PC BIOS         */
-#endif
-
-#if     WIN_GCC
-#define ANSI    0                       /* Normally used for VAX VMS    */
-#define VT52    0                       /* VT52 terminal (Zenith).      */
-#define TERMCAP 0                       /* Use TERMCAP                  */
-#define IBM_PC  1                       /* Standard IBM PC BIOS         */
 #endif
 
 
@@ -193,19 +186,19 @@ typedef struct  LINE {
 typedef struct  {
         short   t_nrow;                 /* Number of rows.              */
         short   t_ncol;                 /* Number of columns.           */
-        void    (*t_open)(void);        /* Open terminal at the start.  */
-        void    (*t_close)(void);       /* Close terminal at end.       */
+        VOID    (*t_open)(void);        /* Open terminal at the start.  */
+        VOID    (*t_close)(void);       /* Close terminal at end.       */
         int     (*t_getchar)(void);     /* Get character from keyboard. */
-        void    (*t_putchar)(int);      /* Put character to display.    */
-        void    (*t_flush)(void);       /* Flush output buffers.        */
-        void    (*t_move)(int,int);     /* Move the cursor, origin 0.   */
-        void    (*t_eeol)(void);        /* Erase to end of line.        */
-        void    (*t_eeop)(void);        /* Erase to end of page.        */
-        void    (*t_beep)(void);        /* Beep.                        */
+        VOID    (*t_putchar)(int);      /* Put character to display.    */
+        VOID    (*t_flush)(void);       /* Flush output buffers.        */
+        VOID    (*t_move)(int,int);     /* Move the cursor, origin 0.   */
+        VOID    (*t_eeol)(void);        /* Erase to end of line.        */
+        VOID    (*t_eeop)(void);        /* Erase to end of page.        */
+        VOID    (*t_beep)(void);        /* Beep.                        */
 }       TERM;
 
 
-#if IBM_PC || WIN_GCC
+#if IBM_PC || IBM_GCC
 /*
  *  This section defines the code returned by all the special keys on
  *  a PC numeric Keypad. It could also be used to define the function
@@ -228,7 +221,7 @@ typedef struct  {
 
 #endif
 
-#if IBM_PC || VAX_VMS
+#if IBM_PC || VMS
 
 #define BADKEY		999
 
@@ -244,54 +237,54 @@ typedef struct  {
 #define LOCALE extern
 #endif
 
-LOCALE int gotobol(void *,int,int);
-LOCALE int backchar(void *,int,int);
-LOCALE int gotoeol(void *,int,int);
-LOCALE int forwchar(void *,int,int);
-LOCALE int gotobob(void *,int,int);
-LOCALE int gotoeob(void *,int,int);
-LOCALE int forwline(void *,int,int);
-LOCALE int backline(void *,int,int);
+LOCALE int gotobol(int,int);
+LOCALE int backchar(int,int);
+LOCALE int gotoeol(int,int);
+LOCALE int forwchar(int,int);
+LOCALE int gotobob(int,int);
+LOCALE int gotoeob(int,int);
+LOCALE int forwline(int,int);
+LOCALE int backline(int,int);
 LOCALE int getgoal(LINE *);
-LOCALE int forwpage(void *,int,int);
-LOCALE int backpage(void *,int,int);
-LOCALE int setmark(void *,int,int);
-LOCALE int swapmark(void *,int,int);
-LOCALE int wrapword(void *);
-LOCALE int backword(void *,int,int);
-LOCALE int forwword(void *,int,int);
-LOCALE int upperword(void *,int,int);
-LOCALE int lowerword(void *,int,int);
-LOCALE int capword(void *,int,int);
-LOCALE int delfword(void *,int,int);
-LOCALE int delbword(void *,int,int);
+LOCALE int forwpage(int,int);
+LOCALE int backpage(int,int);
+LOCALE int setmark(int,int);
+LOCALE int swapmark(int,int);
+LOCALE int wrapword(void);
+LOCALE int backword(int,int);
+LOCALE int forwword(int,int);
+LOCALE int upperword(int,int);
+LOCALE int lowerword(int,int);
+LOCALE int capword(int,int);
+LOCALE int delfword(int,int);
+LOCALE int delbword(int,int);
 LOCALE int inword(void);
-LOCALE int killregion(void *,int,int);
-LOCALE int copyregion(void *,int,int);
-LOCALE int upperregion(void *,int,int);
-LOCALE int lowerregion(void *,int,int);
+LOCALE int killregion(int,int);
+LOCALE int copyregion(int,int);
+LOCALE int upperregion(int,int);
+LOCALE int lowerregion(int,int);
 LOCALE int getregion(REGION *);
-LOCALE int fileread(void *,int,int);
-LOCALE int filevisit(void *,int,int);
-LOCALE int filevisit_guts(void *,char []);
-LOCALE int readin(void *,char []);
+LOCALE int fileread(int,int);
+LOCALE int filevisit(int,int);
+LOCALE int filevisit_guts(char []);
+LOCALE int readin(char []);
 LOCALE int makename(char [],char []);
-LOCALE int filewrite(void *,int,int);
-LOCALE int filesave(void *,int,int);
+LOCALE int filewrite(int,int);
+LOCALE int filesave(int,int);
 LOCALE int writeout(char *);
-LOCALE int filename(void *,int,int);
+LOCALE int filename(int,int);
 LOCALE int ffropen(char *);
 LOCALE int ffwopen(char *);
 LOCALE int ffclose(void);
 LOCALE int ffputline(char [],int);
 LOCALE int ffgetline(char [],int);
-LOCALE void ttopen(void);
-LOCALE void ttclose(void);
-LOCALE void ttputc(int);
-LOCALE void ttflush(void);
+LOCALE VOID ttopen(void);
+LOCALE VOID ttclose(void);
+LOCALE VOID ttputc(int);
+LOCALE VOID ttflush(void);
 LOCALE int ttgetc(void);
 
-#if VAX_VMS
+#if VMS
 LOCALE int parse_esc_seq(void);
 #endif
 
@@ -302,23 +295,23 @@ LOCALE int parse_esc_seq(void);
 #define LOCALE extern
 #endif
 
-LOCALE void edinit(void *,char []);
-LOCALE int execute(void *,int,int,int);
+LOCALE VOID edinit(char []);
+LOCALE int execute(int,int,int);
 LOCALE int getkey(void);
 LOCALE int getctl(void);
-LOCALE int quickexit(void *,int,int);
-LOCALE int edquit(void *,int,int);
-LOCALE int temp_quit(void *,int,int);
-LOCALE int ctlxlp(void *,int,int);
-LOCALE int ctlxrp(void *,int,int);
-LOCALE int ctlxe(void *,int,int);
-LOCALE int ctrlg(void *,int,int);
-LOCALE void full_cleanup(void *);
-LOCALE int kill_all_buffers(void *,BUFFER **);
-LOCALE int kill_all_windows(void *);
-LOCALE int spec_clear(void *,BUFFER *);
-LOCALE void EditCommand(void *);
-LOCALE void EditorFunctionDefinition(void *);
+LOCALE int quickexit(int,int);
+LOCALE int edquit(int,int);
+LOCALE int temp_quit(int,int);
+LOCALE int ctlxlp(int,int);
+LOCALE int ctlxrp(int,int);
+LOCALE int ctlxe(int,int);
+LOCALE int ctrlg(int,int);
+LOCALE VOID full_cleanup(void);
+LOCALE int kill_all_buffers(BUFFER **);
+LOCALE int kill_all_windows(void);
+LOCALE int spec_clear(BUFFER *);
+LOCALE VOID EditCommand(void);
+LOCALE VOID EditorFunctionDefinition(void);
 
 #ifndef _EDMAIN_SOURCE_
 
@@ -350,51 +343,51 @@ extern BUFFER *CompileBufferp;
 #define LOCALE extern
 #endif
 
-LOCALE int compile_region(void *,int,int);
-LOCALE int compile_file(void *,int,int);
-LOCALE int get_compile(void *,char *,char *);
-LOCALE int region_fnd(void *,char *);
-LOCALE int region_getc(void *,char *);
-LOCALE int region_ungetc(void *,int,char *);
-LOCALE int buffer_fnd(void *,char *);
-LOCALE int buffer_getc(void *,char *);
-LOCALE int buffer_ungetc(void *,int,char *);
-LOCALE int query_cmp(void *,char *);
-LOCALE int print_cmp(void *,char *,char *);
-LOCALE void init_cmp_router(void *);
-LOCALE void kill_cmp_router(void *);
-LOCALE int setfillcol(void *,int,int);
-LOCALE int showcpos(void *,int,int);
+LOCALE int compile_region(int,int);
+LOCALE int compile_file(int,int);
+LOCALE int get_compile(char *,char *);
+LOCALE int region_fnd(char *);
+LOCALE int region_getc(char *);
+LOCALE int region_ungetc(int,char *);
+LOCALE int buffer_fnd(char *);
+LOCALE int buffer_getc(char *);
+LOCALE int buffer_ungetc(int,char *);
+LOCALE int query_cmp(char *);
+LOCALE int print_cmp(char *,char *);
+LOCALE VOID init_cmp_router(void);
+LOCALE VOID kill_cmp_router(void);
+LOCALE int setfillcol(int,int);
+LOCALE int showcpos(int,int);
 LOCALE int getccol(int);
 LOCALE int getcline(void);
 LOCALE int cntlines(void);
-LOCALE int gotoline(void *,int,int);
-LOCALE int twiddle(void *,int,int);
-LOCALE int quote(void *,int,int);
-LOCALE int tab(void *,int,int);
-LOCALE int openline(void *,int,int);
-LOCALE int newline(void *,int,int);
-LOCALE int deblank(void *,int,int);
-LOCALE int indent(void *,int,int);
-LOCALE int forwdel(void *,int,int);
-LOCALE int backdel(void *,int,int);
-LOCALE int kill_fwd(void *,int,int);
-LOCALE int yank(void *,int,int);
-LOCALE int forwsearch(void *,int,int);
-LOCALE int backsearch(void *,int,int);
-LOCALE int bkwrdrpl(void *,int,int);
-LOCALE int bkwrdcr(void *,int,int);
-LOCALE int frwsr(void *,int,int);
-LOCALE int querysr(void *,int,int);
-LOCALE int lreplace(void *,char *);
-LOCALE int smatchb(void *,int,int);
+LOCALE int gotoline(int,int);
+LOCALE int twiddle(int,int);
+LOCALE int quote(int,int);
+LOCALE int tab(int,int);
+LOCALE int openline(int,int);
+LOCALE int newline(int,int);
+LOCALE int deblank(int,int);
+LOCALE int indent(int,int);
+LOCALE int forwdel(int,int);
+LOCALE int backdel(int,int);
+LOCALE int kill_fwd(int,int);
+LOCALE int yank(int,int);
+LOCALE int forwsearch(int,int);
+LOCALE int backsearch(int,int);
+LOCALE int bkwrdrpl(int,int);
+LOCALE int bkwrdcr(int,int);
+LOCALE int frwsr(int,int);
+LOCALE int querysr(int,int);
+LOCALE int lreplace(char *);
+LOCALE int smatchb(int,int);
 LOCALE int searchcl(int);
 LOCALE int searchop(int);
-LOCALE int readpattern(void *,char *);
-LOCALE int spawncli(void *,int,int);
-LOCALE int spawn(void *,int,int);
+LOCALE int readpattern(char *);
+LOCALE int spawncli(int,int);
+LOCALE int spawn(int,int);
 
-#if VAX_VMS
+#if VMS
 LOCALE int sys(char *);
 #endif
 
@@ -406,52 +399,52 @@ LOCALE int sys(char *);
 #define LOCALE extern
 #endif
 
-LOCALE int usebuffer(void *,int,int);
-LOCALE int killbuffer(void *,int,int);
-LOCALE int listbuffers(void *,int,int);
-LOCALE int makelist(void *);
-LOCALE int addline(void *,BUFFER *,char *);
+LOCALE int usebuffer(int,int);
+LOCALE int killbuffer(int,int);
+LOCALE int listbuffers(int,int);
+LOCALE int makelist(void);
+LOCALE int addline(BUFFER *,char *);
 LOCALE int anycb(void);
-LOCALE BUFFER *bfind(void *,char *,int,int);
-LOCALE int bclear(void *,BUFFER *);
-LOCALE LINE *lalloc(void *,int);
-LOCALE void lfree(void *,LINE *);
-LOCALE void lchange(int);
-LOCALE int linsert(void *,int,int);
-LOCALE int lnewline(void *);
-LOCALE int ldelete(void *,long,int);
-LOCALE int ldelnewline(void *);
-LOCALE void kdelete(void *);
-LOCALE int kinsert(void *,int);
+LOCALE BUFFER *bfind(char *,int,int);
+LOCALE int bclear(BUFFER *);
+LOCALE LINE *lalloc(int);
+LOCALE VOID lfree(LINE *);
+LOCALE VOID lchange(int);
+LOCALE int linsert(int,int);
+LOCALE int lnewline(void);
+LOCALE int ldelete(long,int);
+LOCALE int ldelnewline(void);
+LOCALE VOID kdelete(void);
+LOCALE int kinsert(int);
 LOCALE int kremove(int);
-LOCALE int reposition(void *,int,int);
-LOCALE int EditorRefresh(void *,int,int);
-LOCALE int nextwind(void *,int,int);
-LOCALE int prevwind(void *,int,int);
-LOCALE int mvdnwind(void *,int,int);
-LOCALE int mvupwind(void *,int,int);
-LOCALE int onlywind(void *,int,int);
-LOCALE int splitwind(void *,int,int);
-LOCALE int enlargewind(void *,int,int);
-LOCALE int shrinkwind(void *,int,int);
-LOCALE WINDOW *wpopup(void *);
-LOCALE void vtinit(void *);
-LOCALE void vttidy(void);
-LOCALE void vtmove(int,int);
-LOCALE void vtputc(int);
-LOCALE void vteeol(void);
-LOCALE void update(void);
-LOCALE void updateline(int,char [],char []);
-LOCALE void modeline(WINDOW *);
-LOCALE void movecursor(int,int);
-LOCALE void mlerase(void);
-LOCALE int mlyesno(void *,char *);
-LOCALE int mlreply(void *,char *,char *,int);
-LOCALE void mlwrite(char *,...);
-LOCALE void mlputs(char *);
-LOCALE void mlputi(int,int);
-LOCALE void mlputli(long,int);
-LOCALE void kill_video_buffers(void *);
+LOCALE int reposition(int,int);
+LOCALE int EditorRefresh(int,int);
+LOCALE int nextwind(int,int);
+LOCALE int prevwind(int,int);
+LOCALE int mvdnwind(int,int);
+LOCALE int mvupwind(int,int);
+LOCALE int onlywind(int,int);
+LOCALE int splitwind(int,int);
+LOCALE int enlargewind(int,int);
+LOCALE int shrinkwind(int,int);
+LOCALE WINDOW *wpopup(void);
+LOCALE VOID vtinit(void);
+LOCALE VOID vttidy(void);
+LOCALE VOID vtmove(int,int);
+LOCALE VOID vtputc(int);
+LOCALE VOID vteeol(void);
+LOCALE VOID update(void);
+LOCALE VOID updateline(int,char [],char []);
+LOCALE VOID modeline(WINDOW *);
+LOCALE VOID movecursor(int,int);
+LOCALE VOID mlerase(void);
+LOCALE int mlyesno(char *);
+LOCALE int mlreply(char *,char *,int);
+LOCALE VOID mlwrite(char *,...);
+LOCALE VOID mlputs(char *);
+LOCALE VOID mlputi(int,int);
+LOCALE VOID mlputli(long,int);
+LOCALE VOID kill_video_buffers(void);
 
 #ifndef _EDSTRUCT_SOURCE_
 extern int     mpresf;
@@ -467,3 +460,4 @@ extern TERM term;
 
 
 
+

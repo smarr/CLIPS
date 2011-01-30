@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.24  06/05/06            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*        FACT RETE ACCESS FUNCTIONS HEADER FILE       */
    /*******************************************************/
@@ -15,8 +15,6 @@
 /* Contributing Programmer(s):                               */
 /*                                                           */
 /* Revision History:                                         */
-/*                                                           */
-/*      6.24: Renamed BOOLEAN macro type to intBool.         */
 /*                                                           */
 /*************************************************************/
 
@@ -38,22 +36,26 @@
 #define LOCALE extern
 #endif
 
-   LOCALE intBool                        FactPNGetVar1(void *,void *,DATA_OBJECT_PTR);
-   LOCALE intBool                        FactPNGetVar2(void *,void *,DATA_OBJECT_PTR);
-   LOCALE intBool                        FactPNGetVar3(void *,void *,DATA_OBJECT_PTR);
-   LOCALE intBool                        FactJNGetVar1(void *,void *,DATA_OBJECT_PTR);
-   LOCALE intBool                        FactJNGetVar2(void *,void *,DATA_OBJECT_PTR);
-   LOCALE intBool                        FactJNGetVar3(void *,void *,DATA_OBJECT_PTR);
-   LOCALE intBool                        FactSlotLength(void *,void *,DATA_OBJECT_PTR);
-   LOCALE int                            FactJNCompVars1(void *,void *,DATA_OBJECT_PTR);
-   LOCALE int                            FactJNCompVars2(void *,void *,DATA_OBJECT_PTR);
-   LOCALE int                            FactPNCompVars1(void *,void *,DATA_OBJECT_PTR);
-   LOCALE intBool                        FactPNConstant1(void *,void *,DATA_OBJECT_PTR);
-   LOCALE intBool                        FactPNConstant2(void *,void *,DATA_OBJECT_PTR);
-   LOCALE int                            FactStoreMultifield(void *,void *,DATA_OBJECT_PTR);
-   LOCALE unsigned short                 AdjustFieldPosition(void *,struct multifieldMarker *,
-                                                             unsigned short,unsigned short,int *);
+   LOCALE BOOLEAN                        FactPNGetVar1(void *,DATA_OBJECT_PTR);
+   LOCALE BOOLEAN                        FactPNGetVar2(void *,DATA_OBJECT_PTR);
+   LOCALE BOOLEAN                        FactPNGetVar3(void *,DATA_OBJECT_PTR);
+   LOCALE BOOLEAN                        FactJNGetVar1(void *,DATA_OBJECT_PTR);
+   LOCALE BOOLEAN                        FactJNGetVar2(void *,DATA_OBJECT_PTR);
+   LOCALE BOOLEAN                        FactJNGetVar3(void *,DATA_OBJECT_PTR);
+   LOCALE BOOLEAN                        FactSlotLength(void *,DATA_OBJECT_PTR);
+   LOCALE int                            FactJNCompVars1(void *,DATA_OBJECT_PTR);
+   LOCALE int                            FactJNCompVars2(void *,DATA_OBJECT_PTR);
+   LOCALE int                            FactPNCompVars1(void *,DATA_OBJECT_PTR);
+   LOCALE BOOLEAN                        FactPNConstant1(void *,DATA_OBJECT_PTR);
+   LOCALE BOOLEAN                        FactPNConstant2(void *,DATA_OBJECT_PTR);
+   LOCALE int                            FactStoreMultifield(void *,DATA_OBJECT_PTR);
+   LOCALE int                            AdjustFieldPosition(struct multifieldMarker *,int,int,int *);
 
 #endif
 
 
+
+
+
+
+

@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*               CLIPS Version 6.20  01/31/02          */
+   /*               CLIPS Version 6.10  04/09/97          */
    /*                                                     */
    /*                                                     */
    /*******************************************************/
@@ -10,7 +10,7 @@
 /* Purpose:                                                  */
 /*                                                           */
 /* Principal Programmer(s):                                  */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Contributing Programmer(s):                               */
 /*                                                           */
@@ -41,12 +41,17 @@
 #define LOCALE extern
 #endif
 
-LOCALE void CallDeffunction(void *,DEFFUNCTION *,EXPRESSION *,DATA_OBJECT *);
+LOCALE void CallDeffunction(DEFFUNCTION *,EXPRESSION *,DATA_OBJECT *);
 
+#ifndef _DFFNXEXE_SOURCE_
+extern Thread DEFFUNCTION *ExecutingDeffunction;
 #endif
 
 #endif
 
+#endif
 
 
 
+
+

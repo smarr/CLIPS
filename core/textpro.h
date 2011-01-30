@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.24  06/05/06            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*             TEXT PROCESSING HEADER FILE             */
    /*******************************************************/
@@ -10,13 +10,11 @@
 /* Purpose:                                                  */
 /*                                                           */
 /* Principal Programmer(s):                                  */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Contributing Programmer(s):                               */
 /*                                                           */
 /* Revision History:                                         */
-/*                                                           */
-/*      6.24: Added get-region function.                     */
 /*                                                           */
 /*************************************************************/
 
@@ -35,21 +33,22 @@
 #endif
 
 #if TEXTPRO_FUNCTIONS
-   LOCALE void                           FetchCommand(void *,DATA_OBJECT *);
-   LOCALE int                            PrintRegionCommand(void *);
-   LOCALE void                          *GetRegionCommand(void *);
-   int                                   TossCommand(void *);
+   LOCALE void                           FetchCommand(DATA_OBJECT *);
+   LOCALE int                            PrintRegionCommand(void);
+   int                                   TossCommand(void);
 #endif
 
 #if HELP_FUNCTIONS
-   LOCALE void                           HelpFunction(void *);
-   LOCALE void                           HelpPathFunction(void *);
+   LOCALE void                           HelpFunction(void);
+   LOCALE void                           HelpPathFunction(void);
 #endif
 
-   LOCALE void                           HelpFunctionDefinitions(void *);
+   LOCALE void                           HelpFunctionDefinitions(void);
 #endif
 
 
 
 
 
+
+

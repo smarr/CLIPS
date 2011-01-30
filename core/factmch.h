@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.20  01/31/02            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*               FACT MATCH HEADER FILE                */
    /*******************************************************/
@@ -42,12 +42,17 @@
 #define LOCALE extern
 #endif
 
-   LOCALE void                           FactPatternMatch(void *,struct fact *,
+   LOCALE void                           FactPatternMatch(struct fact *,
                                                struct factPatternNode *,int,
                                                struct multifieldMarker *,
                                                struct multifieldMarker *);
-   LOCALE void                           MarkFactPatternForIncrementalReset(void *,struct patternNodeHeader *,int);
-   LOCALE void                           FactsIncrementalReset(void *);
+   LOCALE void                           MarkFactPatternForIncrementalReset(struct patternNodeHeader *,int);
+   LOCALE void                           FactsIncrementalReset(void);
+
+#ifndef _FACTMCH_SOURCE_
+   extern Thread struct fact             *CurrentPatternFact;
+   extern Thread struct multifieldMarker *CurrentPatternMarks;
+#endif
 
 #endif
 
@@ -56,3 +61,4 @@
 
 
 
+

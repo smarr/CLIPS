@@ -1,9 +1,9 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.30  03/04/08            */
+   /*             CLIPS Version 6.10  04/13/98            */
    /*                                                     */
-   /*                   API HEADER FILE                   */
+   /*                  CLIPS HEADER FILE                  */
    /*******************************************************/
 
 /*************************************************************/
@@ -15,11 +15,6 @@
 /* Contributing Programmer(s):                               */
 /*                                                           */
 /* Revision History:                                         */
-/*                                                           */
-/*      6.24: Added filertr.h and tmpltfun.h to include      */
-/*            list.                                          */
-/*                                                           */
-/*      6.30: Added classpsr.h to include list.              */
 /*                                                           */
 /*************************************************************/
 
@@ -34,19 +29,12 @@
 #include "memalloc.h"
 #include "cstrcpsr.h"
 #include "filecom.h"
-#include "strngfun.h"
-#include "envrnmnt.h"
-#include "commline.h"
 #ifndef _H_symbol
 #include "symbol.h"
 #endif
-
+#ifndef _H_router
 #include "router.h"
-#include "filertr.h"
-#include "strngrtr.h"
-
-#include "iofun.h"
-
+#endif
 #include "sysdep.h"
 #include "bmathfun.h"
 #ifndef _H_expressn
@@ -91,9 +79,7 @@
 #if DEFTEMPLATE_CONSTRUCT
 #include "tmpltdef.h"
 #include "tmpltbsc.h"
-#include "tmpltfun.h"
 #include "factcom.h"
-#include "factfun.h"
 #ifndef _H_factmngr
 #include "factmngr.h"
 #endif
@@ -116,18 +102,7 @@
 #endif
 
 #if OBJECT_SYSTEM
-#include "classcom.h"
-#include "classexm.h"
-#include "classinf.h"
-#include "classini.h"
-#include "classpsr.h"
-#include "defins.h"
-#include "inscom.h"
-#include "insfile.h"
-#include "insfun.h"
-#include "msgcom.h"
-#include "msgpass.h"
-#include "objrtmch.h"
+#include "extobj.h"
 #endif
 
 
@@ -135,3 +110,4 @@
 
 
 
+

@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.20  01/31/02            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*              DEFTEMPLATE LHS HEADER FILE            */
    /*******************************************************/
@@ -39,10 +39,13 @@
 #define LOCALE extern
 #endif
 
-   LOCALE struct lhsParseNode           *DeftemplateLHSParse(void *,char *,struct deftemplate *);
+   LOCALE struct lhsParseNode           *DeftemplateLHSParse(char *,struct deftemplate *);
 
 #endif
 
 
 
 
+
+
+

@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.24  06/05/06            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*          LOGICAL DEPENDENCIES HEADER FILE           */
    /*******************************************************/
@@ -17,19 +17,11 @@
 /*                                                           */
 /* Revision History:                                         */
 /*                                                           */
-/*      6.24: Renamed BOOLEAN macro type to intBool.         */
-/*                                                           */
 /*************************************************************/
 
 #ifndef _H_lgcldpnd
 
 #define _H_lgcldpnd
-
-struct dependency
-  {
-   void *dPtr;
-   struct dependency *next;
-  };
 
 #ifndef _H_match
 #include "match.h"
@@ -37,6 +29,12 @@ struct dependency
 #ifndef _H_pattern
 #include "pattern.h"
 #endif
+
+struct dependency
+  {
+   void *dPtr;
+   struct dependency *next;
+  };
 
 #ifdef LOCALE
 #undef LOCALE
@@ -47,18 +45,15 @@ struct dependency
 #define LOCALE extern
 #endif
 
-   LOCALE intBool                        AddLogicalDependencies(void *,struct patternEntity *,int);
-   LOCALE void                           RemoveEntityDependencies(void *,struct patternEntity *);
-   LOCALE void                           RemovePMDependencies(void *,struct partialMatch *);
-   LOCALE void                           DestroyPMDependencies(void *,struct partialMatch *);
-   LOCALE void                           RemoveLogicalSupport(void *,struct partialMatch *);
-   LOCALE void                           ForceLogicalRetractions(void *);
-   LOCALE void                           Dependencies(void *,struct patternEntity *);
-   LOCALE void                           Dependents(void *,struct patternEntity *);
-   LOCALE void                           DependenciesCommand(void *);
-   LOCALE void                           DependentsCommand(void *);
-   LOCALE void                           ReturnEntityDependencies(void *,struct patternEntity *);
-   LOCALE struct partialMatch           *FindLogicalBind(struct joinNode *,struct partialMatch *);
+   LOCALE BOOLEAN                        AddLogicalDependencies(struct patternEntity *,int);
+   LOCALE void                           RemoveEntityDependencies(struct patternEntity *);
+   LOCALE void                           RemovePMDependencies(struct partialMatch *);
+   LOCALE void                           RemoveLogicalSupport(struct partialMatch *);
+   LOCALE void                           ForceLogicalRetractions(void);
+   LOCALE void                           Dependencies(struct patternEntity *);
+   LOCALE void                           Dependents(struct patternEntity *);
+   LOCALE void                           DependenciesCommand(void);
+   LOCALE void                           DependentsCommand(void);
 
 #endif
 
@@ -66,3 +61,4 @@ struct dependency
 
 
 
+

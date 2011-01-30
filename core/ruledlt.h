@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.20  01/31/02            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*          RULE DELETION MODULE HEADER FILE           */
    /*******************************************************/
@@ -34,8 +34,13 @@
 #define LOCALE extern
 #endif
 
-   LOCALE void                           ReturnDefrule(void *,void *);
-   LOCALE void                           DestroyDefrule(void *,void *);
+   LOCALE void                           ReturnDefrule(void *);
+
+#ifndef _RULEDLT_SOURCE_
+#if (! RUN_TIME) && (! BLOAD_ONLY) && DEBUGGING_FUNCTIONS
+   extern Thread int                            DeletedRuleDebugFlags;
+#endif
+#endif
 
 #endif
 
@@ -44,3 +49,4 @@
 
 
 
+

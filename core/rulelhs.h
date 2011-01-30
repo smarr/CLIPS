@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.20  01/31/02            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*           DEFRULE LHS PARSING HEADER FILE           */
    /*******************************************************/
@@ -45,11 +45,18 @@
 #define LOCALE extern
 #endif
 
-LOCALE struct lhsParseNode           *ParseRuleLHS(void *,char *,struct token *,char *,int *);
+LOCALE struct lhsParseNode           *ParseRuleLHS(char *,struct token *,char *);
 LOCALE void                           PropagatePatternType(struct lhsParseNode *,struct patternParser *);
+
+#ifndef _RULELHS_SOURCE_
+   extern Thread int                     GlobalSalience;
+   extern Thread int                     GlobalAutoFocus;
+   extern Thread struct expr            *SalienceExpression;
+#endif
 
 #endif
 
 
 
 
+

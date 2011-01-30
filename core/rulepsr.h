@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.20  01/31/02            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*               RULE PARSING HEADER FILE              */
    /*******************************************************/
@@ -31,10 +31,13 @@
 #define LOCALE extern
 #endif
 
-   LOCALE int                            ParseDefrule(void *,char *);
+   LOCALE int                            ParseDefrule(char *);
    LOCALE struct lhsParseNode           *FindVariable(struct symbolHashNode *,
                                                       struct lhsParseNode *);
 
 #endif
 
 
+
+
+

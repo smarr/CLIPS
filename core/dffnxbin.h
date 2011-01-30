@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*               CLIPS Version 6.20  01/31/02          */
+   /*               CLIPS Version 6.10  04/09/97          */
    /*                                                     */
    /*                                                     */
    /*******************************************************/
@@ -10,7 +10,7 @@
 /* Purpose:                                                  */
 /*                                                           */
 /* Principal Programmer(s):                                  */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Contributing Programmer(s):                               */
 /*                                                           */
@@ -25,6 +25,8 @@
 
 #include "dffnxfun.h"
 
+#define DeffunctionPointer(i) (((i) == -1L) ? NULL : (DEFFUNCTION *) &deffunctionArray[i])
+
 #ifdef LOCALE
 #undef LOCALE
 #endif
@@ -35,22 +37,12 @@
 #define LOCALE extern
 #endif
 
-LOCALE void SetupDeffunctionsBload(void *);
-LOCALE void *BloadDeffunctionModuleReference(void *,int);
+LOCALE void SetupDeffunctionsBload(void);
+LOCALE void *BloadDeffunctionModuleReference(int);
 
-#define DFFNXBIN_DATA 24
-
-struct deffunctionBinaryData
-  { 
-   DEFFUNCTION *DeffunctionArray;
-   long DeffunctionCount;
-   long ModuleCount;
-   DEFFUNCTION_MODULE *ModuleArray;
-  };
-  
-#define DeffunctionBinaryData(theEnv) ((struct deffunctionBinaryData *) GetEnvironmentData(theEnv,DFFNXBIN_DATA))
-
-#define DeffunctionPointer(i) (((i) == -1L) ? NULL : (DEFFUNCTION *) &DeffunctionBinaryData(theEnv)->DeffunctionArray[i])
+#ifndef _DFFNXBIN_SOURCE_
+extern Thread DEFFUNCTION *deffunctionArray;
+#endif
 
 #endif
 
@@ -59,3 +51,4 @@ struct deffunctionBinaryData
 
 
 
+

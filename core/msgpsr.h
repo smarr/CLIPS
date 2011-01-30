@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*               CLIPS Version 6.20  01/31/02          */
+   /*               CLIPS Version 6.10  04/09/97          */
    /*                                                     */
    /*                                                     */
    /*******************************************************/
@@ -10,7 +10,7 @@
 /* Purpose:                                                  */
 /*                                                           */
 /* Principal Programmer(s):                                  */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Contributing Programmer(s):                               */
 /*                                                           */
@@ -39,12 +39,17 @@
 #define LOCALE extern
 #endif
 
-LOCALE int ParseDefmessageHandler(void *,char *);
-LOCALE void CreateGetAndPutHandlers(void *,SLOT_DESC *);
+LOCALE int ParseDefmessageHandler(char *);
+LOCALE void CreateGetAndPutHandlers(SLOT_DESC *);
 
+#ifndef _MSGPSR_SOURCE_
+extern Thread SYMBOL_HN *SELF_SYMBOL;
 #endif
 
 #endif
 
+#endif
 
 
+
+

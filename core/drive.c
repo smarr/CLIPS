@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.30  10/19/06            */
+   /*             CLIPS Version 6.10  11/15/99            */
    /*                                                     */
    /*                    DRIVE MODULE                     */
    /*******************************************************/
@@ -17,23 +17,11 @@
 /* Contributing Programmer(s):                               */
 /*                                                           */
 /* Revision History:                                         */
-/*      6.23: Correction for FalseSymbol/TrueSymbol. DR0859  */
 /*                                                           */
-/*      6.24: Removed INCREMENTAL_RESET and                  */
-/*            LOGICAL_DEPENDENCIES compilation flags.        */
-/*                                                           */
-/*            Renamed BOOLEAN macro type to intBool.         */
-/*                                                           */
-/*            Rule with exists CE has incorrect activation.  */
-/*            DR0867                                         */
-/*                                                           */
-/*      6.30: Added support for hashed alpha memories.       */
-/*                                                           */
-/*            Added additional developer statistics to help  */
-/*            analyze join network performance.              */
-/*                                                           */
-/*            Removed pseudo-facts used in not CE.           */
-/*                                                           */
+/* Who               |     Date    | Description             */
+/* ------------------+-------------+------------------------ */
+/*      MDT          | 15-Nov-1999 |        DR834            */
+/* M.Giordano        | 23-Mar-2000 | Mods made for TLS       */
 /*************************************************************/
 
 #define _DRIVE_SOURCE_
@@ -46,44 +34,85 @@
 
 #if DEFRULE_CONSTRUCT
 
-#include "agenda.h"
 #include "constant.h"
-#include "engine.h"
-#include "envrnmnt.h"
 #include "memalloc.h"
-#include "prntutil.h"
 #include "reteutil.h"
-#include "retract.h"
+#include "prntutil.h"
 #include "router.h"
-#include "lgcldpnd.h"
-#include "incrrset.h"
+#include "agenda.h"
+#include "retract.h"
 
-#include "drive.h"  
-  
+#if LOGICAL_DEPENDENCIES
+#include "lgcldpnd.h"
+#endif
+
+#if INCREMENTAL_RESET
+#include "incrrset.h"
+#endif
+
+#include "drive.h"
+
 /***************************************/
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static void                    EmptyDrive(void *,struct joinNode *,struct partialMatch *);
-   static void                    JoinNetErrorMessage(void *,struct joinNode *);
-   
+   static void                    PPDrive(struct partialMatch *,struct partialMatch *,struct joinNode *);
+   static void                    PNRDrive(struct joinNode *,struct partialMatch *,
+                                           struct partialMatch *);
+   static void                    EmptyDrive(struct joinNode *,struct partialMatch *);
+   static void                    JoinNetErrorMessage(struct joinNode *);
+
+/****************************************/
+/* GLOBAL INTERNAL VARIABLE DEFINITIONS */
+/****************************************/
+
+   Thread globle BOOLEAN              JoinOperationInProgress = FALSE;
+
 /************************************************/
 /* NetworkAssert: Primary routine for filtering */
 /*   a partial match through the join network.  */
 /************************************************/
 globle void NetworkAssert(
-  void *theEnv,
   struct partialMatch *binds,
-  struct joinNode *join)
+  struct joinNode *join,
+  int enterDirection)
   {
+   struct partialMatch *lhsBinds = NULL, *rhsBinds = NULL;
+   struct partialMatch *comparePMs = NULL, *newBinds;
+   int exprResult;
+
    /*=========================================================*/
    /* If an incremental reset is being performed and the join */
    /* is not part of the network to be reset, then return.    */
    /*=========================================================*/
 
-#if (! BLOAD_ONLY) && (! RUN_TIME)
-   if (EngineData(theEnv)->IncrementalResetInProgress && (join->initialize == FALSE)) return;
+#if INCREMENTAL_RESET && (! BLOAD_ONLY) && (! RUN_TIME)
+   if (IncrementalResetInProgress && (join->initialize == FALSE)) return;
 #endif
+
+   /*=========================================================*/
+   /* If the associated LHS pattern is a not CE or the join   */
+   /* is a nand join, then we need an additional field in the */
+   /* partial match to keep track of the pseudo fact if one   */
+   /* is created. The partial match is automatically stored   */
+   /* in the beta memory and the counterf slot is used to     */
+   /* determine if it is an actual partial match. If counterf */
+   /* is TRUE, there are one or more fact or instances        */
+   /* keeping the not or nand join from being satisfied.      */
+   /*=========================================================*/
+
+   if ((enterDirection == LHS) &&
+       ((join->patternIsNegated) || (join->joinFromTheRight)))
+     {
+      newBinds = AddSingleMatch(binds,NULL,
+                                (join->ruleToActivate == NULL) ? 0 : 1,
+                                (int) join->logicalJoin);
+      newBinds->notOriginf = TRUE;
+      newBinds->counterf = TRUE;
+      binds = newBinds;
+      binds->next = join->beta;
+      join->beta = binds;
+     }
 
    /*==================================================*/
    /* Use a special routine if this is the first join. */
@@ -91,252 +120,7 @@ globle void NetworkAssert(
 
    if (join->firstJoin)
      {
-      EmptyDrive(theEnv,join,binds);
-      return;
-     }
-
-   /*================================*/
-   /* Enter the join from the right. */
-   /*================================*/
-
-   NetworkAssertRight(theEnv,binds,join);
-
-   return;
-  }
-
-/*****************************************************/
-/* NetworkAssertRight: Primary routine for filtering */
-/*   a partial match through the join network from   */
-/*   the RHS of a join.                              */
-/*****************************************************/
-globle void NetworkAssertRight(
-  void *theEnv,
-  struct partialMatch *rhsBinds,
-  struct joinNode *join)
-  {
-   struct partialMatch *lhsBinds, *nextBind;
-   int exprResult, restore = FALSE;
-   struct partialMatch *oldLHSBinds = NULL;
-   struct partialMatch *oldRHSBinds = NULL;
-   struct joinNode *oldJoin = NULL;
-
-   /*=========================================================*/
-   /* If an incremental reset is being performed and the join */
-   /* is not part of the network to be reset, then return.    */
-   /*=========================================================*/
-
-#if (! BLOAD_ONLY) && (! RUN_TIME)
-   if (EngineData(theEnv)->IncrementalResetInProgress && (join->initialize == FALSE)) return;
-#endif
-
-   if (join->firstJoin)
-     {
-      EmptyDrive(theEnv,join,rhsBinds);
-      return;
-     }
-  
-   /*=====================================================*/
-   /* The partial matches entering from the LHS of a join */
-   /* are stored in the left beta memory of the join.     */
-   /*=====================================================*/
-
-   lhsBinds = GetLeftBetaMemory(join,rhsBinds->hashValue);
-
-#if DEVELOPER
-   if (lhsBinds != NULL)
-     { EngineData(theEnv)->rightToLeftLoops++; }
-#endif
-
-   /*====================================*/
-   /* Set up the evaluation environment. */
-   /*====================================*/
-   
-   if (lhsBinds != NULL)
-     {
-      oldLHSBinds = EngineData(theEnv)->GlobalLHSBinds;
-      oldRHSBinds = EngineData(theEnv)->GlobalRHSBinds;
-      oldJoin = EngineData(theEnv)->GlobalJoin;
-      EngineData(theEnv)->GlobalRHSBinds = rhsBinds;
-      EngineData(theEnv)->GlobalJoin = join;
-      restore = TRUE;
-     }
-    
-   /*===================================================*/
-   /* Compare each set of binds on the opposite side of */
-   /* the join with the set of binds that entered this  */
-   /* join. If the binds don't mismatch, then perform   */
-   /* the appropriate action for the logic of the join. */
-   /*===================================================*/
-
-   while (lhsBinds != NULL)
-     {
-      nextBind = lhsBinds->nextInMemory;
-      join->memoryCompares++;
-      
-      /*===========================================================*/
-      /* Initialize some variables pointing to the partial matches */
-      /* in the LHS and RHS of the join.                           */
-      /*===========================================================*/
-
-      if (lhsBinds->hashValue != rhsBinds->hashValue)
-        {
-#if DEVELOPER
-         if (join->leftMemory->size == 1)
-           { EngineData(theEnv)->betaHashListSkips++; }
-         else
-           { EngineData(theEnv)->betaHashHTSkips++; }
-           
-         if (lhsBinds->marker != NULL)
-           { EngineData(theEnv)->unneededMarkerCompare++; }
-#endif
-         lhsBinds = nextBind;
-         continue;
-        }
-        
-      /*===============================================================*/
-      /* If there already is an associated RHS partial match stored in */
-      /* the LHS partial match from the beta memory of this join, then */
-      /* the exists/nand CE has already been satisfied and we can move */
-      /* on to the next partial match found in the beta memory.        */
-      /*===============================================================*/
-        
-      if (lhsBinds->marker != NULL)
-        { 
-#if DEVELOPER
-         EngineData(theEnv)->unneededMarkerCompare++;
-#endif
-         lhsBinds = nextBind;
-         continue;
-        }
-
-      /*===================================================*/
-      /* If the join has no expression associated with it, */
-      /* then the new partial match derived from the LHS   */
-      /* and RHS partial matches is valid.                 */
-      /*===================================================*/
-
-      if (join->networkTest == NULL)
-        { exprResult = TRUE; }
-
-      /*=========================================================*/
-      /* If the join has an expression associated with it, then  */
-      /* evaluate the expression to determine if the new partial */
-      /* match derived from the LHS and RHS partial matches is   */
-      /* valid (i.e. variable bindings are consistent and        */
-      /* predicate expressions evaluate to TRUE).                */
-      /*=========================================================*/
-
-      else
-        {
-#if DEVELOPER
-         EngineData(theEnv)->rightToLeftComparisons++;
-#endif
-         EngineData(theEnv)->GlobalLHSBinds = lhsBinds;
-         exprResult = EvaluateJoinExpression(theEnv,join->networkTest,join);
-         if (EvaluationData(theEnv)->EvaluationError)
-           {
-            if (join->patternIsNegated) exprResult = TRUE;
-            SetEvaluationError(theEnv,FALSE);
-           }
-
-#if DEVELOPER
-         if (exprResult)
-           { EngineData(theEnv)->rightToLeftSucceeds++; }
-#endif
-        }
-
-      if ((join->secondaryNetworkTest != NULL) && exprResult)
-        {
-         /* EngineData(theEnv)->GlobalRHSBinds = NULL; */
-         
-         exprResult = EvaluateJoinExpression(theEnv,join->secondaryNetworkTest,join);
-         if (EvaluationData(theEnv)->EvaluationError)
-           { SetEvaluationError(theEnv,FALSE); }
-        }
-
-      /*====================================================*/
-      /* If the join expression evaluated to TRUE (i.e.     */
-      /* there were no conflicts between variable bindings, */
-      /* all tests were satisfied, etc.), then perform the  */
-      /* appropriate action given the logic of this join.   */
-      /*====================================================*/
-
-      if (exprResult != FALSE)
-        {
-         if (join->patternIsExists)
-           {
-            AddBlockedLink(lhsBinds,rhsBinds);
-            PPDrive(theEnv,lhsBinds,NULL,join);
-           }
-         else if (join->patternIsNegated || join->joinFromTheRight)
-           {
-            AddBlockedLink(lhsBinds,rhsBinds);
-            if (lhsBinds->children != NULL)
-              { PosEntryRetractBeta(theEnv,lhsBinds,lhsBinds->children); }
-            /*
-            if (lhsBinds->dependents != NULL) 
-              { RemoveLogicalSupport(theEnv,lhsBinds); }
-            */
-           } 
-         else
-           { PPDrive(theEnv,lhsBinds,rhsBinds,join); }
-        }
-
-      /*====================================*/
-      /* Move on to the next partial match. */
-      /*====================================*/
-
-      lhsBinds = nextBind;
-     }
-
-   /*=========================================*/
-   /* Restore the old evaluation environment. */
-   /*=========================================*/
-
-   if (restore)
-     {
-      EngineData(theEnv)->GlobalLHSBinds = oldLHSBinds;
-      EngineData(theEnv)->GlobalRHSBinds = oldRHSBinds;
-      EngineData(theEnv)->GlobalJoin = oldJoin;
-     }
-     
-   return;
-  }
-
-/****************************************************/
-/* NetworkAssertLeft: Primary routine for filtering */
-/*   a partial match through the join network when  */
-/*   entering through the left side of a join.      */
-/****************************************************/
-globle void NetworkAssertLeft(
-  void *theEnv,
-  struct partialMatch *lhsBinds,
-  struct joinNode *join)
-  {
-   struct partialMatch *rhsBinds;
-   int exprResult, restore = FALSE;
-   unsigned long entryHashValue;
-   struct partialMatch *oldLHSBinds = NULL;
-   struct partialMatch *oldRHSBinds = NULL;
-   struct joinNode *oldJoin = NULL;
-
-   /*=========================================================*/
-   /* If an incremental reset is being performed and the join */
-   /* is not part of the network to be reset, then return.    */
-   /*=========================================================*/
-
-#if (! BLOAD_ONLY) && (! RUN_TIME)
-   if (EngineData(theEnv)->IncrementalResetInProgress && (join->initialize == FALSE)) return;
-#endif
-
-   /*===================================*/
-   /* The only action for the last join */
-   /* of a rule is to activate it.      */
-   /*===================================*/
-   
-   if (join->ruleToActivate != NULL)
-     {
-      AddActivation(theEnv,join->ruleToActivate,lhsBinds);
+      EmptyDrive(join,binds);
       return;
      }
 
@@ -345,31 +129,28 @@ globle void NetworkAssertLeft(
    /* side is being compared to the new partial match. */
    /*==================================================*/
 
-   entryHashValue = lhsBinds->hashValue;
-   if (join->joinFromTheRight)
-     { rhsBinds = GetRightBetaMemory(join,entryHashValue); }
-   else
-     { rhsBinds = GetAlphaMemory(theEnv,(struct patternNodeHeader *) join->rightSideEntryStructure,entryHashValue); }
-       
-#if DEVELOPER
-   if (rhsBinds != NULL)
-     { EngineData(theEnv)->leftToRightLoops++; }
-#endif
-   
-   /*====================================*/
-   /* Set up the evaluation environment. */
-   /*====================================*/
-   
-   if ((rhsBinds != NULL) || (join->secondaryNetworkTest != NULL))
+   if (enterDirection == LHS)
      {
-      oldLHSBinds = EngineData(theEnv)->GlobalLHSBinds;
-      oldRHSBinds = EngineData(theEnv)->GlobalRHSBinds;
-      oldJoin = EngineData(theEnv)->GlobalJoin;
-      EngineData(theEnv)->GlobalLHSBinds = lhsBinds;
-      EngineData(theEnv)->GlobalJoin = join;
-      restore = TRUE;
+      if (join->joinFromTheRight)
+        { comparePMs = ((struct joinNode *) join->rightSideEntryStructure)->beta;}
+      else
+        { comparePMs = ((struct patternNodeHeader *) join->rightSideEntryStructure)->alphaMemory; }
+      lhsBinds = binds;
      }
-  
+   else if (enterDirection == RHS)
+     {
+      if (join->patternIsNegated || join->joinFromTheRight)
+        { comparePMs = join->beta; }
+      else
+        { comparePMs = join->lastLevel->beta; }
+      rhsBinds = binds;
+     }
+   else
+     {
+      SystemError("DRIVE",1);
+      ExitRouter(EXIT_FAILURE);
+     }
+
    /*===================================================*/
    /* Compare each set of binds on the opposite side of */
    /* the join with the set of binds that entered this  */
@@ -377,18 +158,95 @@ globle void NetworkAssertLeft(
    /* the appropriate action for the logic of the join. */
    /*===================================================*/
 
-   while (rhsBinds != NULL)
+   while (comparePMs != NULL)
      {
-      join->memoryCompares++;
+      /*===========================================================*/
+      /* Initialize some variables pointing to the partial matches */
+      /* in the LHS and RHS of the join. In addition, check for    */
+      /* certain conditions under which the partial match can be   */
+      /* skipped since it's not a "real" partial match.            */
+      /*===========================================================*/
 
-      /*===================================================*/
-      /* If the join has no expression associated with it, */
-      /* then the new partial match derived from the LHS   */
-      /* and RHS partial matches is valid.                 */
-      /*===================================================*/
+      if (enterDirection == RHS)
+        {
+         lhsBinds = comparePMs;
+
+         /*=====================================================*/
+         /* The partial matches entering from the LHS of a join */
+         /* are stored in the beta memory of the previous join  */
+         /* (unless the current join is a join from the right   */
+         /* or is attached to a not CE). If the previous join   */
+         /* is a join from the right or associated with a not   */
+         /* CE, then some of its partial matches in its beta    */
+         /* memory will not be "real" partial matches. That is, */
+         /* there may be a partial match in the alpha memory    */
+         /* that prevents the partial match from satisfying the */
+         /* join's conditions. If this is the case, then the    */
+         /* counterf flag in the partial match will be set to   */
+         /* TRUE and in this case, we move on to the next       */
+         /* partial match to be checked.                        */
+         /*=====================================================*/
+
+         if (lhsBinds->counterf &&
+             (join->patternIsNegated == FALSE) &&
+             (join->joinFromTheRight == FALSE))
+           {
+            comparePMs = comparePMs->next;
+            continue;
+           }
+
+        /*==================================================*/
+        /* If the join is associated with a not CE or has a */
+        /* join from the right, then the LHS partial match  */
+        /* currently being checked may already have a       */
+        /* partial match from the alpha memory preventing   */
+        /* it from being satisfied. If this is the case,    */
+        /* then move on to the next partial match in the    */
+        /* beta memory of the join.                         */
+        /*==================================================*/
+
+        if ((join->patternIsNegated || join->joinFromTheRight) &&
+            (lhsBinds->counterf))
+          {
+           comparePMs = comparePMs->next;
+           continue;
+          }
+        }
+      else
+        { rhsBinds = comparePMs; }
+
+      /*========================================================*/
+      /* If the join has no expression associated with it, then */
+      /* the new partial match derived from the LHS and RHS     */
+      /* partial matches is valid. In the event that the join   */
+      /* is a join from the right, it must also be checked that */
+      /* the RHS partial match is the same partial match that   */
+      /* the LHS partial match was generated from. Each LHS     */
+      /* partial match in a join from the right corresponds     */
+      /* uniquely to a partial match from the RHS of the join.  */
+      /* To determine whether the LHS partial match is the one  */
+      /* associated with the RHS partial match, we compare the  */
+      /* the entity addresses found in the partial matches to   */
+      /* make sure they're equal.                               */
+      /*========================================================*/
 
       if (join->networkTest == NULL)
-        { exprResult = TRUE; }
+        {
+         exprResult = TRUE;
+         if (join->joinFromTheRight)
+           {
+            int i;
+
+            for (i = 0; i < (int) (lhsBinds->bcount - 1); i++)
+              {
+               if (lhsBinds->binds[i].gm.theMatch != rhsBinds->binds[i].gm.theMatch)
+                 {
+                  exprResult = FALSE;
+                  break;
+                 }
+              }
+           }
+        }
 
       /*=========================================================*/
       /* If the join has an expression associated with it, then  */
@@ -400,22 +258,12 @@ globle void NetworkAssertLeft(
 
       else
         {
-#if DEVELOPER
-         EngineData(theEnv)->leftToRightComparisons++;
-#endif
-         EngineData(theEnv)->GlobalRHSBinds = rhsBinds;
-         
-         exprResult = EvaluateJoinExpression(theEnv,join->networkTest,join);
-         if (EvaluationData(theEnv)->EvaluationError)
+         exprResult = EvaluateJoinExpression(join->networkTest,lhsBinds,rhsBinds,join);
+         if (EvaluationError)
            {
             if (join->patternIsNegated) exprResult = TRUE;
-            SetEvaluationError(theEnv,FALSE);
+            SetEvaluationError(FALSE);
            }
-
-#if DEVELOPER
-         if (exprResult)
-           { EngineData(theEnv)->leftToRightSucceeds++; }
-#endif
         }
 
       /*====================================================*/
@@ -434,25 +282,19 @@ globle void NetworkAssertLeft(
          /*==============================================*/
 
          if ((join->patternIsNegated == FALSE) &&
-             (join->patternIsExists == FALSE) &&
              (join->joinFromTheRight == FALSE))
-           { PPDrive(theEnv,lhsBinds,rhsBinds,join); }
+           { PPDrive(lhsBinds,rhsBinds,join); }
 
-         /*==================================================*/
-         /* At most, one partial match will be generated for */
-         /* a match from the right memory of an exists CE.   */
-         /*==================================================*/
-         
-         else if (join->patternIsExists)
-           { 
-            AddBlockedLink(lhsBinds,rhsBinds);
-            PPDrive(theEnv,lhsBinds,NULL,join);
-            EngineData(theEnv)->GlobalLHSBinds = oldLHSBinds;
-            EngineData(theEnv)->GlobalRHSBinds = oldRHSBinds;
-            EngineData(theEnv)->GlobalJoin = oldJoin;
-            return;
-           }
-           
+         /*=====================================================*/
+         /* Use the PNRDrive routine when the new partial match */
+         /* enters from the RHS of the join and the join either */
+         /* is associated with a not CE or has a join from the  */
+         /* right.                                              */
+         /*=====================================================*/
+
+         else if (enterDirection == RHS)
+           { PNRDrive(join,comparePMs,rhsBinds); }
+
          /*===========================================================*/
          /* If the new partial match entered from the LHS of the join */
          /* and the join is either associated with a not CE or the    */
@@ -464,10 +306,11 @@ globle void NetworkAssertLeft(
          /* the LHS from being satisfied.                             */
          /*===========================================================*/
 
-         else
+         else if (enterDirection == LHS)
            {
-            AddBlockedLink(lhsBinds,rhsBinds);
-            break;
+            binds->binds[binds->bcount - 1].gm.theValue = (void *) rhsBinds;
+            comparePMs = NULL;
+            continue;
            }
         }
 
@@ -475,7 +318,7 @@ globle void NetworkAssertLeft(
       /* Move on to the next partial match. */
       /*====================================*/
 
-      rhsBinds = rhsBinds->nextInMemory;
+      comparePMs = comparePMs->next;
      }
 
    /*==================================================================*/
@@ -489,35 +332,10 @@ globle void NetworkAssertLeft(
    /* to the joins below this join.                                    */
    /*==================================================================*/
 
-   if ((join->patternIsNegated || join->joinFromTheRight) && 
-       (! join->patternIsExists) &&
-       (lhsBinds->marker == NULL))
-     {
-      if (join->secondaryNetworkTest != NULL)
-        {
-         EngineData(theEnv)->GlobalRHSBinds = NULL;
-         
-         exprResult = EvaluateJoinExpression(theEnv,join->secondaryNetworkTest,join);
-         if (EvaluationData(theEnv)->EvaluationError)
-           { SetEvaluationError(theEnv,FALSE); }
-           
-         if (exprResult)
-            { PPDrive(theEnv,lhsBinds,NULL,join); }
-		}
-      else
-        { PPDrive(theEnv,lhsBinds,NULL,join); } 
-     }
-
-   /*=========================================*/
-   /* Restore the old evaluation environment. */
-   /*=========================================*/
-
-   if (restore)
-     {
-      EngineData(theEnv)->GlobalLHSBinds = oldLHSBinds;
-      EngineData(theEnv)->GlobalRHSBinds = oldRHSBinds;
-      EngineData(theEnv)->GlobalJoin = oldJoin;
-     }
+   if ((join->patternIsNegated || join->joinFromTheRight) &&
+       (enterDirection == LHS) &&
+       (binds->binds[binds->bcount - 1].gm.theValue == NULL))
+     { PNLDrive(join,binds); }
 
    return;
   }
@@ -527,19 +345,46 @@ globle void NetworkAssertLeft(
 /*   Performs a faster evaluation for join expressions */
 /*   than if EvaluateExpression was used directly.     */
 /*******************************************************/
-globle intBool EvaluateJoinExpression(
-  void *theEnv,
+globle BOOLEAN EvaluateJoinExpression(
   struct expr *joinExpr,
+  struct partialMatch *lbinds,
+  struct partialMatch *rbinds,
   struct joinNode *joinPtr)
   {
    DATA_OBJECT theResult;
    int andLogic, result = TRUE;
+   struct partialMatch *oldLHSBinds;
+   struct partialMatch *oldRHSBinds;
+   struct joinNode *oldJoin;
 
    /*======================================*/
    /* A NULL expression evaluates to TRUE. */
    /*======================================*/
 
    if (joinExpr == NULL) return(TRUE);
+
+   /*=========================================*/
+   /* Initialize some of the global variables */
+   /* used when evaluating expressions.       */
+   /*=========================================*/
+
+   oldLHSBinds = GlobalLHSBinds;
+   oldRHSBinds = GlobalRHSBinds;
+   oldJoin = GlobalJoin;
+   GlobalLHSBinds = lbinds;
+   GlobalRHSBinds = rbinds;
+   GlobalJoin = joinPtr;
+
+   /*=====================================================*/
+   /* Partial matches stored in joins that are associated */
+   /* with a not CE contain an additional slot shouldn't  */
+   /* be considered when evaluating expressions. Since    */
+   /* joins that have joins from the right don't have any */
+   /* expression, we don't have to do this for partial    */
+   /* matches contained in these joins.                   */
+   /*=====================================================*/
+
+   if (joinPtr->patternIsNegated) lbinds->bcount--;
 
    /*====================================================*/
    /* Initialize some variables which allow this routine */
@@ -550,12 +395,12 @@ globle intBool EvaluateJoinExpression(
    /* speeds up evaluation.                              */
    /*====================================================*/
 
-   if (joinExpr->value == ExpressionData(theEnv)->PTR_AND)
+   if (joinExpr->value == PTR_AND)
      {
       andLogic = TRUE;
       joinExpr = joinExpr->argList;
      }
-   else if (joinExpr->value == ExpressionData(theEnv)->PTR_OR)
+   else if (joinExpr->value == PTR_OR)
      {
       andLogic = FALSE;
       joinExpr = joinExpr->argList;
@@ -574,50 +419,74 @@ globle intBool EvaluateJoinExpression(
       /* Evaluate a primitive function. */
       /*================================*/
 
-      if ((EvaluationData(theEnv)->PrimitivesArray[joinExpr->type] == NULL) ?
+      if ((PrimitivesArray[joinExpr->type] == NULL) ?
           FALSE :
-          EvaluationData(theEnv)->PrimitivesArray[joinExpr->type]->evaluateFunction != NULL)
+          PrimitivesArray[joinExpr->type]->evaluateFunction != NULL)
         {
          struct expr *oldArgument;
 
-         oldArgument = EvaluationData(theEnv)->CurrentExpression;
-         EvaluationData(theEnv)->CurrentExpression = joinExpr;
-         result = (*EvaluationData(theEnv)->PrimitivesArray[joinExpr->type]->evaluateFunction)(theEnv,joinExpr->value,&theResult);
-         EvaluationData(theEnv)->CurrentExpression = oldArgument;
+         oldArgument = CurrentExpression;
+         CurrentExpression = joinExpr;
+         result = (*PrimitivesArray[joinExpr->type]->evaluateFunction)(joinExpr->value,&theResult);
+         CurrentExpression = oldArgument;
         }
 
       /*=============================*/
       /* Evaluate the "or" function. */
       /*=============================*/
 
-      else if (joinExpr->value == ExpressionData(theEnv)->PTR_OR)
+      else if (joinExpr->value == PTR_OR)
         {
          result = FALSE;
-         if (EvaluateJoinExpression(theEnv,joinExpr,joinPtr) == TRUE)
+         if (EvaluateJoinExpression(joinExpr,lbinds,rbinds,joinPtr) == TRUE)
            {
-            if (EvaluationData(theEnv)->EvaluationError)
-              { return(FALSE); }
+            if (EvaluationError)
+              {
+               if (joinPtr->patternIsNegated) lbinds->bcount++;
+               GlobalLHSBinds = oldLHSBinds;
+               GlobalRHSBinds = oldRHSBinds;
+               GlobalJoin = oldJoin;
+               return(FALSE);
+              }
             result = TRUE;
            }
-         else if (EvaluationData(theEnv)->EvaluationError)
-           { return(FALSE); }
+         else if (EvaluationError)
+           {
+            if (joinPtr->patternIsNegated) lbinds->bcount++;
+            GlobalLHSBinds = oldLHSBinds;
+            GlobalRHSBinds = oldRHSBinds;
+            GlobalJoin = oldJoin;
+            return(FALSE);
+           }
         }
 
       /*==============================*/
       /* Evaluate the "and" function. */
       /*==============================*/
 
-      else if (joinExpr->value == ExpressionData(theEnv)->PTR_AND)
+      else if (joinExpr->value == PTR_AND)
         {
          result = TRUE;
-         if (EvaluateJoinExpression(theEnv,joinExpr,joinPtr) == FALSE)
+         if (EvaluateJoinExpression(joinExpr,lbinds,rbinds,joinPtr) == FALSE)
            {
-            if (EvaluationData(theEnv)->EvaluationError)
-              { return(FALSE); }
+            if (EvaluationError)
+              {
+               if (joinPtr->patternIsNegated) lbinds->bcount++;
+               GlobalLHSBinds = oldLHSBinds;
+               GlobalRHSBinds = oldRHSBinds;
+               GlobalJoin = oldJoin;
+               return(FALSE);
+              }
             result = FALSE;
            }
-         else if (EvaluationData(theEnv)->EvaluationError)
-           { return(FALSE); }
+         else if (EvaluationError)
+           {
+            if (joinPtr->patternIsNegated) lbinds->bcount++;
+            GlobalLHSBinds = oldLHSBinds;
+            GlobalRHSBinds = oldRHSBinds;
+            GlobalJoin = oldJoin;
+            return(FALSE);
+           }
         }
 
       /*==========================================================*/
@@ -626,15 +495,19 @@ globle intBool EvaluateJoinExpression(
 
       else
         {
-         EvaluateExpression(theEnv,joinExpr,&theResult);
+         EvaluateExpression(joinExpr,&theResult);
 
-         if (EvaluationData(theEnv)->EvaluationError)
+         if (EvaluationError)
            {
-            JoinNetErrorMessage(theEnv,joinPtr);
+            JoinNetErrorMessage(joinPtr);
+            if (joinPtr->patternIsNegated) lbinds->bcount++;
+            GlobalLHSBinds = oldLHSBinds;
+            GlobalRHSBinds = oldRHSBinds;
+            GlobalJoin = oldJoin;
             return(FALSE);
            }
 
-         if ((theResult.value == EnvFalseSymbol(theEnv)) && (theResult.type == SYMBOL))
+         if ((theResult.value == FalseSymbol) && (theResult.type == SYMBOL))
            { result = FALSE; }
          else
            { result = TRUE; }
@@ -646,9 +519,21 @@ globle intBool EvaluateJoinExpression(
       /*====================================*/
 
       if ((andLogic == TRUE) && (result == FALSE))
-        { return(FALSE); }
+        {
+         if (joinPtr->patternIsNegated) lbinds->bcount++;
+         GlobalLHSBinds = oldLHSBinds;
+         GlobalRHSBinds = oldRHSBinds;
+         GlobalJoin = oldJoin;
+         return(FALSE);
+        }
       else if ((andLogic == FALSE) && (result == TRUE))
-        { return(TRUE); }
+        {
+         if (joinPtr->patternIsNegated) lbinds->bcount++;
+         GlobalLHSBinds = oldLHSBinds;
+         GlobalRHSBinds = oldRHSBinds;
+         GlobalJoin = oldJoin;
+         return(TRUE);
+        }
 
       /*==============================================*/
       /* Move to the next expression to be evaluated. */
@@ -657,152 +542,26 @@ globle intBool EvaluateJoinExpression(
       joinExpr = joinExpr->nextArg;
      }
 
+   /*=======================================*/
+   /* Restore some of the global variables. */
+   /*=======================================*/
+
+   GlobalLHSBinds = oldLHSBinds;
+   GlobalRHSBinds = oldRHSBinds;
+   GlobalJoin = oldJoin;
+
+   /*=====================================*/
+   /* Restore the count value for the LHS */
+   /* binds if it had to be modified.     */
+   /*=====================================*/
+
+   if (joinPtr->patternIsNegated) lbinds->bcount++;
+
    /*=================================================*/
    /* Return the result of evaluating the expression. */
    /*=================================================*/
 
    return(result);
-  }
-
-/*******************************************************/
-/* EvaluateSecondaryNetworkTest:     */
-/*******************************************************/
-globle intBool EvaluateSecondaryNetworkTest(
-  void *theEnv,
-  struct partialMatch *leftMatch,
-  struct joinNode *joinPtr)
-  {
-   int joinExpr;
-   struct partialMatch *oldLHSBinds;
-   struct partialMatch *oldRHSBinds;
-   struct joinNode *oldJoin;
-
-   if (joinPtr->secondaryNetworkTest == NULL)
-     { return(TRUE); }
-        
-#if DEVELOPER
-   EngineData(theEnv)->rightToLeftComparisons++;
-#endif
-   oldLHSBinds = EngineData(theEnv)->GlobalLHSBinds;
-   oldRHSBinds = EngineData(theEnv)->GlobalRHSBinds;
-   oldJoin = EngineData(theEnv)->GlobalJoin;
-   EngineData(theEnv)->GlobalLHSBinds = leftMatch;
-   EngineData(theEnv)->GlobalRHSBinds = NULL;
-   EngineData(theEnv)->GlobalJoin = joinPtr;
-
-   joinExpr = EvaluateJoinExpression(theEnv,joinPtr->secondaryNetworkTest,joinPtr);
-   EvaluationData(theEnv)->EvaluationError = FALSE;
-
-   EngineData(theEnv)->GlobalLHSBinds = oldLHSBinds;
-   EngineData(theEnv)->GlobalRHSBinds = oldRHSBinds;
-   EngineData(theEnv)->GlobalJoin = oldJoin;
-
-   return(joinExpr);
-  }
-
-/*******************************************************/
-/* BetaMemoryHashValue:     */
-/*******************************************************/
-globle unsigned long BetaMemoryHashValue(
-  void *theEnv,
-  struct expr *hashExpr,
-  struct partialMatch *lbinds,
-  struct partialMatch *rbinds,
-  struct joinNode *joinPtr)
-  {
-   DATA_OBJECT theResult;
-   struct partialMatch *oldLHSBinds;
-   struct partialMatch *oldRHSBinds;
-   struct joinNode *oldJoin;
-   unsigned long hashValue = 0;
-   unsigned long multiplier = 1;
-   
-   /*======================================*/
-   /* A NULL expression evaluates to zero. */
-   /*======================================*/
-
-   if (hashExpr == NULL) return(0);
-
-   /*=========================================*/
-   /* Initialize some of the global variables */
-   /* used when evaluating expressions.       */
-   /*=========================================*/
-
-   oldLHSBinds = EngineData(theEnv)->GlobalLHSBinds;
-   oldRHSBinds = EngineData(theEnv)->GlobalRHSBinds;
-   oldJoin = EngineData(theEnv)->GlobalJoin;
-   EngineData(theEnv)->GlobalLHSBinds = lbinds;
-   EngineData(theEnv)->GlobalRHSBinds = rbinds;
-   EngineData(theEnv)->GlobalJoin = joinPtr;
-
-   /*=========================================*/
-   /* Evaluate each of the expressions linked */
-   /* together in the join expression.        */
-   /*=========================================*/
-
-   while (hashExpr != NULL)
-     {
-      /*================================*/
-      /* Evaluate a primitive function. */
-      /*================================*/
-
-      if ((EvaluationData(theEnv)->PrimitivesArray[hashExpr->type] == NULL) ?
-          FALSE :
-          EvaluationData(theEnv)->PrimitivesArray[hashExpr->type]->evaluateFunction != NULL)
-        {
-         struct expr *oldArgument;
-
-         oldArgument = EvaluationData(theEnv)->CurrentExpression;
-         EvaluationData(theEnv)->CurrentExpression = hashExpr;
-         (*EvaluationData(theEnv)->PrimitivesArray[hashExpr->type]->evaluateFunction)(theEnv,hashExpr->value,&theResult);
-         EvaluationData(theEnv)->CurrentExpression = oldArgument;
-        }
-
-      /*==========================================================*/
-      /* Evaluate all other expressions using EvaluateExpression. */
-      /*==========================================================*/
-
-      else
-        { EvaluateExpression(theEnv,hashExpr,&theResult); }
-
-      switch (theResult.type)
-        {
-         case STRING:
-         case SYMBOL:
-         case INSTANCE_NAME:
-           hashValue += (((SYMBOL_HN *) theResult.value)->bucket * multiplier);
-           break;
-             
-         case INTEGER:
-            hashValue += (((INTEGER_HN *) theResult.value)->bucket * multiplier);
-            break;
-             
-         case FLOAT:
-           hashValue += (((FLOAT_HN *) theResult.value)->bucket * multiplier);
-           break;
-        }
-
-      /*==============================================*/
-      /* Move to the next expression to be evaluated. */
-      /*==============================================*/
-
-      hashExpr = hashExpr->nextArg;
-	  multiplier = multiplier * 509;
-	 }
-
-   /*=======================================*/
-   /* Restore some of the global variables. */
-   /*=======================================*/
-
-   EngineData(theEnv)->GlobalLHSBinds = oldLHSBinds;
-   EngineData(theEnv)->GlobalRHSBinds = oldRHSBinds;
-   EngineData(theEnv)->GlobalJoin = oldJoin;
-
-   /*=================================================*/
-   /* Return the result of evaluating the expression. */
-   /*=================================================*/
-
-   return(hashValue);
   }
 
 /*******************************************************************/
@@ -814,102 +573,204 @@ globle unsigned long BetaMemoryHashValue(
 /*   partial match is sent to each child join of the join from     */
 /*   which the merge took place.                                   */
 /*******************************************************************/
-globle void PPDrive(
-  void *theEnv,
+static void PPDrive(
   struct partialMatch *lhsBinds,
   struct partialMatch *rhsBinds,
   struct joinNode *join)
   {
    struct partialMatch *linker;
-   struct joinLink *listOfJoins;
-   unsigned long hashValue;
-   
+   struct joinNode *listOfJoins;
+
+   /*==================================================*/
+   /* Merge the alpha and beta memory partial matches. */
+   /*==================================================*/
+
+   linker = MergePartialMatches(lhsBinds,rhsBinds,
+                                (join->ruleToActivate == NULL) ? 0 : 1,
+                                (int) join->logicalJoin);
+
+   /*=======================================================*/
+   /* Add the partial match to the beta memory of the join. */
+   /*=======================================================*/
+
+   linker->next = join->beta;
+   join->beta = linker;
+
+   /*====================================================*/
+   /* Activate the rule satisfied by this partial match. */
+   /*====================================================*/
+
+   if (join->ruleToActivate != NULL) AddActivation(join->ruleToActivate,linker);
+
    /*================================================*/
    /* Send the new partial match to all child joins. */
    /*================================================*/
 
-   listOfJoins = join->nextLinks;
-   if (listOfJoins == NULL) return;
-
-   /*===============================================================*/
-   /* In the current implementation, all children of this join must */
-   /* be entered from the same side (either all left or all right). */
-   /*===============================================================*/
-   
-   while (listOfJoins != NULL)
+   listOfJoins = join->nextLevel;
+   if (listOfJoins != NULL)
      {
-      /*==================================================*/
-      /* Merge the alpha and beta memory partial matches. */
-      /*==================================================*/
-
-      linker = MergePartialMatches(theEnv,lhsBinds,rhsBinds);
-
-      /*================================================*/
-      /* Determine the hash value of the partial match. */
-      /*================================================*/
-
-      if (listOfJoins->enterDirection == LHS)
+      if (((struct joinNode *) (listOfJoins->rightSideEntryStructure)) == join)
+        { NetworkAssert(linker,listOfJoins,RHS); }
+      else while (listOfJoins != NULL)
         {
-         if (listOfJoins->join->leftHash != NULL)
-           { hashValue = BetaMemoryHashValue(theEnv,listOfJoins->join->leftHash,linker,NULL,listOfJoins->join); }
-         else
-           { hashValue = 0; }
+         NetworkAssert(linker,listOfJoins,LHS);
+         listOfJoins = listOfJoins->rightDriveNode;
         }
-      else
-        { 
-         if (listOfJoins->join->rightHash != NULL)
-           { hashValue = BetaMemoryHashValue(theEnv,listOfJoins->join->rightHash,linker,NULL,listOfJoins->join); }
-         else
-           { hashValue = 0; }
-        }
-     
-      /*=======================================================*/
-      /* Add the partial match to the beta memory of the join. */
-      /*=======================================================*/
-
-      UpdateBetaPMLinks(theEnv,linker,lhsBinds,rhsBinds,listOfJoins->join,hashValue,listOfJoins->enterDirection);
-      
-      if (listOfJoins->enterDirection == LHS)
-        { NetworkAssertLeft(theEnv,linker,listOfJoins->join); }
-      else
-        { NetworkAssertRight(theEnv,linker,listOfJoins->join); }
-      
-      listOfJoins = listOfJoins->next;
      }
 
    return;
   }
 
-/***********************************************************************/
-/* EPMDrive: Drives an empty partial match to the next level of joins. */
-/*   An empty partial match is usually associated with a negated CE    */
-/*   that is the first CE of a rule.                                   */
-/***********************************************************************/
-globle void EPMDrive(
-  void *theEnv,
-  struct partialMatch *parent,
-  struct joinNode *join)
+/**********************************************************************/
+/* PNRDrive: Handles the entry of a partial match from the RHS of a   */
+/*   join that has positive LHS entry and negative RHS entry (meaning */
+/*   the conditional element associated with this join is a not       */
+/*   conditional element). Entry of the alpha memory partial match    */
+/*   will cause the counterf value of the associated beta memory      */
+/*   partial match to be set. This in turn may cause partial matches  */
+/*   associated with the beta memory partial match to be removed from */
+/*   the network.                                                     */
+/**********************************************************************/
+static void PNRDrive(
+  struct joinNode *join,
+  struct partialMatch *lhsBinds,
+  struct partialMatch *rhsBinds)
   {
-   struct partialMatch *linker;
-   struct joinLink *listOfJoins;
-   
-   listOfJoins = join->nextLinks;
-   if (listOfJoins == NULL) return;
-         
-   while (listOfJoins != NULL)
-     {
-      linker = CreateEmptyPartialMatch(theEnv);
-         
-      UpdateBetaPMLinks(theEnv,linker,parent,NULL,listOfJoins->join,0,listOfJoins->enterDirection); 
+   struct joinNode *listOfJoins;
 
-      if (listOfJoins->enterDirection == LHS)
-        { NetworkAssertLeft(theEnv,linker,listOfJoins->join); }
-      else
-        { NetworkAssertRight(theEnv,linker,listOfJoins->join); }
-        
-      listOfJoins = listOfJoins->next;
+   /*==================================================*/
+   /* If the partial match already has a partial match */
+   /* in the alpha memory which prevents it from being */
+   /* satisfied, then don't do anything.               */
+   /*==================================================*/
+
+   if (lhsBinds->counterf == TRUE) return;
+
+   /*=================================================*/
+   /* Set the counterf flag to indicate that an alpha */
+   /* memory partial match is preventing the beta     */
+   /* memory partial match from being satisfied.      */
+   /*=================================================*/
+
+   lhsBinds->counterf = TRUE;
+
+   /*===================================================================*/
+   /* If the partial match caused an activation, remove the activation. */
+   /*===================================================================*/
+
+   if ((lhsBinds->activationf) ?
+       (lhsBinds->binds[lhsBinds->bcount].gm.theValue != NULL) : FALSE)
+     { RemoveActivation((struct activation *) lhsBinds->binds[lhsBinds->bcount].gm.theValue,TRUE,TRUE); }
+
+   /*===========================================================*/
+   /* The counterf flag was FALSE. This means that a pointer to */
+   /* the pseudo-fact matching the not CE is stored directly in */
+   /* the partial match. Determine the ID of this pseudo-fact   */
+   /* and remove all partial matches from descendent joins that */
+   /* contain the ID.                                           */
+   /*===========================================================*/
+   
+   if (join->joinFromTheRight)
+     {
+      RetractCheckDriveRetractions(lhsBinds->binds[lhsBinds->bcount - 1].gm.theMatch,
+                                   (int) join->depth-1);
+     }  
+
+   listOfJoins = join->nextLevel;
+   if (listOfJoins != NULL)
+     {
+      if (((struct joinNode *) (listOfJoins->rightSideEntryStructure)) == join)
+        { NegEntryRetract(listOfJoins,lhsBinds,FALSE); }
+      else while (listOfJoins != NULL)
+        {
+
+         PosEntryRetract(listOfJoins,
+                         lhsBinds->binds[lhsBinds->bcount - 1].gm.theMatch,
+                         lhsBinds,(int) join->depth-1,FALSE);
+         listOfJoins = listOfJoins->rightDriveNode;
+        }
      }
+
+   /*=========================================================================*/
+   /* Remove any logical dependency links associated with this partial match. */
+   /*=========================================================================*/
+
+#if LOGICAL_DEPENDENCIES
+   if (lhsBinds->dependentsf) RemoveLogicalSupport(lhsBinds);
+#endif
+
+   /*========================================*/
+   /* Put the pseudo-fact on a garbage list. */
+   /*========================================*/
+
+   lhsBinds->binds[lhsBinds->bcount - 1].gm.theMatch->next = GarbageAlphaMatches;
+   GarbageAlphaMatches = lhsBinds->binds[lhsBinds->bcount - 1].gm.theMatch;
+
+   /*========================================================*/
+   /* Store the partial match from the alpha memory that is  */
+   /* preventing the LHS partial match from being satisfied. */
+   /*========================================================*/
+
+   lhsBinds->binds[lhsBinds->bcount - 1].gm.theValue = (void *) rhsBinds;
   }
+
+/********************************************************************/
+/* PNLDrive: Handles the entry of a partial match from the LHS of a */
+/*   join that has positive LHS entry and negative RHS entry        */
+/*   (meaning the conditional element associated with this join is  */
+/*   a not conditional element). An new partial match is created by */
+/*   combining the match from the beta memory with a "pseudo"       */
+/*   partial match corresponding to the facts which didn't match    */
+/*   the not CE. Once merged, the new partial match is sent to each */
+/*   child join of the join from which the merge took place.        */
+/********************************************************************/
+globle void PNLDrive(
+  struct joinNode *join,
+  struct partialMatch *binds)
+  {
+   struct joinNode *listOfJoins;
+   struct alphaMatch *tempAlpha;
+
+    /*=======================================================*/
+    /* Create a pseudo-fact representing the facts which did */
+    /* not match the not CE associated with this join.       */
+    /*=======================================================*/
+
+    tempAlpha = get_struct(alphaMatch);
+    tempAlpha->next = NULL;
+    tempAlpha->matchingItem = NULL;
+    tempAlpha->markers = NULL;
+
+    /*===============================================*/
+    /* Store the pointer to the pseudo-fact directly */
+    /* in the beta memory partial match.             */
+    /*===============================================*/
+
+    binds->counterf = FALSE;
+    binds->binds[binds->bcount - 1].gm.theMatch = tempAlpha;
+
+   /*====================================================*/
+   /* Activate the rule satisfied by this partial match. */
+   /*====================================================*/
+
+   if (join->ruleToActivate != NULL) AddActivation(join->ruleToActivate,binds);
+
+    /*========================================================*/
+    /* Send the merged partial match to all descendent joins. */
+    /*========================================================*/
+
+    listOfJoins = join->nextLevel;
+    if (listOfJoins != NULL)
+      {
+       if (((struct joinNode *) (listOfJoins->rightSideEntryStructure)) == join)
+         { NetworkAssert(binds,listOfJoins,RHS); }
+       else while (listOfJoins != NULL)
+         {
+          NetworkAssert(binds,listOfJoins,LHS);
+          listOfJoins = listOfJoins->rightDriveNode;
+         }
+      }
+   }
 
 /***************************************************************/
 /* EmptyDrive: Handles the entry of a alpha memory partial     */
@@ -917,173 +778,90 @@ globle void EPMDrive(
 /*   a rule (i.e. a join that cannot be entered from the LHS). */
 /***************************************************************/
 static void EmptyDrive(
-  void *theEnv,
   struct joinNode *join,
   struct partialMatch *rhsBinds)
   {
-   struct partialMatch *linker, *existsParent = NULL, *notParent;
-   struct joinLink *listOfJoins;
+   struct partialMatch *linker;
+   struct joinNode *listOfJoins;
    int joinExpr;
-   unsigned long hashValue;
-   struct partialMatch *oldLHSBinds;
-   struct partialMatch *oldRHSBinds;
-   struct joinNode *oldJoin;
-   
+
    /*======================================================*/
    /* Determine if the alpha memory partial match satifies */
    /* the join expression. If it doesn't then no further   */
    /* action is taken.                                     */
    /*======================================================*/
 
-   join->memoryCompares++;
-
    if (join->networkTest != NULL)
      {
-
-#if DEVELOPER
-      if (join->networkTest)
-        { EngineData(theEnv)->rightToLeftComparisons++; }
-#endif
-      oldLHSBinds = EngineData(theEnv)->GlobalLHSBinds;
-      oldRHSBinds = EngineData(theEnv)->GlobalRHSBinds;
-      oldJoin = EngineData(theEnv)->GlobalJoin;
-      EngineData(theEnv)->GlobalLHSBinds = NULL;
-      EngineData(theEnv)->GlobalRHSBinds = rhsBinds;
-      EngineData(theEnv)->GlobalJoin = join;
-
-      joinExpr = EvaluateJoinExpression(theEnv,join->networkTest,join);
-      EvaluationData(theEnv)->EvaluationError = FALSE;
-
-      EngineData(theEnv)->GlobalLHSBinds = oldLHSBinds;
-      EngineData(theEnv)->GlobalRHSBinds = oldRHSBinds;
-      EngineData(theEnv)->GlobalJoin = oldJoin;
-
+      joinExpr = EvaluateJoinExpression(join->networkTest,NULL,rhsBinds,join);
+      EvaluationError = FALSE;
       if (joinExpr == FALSE) return;
      }
 
-   /*========================================================*/
-   /* Handle a negated first pattern or join from the right. */
-   /*========================================================*/
+   /*===========================================================*/
+   /* The first join of a rule cannot be connected to a NOT CE. */
+   /*===========================================================*/
 
-   if (join->patternIsNegated || (join->joinFromTheRight && (! join->patternIsExists))) /* reorder to remove patternIsExists test */
+   if (join->patternIsNegated == TRUE)
      {
-      notParent = join->leftMemory->beta[0];
-      if (notParent->marker != NULL)
-        { return; }
-        
-      AddBlockedLink(notParent,rhsBinds);
-      
-      if (notParent->children != NULL)
-        { PosEntryRetractBeta(theEnv,notParent,notParent->children); }
-      /*
-      if (notParent->dependents != NULL) 
-		{ RemoveLogicalSupport(theEnv,notParent); } 
-        */
-              
-      return;
+      SystemError("DRIVE",2);
+      ExitRouter(EXIT_FAILURE);
      }
 
-   /*=====================================================*/
-   /* For exists CEs used as the first pattern of a rule, */
-   /* a special partial match in the left memory of the   */
-   /* join is used to track the RHS partial match         */
-   /* satisfying the CE.                                  */
-   /*=====================================================*/
-  /* TBD reorder */
-   if (join->patternIsExists)
-     {
-      existsParent = join->leftMemory->beta[0];
-      if (existsParent->marker != NULL)
-        { return; }
-      AddBlockedLink(existsParent,rhsBinds);
-     }
+   /*=========================================================*/
+   /* If the join's RHS entry is associated with a pattern CE */
+   /* (positive entry), then copy the alpha memory partial    */
+   /* match and send it to all child joins.                   */
+   /*=========================================================*/
+
+   linker = CopyPartialMatch(rhsBinds,
+                             (join->ruleToActivate == NULL) ? 0 : 1,
+                             (int) join->logicalJoin);
+
+   /*=======================================================*/
+   /* Add the partial match to the beta memory of the join. */
+   /*=======================================================*/
+
+   linker->next = join->beta;
+   join->beta = linker;
+
+   /*====================================================*/
+   /* Activate the rule satisfied by this partial match. */
+   /*====================================================*/
+
+   if (join->ruleToActivate != NULL) AddActivation(join->ruleToActivate,linker);
 
    /*============================================*/
    /* Send the partial match to all child joins. */
    /*============================================*/
 
-   listOfJoins = join->nextLinks;
-   if (listOfJoins == NULL) return;
- 
+   listOfJoins = join->nextLevel;
    while (listOfJoins != NULL)
      {
-      /*===================================================================*/
-      /* An exists CE as the first pattern of a rule can generate at most  */
-      /* one partial match, so if there's already a partial match in the   */
-      /* beta memory nothing further needs to be done. Since there are no  */
-      /* variable bindings which child joins can use for indexing, the     */
-      /* partial matches will always be stored in the bucket with index 0. */
-      /* Although an exists is associated with a specific fact/instance    */
-      /* (through its rightParent link) that allows it to be satisfied,    */
-      /* the bindings in the partial match will be empty for this CE.      */
-      /*===================================================================*/
-
-      if (join->patternIsExists)
-        { linker = CreateEmptyPartialMatch(theEnv); }
-
-      /*=============================================================*/
-      /* Othewise just copy the partial match from the alpha memory. */
-      /*=============================================================*/
-
-      else
-        { linker = CopyPartialMatch(theEnv,rhsBinds); }
-     
-      /*================================================*/
-      /* Determine the hash value of the partial match. */
-      /*================================================*/
-
-      if (listOfJoins->enterDirection == LHS)
-        {
-         if (listOfJoins->join->leftHash != NULL)
-           { hashValue = BetaMemoryHashValue(theEnv,listOfJoins->join->leftHash,linker,NULL,listOfJoins->join); }
-         else
-           { hashValue = 0; }
-        }
-      else
-        { 
-         if (listOfJoins->join->rightHash != NULL)
-           { hashValue = BetaMemoryHashValue(theEnv,listOfJoins->join->rightHash,linker,NULL,listOfJoins->join); }
-         else
-           { hashValue = 0; }
-        }
-     
-      /*=======================================================*/
-      /* Add the partial match to the beta memory of the join. */
-      /*=======================================================*/
-
-      if (join->patternIsExists)
-        { UpdateBetaPMLinks(theEnv,linker,existsParent,NULL,listOfJoins->join,hashValue,listOfJoins->enterDirection); }
-      else
-        { UpdateBetaPMLinks(theEnv,linker,NULL,rhsBinds,listOfJoins->join,hashValue,listOfJoins->enterDirection); }
-
-      if (listOfJoins->enterDirection == LHS)
-        { NetworkAssertLeft(theEnv,linker,listOfJoins->join); }
-      else
-        { NetworkAssertRight(theEnv,linker,listOfJoins->join); }
-        
-      listOfJoins = listOfJoins->next;
+      NetworkAssert(linker,listOfJoins,LHS);
+      listOfJoins = listOfJoins->rightDriveNode;
      }
   }
-  
+
 /********************************************************************/
 /* JoinNetErrorMessage: Prints an informational message indicating  */
 /*   which join of a rule generated an error when a join expression */
 /*   was being evaluated.                                           */
 /********************************************************************/
 static void JoinNetErrorMessage(
-  void *theEnv,
   struct joinNode *joinPtr)
   {
-   PrintErrorID(theEnv,"DRIVE",1,TRUE);
-   EnvPrintRouter(theEnv,WERROR,"This error occurred in the join network\n");
+   char buffer[60];
 
-   EnvPrintRouter(theEnv,WERROR,"   Problem resides in associated join\n"); /* TBD generate test case for join with JFTR */
-/*
+   PrintErrorID("DRIVE",1,TRUE);
+   PrintRouter(WERROR,"This error occurred in the join network\n");
+
    sprintf(buffer,"   Problem resides in join #%d in rule(s):\n",joinPtr->depth);
-   EnvPrintRouter(theEnv,WERROR,buffer);
-*/
-   TraceErrorToRule(theEnv,joinPtr,"      ");
-   EnvPrintRouter(theEnv,WERROR,"\n");
+   PrintRouter(WERROR,buffer);
+
+   TraceErrorToRule(joinPtr,"      ");
+   PrintRouter(WERROR,"\n");
   }
 
 #endif /* DEFRULE_CONSTRUCT */
+

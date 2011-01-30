@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.20  01/31/02            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*       DEFMODULE CONSTRUCT COMPILER HEADER FILE      */
    /*******************************************************/
@@ -42,7 +42,8 @@
 #define LOCALE extern
 #endif
 
-   LOCALE void                           DefmoduleCompilerSetup(void *);
-   LOCALE void                           PrintDefmoduleReference(void *,FILE *,struct defmodule *);
+   LOCALE void                           DefmoduleCompilerSetup(void);
+   LOCALE void                           PrintDefmoduleReference(FILE *,struct defmodule *);
 
 #endif
+

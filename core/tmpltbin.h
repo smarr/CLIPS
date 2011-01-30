@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.20  01/31/02            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*         DEFTEMPLATE BSAVE/BLOAD HEADER FILE         */
    /*******************************************************/
@@ -13,7 +13,7 @@
 /*      Gary D. Riley                                        */
 /*                                                           */
 /* Contributing Programmer(s):                               */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Revision History:                                         */
 /*                                                           */
@@ -33,7 +33,6 @@ struct bsaveTemplateSlot
    unsigned int defaultDynamic : 1;
    long constraints;
    long defaultList;
-   long facetList;
    long next;
   };
 
@@ -58,21 +57,7 @@ struct bsaveDeftemplateModule
    struct bsaveDefmoduleItemHeader header;
   };
 
-#define TMPLTBIN_DATA 61
-
-struct deftemplateBinaryData
-  { 
-   struct deftemplate *DeftemplateArray;
-   long NumberOfDeftemplates;
-   long NumberOfTemplateSlots;
-   long NumberOfTemplateModules;
-   struct templateSlot *SlotArray;
-   struct deftemplateModule *ModuleArray;
-  };
-  
-#define DeftemplateBinaryData(theEnv) ((struct deftemplateBinaryData *) GetEnvironmentData(theEnv,TMPLTBIN_DATA))
-
-#define DeftemplatePointer(i) ((struct deftemplate *) (&DeftemplateBinaryData(theEnv)->DeftemplateArray[i]))
+#define DeftemplatePointer(i) ((struct deftemplate *) (&DeftemplateArray[i]))
 
 #ifndef _H_tmpltdef
 #include "tmpltdef.h"
@@ -88,11 +73,20 @@ struct deftemplateBinaryData
 #define LOCALE extern
 #endif
 
-   LOCALE void                           DeftemplateBinarySetup(void *);
-   LOCALE void                          *BloadDeftemplateModuleReference(void *,int);
+   LOCALE void                           DeftemplateBinarySetup(void);
+   LOCALE void                          *BloadDeftemplateModuleReference(int);
+
+#ifndef _TEMPLATE_SOURCE_
+   extern Thread struct deftemplate  *DeftemplateArray;
+#endif
 
 #endif
 #endif
 
 
 
+
+
+
+
+

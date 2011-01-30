@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.24  07/01/05            */
+   /*             CLIPS Version 6.10  04/13/98            */
    /*                                                     */
    /*               CONSTRAINT PARSER MODULE              */
    /*******************************************************/
@@ -14,17 +14,13 @@
 /*      Gary D. Riley                                        */
 /*                                                           */
 /* Contributing Programmer(s):                               */
-/*      Brian Dantes                                         */
+/*      Brian Donnell                                        */
 /*                                                           */
 /* Revision History:                                         */
-/*      6.23: Changed name of variable exp to theExp         */
-/*            because of Unix compiler warnings of shadowed  */
-/*            definitions.                                   */
 /*                                                           */
-/*      6.24: Added allowed-classes slot facet.              */
-/*                                                           */
-/*            Renamed BOOLEAN macro type to intBool.         */
-/*                                                           */
+/* Who               |     Date    | Description             */
+/* ------------------+-------------+------------------------ */
+/* M.Giordano        | 23-Mar-2000 | Mods made for TLS       */
 /*************************************************************/
 
 #define _CSTRNPSR_SOURCE_
@@ -36,13 +32,11 @@
 #include "setup.h"
 
 #include "constant.h"
-#include "envrnmnt.h"
 #include "memalloc.h"
 #include "router.h"
 #include "scanner.h"
 #include "cstrnutl.h"
 #include "cstrnchk.h"
-#include "sysdep.h"
 
 #include "cstrnpsr.h"
 
@@ -51,14 +45,12 @@
 /***************************************/
 
 #if (! RUN_TIME) && (! BLOAD_ONLY)
-   static intBool                 ParseRangeCardinalityAttribute(void *,
-                                                                 char *,CONSTRAINT_RECORD *,
-                                                                 CONSTRAINT_PARSE_RECORD *,
-                                                                 char *,int);
-   static intBool                 ParseTypeAttribute(void *,char *,CONSTRAINT_RECORD *);
-   static void                    AddToRestrictionList(void *,int,CONSTRAINT_RECORD *,
+   static BOOLEAN                 ParseRangeCardinalityAttribute(char *,CONSTRAINT_RECORD *,
+                                                      CONSTRAINT_PARSE_RECORD *,char *,int);
+   static BOOLEAN                 ParseTypeAttribute(char *,CONSTRAINT_RECORD *);
+   static void                    AddToRestrictionList(int,CONSTRAINT_RECORD *,
                                                        CONSTRAINT_RECORD *);
-   static intBool                 ParseAllowedValuesAttribute(void *,char *,char *,
+   static BOOLEAN                 ParseAllowedValuesAttribute(char *,char *,
                                                               CONSTRAINT_RECORD *,
                                                               CONSTRAINT_PARSE_RECORD *);
    static int                     GetConstraintTypeFromAllowedName(char *);
@@ -66,7 +58,7 @@
    static int                     GetAttributeParseValue(char *,CONSTRAINT_PARSE_RECORD *);
    static void                    SetRestrictionFlag(int,CONSTRAINT_RECORD *,int);
    static void                    SetParseFlag(CONSTRAINT_PARSE_RECORD *,char *);
-   static void                    NoConjunctiveUseError(void *,char *,char *);
+   static void                    NoConjunctiveUseError(char *,char *);
 #endif
 
 /********************************************************************/
@@ -74,8 +66,7 @@
 /*   has any conflicts in the attribute specifications. Returns     */
 /*   TRUE if no conflicts were detected, otherwise FALSE.           */
 /********************************************************************/
-globle intBool CheckConstraintParseConflicts(
-  void *theEnv,
+globle BOOLEAN CheckConstraintParseConflicts(
   CONSTRAINT_RECORD *constraints)
   {
    /*===================================================*/
@@ -88,51 +79,44 @@ globle intBool CheckConstraintParseConflicts(
    else if (constraints->symbolRestriction &&
             (constraints->symbolsAllowed == FALSE))
      {
-      AttributeConflictErrorMessage(theEnv,"type","allowed-symbols");
+      AttributeConflictErrorMessage("type","allowed-symbols");
       return(FALSE);
      }
    else if (constraints->stringRestriction &&
             (constraints->stringsAllowed == FALSE))
      {
-      AttributeConflictErrorMessage(theEnv,"type","allowed-strings");
+      AttributeConflictErrorMessage("type","allowed-strings");
       return(FALSE);
      }
    else if (constraints->integerRestriction &&
             (constraints->integersAllowed == FALSE))
      {
-      AttributeConflictErrorMessage(theEnv,"type","allowed-integers/numbers");
+      AttributeConflictErrorMessage("type","allowed-integers/numbers");
       return(FALSE);
      }
    else if (constraints->floatRestriction &&
             (constraints->floatsAllowed == FALSE))
      {
-      AttributeConflictErrorMessage(theEnv,"type","allowed-floats/numbers");
-      return(FALSE);
-     }
-   else if (constraints->classRestriction &&
-            (constraints->instanceAddressesAllowed == FALSE) &&
-            (constraints->instanceNamesAllowed == FALSE))
-     {
-      AttributeConflictErrorMessage(theEnv,"type","allowed-classes");
+      AttributeConflictErrorMessage("type","allowed-floats/numbers");
       return(FALSE);
      }
    else if (constraints->instanceNameRestriction &&
             (constraints->instanceNamesAllowed == FALSE))
      {
-      AttributeConflictErrorMessage(theEnv,"type","allowed-instance-names");
+      AttributeConflictErrorMessage("type","allowed-instance-names");
       return(FALSE);
      }
    else if (constraints->anyRestriction)
      {
-      struct expr *theExp;
+      struct expr *exp;
 
-      for (theExp = constraints->restrictionList;
-           theExp != NULL;
-           theExp = theExp->nextArg)
+      for (exp = constraints->restrictionList;
+           exp != NULL;
+           exp = exp->nextArg)
         {
-         if (ConstraintCheckValue(theEnv,theExp->type,theExp->value,constraints) != NO_VIOLATION)
+         if (ConstraintCheckValue(exp->type,exp->value,constraints) != NO_VIOLATION)
            {
-            AttributeConflictErrorMessage(theEnv,"type","allowed-values");
+            AttributeConflictErrorMessage("type","allowed-values");
             return(FALSE);
            }
         }
@@ -150,7 +134,7 @@ globle intBool CheckConstraintParseConflicts(
           ((constraints->maxValue->type == FLOAT) &&
            (constraints->floatsAllowed == FALSE)))
         {
-         AttributeConflictErrorMessage(theEnv,"type","range");
+         AttributeConflictErrorMessage("type","range");
          return(FALSE);
         }
      }
@@ -163,23 +147,9 @@ globle intBool CheckConstraintParseConflicts(
           ((constraints->minValue->type == FLOAT) &&
            (constraints->floatsAllowed == FALSE)))
         {
-         AttributeConflictErrorMessage(theEnv,"type","range");
+         AttributeConflictErrorMessage("type","range");
          return(FALSE);
         }
-     }
-
-   /*=========================================*/
-   /* Check to see if allowed-class attribute */
-   /* conflicts with type attribute.          */
-   /*=========================================*/
-
-   if ((constraints->classList != NULL) &&
-       (constraints->anyAllowed == FALSE) &&
-       (constraints->instanceNamesAllowed == FALSE) &&
-       (constraints->instanceAddressesAllowed == FALSE))
-     {
-      AttributeConflictErrorMessage(theEnv,"type","allowed-class");
-      return(FALSE);
      }
 
    /*=====================================================*/
@@ -194,16 +164,15 @@ globle intBool CheckConstraintParseConflicts(
 /*   for a constraint attribute conflict.               */
 /********************************************************/
 globle void AttributeConflictErrorMessage(
-  void *theEnv,
   char *attribute1,
   char *attribute2)
   {
-   PrintErrorID(theEnv,"CSTRNPSR",1,TRUE);
-   EnvPrintRouter(theEnv,WERROR,"The ");
-   EnvPrintRouter(theEnv,WERROR,attribute1);
-   EnvPrintRouter(theEnv,WERROR," attribute conflicts with the ");
-   EnvPrintRouter(theEnv,WERROR,attribute2);
-   EnvPrintRouter(theEnv,WERROR," attribute.\n");
+   PrintErrorID("CSTRNPSR",1,TRUE);
+   PrintRouter(WERROR,"The ");
+   PrintRouter(WERROR,attribute1);
+   PrintRouter(WERROR," attribute conflicts with the ");
+   PrintRouter(WERROR,attribute2);
+   PrintRouter(WERROR," attribute.\n");
   }
 
 #if (! RUN_TIME) && (! BLOAD_ONLY)
@@ -226,7 +195,6 @@ globle void InitializeConstraintParseRecord(
    parsedConstraints->allowedNumbers = FALSE;
    parsedConstraints->allowedValues = FALSE;
    parsedConstraints->allowedInstanceNames = FALSE;
-   parsedConstraints->allowedClasses = FALSE;
    parsedConstraints->cardinality = FALSE;
   }
 
@@ -234,7 +202,7 @@ globle void InitializeConstraintParseRecord(
 /* StandardConstraint: Returns TRUE if the specified name is one of the */
 /*   standard constraints parseable by the routines in this module.     */
 /************************************************************************/
-globle intBool StandardConstraint(
+globle BOOLEAN StandardConstraint(
   char *constraintName)
   {
    if ((strcmp(constraintName,"type") == 0) ||
@@ -247,7 +215,6 @@ globle intBool StandardConstraint(
        (strcmp(constraintName,"allowed-floats") == 0) ||
        (strcmp(constraintName,"allowed-numbers") == 0) ||
        (strcmp(constraintName,"allowed-instance-names") == 0) ||
-       (strcmp(constraintName,"allowed-classes") == 0) ||
        (strcmp(constraintName,"allowed-values") == 0))
 
      { return(TRUE); }
@@ -259,8 +226,7 @@ globle intBool StandardConstraint(
 /* ParseStandardConstraint: Parses a standard constraint. Returns TRUE */
 /*   if the constraint was successfully parsed, otherwise FALSE.       */
 /***********************************************************************/
-globle intBool ParseStandardConstraint(
-  void *theEnv,
+globle BOOLEAN ParseStandardConstraint(
   char *readSource,
   char *constraintName,
   CONSTRAINT_RECORD *constraints,
@@ -275,7 +241,7 @@ globle intBool ParseStandardConstraint(
 
    if (GetAttributeParseValue(constraintName,parsedConstraints))
      {
-      AlreadyParsedErrorMessage(theEnv,constraintName," attribute");
+      AlreadyParsedErrorMessage(constraintName," attribute");
       return(FALSE);
      }
 
@@ -285,7 +251,7 @@ globle intBool ParseStandardConstraint(
 
    if (strcmp(constraintName,"range") == 0)
      {
-      rv = ParseRangeCardinalityAttribute(theEnv,readSource,constraints,parsedConstraints,
+      rv = ParseRangeCardinalityAttribute(readSource,constraints,parsedConstraints,
                                           constraintName,multipleValuesAllowed);
      }
 
@@ -295,7 +261,7 @@ globle intBool ParseStandardConstraint(
 
    else if (strcmp(constraintName,"cardinality") == 0)
      {
-      rv = ParseRangeCardinalityAttribute(theEnv,readSource,constraints,parsedConstraints,
+      rv = ParseRangeCardinalityAttribute(readSource,constraints,parsedConstraints,
                                           constraintName,multipleValuesAllowed);
      }
 
@@ -304,7 +270,7 @@ globle intBool ParseStandardConstraint(
    /*=========================================*/
 
    else if (strcmp(constraintName,"type") == 0)
-     { rv = ParseTypeAttribute(theEnv,readSource,constraints); }
+     { rv = ParseTypeAttribute(readSource,constraints); }
 
    /*================================================*/
    /* If specified, parse the allowed-... attribute. */
@@ -317,11 +283,10 @@ globle intBool ParseStandardConstraint(
             (strcmp(constraintName,"allowed-floats") == 0) ||
             (strcmp(constraintName,"allowed-numbers") == 0) ||
             (strcmp(constraintName,"allowed-instance-names") == 0) ||
-            (strcmp(constraintName,"allowed-classes") == 0) ||
             (strcmp(constraintName,"allowed-values") == 0))
      {
-      rv = ParseAllowedValuesAttribute(theEnv,readSource,constraintName,
-                                       constraints,parsedConstraints);
+      rv = ParseAllowedValuesAttribute(readSource,constraintName,
+                                         constraints,parsedConstraints);
      }
 
    /*=========================================*/
@@ -341,7 +306,6 @@ globle intBool ParseStandardConstraint(
 /* record.                                                 */
 /***********************************************************/
 globle void OverlayConstraint(
-  void *theEnv,
   CONSTRAINT_PARSE_RECORD *pc,
   CONSTRAINT_RECORD *cdst,
   CONSTRAINT_RECORD *csrc)
@@ -362,16 +326,10 @@ globle void OverlayConstraint(
 
    if (pc->range == 0)
      {
-      ReturnExpression(theEnv,cdst->minValue);
-      ReturnExpression(theEnv,cdst->maxValue);
-      cdst->minValue = CopyExpression(theEnv,csrc->minValue);
-      cdst->maxValue = CopyExpression(theEnv,csrc->maxValue);
-     }
-
-   if (pc->allowedClasses == 0)
-     {
-      ReturnExpression(theEnv,cdst->classList);
-      cdst->classList = CopyExpression(theEnv,csrc->classList);
+      ReturnExpression(cdst->minValue);
+      ReturnExpression(cdst->maxValue);
+      cdst->minValue = CopyExpression(csrc->minValue);
+      cdst->maxValue = CopyExpression(csrc->maxValue);
      }
 
    if (pc->allowedValues == 0)
@@ -389,60 +347,59 @@ globle void OverlayConstraint(
          cdst->stringRestriction = csrc->stringRestriction;
          cdst->floatRestriction = csrc->floatRestriction;
          cdst->integerRestriction = csrc->integerRestriction;
-         cdst->classRestriction = csrc->classRestriction;
          cdst->instanceNameRestriction = csrc->instanceNameRestriction;
-         cdst->restrictionList = CopyExpression(theEnv,csrc->restrictionList);
+         cdst->restrictionList = CopyExpression(csrc->restrictionList);
         }
       else
         {
          if ((pc->allowedSymbols == 0) && csrc->symbolRestriction)
            {
             cdst->symbolRestriction = 1;
-            AddToRestrictionList(theEnv,SYMBOL,cdst,csrc);
+            AddToRestrictionList(SYMBOL,cdst,csrc);
            }
          if ((pc->allowedStrings == 0) && csrc->stringRestriction)
            {
             cdst->stringRestriction = 1;
-            AddToRestrictionList(theEnv,STRING,cdst,csrc);
+            AddToRestrictionList(STRING,cdst,csrc);
            }
          if ((pc->allowedLexemes == 0) && csrc->symbolRestriction && csrc->stringRestriction)
            {
             cdst->symbolRestriction = 1;
             cdst->stringRestriction = 1;
-            AddToRestrictionList(theEnv,SYMBOL,cdst,csrc);
-            AddToRestrictionList(theEnv,STRING,cdst,csrc);
+            AddToRestrictionList(SYMBOL,cdst,csrc);
+            AddToRestrictionList(STRING,cdst,csrc);
            }
          if ((pc->allowedIntegers == 0) && csrc->integerRestriction)
            {
             cdst->integerRestriction = 1;
-            AddToRestrictionList(theEnv,INTEGER,cdst,csrc);
+            AddToRestrictionList(INTEGER,cdst,csrc);
            }
          if ((pc->allowedFloats == 0) && csrc->floatRestriction)
            {
             cdst->floatRestriction = 1;
-            AddToRestrictionList(theEnv,FLOAT,cdst,csrc);
+            AddToRestrictionList(FLOAT,cdst,csrc);
            }
          if ((pc->allowedNumbers == 0) && csrc->integerRestriction && csrc->floatRestriction)
            {
             cdst->integerRestriction = 1;
             cdst->floatRestriction = 1;
-            AddToRestrictionList(theEnv,INTEGER,cdst,csrc);
-            AddToRestrictionList(theEnv,FLOAT,cdst,csrc);
+            AddToRestrictionList(INTEGER,cdst,csrc);
+            AddToRestrictionList(FLOAT,cdst,csrc);
            }
          if ((pc->allowedInstanceNames == 0) && csrc->instanceNameRestriction)
            {
             cdst->instanceNameRestriction = 1;
-            AddToRestrictionList(theEnv,INSTANCE_NAME,cdst,csrc);
+            AddToRestrictionList(INSTANCE_NAME,cdst,csrc);
            }
         }
      }
 
    if (pc->cardinality == 0)
      {
-      ReturnExpression(theEnv,cdst->minFields);
-      ReturnExpression(theEnv,cdst->maxFields);
-      cdst->minFields = CopyExpression(theEnv,csrc->minFields);
-      cdst->maxFields = CopyExpression(theEnv,csrc->maxFields);
+      ReturnExpression(cdst->minFields);
+      ReturnExpression(cdst->maxFields);
+      cdst->minFields = CopyExpression(csrc->minFields);
+      cdst->maxFields = CopyExpression(csrc->maxFields);
      }
   }
 
@@ -465,7 +422,6 @@ globle void OverlayConstraintParseRecord(
    if (src->allowedNumbers) dst->allowedNumbers = TRUE;
    if (src->allowedValues) dst->allowedValues = TRUE;
    if (src->allowedInstanceNames) dst->allowedInstanceNames = TRUE;
-   if (src->allowedClasses) dst->allowedClasses = TRUE;
    if (src->cardinality) dst->cardinality = TRUE;
   }
 
@@ -474,18 +430,17 @@ globle void OverlayConstraintParseRecord(
 /* type from the source restriction list to the destination */
 /************************************************************/
 static void AddToRestrictionList(
-  void *theEnv,
   int type,
   CONSTRAINT_RECORD *cdst,
   CONSTRAINT_RECORD *csrc)
   {
-   struct expr *theExp,*tmp;
+   struct expr *exp,*tmp;
 
-   for (theExp = csrc->restrictionList; theExp != NULL; theExp = theExp->nextArg)
+   for (exp = csrc->restrictionList; exp != NULL; exp = exp->nextArg)
      {
-      if (theExp->type == type)
+      if (exp->type == type)
         {
-         tmp = GenConstant(theEnv,theExp->type,theExp->value);
+         tmp = GenConstant(exp->type,exp->value);
          tmp->nextArg = cdst->restrictionList;
          cdst->restrictionList = tmp;
         }
@@ -495,18 +450,17 @@ static void AddToRestrictionList(
 /*******************************************************************/
 /* ParseAllowedValuesAttribute: Parses the allowed-... attributes. */
 /*******************************************************************/
-static intBool ParseAllowedValuesAttribute(
-  void *theEnv,
+static BOOLEAN ParseAllowedValuesAttribute(
   char *readSource,
   char *constraintName,
   CONSTRAINT_RECORD *constraints,
   CONSTRAINT_PARSE_RECORD *parsedConstraints)
   {
    struct token inputToken;
-   int expectedType, restrictionType, error = FALSE;
+   int expectedType, error = FALSE;
    struct expr *newValue, *lastValue;
    int constantParsed = FALSE, variableParsed = FALSE;
-   char *tempPtr = NULL;
+   char *tempPtr;
 
    /*======================================================*/
    /* The allowed-values attribute is not allowed if other */
@@ -529,7 +483,7 @@ static intBool ParseAllowedValuesAttribute(
       else if (parsedConstraints->allowedFloats) tempPtr = "allowed-floats";
       else if (parsedConstraints->allowedNumbers) tempPtr = "allowed-numbers";
       else if (parsedConstraints->allowedInstanceNames) tempPtr = "allowed-instance-names";
-      NoConjunctiveUseError(theEnv,"allowed-values",tempPtr);
+      NoConjunctiveUseError("allowed-values",tempPtr);
       return(FALSE);
      }
 
@@ -544,7 +498,7 @@ static intBool ParseAllowedValuesAttribute(
         (strcmp(constraintName,"allowed-floats") == 0)) &&
        (parsedConstraints->range))
      {
-      NoConjunctiveUseError(theEnv,constraintName,"range");
+      NoConjunctiveUseError(constraintName,"range");
       return(FALSE);
      }
 
@@ -556,7 +510,7 @@ static intBool ParseAllowedValuesAttribute(
    if ((strcmp(constraintName,"allowed-values") != 0) &&
             (parsedConstraints->allowedValues))
      {
-      NoConjunctiveUseError(theEnv,constraintName,"allowed-values");
+      NoConjunctiveUseError(constraintName,"allowed-values");
       return(FALSE);
      }
 
@@ -571,7 +525,7 @@ static intBool ParseAllowedValuesAttribute(
      {
       if (parsedConstraints->allowedFloats) tempPtr = "allowed-floats";
       else tempPtr = "allowed-integers";
-      NoConjunctiveUseError(theEnv,"allowed-numbers",tempPtr);
+      NoConjunctiveUseError("allowed-numbers",tempPtr);
       return(FALSE);
      }
 
@@ -584,7 +538,7 @@ static intBool ParseAllowedValuesAttribute(
         (strcmp(constraintName,"allowed-floats") == 0)) &&
        (parsedConstraints->allowedNumbers))
      {
-      NoConjunctiveUseError(theEnv,constraintName,"allowed-number");
+      NoConjunctiveUseError(constraintName,"allowed-number");
       return(FALSE);
      }
 
@@ -599,7 +553,7 @@ static intBool ParseAllowedValuesAttribute(
      {
       if (parsedConstraints->allowedSymbols) tempPtr = "allowed-symbols";
       else tempPtr = "allowed-strings";
-      NoConjunctiveUseError(theEnv,"allowed-lexemes",tempPtr);
+      NoConjunctiveUseError("allowed-lexemes",tempPtr);
       return(FALSE);
      }
 
@@ -612,7 +566,7 @@ static intBool ParseAllowedValuesAttribute(
         (strcmp(constraintName,"allowed-strings") == 0)) &&
        (parsedConstraints->allowedLexemes))
      {
-      NoConjunctiveUseError(theEnv,constraintName,"allowed-lexemes");
+      NoConjunctiveUseError(constraintName,"allowed-lexemes");
       return(FALSE);
      }
 
@@ -620,23 +574,15 @@ static intBool ParseAllowedValuesAttribute(
    /* Get the expected type. */
    /*========================*/
 
-   restrictionType = GetConstraintTypeFromAllowedName(constraintName);
-   SetRestrictionFlag(restrictionType,constraints,TRUE);
-   if (strcmp(constraintName,"allowed-classes") == 0)
-     { expectedType = SYMBOL; }
-   else
-     { expectedType = restrictionType; }
-   
+   expectedType = GetConstraintTypeFromAllowedName(constraintName);
+   SetRestrictionFlag(expectedType,constraints,TRUE);
+
    /*=================================================*/
    /* Get the last value in the restriction list (the */
    /* allowed values will be appended there).         */
    /*=================================================*/
 
-   if (strcmp(constraintName,"allowed-classes") == 0)
-     { lastValue = constraints->classList; }
-   else
-     { lastValue = constraints->restrictionList; }
-     
+   lastValue = constraints->restrictionList;
    if (lastValue != NULL)
      { while (lastValue->nextArg != NULL) lastValue = lastValue->nextArg; }
 
@@ -645,12 +591,12 @@ static intBool ParseAllowedValuesAttribute(
    /* until a right parenthesis is encountered.        */
    /*==================================================*/
 
-   SavePPBuffer(theEnv," ");
-   GetToken(theEnv,readSource,&inputToken);
+   SavePPBuffer(" ");
+   GetToken(readSource,&inputToken);
 
    while (inputToken.type != RPAREN)
      {
-      SavePPBuffer(theEnv," ");
+      SavePPBuffer(" ");
 
       /*=============================================*/
       /* Determine the type of the token just parsed */
@@ -701,8 +647,8 @@ static intBool ParseAllowedValuesAttribute(
            else
              {
               char tempBuffer[120];
-              gensprintf(tempBuffer,"%s attribute",constraintName);
-              SyntaxErrorMessage(theEnv,tempBuffer);
+              sprintf(tempBuffer,"%s attribute",constraintName);
+              SyntaxErrorMessage(tempBuffer);
               return(FALSE);
              }
 
@@ -711,8 +657,8 @@ static intBool ParseAllowedValuesAttribute(
          default:
            {
             char tempBuffer[120];
-            gensprintf(tempBuffer,"%s attribute",constraintName);
-            SyntaxErrorMessage(theEnv,tempBuffer);
+            sprintf(tempBuffer,"%s attribute",constraintName);
+            SyntaxErrorMessage(tempBuffer);
            }
            return(FALSE);
         }
@@ -724,10 +670,10 @@ static intBool ParseAllowedValuesAttribute(
 
       if (error)
         {
-         PrintErrorID(theEnv,"CSTRNPSR",4,TRUE);
-         EnvPrintRouter(theEnv,WERROR,"Value does not match the expected type for the ");
-         EnvPrintRouter(theEnv,WERROR,constraintName);
-         EnvPrintRouter(theEnv,WERROR," attribute\n");
+         PrintErrorID("CSTRNPSR",4,TRUE);
+         PrintRouter(WERROR,"Value does not match the expected type for the ");
+         PrintRouter(WERROR,constraintName);
+         PrintRouter(WERROR," attribute\n");
          return(FALSE);
         }
 
@@ -739,8 +685,8 @@ static intBool ParseAllowedValuesAttribute(
       if (constantParsed && variableParsed)
         {
          char tempBuffer[120];
-         gensprintf(tempBuffer,"%s attribute",constraintName);
-         SyntaxErrorMessage(theEnv,tempBuffer);
+         sprintf(tempBuffer,"%s attribute",constraintName);
+         SyntaxErrorMessage(tempBuffer);
          return(FALSE);
         }
 
@@ -748,14 +694,9 @@ static intBool ParseAllowedValuesAttribute(
       /* Add the constant to the restriction list. */
       /*===========================================*/
 
-      newValue = GenConstant(theEnv,inputToken.type,inputToken.value);
+      newValue = GenConstant(inputToken.type,inputToken.value);
       if (lastValue == NULL)
-        { 
-         if (strcmp(constraintName,"allowed-classes") == 0)
-           { constraints->classList = newValue; }
-         else
-           { constraints->restrictionList = newValue; }
-        }
+        { constraints->restrictionList = newValue; }
       else
         { lastValue->nextArg = newValue; }
       lastValue = newValue;
@@ -764,7 +705,7 @@ static intBool ParseAllowedValuesAttribute(
       /* Begin parsing the next allowed value. */
       /*=======================================*/
 
-      GetToken(theEnv,readSource,&inputToken);
+      GetToken(readSource,&inputToken);
      }
 
    /*======================================================*/
@@ -774,8 +715,8 @@ static intBool ParseAllowedValuesAttribute(
    if ((! constantParsed) && (! variableParsed))
      {
       char tempBuffer[120];
-      gensprintf(tempBuffer,"%s attribute",constraintName);
-      SyntaxErrorMessage(theEnv,tempBuffer);
+      sprintf(tempBuffer,"%s attribute",constraintName);
+      SyntaxErrorMessage(tempBuffer);
       return(FALSE);
      }
 
@@ -787,7 +728,7 @@ static intBool ParseAllowedValuesAttribute(
 
    if (variableParsed)
      {
-      switch(restrictionType)
+      switch(expectedType)
         {
          case UNKNOWN_VALUE:
            constraints->anyRestriction = FALSE;
@@ -822,10 +763,6 @@ static intBool ParseAllowedValuesAttribute(
          case INSTANCE_NAME:
            constraints->instanceNameRestriction = FALSE;
            break;
-
-         case INSTANCE_OR_INSTANCE_NAME:
-           constraints->classRestriction = FALSE;
-           break;
         }
      }
 
@@ -833,9 +770,9 @@ static intBool ParseAllowedValuesAttribute(
    /* Fix up pretty print representation. */
    /*=====================================*/
 
-   PPBackup(theEnv);
-   PPBackup(theEnv);
-   SavePPBuffer(theEnv,")");
+   PPBackup();
+   PPBackup();
+   SavePPBuffer(")");
 
    /*=======================================*/
    /* Return TRUE to indicate the attribute */
@@ -850,24 +787,22 @@ static intBool ParseAllowedValuesAttribute(
 /*   that two attributes can't be used in conjunction.     */
 /***********************************************************/
 static void NoConjunctiveUseError(
-  void *theEnv,
   char *attribute1,
   char *attribute2)
   {
-   PrintErrorID(theEnv,"CSTRNPSR",3,TRUE);
-   EnvPrintRouter(theEnv,WERROR,"The ");
-   EnvPrintRouter(theEnv,WERROR,attribute1);
-   EnvPrintRouter(theEnv,WERROR," attribute cannot be used\n");
-   EnvPrintRouter(theEnv,WERROR,"in conjunction with the ");
-   EnvPrintRouter(theEnv,WERROR,attribute2);
-   EnvPrintRouter(theEnv,WERROR," attribute.\n");
+   PrintErrorID("CSTRNPSR",3,TRUE);
+   PrintRouter(WERROR,"The ");
+   PrintRouter(WERROR,attribute1);
+   PrintRouter(WERROR," attribute cannot be used\n");
+   PrintRouter(WERROR,"in conjunction with the ");
+   PrintRouter(WERROR,attribute2);
+   PrintRouter(WERROR," attribute.\n");
   }
 
 /**************************************************/
 /* ParseTypeAttribute: Parses the type attribute. */
 /**************************************************/
-static intBool ParseTypeAttribute(
-  void *theEnv,
+static BOOLEAN ParseTypeAttribute(
   char *readSource,
   CONSTRAINT_RECORD *constraints)
   {
@@ -881,12 +816,12 @@ static intBool ParseTypeAttribute(
    /* parenthesis is encountered.          */
    /*======================================*/
 
-   SavePPBuffer(theEnv," ");
-   for (GetToken(theEnv,readSource,&inputToken);
+   SavePPBuffer(" ");
+   for (GetToken(readSource,&inputToken);
         inputToken.type != RPAREN;
-        GetToken(theEnv,readSource,&inputToken))
+        GetToken(readSource,&inputToken))
      {
-      SavePPBuffer(theEnv," ");
+      SavePPBuffer(" ");
 
       /*==================================*/
       /* If the token is a symbol then... */
@@ -900,7 +835,7 @@ static intBool ParseTypeAttribute(
 
          if (variableParsed == TRUE)
            {
-            SyntaxErrorMessage(theEnv,"type attribute");
+            SyntaxErrorMessage("type attribute");
             return(FALSE);
            }
 
@@ -912,7 +847,7 @@ static intBool ParseTypeAttribute(
          theType = GetConstraintTypeFromTypeName(ValueToString(inputToken.value));
          if (theType < 0)
            {
-            SyntaxErrorMessage(theEnv,"type attribute");
+            SyntaxErrorMessage("type attribute");
             return(FALSE);
            }
 
@@ -924,7 +859,7 @@ static intBool ParseTypeAttribute(
 
          if (SetConstraintType(theType,constraints))
            {
-            SyntaxErrorMessage(theEnv,"type attribute");
+            SyntaxErrorMessage("type attribute");
             return(FALSE);
            }
 
@@ -949,7 +884,7 @@ static intBool ParseTypeAttribute(
 
          if (strcmp(inputToken.printForm,"?VARIABLE") != 0)
            {
-            SyntaxErrorMessage(theEnv,"type attribute");
+            SyntaxErrorMessage("type attribute");
             return(FALSE);
            }
 
@@ -960,7 +895,7 @@ static intBool ParseTypeAttribute(
 
          if (typeParsed || variableParsed)
            {
-            SyntaxErrorMessage(theEnv,"type attribute");
+            SyntaxErrorMessage("type attribute");
             return(FALSE);
            }
 
@@ -978,7 +913,7 @@ static intBool ParseTypeAttribute(
 
        else
         {
-         SyntaxErrorMessage(theEnv,"type attribute");
+         SyntaxErrorMessage("type attribute");
          return(FALSE);
         }
      }
@@ -987,9 +922,9 @@ static intBool ParseTypeAttribute(
    /* Fix up pretty print representation. */
    /*=====================================*/
 
-   PPBackup(theEnv);
-   PPBackup(theEnv);
-   SavePPBuffer(theEnv,")");
+   PPBackup();
+   PPBackup();
+   SavePPBuffer(")");
 
    /*=======================================*/
    /* The type attribute must have a value. */
@@ -997,7 +932,7 @@ static intBool ParseTypeAttribute(
 
    if ((! typeParsed) && (! variableParsed))
      {
-      SyntaxErrorMessage(theEnv,"type attribute");
+      SyntaxErrorMessage("type attribute");
       return(FALSE);
      }
 
@@ -1012,8 +947,7 @@ static intBool ParseTypeAttribute(
 /***************************************************************************/
 /* ParseRangeCardinalityAttribute: Parses the range/cardinality attribute. */
 /***************************************************************************/
-static intBool ParseRangeCardinalityAttribute(
-  void *theEnv,
+static BOOLEAN ParseRangeCardinalityAttribute(
   char *readSource,
   CONSTRAINT_RECORD *constraints,
   CONSTRAINT_PARSE_RECORD *parsedConstraints,
@@ -1022,7 +956,7 @@ static intBool ParseRangeCardinalityAttribute(
   {
    struct token inputToken;
    int range;
-   char *tempPtr = NULL;
+   char *tempPtr;
 
    /*=================================*/
    /* Determine if we're parsing the  */
@@ -1047,9 +981,9 @@ static intBool ParseRangeCardinalityAttribute(
    if ((range == FALSE) &&
        (multipleValuesAllowed == FALSE))
      {
-      PrintErrorID(theEnv,"CSTRNPSR",5,TRUE);
-      EnvPrintRouter(theEnv,WERROR,"The cardinality attribute ");
-      EnvPrintRouter(theEnv,WERROR,"can only be used with multifield slots.\n");
+      PrintErrorID("CSTRNPSR",5,TRUE);
+      PrintRouter(WERROR,"The cardinality attribute ");
+      PrintRouter(WERROR,"can only be used with multifield slots.\n");
       return(FALSE);
      }
 
@@ -1068,7 +1002,7 @@ static intBool ParseRangeCardinalityAttribute(
       else if (parsedConstraints->allowedIntegers) tempPtr = "allowed-integers";
       else if (parsedConstraints->allowedFloats) tempPtr = "allowed-floats";
       else if (parsedConstraints->allowedNumbers) tempPtr = "allowed-numbers";
-      NoConjunctiveUseError(theEnv,"range",tempPtr);
+      NoConjunctiveUseError("range",tempPtr);
       return(FALSE);
      }
 
@@ -1076,19 +1010,19 @@ static intBool ParseRangeCardinalityAttribute(
    /* Parse the minimum value. */
    /*==========================*/
 
-   SavePPBuffer(theEnv," ");
-   GetToken(theEnv,readSource,&inputToken);
+   SavePPBuffer(" ");
+   GetToken(readSource,&inputToken);
    if ((inputToken.type == INTEGER) || ((inputToken.type == FLOAT) && range))
      {
       if (range)
         {
-         ReturnExpression(theEnv,constraints->minValue);
-         constraints->minValue = GenConstant(theEnv,inputToken.type,inputToken.value);
+         ReturnExpression(constraints->minValue);
+         constraints->minValue = GenConstant(inputToken.type,inputToken.value);
         }
       else
         {
-         ReturnExpression(theEnv,constraints->minFields);
-         constraints->minFields = GenConstant(theEnv,inputToken.type,inputToken.value);
+         ReturnExpression(constraints->minFields);
+         constraints->minFields = GenConstant(inputToken.type,inputToken.value);
         }
      }
    else if ((inputToken.type == SF_VARIABLE) && (strcmp(inputToken.printForm,"?VARIABLE") == 0))
@@ -1096,8 +1030,8 @@ static intBool ParseRangeCardinalityAttribute(
    else
      {
       char tempBuffer[120];
-      gensprintf(tempBuffer,"%s attribute",constraintName);
-      SyntaxErrorMessage(theEnv,tempBuffer);
+      sprintf(tempBuffer,"%s attribute",constraintName);
+      SyntaxErrorMessage(tempBuffer);
       return(FALSE);
      }
 
@@ -1105,19 +1039,19 @@ static intBool ParseRangeCardinalityAttribute(
    /* Parse the maximum value. */
    /*==========================*/
 
-   SavePPBuffer(theEnv," ");
-   GetToken(theEnv,readSource,&inputToken);
+   SavePPBuffer(" ");
+   GetToken(readSource,&inputToken);
    if ((inputToken.type == INTEGER) || ((inputToken.type == FLOAT) && range))
      {
       if (range)
         {
-         ReturnExpression(theEnv,constraints->maxValue);
-         constraints->maxValue = GenConstant(theEnv,inputToken.type,inputToken.value);
+         ReturnExpression(constraints->maxValue);
+         constraints->maxValue = GenConstant(inputToken.type,inputToken.value);
         }
       else
         {
-         ReturnExpression(theEnv,constraints->maxFields);
-         constraints->maxFields = GenConstant(theEnv,inputToken.type,inputToken.value);
+         ReturnExpression(constraints->maxFields);
+         constraints->maxFields = GenConstant(inputToken.type,inputToken.value);
         }
      }
    else if ((inputToken.type == SF_VARIABLE) && (strcmp(inputToken.printForm,"?VARIABLE") == 0))
@@ -1125,8 +1059,8 @@ static intBool ParseRangeCardinalityAttribute(
    else
      {
       char tempBuffer[120];
-      gensprintf(tempBuffer,"%s attribute",constraintName);
-      SyntaxErrorMessage(theEnv,tempBuffer);
+      sprintf(tempBuffer,"%s attribute",constraintName);
+      SyntaxErrorMessage(tempBuffer);
       return(FALSE);
      }
 
@@ -1134,10 +1068,10 @@ static intBool ParseRangeCardinalityAttribute(
    /* Parse the closing parenthesis. */
    /*================================*/
 
-   GetToken(theEnv,readSource,&inputToken);
+   GetToken(readSource,&inputToken);
    if (inputToken.type != RPAREN)
      {
-      SyntaxErrorMessage(theEnv,"range attribute");
+      SyntaxErrorMessage("range attribute");
       return(FALSE);
      }
 
@@ -1147,27 +1081,27 @@ static intBool ParseRangeCardinalityAttribute(
 
    if (range)
      {
-      if (CompareNumbers(theEnv,constraints->minValue->type,
+      if (CompareNumbers(constraints->minValue->type,
                          constraints->minValue->value,
                          constraints->maxValue->type,
                          constraints->maxValue->value) == GREATER_THAN)
         {
-         PrintErrorID(theEnv,"CSTRNPSR",2,TRUE);
-         EnvPrintRouter(theEnv,WERROR,"Minimum range value must be less than\n");
-         EnvPrintRouter(theEnv,WERROR,"or equal to the maximum range value\n");
+         PrintErrorID("CSTRNPSR",2,TRUE);
+         PrintRouter(WERROR,"Minimum range value must be less than\n");
+         PrintRouter(WERROR,"or equal to the maximum range value\n");
          return(FALSE);
         }
      }
    else
      {
-      if (CompareNumbers(theEnv,constraints->minFields->type,
+      if (CompareNumbers(constraints->minFields->type,
                          constraints->minFields->value,
                          constraints->maxFields->type,
                          constraints->maxFields->value) == GREATER_THAN)
         {
-         PrintErrorID(theEnv,"CSTRNPSR",2,TRUE);
-         EnvPrintRouter(theEnv,WERROR,"Minimum cardinality value must be less than\n");
-         EnvPrintRouter(theEnv,WERROR,"or equal to the maximum cardinality value\n");
+         PrintErrorID("CSTRNPSR",2,TRUE);
+         PrintRouter(WERROR,"Minimum cardinality value must be less than\n");
+         PrintRouter(WERROR,"or equal to the maximum cardinality value\n");
          return(FALSE);
         }
      }
@@ -1194,7 +1128,6 @@ static int GetConstraintTypeFromAllowedName(
    else if (strcmp(constraintName,"allowed-integers") == 0) return(INTEGER);
    else if (strcmp(constraintName,"allowed-numbers") == 0) return(INTEGER_OR_FLOAT);
    else if (strcmp(constraintName,"allowed-instance-names") == 0) return(INSTANCE_NAME);
-   else if (strcmp(constraintName,"allowed-classes") == 0) return(INSTANCE_OR_INSTANCE_NAME);
    else if (strcmp(constraintName,"allowed-floats") == 0) return(FLOAT);
 
    return(-1);
@@ -1246,8 +1179,6 @@ static int GetAttributeParseValue(
      { return(parsedConstraints->allowedLexemes); }
    else if (strcmp(constraintName,"allowed-instance-names") == 0)
      { return(parsedConstraints->allowedInstanceNames); }
-   else if (strcmp(constraintName,"allowed-classes") == 0)
-     { return(parsedConstraints->allowedClasses); }
    else if (strcmp(constraintName,"allowed-integers") == 0)
      { return(parsedConstraints->allowedIntegers); }
    else if (strcmp(constraintName,"allowed-floats") == 0)
@@ -1303,10 +1234,6 @@ static void SetRestrictionFlag(
       case INSTANCE_NAME:
          constraints->instanceNameRestriction = value;
          break;
-
-      case INSTANCE_OR_INSTANCE_NAME:
-         constraints->classRestriction = value;
-         break;
      }
   }
 
@@ -1338,9 +1265,8 @@ static void SetParseFlag(
      { parsedConstraints->allowedNumbers = TRUE; }
    else if (strcmp(constraintName,"allowed-values") == 0)
      { parsedConstraints->allowedValues = TRUE; }
-   else if (strcmp(constraintName,"allowed-classes") == 0)
-     { parsedConstraints->allowedClasses = TRUE; }
   }
 
 #endif /* (! RUN_TIME) && (! BLOAD_ONLY) */
 
+

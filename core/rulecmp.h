@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.20  01/31/02            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*        DEFRULE CONSTRUCT COMPILER HEADER FILE       */
    /*******************************************************/
@@ -27,8 +27,7 @@
 #include "extnfunc.h"
 #endif
 
-#define JoinPrefix() ArbitraryPrefix(DefruleData(theEnv)->DefruleCodeItem,2)
-#define LinkPrefix() ArbitraryPrefix(DefruleData(theEnv)->DefruleCodeItem,3)
+#define JoinPrefix() ArbitraryPrefix(DefruleCodeItem,2)
 
 #ifdef LOCALE
 #undef LOCALE
@@ -40,11 +39,11 @@
 #define LOCALE extern
 #endif
 
-   LOCALE void                     DefruleCompilerSetup(void *);
-   LOCALE void                     DefruleCModuleReference(void *,FILE *,int,int,int);
+   LOCALE void                     DefruleCompilerSetup(void);
+   LOCALE void                     DefruleCModuleReference(FILE *,int,int,int);
 
 #ifndef _RULECMP_SOURCE_
-extern struct CodeGeneratorItem *DefruleCodeItem;
+extern Thread struct CodeGeneratorItem *DefruleCodeItem;
 #endif
 
 #endif
@@ -52,3 +51,4 @@ extern struct CodeGeneratorItem *DefruleCodeItem;
 
 
 
+

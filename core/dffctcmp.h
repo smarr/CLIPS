@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.20  01/31/02            */
+   /*             CLIPS Version 6.10  04/13/98            */
    /*                                                     */
    /*        DEFFACTS CONSTRUCT COMPILER HEADER FILE      */
    /*******************************************************/
@@ -32,7 +32,8 @@
 #define LOCALE extern
 #endif
 
-   LOCALE void                           DeffactsCompilerSetup(void *);
-   LOCALE void                           DeffactsCModuleReference(void *,FILE *,int,int,int);
+   LOCALE void                           DeffactsCompilerSetup(void);
+   LOCALE void                           DeffactsCModuleReference(FILE *,int,int,int);
 
 #endif
+

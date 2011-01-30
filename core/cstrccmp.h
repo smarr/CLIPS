@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*               CLIPS Version 6.20  01/31/02          */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*           CONSTRUCT CONSTRUCTS-TO-C HEADER          */
    /*******************************************************/
@@ -39,9 +39,9 @@
 #endif
 
 #if ANSI_COMPILER  
-   LOCALE void                           MarkConstructHeaders(int);
+   LOCALE VOID                           MarkConstructHeaders(int);
 #else
-   LOCALE void                           MarkConstructHeaders();
+   LOCALE VOID                           MarkConstructHeaders();
 #endif 
 
 #endif
@@ -49,3 +49,4 @@
 
 
 
+

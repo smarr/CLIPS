@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.24  06/05/06            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*            INCREMENTAL RESET HEADER FILE            */
    /*******************************************************/
@@ -17,8 +17,6 @@
 /* Contributing Programmer(s):                               */
 /*                                                           */
 /* Revision History:                                         */
-/*                                                           */
-/*      6.24: Renamed BOOLEAN macro type to intBool.         */
 /*                                                           */
 /*************************************************************/
 
@@ -40,14 +38,17 @@
 #define LOCALE extern
 #endif
 
-#define GetIncrementalReset() EnvGetIncrementalReset(GetCurrentEnvironment())
-#define SetIncrementalReset(a) EnvSetIncrementalReset(GetCurrentEnvironment(),a)
+   LOCALE void                           IncrementalReset(struct defrule *);
+   LOCALE BOOLEAN                        GetIncrementalReset(void);
+   LOCALE BOOLEAN                        SetIncrementalReset(BOOLEAN);
+   LOCALE int                            GetIncrementalResetCommand(void);
+   LOCALE int                            SetIncrementalResetCommand(void);
 
-   LOCALE void                           IncrementalReset(void *,struct defrule *);
-   LOCALE intBool                        EnvGetIncrementalReset(void *);
-   LOCALE intBool                        EnvSetIncrementalReset(void *,intBool);
-   LOCALE int                            GetIncrementalResetCommand(void *);
-   LOCALE int                            SetIncrementalResetCommand(void *);
+#if (! RUN_TIME) && (! BLOAD_ONLY)
+#ifndef _INCRRSET_SOURCE_
+   extern Thread int                            IncrementalResetInProgress;
+#endif
+#endif
 
 #endif
 
@@ -59,3 +60,4 @@
 
 
 
+

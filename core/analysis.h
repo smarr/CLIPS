@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.24  06/05/06            */
+   /*             CLIPS Version 6.10  04/13/98            */
    /*                                                     */
    /*                ANALYSIS HEADER FILE                 */
    /*******************************************************/
@@ -18,8 +18,6 @@
 /* Contributing Programmer(s):                               */
 /*                                                           */
 /* Revision History:                                         */
-/*                                                           */
-/*      6.24: Renamed BOOLEAN macro type to intBool.         */
 /*                                                           */
 /*************************************************************/
 
@@ -43,7 +41,8 @@
 #define LOCALE extern
 #endif
 
-   LOCALE intBool                        VariableAnalysis(void *,struct lhsParseNode *);
+   LOCALE BOOLEAN                        VariableAnalysis(struct lhsParseNode *);
 
 #endif
 
+

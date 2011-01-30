@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*               CLIPS Version 6.24  06/05/06          */
+   /*               CLIPS Version 6.10  04/09/97          */
    /*                                                     */
    /*                                                     */
    /*******************************************************/
@@ -10,18 +10,19 @@
 /* Purpose:                                                  */
 /*                                                           */
 /* Principal Programmer(s):                                  */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Contributing Programmer(s):                               */
 /*                                                           */
 /* Revision History:                                         */
 /*                                                           */
-/*      6.24: Renamed BOOLEAN macro type to intBool.         */
-/*                                                           */
 /*************************************************************/
 
 #ifndef _H_genrcfun
 #define _H_genrcfun
+
+#define SaveBusyCount(gfunc)    (OldGenericBusySave = gfunc->busy)
+#define RestoreBusyCount(gfunc) (gfunc->busy = OldGenericBusySave)
 
 typedef struct defgenericModule DEFGENERIC_MODULE;
 typedef struct restriction RESTRICTION;
@@ -33,9 +34,6 @@ typedef struct defgeneric DEFGENERIC;
 #include <stdio.h>
 #endif
 
-#ifndef _H_conscomp
-#include "conscomp.h"
-#endif
 #ifndef _H_constrct
 #include "constrct.h"
 #endif
@@ -67,17 +65,15 @@ struct restriction
   {
    void **types;
    EXPRESSION *query;
-   short tcnt;
+   unsigned tcnt;
   };
 
 struct method
   {
-   short index;
-   unsigned busy;
-   short restrictionCount;
-   short minRestrictions;
-   short maxRestrictions;
-   short localVarCount;
+   unsigned index,busy;
+   int restrictionCount,
+       minRestrictions,maxRestrictions,
+       localVarCount;
    unsigned system : 1;
    unsigned trace : 1;
    RESTRICTION *restrictions;
@@ -91,38 +87,8 @@ struct defgeneric
    struct constructHeader header;
    unsigned busy,trace;
    DEFMETHOD *methods;
-   short mcnt;
-   short new_index;
+   unsigned mcnt,new_index;
   };
-
-#define DEFGENERIC_DATA 27
-
-struct defgenericData
-  { 
-   struct construct *DefgenericConstruct;
-   int DefgenericModuleIndex;
-   ENTITY_RECORD GenericEntityRecord;
-#if DEBUGGING_FUNCTIONS
-   unsigned WatchGenerics;
-   unsigned WatchMethods;
-#endif
-   DEFGENERIC *CurrentGeneric;
-   DEFMETHOD *CurrentMethod;
-   DATA_OBJECT *GenericCurrentArgument;
-#if (! RUN_TIME) && (! BLOAD_ONLY)
-   unsigned OldGenericBusySave;
-#endif
-#if CONSTRUCT_COMPILER && (! RUN_TIME)
-   struct CodeGeneratorItem *DefgenericCodeItem;
-#endif
-#if (! BLOAD_ONLY) && (! RUN_TIME)
-   struct token GenericInputToken;
-#endif
-  };
-
-#define DefgenericData(theEnv) ((struct defgenericData *) GetEnvironmentData(theEnv,DEFGENERIC_DATA))
-#define SaveBusyCount(gfunc)    (DefgenericData(theEnv)->OldGenericBusySave = gfunc->busy)
-#define RestoreBusyCount(gfunc) (gfunc->busy = DefgenericData(theEnv)->OldGenericBusySave)
 
 #ifdef LOCALE
 #undef LOCALE
@@ -135,39 +101,53 @@ struct defgenericData
 #endif
 
 #if ! RUN_TIME
-LOCALE intBool ClearDefgenericsReady(void *);
-LOCALE void *AllocateDefgenericModule(void *);
-LOCALE void FreeDefgenericModule(void *,void *);
+LOCALE BOOLEAN ClearDefgenericsReady(void);
+LOCALE void *AllocateDefgenericModule(void);
+LOCALE void FreeDefgenericModule(void *);
 #endif
 
 #if (! BLOAD_ONLY) && (! RUN_TIME)
 
-LOCALE int ClearDefmethods(void *);
-LOCALE int RemoveAllExplicitMethods(void *,DEFGENERIC *);
-LOCALE void RemoveDefgeneric(void *,void *);
-LOCALE int ClearDefgenerics(void *);
-LOCALE void MethodAlterError(void *,DEFGENERIC *);
-LOCALE void DeleteMethodInfo(void *,DEFGENERIC *,DEFMETHOD *);
-LOCALE void DestroyMethodInfo(void *,DEFGENERIC *,DEFMETHOD *);
+LOCALE int ClearDefmethods(void);
+LOCALE int RemoveAllExplicitMethods(DEFGENERIC *);
+LOCALE void RemoveDefgeneric(void *);
+LOCALE int ClearDefgenerics(void);
+LOCALE void MethodAlterError(DEFGENERIC *);
+LOCALE void DeleteMethodInfo(DEFGENERIC *,DEFMETHOD *);
 LOCALE int MethodsExecuting(DEFGENERIC *);
-#endif
 #if ! OBJECT_SYSTEM
-LOCALE intBool SubsumeType(int,int);
+LOCALE BOOLEAN SubsumeType(int,int);
+#endif
 #endif
 
-LOCALE long FindMethodByIndex(DEFGENERIC *,long);
+LOCALE int FindMethodByIndex(DEFGENERIC *,unsigned);
 #if DEBUGGING_FUNCTIONS
-LOCALE void PreviewGeneric(void *);
-LOCALE void PrintMethod(void *,char *,int,DEFMETHOD *);
+LOCALE void PreviewGeneric(void);
+LOCALE void PrintMethod(char *,int,DEFMETHOD *);
 #endif
-LOCALE DEFGENERIC *CheckGenericExists(void *,char *,char *);
-LOCALE long CheckMethodExists(void *,char *,DEFGENERIC *,long);
+LOCALE DEFGENERIC *CheckGenericExists(char *,char *);
+LOCALE int CheckMethodExists(char *,DEFGENERIC *,int);
 
 #if ! OBJECT_SYSTEM
-LOCALE char *TypeName(void *,int);
+LOCALE char *TypeName(int);
 #endif
 
-LOCALE void PrintGenericName(void *,char *,DEFGENERIC *);
+LOCALE void PrintGenericName(char *,DEFGENERIC *);
+
+#ifndef _GENRCFUN_SOURCE_
+extern Thread DEFGENERIC *CurrentGeneric;
+extern Thread DEFMETHOD *CurrentMethod;
+extern Thread DATA_OBJECT *GenericCurrentArgument;
+
+#if DEBUGGING_FUNCTIONS
+extern Thread int WatchGenerics,WatchMethods;
+#endif
+
+#if (! RUN_TIME) && (! BLOAD_ONLY)
+extern Thread int OldGenericBusySave;
+#endif
+
+#endif
 
 #endif
 
@@ -175,3 +155,4 @@ LOCALE void PrintGenericName(void *,char *,DEFGENERIC *);
 
 
 
+

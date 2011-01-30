@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.24  06/05/06            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*                DEFFACTS HEADER FILE                 */
    /*******************************************************/
@@ -13,20 +13,15 @@
 /*      Gary D. Riley                                        */
 /*                                                           */
 /* Contributing Programmer(s):                               */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Revision History:                                         */
-/*                                                           */
-/*      6.24: Renamed BOOLEAN macro type to intBool.         */
 /*                                                           */
 /*************************************************************/
 
 #ifndef _H_dffctdef
 #define _H_dffctdef
 
-#ifndef _H_conscomp
-#include "conscomp.h"
-#endif
 #ifndef _H_symbol
 #include "symbol.h"
 #endif
@@ -46,17 +41,6 @@
 #include "cstrccom.h"
 #endif
 
-#define DEFFACTS_DATA 0
-
-struct deffactsData
-  { 
-   struct construct *DeffactsConstruct;
-   int DeffactsModuleIndex;  
-#if CONSTRUCT_COMPILER && (! RUN_TIME)
-   struct CodeGeneratorItem *DeffactsCodeItem;
-#endif
-  };
-  
 struct deffacts
   {
    struct constructHeader header;
@@ -68,10 +52,9 @@ struct deffactsModule
    struct defmoduleItemHeader header;
   };
 
-#define EnvGetDeffactsName(theEnv,x) GetConstructNameString((struct constructHeader *) x)
-#define EnvGetDeffactsPPForm(theEnv,x) GetConstructPPForm(theEnv,(struct constructHeader *) x)
-#define EnvDeffactsModule(theEnv,x) GetConstructModuleName((struct constructHeader *) x)
-#define DeffactsData(theEnv) ((struct deffactsData *) GetEnvironmentData(theEnv,DEFFACTS_DATA))
+#define GetDeffactsName(x) GetConstructNameString((struct constructHeader *) x)
+#define GetDeffactsPPForm(x) GetConstructPPForm((struct constructHeader *) x)
+#define DeffactsModule(x) GetConstructModuleName((struct constructHeader *) x)
 
 #ifdef LOCALE
 #undef LOCALE
@@ -83,20 +66,20 @@ struct deffactsModule
 #define LOCALE extern
 #endif
 
-#define DeffactsModule(x) GetConstructModuleName((struct constructHeader *) x)
-#define FindDeffacts(a) EnvFindDeffacts(GetCurrentEnvironment(),a)
-#define GetDeffactsName(x) GetConstructNameString((struct constructHeader *) x)
-#define GetDeffactsPPForm(x) GetConstructPPForm(GetCurrentEnvironment(),(struct constructHeader *) x)
-#define GetNextDeffacts(a) EnvGetNextDeffacts(GetCurrentEnvironment(),a)
-#define IsDeffactsDeletable(a) EnvIsDeffactsDeletable(GetCurrentEnvironment(),a)
-
-   LOCALE void                           InitializeDeffacts(void *);
-   LOCALE void                          *EnvFindDeffacts(void *,char *);
-   LOCALE void                          *EnvGetNextDeffacts(void *,void *);
+   LOCALE void                           InitializeDeffacts(void);
+   LOCALE void                          *FindDeffacts(char *);
+   LOCALE void                          *GetNextDeffacts(void *);
    LOCALE void                           CreateInitialFactDeffacts(void);
-   LOCALE intBool                        EnvIsDeffactsDeletable(void *,void *);
-   LOCALE struct deffactsModule         *GetDeffactsModuleItem(void *,struct defmodule *);
+   LOCALE BOOLEAN                        IsDeffactsDeletable(void *);
+   LOCALE struct deffactsModule         *GetDeffactsModuleItem(struct defmodule *);
+
+#ifndef _DFFCTDEF_SOURCE_
+   extern Thread struct construct              *DeffactsConstruct;
+   extern Thread int                            DeffactsModuleIndex;
+#endif
+
 
 #endif
 
 
+

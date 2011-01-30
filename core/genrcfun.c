@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*               CLIPS Version 6.24  05/17/06          */
+   /*               CLIPS Version 6.10  04/09/97          */
    /*                                                     */
    /*                                                     */
    /*******************************************************/
@@ -10,19 +10,15 @@
 /* Purpose: Generic Functions Internal Routines              */
 /*                                                           */
 /* Principal Programmer(s):                                  */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Contributing Programmer(s):                               */
 /*                                                           */
 /* Revision History:                                         */
-/*      6.23: Changed name of variable log to logName        */
-/*            because of Unix compiler warnings of shadowed  */
-/*            definitions.                                   */
 /*                                                           */
-/*      6.24: Removed IMPERATIVE_METHODS compilation flag.   */
-/*                                                           */
-/*            Renamed BOOLEAN macro type to intBool.         */
-/*                                                           */
+/* Who               |     Date    | Description             */
+/* ------------------+-------------+------------------------ */
+/* M.Giordano        | 23-Mar-2000 | Mods made for TLS       */
 /*************************************************************/
 
 /* =========================================
@@ -44,18 +40,28 @@
 #endif
 
 #include "argacces.h"
+#include "memalloc.h"
 #include "constrct.h"
 #include "cstrcpsr.h"
-#include "envrnmnt.h"
 #include "genrccom.h"
 #include "genrcexe.h"
-#include "memalloc.h"
 #include "prccode.h"
 #include "router.h"
-#include "sysdep.h"
 
 #define _GENRCFUN_SOURCE_
 #include "genrcfun.h"
+
+/* =========================================
+   *****************************************
+                   CONSTANTS
+   =========================================
+   ***************************************** */
+
+/* =========================================
+   *****************************************
+               MACROS AND TYPES
+   =========================================
+   ***************************************** */
 
 /* =========================================
    *****************************************
@@ -64,8 +70,32 @@
    ***************************************** */
 
 #if DEBUGGING_FUNCTIONS
-static void DisplayGenericCore(void *,DEFGENERIC *);
+static void DisplayGenericCore(DEFGENERIC *);
 #endif
+
+/* =========================================
+   *****************************************
+      EXTERNALLY VISIBLE GLOBAL VARIABLES
+   =========================================
+   ***************************************** */
+Thread globle DEFGENERIC *CurrentGeneric = NULL;
+Thread globle DEFMETHOD *CurrentMethod = NULL;
+Thread globle DATA_OBJECT *GenericCurrentArgument = NULL;
+
+#if DEBUGGING_FUNCTIONS
+Thread globle int WatchGenerics = OFF;
+Thread globle int WatchMethods = OFF;
+#endif
+
+#if (! RUN_TIME) && (! BLOAD_ONLY)
+Thread globle int OldGenericBusySave;
+#endif
+
+/* =========================================
+   *****************************************
+      INTERNALLY VISIBLE GLOBAL VARIABLES
+   =========================================
+   ***************************************** */
 
 /* =========================================
    *****************************************
@@ -89,10 +119,9 @@ static void DisplayGenericCore(void *,DEFGENERIC *);
   SIDE EFFECTS : None
   NOTES        : Used by (clear) and (bload)
  ***************************************************/
-globle intBool ClearDefgenericsReady(
-  void *theEnv)
+globle BOOLEAN ClearDefgenericsReady()
   {
-   return((DefgenericData(theEnv)->CurrentGeneric != NULL) ? FALSE : TRUE);
+   return((CurrentGeneric != NULL) ? FALSE : TRUE);
   }
 
 /*****************************************************
@@ -104,10 +133,9 @@ globle intBool ClearDefgenericsReady(
   SIDE EFFECTS : Deffunction module created
   NOTES        : None
  *****************************************************/
-globle void *AllocateDefgenericModule(
-  void *theEnv)
+globle void *AllocateDefgenericModule()
   {
-   return((void *) get_struct(theEnv,defgenericModule));
+   return((void *) get_struct(defgenericModule));
   }
 
 /***************************************************
@@ -120,13 +148,12 @@ globle void *AllocateDefgenericModule(
   NOTES        : None
  ***************************************************/
 globle void FreeDefgenericModule(
-  void *theEnv,
   void *theItem)
   {
 #if (! BLOAD_ONLY)
-   FreeConstructHeaderModule(theEnv,(struct defmoduleItemHeader *) theItem,DefgenericData(theEnv)->DefgenericConstruct);
+   FreeConstructHeaderModule((struct defmoduleItemHeader *) theItem,DefgenericConstruct);
 #endif
-   rtn_struct(theEnv,defgenericModule,theItem);
+   rtn_struct(defgenericModule,theItem);
   }
 
 #endif
@@ -151,22 +178,21 @@ globle void FreeDefgenericModule(
                    mutually refer to generic functions
                    to be cleared
  ************************************************************/
-globle int ClearDefmethods(
-  void *theEnv)
+globle int ClearDefmethods()
   {
    register DEFGENERIC *gfunc;
    int success = TRUE;
 
 #if BLOAD || BLOAD_AND_BSAVE
-   if (Bloaded(theEnv) == TRUE) return(FALSE);
+   if (Bloaded() == TRUE) return(FALSE);
 #endif
 
-   gfunc = (DEFGENERIC *) EnvGetNextDefgeneric(theEnv,NULL);
+   gfunc = (DEFGENERIC *) GetNextDefgeneric(NULL);
    while (gfunc != NULL)
      {
-      if (RemoveAllExplicitMethods(theEnv,gfunc) == FALSE)
+      if (RemoveAllExplicitMethods(gfunc) == FALSE)
         success = FALSE;
-      gfunc = (DEFGENERIC *) EnvGetNextDefgeneric(theEnv,(void *) gfunc);
+      gfunc = (DEFGENERIC *) GetNextDefgeneric((void *) gfunc);
      }
    return(success);
   }
@@ -182,10 +208,9 @@ globle int ClearDefmethods(
   NOTES        : None
  *****************************************************************/
 globle int RemoveAllExplicitMethods(
-  void *theEnv,
   DEFGENERIC *gfunc)
   {
-   long i,j;
+   register int i,j;
    unsigned systemMethodCount = 0;
    DEFMETHOD *narr;
 
@@ -196,11 +221,11 @@ globle int RemoveAllExplicitMethods(
          if (gfunc->methods[i].system)
            systemMethodCount++;
          else
-           DeleteMethodInfo(theEnv,gfunc,&gfunc->methods[i]);
+           DeleteMethodInfo(gfunc,&gfunc->methods[i]);
         }
       if (systemMethodCount != 0)
         {
-         narr = (DEFMETHOD *) gm2(theEnv,(systemMethodCount * sizeof(DEFMETHOD)));
+         narr = (DEFMETHOD *) gm2((int) (systemMethodCount * sizeof(DEFMETHOD)));
          i = 0;
          j = 0;
          while (i < gfunc->mcnt)
@@ -209,14 +234,14 @@ globle int RemoveAllExplicitMethods(
               GenCopyMemory(DEFMETHOD,1,&narr[j++],&gfunc->methods[i]);
             i++;
            }
-         rm(theEnv,(void *) gfunc->methods,(sizeof(DEFMETHOD) * gfunc->mcnt));
-         gfunc->mcnt = (short) systemMethodCount;
+         rm((void *) gfunc->methods,(int) (sizeof(DEFMETHOD) * gfunc->mcnt));
+         gfunc->mcnt = systemMethodCount;
          gfunc->methods = narr;
         }
       else
         {
          if (gfunc->mcnt != 0)
-           rm(theEnv,(void *) gfunc->methods,(sizeof(DEFMETHOD) * gfunc->mcnt));
+           rm((void *) gfunc->methods,(int) (sizeof(DEFMETHOD) * gfunc->mcnt));
          gfunc->mcnt = 0;
          gfunc->methods = NULL;
         }
@@ -237,21 +262,20 @@ globle int RemoveAllExplicitMethods(
   NOTES        : Assumes generic is not in use!!!
  **************************************************/
 globle void RemoveDefgeneric(
-  void *theEnv,
   void *vgfunc)
   {
    DEFGENERIC *gfunc = (DEFGENERIC *) vgfunc;
-   long i;
+   register int i;
 
    for (i = 0 ; i < gfunc->mcnt ; i++)
-     DeleteMethodInfo(theEnv,gfunc,&gfunc->methods[i]);
+     DeleteMethodInfo(gfunc,&gfunc->methods[i]);
 
    if (gfunc->mcnt != 0)
-     rm(theEnv,(void *) gfunc->methods,(sizeof(DEFMETHOD) * gfunc->mcnt));
-   DecrementSymbolCount(theEnv,GetDefgenericNamePointer((void *) gfunc));
+     rm((void *) gfunc->methods,(int) (sizeof(DEFMETHOD) * gfunc->mcnt));
+   DecrementSymbolCount(GetDefgenericNamePointer((void *) gfunc));
    SetDefgenericPPForm((void *) gfunc,NULL);
-   ClearUserDataList(theEnv,gfunc->header.usrData);
-   rtn_struct(theEnv,defgeneric,gfunc);
+   ClearUserDataList(gfunc->header.usrData);
+   rtn_struct(defgeneric,gfunc);
   }
 
 /****************************************************************
@@ -263,30 +287,29 @@ globle void RemoveDefgeneric(
                   function methods)
   NOTES        : None
  ****************************************************************/
-globle int ClearDefgenerics(
-  void *theEnv)
+globle int ClearDefgenerics()
   {
    register DEFGENERIC *gfunc,*gtmp;
    int success = TRUE;
 
 #if BLOAD || BLOAD_AND_BSAVE
-   if (Bloaded(theEnv) == TRUE) return(FALSE);
+   if (Bloaded() == TRUE) return(FALSE);
 #endif
 
-   gfunc = (DEFGENERIC *) EnvGetNextDefgeneric(theEnv,NULL);
+   gfunc = (DEFGENERIC *) GetNextDefgeneric(NULL);
    while (gfunc != NULL)
      {
       gtmp = gfunc;
-      gfunc = (DEFGENERIC *) EnvGetNextDefgeneric(theEnv,(void *) gfunc);
-      if (RemoveAllExplicitMethods(theEnv,gtmp) == FALSE)
+      gfunc = (DEFGENERIC *) GetNextDefgeneric((void *) gfunc);
+      if (RemoveAllExplicitMethods(gtmp) == FALSE)
         {
-         CantDeleteItemErrorMessage(theEnv,"generic function",EnvGetDefgenericName(theEnv,gtmp));
+         CantDeleteItemErrorMessage("generic function",GetDefgenericName(gtmp));
          success = FALSE;
         }
       else
         {
-         RemoveConstructFromModule(theEnv,(struct constructHeader *) gtmp);
-         RemoveDefgeneric(theEnv,(void *) gtmp);
+         RemoveConstructFromModule((struct constructHeader *) gtmp);
+         RemoveDefgeneric((void *) gtmp);
         }
      }
    return(success);
@@ -304,13 +327,12 @@ globle int ClearDefgenerics(
   NOTES        : None
  ********************************************************/
 globle void MethodAlterError(
-  void *theEnv,
   DEFGENERIC *gfunc)
   {
-   PrintErrorID(theEnv,"GENRCFUN",1,FALSE);
-   EnvPrintRouter(theEnv,WERROR,"Defgeneric ");
-   EnvPrintRouter(theEnv,WERROR,EnvGetDefgenericName(theEnv,(void *) gfunc));
-   EnvPrintRouter(theEnv,WERROR," cannot be modified while one of its methods is executing.\n");
+   PrintErrorID("GENRCFUN",1,FALSE);
+   PrintRouter(WERROR,"Defgeneric ");
+   PrintRouter(WERROR,GetDefgenericName((void *) gfunc));
+   PrintRouter(WERROR," cannot be modified while one of its methods is executing.\n");
   }
 
 /***************************************************
@@ -325,83 +347,38 @@ globle void MethodAlterError(
   NOTES        : None
  ***************************************************/
 globle void DeleteMethodInfo(
-  void *theEnv,
   DEFGENERIC *gfunc,
   DEFMETHOD *meth)
   {
-   short j,k;
-   RESTRICTION *rptr;
+   register int j,k;
+   register RESTRICTION *rptr;
 
    SaveBusyCount(gfunc);
-   ExpressionDeinstall(theEnv,meth->actions);
-   ReturnPackedExpression(theEnv,meth->actions);
-   ClearUserDataList(theEnv,meth->usrData);
+   ExpressionDeinstall(meth->actions);
+   ReturnPackedExpression(meth->actions);
+   ClearUserDataList(meth->usrData);
    if (meth->ppForm != NULL)
-     rm(theEnv,(void *) meth->ppForm,(sizeof(char) * (strlen(meth->ppForm)+1)));
+     rm((void *) meth->ppForm,(int) (sizeof(char) * (strlen(meth->ppForm)+1)));
    for (j = 0 ; j < meth->restrictionCount ; j++)
      {
       rptr = &meth->restrictions[j];
 
       for (k = 0 ; k < rptr->tcnt ; k++)
 #if OBJECT_SYSTEM
-        DecrementDefclassBusyCount(theEnv,rptr->types[k]);
+        DecrementDefclassBusyCount(rptr->types[k]);
 #else
-        DecrementIntegerCount(theEnv,(INTEGER_HN *) rptr->types[k]);
+        DecrementIntegerCount((INTEGER_HN *) rptr->types[k]);
 #endif
 
       if (rptr->types != NULL)
-        rm(theEnv,(void *) rptr->types,(sizeof(void *) * rptr->tcnt));
-      ExpressionDeinstall(theEnv,rptr->query);
-      ReturnPackedExpression(theEnv,rptr->query);
+        rm((void *) rptr->types,(int) (sizeof(void *) * rptr->tcnt));
+      ExpressionDeinstall(rptr->query);
+      ReturnPackedExpression(rptr->query);
      }
    if (meth->restrictions != NULL)
-     rm(theEnv,(void *) meth->restrictions,
-        (sizeof(RESTRICTION) * meth->restrictionCount));
+     rm((void *) meth->restrictions,
+        (int) (sizeof(RESTRICTION) * meth->restrictionCount));
    RestoreBusyCount(gfunc);
-  }
-  
-/***************************************************
-  NAME         : DestroyMethodInfo
-  DESCRIPTION  : Deallocates all the data associated
-                  w/ a method but does not release
-                  the method structure itself
-  INPUTS       : 1) The generic function address
-                 2) The method address
-  RETURNS      : Nothing useful
-  SIDE EFFECTS : Nodes deallocated
-  NOTES        : None
- ***************************************************/
-#if WIN_BTC
-#pragma argsused
-#endif
-globle void DestroyMethodInfo(
-  void *theEnv,
-  DEFGENERIC *gfunc,
-  DEFMETHOD *meth)
-  {
-   register int j;
-   register RESTRICTION *rptr;
-#if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(gfunc)
-#endif
-
-   ReturnPackedExpression(theEnv,meth->actions);
-   
-   ClearUserDataList(theEnv,meth->usrData);
-   if (meth->ppForm != NULL)
-     rm(theEnv,(void *) meth->ppForm,(sizeof(char) * (strlen(meth->ppForm)+1)));
-   for (j = 0 ; j < meth->restrictionCount ; j++)
-     {
-      rptr = &meth->restrictions[j];
-
-      if (rptr->types != NULL)
-        rm(theEnv,(void *) rptr->types,(sizeof(void *) * rptr->tcnt));
-      ReturnPackedExpression(theEnv,rptr->query);
-     }
-
-   if (meth->restrictions != NULL)
-     rm(theEnv,(void *) meth->restrictions,
-        (sizeof(RESTRICTION) * meth->restrictionCount));
   }
 
 /***************************************************
@@ -418,15 +395,13 @@ globle void DestroyMethodInfo(
 globle int MethodsExecuting(
   DEFGENERIC *gfunc)
   {
-   long i;
+   register unsigned i;
 
    for (i = 0 ; i < gfunc->mcnt ; i++)
      if (gfunc->methods[i].busy > 0)
        return(TRUE);
    return(FALSE);
   }
-  
-#endif
 
 #if ! OBJECT_SYSTEM
 
@@ -441,7 +416,7 @@ globle int MethodsExecuting(
   SIDE EFFECTS : None
   NOTES        : Used only when COOL is not present
  **************************************************************/
-globle intBool SubsumeType(
+globle BOOLEAN SubsumeType(
   int t1,
   int t2)
   {
@@ -462,6 +437,8 @@ globle intBool SubsumeType(
 
 #endif
 
+#endif
+
 /*****************************************************
   NAME         : FindMethodByIndex
   DESCRIPTION  : Finds a generic function method of
@@ -474,14 +451,14 @@ globle intBool SubsumeType(
   SIDE EFFECTS : None
   NOTES        : None
  *****************************************************/
-globle long FindMethodByIndex(
+globle int FindMethodByIndex(
   DEFGENERIC *gfunc,
-  long theIndex)
+  unsigned index)
   {
-   long i;
+   register unsigned i;
 
    for (i = 0 ; i < gfunc->mcnt ; i++)
-     if (gfunc->methods[i].index == theIndex)
+     if (gfunc->methods[i].index == index)
        return(i);
    return(-1);
   }
@@ -501,50 +478,49 @@ globle long FindMethodByIndex(
                    the set of applicable methods
   NOTES        : H/L Syntax: (preview-generic <func> <args>)
  *************************************************************/
-globle void PreviewGeneric(
-  void *theEnv)
+globle void PreviewGeneric()
   {
    DEFGENERIC *gfunc;
    DEFGENERIC *previousGeneric;
    int oldce;
    DATA_OBJECT temp;
 
-   EvaluationData(theEnv)->EvaluationError = FALSE;
-   if (EnvArgTypeCheck(theEnv,"preview-generic",1,SYMBOL,&temp) == FALSE)
+   EvaluationError = FALSE;
+   if (ArgTypeCheck("preview-generic",1,SYMBOL,&temp) == FALSE)
      return;
-   gfunc = LookupDefgenericByMdlOrScope(theEnv,DOToString(temp));
+   gfunc = LookupDefgenericByMdlOrScope(DOToString(temp));
    if (gfunc == NULL)
      {
-      PrintErrorID(theEnv,"GENRCFUN",3,FALSE);
-      EnvPrintRouter(theEnv,WERROR,"Unable to find generic function ");
-      EnvPrintRouter(theEnv,WERROR,DOToString(temp));
-      EnvPrintRouter(theEnv,WERROR," in function preview-generic.\n");
+      PrintErrorID("GENRCFUN",3,FALSE);
+      PrintRouter(WERROR,"Unable to find generic function ");
+      PrintRouter(WERROR,DOToString(temp));
+      PrintRouter(WERROR," in function preview-generic.\n");
       return;
      }
-   oldce = ExecutingConstruct(theEnv);
-   SetExecutingConstruct(theEnv,TRUE);
-   previousGeneric = DefgenericData(theEnv)->CurrentGeneric;
-   DefgenericData(theEnv)->CurrentGeneric = gfunc;
-   EvaluationData(theEnv)->CurrentEvaluationDepth++;
-   PushProcParameters(theEnv,GetFirstArgument()->nextArg,
+   oldce = ExecutingConstruct();
+   SetExecutingConstruct(TRUE);
+   previousGeneric = CurrentGeneric;
+   CurrentGeneric = gfunc;
+   CurrentEvaluationDepth++;
+   PushProcParameters(GetFirstArgument()->nextArg,
                           CountArguments(GetFirstArgument()->nextArg),
-                          EnvGetDefgenericName(theEnv,(void *) gfunc),"generic function",
+                          GetDefgenericName((void *) gfunc),"generic function",
                           UnboundMethodErr);
-   if (EvaluationData(theEnv)->EvaluationError)
+   if (EvaluationError)
      {
-      PopProcParameters(theEnv);
-      DefgenericData(theEnv)->CurrentGeneric = previousGeneric;
-      EvaluationData(theEnv)->CurrentEvaluationDepth--;
-      SetExecutingConstruct(theEnv,oldce);
+      PopProcParameters();
+      CurrentGeneric = previousGeneric;
+      CurrentEvaluationDepth--;
+      SetExecutingConstruct(oldce);
       return;
      }
    gfunc->busy++;
-   DisplayGenericCore(theEnv,gfunc);
+   DisplayGenericCore(gfunc);
    gfunc->busy--;
-   PopProcParameters(theEnv);
-   DefgenericData(theEnv)->CurrentGeneric = previousGeneric;
-   EvaluationData(theEnv)->CurrentEvaluationDepth--;
-   SetExecutingConstruct(theEnv,oldce);
+   PopProcParameters();
+   CurrentGeneric = previousGeneric;
+   CurrentEvaluationDepth--;
+   SetExecutingConstruct(oldce);
   }
 
 /******************************************************************
@@ -557,60 +533,53 @@ globle void PreviewGeneric(
   SIDE EFFECTS : None
   NOTES        : A terminating newline is NOT included
  ******************************************************************/
-#if WIN_BTC
-#pragma argsused
-#endif
 globle void PrintMethod(
-  void *theEnv,
   char *buf,
   int buflen,
   DEFMETHOD *meth)
   {
-#if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
-#endif
-   long j,k;
+   register int j,k;
    register RESTRICTION *rptr;
    char numbuf[15];
 
    buf[0] = '\0';
    if (meth->system)
-     genstrncpy(buf,"SYS",(STD_SIZE) buflen);
-   gensprintf(numbuf,"%-2d ",meth->index);
-   genstrncat(buf,numbuf,(STD_SIZE) buflen-3);
+     strncpy(buf,"SYS",(CLIPS_STD_SIZE) buflen);
+   sprintf(numbuf,"%-2d ",meth->index);
+   strncat(buf,numbuf,(CLIPS_STD_SIZE) buflen-3);
    for (j = 0 ; j < meth->restrictionCount ; j++)
      {
       rptr = &meth->restrictions[j];
-      if ((((int) j) == meth->restrictionCount-1) && (meth->maxRestrictions == -1))
+      if ((j == meth->restrictionCount-1) && (meth->maxRestrictions == -1))
         {
          if ((rptr->tcnt == 0) && (rptr->query == NULL))
            {
-            genstrncat(buf,"$?",buflen-strlen(buf));
+            strncat(buf,"$?",buflen-strlen(buf));
             break;
            }
-         genstrncat(buf,"($? ",buflen-strlen(buf));
+         strncat(buf,"($? ",buflen-strlen(buf));
         }
       else
-        genstrncat(buf,"(",buflen-strlen(buf));
+        strncat(buf,"(",buflen-strlen(buf));
       for (k = 0 ; k < rptr->tcnt ; k++)
         {
 #if OBJECT_SYSTEM
-         genstrncat(buf,EnvGetDefclassName(theEnv,rptr->types[k]),buflen-strlen(buf));
+         strncat(buf,GetDefclassName(rptr->types[k]),buflen-strlen(buf));
 #else
-         genstrncat(buf,TypeName(theEnv,ValueToInteger(rptr->types[k])),buflen-strlen(buf));
+         strncat(buf,TypeName(ValueToInteger(rptr->types[k])),buflen-strlen(buf));
 #endif
-         if (((int) k) < (((int) rptr->tcnt) - 1))
-           genstrncat(buf," ",buflen-strlen(buf));
+         if (k < (rptr->tcnt - 1))
+           strncat(buf," ",buflen-strlen(buf));
         }
       if (rptr->query != NULL)
         {
          if (rptr->tcnt != 0)
-           genstrncat(buf," ",buflen-strlen(buf));
-         genstrncat(buf,"<qry>",buflen-strlen(buf));
+           strncat(buf," ",buflen-strlen(buf));
+         strncat(buf,"<qry>",buflen-strlen(buf));
         }
-      genstrncat(buf,")",buflen-strlen(buf));
-      if (((int) j) != (((int) meth->restrictionCount)-1))
-        genstrncat(buf," ",buflen-strlen(buf));
+      strncat(buf,")",buflen-strlen(buf));
+      if (j != (meth->restrictionCount-1))
+        strncat(buf," ",buflen-strlen(buf));
      }
   }
 
@@ -629,22 +598,21 @@ globle void PrintMethod(
   NOTES        : None
  ***************************************************/
 globle DEFGENERIC *CheckGenericExists(
-  void *theEnv,
   char *fname,
   char *gname)
   {
    DEFGENERIC *gfunc;
 
-   gfunc = LookupDefgenericByMdlOrScope(theEnv,gname);
+   gfunc = LookupDefgenericByMdlOrScope(gname);
    if (gfunc == NULL)
      {
-      PrintErrorID(theEnv,"GENRCFUN",3,FALSE);
-      EnvPrintRouter(theEnv,WERROR,"Unable to find generic function ");
-      EnvPrintRouter(theEnv,WERROR,gname);
-      EnvPrintRouter(theEnv,WERROR," in function ");
-      EnvPrintRouter(theEnv,WERROR,fname);
-      EnvPrintRouter(theEnv,WERROR,".\n");
-      SetEvaluationError(theEnv,TRUE);
+      PrintErrorID("GENRCFUN",3,FALSE);
+      PrintRouter(WERROR,"Unable to find generic function ");
+      PrintRouter(WERROR,gname);
+      PrintRouter(WERROR," in function ");
+      PrintRouter(WERROR,fname);
+      PrintRouter(WERROR,".\n");
+      SetEvaluationError(TRUE);
      }
    return(gfunc);
   }
@@ -661,26 +629,25 @@ globle DEFGENERIC *CheckGenericExists(
   SIDE EFFECTS : None
   NOTES        : None
  ***************************************************/
-globle long CheckMethodExists(
-  void *theEnv,
+globle int CheckMethodExists(
   char *fname,
   DEFGENERIC *gfunc,
-  long mi)
+  int mi)
   {
-   long fi;
+   int fi;
 
-   fi = FindMethodByIndex(gfunc,mi);
+   fi = FindMethodByIndex(gfunc,(unsigned) mi);
    if (fi == -1)
      {
-      PrintErrorID(theEnv,"GENRCFUN",2,FALSE);
-      EnvPrintRouter(theEnv,WERROR,"Unable to find method ");
-      EnvPrintRouter(theEnv,WERROR,EnvGetDefgenericName(theEnv,(void *) gfunc));
-      EnvPrintRouter(theEnv,WERROR," #");
-      PrintLongInteger(theEnv,WERROR,mi);
-      EnvPrintRouter(theEnv,WERROR," in function ");
-      EnvPrintRouter(theEnv,WERROR,fname);
-      EnvPrintRouter(theEnv,WERROR,".\n");
-      SetEvaluationError(theEnv,TRUE);
+      PrintErrorID("GENRCFUN",2,FALSE);
+      PrintRouter(WERROR,"Unable to find method ");
+      PrintRouter(WERROR,GetDefgenericName((void *) gfunc));
+      PrintRouter(WERROR," #");
+      PrintLongInteger(WERROR,(long) mi);
+      PrintRouter(WERROR," in function ");
+      PrintRouter(WERROR,fname);
+      PrintRouter(WERROR,".\n");
+      SetEvaluationError(TRUE);
      }
    return(fi);
   }
@@ -701,7 +668,6 @@ globle long CheckMethodExists(
   NOTES        : Used only when COOL is not present
  *******************************************************/
 globle char *TypeName(
-  void *theEnv,
   int tcode)
   {
    switch (tcode)
@@ -721,10 +687,10 @@ globle char *TypeName(
       case LEXEME_TYPE_CODE    : return(LEXEME_TYPE_NAME);
       case ADDRESS_TYPE_CODE   : return(ADDRESS_TYPE_NAME);
       case INSTANCE_TYPE_CODE  : return(INSTANCE_TYPE_NAME);
-      default                  : PrintErrorID(theEnv,"INSCOM",1,FALSE);
-                                 EnvPrintRouter(theEnv,WERROR,"Undefined type in function type.\n");
-                                 SetEvaluationError(theEnv,TRUE);
-                                 return("<UNKNOWN-TYPE>");
+      default                  : PrintErrorID("INSCOM",1,FALSE);
+                                 PrintRouter(WERROR,"Undefined type in function type.\n");
+                                 SetEvaluationError(TRUE);
+                                 return("<???UNKNOWN-TYPE???>");
      }
   }
 
@@ -742,17 +708,16 @@ globle char *TypeName(
   NOTES        : None
  ******************************************************/
 globle void PrintGenericName(
-  void *theEnv,
-  char *logName,
+  char *log,
   DEFGENERIC *gfunc)
   {
-   if (gfunc->header.whichModule->theModule != ((struct defmodule *) EnvGetCurrentModule(theEnv)))
+   if (gfunc->header.whichModule->theModule != ((struct defmodule *) GetCurrentModule()))
      {
-      EnvPrintRouter(theEnv,logName,EnvGetDefmoduleName(theEnv,(void *)
+      PrintRouter(log,GetDefmoduleName((void *)
                         gfunc->header.whichModule->theModule));
-      EnvPrintRouter(theEnv,logName,"::");
+      PrintRouter(log,"::");
      }
-   EnvPrintRouter(theEnv,logName,ValueToString((void *) gfunc->header.name));
+   PrintRouter(log,ValueToString((void *) gfunc->header.name));
   }
 
 /* =========================================
@@ -774,32 +739,34 @@ globle void PrintGenericName(
   NOTES        : None
  *********************************************************/
 static void DisplayGenericCore(
-  void *theEnv,
   DEFGENERIC *gfunc)
   {
-   long i;
+   register int i;
    char buf[256];
    int rtn = FALSE;
 
    for (i = 0 ; i < gfunc->mcnt ; i++)
      {
       gfunc->methods[i].busy++;
-      if (IsMethodApplicable(theEnv,&gfunc->methods[i]))
+      if (IsMethodApplicable(&gfunc->methods[i]))
         {
          rtn = TRUE;
-         EnvPrintRouter(theEnv,WDISPLAY,EnvGetDefgenericName(theEnv,(void *) gfunc));
-         EnvPrintRouter(theEnv,WDISPLAY," #");
-         PrintMethod(theEnv,buf,255,&gfunc->methods[i]);
-         EnvPrintRouter(theEnv,WDISPLAY,buf);
-         EnvPrintRouter(theEnv,WDISPLAY,"\n");
+         PrintRouter(WDISPLAY,GetDefgenericName((void *) gfunc));
+         PrintRouter(WDISPLAY," #");
+         PrintMethod(buf,255,&gfunc->methods[i]);
+         PrintRouter(WDISPLAY,buf);
+         PrintRouter(WDISPLAY,"\n");
+#if ! IMPERATIVE_METHODS
+         break;
+#endif
         }
       gfunc->methods[i].busy--;
      }
    if (rtn == FALSE)
      {
-      EnvPrintRouter(theEnv,WDISPLAY,"No applicable methods for ");
-      EnvPrintRouter(theEnv,WDISPLAY,EnvGetDefgenericName(theEnv,(void *) gfunc));
-      EnvPrintRouter(theEnv,WDISPLAY,".\n");
+      PrintRouter(WDISPLAY,"No applicable methods for ");
+      PrintRouter(WDISPLAY,GetDefgenericName((void *) gfunc));
+      PrintRouter(WDISPLAY,".\n");
      }
   }
 
@@ -807,3 +774,12 @@ static void DisplayGenericCore(
 
 #endif
 
+/***************************************************
+  NAME         :
+  DESCRIPTION  :
+  INPUTS       :
+  RETURNS      :
+  SIDE EFFECTS :
+  NOTES        :
+ ***************************************************/
+

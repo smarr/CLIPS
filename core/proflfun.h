@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.24 06/05/06             */
+   /*             CLIPS Version 6.10 01/31/97             */
    /*                                                     */
    /*      CONSTRUCT PROFILING FUNCTIONS HEADER FILE      */
    /*******************************************************/
@@ -15,8 +15,6 @@
 /* Contributing Programmer(s):                               */
 /*                                                           */
 /* Revision History:                                         */
-/*                                                           */
-/*      6.24: Renamed BOOLEAN macro type to intBool.         */
 /*                                                           */
 /*************************************************************/
 
@@ -53,46 +51,37 @@ struct profileFrameInfo
    double parentStartTime;
    struct constructProfileInfo *oldProfileFrame;
   };
-  
-#define PROFLFUN_DATA 15
 
-struct profileFunctionData
-  { 
-   double ProfileStartTime;
-   double ProfileEndTime;
-   double ProfileTotalTime;
-   int LastProfileInfo;
-   double PercentThreshold;
-   struct userDataRecord ProfileDataInfo;
-   unsigned char ProfileDataID;
-   int ProfileUserFunctions;
-   int ProfileConstructs;
-   struct constructProfileInfo *ActiveProfileFrame;
-   char *OutputString;
-  };
-
-#define ProfileFunctionData(theEnv) ((struct profileFunctionData *) GetEnvironmentData(theEnv,PROFLFUN_DATA))
-
-   LOCALE void                           ConstructProfilingFunctionDefinitions(void *);
-   LOCALE void                           ProfileCommand(void *);
-   LOCALE void                           ProfileInfoCommand(void *);
-   LOCALE void                           StartProfile(void *,
-                                                      struct profileFrameInfo *,
+   LOCALE void                           ConstructProfilingFunctionDefinitions(void);
+   LOCALE void                           ProfileCommand(void);
+   LOCALE void                           ProfileInfoCommand(void);
+   LOCALE void                           StartProfile(struct profileFrameInfo *,
                                                       struct userData **,
-                                                      intBool);
-   LOCALE void                           EndProfile(void *,struct profileFrameInfo *);
-   LOCALE void                           ProfileResetCommand(void *);
+                                                      BOOLEAN);
+   LOCALE void                           EndProfile(struct profileFrameInfo *);
+   LOCALE void                           ProfileResetCommand(void);
    LOCALE void                           ResetProfileInfo(struct constructProfileInfo *);
 
-   LOCALE double                         SetProfilePercentThresholdCommand(void *);
-   LOCALE double                         SetProfilePercentThreshold(void *,double);
-   LOCALE double                         GetProfilePercentThresholdCommand(void *);
-   LOCALE double                         GetProfilePercentThreshold(void *);
-   LOCALE intBool                        Profile(void *,char *);
-   LOCALE void                           DeleteProfileData(void *,void *);
-   LOCALE void                          *CreateProfileData(void *);
-   LOCALE char                          *SetProfileOutputString(void *,char *);
+   LOCALE double                         SetProfilePercentThresholdCommand(void);
+   LOCALE double                         SetProfilePercentThreshold(double);
+   LOCALE double                         GetProfilePercentThresholdCommand(void);
+   LOCALE double                         GetProfilePercentThreshold(void);
+   LOCALE BOOLEAN                        Profile(char *);
+   LOCALE void                           DeleteProfileData(void *);
+   LOCALE void                          *CreateProfileData(void);
+
+#ifndef _PROFLFUN_SOURCE_
+   extern Thread struct constructProfileInfo   *ActiveProfileFrame;
+   extern Thread int                            ProfileUserFunctions;
+   extern Thread int                            ProfileConstructs;
+   extern Thread unsigned char                  ProfileDataID;
+#endif
 
 #endif
 
 
+
+
+
+
+

@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.20  01/31/02            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*                FACT BUILD HEADER FILE               */
    /*******************************************************/
@@ -40,8 +40,9 @@
 #endif
 
    LOCALE int                            FactPatternParserFind(SYMBOL_HN *);
-   LOCALE struct lhsParseNode           *FactPatternParse(void *,char *,struct token *);
-   LOCALE struct lhsParseNode           *SequenceRestrictionParse(void *,char *,struct token *);
-   LOCALE struct lhsParseNode           *CreateInitialFactPattern(void *);
+   LOCALE struct lhsParseNode           *FactPatternParse(char *,struct token *);
+   LOCALE struct lhsParseNode           *SequenceRestrictionParse(char *,struct token *);
+   LOCALE struct lhsParseNode           *CreateInitialFactPattern(void);
 
 #endif
+

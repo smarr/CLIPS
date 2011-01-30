@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.20  01/31/02            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*             DEFFACTS PARSER HEADER FILE             */
    /*******************************************************/
@@ -13,7 +13,7 @@
 /*      Gary D. Riley                                        */
 /*                                                           */
 /* Contributing Programmer(s):                               */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Revision History:                                         */
 /*                                                           */
@@ -32,7 +32,9 @@
 #define LOCALE extern
 #endif
 
-   LOCALE int                            ParseDeffacts(void *,char *);
+   LOCALE int                            ParseDeffacts(char *);
 
 #endif
 
+
+

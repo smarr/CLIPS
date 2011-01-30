@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.30  12/07/07            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*                  SETUP HEADER FILE                  */
    /*******************************************************/
@@ -15,39 +15,12 @@
 /*                                                           */
 /* Principal Programmer(s):                                  */
 /*      Gary D. Riley                                        */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Contributing Programmer(s):                               */
 /*                                                           */
 /* Revision History:                                         */
-/*      6.24: Default locale modification.                   */
 /*                                                           */
-/*            Removed CONFLICT_RESOLUTION_STRATEGIES,        */
-/*            DYNAMIC_SALIENCE, INCREMENTAL_RESET,           */
-/*            LOGICAL_DEPENDENCIES, IMPERATIVE_METHODS,      */
-/*            INSTANCE_PATTERN_MATCHING, and                 */
-/*            IMPERATIVE_MESSAGE_HANDLERS, and               */
-/*            AUXILIARY_MESSAGE_HANDLERS compilation flags.  */
-/*                                                           */
-/*            Removed the SHORT_LINK_NAMES compilation flag. */
-/*                                                           */
-/*            Renamed BOOLEAN macro type to intBool.         */
-/*                                                           */
-/*      6.30: Used #ifndef for preprocessor definitions so   */
-/*            they can be set at the project or makefile     */
-/*            level.                                         */
-/*                                                           */
-/*            Removed ENVIRONMENT_API_ONLY compilation flag. */
-/*                                                           */
-/*            Combined BASIC_IO and EXT_IO compilation       */
-/*            flags into the IO_FUNCTIONS compilation flag.  */
-/*                                                           */    
-/*            Changed the EX_MATH compilation flag to        */
-/*            EXTENDED_MATH_FUNCTIONS.                       */
-/*                                                           */
-/*            Removed VOID definition because of conflict    */
-/*            with Windows.h header file.                    */
-/*                                                           */    
 /*************************************************************/
 
 #ifndef _H_setup
@@ -62,79 +35,50 @@
 /* Only one of these flags should be turned on (set to 1) at a time. */
 /*********************************************************************/
 
-#ifndef UNIX_V
-#define UNIX_V  0   /* UNIX System V, 4.2bsd, or HP Unix, presumably with gcc */
-#endif
+#define GENERIC 1   /* Generic (any machine)                  */
+#define VAX_VMS 0   /* VAX VMS                                */
+#define UNIX_V  0   /* UNIX System V or 4.2bsd or HP Unix     */
+#define UNIX_7  0   /* UNIX System III Version 7 or Sun Unix  */
+#define MAC_SC6 0   /* Macintosh, with Symantec C 6.0         */
+#define MAC_SC7 0   /* Macintosh, with Symantec C 7.0         */
+#define MAC_SC8 0   /* Macintosh, with Symantec C 8.0         */
+#define MAC_MPW 0   /* Macintosh, with MPW 3.2 C              */
+#define MAC_MCW 0   /* Macintosh, with Code Warrior 3.0       */
+#define IBM_MCW 0   /* IBM PC, with CodeWarrior 3.0           */
+#define IBM_ZTC 0   /* IBM PC, with Zortech C++ 3.1           */
+#define IBM_MSC 0   /* IBM PC, with Microsoft C 6.0           */
+#define IBM_TBC 0   /* IBM PC, with Borland C++ 5.0           */
+#define IBM_ICB 0   /* IBM PC, with Intel C Code Builder 1.0  */
+#define IBM_SC  0   /* IBM PC, with Symantec C++ 6.1          */
+#define IBM_GCC 0   /* IBM PC, with DJGPP 2.01                */
 
-#ifndef UNIX_7
-#define UNIX_7  0   /* UNIX System III Version 7 or Sun Unix, presumably with gcc */
-#endif
-
-#ifndef LINUX
-#define LINUX   0   /* Untested, presumably with gcc */
-#endif
-
-#ifndef DARWIN
-#define DARWIN  0   /* Darwin Mac OS 10.5, presumably with gcc or Xcode 3.0 with Console */
-#endif
-
-#ifndef MAC_XCD
-#define MAC_XCD 0   /* MacOS 10.5, with Xcode 3.0 and Cocoa GUI */
-#endif
-
-#ifndef MAC_MCW
-#define MAC_MCW 0   /* MacOS 10.5, with CodeWarrior 9.6 */
-#endif
-
-#ifndef WIN_MVC
-#define WIN_MVC 0   /* Windows XP, with VC++ 2008 Express */
-#endif
-
-#ifndef WIN_BTC
-#define WIN_BTC 0   /* Windows XP, with Borland Turbo C++ 2006 */
-#endif
-
-#ifndef WIN_MCW
-#define WIN_MCW 0   /* Windows XP, with CodeWarrior 9.4 */
-#endif
-
-#ifndef WIN_GCC
-#define WIN_GCC 0   /* Windows XP, with DJGPP 3.21 */
-#endif
-
-/* The following are unsupported: */
-                    
-#ifndef VAX_VMS                    
-#define VAX_VMS 0   /* VAX VMS */
-#endif
-
-/* Use GENERIC if nothing else is used. */
-
-#ifndef GENERIC
-#if (! UNIX_V) && (! LINUX) && (! UNIX_7) && \
-    (! MAC_XCD) && (! MAC_MCW) && (! DARWIN) && \
-    (! WIN_MVC) && (! WIN_BTC) && (! WIN_MCW) && (! WIN_GCC) && \
-    (! VAX_VMS)
-#define GENERIC 1   /* Generic (any machine)                   */
-#else
-#define GENERIC 0   /* Generic (any machine)                   */
-#endif
-#endif
-
-#if WIN_MVC || WIN_BTC || WIN_MCW
+#if IBM_ZTC || IBM_MSC || IBM_TBC || IBM_ICB || IBM_SC || IBM_MCW
 #define IBM 1
 #else
 #define IBM 0
 #endif
 
-/***********************************************/
-/* Some definitions for use with declarations. */
-/***********************************************/
+#if MAC_SC6 || MAC_SC7 || MAC_SC8
+#define MAC_SC 1
+#else
+#define MAC_SC 0
+#endif
 
+#if MAC_SC || MAC_MPW || MAC_MCW
+#define MAC 1
+#else
+#define MAC 0
+#endif
+
+/*********************************************/
+/* Old definitions when K&R C was supported. */
+/*********************************************/
+
+#define VOID     void
 #define VOID_ARG void
-#define STD_SIZE size_t
+#define CLIPS_STD_SIZE size_t
 
-#define intBool int
+#define BOOLEAN int
 #define globle
 
 /*******************************************/
@@ -151,8 +95,22 @@
 /*   construct is included.                      */
 /*************************************************/
 
-#ifndef DEFRULE_CONSTRUCT
 #define DEFRULE_CONSTRUCT 1
+
+#define CONFLICT_RESOLUTION_STRATEGIES 1
+#define DYNAMIC_SALIENCE 1
+#define INCREMENTAL_RESET 1
+#define LOGICAL_DEPENDENCIES  1
+
+#if ! DEFRULE_CONSTRUCT
+#undef CONFLICT_RESOLUTION_STRATEGIES
+#undef DYNAMIC_SALIENCE
+#undef INCREMENTAL_RESET
+#undef LOGICAL_DEPENDENCIES
+#define CONFLICT_RESOLUTION_STRATEGIES  0
+#define DYNAMIC_SALIENCE                0
+#define INCREMENTAL_RESET               0
+#define LOGICAL_DEPENDENCIES            0
 #endif
 
 /************************************************/
@@ -160,36 +118,18 @@
 /*   defmodule construct is included.           */
 /************************************************/
 
-#ifndef DEFMODULE_CONSTRUCT
 #define DEFMODULE_CONSTRUCT 1
-#endif
 
 /****************************************************/
 /* DEFTEMPLATE_CONSTRUCT:  Determines whether facts */
 /*   and the deftemplate construct are included.    */
 /****************************************************/
 
-#ifndef DEFTEMPLATE_CONSTRUCT
 #define DEFTEMPLATE_CONSTRUCT 1
-#endif
 
 #if ! DEFRULE_CONSTRUCT
 #undef DEFTEMPLATE_CONSTRUCT
 #define DEFTEMPLATE_CONSTRUCT 0
-#endif
-
-/************************************************************/
-/* FACT_SET_QUERIES: Determines if fact-set query functions */
-/*  such as any-factp and do-for-all-facts are included.    */
-/************************************************************/
-
-#ifndef FACT_SET_QUERIES
-#define FACT_SET_QUERIES 1
-#endif
-
-#if ! DEFTEMPLATE_CONSTRUCT
-#undef FACT_SET_QUERIES
-#define FACT_SET_QUERIES        0
 #endif
 
 /****************************************************/
@@ -197,9 +137,7 @@
 /*   construct is included.                         */
 /****************************************************/
 
-#ifndef DEFFACT_CONSTRUCT
 #define DEFFACTS_CONSTRUCT 1
-#endif
 
 #if ! DEFTEMPLATE_CONSTRUCT
 #undef DEFFACTS_CONSTRUCT
@@ -211,26 +149,32 @@
 /*   defglobal construct is included.           */
 /************************************************/
 
-#ifndef DEFGLOBAL_CONSTRUCT
 #define DEFGLOBAL_CONSTRUCT 1
-#endif
 
 /**********************************************/
 /* DEFFUNCTION_CONSTRUCT:  Determines whether */
 /*   deffunction construct is included.       */
 /**********************************************/
 
-#ifndef DEFFUNCTION_CONSTRUCT
 #define DEFFUNCTION_CONSTRUCT 1
-#endif
 
 /*********************************************/
 /* DEFGENERIC_CONSTRUCT:  Determines whether */
 /*   generic functions  are included.        */
 /*********************************************/
 
-#ifndef DEFGENERIC_CONSTRUCT
 #define DEFGENERIC_CONSTRUCT 1
+
+/******************************************************************/
+/* IMPERATIVE_METHODS: Determines if call-next-method and         */
+/*   override-next-method can be used to execute shadowed methods */
+/******************************************************************/
+
+#define IMPERATIVE_METHODS 1
+
+#if ! DEFGENERIC_CONSTRUCT
+#undef IMPERATIVE_METHODS
+#define IMPERATIVE_METHODS 0
 #endif
 
 /*****************************************************************/
@@ -239,22 +183,39 @@
 /*   to be able to manipulate multi-field slots.                 */
 /*****************************************************************/
 
-#ifndef OBJECT_SYSTEM
 #define OBJECT_SYSTEM 1
-#endif
 
 /*****************************************************************/
 /* DEFINSTANCES_CONSTRUCT: Determines whether the definstances   */
 /*   construct is enabled.                                       */
 /*****************************************************************/
 
-#ifndef DEFINSTANCES_CONSTRUCT
-#define DEFINSTANCES_CONSTRUCT      1
-#endif
+#define DEFINSTANCES_CONSTRUCT      1                   /* sed */
 
 #if ! OBJECT_SYSTEM
 #undef DEFINSTANCES_CONSTRUCT
 #define DEFINSTANCES_CONSTRUCT      0
+#endif
+
+/******************************************************************/
+/* IMPERATIVE_MESSAGE_HANDLERS: Determines if "around" message-   */
+/*   handlers are allowed. Also determines if call-next-handler   */
+/*   and override-next-handler can be used to execute shadowed    */
+/*   handlers                                                     */
+/* AUXILIARY_MESSAGE_HANDLERS: Determines if "before" and "after" */
+/*   message-handlers are allowed.                                */
+/* Turning both flags off can increase the speed of message       */
+/*   dispatch.                                                    */
+/******************************************************************/
+
+#define IMPERATIVE_MESSAGE_HANDLERS 1
+#define AUXILIARY_MESSAGE_HANDLERS 1
+
+#if ! OBJECT_SYSTEM
+#undef IMPERATIVE_MESSAGE_HANDLERS
+#undef AUXILIARY_MESSAGE_HANDLERS
+#define IMPERATIVE_MESSAGE_HANDLERS 0
+#define AUXILIARY_MESSAGE_HANDLERS  0
 #endif
 
 /********************************************************************/
@@ -262,22 +223,43 @@
 /*  such as any-instancep and do-for-all-instances are included.    */
 /********************************************************************/
 
-#ifndef INSTANCE_SET_QUERIES
 #define INSTANCE_SET_QUERIES 1
-#endif
 
 #if ! OBJECT_SYSTEM
 #undef INSTANCE_SET_QUERIES
 #define INSTANCE_SET_QUERIES        0
 #endif
 
+/********************************************************************/
+/* INSTANCE_PATTERN_MATCHING: Determines if direct pattern-matching */
+/*   on objects on the LHS of rules is allowed.                     */
+/********************************************************************/
+
+#define INSTANCE_PATTERN_MATCHING 1
+
+#if (! OBJECT_SYSTEM) || (! DEFRULE_CONSTRUCT)
+#undef INSTANCE_PATTERN_MATCHING
+#define INSTANCE_PATTERN_MATCHING 0
+#endif
+
 /******************************************************************/
 /* Check for consistencies associated with the defrule construct. */
 /******************************************************************/
 
-#if (! DEFTEMPLATE_CONSTRUCT) && (! OBJECT_SYSTEM)
+#if (! DEFTEMPLATE_CONSTRUCT) && (! INSTANCE_PATTERN_MATCHING)
 #undef DEFRULE_CONSTRUCT
 #define DEFRULE_CONSTRUCT 0
+#endif
+
+#if (! DEFRULE_CONSTRUCT)
+#undef CONFLICT_RESOLUTION_STRATEGIES
+#define CONFLICT_RESOLUTION_STRATEGIES  0
+#undef DYNAMIC_SALIENCE
+#define DYNAMIC_SALIENCE                0
+#undef INCREMENTAL_RESET
+#define INCREMENTAL_RESET               0
+#undef LOGICAL_DEPENDENCIES
+#define LOGICAL_DEPENDENCIES            0
 #endif
 
 /*******************************************************************/
@@ -286,12 +268,8 @@
 /*  binary files                                                   */
 /*******************************************************************/
 
-#ifndef BLOAD_INSTANCES
 #define BLOAD_INSTANCES 1
-#endif
-#ifndef BSAVE_INSTANCES
 #define BSAVE_INSTANCES 1
-#endif
 
 #if ! OBJECT_SYSTEM
 #undef BLOAD_INSTANCES
@@ -309,27 +287,21 @@
 /* machines.                                                    */
 /****************************************************************/
 
-#ifndef EXTENDED_MATH_FUNCTIONS
-#define EXTENDED_MATH_FUNCTIONS 1
-#endif
+#define EX_MATH 1
 
 /****************************************************************/
 /* TEXT PROCESSING : Turn on this flag for support of the       */
 /* hierarchical lookup system.                                  */
 /****************************************************************/
 
-#ifndef TEXTPRO_FUNCTIONS
 #define TEXTPRO_FUNCTIONS 1
-#endif
 
 /****************************************************************/
 /* HELP: To implement the help facility, set the flag below and */
 /* specify the path and name of the help data file your system. */
 /****************************************************************/
 
-#ifndef HELP_FUNCTIONS
 #define HELP_FUNCTIONS 1
-#endif
 
 #if HELP_FUNCTIONS
 #define HELP_DEFAULT "clips.hlp"
@@ -341,15 +313,9 @@
 /* BLOAD_AND_BSAVE: Enables bload, and bsave commands.                   */
 /*************************************************************************/
 
-#ifndef BLOAD_ONLY
 #define BLOAD_ONLY 0
-#endif
-#ifndef BLOAD
 #define BLOAD 0
-#endif
-#ifndef BLOAD_AND_BSAVE
 #define BLOAD_AND_BSAVE 1
-#endif
 
 #if RUN_TIME
 #undef BLOAD_ONLY
@@ -365,13 +331,11 @@
 /*   style editor can be utilized on supported machines.        */
 /****************************************************************/
 
-#ifndef EMACS_EDITOR
-#define  EMACS_EDITOR 1
-#endif
+#define  EMACS_EDITOR 0
 
-#if GENERIC || MAC_XCD || MAC_MCW || WIN_MCW || WIN_BTC || WIN_MVC
-#undef EMACS_EDITOR
-#define  EMACS_EDITOR  0
+#if GENERIC || MAC
+#undef EMACS_EDITOR                         /* Editor can't be used */
+#define  EMACS_EDITOR  0                    /* with Generic or Mac  */
 #endif
 
 /********************************************************************/
@@ -381,22 +345,24 @@
 /*   linked to create a stand-alone run-time executable.            */
 /********************************************************************/
 
-#ifndef CONSTRUCT_COMPILER
 #define  CONSTRUCT_COMPILER 1
-#endif
 
 #if CONSTRUCT_COMPILER
 #define API_HEADER "clips.h"
 #endif
 
-/************************************************/
-/* IO_FUNCTIONS: Includes printout, read, open, */
-/*   close, format, and readline functions.     */
-/************************************************/
+/*******************************************/
+/* BASIC_IO: Includes printout, fprintout, */
+/*   read, open, and close functions.      */
+/*******************************************/
 
-#ifndef IO_FUNCTIONS
-#define IO_FUNCTIONS 1
-#endif
+#define BASIC_IO 1
+
+/***************************************************/
+/* EXT_IO: Includes format and readline functions. */
+/***************************************************/
+
+#define EXT_IO 1
 
 /************************************************/
 /* STRING_FUNCTIONS: Includes string functions: */
@@ -404,9 +370,7 @@
 /*   sub-string, str-index, and eval.           */
 /************************************************/
 
-#ifndef STRING_FUNCTIONS
 #define STRING_FUNCTIONS 1
-#endif
 
 /*********************************************/
 /* MULTIFIELD_FUNCTIONS: Includes multifield */
@@ -414,37 +378,24 @@
 /*   mv-append, str-explode, str-implode.    */
 /*********************************************/
 
-#ifndef MULTIFIELD_FUNCTIONS
 #define MULTIFIELD_FUNCTIONS 1
-#endif
 
 /****************************************************/
 /* DEBUGGING_FUNCTIONS: Includes functions such as  */
 /*   rules, facts, matches, ppdefrule, etc.         */
 /****************************************************/
 
-#ifndef DEBUGGING_FUNCTIONS
 #define DEBUGGING_FUNCTIONS 1
-#endif
-
-/***************************************************/
-/* PROFILING_FUNCTIONS: Enables code for profiling */
-/*   constructs and user functions.                */
-/***************************************************/
-
-#ifndef PROFILING_FUNCTIONS
-#define PROFILING_FUNCTIONS 1
-#endif
 
 /************************************************************************/
 /* BLOCK_MEMORY: Causes memory to be allocated in large blocks.         */
-/*   INITBUFFERSIZE and BLOCKSIZE should both be set to less than the   */
-/*   maximum size of a signed integer.                                  */
+/*   INITBUFFERSIZE and BLOCKSIZE should both be set to less than the  */
+/*   maximum size of a signed integer. On a 16-bit machine, they should */
+/*   be less than 32768. If a LightSpeed (Think) C version 2.x or 3.x   */
+/*   compiler is being used, then this option should be turned on.      */
 /************************************************************************/
 
-#ifndef BLOCK_MEMORY
 #define BLOCK_MEMORY 0
-#endif
 
 #if BLOCK_MEMORY
 
@@ -453,16 +404,17 @@
 
 #endif
 
-/*******************************************************************/
-/* WINDOW_INTERFACE : Set this flag if you are recompiling any of  */
-/*   the machine specific GUI interfaces. Currently, when enabled, */
-/*   this flag disables the more processing used by the help       */
-/*   system. This flag also prevents any input or output being     */
-/*   directly sent to stdin or stdout.                             */
-/*******************************************************************/
+/*****************************************************************/
+/* WINDOW_INTERFACE : Set this flag if you are recompiling the   */
+/*   IBM-PC MS-DOS Window Interface or the Macintosh LSC Window  */
+/*   Interface. Currently, when enabled, this flag disables the  */
+/*   more processing used by the help system.                    */
+/*   This flag also prevents any input or output being directly  */
+/*   sent to stdin or stdout.                                    */
+/*****************************************************************/
 
 #ifndef WINDOW_INTERFACE
-#define WINDOW_INTERFACE 0
+#define WINDOW_INTERFACE 1
 #endif
 
 #if WINDOW_INTERFACE
@@ -470,20 +422,17 @@
 #define  EMACS_EDITOR  0                    /* windowed interface        */
 #endif
 
-/*************************************************************/
-/* ALLOW_ENVIRONMENT_GLOBALS: If enabled, tracks the current */
-/*   environment and allows environments to be referred to   */
-/*   by index. If disabled, CLIPS makes no use of global     */
-/*   variables.                                              */
-/*************************************************************/
+/*****************************************************************/
+/* SHORT_LINK_NAMES: Converts some function and global variable  */
+/*   names to 6 characters. Use with linkers that recognize      */
+/*   fewer significant characters than the C compiler generating */
+/*   the object code.                                            */
+/*****************************************************************/
 
-#ifndef ALLOW_ENVIRONMENT_GLOBALS
-#define ALLOW_ENVIRONMENT_GLOBALS 1
-#endif
+#define SHORT_LINK_NAMES 0
 
-#if ! ALLOW_ENVIRONMENT_GLOBALS
-#undef EMACS_EDITOR                         /* Editor can't be used without */
-#define  EMACS_EDITOR  0                    /* environment globals          */
+#if SHORT_LINK_NAMES
+#include "shrtlnkn.h"
 #endif
 
 /********************************************/
@@ -502,47 +451,36 @@
 #define Bogus(x)
 #endif
 
-/***************************/
-/* Environment Definitions */
-/***************************/
+/***************************************************/
+/* PROFILING_FUNCTIONS: Enables code for profiling */
+/*   constructs and user functions.                */
+/***************************************************/
 
-#include "envrnmnt.h"
+#define PROFILING_FUNCTIONS 1
 
-/******************************/
-/* Compatibilty Redefinitions */
-/******************************/
+/***************************************************/
+/*                Thread definitions               */
+/***************************************************/
+#define THREAD_STORAGE    1
 
-#define PrintCLIPS(x,y) EnvPrintRouter(GetCurrentEnvironment(),x,y)
-#define GetcCLIPS(x,y) EnvGetcRouter(GetCurrentEnvironment(),x)
-#define UngetcCLIPS(x,y) EnvUngetcRouter(GetCurrentEnvironment(),x,y)
-#define ExitCLIPS(x) EnvExitRouter(GetCurrentEnvironment(),x)
-#define CLIPSSystemError(x,y) SystemError(x,y)
-#define CLIPSFunctionCall(x,y,z) FunctionCall(x,y,z)
-#define InitializeCLIPS() InitializeEnvironment()
-#define WCLIPS WPROMPT
-#define CLIPSTrueSymbol EnvTrueSymbol(GetCurrentEnvironment())
-#define CLIPSFalseSymbol EnvFalseSymbol(GetCurrentEnvironment())
-#define EnvCLIPSTrueSymbol(theEnv) EnvTrueSymbol(theEnv)
-#define EnvCLIPSFalseSymbol(theEnv) EnvFalseSymbol(theEnv)
-#define CLIPS_FALSE 0
-#define CLIPS_TRUE 1
+#if  THREAD_STORAGE
+	#ifdef WIN32
+		#define Thread  __declspec( thread )
+	#else
+		#define Thread __thread
+	#endif
+#else
+	#define Thread
+#endif
 
-/*************************************************/
-/* Any user defined global setup information can */
-/* be included in the file usrsetup.h which is   */
-/* an empty file in the baseline version.        */
-/*************************************************/
+/**************************************************/
+/*             DllExport definition               */
+/**************************************************/
+#define DLL_Build 1
+#if DLL_Build
+	#define DllExport	__declspec( dllexport )
+#else
+	#define DllExport
+#endif
 
-#include "usrsetup.h"
-
-#endif	/* _H_setup */
-
-
-
-
-
-
-
-
-
-
+#endif

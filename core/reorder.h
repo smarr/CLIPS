@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.30  10/19/06            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*                 REORDER HEADER FILE                 */
    /*******************************************************/
@@ -24,8 +24,6 @@
 /* Contributing Programmer(s):                               */
 /*                                                           */
 /* Revision History:                                         */
-/*                                                           */
-/*      6.30: Added support for hashed alpha memories.       */
 /*                                                           */
 /*************************************************************/
 
@@ -60,11 +58,9 @@ struct lhsParseNode;
 /***********************************************************************/
 struct lhsParseNode
   {
-   unsigned short type;
+   int type;
    void *value;
    unsigned int negated : 1;
-   unsigned int exists : 1;
-   unsigned int existsNand : 1;
    unsigned int logical : 1;
    unsigned int multifieldSlot : 1;
    unsigned int bindingVariable : 1;
@@ -73,46 +69,34 @@ struct lhsParseNode
    unsigned int whichCE : 7;
    unsigned int marked : 1;
    unsigned int withinMultifieldSlot : 1;
-   unsigned short multiFieldsBefore;
-   unsigned short multiFieldsAfter;
-   unsigned short singleFieldsBefore;
-   unsigned short singleFieldsAfter;
+   unsigned int multiFieldsBefore : 7;
+   unsigned int multiFieldsAfter : 7;
+   unsigned int singleFieldsBefore : 7;
+   unsigned int singleFieldsAfter : 7;
    struct constraintRecord *constraints;
    struct lhsParseNode *referringNode;
    struct patternParser *patternType;
-   short pattern;
-   short index;
+   int pattern;
+   int index;
    struct symbolHashNode *slot;
-   short slotNumber;
+   int slotNumber;
    int beginNandDepth;
    int endNandDepth;
-   int joinDepth;
    struct expr *networkTest;
-   struct expr *externalNetworkTest;
-   struct expr *secondaryNetworkTest;
-   struct expr *secondaryExternalNetworkTest;
-   struct expr *externalLeftHash;
-   struct expr *externalRightHash;
-   struct expr *constantSelector;
-   struct expr *constantValue;
-   struct expr *leftHash;
-   struct expr *rightHash;
-   struct expr *betaHash;
    struct lhsParseNode *expression;
    void *userData;
    struct lhsParseNode *right;
    struct lhsParseNode *bottom;
   };
 
-LOCALE struct lhsParseNode           *ReorderPatterns(void *,struct lhsParseNode *,int *);
-LOCALE struct lhsParseNode           *CopyLHSParseNodes(void *,struct lhsParseNode *);
-LOCALE void                           CopyLHSParseNode(void *,struct lhsParseNode *,struct lhsParseNode *,int);
-LOCALE struct lhsParseNode           *GetLHSParseNode(void *);
-LOCALE void                           ReturnLHSParseNodes(void *,struct lhsParseNode *);
-LOCALE struct lhsParseNode           *ExpressionToLHSParseNodes(void *,struct expr *);
-LOCALE struct expr                   *LHSParseNodesToExpression(void *,struct lhsParseNode *);
-LOCALE void                           AddInitialPatterns(void *,struct lhsParseNode *);
-LOCALE int                            IsExistsSubjoin(struct lhsParseNode *,int);
+LOCALE struct lhsParseNode           *ReorderPatterns(struct lhsParseNode *,int *);
+LOCALE struct lhsParseNode           *CopyLHSParseNodes(struct lhsParseNode *);
+LOCALE void                           CopyLHSParseNode(struct lhsParseNode *,struct lhsParseNode *,int);
+LOCALE struct lhsParseNode           *GetLHSParseNode(void);
+LOCALE void                           ReturnLHSParseNodes(struct lhsParseNode *);
+LOCALE struct lhsParseNode           *ExpressionToLHSParseNodes(struct expr *);
+LOCALE struct expr                   *LHSParseNodesToExpression(struct lhsParseNode *);
+LOCALE void                           AddInitialPatterns(struct lhsParseNode *);
 
 #endif
 
@@ -120,3 +104,8 @@ LOCALE int                            IsExistsSubjoin(struct lhsParseNode *,int)
 
 
 
+
+
+
+
+

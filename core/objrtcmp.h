@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*               CLIPS Version 6.24  05/17/06          */
+   /*               CLIPS Version 6.10  04/09/97          */
    /*                                                     */
    /*                                                     */
    /*******************************************************/
@@ -10,21 +10,18 @@
 /* Purpose:                                                  */
 /*                                                           */
 /* Principal Programmer(s):                                  */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Contributing Programmer(s):                               */
 /*                                                           */
 /* Revision History:                                         */
 /*                                                           */
-/*      6.24: Converted INSTANCE_PATTERN_MATCHING to          */
-/*            DEFRULE_CONSTRUCT.                              */
-/*                                                            */
 /*************************************************************/
 
 #ifndef _H_objrtcmp
 #define _H_objrtcmp
 
-#if DEFRULE_CONSTRUCT && OBJECT_SYSTEM && (! RUN_TIME) && CONSTRUCT_COMPILER
+#if INSTANCE_PATTERN_MATCHING && (! RUN_TIME) && CONSTRUCT_COMPILER
 
 #ifndef _STDIO_INCLUDED_
 #include <stdio.h>
@@ -41,8 +38,8 @@
 #define LOCALE extern
 #endif
 
-LOCALE void ObjectPatternsCompilerSetup(void *);
-LOCALE void ObjectPatternNodeReference(void *,void *,FILE *,int,int);
+LOCALE void ObjectPatternsCompilerSetup(void);
+LOCALE void ObjectPatternNodeReference(void *,FILE *,int,int);
 
 #endif
 
@@ -50,3 +47,7 @@ LOCALE void ObjectPatternNodeReference(void *,void *,FILE *,int,int);
 
 
 
+
+
+
+

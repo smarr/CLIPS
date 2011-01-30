@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*               CLIPS Version 6.30  03/04/08          */
+   /*               CLIPS Version 6.10  04/13/98          */
    /*                                                     */
    /*                  CLASS PARSER MODULE                */
    /*******************************************************/
@@ -10,21 +10,15 @@
 /* Purpose: Parsing Routines for Defclass Construct           */
 /*                                                            */
 /* Principal Programmer(s):                                   */
-/*      Brian L. Dantes                                       */
+/*      Brian L. Donnell                                      */
 /*                                                            */
 /* Contributing Programmer(s):                                */
 /*                                                            */
 /* Revision History:                                          */
-/*      6.24: Added allowed-classes slot facet.               */
 /*                                                            */
-/*            Converted INSTANCE_PATTERN_MATCHING to          */
-/*            DEFRULE_CONSTRUCT.                              */
-/*                                                            */
-/*            Renamed BOOLEAN macro type to intBool.          */
-/*                                                            */
-/*      6.30: Added support to allow CreateClassScopeMap to   */
-/*            be used by other functions.                     */
-/*                                                            */
+/* Who               |     Date    | Description              */
+/* ------------------+-------------+------------------------  */
+/* M.Giordano        | 23-Mar-2000 | Mods made for TLS        */
 /**************************************************************/
 
 /* =========================================
@@ -42,14 +36,13 @@
 
 #include "classcom.h"
 #include "classfun.h"
-#include "clsltpsr.h"
-#include "cstrcpsr.h"
-#include "envrnmnt.h"
-#include "inherpsr.h"
 #include "memalloc.h"
+#include "cstrcpsr.h"
+#include "inherpsr.h"
 #include "modulpsr.h"
 #include "modulutl.h"
 #include "msgpsr.h"
+#include "clsltpsr.h"
 #include "router.h"
 #include "scanner.h"
 
@@ -76,20 +69,42 @@
 
 /* =========================================
    *****************************************
+               MACROS AND TYPES
+   =========================================
+   ***************************************** */
+
+/* =========================================
+   *****************************************
       INTERNALLY VISIBLE FUNCTION HEADERS
    =========================================
    ***************************************** */
 
-static intBool ValidClassName(void *,char *,DEFCLASS **);
-static intBool ParseSimpleQualifier(void *,char *,char *,char *,char *,intBool *,intBool *);
-static intBool ReadUntilClosingParen(void *,char *,struct token *);
-static void AddClass(void *,DEFCLASS *);
-static void BuildSubclassLinks(void *,DEFCLASS *);
-static void FormInstanceTemplate(void *,DEFCLASS *);
-static void FormSlotNameMap(void *,DEFCLASS *);
-static TEMP_SLOT_LINK *MergeSlots(void *,TEMP_SLOT_LINK *,DEFCLASS *,short *,int);
-static void PackSlots(void *,DEFCLASS *,TEMP_SLOT_LINK *);
-static void CreatePublicSlotMessageHandlers(void *,DEFCLASS *);
+static BOOLEAN ValidClassName(char *,DEFCLASS **);
+static BOOLEAN ParseSimpleQualifier(char *,char *,char *,char *,BOOLEAN *,BOOLEAN *);
+static BOOLEAN ReadUntilClosingParen(char *,struct token *);
+static void AddClass(DEFCLASS *);
+static void BuildSubclassLinks(DEFCLASS *);
+static void FormInstanceTemplate(DEFCLASS *);
+static void FormSlotNameMap(DEFCLASS *);
+static TEMP_SLOT_LINK *MergeSlots(TEMP_SLOT_LINK *,DEFCLASS *,unsigned *,int);
+static void PackSlots(DEFCLASS *,TEMP_SLOT_LINK *);
+#if DEFMODULE_CONSTRUCT
+static void CreateClassScopeMap(DEFCLASS *);
+#endif
+static void CreatePublicSlotMessageHandlers(DEFCLASS *);
+
+/* =========================================
+   *****************************************
+      EXTERNALLY VISIBLE GLOBAL VARIABLES
+   =========================================
+   ***************************************** */
+Thread globle struct token ObjectParseToken;
+
+/* =========================================
+   *****************************************
+      INTERNALLY VISIBLE GLOBAL VARIABLES
+   =========================================
+   ***************************************** */
 
 /* =========================================
    *****************************************
@@ -138,13 +153,11 @@ static void CreatePublicSlotMessageHandlers(void *,DEFCLASS *);
                                         (allowed-floats ...) |
                                         (allowed-values ...) |
                                         (allowed-instance-names ...) |
-                                        (allowed-classes ...) |
                                         (range ...)
 
                <default-expression> ::= ?NONE | ?VARIABLE | <expression>*
   ***************************************************************************************/
 globle int ParseDefclass(
-  void *theEnv,
   char *readSource)
   {
    SYMBOL_HN *cname;
@@ -154,75 +167,75 @@ globle int ParseDefclass(
    int roleSpecified = FALSE,
        abstract = FALSE,
        parseError;
-#if DEFRULE_CONSTRUCT
+#if INSTANCE_PATTERN_MATCHING
    int patternMatchSpecified = FALSE,
        reactive = TRUE;
 #endif
 
-   SetPPBufferStatus(theEnv,ON);
-   FlushPPBuffer(theEnv);
-   SetIndentDepth(theEnv,3);
-   SavePPBuffer(theEnv,"(defclass ");
+   SetPPBufferStatus(ON);
+   FlushPPBuffer();
+   SetIndentDepth(3);
+   SavePPBuffer("(defclass ");
 
 #if BLOAD || BLOAD_ONLY || BLOAD_AND_BSAVE
-   if ((Bloaded(theEnv)) && (! ConstructData(theEnv)->CheckSyntaxMode))
+   if ((Bloaded()) && (! CheckSyntaxMode))
      {
-      CannotLoadWithBloadMessage(theEnv,"defclass");
+      CannotLoadWithBloadMessage("defclass");
       return(TRUE);
      }
 #endif
 
-   cname = GetConstructNameAndComment(theEnv,readSource,&DefclassData(theEnv)->ObjectParseToken,"defclass",
-                                      EnvFindDefclass,NULL,"#",TRUE,
+   cname = GetConstructNameAndComment(readSource,&ObjectParseToken,"defclass",
+                                      FindDefclass,NULL,"#",TRUE,
                                       TRUE,TRUE);
    if (cname == NULL)
      return(TRUE);
 
-   if (ValidClassName(theEnv,ValueToString(cname),&cls) == FALSE)
+   if (ValidClassName(ValueToString(cname),&cls) == FALSE)
      return(TRUE);
 
-   sclasses = ParseSuperclasses(theEnv,readSource,cname);
+   sclasses = ParseSuperclasses(readSource,cname);
    if (sclasses == NULL)
      return(TRUE);
-   preclist = FindPrecedenceList(theEnv,cls,sclasses);
+   preclist = FindPrecedenceList(cls,sclasses);
    if (preclist == NULL)
      {
-      DeletePackedClassLinks(theEnv,sclasses,TRUE);
+      DeletePackedClassLinks(sclasses,TRUE);
       return(TRUE);
      }
    parseError = FALSE;
-   GetToken(theEnv,readSource,&DefclassData(theEnv)->ObjectParseToken);
-   while (GetType(DefclassData(theEnv)->ObjectParseToken) != RPAREN)
+   GetToken(readSource,&ObjectParseToken);
+   while (GetType(ObjectParseToken) != RPAREN)
      {
-      if (GetType(DefclassData(theEnv)->ObjectParseToken) != LPAREN)
+      if (GetType(ObjectParseToken) != LPAREN)
         {
-         SyntaxErrorMessage(theEnv,"defclass");
+         SyntaxErrorMessage("defclass");
          parseError = TRUE;
          break;
         }
-      PPBackup(theEnv);
-      PPCRAndIndent(theEnv);
-      SavePPBuffer(theEnv,"(");
-      GetToken(theEnv,readSource,&DefclassData(theEnv)->ObjectParseToken);
-      if (GetType(DefclassData(theEnv)->ObjectParseToken) != SYMBOL)
+      PPBackup();
+      PPCRAndIndent();
+      SavePPBuffer("(");
+      GetToken(readSource,&ObjectParseToken);
+      if (GetType(ObjectParseToken) != SYMBOL)
         {
-         SyntaxErrorMessage(theEnv,"defclass");
+         SyntaxErrorMessage("defclass");
          parseError = TRUE;
          break;
         }
-      if (strcmp(DOToString(DefclassData(theEnv)->ObjectParseToken),ROLE_RLN) == 0)
+      if (strcmp(DOToString(ObjectParseToken),ROLE_RLN) == 0)
         {
-         if (ParseSimpleQualifier(theEnv,readSource,ROLE_RLN,CONCRETE_RLN,ABSTRACT_RLN,
+         if (ParseSimpleQualifier(readSource,ROLE_RLN,CONCRETE_RLN,ABSTRACT_RLN,
                                   &roleSpecified,&abstract) == FALSE)
            {
             parseError = TRUE;
             break;
            }
         }
-#if DEFRULE_CONSTRUCT
-      else if (strcmp(DOToString(DefclassData(theEnv)->ObjectParseToken),MATCH_RLN) == 0)
+#if INSTANCE_PATTERN_MATCHING
+      else if (strcmp(DOToString(ObjectParseToken),MATCH_RLN) == 0)
         {
-         if (ParseSimpleQualifier(theEnv,readSource,MATCH_RLN,NONREACTIVE_RLN,REACTIVE_RLN,
+         if (ParseSimpleQualifier(readSource,MATCH_RLN,NONREACTIVE_RLN,REACTIVE_RLN,
                                   &patternMatchSpecified,&reactive) == FALSE)
            {
             parseError = TRUE;
@@ -230,36 +243,36 @@ globle int ParseDefclass(
            }
         }
 #endif
-      else if (strcmp(DOToString(DefclassData(theEnv)->ObjectParseToken),SLOT_RLN) == 0)
+      else if (strcmp(DOToString(ObjectParseToken),SLOT_RLN) == 0)
         {
-         slots = ParseSlot(theEnv,readSource,slots,preclist,FALSE,FALSE);
+         slots = ParseSlot(readSource,slots,preclist,FALSE,FALSE);
          if (slots == NULL)
            {
             parseError = TRUE;
             break;
            }
         }
-      else if (strcmp(DOToString(DefclassData(theEnv)->ObjectParseToken),SGL_SLOT_RLN) == 0)
+      else if (strcmp(DOToString(ObjectParseToken),SGL_SLOT_RLN) == 0)
         {
-         slots = ParseSlot(theEnv,readSource,slots,preclist,FALSE,TRUE);
+         slots = ParseSlot(readSource,slots,preclist,FALSE,TRUE);
          if (slots == NULL)
            {
             parseError = TRUE;
             break;
            }
         }
-      else if (strcmp(DOToString(DefclassData(theEnv)->ObjectParseToken),MLT_SLOT_RLN) == 0)
+      else if (strcmp(DOToString(ObjectParseToken),MLT_SLOT_RLN) == 0)
         {
-         slots = ParseSlot(theEnv,readSource,slots,preclist,TRUE,TRUE);
+         slots = ParseSlot(readSource,slots,preclist,TRUE,TRUE);
          if (slots == NULL)
            {
             parseError = TRUE;
             break;
            }
         }
-      else if (strcmp(DOToString(DefclassData(theEnv)->ObjectParseToken),HANDLER_DECL) == 0)
+      else if (strcmp(DOToString(ObjectParseToken),HANDLER_DECL) == 0)
         {
-         if (ReadUntilClosingParen(theEnv,readSource,&DefclassData(theEnv)->ObjectParseToken) == FALSE)
+         if (ReadUntilClosingParen(readSource,&ObjectParseToken) == FALSE)
            {
             parseError = TRUE;
             break;
@@ -267,43 +280,30 @@ globle int ParseDefclass(
         }
       else
         {
-         SyntaxErrorMessage(theEnv,"defclass");
+         SyntaxErrorMessage("defclass");
          parseError = TRUE;
          break;
         }
-      GetToken(theEnv,readSource,&DefclassData(theEnv)->ObjectParseToken);
+      GetToken(readSource,&ObjectParseToken);
      }
 
-   if ((GetType(DefclassData(theEnv)->ObjectParseToken) != RPAREN) || (parseError == TRUE))
+   if ((GetType(ObjectParseToken) != RPAREN) || (parseError == TRUE))
      {
-      DeletePackedClassLinks(theEnv,sclasses,TRUE);
-      DeletePackedClassLinks(theEnv,preclist,TRUE);
-      DeleteSlots(theEnv,slots);
+      DeletePackedClassLinks(sclasses,TRUE);
+      DeletePackedClassLinks(preclist,TRUE);
+      DeleteSlots(slots);
       return(TRUE);
      }
-   SavePPBuffer(theEnv,"\n");
+   SavePPBuffer("\n");
 
    /* =========================================================================
       The abstract/reactive qualities of a class are inherited if not specified
       ========================================================================= */
    if (roleSpecified == FALSE)
-     {
-      if (preclist->classArray[1]->system &&                             /* Change to cause         */ 
-          (DefclassData(theEnv)->ClassDefaultsMode == CONVENIENCE_MODE)) /* default role of         */
-        { abstract = FALSE; }                                            /* classes to be concrete. */
-      else
-        { abstract = preclist->classArray[1]->abstract; }
-     }
-#if DEFRULE_CONSTRUCT
+     abstract = preclist->classArray[1]->abstract;
+#if INSTANCE_PATTERN_MATCHING
    if (patternMatchSpecified == FALSE)
-     {
-      if ((preclist->classArray[1]->system) &&                           /* Change to cause       */
-          (! abstract) &&                                                /* default pattern-match */ 
-          (DefclassData(theEnv)->ClassDefaultsMode == CONVENIENCE_MODE)) /* of classes to be      */
-        { reactive = TRUE; }                                             /* reactive.             */
-      else
-        { reactive = preclist->classArray[1]->reactive; }
-     }
+     reactive = preclist->classArray[1]->reactive;
 
    /* ================================================================
       An abstract class cannot have direct instances, thus it makes no
@@ -312,11 +312,11 @@ globle int ParseDefclass(
       ================================================================ */
    if (abstract && reactive)
      {
-      PrintErrorID(theEnv,"CLASSPSR",1,FALSE);
-      EnvPrintRouter(theEnv,WERROR,"An abstract class cannot be reactive.\n");
-      DeletePackedClassLinks(theEnv,sclasses,TRUE);
-      DeletePackedClassLinks(theEnv,preclist,TRUE);
-      DeleteSlots(theEnv,slots);
+      PrintErrorID("CLASSPSR",1,FALSE);
+      PrintRouter(WERROR,"An abstract class cannot be reactive.\n");
+      DeletePackedClassLinks(sclasses,TRUE);
+      DeletePackedClassLinks(preclist,TRUE);
+      DeleteSlots(slots);
       return(TRUE);
      }
 
@@ -327,17 +327,17 @@ globle int ParseDefclass(
       successfully parsed defclass to the KB.
       ======================================================= */
 
-   if (ConstructData(theEnv)->CheckSyntaxMode)
+   if (CheckSyntaxMode)
      {
-      DeletePackedClassLinks(theEnv,sclasses,TRUE);
-      DeletePackedClassLinks(theEnv,preclist,TRUE);
-      DeleteSlots(theEnv,slots);
+      DeletePackedClassLinks(sclasses,TRUE);
+      DeletePackedClassLinks(preclist,TRUE);
+      DeleteSlots(slots);
       return(FALSE);
      }
 
-   cls = NewClass(theEnv,cname);
+   cls = NewClass(cname);
    cls->abstract = abstract;
-#if DEFRULE_CONSTRUCT
+#if INSTANCE_PATTERN_MATCHING
    cls->reactive = reactive;
 #endif
    cls->directSuperclasses.classCount = sclasses->classCount;
@@ -352,15 +352,15 @@ globle int ParseDefclass(
    preclist->classArray[0] = cls;
    cls->allSuperclasses.classCount = preclist->classCount;
    cls->allSuperclasses.classArray = preclist->classArray;
-   rtn_struct(theEnv,packedClassLinks,sclasses);
-   rtn_struct(theEnv,packedClassLinks,preclist);
+   rtn_struct(packedClassLinks,sclasses);
+   rtn_struct(packedClassLinks,preclist);
 
    /* =================================
       Shove slots into contiguous array
       ================================= */
    if (slots != NULL)
-     PackSlots(theEnv,cls,slots);
-   AddClass(theEnv,cls);
+     PackSlots(cls,slots);
+   AddClass(cls);
 
    return(FALSE);
   }
@@ -384,12 +384,11 @@ globle int ParseDefclass(
                  name does not conflict with one from
                  another module
  ***********************************************************/
-static intBool ValidClassName(
-  void *theEnv,
+static BOOLEAN ValidClassName(
   char *theClassName,
   DEFCLASS **theDefclass)
   {
-   *theDefclass = (DEFCLASS *) EnvFindDefclass(theEnv,theClassName);
+   *theDefclass = (DEFCLASS *) FindDefclass(theClassName);
    if (*theDefclass != NULL)
      {
       /* ===================================
@@ -398,8 +397,8 @@ static intBool ValidClassName(
          =================================== */
       if ((*theDefclass)->system)
         {
-         PrintErrorID(theEnv,"CLASSPSR",2,FALSE);
-         EnvPrintRouter(theEnv,WERROR,"Cannot redefine a predefined system class.\n");
+         PrintErrorID("CLASSPSR",2,FALSE);
+         PrintRouter(WERROR,"Cannot redefine a predefined system class.\n");
          return(FALSE);
         }
 
@@ -408,13 +407,13 @@ static intBool ValidClassName(
          redefined if it is not in use, e.g., instances,
          generic function method restrictions, etc.
          =============================================== */
-      if ((EnvIsDefclassDeletable(theEnv,(void *) *theDefclass) == FALSE) &&
-          (! ConstructData(theEnv)->CheckSyntaxMode))
+      if ((IsDefclassDeletable((void *) *theDefclass) == FALSE) &&
+          (! CheckSyntaxMode))
         {
-         PrintErrorID(theEnv,"CLASSPSR",3,FALSE);
-         EnvPrintRouter(theEnv,WERROR,EnvGetDefclassName(theEnv,(void *) *theDefclass));
-         EnvPrintRouter(theEnv,WERROR," class cannot be redefined while\n");
-         EnvPrintRouter(theEnv,WERROR,"    outstanding references to it still exist.\n");
+         PrintErrorID("CLASSPSR",3,FALSE);
+         PrintRouter(WERROR,GetDefclassName((void *) *theDefclass));
+         PrintRouter(WERROR," class cannot be redefined while\n");
+         PrintRouter(WERROR,"    outstanding references to it still exist.\n");
          return(FALSE);
         }
      }
@@ -439,41 +438,40 @@ static intBool ValidClassName(
                  Messages printed on errors
   NOTES        : None
  ***************************************************************/
-static intBool ParseSimpleQualifier(
-  void *theEnv,
+static BOOLEAN ParseSimpleQualifier(
   char *readSource,
   char *classQualifier,
   char *clearRelation,
   char *setRelation,
-  intBool *alreadyTestedFlag,
-  intBool *binaryFlag)
+  BOOLEAN *alreadyTestedFlag,
+  BOOLEAN *binaryFlag)
   {
    if (*alreadyTestedFlag)
      {
-      PrintErrorID(theEnv,"CLASSPSR",4,FALSE);
-      EnvPrintRouter(theEnv,WERROR,"Class ");
-      EnvPrintRouter(theEnv,WERROR,classQualifier);
-      EnvPrintRouter(theEnv,WERROR," already declared.\n");
+      PrintErrorID("CLASSPSR",4,FALSE);
+      PrintRouter(WERROR,"Class ");
+      PrintRouter(WERROR,classQualifier);
+      PrintRouter(WERROR," already declared.\n");
       return(FALSE);
      }
-   SavePPBuffer(theEnv," ");
-   GetToken(theEnv,readSource,&DefclassData(theEnv)->ObjectParseToken);
-   if (GetType(DefclassData(theEnv)->ObjectParseToken) != SYMBOL)
+   SavePPBuffer(" ");
+   GetToken(readSource,&ObjectParseToken);
+   if (GetType(ObjectParseToken) != SYMBOL)
      goto ParseSimpleQualifierError;
-   if (strcmp(DOToString(DefclassData(theEnv)->ObjectParseToken),setRelation) == 0)
+   if (strcmp(DOToString(ObjectParseToken),setRelation) == 0)
      *binaryFlag = TRUE;
-   else if (strcmp(DOToString(DefclassData(theEnv)->ObjectParseToken),clearRelation) == 0)
+   else if (strcmp(DOToString(ObjectParseToken),clearRelation) == 0)
      *binaryFlag = FALSE;
    else
      goto ParseSimpleQualifierError;
-   GetToken(theEnv,readSource,&DefclassData(theEnv)->ObjectParseToken);
-   if (GetType(DefclassData(theEnv)->ObjectParseToken) != RPAREN)
+   GetToken(readSource,&ObjectParseToken);
+   if (GetType(ObjectParseToken) != RPAREN)
      goto ParseSimpleQualifierError;
    *alreadyTestedFlag = TRUE;
    return(TRUE);
 
 ParseSimpleQualifierError:
-   SyntaxErrorMessage(theEnv,"defclass");
+   SyntaxErrorMessage("defclass");
    return(FALSE);
   }
 
@@ -489,8 +487,7 @@ ParseSimpleQualifierError:
   NOTES        : Expects first token after opening
                  paren has already been scanned
  ***************************************************/
-static intBool ReadUntilClosingParen(
-  void *theEnv,
+static BOOLEAN ReadUntilClosingParen(
   char *readSource,
   struct token *inputToken)
   {
@@ -499,11 +496,11 @@ static intBool ReadUntilClosingParen(
    do
      {
       if (lparen_read == FALSE)
-        SavePPBuffer(theEnv," ");
-      GetToken(theEnv,readSource,inputToken);
+        SavePPBuffer(" ");
+      GetToken(readSource,inputToken);
       if (inputToken->type == STOP)
         {
-         SyntaxErrorMessage(theEnv,"message-handler declaration");
+         SyntaxErrorMessage("message-handler declaration");
          return(FALSE);
         }
       else if (inputToken->type == LPAREN)
@@ -516,9 +513,9 @@ static intBool ReadUntilClosingParen(
          cnt--;
          if (lparen_read == FALSE)
            {
-            PPBackup(theEnv);
-            PPBackup(theEnv);
-            SavePPBuffer(theEnv,")");
+            PPBackup();
+            PPBackup();
+            SavePPBuffer(")");
            }
          lparen_read = FALSE;
         }
@@ -548,7 +545,6 @@ static intBool ReadUntilClosingParen(
                  Assumes class is not busy!!!
  *****************************************************************************/
 static void AddClass(
-  void *theEnv,
   DEFCLASS *cls)
   {
    DEFCLASS *ctmp;
@@ -562,7 +558,7 @@ static void AddClass(
       form progeny links with all direct superclasses
       =============================================== */
    cls->hashTableIndex = HashClass(GetDefclassNamePointer((void *) cls));
-   ctmp = (DEFCLASS *) EnvFindDefclass(theEnv,EnvGetDefclassName(theEnv,(void *) cls));
+   ctmp = (DEFCLASS *) FindDefclass(GetDefclassName((void *) cls));
 
    if (ctmp != NULL)
      {
@@ -570,18 +566,18 @@ static void AddClass(
       oldTraceInstances = ctmp->traceInstances;
       oldTraceSlots = ctmp->traceSlots;
 #endif
-      DeleteClassUAG(theEnv,ctmp);
+      DeleteClassUAG(ctmp);
      }
-   PutClassInTable(theEnv,cls);
+   PutClassInTable(cls);
 
-   BuildSubclassLinks(theEnv,cls);
-   InstallClass(theEnv,cls,TRUE);
+   BuildSubclassLinks(cls);
+   InstallClass(cls,TRUE);
    AddConstructToModule((struct constructHeader *) cls);
 
-   FormInstanceTemplate(theEnv,cls);
-   FormSlotNameMap(theEnv,cls);
+   FormInstanceTemplate(cls);
+   FormSlotNameMap(cls);
 
-   AssignClassID(theEnv,cls);
+   AssignClassID(cls);
 
 #if DEBUGGING_FUNCTIONS
    if (cls->abstract)
@@ -599,8 +595,8 @@ static void AddClass(
 #endif
 
 #if DEBUGGING_FUNCTIONS
-   if (EnvGetConserveMemory(theEnv) == FALSE)
-     SetDefclassPPForm((void *) cls,CopyPPBuffer(theEnv));
+   if (GetConserveMemory() == FALSE)
+     SetDefclassPPForm((void *) cls,CopyPPBuffer());
 #endif
 
 #if DEFMODULE_CONSTRUCT
@@ -609,14 +605,14 @@ static void AddClass(
       Create a bitmap indicating whether this
       class is in scope or not for every module
       ========================================= */
-   cls->scopeMap = (BITMAP_HN *) CreateClassScopeMap(theEnv,cls);
+   CreateClassScopeMap(cls);
 
 #endif
 
    /* ==============================================
       Define get- and put- handlers for public slots
       ============================================== */
-   CreatePublicSlotMessageHandlers(theEnv,cls);
+   CreatePublicSlotMessageHandlers(cls);
   }
 
 /*******************************************************
@@ -632,13 +628,12 @@ static void AddClass(
   NOTES        : Assumes the superclass list is formed.
  *******************************************************/
 static void BuildSubclassLinks(
-  void *theEnv,
   DEFCLASS *cls)
   {
-   long i;
+   register unsigned i;
 
    for (i = 0 ; i < cls->directSuperclasses.classCount ; i++)
-     AddClassLink(theEnv,&cls->directSuperclasses.classArray[i]->directSubclasses,cls,-1);
+     AddClassLink(&cls->directSuperclasses.classArray[i]->directSubclasses,cls,-1);
   }
 
 /**********************************************************
@@ -653,17 +648,16 @@ static void BuildSubclassLinks(
   NOTES        : None
  **********************************************************/
 static void FormInstanceTemplate(
-  void *theEnv,
   DEFCLASS *cls)
   {
    TEMP_SLOT_LINK *islots = NULL,*stmp;
-   short scnt = 0;
-   long i;
+   unsigned scnt = 0;
+   register unsigned i;
 
    /* ========================
       Get direct class's slots
       ======================== */
-   islots = MergeSlots(theEnv,islots,cls,&scnt,DIRECT);
+   islots = MergeSlots(islots,cls,&scnt,DIRECT);
 
    /* ===================================================================
       Get all inherited slots - a more specific slot takes precedence
@@ -671,7 +665,7 @@ static void FormInstanceTemplate(
       a particular slot gets to specify its default value
       =================================================================== */
    for (i = 1 ; i < cls->allSuperclasses.classCount ; i++)
-     islots = MergeSlots(theEnv,islots,cls->allSuperclasses.classArray[i],&scnt,INHERIT);
+     islots = MergeSlots(islots,cls->allSuperclasses.classArray[i],&scnt,INHERIT);
 
    /* ===================================================
       Allocate a contiguous array to store all the slots.
@@ -679,7 +673,7 @@ static void FormInstanceTemplate(
    cls->instanceSlotCount = scnt;
    cls->localInstanceSlotCount = 0;
    if (scnt > 0)
-     cls->instanceTemplate = (SLOT_DESC **) gm2(theEnv,(scnt * sizeof(SLOT_DESC *)));
+     cls->instanceTemplate = (SLOT_DESC **) gm2((int) (scnt * sizeof(SLOT_DESC *)));
    for (i = 0 ; i < scnt ; i++)
      {
       stmp = islots;
@@ -687,7 +681,7 @@ static void FormInstanceTemplate(
       cls->instanceTemplate[i] = stmp->desc;
       if (stmp->desc->shared == 0)
         cls->localInstanceSlotCount++;
-      rtn_struct(theEnv,tempSlotLink,stmp);
+      rtn_struct(tempSlotLink,stmp);
      }
   }
 
@@ -714,10 +708,9 @@ static void FormInstanceTemplate(
                  been formed
  **********************************************************/
 static void FormSlotNameMap(
-  void *theEnv,
   DEFCLASS *cls)
   {
-   long i;
+   register int i;
 
    cls->maxSlotNameID = 0;
    cls->slotNameMap = NULL;
@@ -726,7 +719,7 @@ static void FormSlotNameMap(
    for (i = 0 ; i < cls->instanceSlotCount ; i++)
      if (cls->instanceTemplate[i]->slotName->id > cls->maxSlotNameID)
        cls->maxSlotNameID = cls->instanceTemplate[i]->slotName->id;
-   cls->slotNameMap = (unsigned *) gm2(theEnv,(sizeof(unsigned) * (cls->maxSlotNameID + 1)));
+   cls->slotNameMap = (unsigned *) gm2((int) (sizeof(unsigned) * (cls->maxSlotNameID + 1)));
    for (i = 0 ; i <= cls->maxSlotNameID ; i++)
      cls->slotNameMap[i] = 0;
    for (i = 0 ; i < cls->instanceSlotCount ; i++)
@@ -749,10 +742,9 @@ static void FormSlotNameMap(
   NOTES        : Lists are assumed to contain no duplicates
  *******************************************************************/
 static TEMP_SLOT_LINK *MergeSlots(
-  void *theEnv,
   TEMP_SLOT_LINK *old,
   DEFCLASS *cls,
-  short *scnt,
+  unsigned *scnt,
   int src)
   {
    TEMP_SLOT_LINK *cur,*tmp;
@@ -763,7 +755,7 @@ static TEMP_SLOT_LINK *MergeSlots(
       Process the slots in reverse order
       since we are pushing them onto a stack
       ====================================== */
-   for (i = (int) (cls->slotCount - 1) ; i >= 0 ; i--)
+   for (i = cls->slotCount - 1 ; i >= 0 ; i--)
      {
       newSlot = &cls->slots[i];
 
@@ -778,7 +770,7 @@ static TEMP_SLOT_LINK *MergeSlots(
            cur = cur->nxt;
          if (cur == NULL)
            {
-            tmp = get_struct(theEnv,tempSlotLink);
+            tmp = get_struct(tempSlotLink);
             tmp->desc = newSlot;
             tmp->nxt = old;
             old = tmp;
@@ -803,12 +795,11 @@ static TEMP_SLOT_LINK *MergeSlots(
   NOTES        : Assumes class->slotCount == 0 && class->slots == NULL
  ***********************************************************************/
 static void PackSlots(
-  void *theEnv,
   DEFCLASS *cls,
   TEMP_SLOT_LINK *slots)
   {
    TEMP_SLOT_LINK *stmp,*sprv;
-   long i;
+   register int i;
 
    stmp = slots;
    while  (stmp != NULL)
@@ -817,7 +808,7 @@ static void PackSlots(
       cls->slotCount++;
       stmp = stmp->nxt;
      }
-   cls->slots = (SLOT_DESC *) gm2(theEnv,(sizeof(SLOT_DESC) * cls->slotCount));
+   cls->slots = (SLOT_DESC *) gm2((int) (sizeof(SLOT_DESC) * cls->slotCount));
    stmp = slots;
    for (i = 0 ; i < cls->slotCount ; i++)
      {
@@ -826,8 +817,8 @@ static void PackSlots(
       GenCopyMemory(SLOT_DESC,1,&(cls->slots[i]),sprv->desc);
       cls->slots[i].sharedValue.desc = &(cls->slots[i]);
       cls->slots[i].sharedValue.value = NULL;
-      rtn_struct(theEnv,slotDescriptor,sprv->desc);
-      rtn_struct(theEnv,tempSlotLink,sprv);
+      rtn_struct(slotDescriptor,sprv->desc);
+      rtn_struct(tempSlotLink,sprv);
      }
   }
 
@@ -844,41 +835,38 @@ static void PackSlots(
   SIDE EFFECTS : Scope bitmap created and attached
   NOTES        : Uses FindImportedConstruct()
  ********************************************************/
-globle void *CreateClassScopeMap(
-  void *theEnv,
+static void CreateClassScopeMap(
   DEFCLASS *theDefclass)
   {
-   unsigned scopeMapSize;
+   int scopeMapSize;
    char *scopeMap;
    char *className;
    struct defmodule *matchModule,
                     *theModule;
    int moduleID,count;
-   void *theBitMap;
 
    className = ValueToString(theDefclass->header.name);
    matchModule = theDefclass->header.whichModule->theModule;
 
-   scopeMapSize = (sizeof(char) * ((GetNumberOfDefmodules(theEnv) / BITS_PER_BYTE) + 1));
-   scopeMap = (char *) gm2(theEnv,scopeMapSize);
+   scopeMapSize = (int) (sizeof(char) * ((GetNumberOfDefmodules() / BITS_PER_BYTE) + 1));
+   scopeMap = (char *) gm2(scopeMapSize);
 
    ClearBitString((void *) scopeMap,scopeMapSize);
-   SaveCurrentModule(theEnv);
-   for (theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,NULL) ;
+   SaveCurrentModule();
+   for (theModule = (struct defmodule *) GetNextDefmodule(NULL) ;
         theModule != NULL ;
-        theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,(void *) theModule))
+        theModule = (struct defmodule *) GetNextDefmodule((void *) theModule))
      {
-      EnvSetCurrentModule(theEnv,(void *) theModule);
+      SetCurrentModule((void *) theModule);
       moduleID = (int) theModule->bsaveID;
-      if (FindImportedConstruct(theEnv,"defclass",matchModule,
+      if (FindImportedConstruct("defclass",matchModule,
                                 className,&count,TRUE,NULL) != NULL)
         SetBitMap(scopeMap,moduleID);
      }
-   RestoreCurrentModule(theEnv);
-   theBitMap = (BITMAP_HN *) EnvAddBitMap(theEnv,scopeMap,scopeMapSize);
-   IncrementBitMapCount(theBitMap);
-   rm(theEnv,(void *) scopeMap,scopeMapSize);
-   return(theBitMap);
+   RestoreCurrentModule();
+   theDefclass->scopeMap = (BITMAP_HN *) AddBitMap(scopeMap,scopeMapSize);
+   IncrementBitMapCount(theDefclass->scopeMap);
+   rm((void *) scopeMap,scopeMapSize);
   }
 
 #endif
@@ -910,16 +898,15 @@ globle void *CreateClassScopeMap(
   NOTES        : None
  ******************************************************************************/
 static void CreatePublicSlotMessageHandlers(
-  void *theEnv,
   DEFCLASS *theDefclass)
   {
-   long i;
+   register unsigned i;
    register SLOT_DESC *sd;
 
    for (i = 0 ; i < theDefclass->slotCount ; i++)
      {
       sd = &theDefclass->slots[i];
-        CreateGetAndPutHandlers(theEnv,sd);
+        CreateGetAndPutHandlers(sd);
      }
    for (i = 0 ; i < theDefclass->handlerCount ; i++)
      theDefclass->handlers[i].system = TRUE;
@@ -927,3 +914,12 @@ static void CreatePublicSlotMessageHandlers(
 
 #endif
 
+/***************************************************
+  NAME         :
+  DESCRIPTION  :
+  INPUTS       :
+  RETURNS      :
+  SIDE EFFECTS :
+  NOTES        :
+ ***************************************************/
+

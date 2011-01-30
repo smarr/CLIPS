@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.20  01/31/02            */
+   /*             CLIPS Version 6.10  03/24/96            */
    /*                                                     */
    /*            PARSING FUNCTIONS HEADER FILE            */
    /*******************************************************/
@@ -37,9 +37,9 @@
 #define LOCALE extern
 #endif
 
-   LOCALE void                           ParseFunctionDefinitions(void *);
-   LOCALE void                           CheckSyntaxFunction(void *,DATA_OBJECT *);
-   LOCALE int                            CheckSyntax(void *,char *,DATA_OBJECT_PTR);
+   LOCALE void                           ParseFunctionDefinitions(void);
+   LOCALE void                           CheckSyntaxFunction(DATA_OBJECT *);
+   LOCALE int                            CheckSyntax(char *,DATA_OBJECT_PTR);
 
 #endif
 
@@ -47,3 +47,5 @@
 
 
 
+
+

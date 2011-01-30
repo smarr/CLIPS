@@ -1,24 +1,7 @@
-   /*******************************************************/
-   /*      "C" Language Integrated Production System      */
-   /*                                                     */
-   /*              CLIPS Version 6.24  06/05/06           */
-   /*                                                     */
-   /*                                                     */
-   /*******************************************************/
-   
-/*************************************************************/
-/* Purpose:                                                  */
-/*                                                           */
-/* Principal Programmer(s):                                  */
-/*                                                           */
-/* Contributing Programmer(s):                               */
-/*                                                           */
-/* Revision History:                                         */
-/*                                                           */
-/*      6.24: Corrected code generating compilation          */
-/*            warnings.                                      */
-/*                                                           */
-/*************************************************************/
+/*   CLIPS Version 6.10  04/09/97 */
+/* Who               |     Date    | Description             */
+/* ------------------+-------------+------------------------ */
+/* M.Giordano        | 23-Mar-2000 | Mods made for TLS       */
 
 #include "setup.h"
 
@@ -30,49 +13,46 @@
 #include <stdlib.h>
 
 #if ANSI
-static void ansimove(int,int);
-static void ansieeol(void);
-static void ansieeop(void);
-static void ansibeep(void);
-static void ansiparm(int);
-static void ansiopen(void);
+static VOID ansimove(int,int);
+static VOID ansieeol(void);
+static VOID ansieeop(void);
+static VOID ansibeep(void);
+static VOID ansiparm(int);
+static VOID ansiopen(void);
 #endif
 
 #if VT52
-static void vt52move(int,int);
-static void vt52eeol(void);
-static void vt52eeop(void);
-static void vt52beep(void);
-static void vt52parm(int);
-static void vt52open(void);
+static VOID vt52move(int,int);
+static VOID vt52eeol(void);
+static VOID vt52eeop(void);
+static VOID vt52beep(void);
+static VOID vt52parm(int);
+static VOID vt52open(void);
 #endif
 
 #if IBM_PC
-static void pc_open(void);
+static VOID pc_open(void);
 static int scinit(int);
 static int getboard(void);
 static int pc_getc(void);
-static void pc_putc(int);
-static void pc_move(int,int);
-static void pc_eeol(void);
-static void pc_eeop(void);
-static void pc_beep(void);
+static VOID pc_putc(int);
+static VOID pc_move(int,int);
+static VOID pc_eeol(void);
+static VOID pc_eeop(void);
+static VOID pc_beep(void);
 #endif
 
 #if TERMCAP
-#include <termcap.h>
-/*
 extern int tgetent(char *,char *);
 extern char *tgoto(char *,int,int);
 extern int tputs(register char *,int,int (*)(int));
-extern char *tgetstr(char *,char **);
-*/
-static void tcapmove(int,int);
-static void tcapeeol(void);
-static void tcapeeop(void);
-static void tcapbeep(void);
-static void tcapopen(void);
-static void putpad(char *);
+
+static VOID tcapmove(int,int);
+static VOID tcapeeol(void);
+static VOID tcapeeop(void);
+static VOID tcapbeep(void);
+static VOID tcapopen(void);
+static VOID putpad(char *);
 #endif
 
 /* ==========================================================================
@@ -97,7 +77,7 @@ static void putpad(char *);
  * Standard terminal interface dispatch table. Most of the fields point into
  * "termio" code.
  */
-TERM    term    = {
+Thread TERM    term    = {
         NROW-1,
         NCOL,
         ansiopen,
@@ -111,7 +91,7 @@ TERM    term    = {
         ansibeep
 };
 
-static void ansimove(
+static VOID ansimove(
 int row,
 int col)
 {
@@ -123,27 +103,27 @@ int col)
         ttputc('H');
 }
 
-static void ansieeol()
+static VOID ansieeol()
 {
         ttputc(ESC);
         ttputc('[');
         ttputc('K');
 }
 
-static void ansieeop()
+static VOID ansieeop()
 {
         ttputc(ESC);
         ttputc('[');
         ttputc('J');
 }
 
-static void ansibeep()
+static VOID ansibeep()
 {
         ttputc(BEL);
         ttflush();
 }
 
-static void ansiparm(
+static VOID ansiparm(
 int    n)
 {
         register int    q;
@@ -154,9 +134,9 @@ int    n)
         ttputc((n%10) + '0');
 }
 
-static void ansiopen()
+static VOID ansiopen()
 {
-#if     UNIX_7 || UNIX_V || LINUX || DARWIN
+#if     UNIX_7 || UNIX_V
         register char *cp;
 
         if ((cp = getenv("TERM")) == NULL) {
@@ -215,7 +195,7 @@ globle TERM    term    = {
         vt52beep
 };
 
-static void vt52move(
+static VOID vt52move(
 int row,
 int col)
 {
@@ -225,19 +205,19 @@ int col)
         ttputc(col+BIAS);
 }
 
-static void vt52eeol()
+static VOID vt52eeol()
 {
         ttputc(ESC);
         ttputc('K');
 }
 
-static void vt52eeop()
+static VOID vt52eeop()
 {
         ttputc(ESC);
         ttputc('J');
 }
 
-static void vt52beep()
+static VOID vt52beep()
 {
 #ifdef  BEL
         ttputc(BEL);
@@ -245,9 +225,9 @@ static void vt52beep()
 #endif
 }
 
-static void vt52open()
+static VOID vt52open()
 {
-#if     UNIX_7 || UNIX_V || LINUX || DARWIN
+#if     UNIX_7 || UNIX_V
         register char *cp;
 
         if ((cp = getenv("TERM")) == NULL) {
@@ -274,11 +254,15 @@ static void vt52open()
                                                 /* or the Turbo C compiler      */
                                                 /* or the Zortech C compiler    */
                                                 /* or the Intel C Code builder  */
-#if   WIN_MVC || WIN_BTC || WIN_GCC
+#if   IBM_MSC || IBM_TBC || IBM_ZTC || IBM_ICB || IBM_GCC
 #include        <dos.h>
 
-#if WIN_MVC || WIN_GCC
+#if IBM_MSC || IBM_ICB || IBM_GCC
 #include    <conio.h>
+#endif
+
+#if IBM_ZTC
+#include    <disp.h>
 #endif
 
 #define NROW    25                      /* Screen size. rows            */
@@ -287,8 +271,13 @@ static void vt52open()
 #define ESC     0x1B                    /* ESC character.               */
 #define SPACE   32
 
+#if IBM_ICB
+#define	SCADC	0xb8000         /* CGA address of screen RAM	*/
+#define	SCADM	0xb0000         /* MONO address of screen RAM	*/
+#else
 #define	SCADC	0xb8000000L     /* CGA address of screen RAM	*/
 #define	SCADM	0xb0000000L     /* MONO address of screen RAM	*/
+#endif
 
 #define MONOCRSR 0x0B0D			/* monochrome cursor	    */
 #define CGACRSR 0x0607			/* CGA cursor		    */
@@ -304,7 +293,7 @@ static void vt52open()
  * "termio" code.
  */
 
-globle TERM    term    = {
+Thread globle TERM    term    = {
         NROW-1,
         NCOL,
         pc_open,
@@ -318,15 +307,21 @@ globle TERM    term    = {
         pc_beep
 };
 
-static int dtype = -1;		/* current display type		*/
+Thread static int dtype = -1;		/* current display type		*/
 
-static long scadd;		/* address of screen ram	*/
-static int *scptr[NROW];	/* pointer to screen lines	*/
-static unsigned int sline[NCOL];/* screen line image		*/
+#if IBM_ICB
+Thread static int scadd;		/* address of screen ram	*/
+Thread static short *scptr[NROW];	/* pointer to screen lines	*/
+Thread static unsigned short sline[NCOL];/* screen line image		*/
+#else
+Thread static long scadd;		/* address of screen ram	*/
+Thread static int *scptr[NROW];	/* pointer to screen lines	*/
+Thread static unsigned int sline[NCOL];/* screen line image		*/
+#endif
 
-static union REGS rg;
+Thread static union REGS rg;
 
-static void pc_open()
+static VOID pc_open()
 {
  scinit(CDSENSE);
  ttopen();
@@ -337,11 +332,22 @@ static int scinit(	/* initialize the screen head pointers */
 int type)	/* type of adapter to init for */
 
 {
+#if IBM_ICB
+	union {
+		int laddr;	/* long form of address */
+		short *paddr;	/* pointer form of address */
+	} addr;
+#else
 	union {
 		long laddr;	/* long form of address */
 		int *paddr;	/* pointer form of address */
 	} addr;
+#endif
 	int i;
+
+#if IBM_ZTC
+	disp_open();
+#endif
 
 	/* if asked...find out what display is connected */
 	if (type == CDSENSE)
@@ -365,7 +371,11 @@ int type)	/* type of adapter to init for */
 
 	/* initialize the screen pointer array */
 	for (i = 0; i < NROW; i++) {
+#if IBM_ICB
+		addr.laddr = scadd + (NCOL * i * 2);
+#else
 		addr.laddr = scadd + (long)(NCOL * i * 2);
+#endif
 		scptr[i] = addr.paddr;
 	}
 	return(TRUE);
@@ -435,7 +445,7 @@ static int pc_getc()
    }
 }
 
-static void pc_putc(
+static VOID pc_putc(
 int c)
 {
 	rg.h.ah = 14;		/* write char to screen with current attrs */
@@ -445,7 +455,7 @@ int c)
 	int86(0x10, &rg, &rg);
 }
 
-static void pc_move(
+static VOID pc_move(
 int row,
 int col)
 {
@@ -456,10 +466,14 @@ int col)
 	int86(0x10, &rg, &rg);
 }
 
-static void pc_eeol()
+static VOID pc_eeol()
 {
 	unsigned int attr;	/* attribute byte mask to place in RAM */
+#if IBM_ICB
+	unsigned short *lnptr;	/* pointer to the destination line */
+#else
 	unsigned int *lnptr;	/* pointer to the destination line */
+#endif
 	int i;
 	int ccol;	/* current column cursor lives */
 	int crow;	/*	   row	*/
@@ -487,11 +501,18 @@ static void pc_eeol()
 			;
 	}			
 
+#if IBM_ZTC
+        disp_move(crow,ccol);
+        disp_flush();
+	disp_eeol();
+#endif
 	/* and send the string out */
+#if (! IBM_ZTC)
 	memmove(scptr[crow]+ccol, &sline[0], (term.t_ncol-ccol)*2);
+#endif
 }
 
-static void pc_eeop()
+static VOID pc_eeop()
 {
 	int attr;		/* attribute to fill screen with */
 
@@ -505,7 +526,7 @@ static void pc_eeop()
 	int86(0x10, &rg, &rg);
 }
 
-static void pc_beep()
+static VOID pc_beep()
 {
         pc_putc(BEL);
         ttflush();
@@ -537,15 +558,15 @@ static void pc_beep()
 
 #define TCAPSLEN 315
 
-static char tcapbuf[TCAPSLEN];
-static char    /*PC,*/
+Thread static char tcapbuf[TCAPSLEN];
+Thread static char    PC,
         *CM,
         *CE,
-        /* *UP, */
+        *UP,
         *CD;
 
 
-globle TERM term = {
+Thread globle TERM term = {
         NROW-1,
         NCOL,
         tcapopen,
@@ -559,8 +580,9 @@ globle TERM term = {
         tcapbeep
 };
 
-static void tcapopen()
+static VOID tcapopen()
 {
+        extern char *tgetstr(char *,char **);
         char *t, *p;
         char tcbuf[1024];
         char *tv_stype;
@@ -574,7 +596,7 @@ static void tcapopen()
 
         if((tgetent(tcbuf, tv_stype)) != 1)
         {
-                gensprintf(err_str, "Unknown terminal type %s!", tv_stype);
+                sprintf(err_str, "Unknown terminal type %s!", tv_stype);
                 puts(err_str);
                 exit(1);
         }
@@ -603,30 +625,29 @@ static void tcapopen()
         ttopen();
 }
 
-static void tcapmove(
-  int row, 
-  int col)
+static VOID tcapmove(row, col)
+int row, col;
 {
         putpad(tgoto(CM, col, row));
 }
 
-static void tcapeeol()
+static VOID tcapeeol()
 {
         putpad(CE);
 }
 
-static void tcapeeop()
+static VOID tcapeeop()
 {
         putpad(CD);
 }
 
-static void tcapbeep()
+static VOID tcapbeep()
 {
         ttputc(BEL);
 }
 
-static void putpad(
-   char *str)
+static VOID putpad(str)
+char    *str;
 {
         tputs(str, 1, (int (*)(int)) ttputc);
 }
@@ -634,3 +655,4 @@ static void putpad(
 #endif
 
 #endif          /* end original EMACS_EDITOR definition */
+

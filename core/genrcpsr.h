@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*               CLIPS Version 6.24  06/05/06          */
+   /*               CLIPS Version 6.10  04/09/97          */
    /*                                                     */
    /*                                                     */
    /*******************************************************/
@@ -10,13 +10,11 @@
 /* Purpose:                                                  */
 /*                                                           */
 /* Principal Programmer(s):                                  */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Contributing Programmer(s):                               */
 /*                                                           */
 /* Revision History:                                         */
-/*                                                           */
-/*      6.24: Renamed BOOLEAN macro type to intBool.         */
 /*                                                           */
 /*************************************************************/
 
@@ -37,12 +35,12 @@
 #define LOCALE extern
 #endif
 
-LOCALE intBool ParseDefgeneric(void *,char *);
-LOCALE intBool ParseDefmethod(void *,char *);
-LOCALE DEFMETHOD *AddMethod(void *,DEFGENERIC *,DEFMETHOD *,int,short,EXPRESSION *,
+LOCALE BOOLEAN ParseDefgeneric(char *);
+LOCALE BOOLEAN ParseDefmethod(char *);
+LOCALE DEFMETHOD *AddMethod(DEFGENERIC *,DEFMETHOD *,int,unsigned,EXPRESSION *,
                             int,int,SYMBOL_HN *,EXPRESSION *,char *,int);
-LOCALE void PackRestrictionTypes(void *,RESTRICTION *,EXPRESSION *);
-LOCALE void DeleteTempRestricts(void *,EXPRESSION *);
+LOCALE void PackRestrictionTypes(RESTRICTION *,EXPRESSION *);
+LOCALE void DeleteTempRestricts(EXPRESSION *);
 LOCALE DEFMETHOD *FindMethodByRestrictions(DEFGENERIC *,EXPRESSION *,int,
                                            SYMBOL_HN *,int *);
 
@@ -55,3 +53,5 @@ LOCALE DEFMETHOD *FindMethodByRestrictions(DEFGENERIC *,EXPRESSION *,int,
 
 
 
+
+

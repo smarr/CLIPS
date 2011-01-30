@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.24  07/01/05            */
+   /*             CLIPS Version 6.10  04/13/98            */
    /*                                                     */
    /*                CONSTRAINT HEADER FILE               */
    /*******************************************************/
@@ -18,9 +18,6 @@
 /* Contributing Programmer(s):                               */
 /*                                                           */
 /* Revision History:                                         */
-/*      6.24: Added allowed-classes slot facet.              */
-/*                                                           */
-/*            Renamed BOOLEAN macro type to intBool.         */
 /*                                                           */
 /*************************************************************/
 
@@ -60,12 +57,10 @@ struct constraintRecord
    unsigned int stringRestriction : 1;
    unsigned int floatRestriction : 1;
    unsigned int integerRestriction : 1;
-   unsigned int classRestriction : 1;
    unsigned int instanceNameRestriction : 1;
    unsigned int multifieldsAllowed : 1;
    unsigned int singlefieldsAllowed : 1;
    unsigned short bsaveIndex;
-   struct expr *classList;
    struct expr *restrictionList;
    struct expr *minValue;
    struct expr *maxValue;
@@ -81,41 +76,25 @@ typedef struct constraintRecord CONSTRAINT_RECORD;
 
 #define SIZE_CONSTRAINT_HASH  167
 
-#define CONSTRAINT_DATA 43
-
-struct constraintData
-  { 
-   struct constraintRecord **ConstraintHashtable;
-   intBool StaticConstraintChecking;
-   intBool DynamicConstraintChecking;
-#if (BLOAD || BLOAD_ONLY || BLOAD_AND_BSAVE) && (! RUN_TIME)
-   struct constraintRecord *ConstraintArray;
-   long int NumberOfConstraints;
-#endif
-  };
-
-#define ConstraintData(theEnv) ((struct constraintData *) GetEnvironmentData(theEnv,CONSTRAINT_DATA))
-
-#define GetDynamicConstraintChecking() EnvGetDynamicConstraintChecking(GetCurrentEnvironment())
-#define GetStaticConstraintChecking() EnvGetStaticConstraintChecking(GetCurrentEnvironment())
-#define SetDynamicConstraintChecking(a) EnvSetDynamicConstraintChecking(GetCurrentEnvironment(),a)
-#define SetStaticConstraintChecking(a) EnvSetStaticConstraintChecking(GetCurrentEnvironment(),a)
-
-   LOCALE void                           InitializeConstraints(void *);
-   LOCALE int                            GDCCommand(void *);
-   LOCALE int                            SDCCommand(void *d);
-   LOCALE int                            GSCCommand(void *);
-   LOCALE int                            SSCCommand(void *);
-   LOCALE intBool                        EnvSetDynamicConstraintChecking(void *,int);
-   LOCALE intBool                        EnvGetDynamicConstraintChecking(void *);
-   LOCALE intBool                        EnvSetStaticConstraintChecking(void *,int);
-   LOCALE intBool                        EnvGetStaticConstraintChecking(void *);
+   LOCALE void                           InitializeConstraints(void);
+   LOCALE int                            GDCCommand(void);
+   LOCALE int                            SDCCommand(void);
+   LOCALE int                            GSCCommand(void);
+   LOCALE int                            SSCCommand(void);
+   LOCALE BOOLEAN                        SetDynamicConstraintChecking(int);
+   LOCALE BOOLEAN                        GetDynamicConstraintChecking(void);
+   LOCALE BOOLEAN                        SetStaticConstraintChecking(int);
+   LOCALE BOOLEAN                        GetStaticConstraintChecking(void);
 #if (! BLOAD_ONLY) && (! RUN_TIME)
-   LOCALE unsigned long                  HashConstraint(struct constraintRecord *);
-   LOCALE struct constraintRecord       *AddConstraint(void *,struct constraintRecord *);
+   LOCALE int                            HashConstraint(struct constraintRecord *);
+   LOCALE struct constraintRecord       *AddConstraint(struct constraintRecord *);
 #endif
 #if (! RUN_TIME)
-   LOCALE void                           RemoveConstraint(void *,struct constraintRecord *);
+   LOCALE void                           RemoveConstraint(struct constraintRecord *);
+#endif
+
+#ifndef _CONSTRNT_SOURCE_
+   extern Thread struct constraintRecord   **ConstraintHashtable;
 #endif
 
 #endif
@@ -123,3 +102,4 @@ struct constraintData
 
 
 
+

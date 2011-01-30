@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.22  06/15/04            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*                                                     */
    /*******************************************************/
@@ -10,12 +10,15 @@
 /* Purpose: Binary Load/Save Functions for Generic Functions */
 /*                                                           */
 /* Principal Programmer(s):                                  */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Contributing Programmer(s):                               */
 /*                                                           */
 /* Revision History:                                         */
 /*                                                           */
+/* Who               |     Date    | Description             */
+/* ------------------+-------------+------------------------ */
+/* M.Giordano        | 23-Mar-2000 | Mods made for TLS       */
 /*************************************************************/
 
 /* =========================================
@@ -28,7 +31,6 @@
 #if DEFGENERIC_CONSTRUCT && (BLOAD || BLOAD_ONLY || BLOAD_AND_BSAVE)
 
 #include "constant.h"
-#include "envrnmnt.h"
 #include "memalloc.h"
 #include "bload.h"
 #include "bsave.h"
@@ -49,24 +51,30 @@
 
 /* =========================================
    *****************************************
+                   CONSTANTS
+   =========================================
+   ***************************************** */
+
+/* =========================================
+   *****************************************
                MACROS AND TYPES
    =========================================
    ***************************************** */
 
-#define MethodPointer(i) (((i) == -1L) ? NULL : (DEFMETHOD *) &DefgenericBinaryData(theEnv)->MethodArray[i])
-#define RestrictionPointer(i) (((i) == -1L) ? NULL : (RESTRICTION *) &DefgenericBinaryData(theEnv)->RestrictionArray[i])
-#define TypePointer(i) (((i) == -1L) ? NULL : (void **) &DefgenericBinaryData(theEnv)->TypeArray[i])
+#define MethodPointer(i) (((i) == -1L) ? NULL : (DEFMETHOD *) &methodArray[i])
+#define RestrictionPointer(i) (((i) == -1L) ? NULL : (RESTRICTION *) &restrictionArray[i])
+#define TypePointer(i) (((i) == -1L) ? NULL : (void **) &typeArray[i])
 
 typedef struct bsaveRestriction
   {
    long types,query;
-   short tcnt;
+   unsigned tcnt;
   } BSAVE_RESTRICTION;
 
 typedef struct bsaveMethod
   {
-   short index;
-   short restrictionCount,
+   unsigned index;
+   int restrictionCount,
        minRestrictions,maxRestrictions,
        localVarCount;
    int system;
@@ -77,7 +85,7 @@ typedef struct bsaveGenericFunc
   {
    struct bsaveConstructHeader header;
    long methods;
-   short mcnt;
+   unsigned mcnt;
   } BSAVE_GENERIC;
 
 typedef struct bsaveGenericModule
@@ -93,29 +101,53 @@ typedef struct bsaveGenericModule
 
 #if BLOAD_AND_BSAVE
 
-static void BsaveGenericsFind(void *);
-static void MarkDefgenericItems(void *,struct constructHeader *,void *);
-static void BsaveGenericsExpressions(void *,FILE *);
-static void BsaveMethodExpressions(void *,struct constructHeader *,void *);
-static void BsaveRestrictionExpressions(void *,struct constructHeader *,void *);
-static void BsaveGenerics(void *,FILE *);
-static void BsaveDefgenericHeader(void *,struct constructHeader *,void *);
-static void BsaveMethods(void *,struct constructHeader *,void *);
-static void BsaveMethodRestrictions(void *,struct constructHeader *,void *);
-static void BsaveRestrictionTypes(void *,struct constructHeader *,void *);
-static void BsaveStorageGenerics(void *,FILE *);
+static void BsaveGenericsFind(void);
+static void MarkDefgenericItems(struct constructHeader *,void *);
+static void BsaveGenericsExpressions(FILE *);
+static void BsaveMethodExpressions(struct constructHeader *,void *);
+static void BsaveRestrictionExpressions(struct constructHeader *,void *);
+static void BsaveGenerics(FILE *);
+static void BsaveDefgenericHeader(struct constructHeader *,void *);
+static void BsaveMethods(struct constructHeader *,void *);
+static void BsaveMethodRestrictions(struct constructHeader *,void *);
+static void BsaveRestrictionTypes(struct constructHeader *,void *);
+static void BsaveStorageGenerics(FILE *);
 
 #endif
 
-static void BloadStorageGenerics(void *);
-static void BloadGenerics(void *);
-static void UpdateGenericModule(void *,void *,long);
-static void UpdateGeneric(void *,void *,long);
-static void UpdateMethod(void *,void *,long);
-static void UpdateRestriction(void *,void *,long);
-static void UpdateType(void *,void *,long);
-static void ClearBloadGenerics(void *);
-static void DeallocateDefgenericBinaryData(void *);
+static void BloadStorageGenerics(void);
+static void BloadGenerics(void);
+static void UpdateGenericModule(void *,long);
+static void UpdateGeneric(void *,long);
+static void UpdateMethod(void *,long);
+static void UpdateRestriction(void *,long);
+static void UpdateType(void *,long);
+static void ClearBloadGenerics(void);
+
+/* =========================================
+   *****************************************
+      EXTERNALLY VISIBLE GLOBAL VARIABLES
+   =========================================
+   ***************************************** */
+
+Thread globle DEFGENERIC *defgenericArray = NULL;
+
+/* =========================================
+   *****************************************
+      INTERNALLY VISIBLE GLOBAL VARIABLES
+   =========================================
+   ***************************************** */
+
+Thread static long ModuleCount = 0L,
+                   GenericCount = 0L,
+                   MethodCount = 0L,
+                   RestrictionCount = 0L,
+                   TypeCount = 0L;
+
+Thread static DEFGENERIC_MODULE *ModuleArray = NULL;
+Thread static DEFMETHOD *methodArray = NULL;
+Thread static RESTRICTION *restrictionArray = NULL;
+Thread static void **typeArray = NULL;
 
 /* =========================================
    *****************************************
@@ -133,47 +165,18 @@ static void DeallocateDefgenericBinaryData(void *);
   SIDE EFFECTS : Routines defined and structures initialized
   NOTES        : None
  ***********************************************************/
-globle void SetupGenericsBload(
-  void *theEnv)
+globle void SetupGenericsBload()
   {
-   AllocateEnvironmentData(theEnv,GENRCBIN_DATA,sizeof(struct defgenericBinaryData),DeallocateDefgenericBinaryData);
 #if BLOAD_AND_BSAVE
-   AddBinaryItem(theEnv,"generic functions",0,BsaveGenericsFind,BsaveGenericsExpressions,
+   AddBinaryItem("generic functions",0,BsaveGenericsFind,BsaveGenericsExpressions,
                              BsaveStorageGenerics,BsaveGenerics,
                              BloadStorageGenerics,BloadGenerics,
                              ClearBloadGenerics);
 #endif
 #if BLOAD || BLOAD_ONLY
-   AddBinaryItem(theEnv,"generic functions",0,NULL,NULL,NULL,NULL,
+   AddBinaryItem("generic functions",0,NULL,NULL,NULL,NULL,
                              BloadStorageGenerics,BloadGenerics,
                              ClearBloadGenerics);
-#endif
-  }
-  
-/***********************************************************/
-/* DeallocateDefgenericBinaryData: Deallocates environment */
-/*    data for the defgeneric binary functionality.        */
-/***********************************************************/
-static void DeallocateDefgenericBinaryData(
-  void *theEnv)
-  {
-#if (BLOAD || BLOAD_ONLY || BLOAD_AND_BSAVE) && (! RUN_TIME)
-   size_t space;
-
-   space = DefgenericBinaryData(theEnv)->GenericCount * sizeof(struct defgeneric);
-   if (space != 0) genfree(theEnv,(void *) DefgenericBinaryData(theEnv)->DefgenericArray,space);
-
-   space = DefgenericBinaryData(theEnv)->MethodCount * sizeof(struct method);
-   if (space != 0) genfree(theEnv,(void *) DefgenericBinaryData(theEnv)->MethodArray,space);
-
-   space = DefgenericBinaryData(theEnv)->RestrictionCount * sizeof(struct restriction);
-   if (space != 0) genfree(theEnv,(void *) DefgenericBinaryData(theEnv)->RestrictionArray,space);
-
-   space = DefgenericBinaryData(theEnv)->TypeCount * sizeof(void *);
-   if (space != 0) genfree(theEnv,(void *) DefgenericBinaryData(theEnv)->TypeArray,space);
-
-   space =  DefgenericBinaryData(theEnv)->ModuleCount * sizeof(struct defgenericModule);
-   if (space != 0) genfree(theEnv,(void *) DefgenericBinaryData(theEnv)->ModuleArray,space);
 #endif
   }
 
@@ -187,10 +190,9 @@ static void DeallocateDefgenericBinaryData(
   NOTES        : None
  ***************************************************/
 globle void *BloadDefgenericModuleReference(
-  void *theEnv,
-  int theIndex)
+  int index)
   {
-   return ((void *) &DefgenericBinaryData(theEnv)->ModuleArray[theIndex]);
+   return ((void *) &ModuleArray[index]);
   }
 
 /* =========================================
@@ -218,22 +220,22 @@ globle void *BloadDefgenericModuleReference(
   NOTES        : Also sets bsaveIndex for each generic function (assumes
                    generic functions will be bsaved in order of binary list)
  ***************************************************************************/
-static void BsaveGenericsFind(
-  void *theEnv)
+static void BsaveGenericsFind()
   {
-   SaveBloadCount(theEnv,DefgenericBinaryData(theEnv)->ModuleCount);
-   SaveBloadCount(theEnv,DefgenericBinaryData(theEnv)->GenericCount);
-   SaveBloadCount(theEnv,DefgenericBinaryData(theEnv)->MethodCount);
-   SaveBloadCount(theEnv,DefgenericBinaryData(theEnv)->RestrictionCount);
-   SaveBloadCount(theEnv,DefgenericBinaryData(theEnv)->TypeCount);
+   if (Bloaded())
+     {
+      SaveBloadCount(ModuleCount);
+      SaveBloadCount(GenericCount);
+      SaveBloadCount(MethodCount);
+      SaveBloadCount(RestrictionCount);
+      SaveBloadCount(TypeCount);
+     }
+   GenericCount = 0L;
+   MethodCount = 0L;
+   RestrictionCount = 0L;
+   TypeCount = 0L;
 
-   DefgenericBinaryData(theEnv)->GenericCount = 0L;
-   DefgenericBinaryData(theEnv)->MethodCount = 0L;
-   DefgenericBinaryData(theEnv)->RestrictionCount = 0L;
-   DefgenericBinaryData(theEnv)->TypeCount = 0L;
-
-   DefgenericBinaryData(theEnv)->ModuleCount = 
-      DoForAllConstructs(theEnv,MarkDefgenericItems,DefgenericData(theEnv)->DefgenericModuleIndex,
+   ModuleCount = DoForAllConstructs(MarkDefgenericItems,DefgenericModuleIndex,
                                     FALSE,NULL);
   }
 
@@ -247,36 +249,35 @@ static void BsaveGenericsFind(
   SIDE EFFECTS : Needed items marked
   NOTES        : None
  ***************************************************/
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 static void MarkDefgenericItems(
-  void *theEnv,
   struct constructHeader *theDefgeneric,
   void *userBuffer)
   {
-#if MAC_MCW || WIN_MCW || MAC_XCD
+#if MAC_MPW || MAC_MCW || IBM_MCW
 #pragma unused(userBuffer)
 #endif
    DEFGENERIC *gfunc = (DEFGENERIC *) theDefgeneric;
-   long i,j;
+   register unsigned i,j;
    DEFMETHOD *meth;
    RESTRICTION *rptr;
 
-   MarkConstructHeaderNeededItems(&gfunc->header,DefgenericBinaryData(theEnv)->GenericCount++);
-   DefgenericBinaryData(theEnv)->MethodCount += (long) gfunc->mcnt;
+   MarkConstructHeaderNeededItems(&gfunc->header,GenericCount++);
+   MethodCount += gfunc->mcnt;
    for (i = 0 ; i < gfunc->mcnt ; i++)
      {
       meth = &gfunc->methods[i];
-      ExpressionData(theEnv)->ExpressionCount += ExpressionSize(meth->actions);
-      MarkNeededItems(theEnv,meth->actions);
-      DefgenericBinaryData(theEnv)->RestrictionCount += meth->restrictionCount;
+      ExpressionCount += ExpressionSize(meth->actions);
+      MarkNeededItems(meth->actions);
+      RestrictionCount += meth->restrictionCount;
       for (j = 0 ; j < meth->restrictionCount ; j++)
         {
          rptr = &meth->restrictions[j];
-         ExpressionData(theEnv)->ExpressionCount += ExpressionSize(rptr->query);
-         MarkNeededItems(theEnv,rptr->query);
-         DefgenericBinaryData(theEnv)->TypeCount += rptr->tcnt;
+         ExpressionCount += ExpressionSize(rptr->query);
+         MarkNeededItems(rptr->query);
+         TypeCount += rptr->tcnt;
         }
      }
   }
@@ -291,17 +292,16 @@ static void MarkDefgenericItems(
   NOTES        : None
  ***************************************************/
 static void BsaveGenericsExpressions(
-  void *theEnv,
   FILE *fp)
   {
    /* ================================================================
       Important to save all expressions for methods before any
       expressions for restrictions, since methods will be stored first
       ================================================================ */
-   DoForAllConstructs(theEnv,BsaveMethodExpressions,DefgenericData(theEnv)->DefgenericModuleIndex,
+   DoForAllConstructs(BsaveMethodExpressions,DefgenericModuleIndex,
                       FALSE,(void *) fp);
 
-   DoForAllConstructs(theEnv,BsaveRestrictionExpressions,DefgenericData(theEnv)->DefgenericModuleIndex,
+   DoForAllConstructs(BsaveRestrictionExpressions,DefgenericModuleIndex,
                       FALSE,(void *) fp);
   }
 
@@ -316,15 +316,14 @@ static void BsaveGenericsExpressions(
   NOTES        : None
  ***************************************************/
 static void BsaveMethodExpressions(
-  void *theEnv,
   struct constructHeader *theDefgeneric,
   void *userBuffer)
   {
    DEFGENERIC *gfunc = (DEFGENERIC *) theDefgeneric;
-   long i;
+   register unsigned i;
 
    for (i = 0 ; i < gfunc->mcnt ; i++)
-     BsaveExpression(theEnv,gfunc->methods[i].actions,(FILE *) userBuffer);
+     BsaveExpression(gfunc->methods[i].actions,(FILE *) userBuffer);
   }
 
 /***************************************************
@@ -340,19 +339,18 @@ static void BsaveMethodExpressions(
   NOTES        : None
  ***************************************************/
 static void BsaveRestrictionExpressions(
-  void *theEnv,
   struct constructHeader *theDefgeneric,
   void *userBuffer)
   {
    DEFGENERIC *gfunc = (DEFGENERIC *) theDefgeneric;
-   long i,j;
+   register unsigned i,j;
    DEFMETHOD *meth;
 
    for (i = 0 ; i < gfunc->mcnt ; i++)
      {
       meth = &gfunc->methods[i];
       for (j = 0 ; j < meth->restrictionCount ; j++)
-        BsaveExpression(theEnv,meth->restrictions[j].query,(FILE *) userBuffer);
+        BsaveExpression(meth->restrictions[j].query,(FILE *) userBuffer);
      }
   }
 
@@ -367,18 +365,17 @@ static void BsaveRestrictionExpressions(
   NOTES        : None
  ***********************************************************/
 static void BsaveStorageGenerics(
-  void *theEnv,
   FILE *fp)
   {
-   size_t space;
+   unsigned long space;
 
    space = sizeof(long) * 5;
-   GenWrite((void *) &space,sizeof(size_t),fp);
-   GenWrite((void *) &DefgenericBinaryData(theEnv)->ModuleCount,sizeof(long),fp);
-   GenWrite((void *) &DefgenericBinaryData(theEnv)->GenericCount,sizeof(long),fp);
-   GenWrite((void *) &DefgenericBinaryData(theEnv)->MethodCount,sizeof(long),fp);
-   GenWrite((void *) &DefgenericBinaryData(theEnv)->RestrictionCount,sizeof(long),fp);
-   GenWrite((void *) &DefgenericBinaryData(theEnv)->TypeCount,sizeof(long),fp);
+   GenWrite((void *) &space,(unsigned long) sizeof(long),fp);
+   GenWrite((void *) &ModuleCount,(unsigned long) sizeof(long),fp);
+   GenWrite((void *) &GenericCount,(unsigned long) sizeof(long),fp);
+   GenWrite((void *) &MethodCount,(unsigned long) sizeof(long),fp);
+   GenWrite((void *) &RestrictionCount,(unsigned long) sizeof(long),fp);
+   GenWrite((void *) &TypeCount,(unsigned long) sizeof(long),fp);
   }
 
 /****************************************************************************************
@@ -396,78 +393,80 @@ static void BsaveStorageGenerics(
   NOTES        : None
  ****************************************************************************************/
 static void BsaveGenerics(
-  void *theEnv,
   FILE *fp)
   {
    struct defmodule *theModule;
    DEFGENERIC_MODULE *theModuleItem;
-   size_t space;
+   unsigned long space;
    BSAVE_DEFGENERIC_MODULE dummy_generic_module;
 
    /* =====================================================================
       Space is: Sum over all structures(sizeof(structure) * structure-cnt))
       ===================================================================== */
-   space = ((unsigned long) DefgenericBinaryData(theEnv)->ModuleCount * sizeof(BSAVE_DEFGENERIC_MODULE)) +
-           ((unsigned long) DefgenericBinaryData(theEnv)->GenericCount * sizeof(BSAVE_GENERIC)) +
-           ((unsigned long) DefgenericBinaryData(theEnv)->MethodCount * sizeof(BSAVE_METHOD)) +
-           ((unsigned long) DefgenericBinaryData(theEnv)->RestrictionCount * sizeof(BSAVE_RESTRICTION)) +
-           ((unsigned long) DefgenericBinaryData(theEnv)->TypeCount * sizeof(unsigned long));
+   space = ((unsigned long) ModuleCount * (unsigned long) sizeof(BSAVE_DEFGENERIC_MODULE)) +
+           ((unsigned long) GenericCount * (unsigned long) sizeof(BSAVE_GENERIC)) +
+           ((unsigned long) MethodCount * (unsigned long) sizeof(BSAVE_METHOD)) +
+           ((unsigned long) RestrictionCount * (unsigned long) sizeof(BSAVE_RESTRICTION)) +
+           ((unsigned long) TypeCount * (unsigned long) sizeof(unsigned long));
 
    /* ================================================================
       Write out the total amount of space required:  modules,headers,
       methods, restrictions, types
       ================================================================ */
-   GenWrite((void *) &space,sizeof(size_t),fp);
+   GenWrite((void *) &space,(unsigned long) sizeof(unsigned long),fp);
 
    /* ======================================
       Write out the generic function modules
       ====================================== */
-   DefgenericBinaryData(theEnv)->GenericCount = 0L;
-   theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,NULL);
+   GenericCount = 0L;
+   theModule = (struct defmodule *) GetNextDefmodule(NULL);
    while (theModule != NULL)
      {
       theModuleItem = (DEFGENERIC_MODULE *)
-                      GetModuleItem(theEnv,theModule,FindModuleItem(theEnv,"defgeneric")->moduleIndex);
+                      GetModuleItem(theModule,FindModuleItem("defgeneric")->moduleIndex);
       AssignBsaveDefmdlItemHdrVals(&dummy_generic_module.header,
                                            &theModuleItem->header);
       GenWrite((void *) &dummy_generic_module,
-               sizeof(BSAVE_DEFGENERIC_MODULE),fp);
-      theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,(void *) theModule);
+               (unsigned long) sizeof(BSAVE_DEFGENERIC_MODULE),fp);
+      theModule = (struct defmodule *) GetNextDefmodule((void *) theModule);
      }
 
 
    /* ======================================
       Write out the generic function headers
       ====================================== */
-   DefgenericBinaryData(theEnv)->MethodCount = 0L;
-   DoForAllConstructs(theEnv,BsaveDefgenericHeader,DefgenericData(theEnv)->DefgenericModuleIndex,
+   MethodCount = 0L;
+   DoForAllConstructs(BsaveDefgenericHeader,DefgenericModuleIndex,
                       FALSE,(void *) fp);
 
    /* =====================
       Write out the methods
       ===================== */
-   DefgenericBinaryData(theEnv)->RestrictionCount = 0L;
-   DoForAllConstructs(theEnv,BsaveMethods,DefgenericData(theEnv)->DefgenericModuleIndex,
+   RestrictionCount = 0L;
+   DoForAllConstructs(BsaveMethods,DefgenericModuleIndex,
                       FALSE,(void *) fp);
 
    /* =================================
       Write out the method restrictions
       ================================= */
-   DefgenericBinaryData(theEnv)->TypeCount = 0L;
-   DoForAllConstructs(theEnv,BsaveMethodRestrictions,DefgenericData(theEnv)->DefgenericModuleIndex,
+   TypeCount = 0L;
+   DoForAllConstructs(BsaveMethodRestrictions,DefgenericModuleIndex,
                       FALSE,(void *) fp);
 
    /* =============================================================
       Finally, write out the type lists for the method restrictions
       ============================================================= */
-   DoForAllConstructs(theEnv,BsaveRestrictionTypes,DefgenericData(theEnv)->DefgenericModuleIndex,
+   DoForAllConstructs(BsaveRestrictionTypes,DefgenericModuleIndex,
                       FALSE,(void *) fp);
 
-   RestoreBloadCount(theEnv,&DefgenericBinaryData(theEnv)->ModuleCount);
-   RestoreBloadCount(theEnv,&DefgenericBinaryData(theEnv)->GenericCount);
-   RestoreBloadCount(theEnv,&DefgenericBinaryData(theEnv)->MethodCount);
-   RestoreBloadCount(theEnv,&DefgenericBinaryData(theEnv)->RestrictionCount);
-   RestoreBloadCount(theEnv,&DefgenericBinaryData(theEnv)->TypeCount);
+   if (Bloaded())
+     {
+      RestoreBloadCount(&ModuleCount);
+      RestoreBloadCount(&GenericCount);
+      RestoreBloadCount(&MethodCount);
+      RestoreBloadCount(&RestrictionCount);
+      RestoreBloadCount(&TypeCount);
+     }
   }
 
 /***************************************************
@@ -480,7 +479,6 @@ static void BsaveGenerics(
   NOTES        : None
  ***************************************************/
 static void BsaveDefgenericHeader(
-  void *theEnv,
   struct constructHeader *theDefgeneric,
   void *userBuffer)
   {
@@ -491,8 +489,8 @@ static void BsaveDefgenericHeader(
    dummy_generic.mcnt = gfunc->mcnt;
    if (gfunc->methods != NULL)
      {
-      dummy_generic.methods = DefgenericBinaryData(theEnv)->MethodCount;
-      DefgenericBinaryData(theEnv)->MethodCount += (long) gfunc->mcnt;
+      dummy_generic.methods = MethodCount;
+      MethodCount += gfunc->mcnt;
      }
    else
      dummy_generic.methods = -1L;
@@ -509,14 +507,13 @@ static void BsaveDefgenericHeader(
   NOTES        : None
  ***************************************************/
 static void BsaveMethods(
-  void *theEnv,
   struct constructHeader *theDefgeneric,
   void *userBuffer)
   {
    DEFGENERIC *gfunc = (DEFGENERIC *) theDefgeneric;
    DEFMETHOD *meth;
    BSAVE_METHOD dummy_method;
-   long i;
+   register unsigned i;
 
    for (i = 0 ; i < gfunc->mcnt ; i++)
      {
@@ -529,19 +526,19 @@ static void BsaveMethods(
       dummy_method.system = meth->system;
       if (meth->restrictions != NULL)
         {
-         dummy_method.restrictions = DefgenericBinaryData(theEnv)->RestrictionCount;
-         DefgenericBinaryData(theEnv)->RestrictionCount += meth->restrictionCount;
+         dummy_method.restrictions = RestrictionCount;
+         RestrictionCount += meth->restrictionCount;
         }
       else
         dummy_method.restrictions = -1L;
       if (meth->actions != NULL)
         {
-         dummy_method.actions = ExpressionData(theEnv)->ExpressionCount;
-         ExpressionData(theEnv)->ExpressionCount += ExpressionSize(meth->actions);
+         dummy_method.actions = ExpressionCount;
+         ExpressionCount += ExpressionSize(meth->actions);
         }
       else
         dummy_method.actions = -1L;
-      GenWrite((void *) &dummy_method,sizeof(BSAVE_METHOD),(FILE *) userBuffer);
+      GenWrite((void *) &dummy_method,(unsigned long) sizeof(BSAVE_METHOD),(FILE *) userBuffer);
      }
   }
 
@@ -555,14 +552,13 @@ static void BsaveMethods(
   NOTES        : None
  ******************************************************/
 static void BsaveMethodRestrictions(
-  void *theEnv,
   struct constructHeader *theDefgeneric,
   void *userBuffer)
   {
    DEFGENERIC *gfunc = (DEFGENERIC *) theDefgeneric;
    BSAVE_RESTRICTION dummy_restriction;
    RESTRICTION *rptr;
-   short i,j;
+   register unsigned i,j;
 
    for (i = 0 ; i < gfunc->mcnt ; i++)
      {
@@ -572,20 +568,20 @@ static void BsaveMethodRestrictions(
          dummy_restriction.tcnt = rptr->tcnt;
          if (rptr->types != NULL)
            {
-            dummy_restriction.types = DefgenericBinaryData(theEnv)->TypeCount;
-            DefgenericBinaryData(theEnv)->TypeCount += rptr->tcnt;
+            dummy_restriction.types = TypeCount;
+            TypeCount += rptr->tcnt;
            }
          else
            dummy_restriction.types = -1L;
          if (rptr->query != NULL)
            {
-            dummy_restriction.query = ExpressionData(theEnv)->ExpressionCount;
-            ExpressionData(theEnv)->ExpressionCount += ExpressionSize(rptr->query);
+            dummy_restriction.query = ExpressionCount;
+            ExpressionCount += ExpressionSize(rptr->query);
            }
          else
            dummy_restriction.query = -1L;
          GenWrite((void *) &dummy_restriction,
-                  sizeof(BSAVE_RESTRICTION),(FILE *) userBuffer);
+                  (unsigned long) sizeof(BSAVE_RESTRICTION),(FILE *) userBuffer);
         }
      }
   }
@@ -599,21 +595,14 @@ static void BsaveMethodRestrictions(
   SIDE EFFECTS : Defgeneric methods' restrictions' types saved
   NOTES        : None
  *************************************************************/
-#if WIN_BTC
-#pragma argsused
-#endif
 static void BsaveRestrictionTypes(
-  void *theEnv,
   struct constructHeader *theDefgeneric,
   void *userBuffer)
   {
    DEFGENERIC *gfunc = (DEFGENERIC *) theDefgeneric;
    long dummy_type;
    RESTRICTION *rptr;
-   short i,j,k;
-#if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
-#endif
+   register unsigned i,j,k;
 
    for (i = 0 ; i < gfunc->mcnt ; i++)
      {
@@ -627,7 +616,7 @@ static void BsaveRestrictionTypes(
 #else
             dummy_type = (long) ((INTEGER_HN *) rptr->types[k])->contents;
 #endif
-            GenWrite(&dummy_type,sizeof(long),(FILE *) userBuffer);
+            GenWrite(&dummy_type,(unsigned long) sizeof(long),(FILE *) userBuffer);
            }
         }
      }
@@ -645,53 +634,52 @@ static void BsaveRestrictionTypes(
   NOTES        : This routine makes no attempt to reset any pointers
                    within the structures
  ***********************************************************************/
-static void BloadStorageGenerics(
-  void *theEnv)
+static void BloadStorageGenerics()
   {
-   size_t space;
+   unsigned long space;
    long counts[5];
 
-   GenReadBinary(theEnv,(void *) &space,sizeof(size_t));
+   GenRead((void *) &space,(unsigned long) sizeof(unsigned long));
    if (space == 0L)
      return;
-   GenReadBinary(theEnv,(void *) counts,space);
-   DefgenericBinaryData(theEnv)->ModuleCount = counts[0];
-   DefgenericBinaryData(theEnv)->GenericCount = counts[1];
-   DefgenericBinaryData(theEnv)->MethodCount = counts[2];
-   DefgenericBinaryData(theEnv)->RestrictionCount = counts[3];
-   DefgenericBinaryData(theEnv)->TypeCount = counts[4];
-   if (DefgenericBinaryData(theEnv)->ModuleCount != 0L)
+   GenRead((void *) counts,space);
+   ModuleCount = counts[0];
+   GenericCount = counts[1];
+   MethodCount = counts[2];
+   RestrictionCount = counts[3];
+   TypeCount = counts[4];
+   if (ModuleCount != 0L)
      {
-      space = (sizeof(DEFGENERIC_MODULE) * DefgenericBinaryData(theEnv)->ModuleCount);
-      DefgenericBinaryData(theEnv)->ModuleArray = (DEFGENERIC_MODULE *) genalloc(theEnv,space);
+      space = (unsigned long) (sizeof(DEFGENERIC_MODULE) * ModuleCount);
+      ModuleArray = (DEFGENERIC_MODULE *) genlongalloc(space);
      }
    else
      return;
-   if (DefgenericBinaryData(theEnv)->GenericCount != 0L)
+   if (GenericCount != 0L)
      {
-      space = (sizeof(DEFGENERIC) * DefgenericBinaryData(theEnv)->GenericCount);
-      DefgenericBinaryData(theEnv)->DefgenericArray = (DEFGENERIC *) genalloc(theEnv,space);
+      space = (unsigned long) (sizeof(DEFGENERIC) * GenericCount);
+      defgenericArray = (DEFGENERIC *) genlongalloc(space);
      }
    else
      return;
-   if (DefgenericBinaryData(theEnv)->MethodCount != 0L)
+   if (MethodCount != 0L)
      {
-      space = (sizeof(DEFMETHOD) * DefgenericBinaryData(theEnv)->MethodCount);
-      DefgenericBinaryData(theEnv)->MethodArray = (DEFMETHOD *) genalloc(theEnv,space);
+      space = (unsigned long) (sizeof(DEFMETHOD) * MethodCount);
+      methodArray = (DEFMETHOD *) genlongalloc(space);
      }
    else
      return;
-   if (DefgenericBinaryData(theEnv)->RestrictionCount != 0L)
+   if (RestrictionCount != 0L)
      {
-      space = (sizeof(RESTRICTION) * DefgenericBinaryData(theEnv)->RestrictionCount);
-      DefgenericBinaryData(theEnv)->RestrictionArray = (RESTRICTION *) genalloc(theEnv,space);
+      space = (unsigned long) (sizeof(RESTRICTION) * RestrictionCount);
+      restrictionArray = (RESTRICTION *) genlongalloc(space);
      }
    else
      return;
-   if (DefgenericBinaryData(theEnv)->TypeCount != 0L)
+   if (TypeCount != 0L)
      {
-      space = (sizeof(void *) * DefgenericBinaryData(theEnv)->TypeCount);
-      DefgenericBinaryData(theEnv)->TypeArray = (void * *) genalloc(theEnv,space);
+      space = (unsigned long) (sizeof(void *) * TypeCount);
+      typeArray = (void * *) genlongalloc(space);
      }
   }
 
@@ -711,40 +699,37 @@ static void BloadStorageGenerics(
   SIDE EFFECTS : Pointers reset from array indices
   NOTES        : Assumes all loading is finished
  ********************************************************************/
-static void BloadGenerics(
-  void *theEnv)
+static void BloadGenerics()
   {
-   size_t space;
+   unsigned long space;
 
-   GenReadBinary(theEnv,(void *) &space,sizeof(size_t));
-   if (DefgenericBinaryData(theEnv)->ModuleCount == 0L)
+   GenRead((void *) &space,(unsigned long) sizeof(unsigned long));
+   if (ModuleCount == 0L)
      return;
-   BloadandRefresh(theEnv,DefgenericBinaryData(theEnv)->ModuleCount,sizeof(BSAVE_DEFGENERIC_MODULE),UpdateGenericModule);
-   if (DefgenericBinaryData(theEnv)->GenericCount == 0L)
+   BloadandRefresh(ModuleCount,(unsigned) sizeof(BSAVE_DEFGENERIC_MODULE),UpdateGenericModule);
+   if (GenericCount == 0L)
      return;
-   BloadandRefresh(theEnv,DefgenericBinaryData(theEnv)->GenericCount,sizeof(BSAVE_GENERIC),UpdateGeneric);
-   BloadandRefresh(theEnv,DefgenericBinaryData(theEnv)->MethodCount,sizeof(BSAVE_METHOD),UpdateMethod);
-   BloadandRefresh(theEnv,DefgenericBinaryData(theEnv)->RestrictionCount,sizeof(BSAVE_RESTRICTION),UpdateRestriction);
-   BloadandRefresh(theEnv,DefgenericBinaryData(theEnv)->TypeCount,sizeof(long),UpdateType);
+   BloadandRefresh(GenericCount,(unsigned) sizeof(BSAVE_GENERIC),UpdateGeneric);
+   BloadandRefresh(MethodCount,(unsigned) sizeof(BSAVE_METHOD),UpdateMethod);
+   BloadandRefresh(RestrictionCount,(unsigned) sizeof(BSAVE_RESTRICTION),UpdateRestriction);
+   BloadandRefresh(TypeCount,(unsigned) sizeof(long),UpdateType);
   }
 
 /*********************************************
   Bload update routines for generic structures
  *********************************************/
 static void UpdateGenericModule(
-  void *theEnv,
   void *buf,
   long obji)
   {
    BSAVE_DEFGENERIC_MODULE *bdptr;
 
    bdptr = (BSAVE_DEFGENERIC_MODULE *) buf;
-   UpdateDefmoduleItemHeader(theEnv,&bdptr->header,&DefgenericBinaryData(theEnv)->ModuleArray[obji].header,
-                             (int) sizeof(DEFGENERIC),(void *) DefgenericBinaryData(theEnv)->DefgenericArray);
+   UpdateDefmoduleItemHeader(&bdptr->header,&ModuleArray[obji].header,
+                             (int) sizeof(DEFGENERIC),(void *) defgenericArray);
   }
 
 static void UpdateGeneric(
-  void *theEnv,
   void *buf,
   long obji)
   {
@@ -752,75 +737,72 @@ static void UpdateGeneric(
    DEFGENERIC *gp;
 
    bgp = (BSAVE_GENERIC *) buf;
-   gp = (DEFGENERIC *) &DefgenericBinaryData(theEnv)->DefgenericArray[obji];
+   gp = (DEFGENERIC *) &defgenericArray[obji];
 
-   UpdateConstructHeader(theEnv,&bgp->header,&gp->header,
-                         (int) sizeof(DEFGENERIC_MODULE),(void *) DefgenericBinaryData(theEnv)->ModuleArray,
-                         (int) sizeof(DEFGENERIC),(void *) DefgenericBinaryData(theEnv)->DefgenericArray);
-   DefgenericBinaryData(theEnv)->DefgenericArray[obji].busy = 0;
+   UpdateConstructHeader(&bgp->header,&gp->header,
+                         (int) sizeof(DEFGENERIC_MODULE),(void *) ModuleArray,
+                         (int) sizeof(DEFGENERIC),(void *) defgenericArray);
+   defgenericArray[obji].busy = 0;
 #if DEBUGGING_FUNCTIONS
-   DefgenericBinaryData(theEnv)->DefgenericArray[obji].trace = DefgenericData(theEnv)->WatchGenerics;
+   defgenericArray[obji].trace = WatchGenerics;
 #endif
-   DefgenericBinaryData(theEnv)->DefgenericArray[obji].methods = MethodPointer(bgp->methods);
-   DefgenericBinaryData(theEnv)->DefgenericArray[obji].mcnt = bgp->mcnt;
-   DefgenericBinaryData(theEnv)->DefgenericArray[obji].new_index = 0;
+   defgenericArray[obji].methods = MethodPointer(bgp->methods);
+   defgenericArray[obji].mcnt = bgp->mcnt;
+   defgenericArray[obji].new_index = 0;
   }
 
 static void UpdateMethod(
-  void *theEnv,
   void *buf,
   long obji)
   {
    BSAVE_METHOD *bmth;
 
    bmth = (BSAVE_METHOD *) buf;
-   DefgenericBinaryData(theEnv)->MethodArray[obji].index = bmth->index;
-   DefgenericBinaryData(theEnv)->MethodArray[obji].busy = 0;
+   methodArray[obji].index = bmth->index;
+   methodArray[obji].busy = 0;
 #if DEBUGGING_FUNCTIONS
-   DefgenericBinaryData(theEnv)->MethodArray[obji].trace = DefgenericData(theEnv)->WatchMethods;
+   methodArray[obji].trace = WatchMethods;
 #endif
-   DefgenericBinaryData(theEnv)->MethodArray[obji].restrictionCount = bmth->restrictionCount;
-   DefgenericBinaryData(theEnv)->MethodArray[obji].minRestrictions = bmth->minRestrictions;
-   DefgenericBinaryData(theEnv)->MethodArray[obji].maxRestrictions = bmth->maxRestrictions;
-   DefgenericBinaryData(theEnv)->MethodArray[obji].localVarCount = bmth->localVarCount;
-   DefgenericBinaryData(theEnv)->MethodArray[obji].system = bmth->system;
-   DefgenericBinaryData(theEnv)->MethodArray[obji].restrictions = RestrictionPointer(bmth->restrictions);
-   DefgenericBinaryData(theEnv)->MethodArray[obji].actions = ExpressionPointer(bmth->actions);
-   DefgenericBinaryData(theEnv)->MethodArray[obji].ppForm = NULL;
-   DefgenericBinaryData(theEnv)->MethodArray[obji].usrData = NULL;
+   methodArray[obji].restrictionCount = bmth->restrictionCount;
+   methodArray[obji].minRestrictions = bmth->minRestrictions;
+   methodArray[obji].maxRestrictions = bmth->maxRestrictions;
+   methodArray[obji].localVarCount = bmth->localVarCount;
+   methodArray[obji].system = bmth->system;
+   methodArray[obji].restrictions = RestrictionPointer(bmth->restrictions);
+   methodArray[obji].actions = ExpressionPointer(bmth->actions);
+   methodArray[obji].ppForm = NULL;
+   methodArray[obji].usrData = NULL;
   }
 
 static void UpdateRestriction(
-  void *theEnv,
   void *buf,
   long obji)
   {
    BSAVE_RESTRICTION *brp;
 
    brp = (BSAVE_RESTRICTION *) buf;
-   DefgenericBinaryData(theEnv)->RestrictionArray[obji].tcnt = brp->tcnt;
-   DefgenericBinaryData(theEnv)->RestrictionArray[obji].types = TypePointer(brp->types);
-   DefgenericBinaryData(theEnv)->RestrictionArray[obji].query = ExpressionPointer(brp->query);
+   restrictionArray[obji].tcnt = brp->tcnt;
+   restrictionArray[obji].types = TypePointer(brp->types);
+   restrictionArray[obji].query = ExpressionPointer(brp->query);
   }
 
 static void UpdateType(
-  void *theEnv,
   void *buf,
   long obji)
   {
 #if OBJECT_SYSTEM
-   DefgenericBinaryData(theEnv)->TypeArray[obji] = (void *) DefclassPointer(* (long *) buf);
+   typeArray[obji] = (void *) DefclassPointer(* (long *) buf);
 #else
    if ((* (long *) buf) > (long) INSTANCE_TYPE_CODE)
      {
-      PrintWarningID(theEnv,"GENRCBIN",1,FALSE);
-      EnvPrintRouter(theEnv,WWARNING,"COOL not installed!  User-defined class\n");
-      EnvPrintRouter(theEnv,WWARNING,"  in method restriction substituted with OBJECT.\n");
-      DefgenericBinaryData(theEnv)->TypeArray[obji] = (void *) EnvAddLong(theEnv,(long long) OBJECT_TYPE_CODE);
+      PrintWarningID("GENRCBIN",1,FALSE);
+      PrintRouter(WWARNING,"COOL not installed!  User-defined class\n");
+      PrintRouter(WWARNING,"  in method restriction substituted with OBJECT.\n");
+      typeArray[obji] = (void *) AddLong((long) OBJECT_TYPE_CODE);
      }
    else
-     DefgenericBinaryData(theEnv)->TypeArray[obji] = (void *) EnvAddLong(theEnv,* (long *) buf);
-   IncrementIntegerCount((INTEGER_HN *) DefgenericBinaryData(theEnv)->TypeArray[obji]);
+     typeArray[obji] = (void *) AddLong(* (long *) buf);
+   IncrementIntegerCount((INTEGER_HN *) typeArray[obji]);
 #endif
   }
 
@@ -834,54 +816,62 @@ static void UpdateType(
   SIDE EFFECTS : Memory cleared
   NOTES        : Generic function name symbol counts decremented
  ***************************************************************/
-static void ClearBloadGenerics(
-  void *theEnv)
+static void ClearBloadGenerics()
   {
    register long i;
-   size_t space;
+   unsigned long space;
 
-   space = (sizeof(DEFGENERIC_MODULE) * DefgenericBinaryData(theEnv)->ModuleCount);
+   space = (unsigned long) (sizeof(DEFGENERIC_MODULE) * ModuleCount);
    if (space == 0L)
      return;
-   genfree(theEnv,(void *) DefgenericBinaryData(theEnv)->ModuleArray,space);
-   DefgenericBinaryData(theEnv)->ModuleArray = NULL;
-   DefgenericBinaryData(theEnv)->ModuleCount = 0L;
+   genlongfree((void *) ModuleArray,space);
+   ModuleArray = NULL;
+   ModuleCount = 0L;
 
-   for (i = 0 ; i < DefgenericBinaryData(theEnv)->GenericCount ; i++)
-     UnmarkConstructHeader(theEnv,&DefgenericBinaryData(theEnv)->DefgenericArray[i].header);
+   for (i = 0 ; i < GenericCount ; i++)
+     UnmarkConstructHeader(&defgenericArray[i].header);
 
-   space = (sizeof(DEFGENERIC) * DefgenericBinaryData(theEnv)->GenericCount);
+   space = (unsigned long) (sizeof(DEFGENERIC) * GenericCount);
    if (space == 0L)
      return;
-   genfree(theEnv,(void *) DefgenericBinaryData(theEnv)->DefgenericArray,space);
-   DefgenericBinaryData(theEnv)->DefgenericArray = NULL;
-   DefgenericBinaryData(theEnv)->GenericCount = 0L;
+   genlongfree((void *) defgenericArray,space);
+   defgenericArray = NULL;
+   GenericCount = 0L;
 
-   space = (sizeof(DEFMETHOD) * DefgenericBinaryData(theEnv)->MethodCount);
+   space = (unsigned long) (sizeof(DEFMETHOD) * MethodCount);
    if (space == 0L)
      return;
-   genfree(theEnv,(void *) DefgenericBinaryData(theEnv)->MethodArray,space);
-   DefgenericBinaryData(theEnv)->MethodArray = NULL;
-   DefgenericBinaryData(theEnv)->MethodCount = 0L;
+   genlongfree((void *) methodArray,space);
+   methodArray = NULL;
+   MethodCount = 0L;
 
-   space = (sizeof(RESTRICTION) * DefgenericBinaryData(theEnv)->RestrictionCount);
+   space = (unsigned long) (sizeof(RESTRICTION) * RestrictionCount);
    if (space == 0L)
      return;
-   genfree(theEnv,(void *) DefgenericBinaryData(theEnv)->RestrictionArray,space);
-   DefgenericBinaryData(theEnv)->RestrictionArray = NULL;
-   DefgenericBinaryData(theEnv)->RestrictionCount = 0L;
+   genlongfree((void *) restrictionArray,space);
+   restrictionArray = NULL;
+   RestrictionCount = 0L;
 
 #if ! OBJECT_SYSTEM
-   for (i = 0 ; i < DefgenericBinaryData(theEnv)->TypeCount ; i++)
-     DecrementIntegerCount(theEnv,(INTEGER_HN *) DefgenericBinaryData(theEnv)->TypeArray[i]);
+   for (i = 0 ; i < TypeCount ; i++)
+     DecrementIntegerCount((INTEGER_HN *) typeArray[i]);
 #endif
-   space = (sizeof(void *) * DefgenericBinaryData(theEnv)->TypeCount);
+   space = (unsigned long) (sizeof(void *) * TypeCount);
    if (space == 0L)
      return;
-   genfree(theEnv,(void *) DefgenericBinaryData(theEnv)->TypeArray,space);
-   DefgenericBinaryData(theEnv)->TypeArray = NULL;
-   DefgenericBinaryData(theEnv)->TypeCount = 0L;
+   genlongfree((void *) typeArray,space);
+   typeArray = NULL;
+   TypeCount = 0L;
   }
 
 #endif
 
+/***************************************************
+  NAME         :
+  DESCRIPTION  :
+  INPUTS       :
+  RETURNS      :
+  SIDE EFFECTS :
+  NOTES        :
+ ***************************************************/
+

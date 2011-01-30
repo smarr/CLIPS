@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.24  06/05/06            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*                 PRETTY PRINT MODULE                 */
    /*******************************************************/
@@ -15,13 +15,13 @@
 /*                                                           */
 /* Contributing Programmer(s):                               */
 /*      Chris Culbert                                        */
-/*      Brian Dantes                                         */
+/*      Brian Donnell                                        */
 /*                                                           */
 /* Revision History:                                         */
 /*                                                           */
-/*      6.24: Corrected code generating compilation          */
-/*            warnings.                                      */
-/*                                                           */
+/* Who               |     Date    | Description              */
+/* ------------------+-------------+------------------------  */
+/* M.Giordano        | 23-Mar-2000 | Mods made for TLS        */
 /*************************************************************/
 
 #define _PPRINT_SOURCE_
@@ -32,69 +32,48 @@
 #include <ctype.h>
 
 #include "setup.h"
-
 #include "constant.h"
-#include "envrnmnt.h"
 #include "memalloc.h"
-#include "sysdep.h"
 #include "utility.h"
 
 #include "pprint.h"
 
 /***************************************/
-/* LOCAL INTERNAL FUNCTION DEFINITIONS */
+/* LOCAL INTERNAL VARIABLE DEFINITIONS */
 /***************************************/
 
-   static void                    DeallocatePrettyPrintData(void *);
-
-/****************************************************/
-/* InitializePrettyPrintData: Allocates environment */
-/*    data for pretty print routines.               */
-/****************************************************/
-globle void InitializePrettyPrintData(
-  void *theEnv)
-  {
-   AllocateEnvironmentData(theEnv,PRETTY_PRINT_DATA,sizeof(struct prettyPrintData),DeallocatePrettyPrintData);
-   
-   PrettyPrintData(theEnv)->PPBufferEnabled = TRUE;
-  }
-
-/******************************************************/
-/* DeallocatePrettyPrintData: Deallocates environment */
-/*    data for the pretty print routines.             */
-/******************************************************/
-static void DeallocatePrettyPrintData(
-  void *theEnv)
-  {
-   if (PrettyPrintData(theEnv)->PrettyPrintBuffer != NULL) 
-     { rm(theEnv,PrettyPrintData(theEnv)->PrettyPrintBuffer,PrettyPrintData(theEnv)->PPBufferMax); }
-  }
+   Thread static int              PPBufferStatus = OFF;
+   Thread static int              IndentationDepth = 0;
+   Thread static int              PPBufferPos = 0;
+   Thread static int              PPBufferMax = 0;
+   Thread static int              PPBackupOnce = 0;
+   Thread static int              PPBackupTwice = 0;
+   Thread static char            *PrettyPrintBuffer = NULL;
 
 /*******************************************************/
 /* FlushPPBuffer: Resets the pretty print save buffer. */
 /*******************************************************/
-globle void FlushPPBuffer(
-  void *theEnv)
+globle void FlushPPBuffer()
   {
-   if (PrettyPrintData(theEnv)->PrettyPrintBuffer == NULL) return;
-   PrettyPrintData(theEnv)->PPBackupOnce = 0;
-   PrettyPrintData(theEnv)->PPBackupTwice = 0;
-   PrettyPrintData(theEnv)->PPBufferPos = 0;
-   PrettyPrintData(theEnv)->PrettyPrintBuffer[0] = EOS;
+   if (PrettyPrintBuffer == NULL) return;
+   PPBackupOnce = 0;
+   PPBackupTwice = 0;
+   PPBufferPos = 0;
+   PrettyPrintBuffer[0] = EOS;
    return;
   }
 
 /*********************************************************************/
 /* DestroyPPBuffer: Resets and removes the pretty print save buffer. */
 /*********************************************************************/
-globle void DestroyPPBuffer(void *theEnv)
+globle void DestroyPPBuffer()
   {
-   PrettyPrintData(theEnv)->PPBackupOnce = 0;
-   PrettyPrintData(theEnv)->PPBackupTwice = 0;
-   PrettyPrintData(theEnv)->PPBufferPos = 0;
-   if (PrettyPrintData(theEnv)->PrettyPrintBuffer != NULL) rm(theEnv,PrettyPrintData(theEnv)->PrettyPrintBuffer,PrettyPrintData(theEnv)->PPBufferMax);
-   PrettyPrintData(theEnv)->PrettyPrintBuffer = NULL;
-   PrettyPrintData(theEnv)->PPBufferMax = 0;
+   PPBackupOnce = 0;
+   PPBackupTwice = 0;
+   PPBufferPos = 0;
+   if (PrettyPrintBuffer != NULL) rm(PrettyPrintBuffer,PPBufferMax);
+   PrettyPrintBuffer = NULL;
+   PPBufferMax = 0;
   }
 
 /*********************************************/
@@ -102,39 +81,53 @@ globle void DestroyPPBuffer(void *theEnv)
 /*   of the pretty print save buffer.        */
 /*********************************************/
 globle void SavePPBuffer(
-  void *theEnv,
   char *str)
   {
-   size_t increment;
+   long int longSize;
+   int normalSize;
+   int increment;
 
    /*==========================================*/
    /* If the pretty print buffer isn't needed, */
    /* then don't bother writing to it.         */
    /*==========================================*/
 
-   if ((PrettyPrintData(theEnv)->PPBufferStatus == OFF) || (! PrettyPrintData(theEnv)->PPBufferEnabled)) 
-     { return; }
+   if (PPBufferStatus == OFF) return;
 
    /*===============================*/
    /* Determine the increment size. */
    /*===============================*/
 
    increment = 512;
-   if (PrettyPrintData(theEnv)->PPBufferPos > increment)
-     { increment = PrettyPrintData(theEnv)->PPBufferPos * 3; }
+   if (PPBufferPos > increment)
+     {
+      increment = PPBufferPos * 3;
+      if (increment < 0)
+        { increment = 512; }
+     }
+
+   /*==================================================*/
+   /* The pretty print buffer is limited in size to    */
+   /* the maximum size of a signed int. Any characters */
+   /* beyond that number are discarded.                */
+   /*==================================================*/
+
+   normalSize = strlen(str);
+   longSize = (long) normalSize;
+   longSize += (long) PPBufferPos + ((long) increment) + 1L;
+   normalSize += PPBufferPos + increment + 1;
+   if (normalSize != longSize) return;
 
    /*================================================*/
    /* If the pretty print buffer isn't big enough to */
    /* contain the string, then increase its size.    */
    /*================================================*/
 
-   if (strlen(str) + PrettyPrintData(theEnv)->PPBufferPos + 1 >= PrettyPrintData(theEnv)->PPBufferMax)
+   if (((int) strlen(str)) + PPBufferPos + 1 >= PPBufferMax)
      {
-      PrettyPrintData(theEnv)->PrettyPrintBuffer = 
-         (char *) genrealloc(theEnv,PrettyPrintData(theEnv)->PrettyPrintBuffer,
-                                    PrettyPrintData(theEnv)->PPBufferMax,
-                                    PrettyPrintData(theEnv)->PPBufferMax + increment);
-      PrettyPrintData(theEnv)->PPBufferMax += increment;
+      PrettyPrintBuffer = (char *) genrealloc(PrettyPrintBuffer,(unsigned) PPBufferMax,
+                                     (unsigned) PPBufferMax + increment);
+      PPBufferMax += increment;
      }
 
    /*==================================================*/
@@ -142,14 +135,14 @@ globle void SavePPBuffer(
    /* print buffer in case it is necessary to back up. */
    /*==================================================*/
 
-   PrettyPrintData(theEnv)->PPBackupTwice = PrettyPrintData(theEnv)->PPBackupOnce;
-   PrettyPrintData(theEnv)->PPBackupOnce = PrettyPrintData(theEnv)->PPBufferPos;
+   PPBackupTwice = PPBackupOnce;
+   PPBackupOnce = PPBufferPos;
 
    /*=============================================*/
    /* Save the string to the pretty print buffer. */
    /*=============================================*/
 
-   PrettyPrintData(theEnv)->PrettyPrintBuffer = AppendToString(theEnv,str,PrettyPrintData(theEnv)->PrettyPrintBuffer,&PrettyPrintData(theEnv)->PPBufferPos,&PrettyPrintData(theEnv)->PPBufferMax);
+   PrettyPrintBuffer = AppendToString(str,PrettyPrintBuffer,&PPBufferPos,&PPBufferMax);
   }
 
 /***************************************************/
@@ -157,66 +150,55 @@ globle void SavePPBuffer(
 /*   pretty print save buffer. Only capable of     */
 /*   backing up for the two most recent additions. */
 /***************************************************/
-globle void PPBackup(
-  void *theEnv)
+globle void PPBackup()
   {
-   if ((PrettyPrintData(theEnv)->PPBufferStatus == OFF) || 
-       (PrettyPrintData(theEnv)->PrettyPrintBuffer == NULL) ||
-       (! PrettyPrintData(theEnv)->PPBufferEnabled))
-     { return; }
+   if ((PPBufferStatus == OFF) || (PrettyPrintBuffer == NULL)) return;
 
-   PrettyPrintData(theEnv)->PPBufferPos = PrettyPrintData(theEnv)->PPBackupOnce;
-   PrettyPrintData(theEnv)->PPBackupOnce = PrettyPrintData(theEnv)->PPBackupTwice;
-   PrettyPrintData(theEnv)->PrettyPrintBuffer[PrettyPrintData(theEnv)->PPBufferPos] = EOS;
+   PPBufferPos = PPBackupOnce;
+   PPBackupOnce = PPBackupTwice;
+   PrettyPrintBuffer[PPBufferPos] = EOS;
   }
 
 /**************************************************/
 /* CopyPPBuffer: Makes a copy of the pretty print */
 /*   save buffer.                                 */
 /**************************************************/
-globle char *CopyPPBuffer(
-  void *theEnv)
+globle char *CopyPPBuffer()
   {
-   size_t length;
+   int length;
    char *newString;
 
-   length = (1 + strlen(PrettyPrintData(theEnv)->PrettyPrintBuffer)) * (int) sizeof (char);
-   newString = (char *) gm2(theEnv,length);
+   length = (1 + strlen(PrettyPrintBuffer)) * (int) sizeof (char);
+   newString = (char *) gm2(length);
 
-   genstrcpy(newString,PrettyPrintData(theEnv)->PrettyPrintBuffer);
+   strcpy(newString,PrettyPrintBuffer);
    return(newString);
   }
 
 /************************************************************/
 /* GetPPBuffer: Returns a pointer to the PrettyPrintBuffer. */
 /************************************************************/
-globle char *GetPPBuffer(
-  void *theEnv)
+globle char *GetPPBuffer()
   {
-   return(PrettyPrintData(theEnv)->PrettyPrintBuffer);
+   return(PrettyPrintBuffer);
   }
 
 /*******************************************/
 /* PPCRAndIndent: Prints white spaces into */
 /*   the pretty print buffer.              */
 /*******************************************/
-globle void PPCRAndIndent(
-  void *theEnv)
+globle void PPCRAndIndent()
   {
    int i;
    char buffer[120];
 
-   if ((PrettyPrintData(theEnv)->PPBufferStatus == OFF) || 
-       (! PrettyPrintData(theEnv)->PPBufferEnabled))
-     { return; }
-
    buffer[0] = '\n';
 
-   for (i = 1 ; i <= PrettyPrintData(theEnv)->IndentationDepth ; i++)
+   for (i = 1 ; i <= IndentationDepth ; i++)
      { buffer[i] = ' '; }
    buffer[i] = EOS;
 
-   SavePPBuffer(theEnv,buffer);
+   SavePPBuffer(buffer);
   }
 
 /************************************************/
@@ -224,10 +206,9 @@ globle void PPCRAndIndent(
 /*   depth for pretty printing.                 */
 /************************************************/
 globle void IncrementIndentDepth(
-  void *theEnv,
   int value)
   {
-   PrettyPrintData(theEnv)->IndentationDepth += value;
+   IndentationDepth += value;
   }
 
 /************************************************/
@@ -235,10 +216,9 @@ globle void IncrementIndentDepth(
 /*   depth for pretty printing.                 */
 /************************************************/
 globle void DecrementIndentDepth(
-  void *theEnv,
   int value)
   {
-   PrettyPrintData(theEnv)->IndentationDepth -= value;
+   IndentationDepth -= value;
   }
 
 /************************************/
@@ -246,10 +226,9 @@ globle void DecrementIndentDepth(
 /*   depth for pretty printing.     */
 /************************************/
 globle void SetIndentDepth(
-  void *theEnv,
   int value)
   {
-   PrettyPrintData(theEnv)->IndentationDepth = value;
+   IndentationDepth = value;
   }
 
 /******************************************/
@@ -257,42 +236,19 @@ globle void SetIndentDepth(
 /*   flag to boolean value of ON or OFF.  */
 /******************************************/
 globle void SetPPBufferStatus(
-  void *theEnv,
   int value)
   {
-   PrettyPrintData(theEnv)->PPBufferStatus = value;
+   PPBufferStatus = value;
   }
 
 /************************************/
 /* GetPPBufferStatus: Returns value */
 /*   of the PPBufferStatus flag.    */
 /************************************/
-globle int GetPPBufferStatus(
-  void *theEnv)
+globle int GetPPBufferStatus()
   {
-   return(PrettyPrintData(theEnv)->PPBufferStatus);
+   return(PPBufferStatus);
   }
 
-/******************************************/
-/* SetPPBufferEnabled: */
-/******************************************/
-globle int SetPPBufferEnabled(
-  void *theEnv,
-  int value)
-  {
-   int oldValue;
-   
-   oldValue = PrettyPrintData(theEnv)->PPBufferEnabled;
-   PrettyPrintData(theEnv)->PPBufferEnabled = value;
-   return(oldValue);
-  }
 
-/************************************/
-/* GetPPBufferEnabled: */
-/************************************/
-globle int GetPPBufferEnabled(
-  void *theEnv)
-  {
-   return(PrettyPrintData(theEnv)->PPBufferEnabled);
-  }
-
+

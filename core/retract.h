@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.30  10/19/06            */
+   /*             CLIPS Version 6.10  11/15/99            */
    /*                                                     */
    /*                RETRACT HEADER FILE                  */
    /*******************************************************/
@@ -18,14 +18,7 @@
 /*                                                           */
 /* Revision History:                                         */
 /*                                                           */
-/*      6.24: Rule with exists CE has incorrect activation.  */
-/*            DR0867                                         */
-/*                                                           */
-/*      6.30: Added support for hashed alpha memories.       */
-/*                                                           */
-/*            Added additional developer statistics to help  */
-/*            analyze join network performance.              */
-/*                                                           */
+/*      MDT        11/15/99           DR834                  */
 /*************************************************************/
 
 #ifndef _H_retract
@@ -48,22 +41,20 @@
 #define LOCALE extern
 #endif
 
-struct rdriveinfo
-  {
-   struct partialMatch *link;
-   struct joinNode *jlist;
-   struct rdriveinfo *next;
-  };
+LOCALE void                           NetworkRetract(struct patternMatch *);
+LOCALE void                           PosEntryRetract(struct joinNode *,struct alphaMatch *,struct partialMatch *,int,int);
+LOCALE void                           ReturnPartialMatch(struct partialMatch *);
+LOCALE void                           FlushGarbagePartialMatches(void);
+LOCALE void                           NegEntryRetract(struct joinNode *,struct partialMatch *,int);
+LOCALE void                           RetractCheckDriveRetractions(struct alphaMatch *,int);
 
-LOCALE void                           NetworkRetract(void *,struct patternMatch *);
-LOCALE void                           ReturnPartialMatch(void *,struct partialMatch *);
-LOCALE void                           DestroyPartialMatch(void *,struct partialMatch *);
-LOCALE void                           FlushGarbagePartialMatches(void *);
-LOCALE void                           DeletePartialMatches(void *,struct partialMatch *);
-LOCALE void                           PosEntryRetractBeta(void *,struct partialMatch *,struct partialMatch *);
-LOCALE void                           PosEntryRetractAlpha(void *,struct partialMatch *);
+#ifndef _RETRACT_SOURCE_
+   extern Thread struct partialMatch        *GarbagePartialMatches;
+   extern Thread struct alphaMatch          *GarbageAlphaMatches;
+#endif
 
 #endif
 
 
 
+

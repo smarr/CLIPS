@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.20  01/31/02            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*               RULE BUILD HEADER FILE                */
    /*******************************************************/
@@ -45,9 +45,13 @@
 #define LOCALE extern
 #endif
 
-   LOCALE struct joinNode               *ConstructJoins(void *,int,struct lhsParseNode *,int);
+   LOCALE struct joinNode               *ConstructJoins(int,struct lhsParseNode *);
 
 #endif
 
 
 
+
+
+
+

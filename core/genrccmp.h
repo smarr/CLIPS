@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*               CLIPS Version 6.20  01/31/02          */
+   /*               CLIPS Version 6.10  04/09/97          */
    /*                                                     */
    /*                                                     */
    /*******************************************************/
@@ -10,7 +10,7 @@
 /* Purpose: Generic Function Construct Compiler Code         */
 /*                                                           */
 /* Principal Programmer(s):                                  */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Contributing Programmer(s):                               */
 /*                                                           */
@@ -38,9 +38,10 @@
 
 #include "genrcfun.h"
 
-LOCALE void SetupGenericsCompiler(void *);
-LOCALE void PrintGenericFunctionReference(void *,FILE *,DEFGENERIC *,int,int);
-LOCALE void DefgenericCModuleReference(void *,FILE *,int,int,int);
+LOCALE void SetupGenericsCompiler(void);
+LOCALE void PrintGenericFunctionReference(FILE *,DEFGENERIC *,int,int);
+LOCALE void DefgenericCModuleReference(FILE *,int,int,int);
 
 #endif
 
+

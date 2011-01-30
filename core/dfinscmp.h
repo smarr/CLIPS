@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*               CLIPS Version 6.20  01/31/02          */
+   /*               CLIPS Version 6.10  04/09/97          */
    /*                                                     */
    /*                                                     */
    /*******************************************************/
@@ -10,7 +10,7 @@
 /* Purpose: Definstances Construct Compiler Code             */
 /*                                                           */
 /* Principal Programmer(s):                                  */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Contributing Programmer(s):                               */
 /*                                                           */
@@ -38,11 +38,13 @@
 #define LOCALE extern
 #endif
 
-LOCALE void SetupDefinstancesCompiler(void *);
-LOCALE void DefinstancesCModuleReference(void *,FILE *,int,int,int);
+LOCALE void SetupDefinstancesCompiler(void);
+LOCALE void DefinstancesCModuleReference(FILE *,int,int,int);
 
 #endif
 
 #endif
 
 
+
+

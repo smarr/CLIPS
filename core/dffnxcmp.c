@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.20  01/31/02            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*                                                     */
    /*******************************************************/
@@ -10,12 +10,15 @@
 /* Purpose: Generic Function Construct Compiler Code         */
 /*                                                           */
 /* Principal Programmer(s):                                  */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Contributing Programmer(s):                               */
 /*                                                           */
 /* Revision History:                                         */
 /*                                                           */
+/* Who               |     Date    | Description             */
+/* ------------------+-------------+------------------------ */
+/* M.Giordano        | 23-Mar-2000 | Mods made for TLS       */
 /*************************************************************/
 
 /* =========================================
@@ -28,10 +31,21 @@
 #if DEFFUNCTION_CONSTRUCT && CONSTRUCT_COMPILER && (! RUN_TIME)
 
 #include "conscomp.h"
-#include "envrnmnt.h"
 
 #define _DFFNXCMP_SOURCE_
 #include "dffnxcmp.h"
+
+/* =========================================
+   *****************************************
+                   CONSTANTS
+   =========================================
+   ***************************************** */
+
+/* =========================================
+   *****************************************
+               MACROS AND TYPES
+   =========================================
+   ***************************************** */
 
 /* =========================================
    *****************************************
@@ -39,11 +53,18 @@
    =========================================
    ***************************************** */
 
-static void ReadyDeffunctionsForCode(void *);
-static int DeffunctionsToCode(void *,char *,char *,char *,int,FILE *,int,int);
-static void CloseDeffunctionFiles(void *,FILE *,FILE *,int);
-static void DeffunctionModuleToCode(void *,FILE *,struct defmodule *,int,int);
-static void SingleDeffunctionToCode(void *,FILE *,DEFFUNCTION *,int,int,int);
+static void ReadyDeffunctionsForCode(void);
+static int DeffunctionsToCode(char *,int,FILE *,int,int);
+static void CloseDeffunctionFiles(FILE *,FILE *,int);
+static void DeffunctionModuleToCode(FILE *,struct defmodule *,int,int);
+static void SingleDeffunctionToCode(FILE *,DEFFUNCTION *,int,int,int);
+
+/* =========================================
+   *****************************************
+      INTERNALLY VISIBLE GLOBAL VARIABLES
+   =========================================
+   ***************************************** */
+Thread static struct CodeGeneratorItem *DeffunctionCodeItem;
 
 /* =========================================
    *****************************************
@@ -60,10 +81,9 @@ static void SingleDeffunctionToCode(void *,FILE *,DEFFUNCTION *,int,int,int);
   SIDE EFFECTS : Code generator item initialized
   NOTES        : None
  ***************************************************/
-globle void SetupDeffunctionCompiler(
-  void *theEnv)
+globle void SetupDeffunctionCompiler()
   {
-   DeffunctionData(theEnv)->DeffunctionCodeItem = AddCodeGeneratorItem(theEnv,"deffunctions",0,ReadyDeffunctionsForCode,
+   DeffunctionCodeItem = AddCodeGeneratorItem("deffunctions",0,ReadyDeffunctionsForCode,
                                               NULL,DeffunctionsToCode,2);
   }
 
@@ -83,7 +103,6 @@ globle void SetupDeffunctionCompiler(
   NOTES        : None
  ***************************************************/
 globle void PrintDeffunctionReference(
-  void *theEnv,
   FILE *fp,
   DEFFUNCTION *dfPtr,
   int imageID,
@@ -92,7 +111,7 @@ globle void PrintDeffunctionReference(
    if (dfPtr == NULL)
      fprintf(fp,"NULL");
    else
-     fprintf(fp,"&%s%d_%d[%d]",ConstructPrefix(DeffunctionData(theEnv)->DeffunctionCodeItem),imageID,
+     fprintf(fp,"&%s%d_%d[%d]",ConstructPrefix(DeffunctionCodeItem),imageID,
                                (int) ((dfPtr->header.bsaveID / maxIndices) + 1),
                                (int) (dfPtr->header.bsaveID % maxIndices));
   }
@@ -111,14 +130,13 @@ globle void PrintDeffunctionReference(
   NOTES        : None
  ****************************************************/
 globle void DeffunctionCModuleReference(
-  void *theEnv,
   FILE *theFile,
   int count,
   int imageID,
   int maxIndices)
   {
    fprintf(theFile,"MIHS &%s%d_%d[%d]",
-                      ModulePrefix(DeffunctionData(theEnv)->DeffunctionCodeItem),
+                      ModulePrefix(DeffunctionCodeItem),
                       imageID,
                       (count / maxIndices) + 1,
                       (count % maxIndices));
@@ -139,10 +157,9 @@ globle void DeffunctionCModuleReference(
   SIDE EFFECTS : BsaveIndices set
   NOTES        : None
  ***************************************************/
-static void ReadyDeffunctionsForCode(
-  void *theEnv)
+static void ReadyDeffunctionsForCode()
   {
-   MarkConstructBsaveIDs(theEnv,DeffunctionData(theEnv)->DeffunctionModuleIndex);
+   MarkConstructBsaveIDs(DeffunctionModuleIndex);
   }
 
 /*******************************************************
@@ -161,10 +178,7 @@ static void ReadyDeffunctionsForCode(
   NOTES        : None
  *******************************************************/
 static int DeffunctionsToCode(
-  void *theEnv,
   char *fileName,
-  char *pathName,
-  char *fileNameBuffer,
   int fileID,
   FILE *headerFP,
   int imageID,
@@ -186,56 +200,56 @@ static int DeffunctionsToCode(
       Loop through all the modules and all the deffunctions writing
       their C code representation to the file as they are traversed
       ============================================================= */
-   theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,NULL);
+   theModule = (struct defmodule *) GetNextDefmodule(NULL);
 
    while (theModule != NULL)
      {
-      EnvSetCurrentModule(theEnv,(void *) theModule);
+      SetCurrentModule((void *) theModule);
 
-      moduleFile = OpenFileIfNeeded(theEnv,moduleFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
+      moduleFile = OpenFileIfNeeded(moduleFile,fileName,fileID,imageID,&fileCount,
                                     moduleArrayVersion,headerFP,
-                                    "DEFFUNCTION_MODULE",ModulePrefix(DeffunctionData(theEnv)->DeffunctionCodeItem),
+                                    "DEFFUNCTION_MODULE",ModulePrefix(DeffunctionCodeItem),
                                     FALSE,NULL);
 
       if (moduleFile == NULL)
         {
-         CloseDeffunctionFiles(theEnv,moduleFile,deffunctionFile,maxIndices);
+         CloseDeffunctionFiles(moduleFile,deffunctionFile,maxIndices);
          return(0);
         }
 
-      DeffunctionModuleToCode(theEnv,moduleFile,theModule,imageID,maxIndices);
-      moduleFile = CloseFileIfNeeded(theEnv,moduleFile,&moduleArrayCount,&moduleArrayVersion,
+      DeffunctionModuleToCode(moduleFile,theModule,imageID,maxIndices);
+      moduleFile = CloseFileIfNeeded(moduleFile,&moduleArrayCount,&moduleArrayVersion,
                                      maxIndices,NULL,NULL);
 
-      theDeffunction = (DEFFUNCTION *) EnvGetNextDeffunction(theEnv,NULL);
+      theDeffunction = (DEFFUNCTION *) GetNextDeffunction(NULL);
 
       while (theDeffunction != NULL)
         {
-         deffunctionFile = OpenFileIfNeeded(theEnv,deffunctionFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
+         deffunctionFile = OpenFileIfNeeded(deffunctionFile,fileName,fileID,imageID,&fileCount,
                                             deffunctionArrayVersion,headerFP,
-                                            "DEFFUNCTION",ConstructPrefix(DeffunctionData(theEnv)->DeffunctionCodeItem),
+                                            "DEFFUNCTION",ConstructPrefix(DeffunctionCodeItem),
                                             FALSE,NULL);
          if (deffunctionFile == NULL)
            {
-            CloseDeffunctionFiles(theEnv,moduleFile,deffunctionFile,maxIndices);
+            CloseDeffunctionFiles(moduleFile,deffunctionFile,maxIndices);
             return(0);
            }
 
-         SingleDeffunctionToCode(theEnv,deffunctionFile,theDeffunction,imageID,
+         SingleDeffunctionToCode(deffunctionFile,theDeffunction,imageID,
                                  maxIndices,moduleCount);
          deffunctionArrayCount++;
-         deffunctionFile = CloseFileIfNeeded(theEnv,deffunctionFile,&deffunctionArrayCount,
+         deffunctionFile = CloseFileIfNeeded(deffunctionFile,&deffunctionArrayCount,
                                              &deffunctionArrayVersion,maxIndices,NULL,NULL);
 
-         theDeffunction = (DEFFUNCTION *) EnvGetNextDeffunction(theEnv,theDeffunction);
+         theDeffunction = (DEFFUNCTION *) GetNextDeffunction(theDeffunction);
         }
 
-      theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,theModule);
+      theModule = (struct defmodule *) GetNextDefmodule(theModule);
       moduleCount++;
       moduleArrayCount++;
      }
 
-   CloseDeffunctionFiles(theEnv,moduleFile,deffunctionFile,maxIndices);
+   CloseDeffunctionFiles(moduleFile,deffunctionFile,maxIndices);
 
    return(1);
   }
@@ -253,7 +267,6 @@ static int DeffunctionsToCode(
   NOTES        : None
  ***************************************************/
 static void CloseDeffunctionFiles(
-  void *theEnv,
   FILE *moduleFile,
   FILE *deffunctionFile,
   int maxIndices)
@@ -264,13 +277,13 @@ static void CloseDeffunctionFiles(
    if (deffunctionFile != NULL)
      {
       count = maxIndices;
-      CloseFileIfNeeded(theEnv,deffunctionFile,&count,&arrayVersion,maxIndices,NULL,NULL);
+      CloseFileIfNeeded(deffunctionFile,&count,&arrayVersion,maxIndices,NULL,NULL);
      }
 
    if (moduleFile != NULL)
      {
       count = maxIndices;
-      CloseFileIfNeeded(theEnv,moduleFile,&count,&arrayVersion,maxIndices,NULL,NULL);
+      CloseFileIfNeeded(moduleFile,&count,&arrayVersion,maxIndices,NULL,NULL);
      }
   }
 
@@ -288,15 +301,14 @@ static void CloseDeffunctionFiles(
   NOTES        : None
  ***************************************************/
 static void DeffunctionModuleToCode(
-  void *theEnv,
   FILE *theFile,
   struct defmodule *theModule,
   int imageID,
   int maxIndices)
   {
    fprintf(theFile,"{");
-   ConstructModuleToCode(theEnv,theFile,theModule,imageID,maxIndices,
-                         DeffunctionData(theEnv)->DeffunctionModuleIndex,ConstructPrefix(DeffunctionData(theEnv)->DeffunctionCodeItem));
+   ConstructModuleToCode(theFile,theModule,imageID,maxIndices,
+                         DeffunctionModuleIndex,ConstructPrefix(DeffunctionCodeItem));
    fprintf(theFile,"}");
   }
 
@@ -315,7 +327,6 @@ static void DeffunctionModuleToCode(
   NOTES        : None
  ***************************************************/
 static void SingleDeffunctionToCode(
-  void *theEnv,
   FILE *theFile,
   DEFFUNCTION *theDeffunction,
   int imageID,
@@ -327,15 +338,15 @@ static void SingleDeffunctionToCode(
       ================== */
 
    fprintf(theFile,"{");
-   ConstructHeaderToCode(theEnv,theFile,&theDeffunction->header,imageID,maxIndices,moduleCount,
-                         ModulePrefix(DeffunctionData(theEnv)->DeffunctionCodeItem),
-                         ConstructPrefix(DeffunctionData(theEnv)->DeffunctionCodeItem));
+   ConstructHeaderToCode(theFile,&theDeffunction->header,imageID,maxIndices,moduleCount,
+                         ModulePrefix(DeffunctionCodeItem),
+                         ConstructPrefix(DeffunctionCodeItem));
 
    /* =========================
       Deffunction specific data
       ========================= */
    fprintf(theFile,",0,0,0,");
-   ExpressionToCode(theEnv,theFile,theDeffunction->code);
+   ExpressionToCode(theFile,theDeffunction->code);
    fprintf(theFile,",%d,%d,%d",
            theDeffunction->minNumberOfParameters,
            theDeffunction->maxNumberOfParameters,
@@ -354,3 +365,4 @@ static void SingleDeffunctionToCode(
   SIDE EFFECTS :
   NOTES        :
  ***************************************************/
+

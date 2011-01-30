@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.20  01/31/02            */
+   /*             CLIPS Version 6.10  05/23/96            */
    /*                                                     */
    /*            SORT FUNCTIONS HEADER MODULE             */
    /*******************************************************/
@@ -32,12 +32,16 @@
 #define LOCALE extern
 #endif
 
-   LOCALE void                           SortFunctionDefinitions(void *);
-   LOCALE void                           MergeSort(void *,unsigned long,DATA_OBJECT *,
-                                                   int (*)(void *,DATA_OBJECT *,DATA_OBJECT *));
-   LOCALE void                           SortFunction(void *,DATA_OBJECT *);
+   LOCALE void                           SortFunctionDefinitions(void);
+   LOCALE void                           MergeSort(long,DATA_OBJECT *,
+                                                   int (*)(DATA_OBJECT *,DATA_OBJECT *));
+   LOCALE void                           SortFunction(DATA_OBJECT *);
 
 #endif
 
 
 
+
+
+
+

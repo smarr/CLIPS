@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*               CLIPS Version 6.24  06/05/06          */
+   /*               CLIPS Version 6.10  04/09/97          */
    /*                                                     */
    /*                                                     */
    /*******************************************************/
@@ -10,13 +10,11 @@
 /* Purpose:                                                  */
 /*                                                           */
 /* Principal Programmer(s):                                  */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Contributing Programmer(s):                               */
 /*                                                           */
 /* Revision History:                                         */
-/*                                                           */
-/*      6.24: Renamed BOOLEAN macro type to intBool.         */
 /*                                                           */
 /*************************************************************/
 
@@ -38,15 +36,15 @@
 #endif
 
 #if (! RUN_TIME)
-LOCALE void SetupInstanceMultifieldCommands(void *);
+LOCALE void SetupInstanceMultifieldCommands(void);
 #endif
 
-LOCALE void MVSlotReplaceCommand(void *,DATA_OBJECT *);
-LOCALE void MVSlotInsertCommand(void *,DATA_OBJECT *);
-LOCALE void MVSlotDeleteCommand(void *,DATA_OBJECT *);
-LOCALE intBool DirectMVReplaceCommand(void *);
-LOCALE intBool DirectMVInsertCommand(void *);
-LOCALE intBool DirectMVDeleteCommand(void *);
+LOCALE void MVSlotReplaceCommand(DATA_OBJECT *);
+LOCALE void MVSlotInsertCommand(DATA_OBJECT *);
+LOCALE void MVSlotDeleteCommand(DATA_OBJECT *);
+LOCALE BOOLEAN DirectMVReplaceCommand(void);
+LOCALE BOOLEAN DirectMVInsertCommand(void);
+LOCALE BOOLEAN DirectMVDeleteCommand(void);
 
 #ifndef _INSMULT_SOURCE_
 #endif
@@ -55,3 +53,6 @@ LOCALE intBool DirectMVDeleteCommand(void *);
 
 
 
+
+
+

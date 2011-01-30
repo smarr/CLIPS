@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*               CLIPS Version 6.20  01/31/02          */
+   /*               CLIPS Version 6.10  04/09/97          */
    /*                                                     */
    /*                                                     */
    /*******************************************************/
@@ -10,7 +10,7 @@
 /* Purpose:                                                  */
 /*                                                           */
 /* Principal Programmer(s):                                  */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Contributing Programmer(s):                               */
 /*                                                           */
@@ -37,8 +37,8 @@
 #define LOCALE extern
 #endif
 
-LOCALE EXPRESSION *ParseQueryNoAction(void *,EXPRESSION *,char *);
-LOCALE EXPRESSION *ParseQueryAction(void *,EXPRESSION *,char *);
+LOCALE EXPRESSION *ParseQueryNoAction(EXPRESSION *,char *);
+LOCALE EXPRESSION *ParseQueryAction(EXPRESSION *,char *);
 
 #ifndef _INSQYPSR_SOURCE_
 #endif
@@ -49,3 +49,6 @@ LOCALE EXPRESSION *ParseQueryAction(void *,EXPRESSION *,char *);
 
 
 
+
+
+

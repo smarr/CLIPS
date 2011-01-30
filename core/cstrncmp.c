@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.24  07/01/05            */
+   /*             CLIPS Version 6.10  04/13/98            */
    /*                                                     */
    /*          CONSTRAINT CONSTRUCTS-TO-C MODULE          */
    /*******************************************************/
@@ -14,14 +14,13 @@
 /*      Gary D. Riley                                        */
 /*                                                           */
 /* Contributing Programmer(s):                               */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Revision History:                                         */
 /*                                                           */
-/*      6.24: Added allowed-classes slot facet.              */
-/*                                                           */
-/*            Added environment parameter to GenClose.       */
-/*                                                           */
+/* Who               |     Date    | Description             */
+/* ------------------+-------------+------------------------ */
+/* M.Giordano        | 23-Mar-2000 | Mods made for TLS       */
 /*************************************************************/
 
 #define _CSTRNCMP_SOURCE_
@@ -31,12 +30,9 @@
 #if CONSTRUCT_COMPILER && (! RUN_TIME)
 
 #include "constant.h"
-
-#include "conscomp.h"
-#include "envrnmnt.h"
 #include "memalloc.h"
 #include "router.h"
-#include "sysdep.h"
+#include "conscomp.h"
 
 #include "cstrncmp.h"
 
@@ -46,10 +42,7 @@
 /*   using the constructs-to-c function.       */
 /***********************************************/
 globle int ConstraintsToCode(
-  void *theEnv,
   char *fileName,
-  char *pathName,
-  char *fileNameBuffer,
   int fileID,
   FILE *headerFP,
   int imageID,
@@ -69,7 +62,7 @@ globle int ConstraintsToCode(
 
    for (i = 0 ; i < SIZE_CONSTRAINT_HASH; i++)
      {
-      for (tmpPtr = ConstraintData(theEnv)->ConstraintHashtable[i];
+      for (tmpPtr = ConstraintHashtable[i];
            tmpPtr != NULL;
            tmpPtr = tmpPtr->next)
         { tmpPtr->bsaveIndex = numberOfConstraints++; }
@@ -81,12 +74,12 @@ globle int ConstraintsToCode(
    /* which could be saved, then issue a warning message. */
    /*=====================================================*/
 
-   if ((! EnvGetDynamicConstraintChecking(theEnv)) && (numberOfConstraints != 0))
+   if ((! GetDynamicConstraintChecking()) && (numberOfConstraints != 0))
      {
       numberOfConstraints = 0;
-      PrintWarningID(theEnv,"CSTRNCMP",1,FALSE);
-      EnvPrintRouter(theEnv,WWARNING,"Constraints are not saved with a constructs-to-c image\n");
-      EnvPrintRouter(theEnv,WWARNING,"  when dynamic constraint checking is disabled.\n");
+      PrintWarningID("CSTRNCMP",1,FALSE);
+      PrintRouter(WWARNING,"Constraints are not saved with a constructs-to-c image\n");
+      PrintRouter(WWARNING,"  when dynamic constraint checking is disabled.\n");
      }
 
    if (numberOfConstraints == 0) return(-1);
@@ -102,7 +95,7 @@ globle int ConstraintsToCode(
    /* Create the file. */
    /*==================*/
 
-   if ((fp = NewCFile(theEnv,fileName,pathName,fileNameBuffer,fileID,version,FALSE)) == NULL) return(-1);
+   if ((fp = NewCFile(fileName,fileID,version,FALSE)) == NULL) return(-1);
 
    /*===================*/
    /* List the entries. */
@@ -113,7 +106,7 @@ globle int ConstraintsToCode(
 
    for (i = 0; i < SIZE_CONSTRAINT_HASH; i++)
      {
-      for (tmpPtr = ConstraintData(theEnv)->ConstraintHashtable[i];
+      for (tmpPtr = ConstraintHashtable[i];
            tmpPtr != NULL;
            tmpPtr = tmpPtr->next)
         {
@@ -123,7 +116,7 @@ globle int ConstraintsToCode(
             newHeader = FALSE;
            }
 
-         fprintf(fp,"{%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
+         fprintf(fp,"{%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
                  tmpPtr->anyAllowed,
                  tmpPtr->symbolsAllowed,
                  tmpPtr->stringsAllowed,
@@ -139,24 +132,21 @@ globle int ConstraintsToCode(
                  tmpPtr->stringRestriction,
                  tmpPtr->floatRestriction,
                  tmpPtr->integerRestriction,
-                 tmpPtr->classRestriction,
                  tmpPtr->instanceNameRestriction,
                  tmpPtr->multifieldsAllowed,
                  tmpPtr->singlefieldsAllowed);
 
          fprintf(fp,",0,"); /* bsaveIndex */
 
-         PrintHashedExpressionReference(theEnv,fp,tmpPtr->classList,imageID,maxIndices);
+         PrintHashedExpressionReference(fp,tmpPtr->restrictionList,imageID,maxIndices);
          fprintf(fp,",");
-         PrintHashedExpressionReference(theEnv,fp,tmpPtr->restrictionList,imageID,maxIndices);
+         PrintHashedExpressionReference(fp,tmpPtr->minValue,imageID,maxIndices);
          fprintf(fp,",");
-         PrintHashedExpressionReference(theEnv,fp,tmpPtr->minValue,imageID,maxIndices);
+         PrintHashedExpressionReference(fp,tmpPtr->maxValue,imageID,maxIndices);
          fprintf(fp,",");
-         PrintHashedExpressionReference(theEnv,fp,tmpPtr->maxValue,imageID,maxIndices);
+         PrintHashedExpressionReference(fp,tmpPtr->minFields,imageID,maxIndices);
          fprintf(fp,",");
-         PrintHashedExpressionReference(theEnv,fp,tmpPtr->minFields,imageID,maxIndices);
-         fprintf(fp,",");
-         PrintHashedExpressionReference(theEnv,fp,tmpPtr->maxFields,imageID,maxIndices);
+         PrintHashedExpressionReference(fp,tmpPtr->maxFields,imageID,maxIndices);
 
          /* multifield slot */
 
@@ -182,13 +172,13 @@ globle int ConstraintsToCode(
          if ((count == numberOfConstraints) || (j >= maxIndices))
            {
             fprintf(fp,"}};\n");
-            GenClose(theEnv,fp);
+            fclose(fp);
             j = 0;
             version++;
             arrayVersion++;
             if (count < numberOfConstraints)
               {
-               if ((fp = NewCFile(theEnv,fileName,pathName,fileNameBuffer,1,version,FALSE)) == NULL) return(0);
+               if ((fp = NewCFile(fileName,1,version,FALSE)) == NULL) return(0);
                newHeader = TRUE;
               }
            }
@@ -205,13 +195,12 @@ globle int ConstraintsToCode(
 /*   of a constraint record data structure reference.     */
 /**********************************************************/
 globle void PrintConstraintReference(
-  void *theEnv,
   FILE *fp,
   CONSTRAINT_RECORD *cPtr,
   int imageID,
   int maxIndices)
   {
-   if ((cPtr == NULL) || (! EnvGetDynamicConstraintChecking(theEnv)))
+   if ((cPtr == NULL) || (! GetDynamicConstraintChecking()))
      { fprintf(fp,"NULL"); }
    else fprintf(fp,"&C%d_%d[%d]",imageID,
                                  (int) (cPtr->bsaveIndex / maxIndices) + 1,
@@ -222,3 +211,4 @@ globle void PrintConstraintReference(
 
 
 
+

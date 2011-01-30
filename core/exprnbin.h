@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.20  01/31/02            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*           EXPRESSION BLOAD/BSAVE HEADER FILE        */
    /*******************************************************/
@@ -12,7 +12,7 @@
 /*                                                           */
 /* Principal Programmer(s):                                  */
 /*      Gary D. Riley                                        */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Contributing Programmer(s):                               */
 /*                                                           */
@@ -40,16 +40,21 @@
 #define LOCALE extern
 #endif
 
-#define ExpressionPointer(i) ((struct expr *) (((i) == -1L) ? NULL : &ExpressionData(theEnv)->ExpressionArray[i]))
+#define ExpressionPointer(i) ((struct expr *) (((i) == -1L) ? NULL : &ExpressionArray[i]))
 #define HashedExpressionPointer(i) ExpressionPointer(i)
 
-   LOCALE void                        AllocateExpressions(void *);
-   LOCALE void                        RefreshExpressions(void *);
-   LOCALE void                        ClearBloadedExpressions(void *);
-   LOCALE void                        FindHashedExpressions(void *);
-   LOCALE void                        BsaveHashedExpressions(void *,FILE *);
-   LOCALE void                        BsaveConstructExpressions(void *,FILE *);
-   LOCALE void                        BsaveExpression(void *,struct expr *,FILE *);
+   LOCALE void                        AllocateExpressions(void);
+   LOCALE void                        RefreshExpressions(void);
+   LOCALE void                        ClearBloadedExpressions(void);
+   LOCALE void                        FindHashedExpressions(void);
+   LOCALE void                        BsaveHashedExpressions(FILE *);
+   LOCALE void                        BsaveConstructExpressions(FILE *);
+   LOCALE void                        BsaveExpression(struct expr *,FILE *);
+
+#ifndef _EXPRNBIN_SOURCE_
+   extern Thread struct expr                           *ExpressionArray;
+   extern Thread long int                               ExpressionCount;
+#endif
 
 #endif
 
@@ -59,3 +64,4 @@
 
 
 
+

@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.20  01/31/02            */
+   /*             CLIPS Version 6.10  04/13/98            */
    /*                                                     */
    /*    CONSTRAINT BLOAD/BSAVE/CONSTRUCTS-TO-C HEADER    */
    /*******************************************************/
@@ -44,15 +44,22 @@
 #include <stdio.h>
 #endif
 
-#define ConstraintIndex(theConstraint) (((! EnvGetDynamicConstraintChecking(theEnv)) || (theConstraint == NULL)) ? -1L : ((long) theConstraint->bsaveIndex))
-#define ConstraintPointer(i) (((i) == -1L) ? NULL : (CONSTRAINT_RECORD *) &ConstraintData(theEnv)->ConstraintArray[i])
+#define ConstraintIndex(theConstraint) (((! GetDynamicConstraintChecking()) || (theConstraint == NULL)) ? -1L : ((long) theConstraint->bsaveIndex))
+#define ConstraintPointer(i) (((i) == -1L) ? NULL : (CONSTRAINT_RECORD *) &ConstraintArray[i])
 
 #if BLOAD_AND_BSAVE
-   LOCALE void                           WriteNeededConstraints(void *,FILE *);
+   LOCALE void                           WriteNeededConstraints(FILE *);
 #endif
-   LOCALE void                           ReadNeededConstraints(void *);
-   LOCALE void                           ClearBloadedConstraints(void *);
+   LOCALE void                           ReadNeededConstraints(void);
+   LOCALE void                           ClearBloadedConstraints(void);
+
+#ifndef _CSTRNBIN_SOURCE_
+   extern Thread CONSTRAINT_RECORD *   ConstraintArray;
+#endif
 
 #endif
 
 
+
+
+

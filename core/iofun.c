@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.30  03/02/07            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*                 I/O FUNCTIONS MODULE                */
    /*******************************************************/
@@ -12,46 +12,27 @@
 /*   format, and readline.                                   */
 /*                                                           */
 /* Principal Programmer(s):                                  */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*      Gary D. Riley                                        */
 /*      Bebe Ly                                              */
 /*                                                           */
 /* Contributing Programmer(s):                               */
 /*                                                           */
 /* Revision History:                                         */
-/*      6.24: Added the get-char, set-locale, and            */
-/*            read-number functions.                         */
 /*                                                           */
-/*            Modified printing of floats in the format      */
-/*            function to use the locale from the set-locale */
-/*            function.                                      */
-/*                                                           */
-/*            Moved IllegalLogicalNameMessage function to    */
-/*            argacces.c.                                    */
-/*                                                           */
-/*      6.30: Removed the undocumented use of t in the       */
-/*            printout command to perform the same function  */
-/*            as crlf.                                       */
-/*                                                           */
-/*            Added a+, w+, rb, ab, r+b, w+b, and a+b modes  */
-/*            for the open function.                         */
+/* Who               |     Date    | Description             */
+/* ------------------+-------------+------------------------ */
+/* M.Giordano        | 23-Mar-2000 | Mods made for TLS       */
 /*************************************************************/
 
 #define _IOFUN_SOURCE_
-
-#include "setup.h"
-
-#if IO_FUNCTIONS
-#include <locale.h>
-#include <stdlib.h>
-#include <ctype.h>
-#endif
 
 #include <stdio.h>
 #define _STDIO_INCLUDED_
 #include <string.h>
 
-#include "envrnmnt.h"
+#include "setup.h"
+
 #include "router.h"
 #include "strngrtr.h"
 #include "filertr.h"
@@ -73,78 +54,53 @@
 #define FORMAT_MAX 512
 #define FLAG_MAX    80
 
-/********************/
-/* ENVIRONMENT DATA */
-/********************/
-
-#define IO_FUNCTION_DATA 64
-
-struct IOFunctionData
-  { 
-   void *locale;
-   intBool useFullCRLF;
-  };
-
-#define IOFunctionData(theEnv) ((struct IOFunctionData *) GetEnvironmentData(theEnv,IO_FUNCTION_DATA))
-
 /****************************************/
 /* LOCAL INTERNAL FUNCTION DEFINITIONS  */
 /****************************************/
 
-#if IO_FUNCTIONS
-   static void             ReadTokenFromStdin(void *,struct token *);
-   static char            *ControlStringCheck(void *,int);
-   static char             FindFormatFlag(char *,size_t *,char *,size_t);
-   static char            *PrintFormatFlag(void *,char *,int,int);
-   static char            *FillBuffer(void *,char *,size_t *,size_t *);
-   static void             ReadNumber(void *,char *,struct token *,int);
+#if BASIC_IO
+   static void             ReadTokenFromStdin(struct token *);
+#endif
+#if BASIC_IO || EXT_IO
+   static void             IllegalLogicalNameMessage(char *);
+#endif
+#if EXT_IO
+   static char            *ControlStringCheck(int);
+   static char             FindFormatFlag(char *,int *,char *,int *);
+   static char            *PrintFormatFlag (char *,int,int,int);
+   static char            *FillBuffer(char *,int *,int *);
 #endif
 
+#if ! RUN_TIME
 /**************************************/
 /* IOFunctionDefinitions: Initializes */
 /*   the I/O functions.               */
 /**************************************/
-globle void IOFunctionDefinitions(
-  void *theEnv)
+globle void IOFunctionDefinitions()
   {
-   AllocateEnvironmentData(theEnv,IO_FUNCTION_DATA,sizeof(struct IOFunctionData),NULL);
-
-#if IO_FUNCTIONS
-   IOFunctionData(theEnv)->useFullCRLF = FALSE;
-   IOFunctionData(theEnv)->locale = (SYMBOL_HN *) EnvAddSymbol(theEnv,setlocale(LC_ALL,NULL));
-   IncrementSymbolCount(IOFunctionData(theEnv)->locale);
+#if BASIC_IO
+   DefineFunction2("printout", 'v', PTIF PrintoutFunction, "PrintoutFunction", "1*");
+   DefineFunction2("read",     'u', PTIF ReadFunction,  "ReadFunction", "*1");
+   DefineFunction2("open",     'b', OpenFunction,  "OpenFunction", "23*k");
+   DefineFunction2("close",    'b', CloseFunction, "CloseFunction", "*1");
 #endif
 
-#if ! RUN_TIME
-#if IO_FUNCTIONS
-   EnvDefineFunction2(theEnv,"printout",   'v', PTIEF PrintoutFunction, "PrintoutFunction", "1*");
-   EnvDefineFunction2(theEnv,"read",       'u', PTIEF ReadFunction,  "ReadFunction", "*1");
-   EnvDefineFunction2(theEnv,"open",       'b', OpenFunction,  "OpenFunction", "23*k");
-   EnvDefineFunction2(theEnv,"close",      'b', CloseFunction, "CloseFunction", "*1");
-   EnvDefineFunction2(theEnv,"get-char",   'i', GetCharFunction, "GetCharFunction", "*1");
-   EnvDefineFunction2(theEnv,"put-char",   'v', PTIEF PutCharFunction, "PutCharFunction", "12");
-   EnvDefineFunction2(theEnv,"remove",   'b', RemoveFunction,  "RemoveFunction", "11k");
-   EnvDefineFunction2(theEnv,"rename",   'b', RenameFunction, "RenameFunction", "22k");
-   EnvDefineFunction2(theEnv,"format",   's', PTIEF FormatFunction, "FormatFunction", "2**us");
-   EnvDefineFunction2(theEnv,"readline", 'k', PTIEF ReadlineFunction, "ReadlineFunction", "*1");
-   EnvDefineFunction2(theEnv,"set-locale", 'u', PTIEF SetLocaleFunction,  "SetLocaleFunction", "*1");
-   EnvDefineFunction2(theEnv,"read-number",       'u', PTIEF ReadNumberFunction,  "ReadNumberFunction", "*1");
-#endif
-#else
-#if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
-#endif
+#if EXT_IO
+   DefineFunction2("remove",   'b', RemoveFunction,  "RemoveFunction", "11k");
+   DefineFunction2("rename",   'b', RenameFunction, "RenameFunction", "22k");
+   DefineFunction2("format",   's', PTIF FormatFunction, "FormatFunction", "2**us");
+   DefineFunction2("readline", 'k', PTIF ReadlineFunction, "ReadlineFunction", "*1");
 #endif
   }
+#endif
 
-#if IO_FUNCTIONS
+#if BASIC_IO
 
 /******************************************/
 /* PrintoutFunction: H/L access routine   */
 /*   for the printout function.           */
 /******************************************/
-globle void PrintoutFunction(
-  void *theEnv)
+globle void PrintoutFunction()
   {
    char *dummyid;
    int i, argCount;
@@ -154,18 +110,18 @@ globle void PrintoutFunction(
    /* The printout function requires at least one argument. */
    /*=======================================================*/
 
-   if ((argCount = EnvArgCountCheck(theEnv,"printout",AT_LEAST,1)) == -1) return;
+   if ((argCount = ArgCountCheck("printout",AT_LEAST,1)) == -1) return;
 
    /*=====================================================*/
    /* Get the logical name to which output is to be sent. */
    /*=====================================================*/
 
-   dummyid = GetLogicalName(theEnv,1,"stdout");
+   dummyid = GetLogicalName(1,"stdout");
    if (dummyid == NULL)
      {
-      IllegalLogicalNameMessage(theEnv,"printout");
-      SetHaltExecution(theEnv,TRUE);
-      SetEvaluationError(theEnv,TRUE);
+      IllegalLogicalNameMessage("printout");
+      SetHaltExecution(TRUE);
+      SetEvaluationError(TRUE);
       return;
      }
 
@@ -173,11 +129,9 @@ globle void PrintoutFunction(
    /* Determine if any router recognizes the output destination. */
    /*============================================================*/
 
-   if (strcmp(dummyid,"nil") == 0)
-     { return; }
-   else if (QueryRouters(theEnv,dummyid) == FALSE)
+   if (QueryRouters(dummyid) == FALSE)
      {
-      UnrecognizedRouterMessage(theEnv,dummyid);
+      UnrecognizedRouterMessage(dummyid);
       return;
      }
 
@@ -187,69 +141,41 @@ globle void PrintoutFunction(
 
    for (i = 2; i <= argCount; i++)
      {
-      EnvRtnUnknown(theEnv,i,&theArgument);
-      if (EvaluationData(theEnv)->HaltExecution) break;
+      RtnUnknown(i,&theArgument);
+      if (HaltExecution) break;
 
       switch(GetType(theArgument))
         {
          case SYMBOL:
            if (strcmp(DOToString(theArgument),"crlf") == 0)
-             {    
-              if (IOFunctionData(theEnv)->useFullCRLF)
-                { EnvPrintRouter(theEnv,dummyid,"\r\n"); }
-              else
-                { EnvPrintRouter(theEnv,dummyid,"\n"); }
-             }
+             { PrintRouter(dummyid,"\n"); }
            else if (strcmp(DOToString(theArgument),"tab") == 0)
-             { EnvPrintRouter(theEnv,dummyid,"\t"); }
+             { PrintRouter(dummyid,"\t"); }
            else if (strcmp(DOToString(theArgument),"vtab") == 0)
-             { EnvPrintRouter(theEnv,dummyid,"\v"); }
+             { PrintRouter(dummyid,"\v"); }
            else if (strcmp(DOToString(theArgument),"ff") == 0)
-             { EnvPrintRouter(theEnv,dummyid,"\f"); }
-             /*
+             { PrintRouter(dummyid,"\f"); }
            else if (strcmp(DOToString(theArgument),"t") == 0)
-             { 
-              if (IOFunctionData(theEnv)->useFullCRLF)
-                { EnvPrintRouter(theEnv,dummyid,"\r\n"); }
-              else
-                { EnvPrintRouter(theEnv,dummyid,"\n"); }
-             }
-             */
+             { PrintRouter(dummyid,"\n"); }
            else
-             { EnvPrintRouter(theEnv,dummyid,DOToString(theArgument)); }
+             { PrintRouter(dummyid,DOToString(theArgument)); }
            break;
 
          case STRING:
-           EnvPrintRouter(theEnv,dummyid,DOToString(theArgument));
+           PrintRouter(dummyid,DOToString(theArgument));
            break;
 
          default:
-           PrintDataObject(theEnv,dummyid,&theArgument);
+           PrintDataObject(dummyid,&theArgument);
            break;
         }
      }
-  }
-
-/*****************************************************/
-/* SetFullCRLF: Set the flag which indicates whether */
-/*   crlf is treated just as '\n' or '\r\n'.         */
-/*****************************************************/
-globle intBool SetFullCRLF(
-  void *theEnv,
-  intBool value)
-  {
-   intBool oldValue = IOFunctionData(theEnv)->useFullCRLF;
-   
-   IOFunctionData(theEnv)->useFullCRLF = value;
-   
-   return(oldValue);
   }
 
 /*************************************************************/
 /* ReadFunction: H/L access routine for the read function.   */
 /*************************************************************/
 globle void ReadFunction(
-  void *theEnv,
   DATA_OBJECT_PTR returnValue)
   {
    struct token theToken;
@@ -260,10 +186,10 @@ globle void ReadFunction(
    /* Check for an appropriate number of arguments. */
    /*===============================================*/
 
-   if ((numberOfArguments = EnvArgCountCheck(theEnv,"read",NO_MORE_THAN,1)) == -1)
+   if ((numberOfArguments = ArgCountCheck("read",NO_MORE_THAN,1)) == -1)
      {
       returnValue->type = STRING;
-      returnValue->value = (void *) EnvAddSymbol(theEnv,"*** READ ERROR ***");
+      returnValue->value = (void *) AddSymbol("*** READ ERROR ***");
       return;
      }
 
@@ -275,14 +201,14 @@ globle void ReadFunction(
      { logicalName = "stdin"; }
    else if (numberOfArguments == 1)
      {
-      logicalName = GetLogicalName(theEnv,1,"stdin");
+      logicalName = GetLogicalName(1,"stdin");
       if (logicalName == NULL)
         {
-         IllegalLogicalNameMessage(theEnv,"read");
-         SetHaltExecution(theEnv,TRUE);
-         SetEvaluationError(theEnv,TRUE);
+         IllegalLogicalNameMessage("read");
+         SetHaltExecution(TRUE);
+         SetEvaluationError(TRUE);
          returnValue->type = STRING;
-         returnValue->value = (void *) EnvAddSymbol(theEnv,"*** READ ERROR ***");
+         returnValue->value = (void *) AddSymbol("*** READ ERROR ***");
          return;
         }
      }
@@ -291,13 +217,13 @@ globle void ReadFunction(
    /* Check to see that the logical name exists. */
    /*============================================*/
 
-   if (QueryRouters(theEnv,logicalName) == FALSE)
+   if (QueryRouters(logicalName) == FALSE)
      {
-      UnrecognizedRouterMessage(theEnv,logicalName);
-      SetHaltExecution(theEnv,TRUE);
-      SetEvaluationError(theEnv,TRUE);
+      UnrecognizedRouterMessage(logicalName);
+      SetHaltExecution(TRUE);
+      SetEvaluationError(TRUE);
       returnValue->type = STRING;
-      returnValue->value = (void *) EnvAddSymbol(theEnv,"*** READ ERROR ***");
+      returnValue->value = (void *) AddSymbol("*** READ ERROR ***");
       return;
      }
 
@@ -307,12 +233,11 @@ globle void ReadFunction(
    /*=======================================*/
 
    if (strcmp(logicalName,"stdin") == 0)
-     { ReadTokenFromStdin(theEnv,&theToken); }
+     { ReadTokenFromStdin(&theToken); }
    else
-     { GetToken(theEnv,logicalName,&theToken); }
+     { GetToken(logicalName,&theToken); }
 
-   RouterData(theEnv)->CommandBufferInputCount = 0;
-   RouterData(theEnv)->AwaitingInput = FALSE;
+   CommandBufferInputCount = -1;
 
    /*====================================================*/
    /* Copy the token to the return value data structure. */
@@ -328,17 +253,17 @@ globle void ReadFunction(
    else if (theToken.type == STOP)
      {
       returnValue->type = SYMBOL;
-      returnValue->value = (void *) EnvAddSymbol(theEnv,"EOF");
+      returnValue->value = (void *) AddSymbol("EOF");
      }
    else if (theToken.type == UNKNOWN_VALUE)
      {
       returnValue->type = STRING;
-      returnValue->value = (void *) EnvAddSymbol(theEnv,"*** READ ERROR ***");
+      returnValue->value = (void *) AddSymbol("*** READ ERROR ***");
      }
    else
      {
       returnValue->type = STRING;
-      returnValue->value = (void *) EnvAddSymbol(theEnv,theToken.printForm);
+      returnValue->value = (void *) AddSymbol(theToken.printForm);
      }
 
    return;
@@ -349,11 +274,10 @@ globle void ReadFunction(
 /*   function to read a token from standard input.      */
 /********************************************************/
 static void ReadTokenFromStdin(
-  void *theEnv,
   struct token *theToken)
   {
    char *inputString;
-   size_t inputStringSize;
+   int inputStringSize;
    int inchar;
 
    /*=============================================*/
@@ -369,10 +293,8 @@ static void ReadTokenFromStdin(
       /*===========================================*/
 
       inputString = NULL;
-      RouterData(theEnv)->CommandBufferInputCount = 0;
-      RouterData(theEnv)->AwaitingInput = TRUE;
-      inputStringSize = 0;
-      inchar = EnvGetcRouter(theEnv,"stdin");
+      inputStringSize = CommandBufferInputCount = 0;
+      inchar = GetcRouter("stdin");
 
       /*========================================================*/
       /* Continue reading characters until a carriage return is */
@@ -383,11 +305,11 @@ static void ReadTokenFromStdin(
       /*========================================================*/
 
       while ((inchar != '\n') && (inchar != '\r') && (inchar != EOF) &&
-             (! GetHaltExecution(theEnv)))
+             (! GetHaltExecution()))
         {
-         inputString = ExpandStringWithChar(theEnv,inchar,inputString,&RouterData(theEnv)->CommandBufferInputCount,
+         inputString = ExpandStringWithChar(inchar,inputString,&CommandBufferInputCount,
                                             &inputStringSize,inputStringSize + 80);
-         inchar = EnvGetcRouter(theEnv,"stdin");
+         inchar = GetcRouter("stdin");
         }
 
       /*==================================================*/
@@ -396,20 +318,20 @@ static void ReadTokenFromStdin(
       /* contained in the string.                         */
       /*==================================================*/
 
-      OpenStringSource(theEnv,"read",inputString,0);
-      GetToken(theEnv,"read",theToken);
-      CloseStringSource(theEnv,"read");
-      if (inputStringSize > 0) rm(theEnv,inputString,inputStringSize);
+      OpenStringSource("read",inputString,0);
+      GetToken("read",theToken);
+      CloseStringSource("read");
+      if (inputStringSize > 0) rm(inputString,inputStringSize);
 
       /*===========================================*/
       /* Pressing control-c (or comparable action) */
       /* aborts the read function.                 */
       /*===========================================*/
 
-      if (GetHaltExecution(theEnv))
+      if (GetHaltExecution())
         {
          theToken->type = STRING;
-         theToken->value = (void *) EnvAddSymbol(theEnv,"*** READ ERROR ***");
+         theToken->value = (void *) AddSymbol("*** READ ERROR ***");
         }
 
       /*====================================================*/
@@ -422,7 +344,7 @@ static void ReadTokenFromStdin(
       if ((theToken->type == STOP) && (inchar == EOF))
         {
          theToken->type = SYMBOL;
-         theToken->value = (void *) EnvAddSymbol(theEnv,"EOF");
+         theToken->value = (void *) AddSymbol("EOF");
         }
      }
   }
@@ -430,8 +352,7 @@ static void ReadTokenFromStdin(
 /*************************************************************/
 /* OpenFunction: H/L access routine for the open function.   */
 /*************************************************************/
-globle int OpenFunction(
-  void *theEnv)
+globle int OpenFunction()
   {
    int numberOfArguments;
    char *fileName, *logicalName, *accessMode = NULL;
@@ -441,25 +362,25 @@ globle int OpenFunction(
    /* Check for a valid number of arguments. */
    /*========================================*/
 
-   if ((numberOfArguments = EnvArgRangeCheck(theEnv,"open",2,3)) == -1) return(0);
+   if ((numberOfArguments = ArgRangeCheck("open",2,3)) == -1) return(0);
 
    /*====================*/
    /* Get the file name. */
    /*====================*/
 
-   if ((fileName = GetFileName(theEnv,"open",1)) == NULL) return(0);
+   if ((fileName = GetFileName("open",1)) == NULL) return(0);
 
    /*=======================================*/
    /* Get the logical name to be associated */
    /* with the opened file.                 */
    /*=======================================*/
 
-   logicalName = GetLogicalName(theEnv,2,NULL);
+   logicalName = GetLogicalName(2,NULL);
    if (logicalName == NULL)
      {
-      SetHaltExecution(theEnv,TRUE);
-      SetEvaluationError(theEnv,TRUE);
-      IllegalLogicalNameMessage(theEnv,"open");
+      SetHaltExecution(TRUE);
+      SetEvaluationError(TRUE);
+      IllegalLogicalNameMessage("open");
       return(0);
      }
 
@@ -468,14 +389,14 @@ globle int OpenFunction(
    /* is already in use.               */
    /*==================================*/
 
-   if (FindFile(theEnv,logicalName))
+   if (FindFile(logicalName))
      {
-      SetHaltExecution(theEnv,TRUE);
-      SetEvaluationError(theEnv,TRUE);
-      PrintErrorID(theEnv,"IOFUN",2,FALSE);
-      EnvPrintRouter(theEnv,WERROR,"Logical name ");
-      EnvPrintRouter(theEnv,WERROR,logicalName);
-      EnvPrintRouter(theEnv,WERROR," already in use.\n");
+      SetHaltExecution(TRUE);
+      SetEvaluationError(TRUE);
+      PrintErrorID("IOFUN",2,FALSE);
+      PrintRouter(WERROR,"Logical name ");
+      PrintRouter(WERROR,logicalName);
+      PrintRouter(WERROR," already in use.\n");
       return(0);
      }
 
@@ -487,7 +408,7 @@ globle int OpenFunction(
      { accessMode = "r"; }
    else if (numberOfArguments == 3)
      {
-      if (EnvArgTypeCheck(theEnv,"open",3,STRING,&theArgument) == FALSE) return(0);
+      if (ArgTypeCheck("open",3,STRING,&theArgument) == FALSE) return(0);
       accessMode = DOToString(theArgument);
      }
 
@@ -496,21 +417,14 @@ globle int OpenFunction(
    /*=====================================*/
 
    if ((strcmp(accessMode,"r") != 0) &&
+       (strcmp(accessMode,"r+") != 0) &&
        (strcmp(accessMode,"w") != 0) &&
        (strcmp(accessMode,"a") != 0) &&
-       (strcmp(accessMode,"r+") != 0) &&
-       (strcmp(accessMode,"w+") != 0) &&
-       (strcmp(accessMode,"a+") != 0) &&
-       (strcmp(accessMode,"rb") != 0) &&
-       (strcmp(accessMode,"wb") != 0) &&
-       (strcmp(accessMode,"ab") != 0) &&
-       (strcmp(accessMode,"r+b") != 0) &&
-       (strcmp(accessMode,"w+b") != 0) &&
-       (strcmp(accessMode,"a+b") != 0))
+       (strcmp(accessMode,"wb") != 0))
      {
-      SetHaltExecution(theEnv,TRUE);
-      SetEvaluationError(theEnv,TRUE);
-      ExpectedTypeError1(theEnv,"open",3,"string with value \"r\", \"w\", \"a\", \"r+\", \"w+\", \"rb\", \"wb\", \"ab\", \"r+b\", or \"w+b\"");
+      SetHaltExecution(TRUE);
+      SetEvaluationError(TRUE);
+      ExpectedTypeError1("open",3,"string with value \"r\", \"r+\", \"w\", \"wb\", or \"a\"");
       return(0);
      }
 
@@ -520,14 +434,13 @@ globle int OpenFunction(
    /* file was opened successfully, otherwise FALSE. */
    /*================================================*/
 
-   return(OpenAFile(theEnv,fileName,accessMode,logicalName));
+   return(OpenAFile(fileName,accessMode,logicalName));
   }
 
 /***************************************************************/
 /* CloseFunction: H/L access routine for the close function.   */
 /***************************************************************/
-globle int CloseFunction(
-  void *theEnv)
+globle int CloseFunction()
   {
    int numberOfArguments;
    char *logicalName;
@@ -536,7 +449,7 @@ globle int CloseFunction(
    /* Check for valid number of arguments. */
    /*======================================*/
 
-   if ((numberOfArguments = EnvArgCountCheck(theEnv,"close",NO_MORE_THAN,1)) == -1) return(0);
+   if ((numberOfArguments = ArgCountCheck("close",NO_MORE_THAN,1)) == -1) return(0);
 
    /*=====================================================*/
    /* If no arguments are specified, then close all files */
@@ -544,18 +457,18 @@ globle int CloseFunction(
    /* files were closed successfully, otherwise FALSE.    */
    /*=====================================================*/
 
-   if (numberOfArguments == 0) return(CloseAllFiles(theEnv));
+   if (numberOfArguments == 0) return(CloseAllFiles());
 
    /*================================*/
    /* Get the logical name argument. */
    /*================================*/
 
-   logicalName = GetLogicalName(theEnv,1,NULL);
+   logicalName = GetLogicalName(1,NULL);
    if (logicalName == NULL)
      {
-      IllegalLogicalNameMessage(theEnv,"close");
-      SetHaltExecution(theEnv,TRUE);
-      SetEvaluationError(theEnv,TRUE);
+      IllegalLogicalNameMessage("close");
+      SetHaltExecution(TRUE);
+      SetEvaluationError(TRUE);
       return(0);
      }
 
@@ -565,118 +478,19 @@ globle int CloseFunction(
    /* otherwise false.                                       */
    /*========================================================*/
 
-   return(CloseFile(theEnv,logicalName));
+   return(CloseFile(logicalName));
   }
 
-/***************************************/
-/* GetCharFunction: H/L access routine */
-/*   for the get-char function.        */
-/***************************************/
-globle int GetCharFunction(
-  void *theEnv)
-  {
-   int numberOfArguments;
-   char *logicalName;
 
-   if ((numberOfArguments = EnvArgCountCheck(theEnv,"get-char",NO_MORE_THAN,1)) == -1)
-     { return(-1); }
+#endif
 
-   if (numberOfArguments == 0 )
-     { logicalName = "stdin"; }
-   else
-     {
-      logicalName = GetLogicalName(theEnv,1,"stdin");
-      if (logicalName == NULL)
-        {
-         IllegalLogicalNameMessage(theEnv,"get-char");
-         SetHaltExecution(theEnv,TRUE);
-         SetEvaluationError(theEnv,TRUE);
-         return(-1);
-        }
-     }
-
-   if (QueryRouters(theEnv,logicalName) == FALSE)
-     {
-      UnrecognizedRouterMessage(theEnv,logicalName);
-      SetHaltExecution(theEnv,TRUE);
-      SetEvaluationError(theEnv,TRUE);
-      return(-1);
-     }
-
-   return(EnvGetcRouter(theEnv,logicalName));
-  }
-
-/***************************************/
-/* PutCharFunction: H/L access routine */
-/*   for the put-char function.        */
-/***************************************/
-globle void PutCharFunction(
-  void *theEnv)
-  {
-   int numberOfArguments;
-   char *logicalName;
-   DATA_OBJECT theValue;
-   long long theChar;
-   FILE *theFile;
-
-   if ((numberOfArguments = EnvArgRangeCheck(theEnv,"put-char",1,2)) == -1)
-     { return; }
-     
-   /*=======================*/
-   /* Get the logical name. */
-   /*=======================*/
-   
-   if (numberOfArguments == 1)
-     { logicalName = "stdout"; }
-   else
-     {
-      logicalName = GetLogicalName(theEnv,1,"stdout");
-      if (logicalName == NULL)
-        {
-         IllegalLogicalNameMessage(theEnv,"put-char");
-         SetHaltExecution(theEnv,TRUE);
-         SetEvaluationError(theEnv,TRUE);
-         return;
-        }
-     }
-
-   if (QueryRouters(theEnv,logicalName) == FALSE)
-     {
-      UnrecognizedRouterMessage(theEnv,logicalName);
-      SetHaltExecution(theEnv,TRUE);
-      SetEvaluationError(theEnv,TRUE);
-      return;
-     }
-
-   /*===========================*/
-   /* Get the character to put. */
-   /*===========================*/
-   
-   if (numberOfArguments == 1)
-     { if (EnvArgTypeCheck(theEnv,"put-char",1,INTEGER,&theValue) == FALSE) return; }
-   else
-     { if (EnvArgTypeCheck(theEnv,"put-char",2,INTEGER,&theValue) == FALSE) return; }
-     
-   theChar = DOToLong(theValue);
-   
-   /*===================================================*/
-   /* If the "fast load" option is being used, then the */
-   /* logical name is actually a pointer to a file and  */
-   /* we can bypass the router and directly output the  */
-   /* value.                                            */
-   /*===================================================*/
-      
-   theFile = FindFptr(theEnv,logicalName);
-   if (theFile != NULL)
-     { putc((int) theChar,theFile); }
-  }
+#if EXT_IO
 
 /****************************************/
 /* RemoveFunction: H/L access routine   */
 /*   for the remove function.           */
 /****************************************/
-globle int RemoveFunction(
-  void *theEnv)
+globle int RemoveFunction()
   {
    char *theFileName;
 
@@ -684,13 +498,13 @@ globle int RemoveFunction(
    /* Check for valid number of arguments. */
    /*======================================*/
 
-   if (EnvArgCountCheck(theEnv,"remove",EXACTLY,1) == -1) return(FALSE);
+   if (ArgCountCheck("remove",EXACTLY,1) == -1) return(FALSE);
 
    /*====================*/
    /* Get the file name. */
    /*====================*/
 
-   if ((theFileName = GetFileName(theEnv,"remove",1)) == NULL) return(FALSE);
+   if ((theFileName = GetFileName("remove",1)) == NULL) return(FALSE);
 
    /*==============================================*/
    /* Remove the file. Return TRUE if the file was */
@@ -704,8 +518,7 @@ globle int RemoveFunction(
 /* RenameFunction: H/L access routine   */
 /*   for the rename function.           */
 /****************************************/
-globle int RenameFunction(
-  void *theEnv)
+globle int RenameFunction()
   {
    char *oldFileName, *newFileName;
 
@@ -713,14 +526,14 @@ globle int RenameFunction(
    /* Check for a valid number of arguments. */
    /*========================================*/
 
-   if (EnvArgCountCheck(theEnv,"rename",EXACTLY,2) == -1) return(FALSE);
+   if (ArgCountCheck("rename",EXACTLY,2) == -1) return(FALSE);
 
    /*===========================*/
    /* Check for the file names. */
    /*===========================*/
 
-   if ((oldFileName = GetFileName(theEnv,"rename",1)) == NULL) return(FALSE);
-   if ((newFileName = GetFileName(theEnv,"rename",2)) == NULL) return(FALSE);
+   if ((oldFileName = GetFileName("rename",1)) == NULL) return(FALSE);
+   if ((newFileName = GetFileName("rename",2)) == NULL) return(FALSE);
 
    /*==============================================*/
    /* Rename the file. Return TRUE if the file was */
@@ -734,53 +547,52 @@ globle int RenameFunction(
 /* FormatFunction: H/L access routine   */
 /*   for the format function.           */
 /****************************************/
-globle void *FormatFunction(
-  void *theEnv)
+globle void *FormatFunction()
   {
-   int argCount;
-   size_t start_pos;
+   int argCount, start_pos;
    char *formatString, *logicalName;
    char formatFlagType;
    int  f_cur_arg = 3;
-   size_t form_pos = 0;
+   int form_pos = 0;
+   char buffer[FORMAT_MAX];
    char percentBuffer[FLAG_MAX];
    char *fstr = NULL;
-   size_t fmaxm = 0;
-   size_t fpos = 0;
+   int fmax = 0, fpos = 0;
    void *hptr;
+   int longFound;
    char *theString;
 
    /*======================================*/
    /* Set default return value for errors. */
    /*======================================*/
 
-   hptr = EnvAddSymbol(theEnv,"");
+   hptr = AddSymbol("");
 
    /*=========================================*/
    /* Format requires at least two arguments: */
    /* a logical name and a format string.     */
    /*=========================================*/
 
-   if ((argCount = EnvArgCountCheck(theEnv,"format",AT_LEAST,2)) == -1)
+   if ((argCount = ArgCountCheck("format",AT_LEAST,2)) == -1)
      { return(hptr); }
 
    /*========================================*/
    /* First argument must be a logical name. */
    /*========================================*/
 
-   if ((logicalName = GetLogicalName(theEnv,1,"stdout")) == NULL)
+   if ((logicalName = GetLogicalName(1,"stdout")) == NULL)
      {
-      IllegalLogicalNameMessage(theEnv,"format");
-      SetHaltExecution(theEnv,TRUE);
-      SetEvaluationError(theEnv,TRUE);
+      IllegalLogicalNameMessage("format");
+      SetHaltExecution(TRUE);
+      SetEvaluationError(TRUE);
       return(hptr);
      }
 
    if (strcmp(logicalName,"nil") == 0)
      { /* do nothing */ }
-   else if (QueryRouters(theEnv,logicalName) == FALSE)
+   else if (QueryRouters(logicalName) == FALSE)
      {
-      UnrecognizedRouterMessage(theEnv,logicalName);
+      UnrecognizedRouterMessage(logicalName);
       return(hptr);
      }
 
@@ -790,13 +602,15 @@ globle void *FormatFunction(
    /* present in the argument list.                       */
    /*=====================================================*/
 
-   if ((formatString = ControlStringCheck(theEnv,argCount)) == NULL)
+   if ((formatString = ControlStringCheck (argCount)) == NULL)
      { return (hptr); }
 
-   /*========================================*/
-   /* Search the format string, printing the */
-   /* format flags as they are encountered.  */
-   /*========================================*/
+   /*==============================================*/
+   /* Locate a string of 80 character for scanning */
+   /* sub_string from control_string               */
+   /*==============================================*/
+
+   /* Scanning and print the format */
 
    while (formatString[form_pos] != '\0')
      {
@@ -804,28 +618,43 @@ globle void *FormatFunction(
         {
          start_pos = form_pos;
          while ((formatString[form_pos] != '%') &&
-                (formatString[form_pos] != '\0'))
+                (formatString[form_pos] != '\0') &&
+                ((form_pos - start_pos) < FLAG_MAX))
            { form_pos++; }
-         fstr = AppendNToString(theEnv,&formatString[start_pos],fstr,form_pos-start_pos,&fpos,&fmaxm);
+         fstr = AppendNToString(&formatString[start_pos],fstr,form_pos-start_pos,&fpos,&fmax);
         }
       else
         {
-		 form_pos++;
-         formatFlagType = FindFormatFlag(formatString,&form_pos,percentBuffer,FLAG_MAX);
+         start_pos = form_pos;
+         form_pos++;
+         formatFlagType = FindFormatFlag(formatString,&form_pos,buffer,&longFound);
          if (formatFlagType != ' ')
            {
-            if ((theString = PrintFormatFlag(theEnv,percentBuffer,f_cur_arg,formatFlagType)) == NULL)
+            strncpy(percentBuffer,&formatString[start_pos],
+                    (CLIPS_STD_SIZE) form_pos-start_pos);
+            percentBuffer[form_pos-start_pos] = EOS;
+            if ((! longFound) &&
+                ((formatFlagType == 'd') || (formatFlagType == 'o') ||
+                 (formatFlagType == 'u') || (formatFlagType == 'x')))
               {
-               if (fstr != NULL) rm(theEnv,fstr,fmaxm);
+               longFound = TRUE;
+               percentBuffer[(form_pos-start_pos) - 1] = 'l';
+               percentBuffer[form_pos-start_pos] = formatFlagType;
+               percentBuffer[(form_pos-start_pos) + 1] = EOS;
+              }
+
+            if ((theString = PrintFormatFlag(percentBuffer,f_cur_arg,formatFlagType,longFound)) == NULL)
+              {
+               if (fstr != NULL) rm(fstr,fmax);
                return (hptr);
               }
-            fstr = AppendToString(theEnv,theString,fstr,&fpos,&fmaxm);
+            fstr = AppendToString(theString,fstr,&fpos,&fmax);
             if (fstr == NULL) return(hptr);
             f_cur_arg++;
            }
          else
            {
-            fstr = AppendToString(theEnv,percentBuffer,fstr,&fpos,&fmaxm);
+            fstr = AppendToString(buffer,fstr,&fpos,&fmax);
             if (fstr == NULL) return(hptr);
            }
         }
@@ -833,12 +662,12 @@ globle void *FormatFunction(
 
    if (fstr != NULL)
      {
-      hptr = EnvAddSymbol(theEnv,fstr);
-      if (strcmp(logicalName,"nil") != 0) EnvPrintRouter(theEnv,logicalName,fstr);
-      rm(theEnv,fstr,fmaxm);
+      hptr = AddSymbol(fstr);
+      if (strcmp(logicalName,"nil") != 0) PrintRouter(logicalName,fstr);
+      rm(fstr,fmax);
      }
    else
-     { hptr = EnvAddSymbol(theEnv,""); }
+     { hptr = AddSymbol(""); }
 
    return(hptr);
   }
@@ -848,17 +677,16 @@ globle void *FormatFunction(
 /*   control string to see if there are enough matching arguments.   */
 /*********************************************************************/
 static char *ControlStringCheck(
-  void *theEnv,
   int argCount)
   {
    DATA_OBJECT t_ptr;
    char *str_array;
-   char print_buff[FLAG_MAX];
-   size_t i;
-   int per_count;
-   char formatFlag;
+   char print_buff[10];
+   int longFound;
 
-   if (EnvArgTypeCheck(theEnv,"format",2,STRING,&t_ptr) == FALSE) return(NULL);
+   int i,per_count;
+
+   if (ArgTypeCheck("format",2,STRING,&t_ptr) == FALSE) return(NULL);
 
    per_count = 0;
    str_array = ValueToString(t_ptr.value);
@@ -867,17 +695,7 @@ static char *ControlStringCheck(
       if (str_array[i] == '%')
         {
          i++;
-         formatFlag = FindFormatFlag(str_array,&i,print_buff,FLAG_MAX);
-         if (formatFlag == '-')
-           { 
-            PrintErrorID(theEnv,"IOFUN",3,FALSE);
-            EnvPrintRouter(theEnv,WERROR,"Invalid format flag \"");
-            EnvPrintRouter(theEnv,WERROR,print_buff);
-            EnvPrintRouter(theEnv,WERROR,"\" specified in format function.\n");
-            SetEvaluationError(theEnv,TRUE);
-            return (NULL);
-           }
-         else if (formatFlag != ' ')
+         if (FindFormatFlag(str_array,&i,print_buff,&longFound) != ' ')
            { per_count++; }
         }
       else
@@ -886,8 +704,8 @@ static char *ControlStringCheck(
 
    if (per_count != (argCount - 2))
      {
-      ExpectedCountError(theEnv,"format",EXACTLY,per_count+2);
-      SetEvaluationError(theEnv,TRUE);
+      ExpectedCountError("format",EXACTLY,per_count+2);
+      SetEvaluationError(TRUE);
       return (NULL);
      }
 
@@ -900,20 +718,23 @@ static char *ControlStringCheck(
 /***********************************************/
 static char FindFormatFlag(
   char *formatString,
-  size_t *a,
+  int *a,
   char *formatBuffer,
-  size_t bufferMax)
+  int *longFound)
   {
    char inchar, formatFlagType;
-   size_t copy_pos = 0;
+   int start_pos, copy_pos = 0;
 
-   /*====================================================*/
-   /* Set return values to the default value. A blank    */
-   /* character indicates that no format flag was found  */
-   /* which requires a parameter.                        */
-   /*====================================================*/
+   /*===========================================================*/
+   /* Set return values to the default value. A blank character */
+   /* indicates that no format flag was found which requires a  */
+   /* parameter. The longFound flag indicates whether the       */
+   /* character 'l' was used with the float or integer flag to  */
+   /* indicate a double precision float or a long integer.      */
+   /*===========================================================*/
 
    formatFlagType = ' ';
+   *longFound = FALSE;
 
    /*=====================================================*/
    /* The format flags for carriage returns, line feeds,  */
@@ -923,31 +744,31 @@ static char FindFormatFlag(
 
    if (formatString[*a] == 'n')
      {
-      gensprintf(formatBuffer,"\n");
+      sprintf(formatBuffer,"\n");
       (*a)++;
       return(formatFlagType);
      }
    else if (formatString[*a] == 'r')
      {
-      gensprintf(formatBuffer,"\r");
+      sprintf(formatBuffer,"\r");
       (*a)++;
       return(formatFlagType);
      }
    else if (formatString[*a] == 't')
      {
-      gensprintf(formatBuffer,"\t");
+      sprintf(formatBuffer,"\t");
       (*a)++;
       return(formatFlagType);
      }
    else if (formatString[*a] == 'v')
      {
-      gensprintf(formatBuffer,"\v");
+      sprintf(formatBuffer,"\v");
       (*a)++;
       return(formatFlagType);
      }
    else if (formatString[*a] == '%')
      {
-      gensprintf(formatBuffer,"%%");
+      sprintf(formatBuffer,"%%");
       (*a)++;
       return(formatFlagType);
      }
@@ -956,56 +777,32 @@ static char FindFormatFlag(
    /* Identify the format flag which requires a parameter. */
    /*======================================================*/
 
-   formatBuffer[copy_pos++] = '%';
+   start_pos = *a;
    formatBuffer[copy_pos] = '\0';
    while ((formatString[*a] != '%') &&
           (formatString[*a] != '\0') &&
-          (copy_pos < (bufferMax - 5)))
+          ((*a - start_pos) < FLAG_MAX))
      {
       inchar = formatString[*a];
-      (*a)++;
-
+      formatBuffer[copy_pos++] = inchar;
+      formatBuffer[copy_pos] = '\0';
       if ( (inchar == 'd') ||
            (inchar == 'o') ||
            (inchar == 'x') ||
-           (inchar == 'u'))
+           (inchar == 'u') ||
+           (inchar == 'c') ||
+           (inchar == 's') ||
+           (inchar == 'e') ||
+           (inchar == 'f') ||
+           (inchar == 'g') )
         {
          formatFlagType = inchar;
-         formatBuffer[copy_pos++] = 'l';
-         formatBuffer[copy_pos++] = 'l';
-         formatBuffer[copy_pos++] = inchar;
-         formatBuffer[copy_pos] = '\0';
+         if (formatString[(*a) - 1] == 'l')
+           { *longFound = TRUE; }
+         (*a)++;
          return(formatFlagType);
         }
-      else if ( (inchar == 'c') ||
-                (inchar == 's') ||
-                (inchar == 'e') ||
-                (inchar == 'f') ||
-                (inchar == 'g') )
-        {
-         formatBuffer[copy_pos++] = inchar;
-         formatBuffer[copy_pos] = '\0';
-         formatFlagType = inchar;
-         return(formatFlagType);
-        }
-      
-      /*=======================================================*/
-      /* If the type hasn't been read, then this should be the */
-      /* -M.N part of the format specification (where M and N  */
-      /* are integers).                                        */
-      /*=======================================================*/
-      
-      if ( (! isdigit(inchar)) &&
-           (inchar != '.') &&
-           (inchar != '-') )
-        { 
-         formatBuffer[copy_pos++] = inchar;
-         formatBuffer[copy_pos] = '\0';
-         return('-'); 
-        }
-
-      formatBuffer[copy_pos++] = inchar;
-      formatBuffer[copy_pos] = '\0';
+      (*a)++;
      }
 
    return(formatFlagType);
@@ -1016,16 +813,15 @@ static char FindFormatFlag(
 /*   with the argument for that part of the format string.            */
 /**********************************************************************/
 static char *PrintFormatFlag(
-  void *theEnv,
   char *formatString,
   int whichArg,
-  int formatType)
+  int formatType,
+  int longFound)
   {
    DATA_OBJECT theResult;
    char *theString, *printBuffer;
-   size_t theLength;
-   void *oldLocale;
-      
+   int theLength;
+
    /*=================*/
    /* String argument */
    /*=================*/
@@ -1033,30 +829,30 @@ static char *PrintFormatFlag(
    switch (formatType)
      {
       case 's':
-        if (EnvArgTypeCheck(theEnv,"format",whichArg,SYMBOL_OR_STRING,&theResult) == FALSE) return(NULL);
+        if (ArgTypeCheck("format",whichArg,SYMBOL_OR_STRING,&theResult) == FALSE) return(NULL);
         theLength = strlen(formatString) + strlen(ValueToString(theResult.value)) + 200;
-        printBuffer = (char *) gm2(theEnv,(sizeof(char) * theLength));
-        gensprintf(printBuffer,formatString,ValueToString(theResult.value));
+        printBuffer = (char *) gm2 (((int) sizeof(char) * theLength));
+        sprintf(printBuffer,formatString,ValueToString(theResult.value));
         break;
 
       case 'c':
-        EnvRtnUnknown(theEnv,whichArg,&theResult);
+        RtnUnknown(whichArg,&theResult);
         if ((GetType(theResult) == STRING) ||
             (GetType(theResult) == SYMBOL))
           {
            theLength = strlen(formatString) + 200;
-           printBuffer = (char *) gm2(theEnv,(sizeof(char) * theLength));
-           gensprintf(printBuffer,formatString,(ValueToString(theResult.value))[0]);
+           printBuffer = (char *) gm2 (((int) sizeof(char) * theLength));
+           sprintf(printBuffer,formatString,(ValueToString(theResult.value))[0]);
           }
         else if (GetType(theResult) == INTEGER)
           {
            theLength = strlen(formatString) + 200;
-           printBuffer = (char *) gm2(theEnv,(sizeof(char) * theLength));
-           gensprintf(printBuffer,formatString,(char) DOToLong(theResult));
+           printBuffer = (char *) gm2 (((int) sizeof(char) * theLength));
+           sprintf(printBuffer,formatString,(char) DOToLong(theResult));
           }
         else
           {
-           ExpectedTypeError1(theEnv,"format",whichArg,"symbol, string, or integer");
+           ExpectedTypeError1("format",whichArg,"symbol, string, or integer");
            return(NULL);
           }
         break;
@@ -1065,49 +861,46 @@ static char *PrintFormatFlag(
       case 'x':
       case 'o':
       case 'u':
-        if (EnvArgTypeCheck(theEnv,"format",whichArg,INTEGER_OR_FLOAT,&theResult) == FALSE) return(NULL);
+        if (ArgTypeCheck("format",whichArg,INTEGER_OR_FLOAT,&theResult) == FALSE) return(NULL);
         theLength = strlen(formatString) + 200;
-        printBuffer = (char *) gm2(theEnv,(sizeof(char) * theLength));
-        
-        oldLocale = EnvAddSymbol(theEnv,setlocale(LC_NUMERIC,NULL));
-        setlocale(LC_NUMERIC,ValueToString(IOFunctionData(theEnv)->locale));
-
+        printBuffer = (char *) gm2 (((int) sizeof(char) * theLength));
         if (GetType(theResult) == FLOAT)
-          { gensprintf(printBuffer,formatString,(long long) ValueToDouble(theResult.value)); }
+          {
+           if (longFound)
+             { sprintf(printBuffer,formatString,(long) ValueToDouble(theResult.value)); }
+           else
+             { sprintf(printBuffer,formatString,(int) ValueToDouble(theResult.value)); }
+          }
         else
-          { gensprintf(printBuffer,formatString,(long long) ValueToLong(theResult.value)); }
-          
-        setlocale(LC_NUMERIC,ValueToString(oldLocale));
+          {
+           if (longFound)
+             { sprintf(printBuffer,formatString,(long) ValueToLong(theResult.value)); }
+           else
+             { sprintf(printBuffer,formatString,(int) ValueToLong(theResult.value)); }
+          }
         break;
 
       case 'f':
       case 'g':
       case 'e':
-        if (EnvArgTypeCheck(theEnv,"format",whichArg,INTEGER_OR_FLOAT,&theResult) == FALSE) return(NULL);
+        if (ArgTypeCheck("format",whichArg,INTEGER_OR_FLOAT,&theResult) == FALSE) return(NULL);
         theLength = strlen(formatString) + 200;
-        printBuffer = (char *) gm2(theEnv,(sizeof(char) * theLength));
-
-        oldLocale = EnvAddSymbol(theEnv,setlocale(LC_NUMERIC,NULL));
-        
-        setlocale(LC_NUMERIC,ValueToString(IOFunctionData(theEnv)->locale));
+        printBuffer = (char *) gm2 (((int) sizeof(char) * theLength));
 
         if (GetType(theResult) == FLOAT)
-          { gensprintf(printBuffer,formatString,ValueToDouble(theResult.value)); }
+          { sprintf(printBuffer,formatString,ValueToDouble(theResult.value)); }
         else
-          { gensprintf(printBuffer,formatString,(double) ValueToLong(theResult.value)); }
-        
-        setlocale(LC_NUMERIC,ValueToString(oldLocale));
-        
+          { sprintf(printBuffer,formatString,(double) ValueToLong(theResult.value)); }
         break;
 
       default:
-         EnvPrintRouter(theEnv,WERROR," Error in format, the conversion character");
-         EnvPrintRouter(theEnv,WERROR," for formatted output is not valid\n");
+         PrintRouter (WERROR," Error in format, the conversion character");
+         PrintRouter (WERROR," for formatted output is not valid\n");
          return(FALSE);
      }
 
-   theString = ValueToString(EnvAddSymbol(theEnv,printBuffer));
-   rm(theEnv,printBuffer,sizeof(char) * theLength);
+   theString = ValueToString(AddSymbol(printBuffer));
+   rm(printBuffer,(int) sizeof(char) * theLength);
    return(theString);
   }
 
@@ -1116,19 +909,19 @@ static char *PrintFormatFlag(
 /*   for the readline function.           */
 /******************************************/
 globle void ReadlineFunction(
-  void *theEnv,
   DATA_OBJECT_PTR returnValue)
   {
    char *buffer;
-   size_t line_max = 0;
+   int line_max = 0;
    int numberOfArguments;
+
    char *logicalName;
 
    returnValue->type = STRING;
 
-   if ((numberOfArguments = EnvArgCountCheck(theEnv,"readline",NO_MORE_THAN,1)) == -1)
+   if ((numberOfArguments = ArgCountCheck("readline",NO_MORE_THAN,1)) == -1)
      {
-      returnValue->value = (void *) EnvAddSymbol(theEnv,"*** READ ERROR ***");
+      returnValue->value = (void *) AddSymbol("*** READ ERROR ***");
       return;
      }
 
@@ -1136,48 +929,46 @@ globle void ReadlineFunction(
      { logicalName = "stdin"; }
    else
      {
-      logicalName = GetLogicalName(theEnv,1,"stdin");
+      logicalName = GetLogicalName(1,"stdin");
       if (logicalName == NULL)
         {
-         IllegalLogicalNameMessage(theEnv,"readline");
-         SetHaltExecution(theEnv,TRUE);
-         SetEvaluationError(theEnv,TRUE);
-         returnValue->value = (void *) EnvAddSymbol(theEnv,"*** READ ERROR ***");
+         IllegalLogicalNameMessage("readline");
+         SetHaltExecution(TRUE);
+         SetEvaluationError(TRUE);
+         returnValue->value = (void *) AddSymbol("*** READ ERROR ***");
          return;
         }
      }
 
-   if (QueryRouters(theEnv,logicalName) == FALSE)
+   if (QueryRouters(logicalName) == FALSE)
      {
-      UnrecognizedRouterMessage(theEnv,logicalName);
-      SetHaltExecution(theEnv,TRUE);
-      SetEvaluationError(theEnv,TRUE);
-      returnValue->value = (void *) EnvAddSymbol(theEnv,"*** READ ERROR ***");
+      UnrecognizedRouterMessage(logicalName);
+      SetHaltExecution(TRUE);
+      SetEvaluationError(TRUE);
+      returnValue->value = (void *) AddSymbol("*** READ ERROR ***");
       return;
      }
 
-   RouterData(theEnv)->CommandBufferInputCount = 0;
-   RouterData(theEnv)->AwaitingInput = TRUE;
-   buffer = FillBuffer(theEnv,logicalName,&RouterData(theEnv)->CommandBufferInputCount,&line_max);
-   RouterData(theEnv)->CommandBufferInputCount = 0;
-   RouterData(theEnv)->AwaitingInput = FALSE;
+   CommandBufferInputCount = 0;
+   buffer = FillBuffer(logicalName,&CommandBufferInputCount,&line_max);
+   CommandBufferInputCount = -1;
 
-   if (GetHaltExecution(theEnv))
+   if (GetHaltExecution())
      {
-      returnValue->value = (void *) EnvAddSymbol(theEnv,"*** READ ERROR ***");
-      if (buffer != NULL) rm(theEnv,buffer,(int) sizeof (char) * line_max);
+      returnValue->value = (void *) AddSymbol("*** READ ERROR ***");
+      if (buffer != NULL) rm(buffer,(int) sizeof (char) * line_max);
       return;
      }
 
    if (buffer == NULL)
      {
-      returnValue->value = (void *) EnvAddSymbol(theEnv,"EOF");
+      returnValue->value = (void *) AddSymbol("EOF");
       returnValue->type = SYMBOL;
       return;
      }
 
-   returnValue->value = (void *) EnvAddSymbol(theEnv,buffer);
-   rm(theEnv,buffer,(int) sizeof (char) * line_max);
+   returnValue->value = (void *) AddSymbol(buffer);
+   rm(buffer,(int) sizeof (char) * line_max);
    return;
   }
 
@@ -1187,10 +978,9 @@ globle void ReadlineFunction(
 /*   or end-of-file character is read.                       */
 /*************************************************************/
 static char *FillBuffer(
-  void *theEnv,
   char *logicalName,
-  size_t *currentPosition,
-  size_t *maximumSize)
+  int *currentPosition,
+  int *maximumSize)
   {
    int c;
    char *buf = NULL;
@@ -1199,7 +989,7 @@ static char *FillBuffer(
    /* Read until end of line or eof. */
    /*================================*/
 
-   c = EnvGetcRouter(theEnv,logicalName);
+   c = GetcRouter(logicalName);
 
    if (c == EOF)
      { return(NULL); }
@@ -1209,331 +999,36 @@ static char *FillBuffer(
    /*==================================*/
 
    while ((c != '\n') && (c != '\r') && (c != EOF) &&
-          (! GetHaltExecution(theEnv)))
+          (! GetHaltExecution()))
      {
-      buf = ExpandStringWithChar(theEnv,c,buf,currentPosition,maximumSize,*maximumSize+80);
-      c = EnvGetcRouter(theEnv,logicalName);
+      buf = ExpandStringWithChar(c,buf,currentPosition,maximumSize,*maximumSize+80);
+      c = GetcRouter(logicalName);
      }
 
    /*==================*/
    /* Add closing EOS. */
    /*==================*/
 
-   buf = ExpandStringWithChar(theEnv,EOS,buf,currentPosition,maximumSize,*maximumSize+80);
+   buf = ExpandStringWithChar(EOS,buf,currentPosition,maximumSize,*maximumSize+80);
    return (buf);
   }
-  
-/*****************************************/
-/* SetLocaleFunction: H/L access routine */
-/*   for the set-locale function.        */
-/*****************************************/
-globle void SetLocaleFunction(
-  void *theEnv,
-  DATA_OBJECT_PTR returnValue)
-  {
-   DATA_OBJECT theResult;
-   int numArgs;
-   
-   /*======================================*/
-   /* Check for valid number of arguments. */
-   /*======================================*/
-   
-   if ((numArgs = EnvArgCountCheck(theEnv,"set-locale",NO_MORE_THAN,1)) == -1)
-     {
-      returnValue->type = SYMBOL;
-      returnValue->value = EnvFalseSymbol(theEnv);
-      return;
-     }
-     
-   /*=================================*/
-   /* If there are no arguments, just */
-   /* return the current locale.      */
-   /*=================================*/
-   
-   if (numArgs == 0)
-     {
-      returnValue->type = STRING;
-      returnValue->value = IOFunctionData(theEnv)->locale;
-      return;
-     }
-
-   /*=================*/
-   /* Get the locale. */
-   /*=================*/
-   
-   if (EnvArgTypeCheck(theEnv,"set-locale",1,STRING,&theResult) == FALSE)
-     {
-      returnValue->type = SYMBOL;
-      returnValue->value = EnvFalseSymbol(theEnv);
-      return;
-     }
-     
-   /*=====================================*/
-   /* Return the old value of the locale. */
-   /*=====================================*/
-   
-   returnValue->type = STRING;
-   returnValue->value = IOFunctionData(theEnv)->locale;
-   
-   /*======================================================*/
-   /* Change the value of the locale to the one specified. */
-   /*======================================================*/
-   
-   DecrementSymbolCount(theEnv,(struct symbolHashNode *) IOFunctionData(theEnv)->locale);
-   IOFunctionData(theEnv)->locale = DOToPointer(theResult);
-   IncrementSymbolCount(IOFunctionData(theEnv)->locale);
-  }
-
-/******************************************/
-/* ReadNumberFunction: H/L access routine */
-/*   for the read-number function.        */
-/******************************************/
-globle void ReadNumberFunction(
-  void *theEnv,
-  DATA_OBJECT_PTR returnValue)
-  {
-   struct token theToken;
-   int numberOfArguments;
-   char *logicalName = NULL;
-
-   /*===============================================*/
-   /* Check for an appropriate number of arguments. */
-   /*===============================================*/
-
-   if ((numberOfArguments = EnvArgCountCheck(theEnv,"read",NO_MORE_THAN,1)) == -1)
-     {
-      returnValue->type = STRING;
-      returnValue->value = (void *) EnvAddSymbol(theEnv,"*** READ ERROR ***");
-      return;
-     }
-
-   /*======================================================*/
-   /* Determine the logical name from which input is read. */
-   /*======================================================*/
-
-   if (numberOfArguments == 0)
-     { logicalName = "stdin"; }
-   else if (numberOfArguments == 1)
-     {
-      logicalName = GetLogicalName(theEnv,1,"stdin");
-      if (logicalName == NULL)
-        {
-         IllegalLogicalNameMessage(theEnv,"read");
-         SetHaltExecution(theEnv,TRUE);
-         SetEvaluationError(theEnv,TRUE);
-         returnValue->type = STRING;
-         returnValue->value = (void *) EnvAddSymbol(theEnv,"*** READ ERROR ***");
-         return;
-        }
-     }
-
-   /*============================================*/
-   /* Check to see that the logical name exists. */
-   /*============================================*/
-
-   if (QueryRouters(theEnv,logicalName) == FALSE)
-     {
-      UnrecognizedRouterMessage(theEnv,logicalName);
-      SetHaltExecution(theEnv,TRUE);
-      SetEvaluationError(theEnv,TRUE);
-      returnValue->type = STRING;
-      returnValue->value = (void *) EnvAddSymbol(theEnv,"*** READ ERROR ***");
-      return;
-     }
-
-   /*=======================================*/
-   /* Collect input into string if the read */
-   /* source is stdin, else just get token. */
-   /*=======================================*/
-
-   if (strcmp(logicalName,"stdin") == 0)
-     { ReadNumber(theEnv,logicalName,&theToken,TRUE); }
-   else
-     { ReadNumber(theEnv,logicalName,&theToken,FALSE); }
-
-   RouterData(theEnv)->CommandBufferInputCount = 0;
-   RouterData(theEnv)->AwaitingInput = FALSE;
-
-   /*====================================================*/
-   /* Copy the token to the return value data structure. */
-   /*====================================================*/
-
-   returnValue->type = theToken.type;
-   if ((theToken.type == FLOAT) || (theToken.type == STRING) ||
-#if OBJECT_SYSTEM
-       (theToken.type == INSTANCE_NAME) ||
-#endif
-       (theToken.type == SYMBOL) || (theToken.type == INTEGER))
-     { returnValue->value = theToken.value; }
-   else if (theToken.type == STOP)
-     {
-      returnValue->type = SYMBOL;
-      returnValue->value = (void *) EnvAddSymbol(theEnv,"EOF");
-     }
-   else if (theToken.type == UNKNOWN_VALUE)
-     {
-      returnValue->type = STRING;
-      returnValue->value = (void *) EnvAddSymbol(theEnv,"*** READ ERROR ***");
-     }
-   else
-     {
-      returnValue->type = STRING;
-      returnValue->value = (void *) EnvAddSymbol(theEnv,theToken.printForm);
-     }
-
-   return;
-  }
-  
-/********************************************/
-/* ReadNumber: Special routine used by the  */
-/*   read-number function to read a number. */
-/********************************************/
-static void ReadNumber(
-  void *theEnv,
-  char *logicalName,
-  struct token *theToken,
-  int isStdin)
-  {
-   char *inputString;
-   char *charPtr = NULL;
-   size_t inputStringSize;
-   int inchar;
-   long long theLong;
-   double theDouble;
-   void *oldLocale;
-
-   theToken->type = STOP;
-
-   /*===========================================*/
-   /* Initialize the variables used for storing */
-   /* the characters retrieved from stdin.      */
-   /*===========================================*/
-
-   inputString = NULL;
-   RouterData(theEnv)->CommandBufferInputCount = 0;
-   RouterData(theEnv)->AwaitingInput = TRUE;
-   inputStringSize = 0;
-   inchar = EnvGetcRouter(theEnv,logicalName);
-            
-   /*====================================*/
-   /* Skip whitespace before any number. */
-   /*====================================*/
-      
-   while (isspace(inchar) && (inchar != EOF) && 
-          (! GetHaltExecution(theEnv)))
-     { inchar = EnvGetcRouter(theEnv,logicalName); }
-
-   /*=============================================================*/
-   /* Continue reading characters until whitespace is found again */
-   /* (for anything other than stdin) or a CR/LF (for stdin).     */
-   /*=============================================================*/
-
-   while ((((! isStdin) && (! isspace(inchar))) || 
-          (isStdin && (inchar != '\n') && (inchar != '\r'))) &&
-          (inchar != EOF) &&
-          (! GetHaltExecution(theEnv)))
-     {
-      inputString = ExpandStringWithChar(theEnv,inchar,inputString,&RouterData(theEnv)->CommandBufferInputCount,
-                                         &inputStringSize,inputStringSize + 80);
-      inchar = EnvGetcRouter(theEnv,logicalName);
-     }
-
-   /*===========================================*/
-   /* Pressing control-c (or comparable action) */
-   /* aborts the read-number function.          */
-   /*===========================================*/
-
-   if (GetHaltExecution(theEnv))
-     {
-      theToken->type = STRING;
-      theToken->value = (void *) EnvAddSymbol(theEnv,"*** READ ERROR ***");
-      if (inputStringSize > 0) rm(theEnv,inputString,inputStringSize);
-      return;
-     }
-
-   /*====================================================*/
-   /* Return the EOF symbol if the end of file for stdin */
-   /* has been encountered. This typically won't occur,  */
-   /* but is possible (for example by pressing control-d */
-   /* in the UNIX operating system).                     */
-   /*====================================================*/
-
-   if (inchar == EOF)
-     {
-      theToken->type = SYMBOL;
-      theToken->value = (void *) EnvAddSymbol(theEnv,"EOF");
-      if (inputStringSize > 0) rm(theEnv,inputString,inputStringSize);
-      return;
-     }
-
-   /*==================================================*/
-   /* Open a string input source using the characters  */
-   /* retrieved from stdin and extract the first token */
-   /* contained in the string.                         */
-   /*==================================================*/
-   
-   /*=======================================*/
-   /* Change the locale so that numbers are */
-   /* converted using the localized format. */
-   /*=======================================*/
-   
-   oldLocale = EnvAddSymbol(theEnv,setlocale(LC_NUMERIC,NULL));
-   setlocale(LC_NUMERIC,ValueToString(IOFunctionData(theEnv)->locale));
-
-   /*========================================*/
-   /* Try to parse the number as a long. The */
-   /* terminating character must either be   */
-   /* white space or the string terminator.  */
-   /*========================================*/
-
-#if WIN_MVC
-   theLong = _strtoi64(inputString,&charPtr,10);
-#else
-   theLong = strtoll(inputString,&charPtr,10);
 #endif
 
-   if ((charPtr != inputString) && 
-       (isspace(*charPtr) || (*charPtr == '\0')))
-     {
-      theToken->type = INTEGER;
-      theToken->value = (void *) EnvAddLong(theEnv,theLong);
-      if (inputStringSize > 0) rm(theEnv,inputString,inputStringSize);
-      setlocale(LC_NUMERIC,ValueToString(oldLocale));
-      return;
-     }
-     
-   /*==========================================*/
-   /* Try to parse the number as a double. The */
-   /* terminating character must either be     */
-   /* white space or the string terminator.    */
-   /*==========================================*/
+#if BASIC_IO || EXT_IO
 
-   theDouble = strtod(inputString,&charPtr);  
-   if ((charPtr != inputString) && 
-       (isspace(*charPtr) || (*charPtr == '\0')))
-     {
-      theToken->type = FLOAT;
-      theToken->value = (void *) EnvAddDouble(theEnv,theDouble);
-      if (inputStringSize > 0) rm(theEnv,inputString,inputStringSize);
-      setlocale(LC_NUMERIC,ValueToString(oldLocale));
-      return;
-     }
-
-   /*============================================*/
-   /* Restore the "C" locale so that any parsing */
-   /* of numbers uses the C format.              */
-   /*============================================*/
-   
-   setlocale(LC_NUMERIC,ValueToString(oldLocale));
-
-   /*=========================================*/
-   /* Return "*** READ ERROR ***" to indicate */
-   /* a number was not successfully parsed.   */
-   /*=========================================*/
-         
-   theToken->type = STRING;
-   theToken->value = (void *) EnvAddSymbol(theEnv,"*** READ ERROR ***");
+/****************************************************/
+/* IllegalLogicalNameMessage: Generic error message */
+/*   for illegal logical names.                     */
+/****************************************************/
+static void IllegalLogicalNameMessage(
+  char *theFunction)
+  {
+   PrintErrorID("IOFUN",1,FALSE);
+   PrintRouter(WERROR,"Illegal logical name used for ");
+   PrintRouter(WERROR,theFunction);
+   PrintRouter(WERROR," function.\n");
   }
 
 #endif
 
+

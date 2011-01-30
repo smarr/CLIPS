@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.24  06/05/06            */
+   /*             CLIPS Version 6.10  04/02/96            */
    /*                                                     */
    /*             BASIC MATH FUNCTIONS MODULE             */
    /*******************************************************/
@@ -15,8 +15,6 @@
 /* Contributing Programmer(s):                               */
 /*                                                           */
 /* Revision History:                                         */
-/*                                                           */
-/*      6.24: Renamed BOOLEAN macro type to intBool.         */
 /*                                                           */
 /*************************************************************/
 
@@ -38,27 +36,30 @@
 #define LOCALE extern
 #endif
 
-#define GetAutoFloatDividend() EnvGetAutoFloatDividend(GetCurrentEnvironment())
-#define SetAutoFloatDividend(a) EnvSetAutoFloatDividend(GetCurrentEnvironment(),a)
-
-   LOCALE void                    BasicMathFunctionDefinitions(void *);
-   LOCALE void                    AdditionFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                    MultiplicationFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                    SubtractionFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                    DivisionFunction(void *,DATA_OBJECT_PTR);
-   LOCALE long long               DivFunction(void *);
-   LOCALE intBool                 SetAutoFloatDividendCommand(void *);
-   LOCALE intBool                 GetAutoFloatDividendCommand(void *);
-   LOCALE intBool                 EnvGetAutoFloatDividend(void *);
-   LOCALE intBool                 EnvSetAutoFloatDividend(void *,int);
-   LOCALE long long               IntegerFunction(void *);
-   LOCALE double                  FloatFunction(void *);
-   LOCALE void                    AbsFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                    MinFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                    MaxFunction(void *,DATA_OBJECT_PTR);
+   LOCALE void                    BasicMathFunctionDefinitions(void);
+   LOCALE void                    AdditionFunction(DATA_OBJECT_PTR);
+   LOCALE void                    MultiplicationFunction(DATA_OBJECT_PTR);
+   LOCALE void                    SubtractionFunction(DATA_OBJECT_PTR);
+   LOCALE void                    DivisionFunction(DATA_OBJECT_PTR);
+   LOCALE long                    DivFunction(void);
+   LOCALE BOOLEAN                 SetAutoFloatDividendCommand(void);
+   LOCALE BOOLEAN                 GetAutoFloatDividendCommand(void);
+   LOCALE BOOLEAN                 GetAutoFloatDividend(void);
+   LOCALE BOOLEAN                 SetAutoFloatDividend(int);
+   LOCALE long int                IntegerFunction(void);
+   LOCALE double                  FloatFunction(void);
+   LOCALE void                    AbsFunction(DATA_OBJECT_PTR);
+   LOCALE void                    MinFunction(DATA_OBJECT_PTR);
+   LOCALE void                    MaxFunction(DATA_OBJECT_PTR);
 
 #endif
 
 
 
 
+
+
+
+
+
+

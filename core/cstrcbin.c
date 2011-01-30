@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.20  01/31/02            */
+   /*             CLIPS Version 6.10  04/13/98            */
    /*                                                     */
    /*          CONSTRUCT BINARY LOAD/SAVE MODULE          */
    /*******************************************************/
@@ -11,12 +11,15 @@
 /*   headers.                                                */
 /*                                                           */
 /* Principal Programmer(s):                                  */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Contributing Programmer(s):                               */
 /*                                                           */
 /* Revision History:                                         */
 /*                                                           */
+/* Who               |     Date    | Description             */
+/* ------------------+-------------+------------------------ */
+/* M.Giordano        | 23-Mar-2000 | Mods made for TLS       */
 /*************************************************************/
 
 #include "setup.h"
@@ -24,7 +27,6 @@
 #if BLOAD || BLOAD_ONLY || BLOAD_AND_BSAVE
 
 #include "bload.h"
-#include "envrnmnt.h"
 
 #if BLOAD_AND_BSAVE
 #include "bsave.h"
@@ -107,7 +109,6 @@ globle void AssignBsaveConstructHeaderVals(
   NOTES        : None
  ***************************************************/
 LOCALE void UpdateConstructHeader(
-  void *theEnv,
   struct bsaveConstructHeader *theBsaveConstruct,
   struct constructHeader *theConstruct,
   int itemModuleSize,
@@ -144,11 +145,11 @@ LOCALE void UpdateConstructHeader(
   NOTES        : None
  *******************************************************/
 globle void UnmarkConstructHeader(
-  void *theEnv,
   struct constructHeader *theConstruct)
   {
-   DecrementSymbolCount(theEnv,theConstruct->name);
+   DecrementSymbolCount(theConstruct->name);
   }
 
 #endif /* BLOAD || BLOAD_ONLY || BLOAD_AND_BSAVE */
 
+

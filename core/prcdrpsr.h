@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.24  06/05/06            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*       PROCEDURAL FUNCTIONS PARSER HEADER FILE       */
    /*******************************************************/
@@ -11,13 +11,11 @@
 /*                                                           */
 /* Principal Programmer(s):                                  */
 /*      Gary D. Riley                                        */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Contributing Programmer(s):                               */
 /*                                                           */
 /* Revision History:                                         */
-/*                                                           */
-/*      6.24: Renamed BOOLEAN macro type to intBool.         */
 /*                                                           */
 /*************************************************************/
 
@@ -47,17 +45,17 @@ struct BindInfo
   };
 
 #if (! RUN_TIME)
-   LOCALE void                           ProceduralFunctionParsers(void *);
-   LOCALE struct BindInfo               *GetParsedBindNames(void *);
-   LOCALE void                           SetParsedBindNames(void *,struct BindInfo *);
-   LOCALE void                           ClearParsedBindNames(void *);
-   LOCALE intBool                        ParsedBindNamesEmpty(void *);
+   LOCALE void                           ProceduralFunctionParsers(void);
+   LOCALE struct BindInfo               *GetParsedBindNames(void);
+   LOCALE void                           SetParsedBindNames(struct BindInfo *);
+   LOCALE void                           ClearParsedBindNames(void);
+   LOCALE BOOLEAN                        ParsedBindNamesEmpty(void);
 #endif
 #if (! BLOAD_ONLY) && (! RUN_TIME)
-   LOCALE int                            SearchParsedBindNames(void *,struct symbolHashNode *);
-   LOCALE int                            CountParsedBindNames(void *);
-   LOCALE void                           RemoveParsedBindName(void *,struct symbolHashNode *);
-   LOCALE struct constraintRecord       *FindBindConstraints(void *,struct symbolHashNode *);
+   LOCALE int                            SearchParsedBindNames(struct symbolHashNode *);
+   LOCALE int                            CountParsedBindNames(void);
+   LOCALE void                           RemoveParsedBindName(struct symbolHashNode *);
+   LOCALE struct constraintRecord       *FindBindConstraints(struct symbolHashNode *);
 #endif
 
 #endif
@@ -65,3 +63,6 @@ struct BindInfo
 
 
 
+
+
+

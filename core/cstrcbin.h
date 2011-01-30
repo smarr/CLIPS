@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*               CLIPS Version 6.20  01/31/02          */
+   /*               CLIPS Version 6.10  04/13/98          */
    /*                                                     */
    /*                                                     */
    /*******************************************************/
@@ -10,7 +10,7 @@
 /* Purpose:                                                  */
 /*                                                           */
 /* Principal Programmer(s):                                  */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Contributing Programmer(s):                               */
 /*                                                           */
@@ -50,10 +50,9 @@ LOCALE void AssignBsaveConstructHeaderVals(struct bsaveConstructHeader *,
                                              struct constructHeader *);
 #endif
 
-LOCALE void UpdateConstructHeader(void *,
-                                  struct bsaveConstructHeader *,
+LOCALE void UpdateConstructHeader(struct bsaveConstructHeader *,
                                   struct constructHeader *,int,void *,int,void *);
-LOCALE void UnmarkConstructHeader(void *,struct constructHeader *);
+LOCALE void UnmarkConstructHeader(struct constructHeader *);
 
 #ifndef _CSTRCBIN_SOURCE_
 #endif
@@ -65,3 +64,4 @@ LOCALE void UnmarkConstructHeader(void *,struct constructHeader *);
 
 
 
+

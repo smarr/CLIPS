@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.20  01/31/02            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*                GENERATE HEADER FILE                 */
    /*******************************************************/
@@ -41,11 +41,14 @@
 #define LOCALE extern
 #endif
 
-   LOCALE void                           FieldConversion(void *,struct lhsParseNode *,struct lhsParseNode *);
-   LOCALE struct expr                   *GetvarReplace(void *,struct lhsParseNode *,int);
-   LOCALE intBool                        IsNandTest(struct lhsParseNode *);
+   LOCALE void                           FieldConversion(struct lhsParseNode *,struct lhsParseNode *);
+   LOCALE struct expr                   *GetvarReplace(struct lhsParseNode *);
 
 #endif
 
 
 
+
+
+
+

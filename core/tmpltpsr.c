@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.23  01/31/05            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*              DEFTEMPLATE PARSER MODULE              */
    /*******************************************************/
@@ -15,9 +15,10 @@
 /* Contributing Programmer(s):                               */
 /*                                                           */
 /* Revision History:                                         */
-/*      6.23: Added support for templates maintaining their  */
-/*            own list of facts.                             */
 /*                                                           */
+/* Who               |     Date    | Description             */
+/* ------------------+-------------+------------------------ */
+/* M.Giordano        | 23-Mar-2000 | Mods made for TLS       */
 /*************************************************************/
 
 #define _TMPLTPSR_SOURCE_
@@ -37,7 +38,6 @@
 #include "exprnpsr.h"
 #include "router.h"
 #include "constrct.h"
-#include "envrnmnt.h"
 #include "factmngr.h"
 #include "cstrnchk.h"
 #include "cstrnpsr.h"
@@ -60,20 +60,26 @@
 /***************************************/
 
 #if (! RUN_TIME) && (! BLOAD_ONLY)
-   static struct templateSlot    *SlotDeclarations(void *,char *,struct token *);
-   static struct templateSlot    *ParseSlot(void *,char *,struct token *,struct templateSlot *);
-   static struct templateSlot    *DefinedSlots(void *,char *,SYMBOL_HN *,int,struct token *);
-   static intBool                 ParseFacetAttribute(void *,char *,struct templateSlot *,intBool);
+   static struct templateSlot    *SlotDeclarations(char *,struct token *);
+   static struct templateSlot    *ParseSlot(char *,struct token *,struct templateSlot *);
+   static struct templateSlot    *DefinedSlots(char *,SYMBOL_HN *,int,struct token *);
+#endif
+
+/***************************************/
+/* LOCAL INTERNAL VARIABLE DEFINITIONS */
+/***************************************/
+
+#if (! RUN_TIME) && (! BLOAD_ONLY)
+   Thread static int              DeftemplateError;
 #endif
 
 /*******************************************************/
 /* ParseDeftemplate: Parses the deftemplate construct. */
 /*******************************************************/
 globle int ParseDeftemplate(
-  void *theEnv,
   char *readSource)
   {
-#if (MAC_MCW || WIN_MCW) && (RUN_TIME || BLOAD_ONLY)
+#if (MAC_MPW || MAC_MCW) && (RUN_TIME || BLOAD_ONLY)
 #pragma unused(readSource)
 #endif
 
@@ -87,19 +93,19 @@ globle int ParseDeftemplate(
    /* Initialize pretty print and error information. */
    /*================================================*/
 
-   DeftemplateData(theEnv)->DeftemplateError = FALSE;
-   SetPPBufferStatus(theEnv,ON);
-   FlushPPBuffer(theEnv);
-   SavePPBuffer(theEnv,"(deftemplate ");
+   DeftemplateError = FALSE;
+   SetPPBufferStatus(ON);
+   FlushPPBuffer();
+   SavePPBuffer("(deftemplate ");
 
    /*==============================================================*/
    /* Deftemplates can not be added when a binary image is loaded. */
    /*==============================================================*/
 
 #if BLOAD || BLOAD_AND_BSAVE
-   if ((Bloaded(theEnv) == TRUE) && (! ConstructData(theEnv)->CheckSyntaxMode))
+   if ((Bloaded() == TRUE) && (! CheckSyntaxMode))
      {
-      CannotLoadWithBloadMessage(theEnv,"deftemplate");
+      CannotLoadWithBloadMessage("deftemplate");
       return(TRUE);
      }
 #endif
@@ -109,17 +115,17 @@ globle int ParseDeftemplate(
    /*=======================================================*/
 
 #if DEBUGGING_FUNCTIONS
-   DeftemplateData(theEnv)->DeletedTemplateDebugFlags = 0;
+   DeletedTemplateDebugFlags = 0;
 #endif
 
-   deftemplateName = GetConstructNameAndComment(theEnv,readSource,&inputToken,"deftemplate",
-                                                EnvFindDeftemplate,EnvUndeftemplate,"%",
+   deftemplateName = GetConstructNameAndComment(readSource,&inputToken,"deftemplate",
+                                                FindDeftemplate,Undeftemplate,"%",
                                                 TRUE,TRUE,TRUE);
    if (deftemplateName == NULL) return(TRUE);
 
-   if (ReservedPatternSymbol(theEnv,ValueToString(deftemplateName),"deftemplate"))
+   if (ReservedPatternSymbol(ValueToString(deftemplateName),"deftemplate"))
      {
-      ReservedPatternSymbolErrorMsg(theEnv,ValueToString(deftemplateName),"a deftemplate name");
+      ReservedPatternSymbolErrorMsg(ValueToString(deftemplateName),"a deftemplate name");
       return(TRUE);
      }
 
@@ -127,17 +133,17 @@ globle int ParseDeftemplate(
    /* Parse the slot fields of the deftemplate. */
    /*===========================================*/
 
-   slots = SlotDeclarations(theEnv,readSource,&inputToken);
-   if (DeftemplateData(theEnv)->DeftemplateError == TRUE) return(TRUE);
+   slots = SlotDeclarations(readSource,&inputToken);
+   if (DeftemplateError == TRUE) return(TRUE);
 
    /*==============================================*/
    /* If we're only checking syntax, don't add the */
    /* successfully parsed deftemplate to the KB.   */
    /*==============================================*/
 
-   if (ConstructData(theEnv)->CheckSyntaxMode)
+   if (CheckSyntaxMode)
      {
-      ReturnSlots(theEnv,slots);
+      ReturnSlots(slots);
       return(FALSE);
      }
 
@@ -145,7 +151,7 @@ globle int ParseDeftemplate(
    /* Create a new deftemplate structure. */
    /*=====================================*/
 
-   newDeftemplate = get_struct(theEnv,deftemplate);
+   newDeftemplate = get_struct(deftemplate);
    newDeftemplate->header.name =  deftemplateName;
    newDeftemplate->header.next = NULL;
    newDeftemplate->header.usrData = NULL;
@@ -156,10 +162,8 @@ globle int ParseDeftemplate(
    newDeftemplate->watch = 0;
    newDeftemplate->inScope = TRUE;
    newDeftemplate->patternNetwork = NULL;
-   newDeftemplate->factList = NULL;
-   newDeftemplate->lastFact = NULL;
    newDeftemplate->header.whichModule = (struct defmoduleItemHeader *)
-                                        GetModuleItem(theEnv,NULL,DeftemplateData(theEnv)->DeftemplateModuleIndex);
+                                        GetModuleItem(NULL,DeftemplateModuleIndex);
 
    /*================================*/
    /* Determine the number of slots. */
@@ -175,18 +179,18 @@ globle int ParseDeftemplate(
    /* Store pretty print representation. */
    /*====================================*/
 
-   if (EnvGetConserveMemory(theEnv) == TRUE)
+   if (GetConserveMemory() == TRUE)
      { newDeftemplate->header.ppForm = NULL; }
    else
-     { newDeftemplate->header.ppForm = CopyPPBuffer(theEnv); }
+     { newDeftemplate->header.ppForm = CopyPPBuffer(); }
 
    /*=======================================================================*/
    /* If a template is redefined, then we want to restore its watch status. */
    /*=======================================================================*/
 
 #if DEBUGGING_FUNCTIONS
-   if ((BitwiseTest(DeftemplateData(theEnv)->DeletedTemplateDebugFlags,0)) || EnvGetWatchItem(theEnv,"facts"))
-     { EnvSetDeftemplateWatch(theEnv,ON,(void *) newDeftemplate); }
+   if ((BitwiseTest(DeletedTemplateDebugFlags,0)) || GetWatchItem("facts"))
+     { SetDeftemplateWatch(ON,(void *) newDeftemplate); }
 #endif
 
    /*==============================================*/
@@ -195,12 +199,8 @@ globle int ParseDeftemplate(
 
    AddConstructToModule(&newDeftemplate->header);
 
-   InstallDeftemplate(theEnv,newDeftemplate);
+   InstallDeftemplate(newDeftemplate);
 
-#else
-#if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
-#endif
 #endif
 
    return(FALSE);
@@ -214,7 +214,6 @@ globle int ParseDeftemplate(
 /*   the hash table.                                          */
 /**************************************************************/
 globle void InstallDeftemplate(
-  void *theEnv,
   struct deftemplate *theDeftemplate)
   {
    struct templateSlot *slotPtr;
@@ -227,13 +226,10 @@ globle void InstallDeftemplate(
         slotPtr = slotPtr->next)
      {
       IncrementSymbolCount(slotPtr->slotName);
-      tempExpr = AddHashedExpression(theEnv,slotPtr->defaultList);
-      ReturnExpression(theEnv,slotPtr->defaultList);
+      tempExpr = AddHashedExpression(slotPtr->defaultList);
+      ReturnExpression(slotPtr->defaultList);
       slotPtr->defaultList = tempExpr;
-      tempExpr = AddHashedExpression(theEnv,slotPtr->facetList);
-      ReturnExpression(theEnv,slotPtr->facetList);
-      slotPtr->facetList = tempExpr;
-      slotPtr->constraints = AddConstraint(theEnv,slotPtr->constraints);
+      slotPtr->constraints = AddConstraint(slotPtr->constraints);
      }
   }
 
@@ -241,7 +237,6 @@ globle void InstallDeftemplate(
 /* SlotDeclarations: Parses the slot declarations of a deftemplate. */
 /********************************************************************/
 static struct templateSlot *SlotDeclarations(
-  void *theEnv,
   char *readSource,
   struct token *inputToken)
   {
@@ -256,20 +251,20 @@ static struct templateSlot *SlotDeclarations(
 
       if (inputToken->type != LPAREN)
         {
-         SyntaxErrorMessage(theEnv,"deftemplate");
-         ReturnSlots(theEnv,slotList);
-         ReturnSlots(theEnv,multiSlot);
-         DeftemplateData(theEnv)->DeftemplateError = TRUE;
+         SyntaxErrorMessage("deftemplate");
+         ReturnSlots(slotList);
+         ReturnSlots(multiSlot);
+         DeftemplateError = TRUE;
          return(NULL);
         }
 
-      GetToken(theEnv,readSource,inputToken);
+      GetToken(readSource,inputToken);
       if (inputToken->type != SYMBOL)
         {
-         SyntaxErrorMessage(theEnv,"deftemplate");
-         ReturnSlots(theEnv,slotList);
-         ReturnSlots(theEnv,multiSlot);
-         DeftemplateData(theEnv)->DeftemplateError = TRUE;
+         SyntaxErrorMessage("deftemplate");
+         ReturnSlots(slotList);
+         ReturnSlots(multiSlot);
+         DeftemplateError = TRUE;
          return(NULL);
         }
 
@@ -277,12 +272,12 @@ static struct templateSlot *SlotDeclarations(
       /* Parse the slot. */
       /*=================*/
 
-      newSlot = ParseSlot(theEnv,readSource,inputToken,slotList);
-      if (DeftemplateData(theEnv)->DeftemplateError == TRUE)
+      newSlot = ParseSlot(readSource,inputToken,slotList);
+      if (DeftemplateError == TRUE)
         {
-         ReturnSlots(theEnv,newSlot);
-         ReturnSlots(theEnv,slotList);
-         ReturnSlots(theEnv,multiSlot);
+         ReturnSlots(newSlot);
+         ReturnSlots(slotList);
+         ReturnSlots(multiSlot);
          return(NULL);
         }
 
@@ -303,16 +298,16 @@ static struct templateSlot *SlotDeclarations(
       /* Check for closing parenthesis. */
       /*================================*/
 
-      GetToken(theEnv,readSource,inputToken);
+      GetToken(readSource,inputToken);
       if (inputToken->type != RPAREN)
         {
-         PPBackup(theEnv);
-         SavePPBuffer(theEnv,"\n   ");
-         SavePPBuffer(theEnv,inputToken->printForm);
+         PPBackup();
+         SavePPBuffer("\n   ");
+         SavePPBuffer(inputToken->printForm);
         }
      }
 
-  SavePPBuffer(theEnv,"\n");
+  SavePPBuffer("\n");
 
   /*=======================*/
   /* Return the slot list. */
@@ -325,7 +320,6 @@ static struct templateSlot *SlotDeclarations(
 /* ParseSlot: Parses a single slot of a deftemplate. */
 /*****************************************************/
 static struct templateSlot *ParseSlot(
-  void *theEnv,
   char *readSource,
   struct token *inputToken,
   struct templateSlot *slotList)
@@ -344,8 +338,8 @@ static struct templateSlot *ParseSlot(
        (strcmp(ValueToString(inputToken->value),"slot") != 0) &&
        (strcmp(ValueToString(inputToken->value),"multislot") != 0))
      {
-      SyntaxErrorMessage(theEnv,"deftemplate");
-      DeftemplateData(theEnv)->DeftemplateError = TRUE;
+      SyntaxErrorMessage("deftemplate");
+      DeftemplateError = TRUE;
       return(NULL);
      }
 
@@ -363,12 +357,12 @@ static struct templateSlot *ParseSlot(
    /* The name of the slot must be a symbol. */
    /*========================================*/
 
-   SavePPBuffer(theEnv," ");
-   GetToken(theEnv,readSource,inputToken);
+   SavePPBuffer(" ");
+   GetToken(readSource,inputToken);
    if (inputToken->type != SYMBOL)
      {
-      SyntaxErrorMessage(theEnv,"deftemplate");
-      DeftemplateData(theEnv)->DeftemplateError = TRUE;
+      SyntaxErrorMessage("deftemplate");
+      DeftemplateError = TRUE;
       return(NULL);
      }
 
@@ -382,8 +376,8 @@ static struct templateSlot *ParseSlot(
      {
       if (slotList->slotName == slotName)
         {
-         AlreadyParsedErrorMessage(theEnv,"slot ",ValueToString(slotList->slotName));
-         DeftemplateData(theEnv)->DeftemplateError = TRUE;
+         AlreadyParsedErrorMessage("slot ",ValueToString(slotList->slotName));
+         DeftemplateError = TRUE;
          return(NULL);
         }
 
@@ -394,10 +388,10 @@ static struct templateSlot *ParseSlot(
    /* Parse the attributes of the slot. */
    /*===================================*/
 
-   newSlot = DefinedSlots(theEnv,readSource,slotName,parsingMultislot,inputToken);
+   newSlot = DefinedSlots(readSource,slotName,parsingMultislot,inputToken);
    if (newSlot == NULL)
      {
-      DeftemplateData(theEnv)->DeftemplateError = TRUE;
+      DeftemplateError = TRUE;
       return(NULL);
      }
 
@@ -405,27 +399,27 @@ static struct templateSlot *ParseSlot(
    /* Check for slot conflict errors. */
    /*=================================*/
 
-   if (CheckConstraintParseConflicts(theEnv,newSlot->constraints) == FALSE)
+   if (CheckConstraintParseConflicts(newSlot->constraints) == FALSE)
      {
-      ReturnSlots(theEnv,newSlot);
-      DeftemplateData(theEnv)->DeftemplateError = TRUE;
+      ReturnSlots(newSlot);
+      DeftemplateError = TRUE;
       return(NULL);
      }
 
    if ((newSlot->defaultPresent) || (newSlot->defaultDynamic))
-     { rv = ConstraintCheckExpressionChain(theEnv,newSlot->defaultList,newSlot->constraints); }
+     { rv = ConstraintCheckExpressionChain(newSlot->defaultList,newSlot->constraints); }
    else
      { rv = NO_VIOLATION; }
 
-   if ((rv != NO_VIOLATION) && EnvGetStaticConstraintChecking(theEnv))
+   if ((rv != NO_VIOLATION) && GetStaticConstraintChecking())
      {
       char *temp;
       if (newSlot->defaultDynamic) temp = "the default-dynamic attribute";
       else temp = "the default attribute";
-      ConstraintViolationErrorMessage(theEnv,"An expression",temp,FALSE,0,
+      ConstraintViolationErrorMessage("An expression",temp,FALSE,0,
                                       newSlot->slotName,0,rv,newSlot->constraints,TRUE);
-      ReturnSlots(theEnv,newSlot);
-      DeftemplateData(theEnv)->DeftemplateError = TRUE;
+      ReturnSlots(newSlot);
+      DeftemplateError = TRUE;
       return(NULL);
      }
 
@@ -440,7 +434,6 @@ static struct templateSlot *ParseSlot(
 /* DefinedSlots: Parses a field or multifield slot attribute. */
 /**************************************************************/
 static struct templateSlot *DefinedSlots(
-  void *theEnv,
   char *readSource,
   SYMBOL_HN *slotName,
   int multifieldSlot,
@@ -456,11 +449,10 @@ static struct templateSlot *DefinedSlots(
    /* Build the slot container. */
    /*===========================*/
 
-   newSlot = get_struct(theEnv,templateSlot);
+   newSlot = get_struct(templateSlot);
    newSlot->slotName = slotName;
    newSlot->defaultList = NULL;
-   newSlot->facetList = NULL;
-   newSlot->constraints = GetConstraintRecord(theEnv);
+   newSlot->constraints = GetConstraintRecord();
    if (multifieldSlot)
      { newSlot->constraints->multifieldsAllowed = TRUE; }
    newSlot->multislot = multifieldSlot;
@@ -474,13 +466,13 @@ static struct templateSlot *DefinedSlots(
    /*========================================*/
 
    InitializeConstraintParseRecord(&parsedConstraints);
-   GetToken(theEnv,readSource,inputToken);
+   GetToken(readSource,inputToken);
 
    while (inputToken->type != RPAREN)
      {
-      PPBackup(theEnv);
-      SavePPBuffer(theEnv," ");
-      SavePPBuffer(theEnv,inputToken->printForm);
+      PPBackup();
+      SavePPBuffer(" ");
+      SavePPBuffer(inputToken->printForm);
 
       /*================================================*/
       /* Slot attributes begin with a left parenthesis. */
@@ -488,9 +480,9 @@ static struct templateSlot *DefinedSlots(
 
       if (inputToken->type != LPAREN)
         {
-         SyntaxErrorMessage(theEnv,"deftemplate");
-         ReturnSlots(theEnv,newSlot);
-         DeftemplateData(theEnv)->DeftemplateError = TRUE;
+         SyntaxErrorMessage("deftemplate");
+         ReturnSlots(newSlot);
+         DeftemplateError = TRUE;
          return(NULL);
         }
 
@@ -498,12 +490,12 @@ static struct templateSlot *DefinedSlots(
       /* The name of the attribute must be a symbol. */
       /*=============================================*/
 
-      GetToken(theEnv,readSource,inputToken);
+      GetToken(readSource,inputToken);
       if (inputToken->type != SYMBOL)
         {
-         SyntaxErrorMessage(theEnv,"deftemplate");
-         ReturnSlots(theEnv,newSlot);
-         DeftemplateData(theEnv)->DeftemplateError = TRUE;
+         SyntaxErrorMessage("deftemplate");
+         ReturnSlots(newSlot);
+         DeftemplateError = TRUE;
          return(NULL);
         }
 
@@ -513,12 +505,12 @@ static struct templateSlot *DefinedSlots(
 
       if (StandardConstraint(ValueToString(inputToken->value)))
         {
-         if (ParseStandardConstraint(theEnv,readSource,(ValueToString(inputToken->value)),
+         if (ParseStandardConstraint(readSource,(ValueToString(inputToken->value)),
                                      newSlot->constraints,&parsedConstraints,
                                      multifieldSlot) == FALSE)
            {
-            DeftemplateData(theEnv)->DeftemplateError = TRUE;
-            ReturnSlots(theEnv,newSlot);
+            DeftemplateError = TRUE;
+            ReturnSlots(newSlot);
             return(NULL);
            }
         }
@@ -537,9 +529,9 @@ static struct templateSlot *DefinedSlots(
 
          if (defaultFound)
            {
-            AlreadyParsedErrorMessage(theEnv,"default attribute",NULL);
-            DeftemplateData(theEnv)->DeftemplateError = TRUE;
-            ReturnSlots(theEnv,newSlot);
+            AlreadyParsedErrorMessage("default attribute",NULL);
+            DeftemplateError = TRUE;
+            ReturnSlots(newSlot);
             return(NULL);
            }
 
@@ -564,11 +556,11 @@ static struct templateSlot *DefinedSlots(
          /* Parse the list of default values. */
          /*===================================*/
 
-         defaultList = ParseDefault(theEnv,readSource,multifieldSlot,(int) newSlot->defaultDynamic,
-                                  TRUE,&noneSpecified,&deriveSpecified,&DeftemplateData(theEnv)->DeftemplateError);
-         if (DeftemplateData(theEnv)->DeftemplateError == TRUE)
+         defaultList = ParseDefault(readSource,multifieldSlot,(int) newSlot->defaultDynamic,
+                                  TRUE,&noneSpecified,&deriveSpecified,&DeftemplateError);
+         if (DeftemplateError == TRUE)
            {
-            ReturnSlots(theEnv,newSlot);
+            ReturnSlots(newSlot);
             return(NULL);
            }
 
@@ -585,30 +577,6 @@ static struct templateSlot *DefinedSlots(
            }
          newSlot->defaultList = defaultList;
         }
-        
-      /*===============================================*/
-      /* else if the attribute is the facet attribute. */
-      /*===============================================*/
-      
-      else if (strcmp(ValueToString(inputToken->value),"facet") == 0)
-        {
-         if (! ParseFacetAttribute(theEnv,readSource,newSlot,FALSE))
-           {
-            ReturnSlots(theEnv,newSlot);
-            DeftemplateData(theEnv)->DeftemplateError = TRUE;
-            return(NULL);
-           }
-        }
-        
-      else if (strcmp(ValueToString(inputToken->value),"multifacet") == 0)
-        {
-         if (! ParseFacetAttribute(theEnv,readSource,newSlot,TRUE))
-           {
-            ReturnSlots(theEnv,newSlot);
-            DeftemplateData(theEnv)->DeftemplateError = TRUE;
-            return(NULL);
-           }
-        }
 
       /*============================================*/
       /* Otherwise the attribute is an invalid one. */
@@ -616,9 +584,9 @@ static struct templateSlot *DefinedSlots(
 
       else
         {
-         SyntaxErrorMessage(theEnv,"slot attributes");
-         ReturnSlots(theEnv,newSlot);
-         DeftemplateData(theEnv)->DeftemplateError = TRUE;
+         SyntaxErrorMessage("slot attributes");
+         ReturnSlots(newSlot);
+         DeftemplateError = TRUE;
          return(NULL);
         }
 
@@ -626,7 +594,7 @@ static struct templateSlot *DefinedSlots(
       /* Begin parsing the next attribute. */
       /*===================================*/
 
-      GetToken(theEnv,readSource,inputToken);
+      GetToken(readSource,inputToken);
      }
 
    /*============================*/
@@ -636,159 +604,9 @@ static struct templateSlot *DefinedSlots(
    return(newSlot);
   }
 
-/***************************************************/
-/* ParseFacetAttribute: Parses the type attribute. */
-/***************************************************/
-static intBool ParseFacetAttribute(
-  void *theEnv,
-  char *readSource,
-  struct templateSlot *theSlot,
-  intBool multifacet)
-  {
-   struct token inputToken;
-   SYMBOL_HN *facetName;
-   struct expr *facetPair, *tempFacet, *facetValue = NULL, *lastValue = NULL;
-
-   /*==============================*/
-   /* Parse the name of the facet. */
-   /*==============================*/
-   
-   SavePPBuffer(theEnv," ");
-   GetToken(theEnv,readSource,&inputToken);
-   
-   /*==================================*/
-   /* The facet name must be a symbol. */
-   /*==================================*/
-   
-   if (inputToken.type != SYMBOL)
-     {
-      if (multifacet) SyntaxErrorMessage(theEnv,"multifacet attribute");
-      else SyntaxErrorMessage(theEnv,"facet attribute");
-      return(FALSE);
-     }
-     
-   facetName = (SYMBOL_HN *) inputToken.value;
-
-   /*===================================*/
-   /* Don't allow facets with the same  */
-   /* name as a predefined CLIPS facet. */
-   /*===================================*/
-   
-   /*====================================*/
-   /* Has the facet already been parsed? */
-   /*====================================*/
-   
-   for (tempFacet = theSlot->facetList;
-        tempFacet != NULL;
-        tempFacet = tempFacet->nextArg)
-     {
-      if (tempFacet->value == facetName)
-        {
-         if (multifacet) AlreadyParsedErrorMessage(theEnv,"multifacet ",ValueToString(facetName));
-         else AlreadyParsedErrorMessage(theEnv,"facet ",ValueToString(facetName));
-         return(FALSE);
-        }
-     }
-   
-   /*===============================*/
-   /* Parse the value of the facet. */
-   /*===============================*/
-   
-   SavePPBuffer(theEnv," ");
-   GetToken(theEnv,readSource,&inputToken);
-
-   while (inputToken.type != RPAREN)
-     {
-      /*=====================================*/
-      /* The facet value must be a constant. */
-      /*=====================================*/
-   
-      if (! ConstantType(inputToken.type))
-        {
-         if (multifacet) SyntaxErrorMessage(theEnv,"multifacet attribute");
-         else SyntaxErrorMessage(theEnv,"facet attribute");
-         ReturnExpression(theEnv,facetValue);
-         return(FALSE);
-        }
-
-      /*======================================*/
-      /* Add the value to the list of values. */
-      /*======================================*/
-      
-      if (lastValue == NULL)
-        { 
-         facetValue = GenConstant(theEnv,inputToken.type,inputToken.value);
-         lastValue = facetValue;
-        }
-      else
-        {
-         lastValue->nextArg = GenConstant(theEnv,inputToken.type,inputToken.value);
-         lastValue = lastValue->nextArg;
-        }
-        
-      /*=====================*/
-      /* Get the next token. */
-      /*=====================*/
-      
-      SavePPBuffer(theEnv," ");
-      GetToken(theEnv,readSource,&inputToken);
-      
-      /*===============================================*/
-      /* A facet can't contain more than one constant. */
-      /*===============================================*/
-      
-      if ((! multifacet) && (inputToken.type != RPAREN))
-        {
-         SyntaxErrorMessage(theEnv,"facet attribute");
-         ReturnExpression(theEnv,facetValue);
-         return(FALSE);
-        }
-     }
-     
-   /*========================================================*/
-   /* Remove the space before the closing right parenthesis. */
-   /*========================================================*/
-   
-   PPBackup(theEnv);
-   PPBackup(theEnv);
-   SavePPBuffer(theEnv,")");
-
-   /*====================================*/
-   /* A facet must contain one constant. */
-   /*====================================*/
-      
-   if ((! multifacet) && (facetValue == NULL))
-     {
-      SyntaxErrorMessage(theEnv,"facet attribute");
-      return(FALSE);
-     }
-
-   /*=================================================*/
-   /* Add the facet to the list of the slot's facets. */
-   /*=================================================*/
-   
-   facetPair = GenConstant(theEnv,SYMBOL,facetName);
-   
-   if (multifacet)
-     { 
-      facetPair->argList = GenConstant(theEnv,FCALL,(void *) FindFunction(theEnv,"create$"));
-      facetPair->argList->argList = facetValue;
-     }
-   else
-     { facetPair->argList = facetValue; }
-   
-   facetPair->nextArg = theSlot->facetList;
-   theSlot->facetList = facetPair;
-   
-   /*===============================================*/
-   /* The facet/multifacet was successfully parsed. */
-   /*===============================================*/
-
-   return(TRUE);
-  }
-
 #endif /* (! RUN_TIME) && (! BLOAD_ONLY) */
 
 #endif /* DEFTEMPLATE_CONSTRUCT */
 
 
+

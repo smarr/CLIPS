@@ -1,32 +1,12 @@
-   /*******************************************************/
-   /*      "C" Language Integrated Production System      */
-   /*                                                     */
-   /*              CLIPS Version 6.24  06/05/06           */
-   /*                                                     */
-   /*                                                     */
-   /*******************************************************/
-   
-/*************************************************************/
-/* Purpose:                                                  */
-/*                                                           */
-/* Principal Programmer(s):                                  */
-/*                                                           */
-/* Contributing Programmer(s):                               */
-/*                                                           */
-/* Revision History:                                         */
-/*      6.23: Changed name of variable log to logName        */
-/*            because of Unix compiler warnings of shadowed  */
-/*            definitions.                                   */
-/*                                                           */
-/*      6.24: Corrected code generating compilation          */
-/*            warnings.                                      */
-/*                                                           */
-/*************************************************************/
+/*   CLIPS Version 6.10  04/09/97 */
 
 /*
  * This file contains the command processing functions for a number of
  * commands, including the search, spawn, and compile functions.
  */
+/* Who               |     Date    | Description             */
+/* ------------------+-------------+------------------------ */
+/* M.Giordano        | 23-Mar-2000 | Mods made for TLS       */
 
 #include "setup.h"
 
@@ -36,7 +16,7 @@
 #include "ed.h"
 #include "cstrcpsr.h"
 
-static int     tabsize;                        /* Tab size (0: use real tabs)  */
+Thread static int     tabsize;                        /* Tab size (0: use real tabs)  */
 
 /* -----------------------------
  *  Spawn function setups
@@ -51,20 +31,18 @@ static int     tabsize;                        /* Tab size (0: use real tabs)  *
 #include        <descrip.h>
 #include        <iodef.h>
 
-extern  int     oldmode[2];                      /* In "termio.c"        */
-extern  int     newmode[2];                      /* In "termio.c"        */
-extern  short   iochan;                          /* In "termio.c"        */
+extern  Thread int     oldmode[2];                      /* In "termio.c"        */
+extern  Thread int     newmode[2];                      /* In "termio.c"        */
+extern  Thread short   iochan;                          /* In "termio.c"        */
 #endif
 
-#if     WIN_MVC || WIN_BTC || WIN_GCC
+#if     IBM_MSC || IBM_TBC || IBM_ZTC || IBM_ICB || IBM_SC || IBM_GCC
 #include        <dos.h>
 #endif
 
-#if     UNIX_7 || UNIX_V || LINUX || DARWIN
-/*
-extern void sleep(int);
-*/
-#include        <unistd.h>
+#if     UNIX_7 || UNIX_V
+extern VOID sleep(int);
+
 #include        <signal.h>
 #endif
 
@@ -75,26 +53,25 @@ extern void sleep(int);
 
 #define MAX_COMPILE_LINE 161
 
-static int cur_col;
-static long region_size;
-static LINE *linep;
-static int loffs;
-static int CompileSuccess = 1;
-static char CompileLine[MAX_COMPILE_LINE];
-static int CompileLineIndex = 0;
+Thread static int cur_col;
+Thread static long region_size;
+Thread static LINE *linep;
+Thread static int loffs;
+Thread static int CompileSuccess = 1;
+Thread static char CompileLine[MAX_COMPILE_LINE];
+Thread static int CompileLineIndex = 0;
 
 /********************************************************/
 /*    compile a region of a file 			*/
 /********************************************************/
 
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int compile_region(
-  void *theEnv,
-  int f,
-  int n)
-  {
+int f,
+int n)
+{
     register int    s;
     REGION   region;
 
@@ -110,7 +87,7 @@ globle int compile_region(
    if (( s = getregion(&region)) != TRUE)
       return(s);
    if ((lastflag&CFKILL) == 0)
-     kdelete(theEnv);
+     kdelete();
    thisflag |= CFKILL;
    linep = region.r_linep;
    loffs = region.r_offset;
@@ -125,31 +102,30 @@ globle int compile_region(
 
    /* Create IO router for the region (CLIPS.C) */
 
-   EnvAddRouter(theEnv,"emacs_region",90,region_fnd,
+   AddRouter("emacs_region",90,region_fnd,
 		NULL,region_getc,region_ungetc,NULL);
 
    /* COMPILE */
 
-   if (get_compile(theEnv,"emacs_region","Emacs_region") == 0)
+   if (get_compile("emacs_region","Emacs_region") == 0)
      mlwrite("Error while forming compilation buffer!");
    else
      mlwrite("Compilation done.");
    return (TRUE);
-  }
+}
 
 
 /*****************************************************
  *  This function will compile a file form emacs     *
  *****************************************************/
 
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int compile_file(
-  void *theEnv,
-  int f,
-  int n)
-  {
+int f,
+int n)
+{
    if (curbp == CompileBufferp)
      {
       mlwrite("Cannot compile this buffer!");
@@ -163,54 +139,53 @@ globle int compile_file(
 
    /*  Create a IO router for the file   (CLIPS.C)  */
 
-   EnvAddRouter(theEnv,"emacs_file",90,buffer_fnd,
+   AddRouter("emacs_file",90,buffer_fnd,
 		NULL,buffer_getc,buffer_ungetc,NULL);
 
    /*   COMPILE   */
 
-   if (get_compile(theEnv,"emacs_file","Emacs_buffer") == 0)
+   if (get_compile("emacs_file","Emacs_buffer") == 0)
      mlwrite("Error while forming compilation buffer!");
    else
      mlwrite("Compilation done.");
    return (TRUE);
-  }
+}
 
 
 /**********************************************************
  *  Compiles the whole buffer or just a region of a buffer*
  **********************************************************/
 globle int get_compile(
-  void *theEnv,
-  char *str1,
-  char *str2)
-  {
+char *str1,
+char *str2)
+{
 #if (! RUN_TIME) && (! BLOAD_ONLY)
    register WINDOW *wp;
    register BUFFER *bp;
 
    CompileSuccess = 1;
    CompileBufferp->b_flag &= ~BFCHG;           /* Don't complain!      */
-   if (bclear(theEnv,CompileBufferp) != TRUE)         /* Blow old text away   */
+   if (bclear(CompileBufferp) != TRUE)         /* Blow old text away   */
      return (0);
    CompileLineIndex = 0;
    CompileLine[0] = '\0';
 
-   EnvActivateRouter(theEnv,str1);	
-   EnvActivateRouter(theEnv,"cmp_router");
-   SetPrintWhileLoading(theEnv,TRUE);
-   LoadConstructsFromLogicalName(theEnv,str2);
-   DestroyPPBuffer(theEnv);
+   ActivateRouter(str1);	
+   ActivateRouter("cmp_router");
+   SetPrintWhileLoading(TRUE);
+   LoadConstructsFromLogicalName(str2);
+   DestroyPPBuffer();
    /* Flush last diagnostic line (if any) to buffer */
    if (CompileLineIndex != 0)
-     addline(theEnv,CompileBufferp,CompileLine);
-   EnvDeactivateRouter(theEnv,str1);	
-   EnvDeactivateRouter(theEnv,"cmp_router");
-   SetPrintWhileLoading(theEnv,FALSE);
-   EnvDeleteRouter(theEnv,str1);
+     addline(CompileBufferp,CompileLine);
+   DeactivateRouter(str1);	
+   DeactivateRouter("cmp_router");
+   SetPrintWhileLoading(FALSE);
+   DeleteRouter(str1);
 
-   genstrcpy(CompileBufferp->b_fname, "");
+   strcpy(CompileBufferp->b_fname, "");
    if (CompileBufferp->b_nwnd == 0) {          /* Not on screen yet.   */
-           if ((wp=wpopup(theEnv)) == NULL)
+           if ((wp=wpopup()) == NULL)
                    return (0);
            bp = wp->w_bufp;
            if (--bp->b_nwnd == 0) {
@@ -238,7 +213,7 @@ globle int get_compile(
 #else
    return(0);
 #endif		
-  }
+}
 
 /****************************************************************
  *  This function will compare the logical name with names in 	*
@@ -246,24 +221,23 @@ globle int get_compile(
  ****************************************************************/
 
 globle int region_fnd(
-  void *theEnv,
-  char *log_name)
-  {
-   if (strcmp("Emacs_region",log_name)== 0)
-     { return(TRUE); }
-   return(FALSE);
-  }
+char *log_name)
+{
+    if(strcmp("Emacs_region",log_name)== 0)
+	return(TRUE);
+    return(FALSE);
+
+}
 
 /****************************************************************
  *   This function will return a character from the file which  *
  *   is referenced by the logical name				*
  ****************************************************************/
 
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int region_getc(
-  void *theEnv,
 char *log_name)
 {
   int c;
@@ -287,11 +261,10 @@ char *log_name)
  * This function will move the cursor back one charater*
  *******************************************************/
 
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int region_ungetc(
-  void *theEnv,
 int c,
 char *log_name)
 
@@ -316,8 +289,7 @@ char *log_name)
  **************************************************************/
 
 globle int buffer_fnd(
-  void *theEnv,
-  char *log_name)
+char *log_name)
 {
     if(strcmp("Emacs_buffer",log_name)== 0)
     	return(TRUE);
@@ -330,12 +302,11 @@ globle int buffer_fnd(
  * is referred by the logical name				*
  ****************************************************************/
 
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int buffer_getc(
-  void *theEnv,
-  char *log_name)
+char *log_name)
 {
   int c;
   if (linep == curbp->b_linep)       /* End of file */
@@ -359,13 +330,12 @@ globle int buffer_getc(
  * this function will move the cursor back to one character  *
  *************************************************************/
 
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int buffer_ungetc(
-  void *theEnv,
-  int    c,
-  char  *logical_name)
+int    c,
+char  *logical_name)
 {
     if (c == EOF)
       return(1);
@@ -380,21 +350,19 @@ globle int buffer_ungetc(
 }
 
 globle int query_cmp(
-  void *theEnv,
-  char *logName)
+char *log)
 {
-   if((strcmp(logName,"wdialog") == 0) ||
-      (strcmp(logName,"wtrace")  == 0) ||
-      (strcmp(logName,"wwarning")  == 0) ||
-      (strcmp(logName,"werror")  == 0))
+   if((strcmp(log,"wdialog") == 0) ||
+      (strcmp(log,"wtrace")  == 0) ||
+      (strcmp(log,"wwarning")  == 0) ||
+      (strcmp(log,"werror")  == 0))
        return(TRUE);
    else
        return(FALSE);
 }
 
 globle int print_cmp(
-  void *theEnv,
-  char *logName, 
+  char *log, 
   char *str)
   {
    register int i;
@@ -405,7 +373,7 @@ globle int print_cmp(
      {
       if ((str[i] == '\n') || (str[i] == '\r'))
         {
-         addline(theEnv,CompileBufferp,CompileLine);
+         addline(CompileBufferp,CompileLine);
          CompileLineIndex = 0;
          CompileLine[0] = '\0';
         }
@@ -416,7 +384,7 @@ globle int print_cmp(
         }
       else
         {
-         addline(theEnv,CompileBufferp,CompileLine);
+         addline(CompileBufferp,CompileLine);
          CompileLineIndex = 1;
          CompileLine[0] = str[i];
          CompileLine[1] = '\0';
@@ -425,10 +393,9 @@ globle int print_cmp(
    return(1);
   }
 
-globle void init_cmp_router(
-  void *theEnv)
-  {
-   EnvAddRouter(theEnv,"cmp_router",
+globle VOID init_cmp_router()
+{
+   AddRouter("cmp_router",
 	      20,
 	      query_cmp,
 	      print_cmp,
@@ -436,13 +403,12 @@ globle void init_cmp_router(
 	      NULL,
 	      NULL
 	      );
-  }
+}
 
-globle void kill_cmp_router(
-  void *theEnv)
-  {
-   EnvDeleteRouter(theEnv,"cmp_router");
-  }
+globle VOID kill_cmp_router()
+{
+   DeleteRouter("cmp_router");
+}
 
 /* =========================================================================
  *                              MISC FUNCTIONS
@@ -452,31 +418,29 @@ globle void kill_cmp_router(
 /*
  * Set fill column to n.
  */
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int setfillcol(
-  void *theEnv,
-  int f,
-  int n)
-  {
-   fillcol = n;
-   return(TRUE);
-  }
+int f,
+int n)
+{
+        fillcol = n;
+        return(TRUE);
+}
 
 /*
  * Display the current position of the cursor; the current
  * column, the current line and the total number of lines in the file.
  * Bound to "C-X =".      CJC, 8-1-86
  */
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int showcpos(
-  void *theEnv,
-  int f,
-  int n)
-  {
+int f,
+int n)
+{
         register int    cline;
         register int    col;
         register int    tline;
@@ -487,7 +451,7 @@ globle int showcpos(
         mlwrite("MicroEMACS Version %s   col: %d  line: %d of %d"
                 ,VERSION_NUM, col+1, cline, tline);
         return (TRUE);
-  }
+}
 
 /*
  * Return current column.  Stop at first non-blank given TRUE argument.
@@ -550,21 +514,20 @@ globle int cntlines()
 /*
  * Go to a specified line number
  */
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int gotoline(
-  void *theEnv,
-  int f,
-  int n)
-  {
+int f,
+int n)
+{
    register int line;
    char buf[5];
    register int i;
    register int s;
    struct LINE *clp;
 
-   if ((s=mlreply(theEnv,"Goto line: ", buf, 5)) != TRUE)
+   if ((s=mlreply("Goto line: ", buf, 5)) != TRUE)
         return (s);
 
    if((line = atoi(buf)) <= 0) {
@@ -587,7 +550,7 @@ globle int gotoline(
    curwp->w_doto  = 0;
    curwp->w_flag |= WFMOVE;
    return (TRUE);
-  }
+}
 
 /*
  * Twiddle the two characters on either side of dot. If dot is at the end of
@@ -596,14 +559,13 @@ globle int gotoline(
  * work. This fixes up a very common typo with a single stroke. Normally bound
  * to "C-T". This always works within a line, so "WFEDIT" is good enough.
  */
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int twiddle(
-  void *theEnv,
-  int f,
-  int n)
-  {
+int f,
+int n)
+{
         register LINE   *dotp;
         register int    doto;
         register int    cl;
@@ -621,7 +583,7 @@ globle int twiddle(
         lputc(dotp, doto+1, cl);
         lchange(WFEDIT);
         return (TRUE);
-  }
+}
 
 /*
  * Quote the next character, and insert it into the buffer. All the characters
@@ -630,14 +592,13 @@ globle int twiddle(
  * inserted 0 times, for regularity. Bound to "M-Q" (for me) and "C-Q" (for
  * Rich, and only on terminals that don't need XON-XOFF).
  */
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int quote(
-  void *theEnv,
-  int f,
-  int n)
-  {
+int f,
+int n)
+{
         register int    s;
         register int    c;
 
@@ -648,12 +609,12 @@ globle int quote(
                 return (TRUE);
         if (c == '\n') {
                 do {
-                        s = lnewline(theEnv);
+                        s = lnewline();
                 } while (s==TRUE && --n);
                 return (s);
         }
-        return (linsert(theEnv,n, c));
-  }
+        return (linsert(n, c));
+}
 
 /*
  * Set tab size if given non-default argument (n <> 1).  Otherwise, insert a
@@ -662,14 +623,13 @@ globle int quote(
  * done in this slightly funny way because the tab (in ASCII) has been turned
  * into "C-I" (in 10 bit code) already. Bound to "C-I".
  */
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int tab(
-  void *theEnv,
-  int f,
-  int n)
-  {
+int f,
+int n)
+{
         if (n < 0)
                 return (FALSE);
         if (n == 0 || n > 1) {
@@ -677,23 +637,22 @@ globle int tab(
                 return(TRUE);
         }
         if (! tabsize)
-                return(linsert(theEnv,1, '\t'));
-        return(linsert(theEnv,tabsize - (getccol(FALSE) % tabsize), ' '));
-  }
+                return(linsert(1, '\t'));
+        return(linsert(tabsize - (getccol(FALSE) % tabsize), ' '));
+}
 
 /*
  * Open up some blank space. The basic plan is to insert a bunch of newlines,
  * and then back up over them. Everything is done by the subcommand
  * procerssors. They even handle the looping. Normally this is bound to "C-O".
  */
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int openline(
-  void *theEnv,
-  int f,
-  int n)
-  {
+int f,
+int n)
+{
         register int    i;
         register int    s;
 
@@ -703,12 +662,12 @@ globle int openline(
                 return (TRUE);
         i = n;                                  /* Insert newlines.     */
         do {
-                s = lnewline(theEnv);
+                s = lnewline();
         } while (s==TRUE && --i);
         if (s == TRUE)                          /* Then back up overtop */
-                s = backchar(theEnv,f, n);             /* of them all.         */
+                s = backchar(f, n);             /* of them all.         */
         return (s);
-  }
+}
 
 /*
  * Insert a newline. Bound to "C-M". If you are at the end of the line and the
@@ -717,14 +676,13 @@ globle int openline(
  * has to be done. This would not be as critical if screen update were a lot
  * more efficient.
  */
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int newline(
-  void *theEnv,
-  int f,
-  int n)
-  {
+int f,
+int n)
+{
         register LINE   *lp;
         register int    s;
 
@@ -735,13 +693,13 @@ globle int newline(
                 if (llength(lp) == curwp->w_doto
                 && lp != curbp->b_linep
                 && llength(lforw(lp)) == 0) {
-                        if ((s=forwchar(theEnv,FALSE, 1)) != TRUE)
+                        if ((s=forwchar(FALSE, 1)) != TRUE)
                                 return (s);
-                } else if ((s=lnewline(theEnv)) != TRUE)
+                } else if ((s=lnewline()) != TRUE)
                         return (s);
         }
         return (TRUE);
-  }
+}
 
 /*
  * Delete blank lines around dot. What this command does depends if dot is
@@ -751,14 +709,13 @@ globle int newline(
  * the line. Normally this command is bound to "C-X C-O". Any argument is
  * ignored.
  */
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int deblank(
-  void *theEnv,
-  int f,
-  int n)
-  {
+int f,
+int n)
+{
         register LINE   *lp1;
         register LINE   *lp2;
         long nld;
@@ -774,8 +731,8 @@ globle int deblank(
                 return (TRUE);
         curwp->w_dotp = lforw(lp1);
         curwp->w_doto = 0;
-        return (ldelete(theEnv,nld,FALSE));
-  }
+        return (ldelete(nld,FALSE));
+}
 
 /*
  * Insert a newline, then enough tabs and spaces to duplicate the indentation
@@ -785,13 +742,12 @@ globle int deblank(
  * of tabs and spaces. Return TRUE if all ok. Return FALSE if one of the
  * subcomands failed. Normally bound to "C-J".
  */
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int indent(
-  void *theEnv,
-  int f,
-  int n)
+int f,
+int n)
 {
         register int    nicol;
         register int    c;
@@ -809,9 +765,9 @@ globle int indent(
                                 nicol |= 0x07;
                         ++nicol;
                 }
-                if (lnewline(theEnv) == FALSE
-                || ((i=nicol/8)!=0 && linsert(theEnv,i, '\t')==FALSE)
-                || ((i=nicol%8)!=0 && linsert(theEnv,i,  ' ')==FALSE))
+                if (lnewline() == FALSE
+                || ((i=nicol/8)!=0 && linsert(i, '\t')==FALSE)
+                || ((i=nicol%8)!=0 && linsert(i,  ' ')==FALSE))
                         return (FALSE);
         }
         return (TRUE);
@@ -823,23 +779,22 @@ globle int indent(
  * If any argument is present, it kills rather than deletes, to prevent loss
  * of text if typed with a big argument. Normally bound to "C-D".
  */
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int forwdel(
-  void *theEnv,
-  int f,
-  int n)
-  {
+int f,
+int n)
+{
         if (n < 0)
-                return (backdel(theEnv,f, -n));
+                return (backdel(f, -n));
         if (f != FALSE) {                       /* Really a kill.       */
                 if ((lastflag&CFKILL) == 0)
-                        kdelete(theEnv);
+                        kdelete();
                 thisflag |= CFKILL;
         }
-        return (ldelete(theEnv,(long) n, f));
-  }
+        return (ldelete((long) n, f));
+}
 
 /*
  * Delete backwards. This is quite easy too, because it's all done with other
@@ -847,27 +802,26 @@ globle int forwdel(
  * forward, this actually does a kill if presented with an argument. Bound to
  * both "RUBOUT" and "C-H".
  */
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int backdel(
-  void *theEnv,
-  int f,
-  int n)
-  {
+int f,
+int n)
+{
         register int    s;
 
         if (n < 0)
-                return (forwdel(theEnv,f, -n));
+                return (forwdel(f, -n));
         if (f != FALSE) {                       /* Really a kill.       */
                 if ((lastflag&CFKILL) == 0)
-                        kdelete(theEnv);
+                        kdelete();
                 thisflag |= CFKILL;
         }
-        if ((s=backchar(theEnv,f, n)) == TRUE)
-                s = ldelete(theEnv,(long) n, f);
+        if ((s=backchar(f, n)) == TRUE)
+                s = ldelete((long) n, f);
         return (s);
-  }
+}
 
 /*
  * Kill text. If called without an argument, it kills from dot to the end of
@@ -877,19 +831,18 @@ globle int backdel(
  * number of newlines. If called with a negative argument it kills backwards
  * that number of newlines. Normally bound to "C-K".
  */
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int kill_fwd(
-  void *theEnv,
-  int f,
-  int n)
-  {
+int f,
+int n)
+{
         register int    chunk;
         register LINE   *nextp;
 
         if ((lastflag&CFKILL) == 0)             /* Clear kill buffer if */
-                kdelete(theEnv);                      /* last wasn't a kill.  */
+                kdelete();                      /* last wasn't a kill.  */
         thisflag |= CFKILL;
         if (f == FALSE) {
                 chunk = llength(curwp->w_dotp)-curwp->w_doto;
@@ -911,8 +864,8 @@ globle int kill_fwd(
                 mlwrite("neg kill");
                 return (FALSE);
         }
-        return (ldelete(theEnv,(long) chunk, TRUE));
-  }
+        return (ldelete((long) chunk, TRUE));
+}
 
 /*
  * Yank text back from the kill buffer. This is really easy. All of the work
@@ -922,14 +875,13 @@ globle int kill_fwd(
  * happens when you type a carriage return also happens when a carriage return
  * is yanked back from the kill buffer.
  */
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int yank(
-  void *theEnv,
-  int f,
-  int n)
-  {
+int f,
+int n)
+{
         register int    c;
         register int    i;
 
@@ -939,17 +891,17 @@ globle int yank(
                 i = 0;
                 while ((c=kremove(i)) >= 0) {
                         if (c == '\n') {
-                                if (newline(theEnv,FALSE, 1) == FALSE)
+                                if (newline(FALSE, 1) == FALSE)
                                         return (FALSE);
                         } else {
-                                if (linsert(theEnv,1, c) == FALSE)
+                                if (linsert(1, c) == FALSE)
                                         return (FALSE);
                         }
                         ++i;
                 }
         }
         return (TRUE);
-  }
+}
 
 /* =========================================================================
  *                           SEARCH FUNCTIONS
@@ -993,13 +945,12 @@ globle int yank(
  * string, and [perhaps] repaint the display. Bound to "C-S".
  */
 
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int forwsearch(
-  void *theEnv,
-  int f,
-  int n)
+int f,
+int n)
     {
     register LINE *clp;
     register int cbo;
@@ -1009,7 +960,7 @@ globle int forwsearch(
     register char *pp;
     register int s;
 
-    if ((s = readpattern(theEnv,"Search")) != TRUE)
+    if ((s = readpattern("Search")) != TRUE)
         return (s);
 
     clp = curwp->w_dotp;
@@ -1068,13 +1019,12 @@ fail:;
  * pointing at the first character of the pattern [the last character that was
  * matched. Bound to "C-R".
  */
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int backsearch(
-  void *theEnv,
-  int f,
-  int n)
+int f,
+int n)
     {
     register LINE *clp;
     register int cbo;
@@ -1085,7 +1035,7 @@ globle int backsearch(
     register char *pp;
     register int s;
 
-    if ((s = readpattern(theEnv,"Reverse search")) != TRUE)
+    if ((s = readpattern("Reverse search")) != TRUE)
         return (s);
 
     for (epp = &pat[0]; epp[1] != 0; ++epp)
@@ -1154,13 +1104,12 @@ globle int backsearch(
  *   and replace all occurences of an old string by a   *
  *   new string.                                        *
  ********************************************************/
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int bkwrdrpl(
-  void *theEnv,
-  int f,
-  int n)
+int f,
+int n)
     {
     LINE *clp;
     int cbo;
@@ -1172,12 +1121,12 @@ globle int bkwrdrpl(
     char *pat2;
     int s;
 
-    if ((s = readpattern(theEnv,"Rev. replace all occrs of")) != TRUE)
+    if ((s = readpattern("Rev. replace all occrs of")) != TRUE)
         return (s);
-    pat2 = (char *) genalloc(theEnv,(unsigned) strlen (pat) + 1);          /* Pat2 is first pattern */
-    genstrcpy(pat2,pat);
-    if((s = mlreply(theEnv,"Replace with: ",pat,NPAT)) == ABORT) {
-        genfree(theEnv,(void *) pat2, (unsigned) strlen(pat) + 1);
+    pat2 = (char *) genalloc((unsigned) strlen (pat) + 1);          /* Pat2 is first pattern */
+    strcpy(pat2,pat);
+    if((s = mlreply("Replace with: ",pat,NPAT)) == ABORT) {
+        genfree((VOID *) pat2, (unsigned) strlen(pat) + 1);
         return(s);
         }
     for (epp = &pat2[0];epp[1] != 0 ; ++epp);
@@ -1229,7 +1178,7 @@ globle int bkwrdrpl(
 			curwp->w_dotp = clp;
 			curwp->w_doto = tbo;
 			count++;
-			lreplace(theEnv,pat2);
+			lreplace(pat2);
 			clp = curwp->w_dotp;
 			cbo = curwp->w_doto - strlen(pat);
  		  }
@@ -1238,7 +1187,7 @@ globle int bkwrdrpl(
      curwp->w_doto -= strlen(pat);
      curwp->w_flag |= WFMOVE;
      update();
-     gensprintf(buf," %d Replacement[s] ",count);
+     sprintf(buf," %d Replacement[s] ",count);
      mlwrite(buf);
      return(TRUE);
    }
@@ -1248,13 +1197,12 @@ globle int bkwrdrpl(
  *  This function will search backward for the occurences of an old *
  *  string and replace some of them with a new string.              *
  ********************************************************************/
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int bkwrdcr(
-  void *theEnv,
-  int f,
-  int n)
+int f,
+int n)
     {
     LINE *clp;
     int cbo;
@@ -1265,12 +1213,12 @@ globle int bkwrdcr(
     char *pat2;
     int s;
 
-    if ((s = readpattern(theEnv,"Rev. replace some occrs. of")) != TRUE)
+    if ((s = readpattern("Rev. replace some occrs. of")) != TRUE)
         return (s);
-    pat2 = (char *) genalloc(theEnv,(unsigned) strlen (pat) + 1);
-    genstrcpy(pat2,pat);
-    if((s = mlreply(theEnv,"Replace with: ",pat,NPAT)) == ABORT) {
-        genfree(theEnv,(void *) pat2,(unsigned) strlen(pat) + 1);
+    pat2 = (char *) genalloc((unsigned) strlen (pat) + 1);
+    strcpy(pat2,pat);
+    if((s = mlreply("Replace with: ",pat,NPAT)) == ABORT) {
+        genfree((VOID *) pat2,(unsigned) strlen(pat) + 1);
         return(s);
         }
     for (epp = &pat2[0]; epp[1] != 0; ++epp)
@@ -1343,7 +1291,7 @@ globle int bkwrdcr(
 	    	c = (*term.t_getchar)();
             	if((c ==' ')||(c == 'y')||(c == 'Y'))
                	   {
-                 	lreplace(theEnv,pat2);
+                 	lreplace(pat2);
                  	clp = curwp->w_dotp;
                  	cbo = curwp->w_doto - strlen(pat);
 	       	    }
@@ -1358,7 +1306,7 @@ globle int bkwrdcr(
      curwp->w_doto -= strlen(pat);
      update();
      mlwrite("No more occurrences of [%s] in buffer",pat2);
-     genfree(theEnv,(void *) pat2,(unsigned) strlen(pat) + 1);
+     genfree((VOID *) pat2,(unsigned) strlen(pat) + 1);
      return(TRUE);
    }
 
@@ -1369,13 +1317,12 @@ globle int bkwrdcr(
  *  with a new string                                 *
  ******************************************************/
 
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int frwsr(
-  void *theEnv,
-  int f,
-  int n)
+int f,
+int n)
 {
    LINE *clp,*tlp;
    int cbo,tbo,c,s,count = 0 ;
@@ -1384,15 +1331,15 @@ globle int frwsr(
 
  /* Read the string to be replaced */
 
-  if((s = readpattern (theEnv,"Replace the occurences of?")) != TRUE)
+  if((s = readpattern ("Replace the occurences of?")) != TRUE)
     return (s);
-  pat2 = (char *) genalloc (theEnv,(unsigned) strlen(pat) + 1);
-  genstrcpy (pat2,pat);
+  pat2 = (char *) genalloc ((unsigned) strlen(pat) + 1);
+  strcpy (pat2,pat);
 
  /* Read the string to replace with */
 
-  if((s = mlreply(theEnv,"Replace with: ",pat,NPAT)) == ABORT) {
-    genfree(theEnv,(void *) pat2,(unsigned) strlen(pat) + 1);
+  if((s = mlreply("Replace with: ",pat,NPAT)) == ABORT) {
+    genfree((VOID *) pat2,(unsigned) strlen(pat) + 1);
     return(s);
     }
 
@@ -1434,7 +1381,7 @@ globle int frwsr(
             curwp->w_dotp = clp;
             curwp->w_doto = cbo - 1;
             count++;
-            lreplace(theEnv,pat2);
+            lreplace(pat2);
             clp = curwp->w_dotp;
             cbo = curwp->w_doto;
            }
@@ -1444,7 +1391,7 @@ globle int frwsr(
      curwp->w_doto -= strlen(pat);
      curwp->w_flag |= WFMOVE;
      update();
-     gensprintf(buf,"%d replacement[s]",count);
+     sprintf(buf,"%d replacement[s]",count);
      mlwrite(buf);
      return(TRUE);
 
@@ -1455,14 +1402,13 @@ globle int frwsr(
  * replace some of them                            *
  ***************************************************/
 
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int querysr(
-  void *theEnv,
-  int f,
-  int n)
-  {
+int f,
+int n)
+{
    LINE *clp,*tlp;
    int cbo,tbo,c,s;
    char *pp;
@@ -1470,15 +1416,15 @@ globle int querysr(
 
  /* Read the string to be replaced */
 
-  if((s = readpattern (theEnv,"Query_replace ?")) != TRUE)
+  if((s = readpattern ("Query_replace ?")) != TRUE)
     return (s);
-  pat2 = (char *) genalloc(theEnv,(unsigned) strlen(pat) + 1);
-  genstrcpy (pat2,pat);
+  pat2 = (char *) genalloc((unsigned) strlen(pat) + 1);
+  strcpy (pat2,pat);
 
  /* Read the string to replace with */
 
-  if((s = mlreply(theEnv,"Replace with: ",pat,NPAT)) == ABORT) {
-    genfree(theEnv,(void *) pat2,(unsigned) strlen(pat) + 1);
+  if((s = mlreply("Replace with: ",pat,NPAT)) == ABORT) {
+    genfree((VOID *) pat2,(unsigned) strlen(pat) + 1);
     return(s);
     }
 
@@ -1535,7 +1481,7 @@ globle int querysr(
 	    c = (*term.t_getchar)();
             if((c ==' ')||(c == 'y')||(c == 'Y'))
                {
-                 lreplace(theEnv,pat2);
+                 lreplace(pat2);
                  clp = curwp->w_dotp;
                  cbo = curwp->w_doto;
 	       }
@@ -1551,10 +1497,10 @@ globle int querysr(
      curwp->w_doto -= strlen(pat);
      update();
      mlwrite("No more occurrences of [%s] in buffer",pat2);
-     genfree(theEnv,(void *) pat2,(unsigned) strlen(pat) + 1);
+     genfree((VOID *) pat2,(unsigned) strlen(pat) + 1);
      return(TRUE);
 
-  }
+}
 
 /***************************************************
  *    Replace old string with new string           *
@@ -1562,11 +1508,9 @@ globle int querysr(
 
 
 globle int lreplace(
-  void *theEnv,
-  char *pat2)
+char *pat2)
 {
-      int doto;
-      unsigned i;
+      int doto,i;
       char *cp1,*cp2;
       LINE *lp1,*lp2;
       WINDOW *wp;
@@ -1575,7 +1519,7 @@ globle int lreplace(
      lp1 = curwp->w_dotp;
      doto = curwp->w_doto;
 
-     if((lp2 =lalloc(theEnv,(int) (lp1->l_used - strlen(pat2) + strlen(pat) ))) == NULL)
+     if((lp2 =lalloc((int) (lp1->l_used - strlen(pat2) + strlen(pat) ))) == NULL)
           return(FALSE);
 
      cp1 = &lp1->l_text[0];
@@ -1629,7 +1573,7 @@ globle int lreplace(
              }
         wp = wp->w_wndp;
      }
-     genfree(theEnv,(void *) lp1,(unsigned) sizeof(LINE) + lp1->l_size);
+     genfree((VOID *) lp1,(unsigned) sizeof(LINE) + lp1->l_size);
      return(TRUE);
 }
 /********************************************************
@@ -1638,14 +1582,13 @@ globle int lreplace(
  * It is currently bounded to C-X-^                     *
  ********************************************************/
 
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int smatchb(
-  void *theEnv,
-  int f,
-  int n)
-  {
+int f,
+int n)
+{
      int cbo,c;
      LINE *clp;
 
@@ -1671,7 +1614,7 @@ globle int smatchb(
 
      curwp->w_flag |= WFMOVE;
      return(TRUE);
-  }
+}
 
 /***************************************************
  * This function will search for closing bracket,  *
@@ -1810,7 +1753,6 @@ int tempch)
  * style of Jeff Lomicka. There is some do-it-yourself control expansion.
  */
 globle int readpattern(
-    void *theEnv,
     char *prompt)
     {
     register char *cp1;
@@ -1852,10 +1794,10 @@ globle int readpattern(
     *cp1++ = ':';                       /* Finish prompt */
     *cp1++ = ' ';
     *cp1++ = '\0';
-    s = mlreply(theEnv,tpat, tpat, NPAT);      /* Read pattern */
+    s = mlreply(tpat, tpat, NPAT);      /* Read pattern */
 
     if (s == TRUE)                      /* Specified */
-        genstrcpy(pat, tpat);
+        strcpy(pat, tpat);
     else if (s == FALSE && pat[0] != 0)         /* CR, but old one */
         s = TRUE;
 
@@ -1878,15 +1820,14 @@ globle int readpattern(
  * repaint. Bound to "C-C". The message at the start in VMS puts out a newline.
  * Under some (unknown) condition, you don't get one free when DCL starts up.
  */
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int spawncli(
-  void *theEnv,
-  int f,
-  int n)
+int f,
+int n)
 {
-#if     UNIX_7 || UNIX_V || LINUX || DARWIN || WIN_MVC || WIN_BTC || WIN_GCC
+#if     UNIX_7 || UNIX_V || IBM_MSC || IBM_TBC || IBM_ZTC || IBM_ICB || IBM_SC || IBM_GCC
         register char *cp;
 #endif
 	
@@ -1898,7 +1839,7 @@ globle int spawncli(
         return (sys(NULL));                     /* NULL => DCL.         */
 #endif
 
-#if     WIN_MVC || WIN_BTC || WIN_GCC
+#if     IBM_MSC || IBM_TBC || IBM_ZTC || IBM_ICB || IBM_SC || IBM_GCC
         cp = getenv("COMSPEC");
         if (cp == NULL)
           return(TRUE);
@@ -1909,7 +1850,7 @@ globle int spawncli(
         return(TRUE);
 #endif
 
-#if     UNIX_7 || UNIX_V || LINUX || DARWIN
+#if     UNIX_7 || UNIX_V
         movecursor(term.t_nrow, 0);             /* Seek to last line.   */
         (*term.t_flush)();
         ttclose();                              /* stty to old settings */
@@ -1929,19 +1870,18 @@ globle int spawncli(
  * character to be typed, then mark the screen as garbage so a full repaint is
  * done. Bound to "C-X !".
  */
-#if WIN_BTC
+#if IBM_TBC
 #pragma argsused
 #endif
 globle int spawn(
-  void *theEnv,
-  int f,
-  int n)
+int f,
+int n)
 {
         register int    s;
         char            line[NLINE];
 
 #if     VAX_VMS
-        if ((s=mlreply(theEnv,"DCL command: ", line, NLINE)) != TRUE)
+        if ((s=mlreply("DCL command: ", line, NLINE)) != TRUE)
                 return (s);
         (*term.t_putchar)('\n');                /* Already have '\r'    */
         (*term.t_flush)();
@@ -1954,8 +1894,8 @@ globle int spawn(
         return (s);
 #endif
 
-#if     WIN_MVC || WIN_BTC || WIN_GCC
-        if ((s=mlreply(theEnv,"MS-DOS command: ", line, NLINE)) != TRUE)
+#if     IBM_MSC || IBM_TBC || IBM_ZTC || IBM_ICB || IBM_SC || IBM_GCC
+        if ((s=mlreply("MS-DOS command: ", line, NLINE)) != TRUE)
                 return (s);
         system(line);
         mlwrite("Hit any key to continue");
@@ -1964,8 +1904,8 @@ globle int spawn(
         return (TRUE);
 #endif
 
-#if     UNIX_7 || UNIX_V || LINUX || DARWIN
-        if ((s=mlreply(theEnv,"! ", line, NLINE)) != TRUE)
+#if     UNIX_7 || UNIX_V
+        if ((s=mlreply("! ", line, NLINE)) != TRUE)
                 return (s);
         (*term.t_putchar)('\n');                /* Already have '\r'    */
         (*term.t_flush)();
@@ -2024,3 +1964,4 @@ char   *cmd)
 #endif
 
 #endif
+

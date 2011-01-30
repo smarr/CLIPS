@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.20  01/31/02            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*            DEFMODULE UTILITY HEADER FILE            */
    /*******************************************************/
@@ -15,7 +15,7 @@
 /*      Gary D. Riley                                        */
 /*                                                           */
 /* Contributing Programmer(s):                               */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Revision History:                                         */
 /*                                                           */
@@ -41,27 +41,25 @@
 #define LOCALE extern
 #endif
 
-   LOCALE unsigned                       FindModuleSeparator(char *);
-   LOCALE SYMBOL_HN                     *ExtractModuleName(void *,unsigned,char *);
-   LOCALE SYMBOL_HN                     *ExtractConstructName(void *,unsigned,char *);
-   LOCALE char                          *ExtractModuleAndConstructName(void *,char *);
-   LOCALE void                          *FindImportedConstruct(void *,char *,struct defmodule *,
+   LOCALE int                            FindModuleSeparator(char *);
+   LOCALE SYMBOL_HN                     *ExtractModuleName(int,char *);
+   LOCALE SYMBOL_HN                     *ExtractConstructName(int,char *);
+   LOCALE char                          *ExtractModuleAndConstructName(char *);
+   LOCALE void                          *FindImportedConstruct(char *,struct defmodule *,
                                                                char *,int *,int,struct defmodule *);
-   LOCALE void                           AmbiguousReferenceErrorMessage(void *,char *,char *);
-   LOCALE void                           MarkModulesAsUnvisited(void *);
-   LOCALE void                           ListItemsDriver(void *,
-                                                         char *,struct defmodule *,
+   LOCALE void                           AmbiguousReferenceErrorMessage(char *,char *);
+   LOCALE void                           MarkModulesAsUnvisited(void);
+   LOCALE void                           ListItemsDriver(char *,struct defmodule *,
                                                          char *,char *,
-                                                          void *(*)(void *,void *),
+                                                          void *(*)(void *),
                                                           char *(*)(void *),
-                                                          void (*)(void *,char *,void *),
-                                                          int (*)(void *,void *));
-   LOCALE long                           DoForAllModules(void *,
-                                                         void (*)(struct defmodule *,void *),
-                                                         int,void *);
-   LOCALE intBool                        ConstructExported(void *,char *,struct symbolHashNode *,struct symbolHashNode *);
-   
+                                                          void (*)(char *,void *),
+                                                          int (*)(void *));
+   LOCALE long                           DoForAllModules(void (*)(struct defmodule *,void *),
+                                                          int,void *);
+
 #endif
 
 
 
+

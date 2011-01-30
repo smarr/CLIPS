@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*               CLIPS Version 6.24  05/17/06          */
+   /*               CLIPS Version 6.10  04/13/98          */
    /*                                                     */
    /*                                                     */
    /*******************************************************/
@@ -10,16 +10,11 @@
 /* Purpose:                                                  */
 /*                                                           */
 /* Principal Programmer(s):                                  */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Contributing Programmer(s):                               */
 /*                                                           */
 /* Revision History:                                         */
-/*                                                           */
-/*      6.24: Converted INSTANCE_PATTERN_MATCHING to         */
-/*            DEFRULE_CONSTRUCT.                             */
-/*                                                           */
-/*            Renamed BOOLEAN macro type to intBool.         */
 /*                                                           */
 /*************************************************************/
 
@@ -52,91 +47,64 @@
 #define LOCALE extern
 #endif
 
-LOCALE void IncrementDefclassBusyCount(void *,void *);
-LOCALE void DecrementDefclassBusyCount(void *,void *);
-LOCALE intBool InstancesPurge(void *theEnv);
+LOCALE void IncrementDefclassBusyCount(void *);
+LOCALE void DecrementDefclassBusyCount(void *);
+LOCALE BOOLEAN InstancesPurge(void);
 
 #if ! RUN_TIME
-LOCALE void InitializeClasses(void *);
+LOCALE void InitializeClasses(void);
 #endif
 LOCALE SLOT_DESC *FindClassSlot(DEFCLASS *,SYMBOL_HN *);
-LOCALE void ClassExistError(void *,char *,char *);
-LOCALE void DeleteClassLinks(void *,CLASS_LINK *);
-LOCALE void PrintClassName(void *,char *,DEFCLASS *,intBool);
+LOCALE void ClassExistError(char *,char *);
+LOCALE void DeleteClassLinks(CLASS_LINK *);
+LOCALE void PrintClassName(char *,DEFCLASS *,BOOLEAN);
 
 #if DEBUGGING_FUNCTIONS || ((! BLOAD_ONLY) && (! RUN_TIME))
-LOCALE void PrintPackedClassLinks(void *,char *,char *,PACKED_CLASS_LINKS *);
+LOCALE void PrintPackedClassLinks(char *,char *,PACKED_CLASS_LINKS *);
 #endif
 
 #if ! RUN_TIME
-LOCALE void PutClassInTable(void *,DEFCLASS *);
-LOCALE void RemoveClassFromTable(void *,DEFCLASS *);
-LOCALE void AddClassLink(void *,PACKED_CLASS_LINKS *,DEFCLASS *,int);
-LOCALE void DeleteSubclassLink(void *,DEFCLASS *,DEFCLASS *);
-LOCALE DEFCLASS *NewClass(void *,SYMBOL_HN *);
-LOCALE void DeletePackedClassLinks(void *,PACKED_CLASS_LINKS *,int);
-LOCALE void AssignClassID(void *,DEFCLASS *);
-LOCALE SLOT_NAME *AddSlotName(void *,SYMBOL_HN *,int,int);
-LOCALE void DeleteSlotName(void *,SLOT_NAME *);
-LOCALE void RemoveDefclass(void *,void *);
-LOCALE void InstallClass(void *,DEFCLASS *,int);
+LOCALE void PutClassInTable(DEFCLASS *);
+LOCALE void RemoveClassFromTable(DEFCLASS *);
+LOCALE void AddClassLink(PACKED_CLASS_LINKS *,DEFCLASS *,int);
+LOCALE void DeleteSubclassLink(DEFCLASS *,DEFCLASS *);
+LOCALE DEFCLASS *NewClass(SYMBOL_HN *);
+LOCALE void DeletePackedClassLinks(PACKED_CLASS_LINKS *,int);
+LOCALE void AssignClassID(DEFCLASS *);
+LOCALE SLOT_NAME *AddSlotName(SYMBOL_HN *,unsigned,int);
+LOCALE void DeleteSlotName(SLOT_NAME *);
+LOCALE void RemoveDefclass(void *);
+LOCALE void InstallClass(DEFCLASS *,int);
 #endif
-LOCALE void DestroyDefclass(void *,void *);
 
 #if (! BLOAD_ONLY) && (! RUN_TIME)
 LOCALE int IsClassBeingUsed(DEFCLASS *);
-LOCALE int RemoveAllUserClasses(void *);
-LOCALE int DeleteClassUAG(void *,DEFCLASS *);
+LOCALE int RemoveAllUserClasses(void);
+LOCALE int DeleteClassUAG(DEFCLASS *);
 LOCALE void MarkBitMapSubclasses(char *,DEFCLASS *,int);
 #endif
 
-LOCALE short FindSlotNameID(void *,SYMBOL_HN *);
-LOCALE SYMBOL_HN *FindIDSlotName(void *,int);
-LOCALE SLOT_NAME *FindIDSlotNameHash(void *,int);
-LOCALE int GetTraversalID(void *);
-LOCALE void ReleaseTraversalID(void *);
+LOCALE int FindSlotNameID(SYMBOL_HN *);
+LOCALE SYMBOL_HN *FindIDSlotName(unsigned);
+LOCALE SLOT_NAME *FindIDSlotNameHash(unsigned);
+LOCALE int GetTraversalID(void);
+LOCALE void ReleaseTraversalID(void);
 LOCALE unsigned HashClass(SYMBOL_HN *);
 
 #ifndef _CLASSFUN_SOURCE_
-
+extern Thread DEFCLASS **ClassIDMap;
+extern Thread DEFCLASS **ClassTable;
+extern Thread SLOT_NAME **SlotNameTable;
+extern Thread DEFCLASS *PrimitiveClassMap[];
+extern Thread unsigned short MaxClassID;
+extern Thread SYMBOL_HN *ISA_SYMBOL,*NAME_SYMBOL;
 #if DEFRULE_CONSTRUCT
-extern SYMBOL_HN *INITIAL_OBJECT_SYMBOL;
+extern Thread SYMBOL_HN *INITIAL_OBJECT_SYMBOL;
 #endif
 #if DEBUGGING_FUNCTIONS
-extern unsigned WatchInstances,WatchSlots;
+extern Thread int WatchInstances,WatchSlots;
 #endif
 #endif
-
-#define DEFCLASS_DATA 21
-
-#define PRIMITIVE_CLASSES 9
-
-struct defclassData
-  { 
-   struct construct *DefclassConstruct;
-   int DefclassModuleIndex;
-   ENTITY_RECORD DefclassEntityRecord;
-   DEFCLASS *PrimitiveClassMap[PRIMITIVE_CLASSES];
-   DEFCLASS **ClassIDMap;
-   DEFCLASS **ClassTable;
-   unsigned short MaxClassID;
-   unsigned short AvailClassID;
-   SLOT_NAME **SlotNameTable;
-   SYMBOL_HN *ISA_SYMBOL;
-   SYMBOL_HN *NAME_SYMBOL;
-#if DEFRULE_CONSTRUCT
-   SYMBOL_HN *INITIAL_OBJECT_SYMBOL;
-#endif
-#if DEBUGGING_FUNCTIONS
-   unsigned WatchInstances;
-   unsigned WatchSlots;
-#endif
-   unsigned short CTID;
-   struct token ObjectParseToken;
-   unsigned short ClassDefaultsMode;
-  };
-
-#define DefclassData(theEnv) ((struct defclassData *) GetEnvironmentData(theEnv,DEFCLASS_DATA))
 
 #endif
 
@@ -148,3 +116,4 @@ struct defclassData
 
 
 
+

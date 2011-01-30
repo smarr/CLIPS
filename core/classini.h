@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*               CLIPS Version 6.20  01/31/02          */
+   /*               CLIPS Version 6.10  04/13/98          */
    /*                                                     */
    /*                                                     */
    /*******************************************************/
@@ -10,7 +10,7 @@
 /* Purpose:                                                  */
 /*                                                           */
 /* Principal Programmer(s):                                  */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Contributing Programmer(s):                               */
 /*                                                           */
@@ -40,11 +40,16 @@
 #define LOCALE extern
 #endif
 
-LOCALE void SetupObjectSystem(void *);
+LOCALE void SetupObjectSystem(void);
 #if RUN_TIME
-LOCALE void ObjectsRunTimeInitialize(void *,DEFCLASS *[],SLOT_NAME *[],DEFCLASS *[],unsigned);
+LOCALE void ObjectsRunTimeInitialize(DEFCLASS *[],SLOT_NAME *[],DEFCLASS *[],unsigned);
 #else
-LOCALE void CreateSystemClasses(void *);
+LOCALE void CreateSystemClasses(void);
+#endif
+
+#ifndef _CLASSINI_SOURCE_
+extern Thread int DefclassModuleIndex;
+extern Thread struct construct *DefclassConstruct;
 #endif
 
 #endif
@@ -55,3 +60,4 @@ LOCALE void CreateSystemClasses(void *);
 
 
 
+

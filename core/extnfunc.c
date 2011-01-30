@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.30  10/19/06            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*               EXTERNAL FUNCTION MODULE              */
    /*******************************************************/
@@ -14,16 +14,13 @@
 /*      Gary D. Riley                                        */
 /*                                                           */
 /* Contributing Programmer(s):                               */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Revision History:                                         */
 /*                                                           */
-/*      6.24: Corrected code to remove run-time program      */
-/*            compiler warning.                              */
-/*                                                           */
-/*      6.30: Added support for passing context information  */ 
-/*            to user defined functions.                     */
-/*                                                           */
+/* Who               |     Date    | Description             */
+/* ------------------+-------------+------------------------ */
+/* M.Giordano        | 23-Mar-2000 | Mods made for TLS       */
 /*************************************************************/
 
 #define _EXTNFUNC_SOURCE_
@@ -31,10 +28,8 @@
 #include "setup.h"
 
 #include <ctype.h>
-#include <stdlib.h>
 
 #include "constant.h"
-#include "envrnmnt.h"
 #include "router.h"
 #include "memalloc.h"
 #include "evaluatn.h"
@@ -45,62 +40,16 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static void                    AddHashFunction(void *,struct FunctionDefinition *);
-   static void                    InitializeFunctionHashTable(void *);
-   static void                    DeallocateExternalFunctionData(void *);
-#if (! RUN_TIME)
-   static int                     RemoveHashFunction(void *,struct FunctionDefinition *);
-#endif
+   static void                    AddHashFunction(struct FunctionDefinition *);
+   static void                    InitializeFunctionHashTable(void);
+   static int                     RemoveHashFunction(struct FunctionDefinition *);
 
-/*********************************************************/
-/* InitializeExternalFunctionData: Allocates environment */
-/*    data for external functions.                       */
-/*********************************************************/
-globle void InitializeExternalFunctionData(
-  void *theEnv)
-  {
-   AllocateEnvironmentData(theEnv,EXTERNAL_FUNCTION_DATA,sizeof(struct externalFunctionData),DeallocateExternalFunctionData);
-  }
+/***************************************/
+/* LOCAL INTERNAL VARIABLE DEFINITIONS */
+/***************************************/
 
-/***********************************************************/
-/* DeallocateExternalFunctionData: Deallocates environment */
-/*    data for external functions.                         */
-/***********************************************************/
-static void DeallocateExternalFunctionData(
-  void *theEnv)
-  {
-   struct FunctionHash *fhPtr, *nextFHPtr;
-   int i;
-
-#if ! RUN_TIME
-   struct FunctionDefinition *tmpPtr, *nextPtr;
-
-   tmpPtr = ExternalFunctionData(theEnv)->ListOfFunctions;
-   while (tmpPtr != NULL)
-     {
-      nextPtr = tmpPtr->next;
-      rtn_struct(theEnv,FunctionDefinition,tmpPtr);
-      tmpPtr = nextPtr;
-     }
-#endif
-
-   if (ExternalFunctionData(theEnv)->FunctionHashtable == NULL)
-     { return; }
-     
-   for (i = 0; i < SIZE_FUNCTION_HASH; i++)
-     {
-      fhPtr = ExternalFunctionData(theEnv)->FunctionHashtable[i];
-      while (fhPtr != NULL)
-        {
-         nextFHPtr = fhPtr->next;
-         rtn_struct(theEnv,FunctionHash,fhPtr);
-         fhPtr = nextFHPtr;
-        }
-     }
-   
-   genfree(theEnv,ExternalFunctionData(theEnv)->FunctionHashtable,
-           (int) sizeof (struct FunctionHash *) * SIZE_FUNCTION_HASH);
-  }
+   Thread static struct FunctionDefinition     *ListOfFunctions = NULL;
+   Thread static struct FunctionHash          **FunctionHashtable;
 
 #if (! RUN_TIME)
 
@@ -108,107 +57,17 @@ static void DeallocateExternalFunctionData(
 /* DefineFunction: Used to define a system or user external */
 /*   function so that the KB can access it.                 */
 /************************************************************/
-#if ALLOW_ENVIRONMENT_GLOBALS
 globle int DefineFunction(
   char *name,
   int returnType,
   int (*pointer)(void),
   char *actualName)
   {
-   void *theEnv;
-   
-   theEnv = GetCurrentEnvironment();
+   return(DefineFunction2(name,returnType,pointer,actualName,NULL));
+  }
 
-   return(DefineFunction3(theEnv,name,returnType,
-                          (int (*)(void *)) pointer,
-                          actualName,NULL,FALSE,NULL));
-  }
-#endif
-
-/***************************************************************/
-/* EnvDefineFunction: Used to define a system or user external */
-/*   function so that the KB can access it.                    */
-/***************************************************************/
-globle int EnvDefineFunction(
-  void *theEnv,
-  char *name,
-  int returnType,
-  int (*pointer)(void *),
-  char *actualName)
-  {
-   return(DefineFunction3(theEnv,name,returnType,pointer,actualName,NULL,TRUE,NULL));
-  }
-  
-/************************************************************/
-/* EnvDefineFunctionWithContext: Used to define a system or */
-/*   user external function so that the KB can access it.   */
-/************************************************************/
-globle int EnvDefineFunctionWithContext(
-  void *theEnv,
-  char *name,
-  int returnType,
-  int (*pointer)(void *),
-  char *actualName,
-  void *context)
-  {
-   return(DefineFunction3(theEnv,name,returnType,pointer,actualName,NULL,TRUE,context));
-  }
-  
 /*************************************************************/
 /* DefineFunction2: Used to define a system or user external */
-/*   function so that the KB can access it.                  */
-/*************************************************************/
-#if ALLOW_ENVIRONMENT_GLOBALS
-globle int DefineFunction2(
-  char *name,
-  int returnType,
-  int (*pointer)(void),
-  char *actualName,
-  char *restrictions)
-  {
-   void *theEnv;
-   
-   theEnv = GetCurrentEnvironment();
-
-   return(DefineFunction3(theEnv,name,returnType,
-                          (int (*)(void *)) pointer,
-                          actualName,restrictions,FALSE,NULL));
-  }
-#endif
-  
-/*************************************************************/
-/* EnvDefineFunction2: Used to define a system or user external */
-/*   function so that the KB can access it.                  */
-/*************************************************************/
-globle int EnvDefineFunction2(
-  void *theEnv,
-  char *name,
-  int returnType,
-  int (*pointer)(void *),
-  char *actualName,
-  char *restrictions)
-  {
-   return(DefineFunction3(theEnv,name,returnType,pointer,actualName,restrictions,TRUE,NULL));
-  }
-
-/*************************************************************/
-/* EnvDefineFunction2WithContext: Used to define a system or */
-/*   user external function so that the KB can access it.    */
-/*************************************************************/
-globle int EnvDefineFunction2WithContext(
-  void *theEnv,
-  char *name,
-  int returnType,
-  int (*pointer)(void *),
-  char *actualName,
-  char *restrictions,
-  void *context)
-  {
-   return(DefineFunction3(theEnv,name,returnType,pointer,actualName,restrictions,TRUE,context));
-  }
-
-/*************************************************************/
-/* DefineFunction3: Used to define a system or user external */
 /*   function so that the KB can access it. Allows argument  */
 /*   restrictions to be attached to the function.            */
 /*   Return types are:                                       */
@@ -217,12 +76,11 @@ globle int EnvDefineFunction2WithContext(
 /*     c - character (converted to symbol)                   */
 /*     d - double precision float                            */
 /*     f - single precision float (converted to double)      */
-/*     g - long long integer                                 */
-/*     i - integer (converted to long long integer)          */
+/*     i - integer (converted to long integer)               */
 /*     j - unknown (symbol, string,                          */
 /*                  or instance name by convention)          */
 /*     k - unknown (symbol or string by convention)          */
-/*     l - long integer (converted to long long integer)     */
+/*     l - long integer                                      */
 /*     m - unknown (multifield by convention)                */
 /*     n - unknown (integer or float by convention)          */
 /*     o - instance name                                     */
@@ -232,15 +90,12 @@ globle int EnvDefineFunction2WithContext(
 /*     w - symbol                                            */
 /*     x - instance address                                  */
 /*************************************************************/
-globle int DefineFunction3(
-  void *theEnv,
+globle int DefineFunction2(
   char *name,
   int returnType,
-  int (*pointer)(void *),
+  int (*pointer)(void),
   char *actualName,
-  char *restrictions,
-  intBool environmentAware,
-  void *context)
+  char *restrictions)
   {
    struct FunctionDefinition *newFunction;
 
@@ -249,7 +104,6 @@ globle int DefineFunction3(
         (returnType != 'c') &&
         (returnType != 'd') &&
         (returnType != 'f') &&
-        (returnType != 'g') &&
         (returnType != 'i') &&
         (returnType != 'j') &&
         (returnType != 'k') &&
@@ -268,19 +122,11 @@ globle int DefineFunction3(
         (returnType != 'w') )
      { return(0); }
 
-   newFunction = FindFunction(theEnv,name);
-   if (newFunction == NULL)
-     {
-      newFunction = get_struct(theEnv,FunctionDefinition);
-      newFunction->callFunctionName = (SYMBOL_HN *) EnvAddSymbol(theEnv,name);
-      IncrementSymbolCount(newFunction->callFunctionName);
-      newFunction->next = GetFunctionList(theEnv);
-      ExternalFunctionData(theEnv)->ListOfFunctions = newFunction;
-      AddHashFunction(theEnv,newFunction);
-     }
-     
+   newFunction = get_struct(FunctionDefinition);
+   newFunction->callFunctionName = (SYMBOL_HN *) AddSymbol(name);
    newFunction->returnValueType = (char) returnType;
-   newFunction->functionPointer = (int (*)(void)) pointer;
+   newFunction->functionPointer = pointer;
+   newFunction->next = GetFunctionList();
    newFunction->actualFunctionName = actualName;
    if (restrictions != NULL)
      {
@@ -293,80 +139,46 @@ globle int DefineFunction3(
    newFunction->parser = NULL;
    newFunction->overloadable = TRUE;
    newFunction->sequenceuseok = TRUE;
-   newFunction->environmentAware = (short) environmentAware;
    newFunction->usrData = NULL;
-   newFunction->context = context;
+
+   IncrementSymbolCount(newFunction->callFunctionName);
+   ListOfFunctions = newFunction;
+   AddHashFunction(newFunction);
 
    return(1);
   }
-  
+
 /***********************************************/
 /* UndefineFunction: Used to remove a function */
 /*   definition from the list of functions.    */
 /***********************************************/
 globle int UndefineFunction(
-  void *theEnv,
   char *functionName)
   {
    SYMBOL_HN *findValue;
    struct FunctionDefinition *fPtr, *lastPtr = NULL;
 
-   findValue = (SYMBOL_HN *) FindSymbolHN(theEnv,functionName);
+   findValue = (SYMBOL_HN *) FindSymbol(functionName);
 
-   for (fPtr = ExternalFunctionData(theEnv)->ListOfFunctions;
+   for (fPtr = ListOfFunctions;
         fPtr != NULL;
         fPtr = fPtr->next)
      {
       if (fPtr->callFunctionName == findValue)
         {
-         DecrementSymbolCount(theEnv,fPtr->callFunctionName);
-         RemoveHashFunction(theEnv,fPtr);
+         DecrementSymbolCount(fPtr->callFunctionName);
+         RemoveHashFunction(fPtr);
 
          if (lastPtr == NULL)
-           { ExternalFunctionData(theEnv)->ListOfFunctions = fPtr->next; }
+           { ListOfFunctions = fPtr->next; }
          else
            { lastPtr->next = fPtr->next; }
-           
-         ClearUserDataList(theEnv,fPtr->usrData);
-         rtn_struct(theEnv,FunctionDefinition,fPtr);
+
+         rtn_struct(FunctionDefinition,fPtr);
          return(TRUE);
         }
 
       lastPtr = fPtr;
-     }
-
-   return(FALSE);
-  }
-
-/******************************************/
-/* RemoveHashFunction: Removes a function */
-/*   from the function hash table.        */
-/******************************************/
-static int RemoveHashFunction(
-  void *theEnv,
-  struct FunctionDefinition *fdPtr)
-  {
-   struct FunctionHash *fhPtr, *lastPtr = NULL;
-   unsigned hashValue;
-
-   hashValue = HashSymbol(ValueToString(fdPtr->callFunctionName),SIZE_FUNCTION_HASH);
-
-   for (fhPtr = ExternalFunctionData(theEnv)->FunctionHashtable[hashValue];
-        fhPtr != NULL;
-        fhPtr = fhPtr->next)
-     {
-      if (fhPtr->fdPtr == fdPtr)
-        {
-         if (lastPtr == NULL)
-           { ExternalFunctionData(theEnv)->FunctionHashtable[hashValue] = fhPtr->next; }
-         else
-           { lastPtr->next = fhPtr->next; }
-
-         rtn_struct(theEnv,FunctionHash,fhPtr);
-         return(TRUE);
-        }
-
-      lastPtr = fhPtr;
      }
 
    return(FALSE);
@@ -382,16 +194,15 @@ static int RemoveHashFunction(
 /*   parsing routines.                                                     */
 /***************************************************************************/
 globle int AddFunctionParser(
-  void *theEnv,
   char *functionName,
-  struct expr *(*fpPtr)(void *,struct expr *,char *))
+  struct expr *(*fpPtr)(struct expr *,char *))
   {
    struct FunctionDefinition *fdPtr;
 
-   fdPtr = FindFunction(theEnv,functionName);
+   fdPtr = FindFunction(functionName);
    if (fdPtr == NULL)
      {
-      EnvPrintRouter(theEnv,WERROR,"Function parsers can only be added for existing functions.\n");
+      PrintRouter(WERROR,"Function parsers can only be added for existing functions.\n");
       return(0);
      }
    fdPtr->restrictions = NULL;
@@ -406,15 +217,14 @@ globle int AddFunctionParser(
 /*   function (if it exists) from the function entry for a function. */
 /*********************************************************************/
 globle int RemoveFunctionParser(
-  void *theEnv,
   char *functionName)
   {
    struct FunctionDefinition *fdPtr;
 
-   fdPtr = FindFunction(theEnv,functionName);
+   fdPtr = FindFunction(functionName);
    if (fdPtr == NULL)
      {
-      EnvPrintRouter(theEnv,WERROR,"Function parsers can only be removed from existing functions.\n");
+      PrintRouter(WERROR,"Function parsers can only be removed from existing functions.\n");
       return(0);
      }
 
@@ -428,17 +238,16 @@ globle int RemoveFunctionParser(
 /* i.e. can the function be a method for a generic function.     */
 /*****************************************************************/
 globle int FuncSeqOvlFlags(
-  void *theEnv,
   char *functionName,
   int seqp,
   int ovlp)
   {
    struct FunctionDefinition *fdPtr;
 
-   fdPtr = FindFunction(theEnv,functionName);
+   fdPtr = FindFunction(functionName);
    if (fdPtr == NULL)
      {
-      EnvPrintRouter(theEnv,WERROR,"Only existing functions can be marked as using sequence expansion arguments/overloadable or not.\n");
+      PrintRouter(WERROR,"Only existing functions can be marked as using sequence expansion arguments/overloadable or not.\n");
       return(FALSE);
      }
    fdPtr->sequenceuseok = (short) (seqp ? TRUE : FALSE);
@@ -528,8 +337,7 @@ globle int GetNthRestriction(
   struct FunctionDefinition *theFunction,
   int position)
   {
-   int defaultRestriction = (int) 'u';
-   size_t theLength;
+   int defaultRestriction = (int) 'u', theLength;
    int i = 2;
 
    /*===========================================================*/
@@ -565,7 +373,7 @@ globle int GetNthRestriction(
    /* specified, then return the default restriction.       */
    /*=======================================================*/
 
-   if (theLength < (size_t) (position + 3)) return(defaultRestriction);
+   if (theLength < (position + 3)) return(defaultRestriction);
 
    /*=========================================================*/
    /* Return the restriction specified for the nth parameter. */
@@ -577,10 +385,9 @@ globle int GetNthRestriction(
 /*************************************************/
 /* GetFunctionList: Returns the ListOfFunctions. */
 /*************************************************/
-globle struct FunctionDefinition *GetFunctionList(
-  void *theEnv)
+globle struct FunctionDefinition *GetFunctionList()
   {
-   return(ExternalFunctionData(theEnv)->ListOfFunctions);
+   return(ListOfFunctions);
   }
 
 /**************************************************************/
@@ -588,32 +395,31 @@ globle struct FunctionDefinition *GetFunctionList(
 /*   the function entries to the FunctionHashTable.           */
 /**************************************************************/
 globle void InstallFunctionList(
-  void *theEnv,
   struct FunctionDefinition *value)
   {
    int i;
    struct FunctionHash *fhPtr, *nextPtr;
 
-   if (ExternalFunctionData(theEnv)->FunctionHashtable != NULL)
+   if (FunctionHashtable != NULL)
      {
       for (i = 0; i < SIZE_FUNCTION_HASH; i++)
         {
-         fhPtr = ExternalFunctionData(theEnv)->FunctionHashtable[i];
+         fhPtr = FunctionHashtable[i];
          while (fhPtr != NULL)
            {
             nextPtr = fhPtr->next;
-            rtn_struct(theEnv,FunctionHash,fhPtr);
+            rtn_struct(FunctionHash,fhPtr);
             fhPtr = nextPtr;
            }
-         ExternalFunctionData(theEnv)->FunctionHashtable[i] = NULL;
+         FunctionHashtable[i] = NULL;
         }
      }
 
-   ExternalFunctionData(theEnv)->ListOfFunctions = value;
+   ListOfFunctions = value;
 
    while (value != NULL)
      {
-      AddHashFunction(theEnv,value);
+      AddHashFunction(value);
       value = value->next;
      }
   }
@@ -624,20 +430,17 @@ globle void InstallFunctionList(
 /*   in the function list, otherwise returns NULL.      */
 /********************************************************/
 globle struct FunctionDefinition *FindFunction(
-  void *theEnv,
   char *functionName)
   {
    struct FunctionHash *fhPtr;
-   unsigned hashValue;
+   int hashValue;
    SYMBOL_HN *findValue;
 
-   if (ExternalFunctionData(theEnv)->FunctionHashtable == NULL) return(NULL);
-   
    hashValue = HashSymbol(functionName,SIZE_FUNCTION_HASH);
 
-   findValue = (SYMBOL_HN *) FindSymbolHN(theEnv,functionName);
+   findValue = (SYMBOL_HN *) FindSymbol(functionName);
 
-   for (fhPtr = ExternalFunctionData(theEnv)->FunctionHashtable[hashValue];
+   for (fhPtr = FunctionHashtable[hashValue];
         fhPtr != NULL;
         fhPtr = fhPtr->next)
      {
@@ -652,83 +455,68 @@ globle struct FunctionDefinition *FindFunction(
 /* InitializeFunctionHashTable: Purpose is to initialize */
 /*   the function hash table to NULL.                    */
 /*********************************************************/
-static void InitializeFunctionHashTable(
-  void *theEnv)
+static void InitializeFunctionHashTable()
   {
    int i;
 
-   ExternalFunctionData(theEnv)->FunctionHashtable = (struct FunctionHash **)
-                       gm2(theEnv,(int) sizeof (struct FunctionHash *) *
+   FunctionHashtable = (struct FunctionHash **)
+                       gm2((int) sizeof (struct FunctionHash *) *
                            SIZE_FUNCTION_HASH);
 
-   for (i = 0; i < SIZE_FUNCTION_HASH; i++) ExternalFunctionData(theEnv)->FunctionHashtable[i] = NULL;
+   for (i = 0; i < SIZE_FUNCTION_HASH; i++) FunctionHashtable[i] = NULL;
   }
 
 /****************************************************************/
 /* AddHashFunction: Adds a function to the function hash table. */
 /****************************************************************/
 static void AddHashFunction(
-  void *theEnv,
   struct FunctionDefinition *fdPtr)
   {
    struct FunctionHash *newhash, *temp;
-   unsigned hashValue;
+   int hashValue;
 
-   if (ExternalFunctionData(theEnv)->FunctionHashtable == NULL) InitializeFunctionHashTable(theEnv);
+   if (FunctionHashtable == NULL) InitializeFunctionHashTable();
 
-   newhash = get_struct(theEnv,FunctionHash);
+   newhash = get_struct(FunctionHash);
    newhash->fdPtr = fdPtr;
 
    hashValue = HashSymbol(fdPtr->callFunctionName->contents,SIZE_FUNCTION_HASH);
 
-   temp = ExternalFunctionData(theEnv)->FunctionHashtable[hashValue];
-   ExternalFunctionData(theEnv)->FunctionHashtable[hashValue] = newhash;
+   temp = FunctionHashtable[hashValue];
+   FunctionHashtable[hashValue] = newhash;
    newhash->next = temp;
   }
 
-/*************************************************/
-/* GetMinimumArgs: Returns the minimum number of */
-/*   arguments expected by an external function. */
-/*************************************************/
-globle int GetMinimumArgs(
-  struct FunctionDefinition *theFunction)
+/******************************************/
+/* RemoveHashFunction: Removes a function */
+/*   from the function hash table.        */
+/******************************************/
+static int RemoveHashFunction(
+  struct FunctionDefinition *fdPtr)
   {
-   char theChar[2], *restrictions;
+   struct FunctionHash *fhPtr, *lastPtr = NULL;
+   int hashValue;
 
-   restrictions = theFunction->restrictions;
-   if (restrictions == NULL) return(-1);
+   hashValue = HashSymbol(ValueToString(fdPtr->callFunctionName),SIZE_FUNCTION_HASH);
 
-   theChar[0] = restrictions[0];
-   theChar[1] = '\0';
+   for (fhPtr = FunctionHashtable[hashValue];
+        fhPtr != NULL;
+        fhPtr = fhPtr->next)
+     {
+      if (fhPtr->fdPtr == fdPtr)
+        {
+         if (lastPtr == NULL)
+           { FunctionHashtable[hashValue] = fhPtr->next; }
+         else
+           { lastPtr->next = fhPtr->next; }
 
-   if (isdigit(theChar[0]))
-     { return atoi(theChar); }
-   else if (theChar[0] == '*')
-     { return(-1); }
-   
-   return(-1); 
+         rtn_struct(FunctionHash,fhPtr);
+         return(TRUE);
+        }
+
+      lastPtr = fhPtr;
+     }
+
+   return(FALSE);
   }
-  
-/*************************************************/
-/* GetMaximumArgs: Returns the maximum number of */
-/*   arguments expected by an external function. */
-/*************************************************/
-globle int GetMaximumArgs(
-  struct FunctionDefinition *theFunction)
-  {
-   char theChar[2], *restrictions;
-
-   restrictions = theFunction->restrictions;
-   if (restrictions == NULL) return(-1);
-   if (restrictions[0] == '\0') return(-1);
-
-   theChar[0] = restrictions[1];
-   theChar[1] = '\0';
-
-   if (isdigit(theChar[0]))
-     { return atoi(theChar); }
-   else if (theChar[0] == '*')
-     { return(-1); }
-   
-   return(-1); 
-  }
+

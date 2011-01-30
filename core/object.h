@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*               CLIPS Version 6.20  01/31/02          */
+   /*               CLIPS Version 6.10  04/09/97          */
    /*                                                     */
    /*                OBJECT SYSTEM DEFINITIONS            */
    /*******************************************************/
@@ -10,7 +10,7 @@
 /* Purpose:                                                  */
 /*                                                           */
 /* Principal Programmer(s):                                  */
-/*      Brian L. Dantes                                      */
+/*      Brian L. Donnell                                     */
 /*                                                           */
 /* Contributing Programmer(s):                               */
 /*                                                           */
@@ -35,8 +35,8 @@ typedef struct instanceSlot INSTANCE_SLOT;
 /* Maximum # of simultaneous class hierarchy traversals
    should be a multiple of BITS_PER_BYTE and less than MAX_INT      */
 
-#define MAX_TRAVERSALS  256
-#define TRAVERSAL_BYTES 32       /* (MAX_TRAVERSALS / BITS_PER_BYTE) */
+#define MAX_TRAVERSALS  128
+#define TRAVERSAL_BYTES 16       /* (MAX_TRAVERSALS / BITS_PER_BYTE) */
 
 #define VALUE_REQUIRED     0
 #define VALUE_PROHIBITED   1
@@ -75,7 +75,7 @@ typedef struct instanceSlot INSTANCE_SLOT;
 
 struct packedClassLinks
   {
-   long classCount;
+   unsigned short classCount;
    DEFCLASS **classArray;
   };
 
@@ -93,7 +93,7 @@ struct defclass
    unsigned reactive       : 1;
    unsigned traceInstances : 1;
    unsigned traceSlots     : 1;
-   unsigned id;
+   unsigned short id;
    unsigned busy,
             hashTableIndex;
    PACKED_CLASS_LINKS directSuperclasses,
@@ -102,15 +102,15 @@ struct defclass
    SLOT_DESC *slots,
              **instanceTemplate;
    unsigned *slotNameMap;
-   short slotCount;
-   short localInstanceSlotCount;
-   short instanceSlotCount;
-   short maxSlotNameID;
+   unsigned slotCount,
+            localInstanceSlotCount,
+            instanceSlotCount,
+            maxSlotNameID;
    INSTANCE_TYPE *instanceList,
                  *instanceListBottom;
    HANDLER *handlers;
    unsigned *handlerOrderMap;
-   short handlerCount;
+   unsigned handlerCount;
    DEFCLASS *nxtHash;
    BITMAP_HN *scopeMap;
    char traversalRecord[TRAVERSAL_BYTES];
@@ -125,8 +125,8 @@ struct classLink
 struct slotName
   {
    unsigned hashTableIndex,
-            use;
-   short id;
+            use,
+            id;
    SYMBOL_HN *name,
              *putHandlerName;
    struct slotName *nxt;
@@ -138,7 +138,7 @@ struct instanceSlot
    SLOT_DESC *desc;
    unsigned valueRequired : 1;
    unsigned override      : 1;
-   unsigned short type;
+   unsigned type          : 6;
    void *value;
   };
 
@@ -199,9 +199,9 @@ struct messageHandler
    unsigned busy;
    SYMBOL_HN *name;
    DEFCLASS *cls;
-   short minParams;
-   short maxParams;
-   short localVarCount;
+   int minParams,
+       maxParams,
+       localVarCount;
    EXPRESSION *actions;
    char *ppForm;
    struct userData *usrData;
@@ -213,3 +213,5 @@ struct messageHandler
 
 
 
+
+

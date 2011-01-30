@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.24  06/05/06            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*                 FACT HASHING MODULE                 */
    /*******************************************************/
@@ -15,8 +15,6 @@
 /* Contributing Programmer(s):                               */
 /*                                                           */
 /* Revision History:                                         */
-/*                                                           */
-/*      6.24: Renamed BOOLEAN macro type to intBool.         */
 /*                                                           */
 /*************************************************************/
 
@@ -36,7 +34,7 @@ struct factHashEntry
    struct factHashEntry *next;
   };
 
-#define SIZE_FACT_HASH 16231
+#define SIZE_FACT_HASH  1013
 
 #ifdef LOCALE
 #undef LOCALE
@@ -47,18 +45,19 @@ struct factHashEntry
 #define LOCALE extern
 #endif
 
-#define GetFactDuplication() EnvGetFactDuplication(GetCurrentEnvironment())
-#define SetFactDuplication(a) EnvSetFactDuplication(GetCurrentEnvironment(),a)
-
-   LOCALE void                           AddHashedFact(void *,struct fact *,unsigned long);
-   LOCALE intBool                        RemoveHashedFact(void *,struct fact *);
-   LOCALE unsigned long                  HandleFactDuplication(void *,void *,intBool *);
-   LOCALE intBool                        EnvGetFactDuplication(void *);
-   LOCALE intBool                        EnvSetFactDuplication(void *,int);
-   LOCALE void                           InitializeFactHashTable(void *);
-   LOCALE void                           ShowFactHashTable(void *);
-   LOCALE unsigned long                  HashFact(struct fact *);
+   LOCALE void                           AddHashedFact(struct fact *,int);
+   LOCALE BOOLEAN                        RemoveHashedFact(struct fact *);
+   LOCALE int                            HandleFactDuplication(void *);
+   LOCALE DllExport BOOLEAN              GetFactDuplication(void);
+   LOCALE DllExport BOOLEAN              SetFactDuplication(int);
+   LOCALE void                           InitializeFactHashTable(void);
+   LOCALE void                           ShowFactHashTable(void);
+   LOCALE int                            HashFact(struct fact *);
 
 #endif
 
 
+
+
+
+

@@ -1,7 +1,7 @@
    /*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
-   /*             CLIPS Version 6.20  01/31/02            */
+   /*             CLIPS Version 6.10  04/09/97            */
    /*                                                     */
    /*      DEFTEMPLATE CONSTRUCT COMPILER HEADER FILE     */
    /*******************************************************/
@@ -32,8 +32,9 @@
 #define LOCALE extern
 #endif
 
-   LOCALE void                           DeftemplateCompilerSetup(void *);
-   LOCALE void                           DeftemplateCModuleReference(void *,FILE *,int,int,int);
-   LOCALE void                           DeftemplateCConstructReference(void *,FILE *,void *,int,int);
+   LOCALE void                           DeftemplateCompilerSetup(void);
+   LOCALE void                           DeftemplateCModuleReference(FILE *,int,int,int);
+   LOCALE void                           DeftemplateCConstructReference(FILE *,void *,int,int);
 
 #endif
+
