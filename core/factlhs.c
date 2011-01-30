@@ -280,4 +280,3 @@ globle struct lhsParseNode *FactPatternParse(
 
 
 
-

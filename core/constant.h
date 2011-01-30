@@ -216,10 +216,3 @@ typedef long int FACT_ID;
 #define CREATOR_CODE   'CLIS'
 
 #endif
-
-
-
-
-
-
-

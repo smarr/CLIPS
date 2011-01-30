@@ -1204,4 +1204,3 @@ static char *ConstraintCode(
   SIDE EFFECTS :
   NOTES        :
  ***************************************************/
-

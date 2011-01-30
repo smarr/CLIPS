@@ -365,4 +365,3 @@ static void SingleDeffunctionToCode(
   SIDE EFFECTS :
   NOTES        :
  ***************************************************/
-

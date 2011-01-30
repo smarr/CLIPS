@@ -46,4 +46,3 @@
    LOCALE void                           PrintDefmoduleReference(FILE *,struct defmodule *);
 
 #endif
-

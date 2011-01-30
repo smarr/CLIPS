@@ -1713,4 +1713,3 @@ globle int DeleteMultiValueField(
 #endif
 
 
-

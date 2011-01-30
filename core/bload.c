@@ -777,5 +777,3 @@ globle int BloadCommand()
 #endif
    return(FALSE);
   }
-
-

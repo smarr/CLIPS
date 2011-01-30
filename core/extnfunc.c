@@ -519,4 +519,3 @@ static int RemoveHashFunction(
 
    return(FALSE);
   }
-

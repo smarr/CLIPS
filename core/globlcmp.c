@@ -314,4 +314,3 @@ globle void DefglobalCConstructReference(
 #endif /* DEFGLOBAL_CONSTRUCT && CONSTRUCT_COMPILER && (! RUN_TIME) */
 
 
-

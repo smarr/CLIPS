@@ -1367,4 +1367,3 @@ static BOOLEAN EvaluateBadCall(
   SIDE EFFECTS :
   NOTES        :
  ***************************************************/
-

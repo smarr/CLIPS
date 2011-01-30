@@ -654,4 +654,3 @@ static void UpdateDefclassesScope()
   SIDE EFFECTS :
   NOTES        :
  ***************************************************/
-

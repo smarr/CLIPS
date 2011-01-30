@@ -864,4 +864,3 @@ static void JoinNetErrorMessage(
   }
 
 #endif /* DEFRULE_CONSTRUCT */
-

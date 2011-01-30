@@ -271,5 +271,3 @@ globle BOOLEAN DeftemplateWatchPrint(
 
 #endif /* DEFTEMPLATE_CONSTRUCT */
 
-
-

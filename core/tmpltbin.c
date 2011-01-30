@@ -585,5 +585,3 @@ globle void *BloadDeftemplateModuleReference(
 
 #endif /* DEFTEMPLATE_CONSTRUCT && (BLOAD || BLOAD_ONLY || BLOAD_AND_BSAVE) && (! RUN_TIME) */
 
-
-

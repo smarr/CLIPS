@@ -672,4 +672,3 @@ globle void *GetNextDefglobalInScope(
 #endif /* DEFGLOBAL_CONSTRUCT */
 
 
-

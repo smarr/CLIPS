@@ -1386,4 +1386,3 @@ static void TraceErrorToObjectPattern(
   SIDE EFFECTS :
   NOTES        :
  ***************************************************/
-

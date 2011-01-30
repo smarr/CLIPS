@@ -314,6 +314,3 @@ static void DoMergeSort(
      { TransferDataObjectValues(&theList[c1],&tempList[c1]); }
   }
 
-
-
-

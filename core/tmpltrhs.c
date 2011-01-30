@@ -557,5 +557,3 @@ static struct expr *FindAssertSlotItem(
   }
 
 #endif /* DEFTEMPLATE_CONSTRUCT */
-
-

@@ -893,4 +893,3 @@ globle int FactStoreMultifield(
 
 #endif /* DEFTEMPLATE_CONSTRUCT && DEFRULE_CONSTRUCT */
 
-

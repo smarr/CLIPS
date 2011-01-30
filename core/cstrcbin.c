@@ -151,5 +151,3 @@ globle void UnmarkConstructHeader(
   }
 
 #endif /* BLOAD || BLOAD_ONLY || BLOAD_AND_BSAVE */
-
-

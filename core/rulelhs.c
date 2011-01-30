@@ -1197,4 +1197,3 @@ globle void PropagatePatternType(
 #endif /* (! RUN_TIME) && (! BLOAD_ONLY) &&  DEFRULE_CONSTRUCT */
 
 
-

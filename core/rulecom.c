@@ -446,4 +446,3 @@ static void ShowJoins(
 
 #endif /* DEFRULE_CONSTRUCT */
 
-

@@ -1554,4 +1554,3 @@ static void PropagateIndexSlotPatternValues(
 
 #endif
 
-

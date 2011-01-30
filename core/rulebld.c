@@ -590,4 +590,3 @@ static struct joinNode *CreateNewJoin(
 
 
 
-

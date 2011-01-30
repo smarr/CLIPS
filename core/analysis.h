@@ -44,5 +44,3 @@
    LOCALE BOOLEAN                        VariableAnalysis(struct lhsParseNode *);
 
 #endif
-
-

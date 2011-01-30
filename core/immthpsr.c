@@ -429,4 +429,3 @@ static EXPRESSION *GenTypeExpression(
   NOTES        :
  ***************************************************/
 
-

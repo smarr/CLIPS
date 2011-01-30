@@ -1514,4 +1514,3 @@ static DEFGENERIC *NewGeneric(
   SIDE EFFECTS :
   NOTES        :
  ***************************************************/
-

@@ -844,4 +844,3 @@ globle void *BloadDefruleModuleReference(
 #endif /* DEFRULE_CONSTRUCT && (BLOAD || BLOAD_ONLY || BLOAD_AND_BSAVE) && (! RUN_TIME) */
 
 
-

@@ -986,5 +986,3 @@ void *GetFactOrInstanceArgument(
    ExpectedTypeError2(functionName,thePosition);
    return(NULL);
   }
-
-

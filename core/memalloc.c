@@ -1165,4 +1165,3 @@ static int BlockMemoryExitFunction(
    return(1);
   }
 #endif
-

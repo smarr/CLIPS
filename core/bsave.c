@@ -612,9 +612,3 @@ globle void GenWrite(
   }
 
 #endif /* BLOAD_AND_BSAVE || BSAVE_INSTANCES */
-
-
-
-
-
-

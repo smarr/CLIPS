@@ -1166,4 +1166,3 @@ globle void SetFocusChanged(
 
 #endif /* DEFRULE_CONSTRUCT */
 
-

@@ -281,4 +281,3 @@ static BOOLEAN DefglobalWatchPrint(
 #endif /* DEFGLOBAL_CONSTRUCT */
 
 
-

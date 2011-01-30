@@ -401,4 +401,3 @@ globle int CheckSyntax(
 #endif /* (! RUN_TIME) && (! BLOAD_ONLY) */
 
 
-

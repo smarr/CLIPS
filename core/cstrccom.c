@@ -1443,4 +1443,3 @@ globle void *LookupConstruct(
    return(theConstruct);
   }
 
-

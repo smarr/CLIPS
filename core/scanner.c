@@ -763,4 +763,3 @@ globle void DecrementLineCount()
   {
    LineCount--;
   }
-

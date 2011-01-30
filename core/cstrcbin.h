@@ -61,7 +61,3 @@ LOCALE void UnmarkConstructHeader(struct constructHeader *);
 
 #endif
 
-
-
-
-

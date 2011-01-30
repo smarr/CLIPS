@@ -259,4 +259,3 @@ globle void DeffactsCModuleReference(
 #endif /* DEFFACTS_CONSTRUCT && CONSTRUCT_COMPILER && (! RUN_TIME) */
 
 
-

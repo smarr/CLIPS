@@ -195,4 +195,3 @@ static void ReturnDeffacts(
 #endif /* DEFFACTS_CONSTRUCT */
 
 
-

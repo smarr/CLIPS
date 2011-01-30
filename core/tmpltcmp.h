@@ -37,4 +37,3 @@
    LOCALE void                           DeftemplateCConstructReference(FILE *,void *,int,int);
 
 #endif
-

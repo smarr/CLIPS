@@ -37,4 +37,3 @@
    LOCALE void                           DefglobalCConstructReference(FILE *,void *,int,int);
 
 #endif
-

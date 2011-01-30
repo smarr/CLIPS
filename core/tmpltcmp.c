@@ -391,4 +391,3 @@ globle void DeftemplateCConstructReference(
 
 #endif /* DEFTEMPLATE_CONSTRUCT && CONSTRUCT_COMPILER && (! RUN_TIME) */
 
-

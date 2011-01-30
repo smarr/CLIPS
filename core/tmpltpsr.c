@@ -607,6 +607,3 @@ static struct templateSlot *DefinedSlots(
 #endif /* (! RUN_TIME) && (! BLOAD_ONLY) */
 
 #endif /* DEFTEMPLATE_CONSTRUCT */
-
-
-

@@ -201,4 +201,3 @@ globle BOOLEAN IsDefruleDeletable(
 #endif /* DEFRULE_CONSTRUCT */
 
 
-

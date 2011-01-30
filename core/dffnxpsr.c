@@ -459,4 +459,3 @@ static DEFFUNCTION *AddDeffunction(
   SIDE EFFECTS :
   NOTES        :
  ***************************************************/
-

@@ -675,4 +675,3 @@ static void SaveDefclass(
   SIDE EFFECTS :
   NOTES        :
  ***************************************************/
-

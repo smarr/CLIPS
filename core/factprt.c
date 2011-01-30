@@ -448,4 +448,3 @@ globle void PrintFactPNConstant2(
 #endif /* DEFTEMPLATE_CONSTRUCT && DEFRULE_CONSTRUCT */
 
 
-

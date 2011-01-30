@@ -607,4 +607,3 @@ globle void FreeAtomicValueStorage()
   }
 
 #endif /* BLOAD || BLOAD_ONLY || BLOAD_AND_BSAVE || BLOAD_INSTANCES || BSAVE_INSTANCES */
-

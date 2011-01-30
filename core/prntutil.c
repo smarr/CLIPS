@@ -428,4 +428,3 @@ globle void SalienceNonIntegerError()
    PrintRouter(WERROR,"Salience value must be an integer value.\n");
   }
 
-

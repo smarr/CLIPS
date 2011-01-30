@@ -334,4 +334,3 @@ static void SingleDefinstancesToCode(
   SIDE EFFECTS :
   NOTES        :
  ***************************************************/
-

@@ -510,4 +510,3 @@ globle struct fact *GetFactAddressOrIndexArgument(
 #endif /* DEFTEMPLATE_CONSTRUCT */
 
 
-

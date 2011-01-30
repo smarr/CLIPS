@@ -589,4 +589,3 @@ static void TypeToCode(
   SIDE EFFECTS :
   NOTES        :
  ***************************************************/
-

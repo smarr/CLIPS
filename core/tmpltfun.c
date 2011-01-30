@@ -731,4 +731,3 @@ static struct expr *ModAndDupParse(
 
 #endif /* DEFTEMPLATE_CONSTRUCT */
 
-

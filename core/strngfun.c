@@ -891,4 +891,3 @@ globle int Build(
 #endif /* (! RUN_TIME) && (! BLOAD_ONLY) */
 
 #endif /* STRING_FUNCTIONS */
-

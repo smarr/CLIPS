@@ -264,4 +264,3 @@ globle void ShowFactHashTable()
 
 #endif /* DEFTEMPLATE_CONSTRUCT */
 
-

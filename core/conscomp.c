@@ -1429,4 +1429,3 @@ globle void ConstructModuleToCode(
 void ConstructsToCCommand() {}
 
 #endif /* CONSTRUCT_COMPILER && (! RUN_TIME) */
-

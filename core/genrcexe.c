@@ -699,4 +699,3 @@ static DEFCLASS *DetermineRestrictionClass(
   SIDE EFFECTS :
   NOTES        :
  ***************************************************/
-

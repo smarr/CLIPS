@@ -789,6 +789,3 @@ globle char *GetCommandCompletionString(
 
 #endif
 
-
-
-

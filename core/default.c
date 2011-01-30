@@ -466,4 +466,3 @@ globle struct expr *ParseDefault(
   }
 
 #endif /* (! RUN_TIME) && (! BLOAD_ONLY) */
-

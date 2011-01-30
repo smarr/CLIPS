@@ -64,4 +64,3 @@ LOCALE int ClassExistPCommand(void);
 #endif
 
 #endif
-

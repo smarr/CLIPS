@@ -1269,4 +1269,3 @@ static void SetParseFlag(
 
 #endif /* (! RUN_TIME) && (! BLOAD_ONLY) */
 
-

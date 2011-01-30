@@ -403,4 +403,3 @@ globle int GetIncrementalResetCommand()
   }
 
 #endif /* DEFRULE_CONSTRUCT && INCREMENTAL_RESET */
-

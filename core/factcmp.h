@@ -43,4 +43,3 @@
    LOCALE void                           FactPatternNodeReference(void *,FILE *,int,int);
 
 #endif
-

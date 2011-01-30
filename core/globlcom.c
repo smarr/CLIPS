@@ -263,4 +263,3 @@ static void PrintDefglobalValueForm(
 
 #endif /* DEFGLOBAL_CONSTRUCT */
 
-

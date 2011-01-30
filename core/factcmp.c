@@ -371,4 +371,3 @@ globle void FactPatternNodeReference(
 #endif /* DEFRULE_CONSTRUCT && (! RUN_TIME) && DEFTEMPLATE_CONSTRUCT && CONSTRUCT_COMPILER */
 
 
-

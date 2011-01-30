@@ -1441,4 +1441,3 @@ globle void RestoreAtomicValueBuckets()
   }
 
 #endif /* BLOAD_AND_BSAVE || CONSTRUCT_COMPILER || BSAVE_INSTANCES */
-

@@ -1102,5 +1102,3 @@ globle void AgendaCommand()
 #endif /* DEBUGGING_FUNCTIONS */
 
 #endif /* DEFRULE_CONSTRUCT */
-
-

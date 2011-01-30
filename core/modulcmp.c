@@ -491,4 +491,3 @@ static struct portItem *GetNextPortItem(
 #endif /* CONSTRUCT_COMPILER && (! RUN_TIME) */
 
 
-

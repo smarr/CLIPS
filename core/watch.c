@@ -566,4 +566,3 @@ static int CaptureWatchPrints(
 
 #endif /* DEBUGGING_FUNCTIONS */
 
-

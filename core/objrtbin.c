@@ -519,4 +519,3 @@ static void ClearBloadObjectPatterns()
   NOTES        :
  ***************************************************/
 
-

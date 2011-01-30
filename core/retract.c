@@ -938,4 +938,3 @@ globle void RetractCheckDriveRetractions(
 
 #endif /* DEFRULE_CONSTRUCT */
 
-

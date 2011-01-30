@@ -618,4 +618,3 @@ static void NoSuchTemplateError(
 #endif /* DEFTEMPLATE_CONSTRUCT */
 
 
-

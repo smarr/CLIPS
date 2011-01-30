@@ -926,4 +926,3 @@ static void ClearPatternMatches(
 
 
 
-

@@ -790,5 +790,3 @@ globle void MaxFunction(
 
    return;
   }
-
-

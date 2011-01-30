@@ -207,4 +207,3 @@ struct factCheckLengthPNCall
    LOCALE struct expr               *FactGenCheckZeroLength(int);
 
 #endif
-

@@ -957,4 +957,3 @@ static void AddToDefruleList(
 #endif /* (! RUN_TIME) && (! BLOAD_ONLY) */
 
 #endif /* DEFRULE_CONSTRUCT */
-

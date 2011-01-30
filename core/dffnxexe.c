@@ -235,4 +235,3 @@ static void WatchDeffunction(
   SIDE EFFECTS :
   NOTES        :
  ***************************************************/
-

@@ -459,4 +459,3 @@ globle void *BloadDeffactsModuleReference(
 #endif /* DEFFACTS_CONSTRUCT && (BLOAD || BLOAD_ONLY || BLOAD_AND_BSAVE) && (! RUN_TIME) */
 
 
-

@@ -542,4 +542,3 @@ globle BOOLEAN SetStaticConstraintChecking(
 globle BOOLEAN GetStaticConstraintChecking()
   { return(StaticConstraintChecking); }
 
-

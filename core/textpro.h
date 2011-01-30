@@ -46,9 +46,3 @@
    LOCALE void                           HelpFunctionDefinitions(void);
 #endif
 
-
-
-
-
-
-

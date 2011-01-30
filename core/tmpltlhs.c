@@ -357,5 +357,3 @@ static BOOLEAN MultiplyDefinedLHSSlots(
 
 #endif /* DEFTEMPLATE_CONSTRUCT && DEFRULE_CONSTRUCT && (! RUN_TIME) && (! BLOAD_ONLY) */
 
-
-

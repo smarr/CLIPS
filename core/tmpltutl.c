@@ -450,4 +450,3 @@ globle struct deftemplate *CreateImpliedDeftemplate(
 #endif
 
 #endif /* DEFTEMPLATE_CONSTRUCT */
-

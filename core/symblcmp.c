@@ -826,4 +826,3 @@ static void PrintCString(
   }
 
 #endif /* CONSTRUCT_COMPILER && (! RUN_TIME) */
-

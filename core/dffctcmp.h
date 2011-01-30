@@ -36,4 +36,3 @@
    LOCALE void                           DeffactsCModuleReference(FILE *,int,int,int);
 
 #endif
-

@@ -899,5 +899,3 @@ static char *GetStrategyName(
 #endif /* CONFLICT_RESOLUTION_STRATEGIES */
 
 #endif /* DEFRULE_CONSTRUCT */
-
-

@@ -518,4 +518,3 @@ static int AlphaPatternNodesToCode(
   SIDE EFFECTS :
   NOTES        :
  ***************************************************/
-

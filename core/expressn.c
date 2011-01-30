@@ -404,4 +404,3 @@ globle long HashedExpressionIndex(
 
 #endif /* (BLOAD_AND_BSAVE || BLOAD_ONLY || BLOAD || CONSTRUCT_COMPILER) && (! RUN_TIME) */
 
-

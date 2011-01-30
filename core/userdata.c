@@ -144,4 +144,3 @@ globle struct userData *DeleteUserData(
         
    return(theList);   
   }
-

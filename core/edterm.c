@@ -655,4 +655,3 @@ char    *str;
 #endif
 
 #endif          /* end original EMACS_EDITOR definition */
-

@@ -1704,4 +1704,3 @@ globle void TypeCommand(
   SIDE EFFECTS :
   NOTES        :
  ***************************************************/
-

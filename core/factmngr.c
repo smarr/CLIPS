@@ -1415,4 +1415,3 @@ globle struct fact *FindIndexedFact(
 
 #endif /* DEFTEMPLATE_CONSTRUCT && DEFRULE_CONSTRUCT */
 
-

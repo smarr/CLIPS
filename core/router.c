@@ -611,4 +611,3 @@ globle int PrintNRouter(
    genlongfree(tempStr,length+1);
    return(rv);
   }
-

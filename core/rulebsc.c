@@ -339,4 +339,3 @@ globle BOOLEAN DefruleWatchPrint(
 #endif /* DEFTEMPLATE_CONSTRUCT */
 
 
-

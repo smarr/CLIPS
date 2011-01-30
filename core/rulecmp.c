@@ -508,4 +508,3 @@ globle void DefruleCModuleReference(
 #endif /* DEFRULE_CONSTRUCT && (! RUN_TIME) && CONSTRUCT_COMPILER */
 
 
-

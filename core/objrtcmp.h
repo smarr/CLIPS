@@ -50,4 +50,3 @@ LOCALE void ObjectPatternNodeReference(void *,FILE *,int,int);
 
 
 
-

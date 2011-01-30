@@ -973,5 +973,3 @@ static void VariableMixingErrorMessage(
 
 #endif /* (! RUN_TIME) && (! BLOAD_ONLY) && DEFRULE_CONSTRUCT */
 
-
-

@@ -775,4 +775,3 @@ globle void FactsIncrementalReset()
 
 #endif /* DEFTEMPLATE_CONSTRUCT && DEFRULE_CONSTRUCT */
 
-

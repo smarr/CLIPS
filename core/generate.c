@@ -854,4 +854,3 @@ static int AllVariablesInExpression(
 #endif /* (! RUN_TIME) && (! BLOAD_ONLY) && DEFRULE_CONSTRUCT */
 
 
-

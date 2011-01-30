@@ -631,4 +631,3 @@ globle void DependentsCommand()
 
 #endif /* DEFRULE_CONSTRUCT && LOGICAL_DEPENDENCIES */
 
-

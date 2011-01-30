@@ -304,5 +304,3 @@ static void IncrementDeftemplateBusyCount(
 
 #endif /* DEFTEMPLATE_CONSTRUCT */
 
-
-
