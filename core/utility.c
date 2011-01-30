@@ -1000,3 +1000,4 @@ globle size_t UTF8CharNum(
      
    return charnum;
   }
+
