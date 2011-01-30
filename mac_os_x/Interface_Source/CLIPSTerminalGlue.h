@@ -7,7 +7,7 @@
  */
  
 #import <Cocoa/Cocoa.h>
-#import <CLIPS/clips.h>
+#import <core/clips.h>
 
    intBool                 QueryInterfaceRouter(void *,char *);
    int                     PrintInterfaceRouter(void *,char *,char *);
