@@ -5,7 +5,7 @@
 #import "CLIPSModule.h"
 #import "CLIPSActivation.h"
 
-#import <CLIPS/clips.h>
+#import <core/clips.h>
 
 #include <setjmp.h>
 

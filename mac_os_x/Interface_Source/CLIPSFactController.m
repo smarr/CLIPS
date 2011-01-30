@@ -13,7 +13,7 @@
 #import "CLIPSFactInstance.h"
 #import "ModuleArrayController.h"
 
-#include <CLIPS/clips.h>
+#include <core/clips.h>
 
 @implementation CLIPSFactController
 

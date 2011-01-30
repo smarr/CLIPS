@@ -12,7 +12,7 @@
 #import "CLIPSEnvironment.h"
 #import "CLIPSTerminalGlue.h"
 
-#include <CLIPS/clips.h>
+#include <core/clips.h>
 
 #define BUFFER_SIZE 32768
 #define CLIPS_TERMINAL_LINE_MAX 10000

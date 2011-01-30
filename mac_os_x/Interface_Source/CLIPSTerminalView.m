@@ -8,7 +8,7 @@
 #import "CLIPSEnvironment.h"
 #import "CLIPSTerminalView.h"
 #import "CLIPSTerminalController.h"
-#import <CLIPS/clips.h>
+#import <core/clips.h>
 
 #define DOES_NOT_CHAR  0
 #define NEEDS_CHAR     1 

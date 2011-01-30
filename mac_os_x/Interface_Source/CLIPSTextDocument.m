@@ -12,7 +12,7 @@
 #import "CLIPSEnvironment.h"
 #import "CLIPSTextView.h"
 
-#import <CLIPS/clips.h>
+#import <core/clips.h>
 
 @implementation CLIPSTextDocument
 

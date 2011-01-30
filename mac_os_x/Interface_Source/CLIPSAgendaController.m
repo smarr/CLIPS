@@ -12,7 +12,7 @@
 #import "CLIPSEnvironment.h"
 #import "CLIPSActivation.h"
 
-#include <CLIPS/clips.h>
+#include <core/clips.h>
 
 @implementation CLIPSAgendaController
 

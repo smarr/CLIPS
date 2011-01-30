@@ -4,7 +4,7 @@
 #import "PreferenceController.h"
 #import "CLIPSTerminalController.h"
 #import "CLIPSTextMenu.h"
-#import <CLIPS/clips.h>
+#import <core/clips.h>
 
 @implementation AppController
 
