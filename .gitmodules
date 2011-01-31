@@ -1,0 +1,3 @@
+[submodule "libs/apr"]
+	path = libs/apr
+	url = https://github.com/apache/apr.git
