@@ -367,7 +367,7 @@ globle void *CreateEnvironmentDriver(
       return(NULL);
     }
     
-    rv = apr_thread_pool_create(&theEnvironment->threadPool, 8, 8, theEnvironment->memoryPool);
+    rv = apr_thread_pool_create(&theEnvironment->threadPool, 1, 1, theEnvironment->memoryPool);
     if (rv) {
       printf("\n[ENVRNMNT_THREAD] Unable to create thread pool.\n");
       return(NULL);

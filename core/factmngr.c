@@ -84,6 +84,10 @@
 #include "tmpltutl.h"
 #include "tmpltfun.h"
 
+
+#include <unistd.h>
+
+
 /***************************************/
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
@@ -620,6 +624,57 @@ static void RemoveGarbageFacts(
      }
   }
 
+
+
+/*
+ * Used to transfer the parameters from EnvAssert to
+ * the pattern matching and retracting process.
+ */
+struct paramsForFactMatchAndRetract
+{
+  void *theEnv;
+  struct fact *theFact;
+  struct factPatternNode *patternPtr;
+  int offset;
+  struct multifieldMarker *markers;
+  struct multifieldMarker *endMark;
+};
+
+
+/*************************************************************************/
+/* ParallelFactPatternMatch: Parallel Wrapper function for queued match  */
+/*                           jobs.                                       */
+/*************************************************************************/
+static void * APR_THREAD_FUNC ParallelFactMatchAndLogicRetract(apr_thread_t *thread, void *parameters)
+{
+  struct paramsForFactMatchAndRetract * const params = (struct paramsForFactMatchAndRetract*)parameters;
+  
+  
+  FactPatternMatch(params->theEnv,
+                   params->theFact,
+                   params->patternPtr,
+                   params->offset,
+                   params->markers,
+                   params->endMark);
+  
+  // STEFAN: IMPORTANT: removed for now
+  
+  // EngineData(theEnv)->JoinOperationInProgress = FALSE;
+  
+  
+  /*===================================================*/
+  /* Retract other facts that were logically dependent */
+  /* on the non-existence of the fact just asserted.   */
+  /*===================================================*/
+  
+  ForceLogicalRetractions(params->theEnv);
+  
+  free(params);
+  
+  return NULL;
+}
+
+
 /********************************************************/
 /* EnvAssert: C access routine for the assert function. */
 /********************************************************/
@@ -767,15 +822,39 @@ globle void *EnvAssert(
    /*=============================================*/
 
    EngineData(theEnv)->JoinOperationInProgress = TRUE;
-   FactPatternMatch(theEnv,theFact,theFact->whichDeftemplate->patternNetwork,0,NULL,NULL);
+    
+    // STEFAN: Lets go parallel
+    
+    struct paramsForFactMatchAndRetract * parameters = (struct paramsForFactMatchAndRetract *)malloc(sizeof(struct paramsForFactMatchAndRetract));
+    
+    if (!parameters) {
+      /// go crazy
+    }
+    else {
+      parameters->theEnv = theEnv;
+      parameters->theFact = theFact;
+      parameters->patternPtr = theFact->whichDeftemplate->patternNetwork;
+      parameters->offset = 0;
+      parameters->markers = NULL;
+      parameters->endMark = NULL;
+      
+      apr_status_t rv;
+      rv = apr_thread_pool_push(((struct environmentData *)theEnv)->threadPool,
+                                ParallelFactMatchAndLogicRetract,
+                                parameters,
+                                0, NULL);
+    }
+    
+    
+   //   FactPatternMatch(theEnv,theFact,theFact->whichDeftemplate->patternNetwork,0,NULL,NULL);
    EngineData(theEnv)->JoinOperationInProgress = FALSE;
+    
+    // STEFAN: TEST
+    while (apr_thread_pool_busy_count(((struct environmentData *)theEnv)->threadPool) > 0) {
+      usleep(100);
+    }
 
-   /*===================================================*/
-   /* Retract other facts that were logically dependent */
-   /* on the non-existence of the fact just asserted.   */
-   /*===================================================*/
 
-   ForceLogicalRetractions(theEnv);
 
    /*=========================================*/
    /* Free partial matches that were released */
