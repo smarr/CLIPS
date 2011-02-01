@@ -86,7 +86,7 @@
 
 
 #include <unistd.h>
-
+#include <assert.h>
 
 /***************************************/
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
@@ -657,9 +657,7 @@ static void * APR_THREAD_FUNC ParallelFactMatchAndLogicRetract(apr_thread_t *thr
                    params->markers,
                    params->endMark);
   
-  // STEFAN: IMPORTANT: removed for now
-  
-  // EngineData(theEnv)->JoinOperationInProgress = FALSE;
+  EngineData(params->theEnv)->JoinOperationInProgress = FALSE;
   
   
   /*===================================================*/
@@ -828,33 +826,39 @@ globle void *EnvAssert(
     struct paramsForFactMatchAndRetract * parameters = (struct paramsForFactMatchAndRetract *)malloc(sizeof(struct paramsForFactMatchAndRetract));
     
     if (!parameters) {
-      /// go crazy
+      SystemError(theEnv,"malloc failed",1);
     }
     else {
-      parameters->theEnv = theEnv;
-      parameters->theFact = theFact;
+      parameters->theEnv     = theEnv;
+      parameters->theFact    = theFact;
       parameters->patternPtr = theFact->whichDeftemplate->patternNetwork;
-      parameters->offset = 0;
-      parameters->markers = NULL;
-      parameters->endMark = NULL;
+      parameters->offset     = 0;
+      parameters->markers    = NULL;
+      parameters->endMark    = NULL;
       
       apr_status_t rv;
       rv = apr_thread_pool_push(((struct environmentData *)theEnv)->threadPool,
                                 ParallelFactMatchAndLogicRetract,
                                 parameters,
                                 0, NULL);
+      if (rv) {
+        SystemError(theEnv,"Putting task on thread pool failed",1);
+      }
     }
     
+    /*===================================================*/
+    /* Retract other facts that were logically dependent */
+    /* on the non-existence of the fact just asserted.   */
+    /*===================================================*/
     
-   //   FactPatternMatch(theEnv,theFact,theFact->whichDeftemplate->patternNetwork,0,NULL,NULL);
-   EngineData(theEnv)->JoinOperationInProgress = FALSE;
+    ForceLogicalRetractions(theEnv);
     
-    // STEFAN: TEST
-    while (apr_thread_pool_busy_count(((struct environmentData *)theEnv)->threadPool) > 0) {
+    while ((apr_thread_pool_tasks_count(((struct environmentData *)theEnv)->threadPool) > 0)
+           || ((apr_thread_pool_busy_count(((struct environmentData *)theEnv)->threadPool)) > 0)) {
       usleep(100);
     }
-
-
+       
+    assert(apr_thread_pool_idle_count(((struct environmentData *)theEnv)->threadPool) == 1);
 
    /*=========================================*/
    /* Free partial matches that were released */
