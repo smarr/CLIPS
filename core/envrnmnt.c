@@ -352,6 +352,27 @@ globle void *CreateEnvironmentDriver(
    theEnvironment->routerContext = NULL;
    theEnvironment->functionContext = NULL;
    theEnvironment->callbackContext = NULL;
+    
+    theEnvironment->memoryPool = NULL;
+    theEnvironment->threadPool = NULL;
+    
+    // STEFAN: initalize the thread-pool related data structures
+    apr_status_t rv;
+    
+    apr_initialize();
+    
+    rv = apr_pool_create(&theEnvironment->memoryPool, NULL);
+    if (rv) {
+      printf("\n[ENVRNMNT_THREAD] Unable to create memory pool.\n");
+      return(NULL);
+    }
+    
+    rv = apr_thread_pool_create(&theEnvironment->threadPool, 8, 8, theEnvironment->memoryPool);
+    if (rv) {
+      printf("\n[ENVRNMNT_THREAD] Unable to create thread pool.\n");
+      return(NULL);
+    }
+    
 
    /*=============================================*/
    /* Allocate storage for the cleanup functions. */

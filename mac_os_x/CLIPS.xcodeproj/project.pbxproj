@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0AC5631012F6FA1900D7E70E /* apr_thread_pool.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AC5630F12F6FA1900D7E70E /* apr_thread_pool.h */; };
+		0AC5631112F6FA1900D7E70E /* apr_thread_pool.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AC5630F12F6FA1900D7E70E /* apr_thread_pool.h */; };
+		0AC5631312F6FEC500D7E70E /* apr_pools.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AC5631212F6FEC500D7E70E /* apr_pools.h */; };
+		0AC5631412F6FEC500D7E70E /* apr_pools.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AC5631212F6FEC500D7E70E /* apr_pools.h */; };
+		0AC5632A12F70C5E00D7E70E /* libapr-2.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AC5632912F70C5E00D7E70E /* libapr-2.0.dylib */; };
 		0ADFF2C312F5830C00AE91B5 /* agenda.c in Sources */ = {isa = PBXBuildFile; fileRef = 0ADFF21A12F5830C00AE91B5 /* agenda.c */; };
 		0ADFF2C412F5830C00AE91B5 /* analysis.c in Sources */ = {isa = PBXBuildFile; fileRef = 0ADFF21B12F5830C00AE91B5 /* analysis.c */; };
 		0ADFF2C512F5830C00AE91B5 /* argacces.c in Sources */ = {isa = PBXBuildFile; fileRef = 0ADFF21C12F5830C00AE91B5 /* argacces.c */; };
@@ -628,6 +633,10 @@
 
 /* Begin PBXFileReference section */
 		089C1660FE840EACC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		0AC5630F12F6FA1900D7E70E /* apr_thread_pool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = apr_thread_pool.h; path = ../libs/apr/include/apr_thread_pool.h; sourceTree = "<group>"; };
+		0AC5631212F6FEC500D7E70E /* apr_pools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = apr_pools.h; path = ../libs/apr/include/apr_pools.h; sourceTree = "<group>"; };
+		0AC5632712F70C2100D7E70E /* libapr-2.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libapr-2.0.dylib"; path = "../libs/apr/.libs/libapr-2.0.dylib"; sourceTree = "<group>"; };
+		0AC5632912F70C5E00D7E70E /* libapr-2.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libapr-2.0.dylib"; path = "../libs/apr/.libs/libapr-2.0.dylib"; sourceTree = "<group>"; };
 		0ADFF21A12F5830C00AE91B5 /* agenda.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = agenda.c; path = ../core/agenda.c; sourceTree = "<group>"; };
 		0ADFF21B12F5830C00AE91B5 /* analysis.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = analysis.c; path = ../core/analysis.c; sourceTree = "<group>"; };
 		0ADFF21C12F5830C00AE91B5 /* argacces.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = argacces.c; path = ../core/argacces.c; sourceTree = "<group>"; };
@@ -1057,6 +1066,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0AC5632A12F70C5E00D7E70E /* libapr-2.0.dylib in Frameworks */,
 				B580A3FA0D513B7000150F2D /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1064,6 +1074,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0AC5630E12F6F9FF00D7E70E /* Apache APR */ = {
+			isa = PBXGroup;
+			children = (
+				0AC5630F12F6FA1900D7E70E /* apr_thread_pool.h */,
+				0AC5631212F6FEC500D7E70E /* apr_pools.h */,
+			);
+			name = "Apache APR";
+			sourceTree = "<group>";
+		};
 		1058C7A6FEA54F5311CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -1092,6 +1111,9 @@
 		2A37F4AAFDCFA73011CA2CEA /* CLIPSEditor */ = {
 			isa = PBXGroup;
 			children = (
+				0AC5632912F70C5E00D7E70E /* libapr-2.0.dylib */,
+				0AC5632712F70C2100D7E70E /* libapr-2.0.dylib */,
+				0AC5630E12F6F9FF00D7E70E /* Apache APR */,
 				2A37F4ABFDCFA73011CA2CEA /* Classes */,
 				B5BCF20509AD249F000E597B /* CLIPS Source */,
 				B54DA5D109AE1D4C00D9DF3D /* CLIPS Source Headers */,
@@ -1729,6 +1751,8 @@
 				0ADFF4C112F5833100AE91B5 /* usrsetup.h in Headers */,
 				0ADFF4C212F5833100AE91B5 /* utility.h in Headers */,
 				0ADFF4C312F5833100AE91B5 /* watch.h in Headers */,
+				0AC5631012F6FA1900D7E70E /* apr_thread_pool.h in Headers */,
+				0AC5631312F6FEC500D7E70E /* apr_pools.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1736,6 +1760,8 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0AC5631112F6FA1900D7E70E /* apr_thread_pool.h in Headers */,
+				0AC5631412F6FEC500D7E70E /* apr_pools.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2392,8 +2418,14 @@
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = ../;
+				HEADER_SEARCH_PATHS = (
+					../,
+					../libs/apr/include,
+					../libs/apr/include/arch/unix,
+				);
+				LIBRARY_SEARCH_PATHS = ../libs/apr/.libs;
 				PREBINDING = NO;
+				PRELINK_LIBS = "";
 				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
 				VALID_ARCHS = "ppc64 ppc7400 ppc970 i386 x86_64 ppc";
 			};
@@ -2411,6 +2443,11 @@
 					"WINDOW_INTERFACE=0",
 					"DARWIN=1",
 				);
+				LIBRARY_SEARCH_PATHS = (
+					../libs/apr/.libs,
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+				);
+				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/../libs/apr/.libs\"";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				OTHER_REZFLAGS = "";
@@ -2428,6 +2465,8 @@
 		1E6F78CF0D502A6500B9DCFB /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1)";
+				ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1 = "ppc i386";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2467,6 +2506,11 @@
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "Interface_Source/CLIPS-Info.plist";
 				INSTALL_PATH = "@executable_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+				);
+				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/../libs/apr/.libs\"";
 				OTHER_LDFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = CLIPS;
@@ -2478,6 +2522,8 @@
 		B5997A560D4D9B9E00C9B896 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1)";
+				ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1 = "ppc i386";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
@@ -2487,12 +2533,18 @@
 					"WINDOW_INTERFACE=0",
 					"DARWIN=1",
 				);
+				LIBRARY_SEARCH_PATHS = (
+					../libs/apr/.libs,
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+				);
+				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/../libs/apr/.libs\"";
 				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "";
+				OTHER_LDFLAGS = "-lapr-2.0";
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = "CLIPS Console";
 				REZ_EXECUTABLE = YES;
 				SECTORDER_FLAGS = "";
+				VALID_ARCHS = "i386 x86_64";
 				WARNING_CFLAGS = (
 					"-Wmost",
 					"-Wno-four-char-constants",
@@ -2504,6 +2556,8 @@
 		B5BCEF5809AD23C0000E597B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1)";
+				ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1 = "ppc i386";
 				COPY_PHASE_STRIP = NO;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -2522,10 +2576,16 @@
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "Interface_Source/CLIPS-Info.plist";
 				INSTALL_PATH = "@executable_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+				);
+				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/../libs/apr/.libs\"";
 				OTHER_LDFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = CLIPS;
 				SKIP_INSTALL = YES;
+				VALID_ARCHS = i386;
 				ZERO_LINK = YES;
 			};
 			name = Debug;
@@ -2533,6 +2593,8 @@
 		C05733C808A9546B00998B17 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1)";
+				ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1 = "ppc i386";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2546,6 +2608,7 @@
 				INFOPLIST_FILE = Interface_Source/Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				PRODUCT_NAME = "CLIPS IDE";
+				VALID_ARCHS = i386;
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = YES;
 			};
@@ -2566,8 +2629,14 @@
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = ../;
+				HEADER_SEARCH_PATHS = (
+					../,
+					../libs/apr/include,
+					../libs/apr/include/arch/unix,
+				);
+				LIBRARY_SEARCH_PATHS = ../libs/apr/.libs;
 				PREBINDING = NO;
+				PRELINK_LIBS = "";
 				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
 				VALID_ARCHS = "ppc64 ppc7400 ppc970 i386 x86_64 ppc";
 			};

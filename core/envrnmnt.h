@@ -48,6 +48,9 @@
 #define USER_ENVIRONMENT_DATA 70
 #define MAXIMUM_ENVIRONMENT_POSITIONS 100
 
+# include <apr_pools.h>
+# include <apr_thread_pool.h>
+
 struct environmentCleanupFunction
   {
    char *name;
@@ -68,6 +71,10 @@ struct environmentData
    void (**cleanupFunctions)(void *);
    struct environmentCleanupFunction *listOfCleanupEnvironmentFunctions;
    struct environmentData *next;
+    
+    // STEFAN: Adding thread pool properties
+    apr_pool_t        *memoryPool;
+    apr_thread_pool_t *threadPool;    
   };
 
 typedef struct environmentData ENVIRONMENT_DATA;
