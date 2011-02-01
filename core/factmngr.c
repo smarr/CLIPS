@@ -837,7 +837,7 @@ globle void *EnvAssert(
       parameters->endMark    = NULL;
       
       apr_status_t rv;
-      rv = apr_thread_pool_push(((struct environmentData *)theEnv)->threadPool,
+      rv = apr_thread_pool_push(Env(theEnv)->threadPool,
                                 ParallelFactMatchAndLogicRetract,
                                 parameters,
                                 0, NULL);
@@ -853,12 +853,12 @@ globle void *EnvAssert(
     
     ForceLogicalRetractions(theEnv);
     
-    while ((apr_thread_pool_tasks_count(((struct environmentData *)theEnv)->threadPool) > 0)
-           || ((apr_thread_pool_busy_count(((struct environmentData *)theEnv)->threadPool)) > 0)) {
+    while ((apr_thread_pool_tasks_count(Env(theEnv)->threadPool) > 0)
+           || ((apr_thread_pool_busy_count(Env(theEnv)->threadPool)) > 0)) {
       usleep(100);
     }
        
-    assert(apr_thread_pool_idle_count(((struct environmentData *)theEnv)->threadPool) == 1);
+    assert(apr_thread_pool_idle_count(Env(theEnv)->threadPool) == 1);
 
    /*=========================================*/
    /* Free partial matches that were released */
