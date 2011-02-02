@@ -26,7 +26,7 @@
 #ifndef _H_msgpass
 #define _H_msgpass
 
-#define GetActiveInstance(theEnv) ((INSTANCE_TYPE *) GetNthMessageArgument(theEnv,0)->value)
+#define GetActiveInstance(theEnv) ((INSTANCE_TYPE *) GetNthMessageArgument(theEnv,execStatus,0)->value)
 
 #ifndef _H_object
 #include "object.h"

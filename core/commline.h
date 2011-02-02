@@ -47,7 +47,7 @@ struct commandLineData
 #endif
   };
 
-#define CommandLineData(theEnv) ((struct commandLineData *) GetEnvironmentData(theEnv,COMMANDLINE_DATA))
+#define CommandLineData(theEnv) ((struct commandLineData *) GetEnvironmentData(theEnv,execStatus,COMMANDLINE_DATA))
 
 #ifdef LOCALE
 #undef LOCALE

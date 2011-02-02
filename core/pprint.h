@@ -36,7 +36,7 @@ struct prettyPrintData
    char *PrettyPrintBuffer;
   };
 
-#define PrettyPrintData(theEnv) ((struct prettyPrintData *) GetEnvironmentData(theEnv,PRETTY_PRINT_DATA))
+#define PrettyPrintData(theEnv) ((struct prettyPrintData *) GetEnvironmentData(theEnv,execStatus,PRETTY_PRINT_DATA))
 
 #ifdef LOCALE
 #undef LOCALE

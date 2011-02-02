@@ -149,7 +149,7 @@ globle void UnmarkConstructHeader(
   EXEC_STATUS,
   struct constructHeader *theConstruct)
   {
-   DecrementSymbolCount(theEnv,theConstruct->name);
+   DecrementSymbolCount(theEnv,execStatus,theConstruct->name);
   }
 
 #endif /* BLOAD || BLOAD_ONLY || BLOAD_AND_BSAVE */

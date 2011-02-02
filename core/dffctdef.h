@@ -68,10 +68,10 @@ struct deffactsModule
    struct defmoduleItemHeader header;
   };
 
-#define EnvGetDeffactsName(theEnv,x) GetConstructNameString((struct constructHeader *) x)
-#define EnvGetDeffactsPPForm(theEnv,x) GetConstructPPForm(theEnv,(struct constructHeader *) x)
-#define EnvDeffactsModule(theEnv,x) GetConstructModuleName((struct constructHeader *) x)
-#define DeffactsData(theEnv) ((struct deffactsData *) GetEnvironmentData(theEnv,DEFFACTS_DATA))
+#define EnvGetDeffactsName(theEnv,execStatus,x) GetConstructNameString((struct constructHeader *) x)
+#define EnvGetDeffactsPPForm(theEnv,execStatus,x) GetConstructPPForm(theEnv,execStatus,(struct constructHeader *) x)
+#define EnvDeffactsModule(theEnv,execStatus,x) GetConstructModuleName((struct constructHeader *) x)
+#define DeffactsData(theEnv) ((struct deffactsData *) GetEnvironmentData(theEnv,execStatus,DEFFACTS_DATA))
 
 #ifdef LOCALE
 #undef LOCALE

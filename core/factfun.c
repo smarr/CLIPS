@@ -77,12 +77,12 @@ globle void FactFunctionDefinitions(
   EXEC_STATUS)
   {
 #if ! RUN_TIME
-   EnvDefineFunction2(theEnv,"fact-existp",  'b', PTIEF FactExistpFunction,  "FactExistpFunction", "11z");
-   EnvDefineFunction2(theEnv,"fact-relation",'w', PTIEF FactRelationFunction,"FactRelationFunction", "11z");
-   EnvDefineFunction2(theEnv,"fact-slot-value",'u', PTIEF FactSlotValueFunction,"FactSlotValueFunction", "22*zw");
-   EnvDefineFunction2(theEnv,"fact-slot-names",'u', PTIEF FactSlotNamesFunction,"FactSlotNamesFunction", "11z");
-   EnvDefineFunction2(theEnv,"get-fact-list",'m',PTIEF GetFactListFunction,"GetFactListFunction","01w");
-   EnvDefineFunction2(theEnv,"ppfact",'v',PTIEF PPFactFunction,"PPFactFunction","13*z");
+   EnvDefineFunction2(theEnv,execStatus,"fact-existp",  'b', PTIEF FactExistpFunction,  "FactExistpFunction", "11z");
+   EnvDefineFunction2(theEnv,execStatus,"fact-relation",'w', PTIEF FactRelationFunction,"FactRelationFunction", "11z");
+   EnvDefineFunction2(theEnv,execStatus,"fact-slot-value",'u', PTIEF FactSlotValueFunction,"FactSlotValueFunction", "22*zw");
+   EnvDefineFunction2(theEnv,execStatus,"fact-slot-names",'u', PTIEF FactSlotNamesFunction,"FactSlotNamesFunction", "11z");
+   EnvDefineFunction2(theEnv,execStatus,"get-fact-list",'m',PTIEF GetFactListFunction,"GetFactListFunction","01w");
+   EnvDefineFunction2(theEnv,execStatus,"ppfact",'v',PTIEF PPFactFunction,"PPFactFunction","13*z");
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
 #pragma unused(theEnv)
@@ -102,7 +102,7 @@ globle void *FactRelationFunction(
 
    if (EnvArgCountCheck(theEnv,execStatus,"fact-relation",EXACTLY,1) == -1) return(EnvFalseSymbol(theEnv));
 
-   theFact = GetFactAddressOrIndexArgument(theEnv,"fact-relation",1,FALSE);
+   theFact = GetFactAddressOrIndexArgument(theEnv,execStatus,"fact-relation",1,FALSE);
 
    if (theFact == NULL) return(EnvFalseSymbol(theEnv));
 
@@ -154,9 +154,9 @@ globle int FactExistpFunction(
 
    if (EnvArgCountCheck(theEnv,execStatus,"fact-existp",EXACTLY,1) == -1) return(-1L);
 
-   theFact = GetFactAddressOrIndexArgument(theEnv,"fact-existp",1,FALSE);
+   theFact = GetFactAddressOrIndexArgument(theEnv,execStatus,"fact-existp",1,FALSE);
 
-   return(EnvFactExistp(theEnv,theFact));
+   return(EnvFactExistp(theEnv,execStatus,theFact));
   }
 
 /***********************************/
@@ -212,7 +212,7 @@ globle void FactSlotValueFunction(
    /* Get the reference to the fact. */
    /*================================*/
 
-   theFact = GetFactAddressOrIndexArgument(theEnv,"fact-slot-value",1,TRUE);
+   theFact = GetFactAddressOrIndexArgument(theEnv,execStatus,"fact-slot-value",1,TRUE);
    if (theFact == NULL) return;
 
    /*===========================*/
@@ -226,7 +226,7 @@ globle void FactSlotValueFunction(
    /* Get the slot's value. */
    /*=======================*/
 
-   FactSlotValue(theEnv,theFact,DOToString(theValue),returnValue);
+   FactSlotValue(theEnv,execStatus,theFact,DOToString(theValue),returnValue);
   }
 
 /***************************************/
@@ -252,17 +252,17 @@ globle void FactSlotValue(
      {
       if (strcmp(theSlotName,"implied") != 0)
         {
-         SetEvaluationError(theEnv,TRUE);
-         InvalidDeftemplateSlotMessage(theEnv,theSlotName,
+         SetEvaluationError(theEnv,execStatus,TRUE);
+         InvalidDeftemplateSlotMessage(theEnv,execStatus,theSlotName,
                                        ValueToString(theFact->whichDeftemplate->header.name),FALSE);
          return;
         }
      }
 
-   else if (FindSlot(theFact->whichDeftemplate,(SYMBOL_HN *) EnvAddSymbol(theEnv,theSlotName),&position) == NULL)
+   else if (FindSlot(theFact->whichDeftemplate,(SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,theSlotName),&position) == NULL)
      {
-      SetEvaluationError(theEnv,TRUE);
-      InvalidDeftemplateSlotMessage(theEnv,theSlotName,
+      SetEvaluationError(theEnv,execStatus,TRUE);
+      InvalidDeftemplateSlotMessage(theEnv,execStatus,theSlotName,
                                     ValueToString(theFact->whichDeftemplate->header.name),FALSE);
       return;
      }
@@ -272,9 +272,9 @@ globle void FactSlotValue(
    /*==========================*/
 
    if (theFact->whichDeftemplate->implied)
-     { EnvGetFactSlot(theEnv,theFact,NULL,returnValue); }
+     { EnvGetFactSlot(theEnv,execStatus,theFact,NULL,returnValue); }
    else
-     { EnvGetFactSlot(theEnv,theFact,theSlotName,returnValue); }
+     { EnvGetFactSlot(theEnv,execStatus,theFact,theSlotName,returnValue); }
   }
 
 /***********************************************/
@@ -305,14 +305,14 @@ globle void FactSlotNamesFunction(
    /* Get the reference to the fact. */
    /*================================*/
 
-   theFact = GetFactAddressOrIndexArgument(theEnv,"fact-slot-names",1,TRUE);
+   theFact = GetFactAddressOrIndexArgument(theEnv,execStatus,"fact-slot-names",1,TRUE);
    if (theFact == NULL) return;
 
    /*=====================*/
    /* Get the slot names. */
    /*=====================*/
 
-   EnvFactSlotNames(theEnv,theFact,returnValue);
+   EnvFactSlotNames(theEnv,execStatus,theFact,returnValue);
   }
 
 /***************************************/
@@ -340,9 +340,9 @@ globle void EnvFactSlotNames(
       SetpType(returnValue,MULTIFIELD);
       SetpDOBegin(returnValue,1);
       SetpDOEnd(returnValue,1);
-      theList = (struct multifield *) EnvCreateMultifield(theEnv,(int) 1);
+      theList = (struct multifield *) EnvCreateMultifield(theEnv,execStatus,(int) 1);
       SetMFType(theList,1,SYMBOL);
-      SetMFValue(theList,1,EnvAddSymbol(theEnv,"implied"));
+      SetMFValue(theList,1,EnvAddSymbol(theEnv,execStatus,"implied"));
       SetpValue(returnValue,(void *) theList);
       return;
      }
@@ -363,7 +363,7 @@ globle void EnvFactSlotNames(
    SetpType(returnValue,MULTIFIELD);
    SetpDOBegin(returnValue,1);
    SetpDOEnd(returnValue,(long) count);
-   theList = (struct multifield *) EnvCreateMultifield(theEnv,count);
+   theList = (struct multifield *) EnvCreateMultifield(theEnv,execStatus,count);
    SetpValue(returnValue,(void *) theList);
 
    /*===============================================*/
@@ -398,7 +398,7 @@ globle void GetFactListFunction(
 
    if ((numArgs = EnvArgCountCheck(theEnv,execStatus,"get-fact-list",NO_MORE_THAN,1)) == -1)
      {
-      EnvSetMultifieldErrorValue(theEnv,returnValue);
+      EnvSetMultifieldErrorValue(theEnv,execStatus,returnValue);
       return;
      }
 
@@ -408,17 +408,17 @@ globle void GetFactListFunction(
 
       if (GetType(result) != SYMBOL)
         {
-         EnvSetMultifieldErrorValue(theEnv,returnValue);
-         ExpectedTypeError1(theEnv,"get-fact-list",1,"defmodule name");
+         EnvSetMultifieldErrorValue(theEnv,execStatus,returnValue);
+         ExpectedTypeError1(theEnv,execStatus,"get-fact-list",1,"defmodule name");
          return;
         }
 
-      if ((theModule = (struct defmodule *) EnvFindDefmodule(theEnv,DOToString(result))) == NULL)
+      if ((theModule = (struct defmodule *) EnvFindDefmodule(theEnv,execStatus,DOToString(result))) == NULL)
         {
          if (strcmp("*",DOToString(result)) != 0)
            {
-            EnvSetMultifieldErrorValue(theEnv,returnValue);
-            ExpectedTypeError1(theEnv,"get-fact-list",1,"defmodule name");
+            EnvSetMultifieldErrorValue(theEnv,execStatus,returnValue);
+            ExpectedTypeError1(theEnv,execStatus,"get-fact-list",1,"defmodule name");
             return;
            }
 
@@ -432,7 +432,7 @@ globle void GetFactListFunction(
    /* Get the constructs. */
    /*=====================*/
 
-   EnvGetFactList(theEnv,returnValue,theModule);
+   EnvGetFactList(theEnv,execStatus,returnValue,theModule);
   }
 
 /*************************************/
@@ -462,18 +462,18 @@ globle void EnvGetFactList(
 
    if (theModule == NULL)
      {
-      for (theFact = (struct fact *) EnvGetNextFact(theEnv,NULL), count = 0;
+      for (theFact = (struct fact *) EnvGetNextFact(theEnv,execStatus,NULL), count = 0;
            theFact != NULL;
-           theFact = (struct fact *) EnvGetNextFact(theEnv,theFact), count++)
+           theFact = (struct fact *) EnvGetNextFact(theEnv,execStatus,theFact), count++)
         { /* Do Nothing */ }
      }
    else
      {
-      EnvSetCurrentModule(theEnv,(void *) theModule);
+      EnvSetCurrentModule(theEnv,execStatus,(void *) theModule);
       UpdateDeftemplateScope(theEnv);
-      for (theFact = (struct fact *) GetNextFactInScope(theEnv,NULL), count = 0;
+      for (theFact = (struct fact *) GetNextFactInScope(theEnv,execStatus,NULL), count = 0;
            theFact != NULL;
-           theFact = (struct fact *) GetNextFactInScope(theEnv,theFact), count++)
+           theFact = (struct fact *) GetNextFactInScope(theEnv,execStatus,theFact), count++)
         { /* Do Nothing */ }
      }
 
@@ -484,7 +484,7 @@ globle void EnvGetFactList(
    SetpType(returnValue,MULTIFIELD);
    SetpDOBegin(returnValue,1);
    SetpDOEnd(returnValue,(long) count);
-   theList = (struct multifield *) EnvCreateMultifield(theEnv,count);
+   theList = (struct multifield *) EnvCreateMultifield(theEnv,execStatus,count);
    SetpValue(returnValue,(void *) theList);
 
    /*==================================================*/
@@ -493,9 +493,9 @@ globle void EnvGetFactList(
 
    if (theModule == NULL)
      {
-      for (theFact = (struct fact *) EnvGetNextFact(theEnv,NULL), count = 1;
+      for (theFact = (struct fact *) EnvGetNextFact(theEnv,execStatus,NULL), count = 1;
            theFact != NULL;
-           theFact = (struct fact *) EnvGetNextFact(theEnv,theFact), count++)
+           theFact = (struct fact *) EnvGetNextFact(theEnv,execStatus,theFact), count++)
         {
          SetMFType(theList,count,FACT_ADDRESS);
          SetMFValue(theList,count,(void *) theFact);
@@ -503,9 +503,9 @@ globle void EnvGetFactList(
      }
    else
      {
-      for (theFact = (struct fact *) GetNextFactInScope(theEnv,NULL), count = 1;
+      for (theFact = (struct fact *) GetNextFactInScope(theEnv,execStatus,NULL), count = 1;
            theFact != NULL;
-           theFact = (struct fact *) GetNextFactInScope(theEnv,theFact), count++)
+           theFact = (struct fact *) GetNextFactInScope(theEnv,execStatus,theFact), count++)
         {
          SetMFType(theList,count,FACT_ADDRESS);
          SetMFValue(theList,count,(void *) theFact);
@@ -540,7 +540,7 @@ globle void PPFactFunction(
 
    if ((numberOfArguments = EnvArgRangeCheck(theEnv,execStatus,"ppfact",1,3)) == -1) return;
 
-   theFact = GetFactAddressOrIndexArgument(theEnv,"ppfact",1,TRUE);
+   theFact = GetFactAddressOrIndexArgument(theEnv,execStatus,"ppfact",1,TRUE);
    if (theFact == NULL) return;
 
    /*===============================================================*/
@@ -554,9 +554,9 @@ globle void PPFactFunction(
       logicalName = GetLogicalName(theEnv,execStatus,2,"stdout");
       if (logicalName == NULL)
         {
-         IllegalLogicalNameMessage(theEnv,"ppfact");
-         SetHaltExecution(theEnv,TRUE);
-         SetEvaluationError(theEnv,TRUE);
+         IllegalLogicalNameMessage(theEnv,execStatus,"ppfact");
+         SetHaltExecution(theEnv,execStatus,TRUE);
+         SetEvaluationError(theEnv,execStatus,TRUE);
          return;
         }
      }
@@ -582,13 +582,13 @@ globle void PPFactFunction(
 
    if (strcmp(logicalName,"nil") == 0)
      { return; }
-   else if (QueryRouters(theEnv,logicalName) == FALSE)
+   else if (QueryRouters(theEnv,execStatus,logicalName) == FALSE)
      {
-      UnrecognizedRouterMessage(theEnv,logicalName);
+      UnrecognizedRouterMessage(theEnv,execStatus,logicalName);
       return;
      }
 
-   EnvPPFact(theEnv,theFact,logicalName,ignoreDefaults);
+   EnvPPFact(theEnv,execStatus,theFact,logicalName,ignoreDefaults);
   }
 
 /*******************************/
@@ -614,9 +614,9 @@ globle void EnvPPFact(
 
    if (theFact->garbage) return;
 
-   PrintFact(theEnv,logicalName,theFact,TRUE,ignoreDefaults);
+   PrintFact(theEnv,execStatus,logicalName,theFact,TRUE,ignoreDefaults);
    
-   EnvPrintRouter(theEnv,logicalName,"\n");
+   EnvPrintRouter(theEnv,execStatus,logicalName,"\n");
   }
   
 /**************************************************************/
@@ -647,22 +647,22 @@ globle struct fact *GetFactAddressOrIndexArgument(
       factIndex = ValueToLong(item.value);
       if (factIndex < 0)
         {
-         ExpectedTypeError1(theEnv,theFunction,position,"fact-address or fact-index");
+         ExpectedTypeError1(theEnv,execStatus,theFunction,position,"fact-address or fact-index");
          return(NULL);
         }
 
-      theFact = FindIndexedFact(theEnv,factIndex);
+      theFact = FindIndexedFact(theEnv,execStatus,factIndex);
       if ((theFact == NULL) && noFactError)
         {
          gensprintf(tempBuffer,"f-%lld",factIndex);
-         CantFindItemErrorMessage(theEnv,"fact",tempBuffer);
+         CantFindItemErrorMessage(theEnv,execStatus,"fact",tempBuffer);
          return(NULL);
         }
 
       return(theFact);
      }
 
-   ExpectedTypeError1(theEnv,theFunction,position,"fact-address or fact-index");
+   ExpectedTypeError1(theEnv,execStatus,theFunction,position,"fact-address or fact-index");
    return(NULL);
   }
 

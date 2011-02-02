@@ -121,33 +121,33 @@ globle EXPRESSION *FactParseQueryNoAction(
    EXPRESSION *factQuerySetVars;
    struct token queryInputToken;
 
-   factQuerySetVars = ParseQueryRestrictions(theEnv,top,readSource,&queryInputToken);
+   factQuerySetVars = ParseQueryRestrictions(theEnv,execStatus,top,readSource,&queryInputToken);
    if (factQuerySetVars == NULL)
      { return(NULL); }
      
-   IncrementIndentDepth(theEnv,3);
+   IncrementIndentDepth(theEnv,execStatus,3);
    PPCRAndIndent(theEnv);
    
-   if (ParseQueryTestExpression(theEnv,top,readSource) == FALSE)
+   if (ParseQueryTestExpression(theEnv,execStatus,top,readSource) == FALSE)
      {
-      DecrementIndentDepth(theEnv,3);
-      ReturnExpression(theEnv,factQuerySetVars);
+      DecrementIndentDepth(theEnv,execStatus,3);
+      ReturnExpression(theEnv,execStatus,factQuerySetVars);
       return(NULL);
      }
      
-   DecrementIndentDepth(theEnv,3);
+   DecrementIndentDepth(theEnv,execStatus,3);
    
-   GetToken(theEnv,readSource,&queryInputToken);   
+   GetToken(theEnv,execStatus,readSource,&queryInputToken);   
    if (GetType(queryInputToken) != RPAREN)
      {
-      SyntaxErrorMessage(theEnv,"fact-set query function");
-      ReturnExpression(theEnv,top);
-      ReturnExpression(theEnv,factQuerySetVars);
+      SyntaxErrorMessage(theEnv,execStatus,"fact-set query function");
+      ReturnExpression(theEnv,execStatus,top);
+      ReturnExpression(theEnv,execStatus,factQuerySetVars);
       return(NULL);
      }
      
-   ReplaceFactVariables(theEnv,factQuerySetVars,top->argList,TRUE,0);
-   ReturnExpression(theEnv,factQuerySetVars);
+   ReplaceFactVariables(theEnv,execStatus,factQuerySetVars,top->argList,TRUE,0);
+   ReturnExpression(theEnv,execStatus,factQuerySetVars);
    
    return(top);
   }
@@ -190,42 +190,42 @@ globle EXPRESSION *FactParseQueryAction(
    EXPRESSION *factQuerySetVars;
    struct token queryInputToken;
 
-   factQuerySetVars = ParseQueryRestrictions(theEnv,top,readSource,&queryInputToken);
+   factQuerySetVars = ParseQueryRestrictions(theEnv,execStatus,top,readSource,&queryInputToken);
    if (factQuerySetVars == NULL)
      { return(NULL); }
      
-   IncrementIndentDepth(theEnv,3);
+   IncrementIndentDepth(theEnv,execStatus,3);
    PPCRAndIndent(theEnv);
    
-   if (ParseQueryTestExpression(theEnv,top,readSource) == FALSE)
+   if (ParseQueryTestExpression(theEnv,execStatus,top,readSource) == FALSE)
      {
-      DecrementIndentDepth(theEnv,3);
-      ReturnExpression(theEnv,factQuerySetVars);
+      DecrementIndentDepth(theEnv,execStatus,3);
+      ReturnExpression(theEnv,execStatus,factQuerySetVars);
       return(NULL);
      }
      
    PPCRAndIndent(theEnv);
    
-   if (ParseQueryActionExpression(theEnv,top,readSource,factQuerySetVars,&queryInputToken) == FALSE)
+   if (ParseQueryActionExpression(theEnv,execStatus,top,readSource,factQuerySetVars,&queryInputToken) == FALSE)
      {
-      DecrementIndentDepth(theEnv,3);
-      ReturnExpression(theEnv,factQuerySetVars);
+      DecrementIndentDepth(theEnv,execStatus,3);
+      ReturnExpression(theEnv,execStatus,factQuerySetVars);
       return(NULL);
      }
      
-   DecrementIndentDepth(theEnv,3);
+   DecrementIndentDepth(theEnv,execStatus,3);
    
    if (GetType(queryInputToken) != RPAREN)
      {
-      SyntaxErrorMessage(theEnv,"fact-set query function");
-      ReturnExpression(theEnv,top);
-      ReturnExpression(theEnv,factQuerySetVars);
+      SyntaxErrorMessage(theEnv,execStatus,"fact-set query function");
+      ReturnExpression(theEnv,execStatus,top);
+      ReturnExpression(theEnv,execStatus,factQuerySetVars);
       return(NULL);
      }
      
-   ReplaceFactVariables(theEnv,factQuerySetVars,top->argList,TRUE,0);
-   ReplaceFactVariables(theEnv,factQuerySetVars,top->argList->nextArg,FALSE,0);
-   ReturnExpression(theEnv,factQuerySetVars);
+   ReplaceFactVariables(theEnv,execStatus,factQuerySetVars,top->argList,TRUE,0);
+   ReplaceFactVariables(theEnv,execStatus,factQuerySetVars,top->argList->nextArg,FALSE,0);
+   ReturnExpression(theEnv,execStatus,factQuerySetVars);
    
    return(top);
   }
@@ -262,19 +262,19 @@ static EXPRESSION *ParseQueryRestrictions(
               *tmp,*lastOne = NULL;
    int error = FALSE;
 
-   SavePPBuffer(theEnv," ");
+   SavePPBuffer(theEnv,execStatus," ");
    
-   GetToken(theEnv,readSource,queryInputToken);
+   GetToken(theEnv,execStatus,readSource,queryInputToken);
    if (queryInputToken->type != LPAREN)
      { goto ParseQueryRestrictionsError1; }
      
-   GetToken(theEnv,readSource,queryInputToken);
+   GetToken(theEnv,execStatus,readSource,queryInputToken);
    if (queryInputToken->type != LPAREN)
      { goto ParseQueryRestrictionsError1; }
      
    while (queryInputToken->type == LPAREN)
      {
-      GetToken(theEnv,readSource,queryInputToken);
+      GetToken(theEnv,execStatus,readSource,queryInputToken);
       if (queryInputToken->type != SF_VARIABLE)
         { goto ParseQueryRestrictionsError1; }
         
@@ -283,26 +283,26 @@ static EXPRESSION *ParseQueryRestrictions(
         {
          if (tmp->value == queryInputToken->value)
            {
-            PrintErrorID(theEnv,"FACTQPSR",1,FALSE);
-            EnvPrintRouter(theEnv,WERROR,"Duplicate fact member variable name in function ");
-            EnvPrintRouter(theEnv,WERROR,ValueToString(ExpressionFunctionCallName(top)));
-            EnvPrintRouter(theEnv,WERROR,".\n");
+            PrintErrorID(theEnv,execStatus,"FACTQPSR",1,FALSE);
+            EnvPrintRouter(theEnv,execStatus,WERROR,"Duplicate fact member variable name in function ");
+            EnvPrintRouter(theEnv,execStatus,WERROR,ValueToString(ExpressionFunctionCallName(top)));
+            EnvPrintRouter(theEnv,execStatus,WERROR,".\n");
             goto ParseQueryRestrictionsError2;
            }
            
          tmp = tmp->nextArg;
         }
         
-      tmp = GenConstant(theEnv,SF_VARIABLE,queryInputToken->value);
+      tmp = GenConstant(theEnv,execStatus,SF_VARIABLE,queryInputToken->value);
       if (factQuerySetVars == NULL)
         { factQuerySetVars = tmp; }
       else
         { lastFactQuerySetVars->nextArg = tmp; }
       
       lastFactQuerySetVars = tmp;
-      SavePPBuffer(theEnv," ");
+      SavePPBuffer(theEnv,execStatus," ");
       
-      templateExp = ArgumentParse(theEnv,readSource,&error);
+      templateExp = ArgumentParse(theEnv,execStatus,readSource,&error);
       
       if (error)
         { goto ParseQueryRestrictionsError2; }
@@ -310,19 +310,19 @@ static EXPRESSION *ParseQueryRestrictions(
       if (templateExp == NULL)
         { goto ParseQueryRestrictionsError1; }
       
-      if (ReplaceTemplateNameWithReference(theEnv,templateExp) == FALSE)
+      if (ReplaceTemplateNameWithReference(theEnv,execStatus,templateExp) == FALSE)
         { goto ParseQueryRestrictionsError2; }
       
       lastTemplateExp = templateExp;
-      SavePPBuffer(theEnv," ");
+      SavePPBuffer(theEnv,execStatus," ");
       
-      while ((tmp = ArgumentParse(theEnv,readSource,&error)) != NULL)
+      while ((tmp = ArgumentParse(theEnv,execStatus,readSource,&error)) != NULL)
         {
-         if (ReplaceTemplateNameWithReference(theEnv,tmp) == FALSE)
+         if (ReplaceTemplateNameWithReference(theEnv,execStatus,tmp) == FALSE)
            goto ParseQueryRestrictionsError2;
          lastTemplateExp->nextArg = tmp;
          lastTemplateExp = tmp;
-         SavePPBuffer(theEnv," ");
+         SavePPBuffer(theEnv,execStatus," ");
         }
         
       if (error)
@@ -330,9 +330,9 @@ static EXPRESSION *ParseQueryRestrictions(
         
       PPBackup(theEnv);
       PPBackup(theEnv);
-      SavePPBuffer(theEnv,")");
+      SavePPBuffer(theEnv,execStatus,")");
       
-      tmp = GenConstant(theEnv,SYMBOL,(void *) FactQueryData(theEnv)->QUERY_DELIMETER_SYMBOL);
+      tmp = GenConstant(theEnv,execStatus,SYMBOL,(void *) FactQueryData(theEnv)->QUERY_DELIMETER_SYMBOL);
       
       lastTemplateExp->nextArg = tmp;
       lastTemplateExp = tmp;
@@ -344,8 +344,8 @@ static EXPRESSION *ParseQueryRestrictions(
       
       lastOne = lastTemplateExp;
       templateExp = NULL;
-      SavePPBuffer(theEnv," ");
-      GetToken(theEnv,readSource,queryInputToken);
+      SavePPBuffer(theEnv,execStatus," ");
+      GetToken(theEnv,execStatus,readSource,queryInputToken);
      }
      
    if (queryInputToken->type != RPAREN)
@@ -353,16 +353,16 @@ static EXPRESSION *ParseQueryRestrictions(
      
    PPBackup(theEnv);
    PPBackup(theEnv);
-   SavePPBuffer(theEnv,")");
+   SavePPBuffer(theEnv,execStatus,")");
    return(factQuerySetVars);
 
 ParseQueryRestrictionsError1:
-   SyntaxErrorMessage(theEnv,"fact-set query function");
+   SyntaxErrorMessage(theEnv,execStatus,"fact-set query function");
 
 ParseQueryRestrictionsError2:
-   ReturnExpression(theEnv,templateExp);
-   ReturnExpression(theEnv,top);
-   ReturnExpression(theEnv,factQuerySetVars);
+   ReturnExpression(theEnv,execStatus,templateExp);
+   ReturnExpression(theEnv,execStatus,top);
+   ReturnExpression(theEnv,execStatus,factQuerySetVars);
    return(NULL);
   }
 
@@ -394,18 +394,18 @@ static intBool ReplaceTemplateNameWithReference(
       theTemplateName = ValueToString(theExp->value);
       
       theDeftemplate = (struct deftemplate *)
-                       FindImportedConstruct(theEnv,"deftemplate",NULL,theTemplateName,
+                       FindImportedConstruct(theEnv,execStatus,"deftemplate",NULL,theTemplateName,
                                              &count,TRUE,NULL);
 
       if (theDeftemplate == NULL)
         {
-         CantFindItemErrorMessage(theEnv,"deftemplate",theTemplateName);
+         CantFindItemErrorMessage(theEnv,execStatus,"deftemplate",theTemplateName);
          return(FALSE);
         }
         
       if (count > 1)
         {
-         AmbiguousReferenceErrorMessage(theEnv,"deftemplate",theTemplateName);
+         AmbiguousReferenceErrorMessage(theEnv,execStatus,"deftemplate",theTemplateName);
          return(FALSE);
         }
 
@@ -439,22 +439,22 @@ static int ParseQueryTestExpression(
 
    error = FALSE;
    oldBindList = GetParsedBindNames(theEnv);
-   SetParsedBindNames(theEnv,NULL);
+   SetParsedBindNames(theEnv,execStatus,NULL);
    
-   qtest = ArgumentParse(theEnv,readSource,&error);
+   qtest = ArgumentParse(theEnv,execStatus,readSource,&error);
    
    if (error == TRUE)
      {
-      SetParsedBindNames(theEnv,oldBindList);
-      ReturnExpression(theEnv,top);
+      SetParsedBindNames(theEnv,execStatus,oldBindList);
+      ReturnExpression(theEnv,execStatus,top);
       return(FALSE);
      }
    
    if (qtest == NULL)
      {
-      SetParsedBindNames(theEnv,oldBindList);
-      SyntaxErrorMessage(theEnv,"fact-set query function");
-      ReturnExpression(theEnv,top);
+      SetParsedBindNames(theEnv,execStatus,oldBindList);
+      SyntaxErrorMessage(theEnv,execStatus,"fact-set query function");
+      ReturnExpression(theEnv,execStatus,top);
       return(FALSE);
      }
    
@@ -464,16 +464,16 @@ static int ParseQueryTestExpression(
    if (ParsedBindNamesEmpty(theEnv) == FALSE)
      {
       ClearParsedBindNames(theEnv);
-      SetParsedBindNames(theEnv,oldBindList);
-      PrintErrorID(theEnv,"FACTQPSR",2,FALSE);
-      EnvPrintRouter(theEnv,WERROR,"Binds are not allowed in fact-set query in function ");
-      EnvPrintRouter(theEnv,WERROR,ValueToString(ExpressionFunctionCallName(top)));
-      EnvPrintRouter(theEnv,WERROR,".\n");
-      ReturnExpression(theEnv,top);
+      SetParsedBindNames(theEnv,execStatus,oldBindList);
+      PrintErrorID(theEnv,execStatus,"FACTQPSR",2,FALSE);
+      EnvPrintRouter(theEnv,execStatus,WERROR,"Binds are not allowed in fact-set query in function ");
+      EnvPrintRouter(theEnv,execStatus,WERROR,ValueToString(ExpressionFunctionCallName(top)));
+      EnvPrintRouter(theEnv,execStatus,WERROR,".\n");
+      ReturnExpression(theEnv,execStatus,top);
       return(FALSE);
      }
      
-   SetParsedBindNames(theEnv,oldBindList);
+   SetParsedBindNames(theEnv,execStatus,oldBindList);
    
    return(TRUE);
   }
@@ -506,31 +506,31 @@ static int ParseQueryActionExpression(
 
    error = FALSE;
    oldBindList = GetParsedBindNames(theEnv);
-   SetParsedBindNames(theEnv,NULL);
+   SetParsedBindNames(theEnv,execStatus,NULL);
    
    ExpressionData(theEnv)->BreakContext = TRUE;
    ExpressionData(theEnv)->ReturnContext = ExpressionData(theEnv)->svContexts->rtn;
 
-   qaction = GroupActions(theEnv,readSource,queryInputToken,TRUE,NULL,FALSE);
+   qaction = GroupActions(theEnv,execStatus,readSource,queryInputToken,TRUE,NULL,FALSE);
    
    PPBackup(theEnv);
    PPBackup(theEnv);
-   SavePPBuffer(theEnv,queryInputToken->printForm);
+   SavePPBuffer(theEnv,execStatus,queryInputToken->printForm);
 
    ExpressionData(theEnv)->BreakContext = FALSE;
    
    if (error == TRUE)
      {
-      SetParsedBindNames(theEnv,oldBindList);
-      ReturnExpression(theEnv,top);
+      SetParsedBindNames(theEnv,execStatus,oldBindList);
+      ReturnExpression(theEnv,execStatus,top);
       return(FALSE);
      }
    
    if (qaction == NULL)
      {
-      SetParsedBindNames(theEnv,oldBindList);
-      SyntaxErrorMessage(theEnv,"fact-set query function");
-      ReturnExpression(theEnv,top);
+      SetParsedBindNames(theEnv,execStatus,oldBindList);
+      SyntaxErrorMessage(theEnv,execStatus,"fact-set query function");
+      ReturnExpression(theEnv,execStatus,top);
       return(FALSE);
      }
      
@@ -547,14 +547,14 @@ static int ParseQueryActionExpression(
          if (tmpFactSetVars->value == (void *) newBindList->name)
            {
             ClearParsedBindNames(theEnv);
-            SetParsedBindNames(theEnv,oldBindList);
-            PrintErrorID(theEnv,"FACTQPSR",3,FALSE);
-            EnvPrintRouter(theEnv,WERROR,"Cannot rebind fact-set member variable ");
-            EnvPrintRouter(theEnv,WERROR,ValueToString(tmpFactSetVars->value));
-            EnvPrintRouter(theEnv,WERROR," in function ");
-            EnvPrintRouter(theEnv,WERROR,ValueToString(ExpressionFunctionCallName(top)));
-            EnvPrintRouter(theEnv,WERROR,".\n");
-            ReturnExpression(theEnv,top);
+            SetParsedBindNames(theEnv,execStatus,oldBindList);
+            PrintErrorID(theEnv,execStatus,"FACTQPSR",3,FALSE);
+            EnvPrintRouter(theEnv,execStatus,WERROR,"Cannot rebind fact-set member variable ");
+            EnvPrintRouter(theEnv,execStatus,WERROR,ValueToString(tmpFactSetVars->value));
+            EnvPrintRouter(theEnv,execStatus,WERROR," in function ");
+            EnvPrintRouter(theEnv,execStatus,WERROR,ValueToString(ExpressionFunctionCallName(top)));
+            EnvPrintRouter(theEnv,execStatus,WERROR,".\n");
+            ReturnExpression(theEnv,execStatus,top);
             return(FALSE);
            }
          tmpFactSetVars = tmpFactSetVars->nextArg;
@@ -564,7 +564,7 @@ static int ParseQueryActionExpression(
      }
      
    if (prev == NULL)
-     { SetParsedBindNames(theEnv,oldBindList); }
+     { SetParsedBindNames(theEnv,execStatus,oldBindList); }
    else
      { prev->next = oldBindList; }
    
@@ -602,8 +602,8 @@ static void ReplaceFactVariables(
    struct FunctionDefinition *rindx_func,*rslot_func;
    int posn;
 
-   rindx_func = FindFunction(theEnv,"(query-fact)");
-   rslot_func = FindFunction(theEnv,"(query-fact-slot)");
+   rindx_func = FindFunction(theEnv,execStatus,"(query-fact)");
+   rslot_func = FindFunction(theEnv,execStatus,"(query-fact-slot)");
    while (bexp != NULL)
      {
       if (bexp->type == SF_VARIABLE)
@@ -619,19 +619,19 @@ static void ReplaceFactVariables(
            {
             bexp->type = FCALL;
             bexp->value = (void *) rindx_func;
-            eptr = GenConstant(theEnv,INTEGER,(void *) EnvAddLong(theEnv,(long long) ndepth));
-            eptr->nextArg = GenConstant(theEnv,INTEGER,(void *) EnvAddLong(theEnv,(long long) posn));
+            eptr = GenConstant(theEnv,execStatus,INTEGER,(void *) EnvAddLong(theEnv,execStatus,(long long) ndepth));
+            eptr->nextArg = GenConstant(theEnv,execStatus,INTEGER,(void *) EnvAddLong(theEnv,execStatus,(long long) posn));
             bexp->argList = eptr;
            }
          else if (sdirect == TRUE)
-           { ReplaceSlotReference(theEnv,vlist,bexp,rslot_func,ndepth); }
+           { ReplaceSlotReference(theEnv,execStatus,vlist,bexp,rslot_func,ndepth); }
         }
       if (bexp->argList != NULL)
         {
          if (IsQueryFunction(bexp))
-           { ReplaceFactVariables(theEnv,vlist,bexp->argList,sdirect,ndepth+1); }
+           { ReplaceFactVariables(theEnv,execStatus,vlist,bexp->argList,sdirect,ndepth+1); }
          else
-           { ReplaceFactVariables(theEnv,vlist,bexp->argList,sdirect,ndepth); }
+           { ReplaceFactVariables(theEnv,execStatus,vlist,bexp->argList,sdirect,ndepth); }
         }
       bexp = bexp->nextArg;
      }
@@ -686,18 +686,18 @@ static void ReplaceSlotReference(
            }
          if (eptr != NULL)
            {
-            OpenStringSource(theEnv,"query-var",str+i+1,0);
+            OpenStringSource(theEnv,execStatus,"query-var",str+i+1,0);
             oldpp = GetPPBufferStatus(theEnv);
-            SetPPBufferStatus(theEnv,OFF);
-            GetToken(theEnv,"query-var",&itkn);
-            SetPPBufferStatus(theEnv,oldpp);
-            CloseStringSource(theEnv,"query-var");
+            SetPPBufferStatus(theEnv,execStatus,OFF);
+            GetToken(theEnv,execStatus,"query-var",&itkn);
+            SetPPBufferStatus(theEnv,execStatus,oldpp);
+            CloseStringSource(theEnv,execStatus,"query-var");
             theExp->type = FCALL;
             theExp->value = (void *) func;
-            theExp->argList = GenConstant(theEnv,INTEGER,(void *) EnvAddLong(theEnv,(long long) ndepth));
+            theExp->argList = GenConstant(theEnv,execStatus,INTEGER,(void *) EnvAddLong(theEnv,execStatus,(long long) ndepth));
             theExp->argList->nextArg =
-              GenConstant(theEnv,INTEGER,(void *) EnvAddLong(theEnv,(long long) posn));
-            theExp->argList->nextArg->nextArg = GenConstant(theEnv,itkn.type,itkn.value);
+              GenConstant(theEnv,execStatus,INTEGER,(void *) EnvAddLong(theEnv,execStatus,(long long) posn));
+            theExp->argList->nextArg->nextArg = GenConstant(theEnv,execStatus,itkn.type,itkn.value);
             break;
            }
         }

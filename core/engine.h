@@ -103,7 +103,7 @@ struct engineData
 #endif
   };
 
-#define EngineData(theEnv) ((struct engineData *) GetEnvironmentData(theEnv,ENGINE_DATA))
+#define EngineData(theEnv) ((struct engineData *) GetEnvironmentData(theEnv,execStatus,ENGINE_DATA))
 
 #ifdef LOCALE
 #undef LOCALE

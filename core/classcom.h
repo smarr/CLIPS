@@ -28,8 +28,8 @@
 #define CONVENIENCE_MODE  0
 #define CONSERVATION_MODE 1
 
-#define EnvGetDefclassName(theEnv,x) GetConstructNameString((struct constructHeader *) x)
-#define EnvGetDefclassPPForm(theEnv,x) GetConstructPPForm(theEnv,(struct constructHeader *) x)
+#define EnvGetDefclassName(theEnv,execStatus,x) GetConstructNameString((struct constructHeader *) x)
+#define EnvGetDefclassPPForm(theEnv,execStatus,x) GetConstructPPForm(theEnv,execStatus,(struct constructHeader *) x)
 
 #define GetDefclassNamePointer(x) GetConstructNamePointer((struct constructHeader *) x)
 #define GetDefclassModule(x) GetConstructModuleItem((struct constructHeader *) x)
@@ -37,9 +37,9 @@
 #define SetNextDefclass(c,t) SetNextConstruct((struct constructHeader *) c, \
                                               (struct constructHeader *) t)
 
-#define SetDefclassPPForm(c,ppf) SetConstructPPForm(theEnv,(struct constructHeader *) c,ppf)
+#define SetDefclassPPForm(c,ppf) SetConstructPPForm(theEnv,execStatus,(struct constructHeader *) c,ppf)
 
-#define EnvDefclassModule(theEnv,x) GetConstructModuleName((struct constructHeader *) x)
+#define EnvDefclassModule(theEnv,execStatus,x) GetConstructModuleName((struct constructHeader *) x)
 
 #ifndef _H_cstrccom
 #include "cstrccom.h"

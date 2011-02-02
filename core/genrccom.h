@@ -25,15 +25,15 @@
 #ifndef _H_genrccom
 #define _H_genrccom
 
-#define EnvGetDefgenericName(theEnv,x) GetConstructNameString((struct constructHeader *) x)
-#define EnvGetDefgenericPPForm(theEnv,x) GetConstructPPForm(theEnv,(struct constructHeader *) x)
+#define EnvGetDefgenericName(theEnv,execStatus,x) GetConstructNameString((struct constructHeader *) x)
+#define EnvGetDefgenericPPForm(theEnv,execStatus,x) GetConstructPPForm(theEnv,execStatus,(struct constructHeader *) x)
 
 #define SetNextDefgeneric(g,t) SetNextConstruct((struct constructHeader *) g, \
                                                 (struct constructHeader *) t)
 #define GetDefgenericNamePointer(x) GetConstructNamePointer((struct constructHeader *) x)
-#define SetDefgenericPPForm(g,ppf) SetConstructPPForm(theEnv,(struct constructHeader *) g,ppf)
+#define SetDefgenericPPForm(g,ppf) SetConstructPPForm(theEnv,execStatus,(struct constructHeader *) g,ppf)
 
-#define EnvDefgenericModule(theEnv,x) GetConstructModuleName((struct constructHeader *) x)
+#define EnvDefgenericModule(theEnv,execStatus,x) GetConstructModuleName((struct constructHeader *) x)
 
 #ifndef _H_constrct
 #include "constrct.h"

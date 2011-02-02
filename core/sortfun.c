@@ -45,7 +45,7 @@ struct sortFunctionData
    struct expr *SortComparisonFunction;
   };
 
-#define SortFunctionData(theEnv) ((struct sortFunctionData *) GetEnvironmentData(theEnv,SORTFUN_DATA))
+#define SortFunctionData(theEnv) ((struct sortFunctionData *) GetEnvironmentData(theEnv,execStatus,SORTFUN_DATA))
 
 /***************************************/
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
@@ -65,9 +65,9 @@ globle void SortFunctionDefinitions(
   void *theEnv,
   EXEC_STATUS)
   {
-   AllocateEnvironmentData(theEnv,SORTFUN_DATA,sizeof(struct sortFunctionData),DeallocateSortFunctionData);
+   AllocateEnvironmentData(theEnv,execStatus,SORTFUN_DATA,sizeof(struct sortFunctionData),DeallocateSortFunctionData);
 #if ! RUN_TIME
-   EnvDefineFunction2(theEnv,"sort",'u', PTIEF SortFunction,"SortFunction","1**w");
+   EnvDefineFunction2(theEnv,execStatus,"sort",'u', PTIEF SortFunction,"SortFunction","1**w");
 #endif
   }
 
@@ -79,7 +79,7 @@ static void DeallocateSortFunctionData(
   void *theEnv,
   EXEC_STATUS)
   {
-   ReturnExpression(theEnv,SortFunctionData(theEnv)->SortComparisonFunction);
+   ReturnExpression(theEnv,execStatus,SortFunctionData(theEnv)->SortComparisonFunction);
   }
 
 /**************************************/
@@ -93,12 +93,12 @@ static int DefaultCompareSwapFunction(
   {
    DATA_OBJECT returnValue;
 
-   SortFunctionData(theEnv)->SortComparisonFunction->argList = GenConstant(theEnv,item1->type,item1->value);
-   SortFunctionData(theEnv)->SortComparisonFunction->argList->nextArg = GenConstant(theEnv,item2->type,item2->value);
-   ExpressionInstall(theEnv,SortFunctionData(theEnv)->SortComparisonFunction);
-   EvaluateExpression(theEnv,SortFunctionData(theEnv)->SortComparisonFunction,&returnValue);
-   ExpressionDeinstall(theEnv,SortFunctionData(theEnv)->SortComparisonFunction);
-   ReturnExpression(theEnv,SortFunctionData(theEnv)->SortComparisonFunction->argList);
+   SortFunctionData(theEnv)->SortComparisonFunction->argList = GenConstant(theEnv,execStatus,item1->type,item1->value);
+   SortFunctionData(theEnv)->SortComparisonFunction->argList->nextArg = GenConstant(theEnv,execStatus,item2->type,item2->value);
+   ExpressionInstall(theEnv,execStatus,SortFunctionData(theEnv)->SortComparisonFunction);
+   EvaluateExpression(theEnv,execStatus,SortFunctionData(theEnv)->SortComparisonFunction,&returnValue);
+   ExpressionDeinstall(theEnv,execStatus,SortFunctionData(theEnv)->SortComparisonFunction);
+   ReturnExpression(theEnv,execStatus,SortFunctionData(theEnv)->SortComparisonFunction->argList);
    SortFunctionData(theEnv)->SortComparisonFunction->argList = NULL;
 
    if ((GetType(returnValue) == SYMBOL) &&
@@ -151,10 +151,10 @@ globle void SortFunction(
      { return; }
 
    functionName = DOToString(theArg);
-   functionReference = FunctionReferenceExpression(theEnv,functionName);
+   functionReference = FunctionReferenceExpression(theEnv,execStatus,functionName);
    if (functionReference == NULL)
      {
-      ExpectedTypeError1(theEnv,"sort",1,"function name, deffunction name, or defgeneric name");
+      ExpectedTypeError1(theEnv,execStatus,"sort",1,"function name, deffunction name, or defgeneric name");
       return;
      }
 
@@ -170,8 +170,8 @@ globle void SortFunction(
           (GetMaximumArgs(fptr) == 0) ||
           (GetMaximumArgs(fptr) == 1))
         {
-         ExpectedTypeError1(theEnv,"sort",1,"function name expecting two arguments");
-         ReturnExpression(theEnv,functionReference);
+         ExpectedTypeError1(theEnv,execStatus,"sort",1,"function name expecting two arguments");
+         ReturnExpression(theEnv,execStatus,functionReference);
          return;
         }
      }
@@ -189,8 +189,8 @@ globle void SortFunction(
           (dptr->maxNumberOfParameters == 0) ||
           (dptr->maxNumberOfParameters == 1))
         {
-         ExpectedTypeError1(theEnv,"sort",1,"deffunction name expecting two arguments");
-         ReturnExpression(theEnv,functionReference);
+         ExpectedTypeError1(theEnv,execStatus,"sort",1,"deffunction name expecting two arguments");
+         ReturnExpression(theEnv,execStatus,functionReference);
          return;
         }
      }
@@ -203,8 +203,8 @@ globle void SortFunction(
 
    if (argumentCount == 1)
      {
-      EnvSetMultifieldErrorValue(theEnv,returnValue);
-      ReturnExpression(theEnv,functionReference);
+      EnvSetMultifieldErrorValue(theEnv,execStatus,returnValue);
+      ReturnExpression(theEnv,execStatus,functionReference);
       return;
      }
      
@@ -213,7 +213,7 @@ globle void SortFunction(
    /* and determine how many there are.   */
    /*=====================================*/
 
-   theArguments = (DATA_OBJECT *) genalloc(theEnv,(argumentCount - 1) * sizeof(DATA_OBJECT));
+   theArguments = (DATA_OBJECT *) genalloc(theEnv,execStatus,(argumentCount - 1) * sizeof(DATA_OBJECT));
 
    for (i = 2; i <= argumentCount; i++)
      {
@@ -226,9 +226,9 @@ globle void SortFunction(
      
    if (argumentSize == 0)
      {   
-      genfree(theEnv,theArguments,(argumentCount - 1) * sizeof(DATA_OBJECT)); /* Bug Fix */
-      EnvSetMultifieldErrorValue(theEnv,returnValue);
-      ReturnExpression(theEnv,functionReference);
+      genfree(theEnv,execStatus,theArguments,(argumentCount - 1) * sizeof(DATA_OBJECT)); /* Bug Fix */
+      EnvSetMultifieldErrorValue(theEnv,execStatus,returnValue);
+      ReturnExpression(theEnv,execStatus,functionReference);
       return;
      }
    
@@ -237,7 +237,7 @@ globle void SortFunction(
    /* into a data object array.          */
    /*====================================*/
    
-   theArguments2 = (DATA_OBJECT *) genalloc(theEnv,argumentSize * sizeof(DATA_OBJECT));
+   theArguments2 = (DATA_OBJECT *) genalloc(theEnv,execStatus,argumentSize * sizeof(DATA_OBJECT));
 
    for (i = 2; i <= argumentCount; i++)
      {
@@ -258,24 +258,24 @@ globle void SortFunction(
         }
      }
      
-   genfree(theEnv,theArguments,(argumentCount - 1) * sizeof(DATA_OBJECT));
+   genfree(theEnv,execStatus,theArguments,(argumentCount - 1) * sizeof(DATA_OBJECT));
 
    functionReference->nextArg = SortFunctionData(theEnv)->SortComparisonFunction;
    SortFunctionData(theEnv)->SortComparisonFunction = functionReference;
 
    for (i = 0; i < argumentSize; i++)
-     { ValueInstall(theEnv,&theArguments2[i]); }
+     { ValueInstall(theEnv,execStatus,&theArguments2[i]); }
 
-   MergeSort(theEnv,(unsigned long) argumentSize,theArguments2,DefaultCompareSwapFunction);
+   MergeSort(theEnv,execStatus,(unsigned long) argumentSize,theArguments2,DefaultCompareSwapFunction);
   
    for (i = 0; i < argumentSize; i++)
-     { ValueDeinstall(theEnv,&theArguments2[i]); }
+     { ValueDeinstall(theEnv,execStatus,&theArguments2[i]); }
 
    SortFunctionData(theEnv)->SortComparisonFunction = SortFunctionData(theEnv)->SortComparisonFunction->nextArg;
    functionReference->nextArg = NULL;
-   ReturnExpression(theEnv,functionReference);
+   ReturnExpression(theEnv,execStatus,functionReference);
 
-   theMultifield = (struct multifield *) EnvCreateMultifield(theEnv,(unsigned long) argumentSize);
+   theMultifield = (struct multifield *) EnvCreateMultifield(theEnv,execStatus,(unsigned long) argumentSize);
 
    for (i = 0; i < argumentSize; i++)
      {
@@ -283,7 +283,7 @@ globle void SortFunction(
       SetMFValue(theMultifield,i+1,GetValue(theArguments2[i]));
      }
      
-   genfree(theEnv,theArguments2,argumentSize * sizeof(DATA_OBJECT));
+   genfree(theEnv,execStatus,theArguments2,argumentSize * sizeof(DATA_OBJECT));
 
    SetpType(returnValue,MULTIFIELD);
    SetpDOBegin(returnValue,1);
@@ -313,21 +313,21 @@ void MergeSort(
    /* needed for the merge sort.   */
    /*==============================*/
 
-   tempList = (DATA_OBJECT *) genalloc(theEnv,listSize * sizeof(DATA_OBJECT));
+   tempList = (DATA_OBJECT *) genalloc(theEnv,execStatus,listSize * sizeof(DATA_OBJECT));
 
    /*=====================================*/
    /* Call the merge sort driver routine. */
    /*=====================================*/
 
    middle = (listSize + 1) / 2;
-   DoMergeSort(theEnv,theList,tempList,0,middle-1,middle,listSize - 1,swapFunction);
+   DoMergeSort(theEnv,execStatus,theList,tempList,0,middle-1,middle,listSize - 1,swapFunction);
 
    /*==================================*/
    /* Deallocate the temporary storage */
    /* needed by the merge sort.        */
    /*==================================*/
 
-   genfree(theEnv,tempList,listSize * sizeof(DATA_OBJECT));
+   genfree(theEnv,execStatus,tempList,listSize * sizeof(DATA_OBJECT));
   }
 
 
@@ -356,7 +356,7 @@ static void DoMergeSort(
      { /* List doesn't need to be merged. */ }
    else if ((s1 + 1) == e1)
      {
-      if ((*swapFunction)(theEnv,&theList[s1],&theList[e1]))
+      if ((*swapFunction)(theEnv,execStatus,&theList[s1],&theList[e1]))
         {
          TransferDataObjectValues(&temp,&theList[s1]);
          TransferDataObjectValues(&theList[s1],&theList[e1]);
@@ -367,14 +367,14 @@ static void DoMergeSort(
      {
       size = ((e1 - s1) + 1);
       middle = s1 + ((size + 1) / 2);
-      DoMergeSort(theEnv,theList,tempList,s1,middle-1,middle,e1,swapFunction);
+      DoMergeSort(theEnv,execStatus,theList,tempList,s1,middle-1,middle,e1,swapFunction);
      }
 
    if (s2 == e2)
      { /* List doesn't need to be merged. */ }
    else if ((s2 + 1) == e2)
      {
-      if ((*swapFunction)(theEnv,&theList[s2],&theList[e2]))
+      if ((*swapFunction)(theEnv,execStatus,&theList[s2],&theList[e2]))
         {
          TransferDataObjectValues(&temp,&theList[s2]);
          TransferDataObjectValues(&theList[s2],&theList[e2]);
@@ -385,7 +385,7 @@ static void DoMergeSort(
      {
       size = ((e2 - s2) + 1);
       middle = s2 + ((size + 1) / 2);
-      DoMergeSort(theEnv,theList,tempList,s2,middle-1,middle,e2,swapFunction);
+      DoMergeSort(theEnv,execStatus,theList,tempList,s2,middle-1,middle,e2,swapFunction);
      }
 
    /*======================*/
@@ -410,7 +410,7 @@ static void DoMergeSort(
          c1++;
          mergePoint++;
         }
-      else if ((*swapFunction)(theEnv,&theList[c1],&theList[c2]))
+      else if ((*swapFunction)(theEnv,execStatus,&theList[c1],&theList[c2]))
         {
          TransferDataObjectValues(&tempList[mergePoint],&theList[c2]);
          c2++;

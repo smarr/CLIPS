@@ -103,16 +103,16 @@ typedef struct entityRecord * ENTITY_RECORD_PTR;
 #define SetpDOBegin(target,val)   ((target)->begin = (long) ((val) - 1))
 #define SetpDOEnd(target,val)     ((target)->end = (long) ((val) - 1))
 
-#define EnvGetDOLength(theEnv,target)       (((target).end - (target).begin) + 1)
-#define EnvGetpDOLength(theEnv,target)      (((target)->end - (target)->begin) + 1)
-#define EnvGetDOBegin(theEnv,target)        ((target).begin + 1)
-#define EnvGetDOEnd(theEnv,target)          ((target).end + 1)
-#define EnvGetpDOBegin(theEnv,target)       ((target)->begin + 1)
-#define EnvGetpDOEnd(theEnv,target)         ((target)->end + 1)
-#define EnvSetDOBegin(theEnv,target,val)   ((target).begin = (long) ((val) - 1))
-#define EnvSetDOEnd(theEnv,target,val)     ((target).end = (long) ((val) - 1))
-#define EnvSetpDOBegin(theEnv,target,val)   ((target)->begin = (long) ((val) - 1))
-#define EnvSetpDOEnd(theEnv,target,val)     ((target)->end = (long) ((val) - 1))
+#define EnvGetDOLength(theEnv,execStatus,target)       (((target).end - (target).begin) + 1)
+#define EnvGetpDOLength(theEnv,execStatus,target)      (((target)->end - (target)->begin) + 1)
+#define EnvGetDOBegin(theEnv,execStatus,target)        ((target).begin + 1)
+#define EnvGetDOEnd(theEnv,execStatus,target)          ((target).end + 1)
+#define EnvGetpDOBegin(theEnv,execStatus,target)       ((target)->begin + 1)
+#define EnvGetpDOEnd(theEnv,execStatus,target)         ((target)->end + 1)
+#define EnvSetDOBegin(theEnv,execStatus,target,val)   ((target).begin = (long) ((val) - 1))
+#define EnvSetDOEnd(theEnv,execStatus,target,val)     ((target).end = (long) ((val) - 1))
+#define EnvSetpDOBegin(theEnv,execStatus,target,val)   ((target)->begin = (long) ((val) - 1))
+#define EnvSetpDOEnd(theEnv,execStatus,target,val)     ((target)->end = (long) ((val) - 1))
 
 #define DOPToString(target) (((struct symbolHashNode *) ((target)->value))->contents)
 #define DOPToDouble(target) (((struct floatHashNode *) ((target)->value))->contents)
@@ -122,12 +122,12 @@ typedef struct entityRecord * ENTITY_RECORD_PTR;
 #define DOPToPointer(target)       ((target)->value)
 #define DOPToExternalAddress(target) (((struct externalAddressHashNode *) ((target)->value))->externalAddress)
 
-#define EnvDOPToString(theEnv,target) (((struct symbolHashNode *) ((target)->value))->contents)
-#define EnvDOPToDouble(theEnv,target) (((struct floatHashNode *) ((target)->value))->contents)
-#define EnvDOPToFloat(theEnv,target) ((float) (((struct floatHashNode *) ((target)->value))->contents))
-#define EnvDOPToLong(theEnv,target) (((struct integerHashNode *) ((target)->value))->contents)
-#define EnvDOPToInteger(theEnv,target) ((int) (((struct integerHashNode *) ((target)->value))->contents))
-#define EnvDOPToPointer(theEnv,target)       ((target)->value)
+#define EnvDOPToString(theEnv,execStatus,target) (((struct symbolHashNode *) ((target)->value))->contents)
+#define EnvDOPToDouble(theEnv,execStatus,target) (((struct floatHashNode *) ((target)->value))->contents)
+#define EnvDOPToFloat(theEnv,execStatus,target) ((float) (((struct floatHashNode *) ((target)->value))->contents))
+#define EnvDOPToLong(theEnv,execStatus,target) (((struct integerHashNode *) ((target)->value))->contents)
+#define EnvDOPToInteger(theEnv,execStatus,target) ((int) (((struct integerHashNode *) ((target)->value))->contents))
+#define EnvDOPToPointer(theEnv,execStatus,target)       ((target)->value)
 #define EnvDOPToExternalAddress(target) (((struct externalAddressHashNode *) ((target)->value))->externalAddress)
 
 #define DOToString(target) (((struct symbolHashNode *) ((target).value))->contents)
@@ -138,12 +138,12 @@ typedef struct entityRecord * ENTITY_RECORD_PTR;
 #define DOToPointer(target)        ((target).value)
 #define DOToExternalAddress(target) (((struct externalAddressHashNode *) ((target).value))->externalAddress))
 
-#define EnvDOToString(theEnv,target) (((struct symbolHashNode *) ((target).value))->contents)
-#define EnvDOToDouble(theEnv,target) (((struct floatHashNode *) ((target).value))->contents)
-#define EnvDOToFloat(theEnv,target) ((float) (((struct floatHashNode *) ((target).value))->contents))
-#define EnvDOToLong(theEnv,target) (((struct integerHashNode *) ((target).value))->contents)
-#define EnvDOToInteger(theEnv,target) ((int) (((struct integerHashNode *) ((target).value))->contents))
-#define EnvDOToPointer(theEnv,target)        ((target).value)
+#define EnvDOToString(theEnv,execStatus,target) (((struct symbolHashNode *) ((target).value))->contents)
+#define EnvDOToDouble(theEnv,execStatus,target) (((struct floatHashNode *) ((target).value))->contents)
+#define EnvDOToFloat(theEnv,execStatus,target) ((float) (((struct floatHashNode *) ((target).value))->contents))
+#define EnvDOToLong(theEnv,execStatus,target) (((struct integerHashNode *) ((target).value))->contents)
+#define EnvDOToInteger(theEnv,execStatus,target) ((int) (((struct integerHashNode *) ((target).value))->contents))
+#define EnvDOToPointer(theEnv,execStatus,target)        ((target).value)
 #define EnvDOToExternalAddress(target) (((struct externalAddressHashNode *) ((target).value))->externalAddress))
 
 #define CoerceToLongInteger(t,v) ((t == INTEGER) ? ValueToLong(v) : (long int) ValueToDouble(v))
@@ -188,7 +188,7 @@ struct evaluationData
    struct externalAddressType *ExternalAddressTypes[MAXIMUM_EXTERNAL_ADDRESS_TYPES];
   };
 
-#define EvaluationData(theEnv) ((struct evaluationData *) GetEnvironmentData(theEnv,EVALUATION_DATA))
+#define EvaluationData(theEnv) ((struct evaluationData *) GetEnvironmentData(theEnv,execStatus,EVALUATION_DATA))
 
 #ifdef LOCALE
 #undef LOCALE

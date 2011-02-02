@@ -71,7 +71,7 @@ struct profileFunctionData
    char *OutputString;
   };
 
-#define ProfileFunctionData(theEnv) ((struct profileFunctionData *) GetEnvironmentData(theEnv,PROFLFUN_DATA))
+#define ProfileFunctionData(theEnv) ((struct profileFunctionData *) GetEnvironmentData(theEnv,execStatus,PROFLFUN_DATA))
 
    LOCALE void                           ConstructProfilingFunctionDefinitions(void *);
    LOCALE void                           ProfileCommand(void *);

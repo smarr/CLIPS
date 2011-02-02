@@ -51,7 +51,7 @@ struct deffactsBinaryData
    long NumberOfDeffactsModules;
   };
   
-#define DeffactsBinaryData(theEnv) ((struct deffactsBinaryData *) GetEnvironmentData(theEnv,DFFCTBIN_DATA))
+#define DeffactsBinaryData(theEnv) ((struct deffactsBinaryData *) GetEnvironmentData(theEnv,execStatus,DFFCTBIN_DATA))
 
 #ifdef LOCALE
 #undef LOCALE

@@ -78,11 +78,11 @@ struct defglobalModule
    struct defmoduleItemHeader header;
   };
 
-#define EnvGetDefglobalName(theEnv,x) GetConstructNameString((struct constructHeader *) x)
-#define EnvGetDefglobalPPForm(theEnv,x) GetConstructPPForm(theEnv,(struct constructHeader *) x)
-#define EnvDefglobalModule(theEnv,x) GetConstructModuleName((struct constructHeader *) x)
+#define EnvGetDefglobalName(theEnv,execStatus,x) GetConstructNameString((struct constructHeader *) x)
+#define EnvGetDefglobalPPForm(theEnv,execStatus,x) GetConstructPPForm(theEnv,execStatus,(struct constructHeader *) x)
+#define EnvDefglobalModule(theEnv,execStatus,x) GetConstructModuleName((struct constructHeader *) x)
 
-#define DefglobalData(theEnv) ((struct defglobalData *) GetEnvironmentData(theEnv,DEFGLOBAL_DATA))
+#define DefglobalData(theEnv) ((struct defglobalData *) GetEnvironmentData(theEnv,execStatus,DEFGLOBAL_DATA))
 
 #ifdef LOCALE
 #undef LOCALE

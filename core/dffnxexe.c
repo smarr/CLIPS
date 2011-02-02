@@ -80,7 +80,7 @@ static void WatchDeffunction(void *,char *);
   RETURNS      : Nothing useful
   SIDE EFFECTS : Deffunction executed and result
                  stored in data object buffer
-  NOTES        : Used in EvaluateExpression(theEnv,)
+  NOTES        : Used in EvaluateExpression(theEnv,execStatus,)
  ****************************************************/
 globle void CallDeffunction(
   void *theEnv,
@@ -101,12 +101,12 @@ globle void CallDeffunction(
    if (execStatus->HaltExecution)
      return;
    oldce = ExecutingConstruct(theEnv);
-   SetExecutingConstruct(theEnv,TRUE);
+   SetExecutingConstruct(theEnv,execStatus,TRUE);
    previouslyExecutingDeffunction = DeffunctionData(theEnv)->ExecutingDeffunction;
    DeffunctionData(theEnv)->ExecutingDeffunction = dptr;
    execStatus->CurrentEvaluationDepth++;
    dptr->executing++;
-   PushProcParameters(theEnv,args,CountArguments(args),EnvGetDeffunctionName(theEnv,(void *) dptr),
+   PushProcParameters(theEnv,execStatus,args,CountArguments(args),EnvGetDeffunctionName(theEnv,execStatus,(void *) dptr),
                       "deffunction",UnboundDeffunctionErr);
    if (execStatus->EvaluationError)
      {
@@ -114,32 +114,32 @@ globle void CallDeffunction(
       DeffunctionData(theEnv)->ExecutingDeffunction = previouslyExecutingDeffunction;
       execStatus->CurrentEvaluationDepth--;
       PeriodicCleanup(theEnv,execStatus,FALSE,TRUE);
-      SetExecutingConstruct(theEnv,oldce);
+      SetExecutingConstruct(theEnv,execStatus,oldce);
       return;
      }
 
 #if DEBUGGING_FUNCTIONS
    if (dptr->trace)
-     WatchDeffunction(theEnv,BEGIN_TRACE);
+     WatchDeffunction(theEnv,execStatus,BEGIN_TRACE);
 #endif
 
 #if PROFILING_FUNCTIONS
-   StartProfile(theEnv,&profileFrame,
+   StartProfile(theEnv,execStatus,&profileFrame,
                 &dptr->header.usrData,
                 ProfileFunctionData(theEnv)->ProfileConstructs);
 #endif
 
-   EvaluateProcActions(theEnv,dptr->header.whichModule->theModule,
+   EvaluateProcActions(theEnv,execStatus,dptr->header.whichModule->theModule,
                        dptr->code,dptr->numberOfLocalVars,
                        result,UnboundDeffunctionErr);
 
 #if PROFILING_FUNCTIONS
-    EndProfile(theEnv,&profileFrame);
+    EndProfile(theEnv,execStatus,&profileFrame);
 #endif
 
 #if DEBUGGING_FUNCTIONS
    if (dptr->trace)
-     WatchDeffunction(theEnv,END_TRACE);
+     WatchDeffunction(theEnv,execStatus,END_TRACE);
 #endif
    ProcedureFunctionData(theEnv)->ReturnFlag = FALSE;
 
@@ -147,9 +147,9 @@ globle void CallDeffunction(
    PopProcParameters(theEnv);
    DeffunctionData(theEnv)->ExecutingDeffunction = previouslyExecutingDeffunction;
    execStatus->CurrentEvaluationDepth--;
-   PropagateReturnValue(theEnv,result);
+   PropagateReturnValue(theEnv,execStatus,result);
    PeriodicCleanup(theEnv,execStatus,FALSE,TRUE);
-   SetExecutingConstruct(theEnv,oldce);
+   SetExecutingConstruct(theEnv,execStatus,oldce);
   }
 
 /* =========================================
@@ -172,9 +172,9 @@ static void UnboundDeffunctionErr(
   void *theEnv,
   EXEC_STATUS)
   {
-   EnvPrintRouter(theEnv,WERROR,"deffunction ");
-   EnvPrintRouter(theEnv,WERROR,EnvGetDeffunctionName(theEnv,(void *) DeffunctionData(theEnv)->ExecutingDeffunction));
-   EnvPrintRouter(theEnv,WERROR,".\n");
+   EnvPrintRouter(theEnv,execStatus,WERROR,"deffunction ");
+   EnvPrintRouter(theEnv,execStatus,WERROR,EnvGetDeffunctionName(theEnv,execStatus,(void *) DeffunctionData(theEnv)->ExecutingDeffunction));
+   EnvPrintRouter(theEnv,execStatus,WERROR,".\n");
   }
 
 #if DEBUGGING_FUNCTIONS
@@ -196,18 +196,18 @@ static void WatchDeffunction(
   EXEC_STATUS,
   char *tstring)
   {
-   EnvPrintRouter(theEnv,WTRACE,"DFN ");
-   EnvPrintRouter(theEnv,WTRACE,tstring);
+   EnvPrintRouter(theEnv,execStatus,WTRACE,"DFN ");
+   EnvPrintRouter(theEnv,execStatus,WTRACE,tstring);
    if (DeffunctionData(theEnv)->ExecutingDeffunction->header.whichModule->theModule != ((struct defmodule *) EnvGetCurrentModule(theEnv)))
      {
-      EnvPrintRouter(theEnv,WTRACE,EnvGetDefmoduleName(theEnv,(void *)
+      EnvPrintRouter(theEnv,execStatus,WTRACE,EnvGetDefmoduleName(theEnv,execStatus,(void *)
                         DeffunctionData(theEnv)->ExecutingDeffunction->header.whichModule->theModule));
-      EnvPrintRouter(theEnv,WTRACE,"::");
+      EnvPrintRouter(theEnv,execStatus,WTRACE,"::");
      }
-   EnvPrintRouter(theEnv,WTRACE,ValueToString(DeffunctionData(theEnv)->ExecutingDeffunction->header.name));
-   EnvPrintRouter(theEnv,WTRACE," ED:");
-   PrintLongInteger(theEnv,WTRACE,(long long) execStatus->CurrentEvaluationDepth);
-   PrintProcParamArray(theEnv,WTRACE);
+   EnvPrintRouter(theEnv,execStatus,WTRACE,ValueToString(DeffunctionData(theEnv)->ExecutingDeffunction->header.name));
+   EnvPrintRouter(theEnv,execStatus,WTRACE," ED:");
+   PrintLongInteger(theEnv,execStatus,WTRACE,(long long) execStatus->CurrentEvaluationDepth);
+   PrintProcParamArray(theEnv,execStatus,WTRACE);
   }
 
 #endif

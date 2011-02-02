@@ -55,7 +55,7 @@ globle void DefglobalCompilerSetup(
   EXEC_STATUS)
   {
    DefglobalData(theEnv)->DefglobalCodeItem = 
-      AddCodeGeneratorItem(theEnv,"defglobal",0,BeforeDefglobalsToCode,
+      AddCodeGeneratorItem(theEnv,execStatus,"defglobal",0,BeforeDefglobalsToCode,
                            InitDefglobalsCode,ConstructToCode,2);
   }
 
@@ -68,7 +68,7 @@ static void BeforeDefglobalsToCode(
   void *theEnv,
   EXEC_STATUS)
   {
-   MarkConstructBsaveIDs(theEnv,DefglobalData(theEnv)->DefglobalModuleIndex);
+   MarkConstructBsaveIDs(theEnv,execStatus,DefglobalData(theEnv)->DefglobalModuleIndex);
   }
 
 /*************************************************/
@@ -126,44 +126,44 @@ static int ConstructToCode(
    /*  C code representation to the file as they are traversed.         */
    /*===================================================================*/
 
-   for (theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,NULL);
+   for (theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,NULL);
         theModule != NULL;
-        theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,theModule))
+        theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,theModule))
      {
-      EnvSetCurrentModule(theEnv,(void *) theModule);
+      EnvSetCurrentModule(theEnv,execStatus,(void *) theModule);
 
-      moduleFile = OpenFileIfNeeded(theEnv,moduleFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
+      moduleFile = OpenFileIfNeeded(theEnv,execStatus,moduleFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
                                     moduleArrayVersion,headerFP,
                                     "struct defglobalModule",ModulePrefix(DefglobalData(theEnv)->DefglobalCodeItem),
                                     FALSE,NULL);
 
       if (moduleFile == NULL)
         {
-         CloseDefglobalFiles(theEnv,moduleFile,defglobalFile,maxIndices);
+         CloseDefglobalFiles(theEnv,execStatus,moduleFile,defglobalFile,maxIndices);
          return(0);
         }
 
-      DefglobalModuleToCode(theEnv,moduleFile,theModule,imageID,maxIndices,moduleCount);
-      moduleFile = CloseFileIfNeeded(theEnv,moduleFile,&moduleArrayCount,&moduleArrayVersion,
+      DefglobalModuleToCode(theEnv,execStatus,moduleFile,theModule,imageID,maxIndices,moduleCount);
+      moduleFile = CloseFileIfNeeded(theEnv,execStatus,moduleFile,&moduleArrayCount,&moduleArrayVersion,
                                      maxIndices,NULL,NULL);
 
-      for (theDefglobal = (struct defglobal *) EnvGetNextDefglobal(theEnv,NULL);
+      for (theDefglobal = (struct defglobal *) EnvGetNextDefglobal(theEnv,execStatus,NULL);
            theDefglobal != NULL;
-           theDefglobal = (struct defglobal *) EnvGetNextDefglobal(theEnv,theDefglobal))
+           theDefglobal = (struct defglobal *) EnvGetNextDefglobal(theEnv,execStatus,theDefglobal))
         {
-         defglobalFile = OpenFileIfNeeded(theEnv,defglobalFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
+         defglobalFile = OpenFileIfNeeded(theEnv,execStatus,defglobalFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
                                          defglobalArrayVersion,headerFP,
                                          "struct defglobal",ConstructPrefix(DefglobalData(theEnv)->DefglobalCodeItem),
                                          FALSE,NULL);
          if (defglobalFile == NULL)
            {
-            CloseDefglobalFiles(theEnv,moduleFile,defglobalFile,maxIndices);
+            CloseDefglobalFiles(theEnv,execStatus,moduleFile,defglobalFile,maxIndices);
             return(0);
            }
 
-         DefglobalToCode(theEnv,defglobalFile,theDefglobal,imageID,maxIndices,moduleCount);
+         DefglobalToCode(theEnv,execStatus,defglobalFile,theDefglobal,imageID,maxIndices,moduleCount);
          defglobalArrayCount++;
-         defglobalFile = CloseFileIfNeeded(theEnv,defglobalFile,&defglobalArrayCount,
+         defglobalFile = CloseFileIfNeeded(theEnv,execStatus,defglobalFile,&defglobalArrayCount,
                                            &defglobalArrayVersion,maxIndices,NULL,NULL);
         }
 
@@ -171,7 +171,7 @@ static int ConstructToCode(
       moduleArrayCount++;
      }
 
-   CloseDefglobalFiles(theEnv,moduleFile,defglobalFile,maxIndices);
+   CloseDefglobalFiles(theEnv,execStatus,moduleFile,defglobalFile,maxIndices);
 
    return(1);
   }
@@ -194,13 +194,13 @@ static void CloseDefglobalFiles(
    if (defglobalFile != NULL)
      {
       count = maxIndices;
-      CloseFileIfNeeded(theEnv,defglobalFile,&count,&arrayVersion,maxIndices,NULL,NULL);
+      CloseFileIfNeeded(theEnv,execStatus,defglobalFile,&count,&arrayVersion,maxIndices,NULL,NULL);
      }
 
    if (moduleFile != NULL)
      {
       count = maxIndices;
-      CloseFileIfNeeded(theEnv,moduleFile,&count,&arrayVersion,maxIndices,NULL,NULL);
+      CloseFileIfNeeded(theEnv,execStatus,moduleFile,&count,&arrayVersion,maxIndices,NULL,NULL);
      }
   }
 
@@ -226,7 +226,7 @@ static void DefglobalModuleToCode(
 
    fprintf(theFile,"{");
 
-   ConstructModuleToCode(theEnv,theFile,theModule,imageID,maxIndices,
+   ConstructModuleToCode(theEnv,execStatus,theFile,theModule,imageID,maxIndices,
                                   DefglobalData(theEnv)->DefglobalModuleIndex,ConstructPrefix(DefglobalData(theEnv)->DefglobalCodeItem));
 
    fprintf(theFile,"}");
@@ -251,7 +251,7 @@ static void DefglobalToCode(
 
    fprintf(theFile,"{");
 
-   ConstructHeaderToCode(theEnv,theFile,&theDefglobal->header,imageID,maxIndices,
+   ConstructHeaderToCode(theEnv,execStatus,theFile,&theDefglobal->header,imageID,maxIndices,
                          moduleCount,ModulePrefix(DefglobalData(theEnv)->DefglobalCodeItem),
                          ConstructPrefix(DefglobalData(theEnv)->DefglobalCodeItem));
 
@@ -274,7 +274,7 @@ static void DefglobalToCode(
    /*=====================*/
 
    fprintf(theFile,",");
-   PrintHashedExpressionReference(theEnv,theFile,theDefglobal->initial,imageID,maxIndices);
+   PrintHashedExpressionReference(theEnv,execStatus,theFile,theDefglobal->initial,imageID,maxIndices);
 
    fprintf(theFile,"}");
   }

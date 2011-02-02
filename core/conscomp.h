@@ -72,7 +72,7 @@ struct constructCompilerData
    struct CodeGeneratorItem *ListOfCodeGeneratorItems;
   };
 
-#define ConstructCompilerData(theEnv) ((struct constructCompilerData *) GetEnvironmentData(theEnv,CONSTRUCT_COMPILER_DATA))
+#define ConstructCompilerData(theEnv) ((struct constructCompilerData *) GetEnvironmentData(theEnv,execStatus,CONSTRUCT_COMPILER_DATA))
 
 #ifdef LOCALE
 #undef LOCALE

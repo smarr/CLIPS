@@ -71,7 +71,7 @@ struct factQueryData
    int AbortQuery;
   };
 
-#define FactQueryData(theEnv) ((struct factQueryData *) GetEnvironmentData(theEnv,FACT_QUERY_DATA))
+#define FactQueryData(theEnv) ((struct factQueryData *) GetEnvironmentData(theEnv,execStatus,FACT_QUERY_DATA))
 
 #ifdef LOCALE
 #undef LOCALE

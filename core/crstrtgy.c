@@ -89,7 +89,7 @@ globle void PlaceActivation(
    /* been made to the agenda.                       */
    /*================================================*/
 
-   EnvSetAgendaChanged(theEnv,TRUE);
+   EnvSetAgendaChanged(theEnv,execStatus,TRUE);
 
    /*=============================================*/
    /* Determine the location where the activation */
@@ -110,11 +110,11 @@ globle void PlaceActivation(
            break;
 
          case LEX_STRATEGY:
-           placeAfter = PlaceLEXActivation(theEnv,newActivation,theGroup);
+           placeAfter = PlaceLEXActivation(theEnv,execStatus,newActivation,theGroup);
            break;
 
          case MEA_STRATEGY:
-           placeAfter = PlaceMEAActivation(theEnv,newActivation,theGroup);
+           placeAfter = PlaceMEAActivation(theEnv,execStatus,newActivation,theGroup);
            break;
 
          case COMPLEXITY_STRATEGY:
@@ -336,7 +336,7 @@ static ACTIVATION *PlaceLEXActivation(
    actPtr = theGroup->last;
    if (actPtr != NULL)
      {
-      flag = ComparePartialMatches(theEnv,actPtr,newActivation);
+      flag = ComparePartialMatches(theEnv,execStatus,actPtr,newActivation);
       
       if ((flag == LESS_THAN) ||
           ((flag == EQUAL) &&  (timetag > actPtr->timetag)))
@@ -358,7 +358,7 @@ static ACTIVATION *PlaceLEXActivation(
    actPtr = theGroup->first;
    while (actPtr != NULL)
      {
-      flag = ComparePartialMatches(theEnv,actPtr,newActivation);
+      flag = ComparePartialMatches(theEnv,execStatus,actPtr,newActivation);
 
       if (flag == LESS_THAN)
         {
@@ -457,7 +457,7 @@ static ACTIVATION *PlaceMEAActivation(
         { oSet = FALSE; }
         
       if ((cSet == FALSE) && (oSet == FALSE))  
-        { flag = ComparePartialMatches(theEnv,actPtr,newActivation); }
+        { flag = ComparePartialMatches(theEnv,execStatus,actPtr,newActivation); }
       else if ((cSet == TRUE) && (oSet == FALSE))
         { flag = GREATER_THAN; }
       else if ((cSet == FALSE) && (oSet == TRUE))
@@ -467,7 +467,7 @@ static ACTIVATION *PlaceMEAActivation(
       else if (oWhoset > cWhoset)
         { flag = LESS_THAN; }
       else
-        { flag = ComparePartialMatches(theEnv,actPtr,newActivation); }
+        { flag = ComparePartialMatches(theEnv,execStatus,actPtr,newActivation); }
 
       if ((flag == LESS_THAN) ||
           ((flag == EQUAL) &&  (timetag > actPtr->timetag)))
@@ -508,7 +508,7 @@ static ACTIVATION *PlaceMEAActivation(
          else flag = GREATER_THAN;
         }
       else
-        { flag = ComparePartialMatches(theEnv,actPtr,newActivation); }
+        { flag = ComparePartialMatches(theEnv,execStatus,actPtr,newActivation); }
 
       if (flag == LESS_THAN)
         {
@@ -804,7 +804,7 @@ static unsigned long long *SortPartialMatch(
    /* should have timetags greater than 0.               */
    /*====================================================*/
 
-   nbinds = (unsigned long long *) get_mem(theEnv,sizeof(long long) * binds->bcount);
+   nbinds = (unsigned long long *) get_mem(theEnv,execStatus,sizeof(long long) * binds->bcount);
       
    for (j = 0; j < (unsigned) binds->bcount; j++)
      {
@@ -863,8 +863,8 @@ static int ComparePartialMatches(
    /* have a set of sorted timetags, then create one. */
    /*=================================================*/
 
-   basis1 = SortPartialMatch(theEnv,newActivation->basis);
-   basis2 = SortPartialMatch(theEnv,actPtr->basis);
+   basis1 = SortPartialMatch(theEnv,execStatus,newActivation->basis);
+   basis2 = SortPartialMatch(theEnv,execStatus,actPtr->basis);
    
    /*==============================================================*/
    /* Determine the number of timetags in each of the activations. */
@@ -890,20 +890,20 @@ static int ComparePartialMatches(
      {
       if (basis1[i] < basis2[i])
         { 
-         rtn_mem(theEnv,sizeof(long long) * cCount,basis1);
-         rtn_mem(theEnv,sizeof(long long) * oCount,basis2);
+         rtn_mem(theEnv,execStatus,sizeof(long long) * cCount,basis1);
+         rtn_mem(theEnv,execStatus,sizeof(long long) * oCount,basis2);
          return(LESS_THAN); 
         }
       else if (basis1[i] > basis2[i])
         { 
-         rtn_mem(theEnv,sizeof(long long) * cCount,basis1);
-         rtn_mem(theEnv,sizeof(long long) * oCount,basis2);
+         rtn_mem(theEnv,execStatus,sizeof(long long) * cCount,basis1);
+         rtn_mem(theEnv,execStatus,sizeof(long long) * oCount,basis2);
          return(GREATER_THAN); 
         }
      }
   
-   rtn_mem(theEnv,sizeof(long long) * cCount,basis1);
-   rtn_mem(theEnv,sizeof(long long) * oCount,basis2);
+   rtn_mem(theEnv,execStatus,sizeof(long long) * cCount,basis1);
+   rtn_mem(theEnv,execStatus,sizeof(long long) * oCount,basis2);
 
    /*==========================================================*/
    /* If the sorted timetags are identical up to the number of */
@@ -951,7 +951,7 @@ globle int EnvSetStrategy(
    oldStrategy = AgendaData(theEnv)->Strategy;
    AgendaData(theEnv)->Strategy = value;
 
-   if (oldStrategy != AgendaData(theEnv)->Strategy) EnvReorderAgenda(theEnv,NULL);
+   if (oldStrategy != AgendaData(theEnv)->Strategy) EnvReorderAgenda(theEnv,execStatus,NULL);
 
    return(oldStrategy);
   }
@@ -977,7 +977,7 @@ globle void *GetStrategyCommand(
   {
    EnvArgCountCheck(theEnv,execStatus,"get-strategy",EXACTLY,0);
 
-   return((SYMBOL_HN *) EnvAddSymbol(theEnv,GetStrategyName(EnvGetStrategy(theEnv))));
+   return((SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,GetStrategyName(EnvGetStrategy(theEnv))));
   }
 
 /********************************************/
@@ -999,10 +999,10 @@ globle void *SetStrategyCommand(
    /*=====================================================*/
 
    if (EnvArgCountCheck(theEnv,execStatus,"set-strategy",EXACTLY,1) == -1)
-     { return((SYMBOL_HN *) EnvAddSymbol(theEnv,GetStrategyName(EnvGetStrategy(theEnv)))); }
+     { return((SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,GetStrategyName(EnvGetStrategy(theEnv)))); }
 
    if (EnvArgTypeCheck(theEnv,execStatus,"set-strategy",1,SYMBOL,&argPtr) == FALSE)
-     { return((SYMBOL_HN *) EnvAddSymbol(theEnv,GetStrategyName(EnvGetStrategy(theEnv)))); }
+     { return((SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,GetStrategyName(EnvGetStrategy(theEnv)))); }
 
    argument = DOToString(argPtr);
 
@@ -1011,31 +1011,31 @@ globle void *SetStrategyCommand(
    /*=============================================*/
 
    if (strcmp(argument,"depth") == 0)
-     { EnvSetStrategy(theEnv,DEPTH_STRATEGY); }
+     { EnvSetStrategy(theEnv,execStatus,DEPTH_STRATEGY); }
    else if (strcmp(argument,"breadth") == 0)
-     { EnvSetStrategy(theEnv,BREADTH_STRATEGY); }
+     { EnvSetStrategy(theEnv,execStatus,BREADTH_STRATEGY); }
    else if (strcmp(argument,"lex") == 0)
-     { EnvSetStrategy(theEnv,LEX_STRATEGY); }
+     { EnvSetStrategy(theEnv,execStatus,LEX_STRATEGY); }
    else if (strcmp(argument,"mea") == 0)
-     { EnvSetStrategy(theEnv,MEA_STRATEGY); }
+     { EnvSetStrategy(theEnv,execStatus,MEA_STRATEGY); }
    else if (strcmp(argument,"complexity") == 0)
-     { EnvSetStrategy(theEnv,COMPLEXITY_STRATEGY); }
+     { EnvSetStrategy(theEnv,execStatus,COMPLEXITY_STRATEGY); }
    else if (strcmp(argument,"simplicity") == 0)
-     { EnvSetStrategy(theEnv,SIMPLICITY_STRATEGY); }
+     { EnvSetStrategy(theEnv,execStatus,SIMPLICITY_STRATEGY); }
    else if (strcmp(argument,"random") == 0)
-     { EnvSetStrategy(theEnv,RANDOM_STRATEGY); }
+     { EnvSetStrategy(theEnv,execStatus,RANDOM_STRATEGY); }
    else
      {
-      ExpectedTypeError1(theEnv,"set-strategy",1,
+      ExpectedTypeError1(theEnv,execStatus,"set-strategy",1,
       "symbol with value depth, breadth, lex, mea, complexity, simplicity, or random");
-      return((SYMBOL_HN *) EnvAddSymbol(theEnv,GetStrategyName(EnvGetStrategy(theEnv))));
+      return((SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,GetStrategyName(EnvGetStrategy(theEnv))));
      }
 
    /*=======================================*/
    /* Return the old value of the strategy. */
    /*=======================================*/
 
-   return((SYMBOL_HN *) EnvAddSymbol(theEnv,GetStrategyName(oldStrategy)));
+   return((SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,GetStrategyName(oldStrategy)));
   }
 
 /**********************************************************/

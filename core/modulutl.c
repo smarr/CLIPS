@@ -93,7 +93,7 @@ globle SYMBOL_HN *ExtractModuleName(
    /* Allocate storage for a temporary string. */
    /*==========================================*/
 
-   newString = (char *) gm2(theEnv,thePosition);
+   newString = (char *) gm2(theEnv,execStatus,thePosition);
 
    /*======================================================*/
    /* Copy the entire module/construct name to the string. */
@@ -113,13 +113,13 @@ globle SYMBOL_HN *ExtractModuleName(
    /* name) to the symbol table.                          */
    /*=====================================================*/
 
-   returnValue = (SYMBOL_HN *) EnvAddSymbol(theEnv,newString);
+   returnValue = (SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,newString);
 
    /*=============================================*/
    /* Return the storage of the temporary string. */
    /*=============================================*/
 
-   rm(theEnv,newString,thePosition);
+   rm(theEnv,execStatus,newString,thePosition);
 
    /*=============================================*/
    /* Return a pointer to the module name symbol. */
@@ -149,7 +149,7 @@ globle SYMBOL_HN *ExtractConstructName(
    /* contain the :: symbol.               */
    /*======================================*/
 
-   if (thePosition == 0) return((SYMBOL_HN *) EnvAddSymbol(theEnv,theString));
+   if (thePosition == 0) return((SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,theString));
 
    /*=====================================*/
    /* Determine the length of the string. */
@@ -169,7 +169,7 @@ globle SYMBOL_HN *ExtractConstructName(
    /* enough to hold the construct name. */
    /*====================================*/
 
-   newString = (char *) gm2(theEnv,theLength - thePosition);
+   newString = (char *) gm2(theEnv,execStatus,theLength - thePosition);
 
    /*================================================*/
    /* Copy the construct name portion of the         */
@@ -183,13 +183,13 @@ globle SYMBOL_HN *ExtractConstructName(
    /* Add the construct name to the symbol table. */
    /*=============================================*/
 
-   returnValue = (SYMBOL_HN *) EnvAddSymbol(theEnv,newString);
+   returnValue = (SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,newString);
 
    /*=============================================*/
    /* Return the storage of the temporary string. */
    /*=============================================*/
 
-   rm(theEnv,newString,theLength - thePosition);
+   rm(theEnv,execStatus,newString,theLength - thePosition);
 
    /*================================================*/
    /* Return a pointer to the construct name symbol. */
@@ -223,27 +223,27 @@ globle char *ExtractModuleAndConstructName(
    /* Extract the module name. */
    /*==========================*/
 
-   moduleName = ExtractModuleName(theEnv,separatorPosition,theName);
+   moduleName = ExtractModuleName(theEnv,execStatus,separatorPosition,theName);
    if (moduleName == NULL) return(NULL);
 
    /*====================================*/
    /* Check to see if the module exists. */
    /*====================================*/
 
-   theModule = (struct defmodule *) EnvFindDefmodule(theEnv,ValueToString(moduleName));
+   theModule = (struct defmodule *) EnvFindDefmodule(theEnv,execStatus,ValueToString(moduleName));
    if (theModule == NULL) return(NULL);
 
    /*============================*/
    /* Change the current module. */
    /*============================*/
 
-   EnvSetCurrentModule(theEnv,(void *) theModule);
+   EnvSetCurrentModule(theEnv,execStatus,(void *) theModule);
 
    /*=============================*/
    /* Extract the construct name. */
    /*=============================*/
 
-   shortName = ExtractConstructName(theEnv,separatorPosition,theName);
+   shortName = ExtractConstructName(theEnv,execStatus,separatorPosition,theName);
    if (shortName == NULL) return(NULL);
    return(ValueToString(shortName));
   }
@@ -292,7 +292,7 @@ globle void *FindImportedConstruct(
    /* for the construct type being sought.     */
    /*==========================================*/
 
-   if ((theModuleItem = FindModuleItem(theEnv,constructName)) == NULL)
+   if ((theModuleItem = FindModuleItem(theEnv,execStatus,constructName)) == NULL)
      {
       RestoreCurrentModule(theEnv);
       return(NULL);
@@ -320,9 +320,9 @@ globle void *FindImportedConstruct(
    /* Search for the construct. */
    /*===========================*/
 
-   rv = SearchImportedConstructModules(theEnv,(SYMBOL_HN *) EnvAddSymbol(theEnv,constructName),
+   rv = SearchImportedConstructModules(theEnv,execStatus,(SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,constructName),
                                        matchModule,theModuleItem,
-                                       (SYMBOL_HN *) EnvAddSymbol(theEnv,findName),count,
+                                       (SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,findName),count,
                                        searchCurrent,notYetDefinedInModule);
 
    /*=============================*/
@@ -349,11 +349,11 @@ globle void AmbiguousReferenceErrorMessage(
   char *constructName,
   char *findName)
   {
-   EnvPrintRouter(theEnv,WERROR,"Ambiguous reference to ");
-   EnvPrintRouter(theEnv,WERROR,constructName);
-   EnvPrintRouter(theEnv,WERROR," ");
-   EnvPrintRouter(theEnv,WERROR,findName);
-   EnvPrintRouter(theEnv,WERROR,".\nIt is imported from more than one module.\n");
+   EnvPrintRouter(theEnv,execStatus,WERROR,"Ambiguous reference to ");
+   EnvPrintRouter(theEnv,execStatus,WERROR,constructName);
+   EnvPrintRouter(theEnv,execStatus,WERROR," ");
+   EnvPrintRouter(theEnv,execStatus,WERROR,findName);
+   EnvPrintRouter(theEnv,execStatus,WERROR,".\nIt is imported from more than one module.\n");
   }
 
 /****************************************************/
@@ -368,9 +368,9 @@ globle void MarkModulesAsUnvisited(
    struct defmodule *theModule;
 
    DefmoduleData(theEnv)->CurrentModule->visitedFlag = FALSE;
-   for (theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,NULL);
+   for (theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,NULL);
         theModule != NULL;
-        theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,theModule))
+        theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,theModule))
      { theModule->visitedFlag = FALSE; }
   }
 
@@ -420,7 +420,7 @@ static void *SearchImportedConstructModules(
       /* Look for the construct in the current module. */
       /*===============================================*/
 
-      rv = (*theModuleItem->findFunction)(theEnv,ValueToString(findName));
+      rv = (*theModuleItem->findFunction)(theEnv,execStatus,ValueToString(findName));
 
       /*========================================================*/
       /* If we're in the process of defining the construct in   */
@@ -490,7 +490,7 @@ static void *SearchImportedConstructModules(
       if (searchModule)
         {
          theModule = (struct defmodule *)
-                     EnvFindDefmodule(theEnv,ValueToString(theImportList->moduleName));
+                     EnvFindDefmodule(theEnv,execStatus,ValueToString(theImportList->moduleName));
          if (theModule == NULL) searchModule = FALSE;
         }
 
@@ -524,8 +524,8 @@ static void *SearchImportedConstructModules(
 
       if (searchModule)
         {
-         EnvSetCurrentModule(theEnv,(void *) theModule);
-         if ((rv = SearchImportedConstructModules(theEnv,constructType,matchModule,
+         EnvSetCurrentModule(theEnv,execStatus,(void *) theModule);
+         if ((rv = SearchImportedConstructModules(theEnv,execStatus,constructType,matchModule,
                                                   theModuleItem,findName,
                                                   count,TRUE,
                                                   notYetDefinedInModule)) != NULL)
@@ -562,8 +562,8 @@ globle intBool ConstructExported(
    struct defmodule *theModule;
    struct portItem *theExportList;
    
-   constructType = FindSymbolHN(theEnv,constructTypeStr);
-   theModule = (struct defmodule *) EnvFindDefmodule(theEnv,ValueToString(moduleName));
+   constructType = FindSymbolHN(theEnv,execStatus,constructTypeStr);
+   theModule = (struct defmodule *) EnvFindDefmodule(theEnv,execStatus,ValueToString(moduleName));
    
    if ((constructType == NULL) || (theModule == NULL) || (findName == NULL))
      { return(FALSE); }
@@ -622,7 +622,7 @@ globle void ListItemsDriver(
 
    if (theModule == NULL)
      {
-      theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,NULL);
+      theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,NULL);
       allModules = TRUE;
      }
 
@@ -630,18 +630,18 @@ globle void ListItemsDriver(
      {
       if (allModules)
         {
-         EnvPrintRouter(theEnv,logicalName,EnvGetDefmoduleName(theEnv,theModule));
-         EnvPrintRouter(theEnv,logicalName,":\n");
+         EnvPrintRouter(theEnv,execStatus,logicalName,EnvGetDefmoduleName(theEnv,execStatus,theModule));
+         EnvPrintRouter(theEnv,execStatus,logicalName,":\n");
         }
 
-      EnvSetCurrentModule(theEnv,(void *) theModule);
-      constructPtr = (*nextFunction)(theEnv,NULL);
+      EnvSetCurrentModule(theEnv,execStatus,(void *) theModule);
+      constructPtr = (*nextFunction)(theEnv,execStatus,NULL);
       while (constructPtr != NULL)
         {
          if (execStatus->HaltExecution == TRUE) return;
 
          if (doItFunction == NULL) doIt = TRUE;
-         else doIt = (*doItFunction)(theEnv,constructPtr);
+         else doIt = (*doItFunction)(theEnv,execStatus,constructPtr);
 
          if (! doIt) {}
          else if (nameFunction != NULL)
@@ -649,23 +649,23 @@ globle void ListItemsDriver(
             constructName = (*nameFunction)(constructPtr);
             if (constructName != NULL)
               {
-               if (allModules) EnvPrintRouter(theEnv,logicalName,"   ");
-               EnvPrintRouter(theEnv,logicalName,constructName);
-               EnvPrintRouter(theEnv,logicalName,"\n");
+               if (allModules) EnvPrintRouter(theEnv,execStatus,logicalName,"   ");
+               EnvPrintRouter(theEnv,execStatus,logicalName,constructName);
+               EnvPrintRouter(theEnv,execStatus,logicalName,"\n");
               }
            }
          else if (printFunction != NULL)
            {
-            if (allModules) EnvPrintRouter(theEnv,logicalName,"   ");
-            (*printFunction)(theEnv,logicalName,constructPtr);
-            EnvPrintRouter(theEnv,logicalName,"\n");
+            if (allModules) EnvPrintRouter(theEnv,execStatus,logicalName,"   ");
+            (*printFunction)(theEnv,execStatus,logicalName,constructPtr);
+            EnvPrintRouter(theEnv,execStatus,logicalName,"\n");
            }
 
-         constructPtr = (*nextFunction)(theEnv,constructPtr);
+         constructPtr = (*nextFunction)(theEnv,execStatus,constructPtr);
          count++;
         }
 
-      if (allModules) theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,theModule);
+      if (allModules) theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,theModule);
       else theModule = NULL;
      }
 
@@ -673,7 +673,7 @@ globle void ListItemsDriver(
    /* Print the tally and restore the current module. */
    /*=================================================*/
 
-   if (singleName != NULL) PrintTally(theEnv,logicalName,count,singleName,pluralName);
+   if (singleName != NULL) PrintTally(theEnv,execStatus,logicalName,count,singleName,pluralName);
 
    RestoreCurrentModule(theEnv);
   }
@@ -701,11 +701,11 @@ globle long DoForAllModules(
    /* Loop through all of the modules. */
    /*==================================*/
 
-   for (theModule = EnvGetNextDefmodule(theEnv,NULL);
+   for (theModule = EnvGetNextDefmodule(theEnv,execStatus,NULL);
         theModule != NULL;
-        theModule = EnvGetNextDefmodule(theEnv,theModule), moduleCount++)
+        theModule = EnvGetNextDefmodule(theEnv,execStatus,theModule), moduleCount++)
      {
-      EnvSetCurrentModule(theEnv,(void *) theModule);
+      EnvSetCurrentModule(theEnv,execStatus,(void *) theModule);
 
       if ((interruptable) && GetHaltExecution(theEnv))
         {

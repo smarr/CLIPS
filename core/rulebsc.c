@@ -77,27 +77,27 @@ globle void DefruleBasicCommands(
   void *theEnv,
   EXEC_STATUS)
   {
-   EnvAddResetFunction(theEnv,"defrule",ResetDefrules,70);
-   EnvAddResetFunction(theEnv,"defrule",ResetDefrulesPrime,10);
-   AddSaveFunction(theEnv,"defrule",SaveDefrules,0);
+   EnvAddResetFunction(theEnv,execStatus,"defrule",ResetDefrules,70);
+   EnvAddResetFunction(theEnv,execStatus,"defrule",ResetDefrulesPrime,10);
+   AddSaveFunction(theEnv,execStatus,"defrule",SaveDefrules,0);
 #if (! RUN_TIME)
-   AddClearReadyFunction(theEnv,"defrule",ClearDefrulesReady,0);
-   EnvAddClearFunction(theEnv,"defrule",ClearDefrules,0);
+   AddClearReadyFunction(theEnv,execStatus,"defrule",ClearDefrulesReady,0);
+   EnvAddClearFunction(theEnv,execStatus,"defrule",ClearDefrules,0);
 #endif
    
 #if DEBUGGING_FUNCTIONS
-   AddWatchItem(theEnv,"rules",0,&DefruleData(theEnv)->WatchRules,70,DefruleWatchAccess,DefruleWatchPrint);
+   AddWatchItem(theEnv,execStatus,"rules",0,&DefruleData(theEnv)->WatchRules,70,DefruleWatchAccess,DefruleWatchPrint);
 #endif
 
 #if ! RUN_TIME
-   EnvDefineFunction2(theEnv,"get-defrule-list",'m',PTIEF GetDefruleListFunction,"GetDefruleListFunction","01w");
-   EnvDefineFunction2(theEnv,"undefrule",'v',PTIEF UndefruleCommand,"UndefruleCommand","11w");
-   EnvDefineFunction2(theEnv,"defrule-module",'w',PTIEF DefruleModuleFunction,"DefruleModuleFunction","11w");
+   EnvDefineFunction2(theEnv,execStatus,"get-defrule-list",'m',PTIEF GetDefruleListFunction,"GetDefruleListFunction","01w");
+   EnvDefineFunction2(theEnv,execStatus,"undefrule",'v',PTIEF UndefruleCommand,"UndefruleCommand","11w");
+   EnvDefineFunction2(theEnv,execStatus,"defrule-module",'w',PTIEF DefruleModuleFunction,"DefruleModuleFunction","11w");
 
 #if DEBUGGING_FUNCTIONS
-   EnvDefineFunction2(theEnv,"rules",'v', PTIEF ListDefrulesCommand,"ListDefrulesCommand","01w");
-   EnvDefineFunction2(theEnv,"list-defrules",'v', PTIEF ListDefrulesCommand,"ListDefrulesCommand","01w");
-   EnvDefineFunction2(theEnv,"ppdefrule",'v',PTIEF PPDefruleCommand,"PPDefruleCommand","11w");
+   EnvDefineFunction2(theEnv,execStatus,"rules",'v', PTIEF ListDefrulesCommand,"ListDefrulesCommand","01w");
+   EnvDefineFunction2(theEnv,execStatus,"list-defrules",'v', PTIEF ListDefrulesCommand,"ListDefrulesCommand","01w");
+   EnvDefineFunction2(theEnv,execStatus,"ppdefrule",'v',PTIEF PPDefruleCommand,"PPDefruleCommand","11w");
 #endif
 
 #if (BLOAD || BLOAD_ONLY || BLOAD_AND_BSAVE)
@@ -128,13 +128,13 @@ static void ResetDefrules(
   
    DefruleData(theEnv)->CurrentEntityTimeTag = 1L;
    EnvClearFocusStack(theEnv);
-   theModule = (struct defmodule *) EnvFindDefmodule(theEnv,"MAIN");
-   EnvFocus(theEnv,(void *) theModule);
+   theModule = (struct defmodule *) EnvFindDefmodule(theEnv,execStatus,"MAIN");
+   EnvFocus(theEnv,execStatus,(void *) theModule);
    
    for (theLink = DefruleData(theEnv)->RightPrimeJoins;
         theLink != NULL;
         theLink = theLink->next)
-     { PosEntryRetractAlpha(theEnv,theLink->join->rightMemory->beta[0]); }
+     { PosEntryRetractAlpha(theEnv,execStatus,theLink->join->rightMemory->beta[0]); }
 
    for (theLink = DefruleData(theEnv)->LeftPrimeJoins;
         theLink != NULL;
@@ -155,10 +155,10 @@ static void ResetDefrules(
          notParent->marker = notParent;
          
          if (notParent->children != NULL)
-           { PosEntryRetractBeta(theEnv,notParent,notParent->children); }
+           { PosEntryRetractBeta(theEnv,execStatus,notParent,notParent->children); }
            /*
          if (notParent->dependents != NULL) 
-           { RemoveLogicalSupport(theEnv,notParent); } */
+           { RemoveLogicalSupport(theEnv,execStatus,notParent); } */
         }
      }
   }
@@ -176,7 +176,7 @@ static void ResetDefrulesPrime(
    for (theLink = DefruleData(theEnv)->RightPrimeJoins;
         theLink != NULL;
         theLink = theLink->next)
-     { NetworkAssert(theEnv,theLink->join->rightMemory->beta[0],theLink->join); }
+     { NetworkAssert(theEnv,execStatus,theLink->join->rightMemory->beta[0],theLink->join); }
 
    for (theLink = DefruleData(theEnv)->LeftPrimeJoins;
         theLink != NULL;
@@ -189,13 +189,13 @@ static void ResetDefrulesPrime(
 
          if (theLink->join->secondaryNetworkTest != NULL)
            {
-            if (EvaluateSecondaryNetworkTest(theEnv,notParent,theLink->join) == FALSE)
+            if (EvaluateSecondaryNetworkTest(theEnv,execStatus,notParent,theLink->join) == FALSE)
               { continue; }
            }
 
          notParent->marker = NULL;
 
-         EPMDrive(theEnv,notParent,theLink->join);
+         EPMDrive(theEnv,execStatus,notParent,theLink->join);
         }
      }
 
@@ -228,8 +228,8 @@ static void ClearDefrules(
   {
    struct defmodule *theModule;
 
-   theModule = (struct defmodule *) EnvFindDefmodule(theEnv,"MAIN");
-   EnvFocus(theEnv,(void *) theModule);
+   theModule = (struct defmodule *) EnvFindDefmodule(theEnv,execStatus,"MAIN");
+   EnvFocus(theEnv,execStatus,(void *) theModule);
   }
 #endif
 
@@ -243,7 +243,7 @@ static void SaveDefrules(
   void *theModule,
   char *logicalName)
   {
-   SaveConstruct(theEnv,theModule,logicalName,DefruleData(theEnv)->DefruleConstruct); 
+   SaveConstruct(theEnv,execStatus,theModule,logicalName,DefruleData(theEnv)->DefruleConstruct); 
   }
 
 /******************************************/
@@ -254,7 +254,7 @@ globle void UndefruleCommand(
   void *theEnv,
   EXEC_STATUS)
   { 
-   UndefconstructCommand(theEnv,"undefrule",DefruleData(theEnv)->DefruleConstruct); 
+   UndefconstructCommand(theEnv,execStatus,"undefrule",DefruleData(theEnv)->DefruleConstruct); 
   }
 
 /**********************************/
@@ -266,7 +266,7 @@ globle intBool EnvUndefrule(
   EXEC_STATUS,
   void *theDefrule)
   {
-   return(Undefconstruct(theEnv,theDefrule,DefruleData(theEnv)->DefruleConstruct)); 
+   return(Undefconstruct(theEnv,execStatus,theDefrule,DefruleData(theEnv)->DefruleConstruct)); 
   }
 
 /************************************************/
@@ -278,7 +278,7 @@ globle void GetDefruleListFunction(
   EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
-   GetConstructListFunction(theEnv,"get-defrule-list",returnValue,DefruleData(theEnv)->DefruleConstruct); 
+   GetConstructListFunction(theEnv,execStatus,"get-defrule-list",returnValue,DefruleData(theEnv)->DefruleConstruct); 
   }
 
 /****************************************/
@@ -291,7 +291,7 @@ globle void EnvGetDefruleList(
   DATA_OBJECT_PTR returnValue,
   void *theModule)
   {
-   GetConstructList(theEnv,returnValue,DefruleData(theEnv)->DefruleConstruct,(struct defmodule *) theModule);
+   GetConstructList(theEnv,execStatus,returnValue,DefruleData(theEnv)->DefruleConstruct,(struct defmodule *) theModule);
   }
 
 /*********************************************/
@@ -302,7 +302,7 @@ globle void *DefruleModuleFunction(
   void *theEnv,
   EXEC_STATUS)
   {
-   return(GetConstructModuleCommand(theEnv,"defrule-module",DefruleData(theEnv)->DefruleConstruct)); 
+   return(GetConstructModuleCommand(theEnv,execStatus,"defrule-module",DefruleData(theEnv)->DefruleConstruct)); 
   }
 
 #if DEBUGGING_FUNCTIONS
@@ -315,7 +315,7 @@ globle void PPDefruleCommand(
   void *theEnv,
   EXEC_STATUS)
   {
-   PPConstructCommand(theEnv,"ppdefrule",DefruleData(theEnv)->DefruleConstruct);
+   PPConstructCommand(theEnv,execStatus,"ppdefrule",DefruleData(theEnv)->DefruleConstruct);
   }
 
 /***********************************/
@@ -328,7 +328,7 @@ globle int PPDefrule(
   char *defruleName,
   char *logicalName)
   {
-   return(PPConstruct(theEnv,defruleName,logicalName,DefruleData(theEnv)->DefruleConstruct));
+   return(PPConstruct(theEnv,execStatus,defruleName,logicalName,DefruleData(theEnv)->DefruleConstruct));
   }
 
 /*********************************************/
@@ -339,7 +339,7 @@ globle void ListDefrulesCommand(
   void *theEnv,
   EXEC_STATUS)
   {
-   ListConstructCommand(theEnv,"list-defrules",DefruleData(theEnv)->DefruleConstruct); 
+   ListConstructCommand(theEnv,execStatus,"list-defrules",DefruleData(theEnv)->DefruleConstruct); 
   }
 
 /*************************************/
@@ -352,7 +352,7 @@ globle void EnvListDefrules(
   char *logicalName,
   void *theModule)
   {
-   ListConstruct(theEnv,DefruleData(theEnv)->DefruleConstruct,logicalName,(struct defmodule *) theModule); 
+   ListConstruct(theEnv,execStatus,DefruleData(theEnv)->DefruleConstruct,logicalName,(struct defmodule *) theModule); 
   }
 
 /*******************************************************/
@@ -469,10 +469,10 @@ globle unsigned DefruleWatchAccess(
   struct expr *argExprs)
   {
    if (code)
-     return(ConstructSetWatchAccess(theEnv,DefruleData(theEnv)->DefruleConstruct,newState,argExprs,
+     return(ConstructSetWatchAccess(theEnv,execStatus,DefruleData(theEnv)->DefruleConstruct,newState,argExprs,
                                     EnvGetDefruleWatchActivations,EnvSetDefruleWatchActivations));
    else
-     return(ConstructSetWatchAccess(theEnv,DefruleData(theEnv)->DefruleConstruct,newState,argExprs,
+     return(ConstructSetWatchAccess(theEnv,execStatus,DefruleData(theEnv)->DefruleConstruct,newState,argExprs,
                                     EnvGetDefruleWatchFirings,EnvSetDefruleWatchFirings));
   }
 
@@ -488,10 +488,10 @@ globle unsigned DefruleWatchPrint(
   struct expr *argExprs)
   {   
    if (code)
-     return(ConstructPrintWatchAccess(theEnv,DefruleData(theEnv)->DefruleConstruct,logName,argExprs,
+     return(ConstructPrintWatchAccess(theEnv,execStatus,DefruleData(theEnv)->DefruleConstruct,logName,argExprs,
                                       EnvGetDefruleWatchActivations,EnvSetDefruleWatchActivations));
    else
-     return(ConstructPrintWatchAccess(theEnv,DefruleData(theEnv)->DefruleConstruct,logName,argExprs,
+     return(ConstructPrintWatchAccess(theEnv,execStatus,DefruleData(theEnv)->DefruleConstruct,logName,argExprs,
                                       EnvGetDefruleWatchActivations,EnvSetDefruleWatchActivations));
   }
 

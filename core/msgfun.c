@@ -79,8 +79,8 @@ globle void UnboundHandlerErr(
   void *theEnv,
   EXEC_STATUS)
   {
-   EnvPrintRouter(theEnv,WERROR,"message-handler ");
-   PrintHandler(theEnv,WERROR,MessageHandlerData(theEnv)->CurrentCore->hnd,TRUE);
+   EnvPrintRouter(theEnv,execStatus,WERROR,"message-handler ");
+   PrintHandler(theEnv,execStatus,WERROR,MessageHandlerData(theEnv)->CurrentCore->hnd,TRUE);
   }
 
 /*****************************************************************
@@ -96,10 +96,10 @@ globle void PrintNoHandlerError(
   EXEC_STATUS,
   char *msg)
   {
-   PrintErrorID(theEnv,"MSGFUN",1,FALSE);
-   EnvPrintRouter(theEnv,WERROR,"No applicable primary message-handlers found for ");
-   EnvPrintRouter(theEnv,WERROR,msg);
-   EnvPrintRouter(theEnv,WERROR,".\n");
+   PrintErrorID(theEnv,execStatus,"MSGFUN",1,FALSE);
+   EnvPrintRouter(theEnv,execStatus,WERROR,"No applicable primary message-handlers found for ");
+   EnvPrintRouter(theEnv,execStatus,WERROR,msg);
+   EnvPrintRouter(theEnv,execStatus,WERROR,".\n");
   }
 
 /***************************************************************
@@ -122,21 +122,21 @@ globle int CheckHandlerArgCount(
    if ((hnd->maxParams == -1) ? (ProceduralPrimitiveData(theEnv)->ProcParamArraySize < hnd->minParams) :
        (ProceduralPrimitiveData(theEnv)->ProcParamArraySize != hnd->minParams))
      {
-      SetEvaluationError(theEnv,TRUE);
-      PrintErrorID(theEnv,"MSGFUN",2,FALSE);
-      EnvPrintRouter(theEnv,WERROR,"Message-handler ");
-      EnvPrintRouter(theEnv,WERROR,ValueToString(hnd->name));
-      EnvPrintRouter(theEnv,WERROR," ");
-      EnvPrintRouter(theEnv,WERROR,MessageHandlerData(theEnv)->hndquals[hnd->type]);
-      EnvPrintRouter(theEnv,WERROR," in class ");
-      EnvPrintRouter(theEnv,WERROR,EnvGetDefclassName(theEnv,(void *) hnd->cls));
-      EnvPrintRouter(theEnv,WERROR," expected ");
+      SetEvaluationError(theEnv,execStatus,TRUE);
+      PrintErrorID(theEnv,execStatus,"MSGFUN",2,FALSE);
+      EnvPrintRouter(theEnv,execStatus,WERROR,"Message-handler ");
+      EnvPrintRouter(theEnv,execStatus,WERROR,ValueToString(hnd->name));
+      EnvPrintRouter(theEnv,execStatus,WERROR," ");
+      EnvPrintRouter(theEnv,execStatus,WERROR,MessageHandlerData(theEnv)->hndquals[hnd->type]);
+      EnvPrintRouter(theEnv,execStatus,WERROR," in class ");
+      EnvPrintRouter(theEnv,execStatus,WERROR,EnvGetDefclassName(theEnv,execStatus,(void *) hnd->cls));
+      EnvPrintRouter(theEnv,execStatus,WERROR," expected ");
       if (hnd->maxParams == -1)
-        EnvPrintRouter(theEnv,WERROR,"at least ");
+        EnvPrintRouter(theEnv,execStatus,WERROR,"at least ");
       else
-        EnvPrintRouter(theEnv,WERROR,"exactly ");
-      PrintLongInteger(theEnv,WERROR,(long long) (hnd->minParams-1));
-      EnvPrintRouter(theEnv,WERROR," argument(s).\n");
+        EnvPrintRouter(theEnv,execStatus,WERROR,"exactly ");
+      PrintLongInteger(theEnv,execStatus,WERROR,(long long) (hnd->minParams-1));
+      EnvPrintRouter(theEnv,execStatus,WERROR," argument(s).\n");
       return(FALSE);
      }
    return(TRUE);
@@ -163,17 +163,17 @@ globle void SlotAccessViolationError(
   intBool instanceFlag,
   void *theInstanceOrClass)
   {
-   PrintErrorID(theEnv,"MSGFUN",3,FALSE);
-   EnvPrintRouter(theEnv,WERROR,slotName);
-   EnvPrintRouter(theEnv,WERROR," slot in ");
+   PrintErrorID(theEnv,execStatus,"MSGFUN",3,FALSE);
+   EnvPrintRouter(theEnv,execStatus,WERROR,slotName);
+   EnvPrintRouter(theEnv,execStatus,WERROR," slot in ");
    if (instanceFlag)
-     PrintInstanceNameAndClass(theEnv,WERROR,(INSTANCE_TYPE *) theInstanceOrClass,FALSE);
+     PrintInstanceNameAndClass(theEnv,execStatus,WERROR,(INSTANCE_TYPE *) theInstanceOrClass,FALSE);
    else
      {
-      EnvPrintRouter(theEnv,WERROR,"class ");
-      PrintClassName(theEnv,WERROR,(DEFCLASS *) theInstanceOrClass,FALSE);
+      EnvPrintRouter(theEnv,execStatus,WERROR,"class ");
+      PrintClassName(theEnv,execStatus,WERROR,(DEFCLASS *) theInstanceOrClass,FALSE);
      }
-   EnvPrintRouter(theEnv,WERROR,": write access denied.\n");
+   EnvPrintRouter(theEnv,execStatus,WERROR,": write access denied.\n");
   }
 
 /***************************************************
@@ -193,13 +193,13 @@ globle void SlotVisibilityViolationError(
   SLOT_DESC *sd,
   DEFCLASS *theDefclass)
   {
-   PrintErrorID(theEnv,"MSGFUN",6,FALSE);
-   EnvPrintRouter(theEnv,WERROR,"Private slot ");
-   EnvPrintRouter(theEnv,WERROR,ValueToString(sd->slotName->name));
-   EnvPrintRouter(theEnv,WERROR," of class ");
-   PrintClassName(theEnv,WERROR,sd->cls,FALSE);
-   EnvPrintRouter(theEnv,WERROR," cannot be accessed directly\n   by handlers attached to class ");
-   PrintClassName(theEnv,WERROR,theDefclass,TRUE);
+   PrintErrorID(theEnv,execStatus,"MSGFUN",6,FALSE);
+   EnvPrintRouter(theEnv,execStatus,WERROR,"Private slot ");
+   EnvPrintRouter(theEnv,execStatus,WERROR,ValueToString(sd->slotName->name));
+   EnvPrintRouter(theEnv,execStatus,WERROR," of class ");
+   PrintClassName(theEnv,execStatus,WERROR,sd->cls,FALSE);
+   EnvPrintRouter(theEnv,execStatus,WERROR," cannot be accessed directly\n   by handlers attached to class ");
+   PrintClassName(theEnv,execStatus,WERROR,theDefclass,TRUE);
   }
 
 #if ! RUN_TIME
@@ -236,16 +236,16 @@ globle void NewSystemHandler(
    DEFCLASS *cls;
    HANDLER *hnd;
 
-   cls = LookupDefclassInScope(theEnv,cname);
-   hnd = InsertHandlerHeader(theEnv,cls,(SYMBOL_HN *) EnvAddSymbol(theEnv,mname),MPRIMARY);
+   cls = LookupDefclassInScope(theEnv,execStatus,cname);
+   hnd = InsertHandlerHeader(theEnv,execStatus,cls,(SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,mname),MPRIMARY);
    IncrementSymbolCount(hnd->name);
    hnd->system = 1;
    hnd->minParams = hnd->maxParams = (short) (extraargs + 1);
    hnd->localVarCount = 0;
-   hnd->actions = get_struct(theEnv,expr);
+   hnd->actions = get_struct(theEnv,execStatus,expr);
    hnd->actions->argList = NULL;
    hnd->actions->type = FCALL;
-   hnd->actions->value = (void *) FindFunction(theEnv,fname);
+   hnd->actions->value = (void *) FindFunction(theEnv,execStatus,fname);
    hnd->actions->nextArg = NULL;
   }
 
@@ -277,8 +277,8 @@ globle HANDLER *InsertHandlerHeader(
 
    hnd = cls->handlers;
    arr = cls->handlerOrderMap;
-   nhnd = (HANDLER *) gm2(theEnv,(sizeof(HANDLER) * (cls->handlerCount+1)));
-   narr = (unsigned *) gm2(theEnv,(sizeof(unsigned) * (cls->handlerCount+1)));
+   nhnd = (HANDLER *) gm2(theEnv,execStatus,(sizeof(HANDLER) * (cls->handlerCount+1)));
+   narr = (unsigned *) gm2(theEnv,execStatus,(sizeof(unsigned) * (cls->handlerCount+1)));
    GenCopyMemory(HANDLER,cls->handlerCount,nhnd,hnd);
    for (i = 0 , j = 0 ; i < cls->handlerCount ; i++ , j++)
      {
@@ -313,8 +313,8 @@ globle HANDLER *InsertHandlerHeader(
    nhnd[cls->handlerCount].usrData = NULL;
    if (cls->handlerCount != 0)
      {
-      rm(theEnv,(void *) hnd,(sizeof(HANDLER) * cls->handlerCount));
-      rm(theEnv,(void *) arr,(sizeof(unsigned) * cls->handlerCount));
+      rm(theEnv,execStatus,(void *) hnd,(sizeof(HANDLER) * cls->handlerCount));
+      rm(theEnv,execStatus,(void *) arr,(sizeof(unsigned) * cls->handlerCount));
      }
    cls->handlers = nhnd;
    cls->handlerOrderMap = narr;
@@ -383,14 +383,14 @@ globle int DeleteHandler(
      {
       if (indicate_missing)
         {
-         HandlerDeleteError(theEnv,EnvGetDefclassName(theEnv,(void *) cls));
+         HandlerDeleteError(theEnv,execStatus,EnvGetDefclassName(theEnv,execStatus,(void *) cls));
          return(0);
         }
       return(1);
      }
    if (HandlersExecuting(cls))
      {
-      HandlerDeleteError(theEnv,EnvGetDefclassName(theEnv,(void *) cls));
+      HandlerDeleteError(theEnv,execStatus,EnvGetDefclassName(theEnv,execStatus,(void *) cls));
       return(0);
      }
    if (mtype == -1)
@@ -406,8 +406,8 @@ globle int DeleteHandler(
               hnd->mark = 1;
             else
               {
-               PrintErrorID(theEnv,"MSGPSR",3,FALSE);
-               EnvPrintRouter(theEnv,WERROR,"System message-handlers may not be modified.\n");
+               PrintErrorID(theEnv,execStatus,"MSGPSR",3,FALSE);
+               EnvPrintRouter(theEnv,execStatus,WERROR,"System message-handlers may not be modified.\n");
                success = 0;
               }
            }
@@ -434,7 +434,7 @@ globle int DeleteHandler(
          else
            {
             if (indicate_missing)
-              HandlerDeleteError(theEnv,EnvGetDefclassName(theEnv,(void *) cls));
+              HandlerDeleteError(theEnv,execStatus,EnvGetDefclassName(theEnv,execStatus,(void *) cls));
             success = 0;
            }
         }
@@ -444,13 +444,13 @@ globle int DeleteHandler(
         {
          if (indicate_missing)
            {
-            PrintErrorID(theEnv,"MSGPSR",3,FALSE);
-            EnvPrintRouter(theEnv,WERROR,"System message-handlers may not be modified.\n");
+            PrintErrorID(theEnv,execStatus,"MSGPSR",3,FALSE);
+            EnvPrintRouter(theEnv,execStatus,WERROR,"System message-handlers may not be modified.\n");
            }
          success = 0;
         }
      }
-   DeallocateMarkedHandlers(theEnv,cls);
+   DeallocateMarkedHandlers(theEnv,execStatus,cls);
    return(success);
   }
 
@@ -482,12 +482,12 @@ globle void DeallocateMarkedHandlers(
       if (hnd->mark == 1)
         {
          count++;
-         DecrementSymbolCount(theEnv,hnd->name);
-         ExpressionDeinstall(theEnv,hnd->actions);
-         ReturnPackedExpression(theEnv,hnd->actions);
-         ClearUserDataList(theEnv,hnd->usrData);
+         DecrementSymbolCount(theEnv,execStatus,hnd->name);
+         ExpressionDeinstall(theEnv,execStatus,hnd->actions);
+         ReturnPackedExpression(theEnv,execStatus,hnd->actions);
+         ClearUserDataList(theEnv,execStatus,hnd->usrData);
          if (hnd->ppForm != NULL)
-           rm(theEnv,(void *) hnd->ppForm,
+           rm(theEnv,execStatus,(void *) hnd->ppForm,
               (sizeof(char) * (strlen(hnd->ppForm)+1)));
         }
       else
@@ -501,8 +501,8 @@ globle void DeallocateMarkedHandlers(
      return;
    if (count == cls->handlerCount)
      {
-      rm(theEnv,(void *) cls->handlers,(sizeof(HANDLER) * cls->handlerCount));
-      rm(theEnv,(void *) cls->handlerOrderMap,(sizeof(unsigned) * cls->handlerCount));
+      rm(theEnv,execStatus,(void *) cls->handlers,(sizeof(HANDLER) * cls->handlerCount));
+      rm(theEnv,execStatus,(void *) cls->handlerOrderMap,(sizeof(unsigned) * cls->handlerCount));
       cls->handlers = NULL;
       cls->handlerOrderMap = NULL;
       cls->handlerCount = 0;
@@ -512,8 +512,8 @@ globle void DeallocateMarkedHandlers(
       count = (short) (cls->handlerCount - count);
       hnd = cls->handlers;
       arr = cls->handlerOrderMap;
-      nhnd = (HANDLER *) gm2(theEnv,(sizeof(HANDLER) * count));
-      narr = (unsigned *) gm2(theEnv,(sizeof(unsigned) * count));
+      nhnd = (HANDLER *) gm2(theEnv,execStatus,(sizeof(HANDLER) * count));
+      narr = (unsigned *) gm2(theEnv,execStatus,(sizeof(unsigned) * count));
       for (i = 0 , j = 0 ; j < count ; i++)
         {
          if (hnd[arr[i]].mark == 0)
@@ -536,8 +536,8 @@ globle void DeallocateMarkedHandlers(
             j++;
            }
         }
-      rm(theEnv,(void *) hnd,(sizeof(HANDLER) * cls->handlerCount));
-      rm(theEnv,(void *) arr,(sizeof(unsigned) * cls->handlerCount));
+      rm(theEnv,execStatus,(void *) hnd,(sizeof(HANDLER) * cls->handlerCount));
+      rm(theEnv,execStatus,(void *) arr,(sizeof(unsigned) * cls->handlerCount));
       cls->handlers = nhnd;
       cls->handlerOrderMap = narr;
       cls->handlerCount = count;
@@ -573,10 +573,10 @@ globle unsigned HandlerType(
         return(i);
        }
 
-   PrintErrorID(theEnv,"MSGFUN",7,FALSE);
-   EnvPrintRouter(theEnv,"werror","Unrecognized message-handler type in ");
-   EnvPrintRouter(theEnv,"werror",func);
-   EnvPrintRouter(theEnv,"werror",".\n");
+   PrintErrorID(theEnv,execStatus,"MSGFUN",7,FALSE);
+   EnvPrintRouter(theEnv,execStatus,"werror","Unrecognized message-handler type in ");
+   EnvPrintRouter(theEnv,execStatus,"werror",func);
+   EnvPrintRouter(theEnv,execStatus,"werror",".\n");
    return(MERROR);
   }
 
@@ -602,26 +602,26 @@ globle int CheckCurrentMessage(
 
    if (!MessageHandlerData(theEnv)->CurrentCore || (MessageHandlerData(theEnv)->CurrentCore->hnd->actions != ProceduralPrimitiveData(theEnv)->CurrentProcActions))
      {
-      PrintErrorID(theEnv,"MSGFUN",4,FALSE);
-      EnvPrintRouter(theEnv,WERROR,func);
-      EnvPrintRouter(theEnv,WERROR," may only be called from within message-handlers.\n");
-      SetEvaluationError(theEnv,TRUE);
+      PrintErrorID(theEnv,execStatus,"MSGFUN",4,FALSE);
+      EnvPrintRouter(theEnv,execStatus,WERROR,func);
+      EnvPrintRouter(theEnv,execStatus,WERROR," may only be called from within message-handlers.\n");
+      SetEvaluationError(theEnv,execStatus,TRUE);
       return(FALSE);
      }
-   activeMsgArg = GetNthMessageArgument(theEnv,0);
+   activeMsgArg = GetNthMessageArgument(theEnv,execStatus,0);
    if ((ins_reqd == TRUE) ? (activeMsgArg->type != INSTANCE_ADDRESS) : FALSE)
      {
-      PrintErrorID(theEnv,"MSGFUN",5,FALSE);
-      EnvPrintRouter(theEnv,WERROR,func);
-      EnvPrintRouter(theEnv,WERROR," operates only on instances.\n");
-      SetEvaluationError(theEnv,TRUE);
+      PrintErrorID(theEnv,execStatus,"MSGFUN",5,FALSE);
+      EnvPrintRouter(theEnv,execStatus,WERROR,func);
+      EnvPrintRouter(theEnv,execStatus,WERROR," operates only on instances.\n");
+      SetEvaluationError(theEnv,execStatus,TRUE);
       return(FALSE);
      }
    if ((activeMsgArg->type == INSTANCE_ADDRESS) ?
        (((INSTANCE_TYPE *) activeMsgArg->value)->garbage == 1) : FALSE)
      {
-      StaleInstanceAddress(theEnv,func,0);
-      SetEvaluationError(theEnv,TRUE);
+      StaleInstanceAddress(theEnv,execStatus,func,0);
+      SetEvaluationError(theEnv,execStatus,TRUE);
       return(FALSE);
      }
    return(TRUE);
@@ -645,11 +645,11 @@ globle void PrintHandler(
   HANDLER *theHandler,
   int crtn)
   {
-   EnvPrintRouter(theEnv,logName,ValueToString(theHandler->name));
-   EnvPrintRouter(theEnv,logName," ");
-   EnvPrintRouter(theEnv,logName,MessageHandlerData(theEnv)->hndquals[theHandler->type]);
-   EnvPrintRouter(theEnv,logName," in class ");
-   PrintClassName(theEnv,logName,theHandler->cls,crtn);
+   EnvPrintRouter(theEnv,execStatus,logName,ValueToString(theHandler->name));
+   EnvPrintRouter(theEnv,execStatus,logName," ");
+   EnvPrintRouter(theEnv,execStatus,logName,MessageHandlerData(theEnv)->hndquals[theHandler->type]);
+   EnvPrintRouter(theEnv,execStatus,logName," in class ");
+   PrintClassName(theEnv,execStatus,logName,theHandler->cls,crtn);
   }
 
 /***********************************************************
@@ -802,10 +802,10 @@ globle void HandlerDeleteError(
   EXEC_STATUS,
   char *cname)
   {
-   PrintErrorID(theEnv,"MSGFUN",8,FALSE);
-   EnvPrintRouter(theEnv,WERROR,"Unable to delete message-handler(s) from class ");
-   EnvPrintRouter(theEnv,WERROR,cname);
-   EnvPrintRouter(theEnv,WERROR,".\n");
+   PrintErrorID(theEnv,execStatus,"MSGFUN",8,FALSE);
+   EnvPrintRouter(theEnv,execStatus,WERROR,"Unable to delete message-handler(s) from class ");
+   EnvPrintRouter(theEnv,execStatus,WERROR,cname);
+   EnvPrintRouter(theEnv,execStatus,WERROR,".\n");
   }
 
 #if DEBUGGING_FUNCTIONS
@@ -838,27 +838,27 @@ globle void DisplayCore(
   {
    if (core->hnd->type == MAROUND)
      {
-      PrintPreviewHandler(theEnv,logicalName,core,sdepth,BEGIN_TRACE);
+      PrintPreviewHandler(theEnv,execStatus,logicalName,core,sdepth,BEGIN_TRACE);
       if (core->nxt != NULL)
-        DisplayCore(theEnv,logicalName,core->nxt,sdepth+1);
-      PrintPreviewHandler(theEnv,logicalName,core,sdepth,END_TRACE);
+        DisplayCore(theEnv,execStatus,logicalName,core->nxt,sdepth+1);
+      PrintPreviewHandler(theEnv,execStatus,logicalName,core,sdepth,END_TRACE);
      }
    else
      {
       while ((core != NULL) ? (core->hnd->type == MBEFORE) : FALSE)
         {
-         PrintPreviewHandler(theEnv,logicalName,core,sdepth,BEGIN_TRACE);
-         PrintPreviewHandler(theEnv,logicalName,core,sdepth,END_TRACE);
+         PrintPreviewHandler(theEnv,execStatus,logicalName,core,sdepth,BEGIN_TRACE);
+         PrintPreviewHandler(theEnv,execStatus,logicalName,core,sdepth,END_TRACE);
          core = core->nxt;
         }
       if ((core != NULL) ? (core->hnd->type == MPRIMARY) : FALSE)
 
-        core = DisplayPrimaryCore(theEnv,logicalName,core,sdepth);
+        core = DisplayPrimaryCore(theEnv,execStatus,logicalName,core,sdepth);
 
       while ((core != NULL) ? (core->hnd->type == MAFTER) : FALSE)
         {
-         PrintPreviewHandler(theEnv,logicalName,core,sdepth,BEGIN_TRACE);
-         PrintPreviewHandler(theEnv,logicalName,core,sdepth,END_TRACE);
+         PrintPreviewHandler(theEnv,execStatus,logicalName,core,sdepth,BEGIN_TRACE);
+         PrintPreviewHandler(theEnv,execStatus,logicalName,core,sdepth,END_TRACE);
          core = core->nxt;
         }
 
@@ -889,8 +889,8 @@ globle HANDLER_LINK *FindPreviewApplicableHandlers(
      tops[i] = bots[i] = NULL;
 
    for (i = 0 ; i < cls->allSuperclasses.classCount ; i++)
-     FindApplicableOfName(theEnv,cls->allSuperclasses.classArray[i],tops,bots,mname);
-   return(JoinHandlerLinks(theEnv,tops,bots,mname));
+     FindApplicableOfName(theEnv,execStatus,cls->allSuperclasses.classArray[i],tops,bots,mname);
+   return(JoinHandlerLinks(theEnv,execStatus,tops,bots,mname));
   }
 
 /***********************************************************
@@ -910,13 +910,13 @@ globle void WatchMessage(
   char *logName,
   char *tstring)
   {
-   EnvPrintRouter(theEnv,logName,"MSG ");
-   EnvPrintRouter(theEnv,logName,tstring);
-   EnvPrintRouter(theEnv,logName," ");
-   EnvPrintRouter(theEnv,logName,ValueToString(MessageHandlerData(theEnv)->CurrentMessageName));
-   EnvPrintRouter(theEnv,logName," ED:");
-   PrintLongInteger(theEnv,logName,(long long) execStatus->CurrentEvaluationDepth);
-   PrintProcParamArray(theEnv,logName);
+   EnvPrintRouter(theEnv,execStatus,logName,"MSG ");
+   EnvPrintRouter(theEnv,execStatus,logName,tstring);
+   EnvPrintRouter(theEnv,execStatus,logName," ");
+   EnvPrintRouter(theEnv,execStatus,logName,ValueToString(MessageHandlerData(theEnv)->CurrentMessageName));
+   EnvPrintRouter(theEnv,execStatus,logName," ED:");
+   PrintLongInteger(theEnv,execStatus,logName,(long long) execStatus->CurrentEvaluationDepth);
+   PrintProcParamArray(theEnv,execStatus,logName);
   }
 
 /***********************************************************
@@ -940,14 +940,14 @@ globle void WatchHandler(
   {
    HANDLER *hnd;
    
-   EnvPrintRouter(theEnv,logName,"HND ");
-   EnvPrintRouter(theEnv,logName,tstring);
-   EnvPrintRouter(theEnv,logName," ");
+   EnvPrintRouter(theEnv,execStatus,logName,"HND ");
+   EnvPrintRouter(theEnv,execStatus,logName,tstring);
+   EnvPrintRouter(theEnv,execStatus,logName," ");
    hnd = hndl->hnd;
-   PrintHandler(theEnv,WTRACE,hnd,TRUE);
-   EnvPrintRouter(theEnv,logName,"       ED:");
-   PrintLongInteger(theEnv,logName,(long long) execStatus->CurrentEvaluationDepth);
-   PrintProcParamArray(theEnv,logName);
+   PrintHandler(theEnv,execStatus,WTRACE,hnd,TRUE);
+   EnvPrintRouter(theEnv,execStatus,logName,"       ED:");
+   PrintLongInteger(theEnv,execStatus,logName,(long long) execStatus->CurrentEvaluationDepth);
+   PrintProcParamArray(theEnv,execStatus,logName);
   }
 
 #endif /* DEBUGGING_FUNCTIONS */
@@ -988,12 +988,12 @@ static HANDLER_LINK *DisplayPrimaryCore(
   {
    register HANDLER_LINK *rtn;
 
-   PrintPreviewHandler(theEnv,logicalName,core,pdepth,BEGIN_TRACE);
+   PrintPreviewHandler(theEnv,execStatus,logicalName,core,pdepth,BEGIN_TRACE);
    if ((core->nxt != NULL) ? (core->nxt->hnd->type == MPRIMARY) : FALSE)
-     rtn = DisplayPrimaryCore(theEnv,logicalName,core->nxt,pdepth+1);
+     rtn = DisplayPrimaryCore(theEnv,execStatus,logicalName,core->nxt,pdepth+1);
    else
      rtn = core->nxt;
-   PrintPreviewHandler(theEnv,logicalName,core,pdepth,END_TRACE);
+   PrintPreviewHandler(theEnv,execStatus,logicalName,core,pdepth,END_TRACE);
    return(rtn);
   }
 
@@ -1019,10 +1019,10 @@ static void PrintPreviewHandler(
    register int i;
 
    for (i = 0 ; i < sdepth ; i++)
-     EnvPrintRouter(theEnv,logicalName,"| ");
-   EnvPrintRouter(theEnv,logicalName,tstr);
-   EnvPrintRouter(theEnv,logicalName," ");
-   PrintHandler(theEnv,logicalName,cptr->hnd,TRUE);
+     EnvPrintRouter(theEnv,execStatus,logicalName,"| ");
+   EnvPrintRouter(theEnv,execStatus,logicalName,tstr);
+   EnvPrintRouter(theEnv,execStatus,logicalName," ");
+   PrintHandler(theEnv,execStatus,logicalName,cptr->hnd,TRUE);
   }
 
 #endif

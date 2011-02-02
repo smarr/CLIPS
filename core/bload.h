@@ -57,7 +57,7 @@ struct bloadData
    struct callFunctionItem *AbortBloadFunctions;
   };
 
-#define BloadData(theEnv) ((struct bloadData *) GetEnvironmentData(theEnv,BLOAD_DATA))
+#define BloadData(theEnv) ((struct bloadData *) GetEnvironmentData(theEnv,execStatus,BLOAD_DATA))
 
 #ifdef LOCALE
 #undef LOCALE

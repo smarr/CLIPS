@@ -59,9 +59,9 @@ globle void InitializeStringRouter(
   void *theEnv,
   EXEC_STATUS)
   {
-   AllocateEnvironmentData(theEnv,STRING_ROUTER_DATA,sizeof(struct stringRouterData),DeallocateStringRouterData);
+   AllocateEnvironmentData(theEnv,execStatus,STRING_ROUTER_DATA,sizeof(struct stringRouterData),DeallocateStringRouterData);
 
-   EnvAddRouter(theEnv,"string",0,FindString,PrintString,GetcString,UngetcString,NULL);
+   EnvAddRouter(theEnv,execStatus,"string",0,FindString,PrintString,GetcString,UngetcString,NULL);
   }
   
 /*******************************************/
@@ -78,8 +78,8 @@ static void DeallocateStringRouterData(
    while (tmpPtr != NULL)
      {
       nextPtr = tmpPtr->next;
-      rm(theEnv,tmpPtr->name,strlen(tmpPtr->name) + 1);
-      rtn_struct(theEnv,stringRouter,tmpPtr);
+      rm(theEnv,execStatus,tmpPtr->name,strlen(tmpPtr->name) + 1);
+      rtn_struct(theEnv,execStatus,stringRouter,tmpPtr);
       tmpPtr = nextPtr;
      }
   }
@@ -116,11 +116,11 @@ static int PrintString(
   {
    struct stringRouter *head;
 
-   head = FindStringRouter(theEnv,logicalName);
+   head = FindStringRouter(theEnv,execStatus,logicalName);
    if (head == NULL)
      {
-      SystemError(theEnv,"ROUTER",3);
-      EnvExitRouter(theEnv,EXIT_FAILURE);
+      SystemError(theEnv,execStatus,"ROUTER",3);
+      EnvExitRouter(theEnv,execStatus,EXIT_FAILURE);
      }
 
    if (head->readWriteType != WRITE_STRING) return(1);
@@ -148,11 +148,11 @@ static int GetcString(
    struct stringRouter *head;
    int rc;
 
-   head = FindStringRouter(theEnv,logicalName);
+   head = FindStringRouter(theEnv,execStatus,logicalName);
    if (head == NULL)
      {
-      SystemError(theEnv,"ROUTER",1);
-      EnvExitRouter(theEnv,EXIT_FAILURE);
+      SystemError(theEnv,execStatus,"ROUTER",1);
+      EnvExitRouter(theEnv,execStatus,EXIT_FAILURE);
      }
 
    if (head->readWriteType != READ_STRING) return(EOF);
@@ -185,12 +185,12 @@ static int UngetcString(
 #pragma unused(ch)
 #endif
 
-   head = FindStringRouter(theEnv,logicalName);
+   head = FindStringRouter(theEnv,execStatus,logicalName);
 
    if (head == NULL)
      {
-      SystemError(theEnv,"ROUTER",2);
-      EnvExitRouter(theEnv,EXIT_FAILURE);
+      SystemError(theEnv,execStatus,"ROUTER",2);
+      EnvExitRouter(theEnv,execStatus,EXIT_FAILURE);
      }
 
    if (head->readWriteType != READ_STRING) return(0);
@@ -220,7 +220,7 @@ globle int OpenStringSource(
    else
      { maximumPosition = strlen(str); }
 
-   return(CreateReadStringSource(theEnv,name,str,currentPosition,maximumPosition));
+   return(CreateReadStringSource(theEnv,execStatus,name,str,currentPosition,maximumPosition));
   }
 
 /******************************************************/
@@ -241,7 +241,7 @@ globle int OpenTextSource(
       maximumPosition = 0;
      }
 
-   return(CreateReadStringSource(theEnv,name,str,currentPosition,maximumPosition));
+   return(CreateReadStringSource(theEnv,execStatus,name,str,currentPosition,maximumPosition));
   }
 
 /******************************************************************/
@@ -257,10 +257,10 @@ static int CreateReadStringSource(
   {
    struct stringRouter *newStringRouter;
 
-   if (FindStringRouter(theEnv,name) != NULL) return(0);
+   if (FindStringRouter(theEnv,execStatus,name) != NULL) return(0);
 
-   newStringRouter = get_struct(theEnv,stringRouter);
-   newStringRouter->name = (char *) gm1(theEnv,strlen(name) + 1);
+   newStringRouter = get_struct(theEnv,execStatus,stringRouter);
+   newStringRouter->name = (char *) gm1(theEnv,execStatus,strlen(name) + 1);
    genstrcpy(newStringRouter->name,name);
    newStringRouter->str = str;
    newStringRouter->currentPosition = currentPosition;
@@ -291,15 +291,15 @@ globle int CloseStringSource(
          if (last == NULL)
            {
             StringRouterData(theEnv)->ListOfStringRouters = head->next;
-            rm(theEnv,head->name,strlen(head->name) + 1);
-            rtn_struct(theEnv,stringRouter,head);
+            rm(theEnv,execStatus,head->name,strlen(head->name) + 1);
+            rtn_struct(theEnv,execStatus,stringRouter,head);
             return(1);
            }
          else
            {
             last->next = head->next;
-            rm(theEnv,head->name,strlen(head->name) + 1);
-            rtn_struct(theEnv,stringRouter,head);
+            rm(theEnv,execStatus,head->name,strlen(head->name) + 1);
+            rtn_struct(theEnv,execStatus,stringRouter,head);
             return(1);
            }
         }
@@ -322,10 +322,10 @@ globle int OpenStringDestination(
   {
    struct stringRouter *newStringRouter;
 
-   if (FindStringRouter(theEnv,name) != NULL) return(0);
+   if (FindStringRouter(theEnv,execStatus,name) != NULL) return(0);
 
-   newStringRouter = get_struct(theEnv,stringRouter);
-   newStringRouter->name = (char *) gm1(theEnv,(int) strlen(name) + 1);
+   newStringRouter = get_struct(theEnv,execStatus,stringRouter);
+   newStringRouter->name = (char *) gm1(theEnv,execStatus,(int) strlen(name) + 1);
    genstrcpy(newStringRouter->name,name);
    newStringRouter->str = str;
    newStringRouter->currentPosition = 0;
@@ -345,7 +345,7 @@ globle int CloseStringDestination(
   EXEC_STATUS,
   char *name)
   {
-   return(CloseStringSource(theEnv,name));
+   return(CloseStringSource(theEnv,execStatus,name));
   }
 
 /*******************************************************************/

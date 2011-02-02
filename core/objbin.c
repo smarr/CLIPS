@@ -206,18 +206,18 @@ globle void SetupObjectsBload(
   void *theEnv,
   EXEC_STATUS)
   {
-   AllocateEnvironmentData(theEnv,OBJECTBIN_DATA,sizeof(struct objectBinaryData),DeallocateObjectBinaryData);
+   AllocateEnvironmentData(theEnv,execStatus,OBJECTBIN_DATA,sizeof(struct objectBinaryData),DeallocateObjectBinaryData);
    
-   AddAbortBloadFunction(theEnv,"defclass",CreateSystemClasses,0);
+   AddAbortBloadFunction(theEnv,execStatus,"defclass",CreateSystemClasses,0);
 
 #if BLOAD_AND_BSAVE
-   AddBinaryItem(theEnv,"defclass",0,BsaveObjectsFind,BsaveObjectsExpressions,
+   AddBinaryItem(theEnv,execStatus,"defclass",0,BsaveObjectsFind,BsaveObjectsExpressions,
                              BsaveStorageObjects,BsaveObjects,
                              BloadStorageObjects,BloadObjects,
                              ClearBloadObjects);
 #endif
 #if BLOAD || BLOAD_ONLY
-   AddBinaryItem(theEnv,"defclass",0,NULL,NULL,NULL,NULL,
+   AddBinaryItem(theEnv,execStatus,"defclass",0,NULL,NULL,NULL,NULL,
                              BloadStorageObjects,BloadObjects,
                              ClearBloadObjects);
 #endif
@@ -238,42 +238,42 @@ static void DeallocateObjectBinaryData(
 #if (BLOAD || BLOAD_ONLY || BLOAD_AND_BSAVE) && (! RUN_TIME)
    
    space = (sizeof(DEFCLASS_MODULE) * ObjectBinaryData(theEnv)->ModuleCount);
-   if (space != 0) genfree(theEnv,(void *) ObjectBinaryData(theEnv)->ModuleArray,space); 
+   if (space != 0) genfree(theEnv,execStatus,(void *) ObjectBinaryData(theEnv)->ModuleArray,space); 
 
    if (ObjectBinaryData(theEnv)->ClassCount != 0)
      { 
       if (DefclassData(theEnv)->ClassIDMap != NULL)
-        { rm(theEnv,(void *) DefclassData(theEnv)->ClassIDMap,(sizeof(DEFCLASS *) * DefclassData(theEnv)->AvailClassID)); }
+        { rm(theEnv,execStatus,(void *) DefclassData(theEnv)->ClassIDMap,(sizeof(DEFCLASS *) * DefclassData(theEnv)->AvailClassID)); }
 
       for (i = 0L ; i < ObjectBinaryData(theEnv)->SlotCount ; i++)
         {
          if ((ObjectBinaryData(theEnv)->SlotArray[i].defaultValue != NULL) && (ObjectBinaryData(theEnv)->SlotArray[i].dynamicDefault == 0))
-           { rtn_struct(theEnv,dataObject,ObjectBinaryData(theEnv)->SlotArray[i].defaultValue); }
+           { rtn_struct(theEnv,execStatus,dataObject,ObjectBinaryData(theEnv)->SlotArray[i].defaultValue); }
         }
 
       space = (sizeof(DEFCLASS) * ObjectBinaryData(theEnv)->ClassCount);
       if (space != 0L)
-        { genfree(theEnv,(void *) ObjectBinaryData(theEnv)->DefclassArray,space); }
+        { genfree(theEnv,execStatus,(void *) ObjectBinaryData(theEnv)->DefclassArray,space); }
 
       space = (sizeof(DEFCLASS *) * ObjectBinaryData(theEnv)->LinkCount);
       if (space != 0L)
-        { genfree(theEnv,(void *) ObjectBinaryData(theEnv)->LinkArray,space); }
+        { genfree(theEnv,execStatus,(void *) ObjectBinaryData(theEnv)->LinkArray,space); }
 
       space = (sizeof(SLOT_DESC) * ObjectBinaryData(theEnv)->SlotCount);
       if (space != 0L)
-        { genfree(theEnv,(void *) ObjectBinaryData(theEnv)->SlotArray,space); }
+        { genfree(theEnv,execStatus,(void *) ObjectBinaryData(theEnv)->SlotArray,space); }
 
       space = (sizeof(SLOT_NAME) * ObjectBinaryData(theEnv)->SlotNameCount);
       if (space != 0L)
-        { genfree(theEnv,(void *) ObjectBinaryData(theEnv)->SlotNameArray,space); }
+        { genfree(theEnv,execStatus,(void *) ObjectBinaryData(theEnv)->SlotNameArray,space); }
 
       space = (sizeof(SLOT_DESC *) * ObjectBinaryData(theEnv)->TemplateSlotCount);
       if (space != 0L)
-        { genfree(theEnv,(void *) ObjectBinaryData(theEnv)->TmpslotArray,space); }
+        { genfree(theEnv,execStatus,(void *) ObjectBinaryData(theEnv)->TmpslotArray,space); }
 
       space = (sizeof(unsigned) * ObjectBinaryData(theEnv)->SlotNameMapCount);
       if (space != 0L)
-        { genfree(theEnv,(void *) ObjectBinaryData(theEnv)->MapslotArray,space); }
+        { genfree(theEnv,execStatus,(void *) ObjectBinaryData(theEnv)->MapslotArray,space); }
      }
 
    if (ObjectBinaryData(theEnv)->HandlerCount != 0L)
@@ -281,9 +281,9 @@ static void DeallocateObjectBinaryData(
       space = (sizeof(HANDLER) * ObjectBinaryData(theEnv)->HandlerCount);
       if (space != 0L)
         {
-         genfree(theEnv,(void *) ObjectBinaryData(theEnv)->HandlerArray,space);
+         genfree(theEnv,execStatus,(void *) ObjectBinaryData(theEnv)->HandlerArray,space);
          space = (sizeof(unsigned) * ObjectBinaryData(theEnv)->HandlerCount);
-         genfree(theEnv,(void *) ObjectBinaryData(theEnv)->MaphandlerArray,space);
+         genfree(theEnv,execStatus,(void *) ObjectBinaryData(theEnv)->MaphandlerArray,space);
         }
      }
 #endif
@@ -338,14 +338,14 @@ static void BsaveObjectsFind(
    /* ========================================================
       The counts need to be saved in case a bload is in effect
       ======================================================== */
-      SaveBloadCount(theEnv,ObjectBinaryData(theEnv)->ModuleCount);
-      SaveBloadCount(theEnv,ObjectBinaryData(theEnv)->ClassCount);
-      SaveBloadCount(theEnv,ObjectBinaryData(theEnv)->LinkCount);
-      SaveBloadCount(theEnv,ObjectBinaryData(theEnv)->SlotNameCount);
-      SaveBloadCount(theEnv,ObjectBinaryData(theEnv)->SlotCount);
-      SaveBloadCount(theEnv,ObjectBinaryData(theEnv)->TemplateSlotCount);
-      SaveBloadCount(theEnv,ObjectBinaryData(theEnv)->SlotNameMapCount);
-      SaveBloadCount(theEnv,ObjectBinaryData(theEnv)->HandlerCount);
+      SaveBloadCount(theEnv,execStatus,ObjectBinaryData(theEnv)->ModuleCount);
+      SaveBloadCount(theEnv,execStatus,ObjectBinaryData(theEnv)->ClassCount);
+      SaveBloadCount(theEnv,execStatus,ObjectBinaryData(theEnv)->LinkCount);
+      SaveBloadCount(theEnv,execStatus,ObjectBinaryData(theEnv)->SlotNameCount);
+      SaveBloadCount(theEnv,execStatus,ObjectBinaryData(theEnv)->SlotCount);
+      SaveBloadCount(theEnv,execStatus,ObjectBinaryData(theEnv)->TemplateSlotCount);
+      SaveBloadCount(theEnv,execStatus,ObjectBinaryData(theEnv)->SlotNameMapCount);
+      SaveBloadCount(theEnv,execStatus,ObjectBinaryData(theEnv)->HandlerCount);
 
    ObjectBinaryData(theEnv)->ModuleCount= 0L;
    ObjectBinaryData(theEnv)->ClassCount = 0L;
@@ -360,7 +360,7 @@ static void BsaveObjectsFind(
       Mark items needed by defclasses in all modules
       ============================================== */
    ObjectBinaryData(theEnv)->ModuleCount = 
-      DoForAllConstructs(theEnv,MarkDefclassItems,DefclassData(theEnv)->DefclassModuleIndex,
+      DoForAllConstructs(theEnv,execStatus,MarkDefclassItems,DefclassData(theEnv)->DefclassModuleIndex,
                                     FALSE,NULL);
 
    /* =============================================
@@ -426,7 +426,7 @@ static void MarkDefclassItems(
            {
             ExpressionData(theEnv)->ExpressionCount +=
               ExpressionSize((EXPRESSION *) cls->slots[i].defaultValue);
-            MarkNeededItems(theEnv,(EXPRESSION *) cls->slots[i].defaultValue);
+            MarkNeededItems(theEnv,execStatus,(EXPRESSION *) cls->slots[i].defaultValue);
            }
          else
            {
@@ -435,10 +435,10 @@ static void MarkDefclassItems(
                and must be converted into expressions
                ================================================= */
             tmpexp =
-              ConvertValueToExpression(theEnv,(DATA_OBJECT *) cls->slots[i].defaultValue);
+              ConvertValueToExpression(theEnv,execStatus,(DATA_OBJECT *) cls->slots[i].defaultValue);
             ExpressionData(theEnv)->ExpressionCount += ExpressionSize(tmpexp);
-            MarkNeededItems(theEnv,tmpexp);
-            ReturnExpression(theEnv,tmpexp);
+            MarkNeededItems(theEnv,execStatus,tmpexp);
+            ReturnExpression(theEnv,execStatus,tmpexp);
            }
         }
      }
@@ -457,7 +457,7 @@ static void MarkDefclassItems(
      {
       cls->handlers[i].name->neededSymbol = TRUE;
       ExpressionData(theEnv)->ExpressionCount += ExpressionSize(cls->handlers[i].actions);
-      MarkNeededItems(theEnv,cls->handlers[i].actions);
+      MarkNeededItems(theEnv,execStatus,cls->handlers[i].actions);
      }
    ObjectBinaryData(theEnv)->HandlerCount += (long) cls->handlerCount;
   }
@@ -482,13 +482,13 @@ static void BsaveObjectsExpressions(
    /* ================================================
       Save the defclass slot default value expressions
       ================================================ */
-   DoForAllConstructs(theEnv,BsaveDefaultSlotExpressions,DefclassData(theEnv)->DefclassModuleIndex,
+   DoForAllConstructs(theEnv,execStatus,BsaveDefaultSlotExpressions,DefclassData(theEnv)->DefclassModuleIndex,
                       FALSE,(void *) fp);
 
    /* ==============================================
       Save the defmessage-handler action expressions
       ============================================== */
-   DoForAllConstructs(theEnv,BsaveHandlerActionExpressions,DefclassData(theEnv)->DefclassModuleIndex,
+   DoForAllConstructs(theEnv,execStatus,BsaveHandlerActionExpressions,DefclassData(theEnv)->DefclassModuleIndex,
                       FALSE,(void *) fp);
   }
 
@@ -517,7 +517,7 @@ static void BsaveDefaultSlotExpressions(
       if (cls->slots[i].defaultValue != NULL)
         {
          if (cls->slots[i].dynamicDefault)
-           BsaveExpression(theEnv,(EXPRESSION *) cls->slots[i].defaultValue,(FILE *) buf);
+           BsaveExpression(theEnv,execStatus,(EXPRESSION *) cls->slots[i].defaultValue,(FILE *) buf);
          else
            {
             /* =================================================
@@ -525,9 +525,9 @@ static void BsaveDefaultSlotExpressions(
                and must be converted into expressions
                ================================================= */
             tmpexp =
-              ConvertValueToExpression(theEnv,(DATA_OBJECT *) cls->slots[i].defaultValue);
-            BsaveExpression(theEnv,tmpexp,(FILE *) buf);
-            ReturnExpression(theEnv,tmpexp);
+              ConvertValueToExpression(theEnv,execStatus,(DATA_OBJECT *) cls->slots[i].defaultValue);
+            BsaveExpression(theEnv,execStatus,tmpexp,(FILE *) buf);
+            ReturnExpression(theEnv,execStatus,tmpexp);
            }
         }
      }
@@ -553,7 +553,7 @@ static void BsaveHandlerActionExpressions(
    long i;
 
    for (i = 0 ; i < cls->handlerCount ; i++)
-     BsaveExpression(theEnv,cls->handlers[i].actions,(FILE *) buf);
+     BsaveExpression(theEnv,execStatus,cls->handlers[i].actions,(FILE *) buf);
   }
 
 /*************************************************************************************
@@ -651,26 +651,26 @@ static void BsaveObjects(
    /* =================================
       Write out each defclass module
       ================================= */
-   theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,NULL);
+   theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,NULL);
    while (theModule != NULL)
      {
       theModuleItem = (DEFCLASS_MODULE *)
-                      GetModuleItem(theEnv,theModule,FindModuleItem(theEnv,"defclass")->moduleIndex);
+                      GetModuleItem(theEnv,execStatus,theModule,FindModuleItem(theEnv,execStatus,"defclass")->moduleIndex);
       AssignBsaveDefmdlItemHdrVals(&dummy_mitem.header,&theModuleItem->header);
       GenWrite((void *) &dummy_mitem,sizeof(BSAVE_DEFCLASS_MODULE),fp);
-      theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,(void *) theModule);
+      theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,(void *) theModule);
      }
 
    /* =====================
       Write out the classes
       ===================== */
-   DoForAllConstructs(theEnv,BsaveDefclass,DefclassData(theEnv)->DefclassModuleIndex,FALSE,(void *) fp);
+   DoForAllConstructs(theEnv,execStatus,BsaveDefclass,DefclassData(theEnv)->DefclassModuleIndex,FALSE,(void *) fp);
 
    /* =========================
       Write out the class links
       ========================= */
    ObjectBinaryData(theEnv)->LinkCount = 0L;
-   DoForAllConstructs(theEnv,BsaveClassLinks,DefclassData(theEnv)->DefclassModuleIndex,FALSE,(void *) fp);
+   DoForAllConstructs(theEnv,execStatus,BsaveClassLinks,DefclassData(theEnv)->DefclassModuleIndex,FALSE,(void *) fp);
 
    /* ===============================
       Write out the slot name entries
@@ -691,36 +691,36 @@ static void BsaveObjects(
    /* ===================
       Write out the slots
       =================== */
-   DoForAllConstructs(theEnv,BsaveSlots,DefclassData(theEnv)->DefclassModuleIndex,FALSE,(void *) fp);
+   DoForAllConstructs(theEnv,execStatus,BsaveSlots,DefclassData(theEnv)->DefclassModuleIndex,FALSE,(void *) fp);
 
    /* =====================================
       Write out the template instance slots
       ===================================== */
-   DoForAllConstructs(theEnv,BsaveTemplateSlots,DefclassData(theEnv)->DefclassModuleIndex,FALSE,(void *) fp);
+   DoForAllConstructs(theEnv,execStatus,BsaveTemplateSlots,DefclassData(theEnv)->DefclassModuleIndex,FALSE,(void *) fp);
 
    /* =============================================
       Write out the ordered instance slot name maps
       ============================================= */
-   DoForAllConstructs(theEnv,BsaveSlotMap,DefclassData(theEnv)->DefclassModuleIndex,FALSE,(void *) fp);
+   DoForAllConstructs(theEnv,execStatus,BsaveSlotMap,DefclassData(theEnv)->DefclassModuleIndex,FALSE,(void *) fp);
 
    /* ==============================
       Write out the message-handlers
       ============================== */
-   DoForAllConstructs(theEnv,BsaveHandlers,DefclassData(theEnv)->DefclassModuleIndex,FALSE,(void *) fp);
+   DoForAllConstructs(theEnv,execStatus,BsaveHandlers,DefclassData(theEnv)->DefclassModuleIndex,FALSE,(void *) fp);
 
    /* ==========================================
       Write out the ordered message-handler maps
       ========================================== */
-   DoForAllConstructs(theEnv,BsaveHandlerMap,DefclassData(theEnv)->DefclassModuleIndex,FALSE,(void *) fp);
+   DoForAllConstructs(theEnv,execStatus,BsaveHandlerMap,DefclassData(theEnv)->DefclassModuleIndex,FALSE,(void *) fp);
 
-      RestoreBloadCount(theEnv,&ObjectBinaryData(theEnv)->ModuleCount);
-      RestoreBloadCount(theEnv,&ObjectBinaryData(theEnv)->ClassCount);
-      RestoreBloadCount(theEnv,&ObjectBinaryData(theEnv)->LinkCount);
-      RestoreBloadCount(theEnv,&ObjectBinaryData(theEnv)->SlotCount);
-      RestoreBloadCount(theEnv,&ObjectBinaryData(theEnv)->SlotNameCount);
-      RestoreBloadCount(theEnv,&ObjectBinaryData(theEnv)->TemplateSlotCount);
-      RestoreBloadCount(theEnv,&ObjectBinaryData(theEnv)->SlotNameMapCount);
-      RestoreBloadCount(theEnv,&ObjectBinaryData(theEnv)->HandlerCount);
+      RestoreBloadCount(theEnv,execStatus,&ObjectBinaryData(theEnv)->ModuleCount);
+      RestoreBloadCount(theEnv,execStatus,&ObjectBinaryData(theEnv)->ClassCount);
+      RestoreBloadCount(theEnv,execStatus,&ObjectBinaryData(theEnv)->LinkCount);
+      RestoreBloadCount(theEnv,execStatus,&ObjectBinaryData(theEnv)->SlotCount);
+      RestoreBloadCount(theEnv,execStatus,&ObjectBinaryData(theEnv)->SlotNameCount);
+      RestoreBloadCount(theEnv,execStatus,&ObjectBinaryData(theEnv)->TemplateSlotCount);
+      RestoreBloadCount(theEnv,execStatus,&ObjectBinaryData(theEnv)->SlotNameMapCount);
+      RestoreBloadCount(theEnv,execStatus,&ObjectBinaryData(theEnv)->HandlerCount);
   }
 
 /***************************************************
@@ -894,9 +894,9 @@ static void BsaveSlots(
            ExpressionData(theEnv)->ExpressionCount += ExpressionSize((EXPRESSION *) sp->defaultValue);
          else
            {
-            tmpexp = ConvertValueToExpression(theEnv,(DATA_OBJECT *) sp->defaultValue);
+            tmpexp = ConvertValueToExpression(theEnv,execStatus,(DATA_OBJECT *) sp->defaultValue);
             ExpressionData(theEnv)->ExpressionCount += ExpressionSize(tmpexp);
-            ReturnExpression(theEnv,tmpexp);
+            ReturnExpression(theEnv,execStatus,tmpexp);
            }
         }
       else
@@ -1060,16 +1060,16 @@ static void BloadStorageObjects(
 
    if ((DefclassData(theEnv)->ClassIDMap != NULL) || (DefclassData(theEnv)->MaxClassID != 0))
      {
-      SystemError(theEnv,"OBJBIN",1);
-      EnvExitRouter(theEnv,EXIT_FAILURE);
+      SystemError(theEnv,execStatus,"OBJBIN",1);
+      EnvExitRouter(theEnv,execStatus,EXIT_FAILURE);
      }
-   GenReadBinary(theEnv,(void *) &space,sizeof(size_t));
+   GenReadBinary(theEnv,execStatus,(void *) &space,sizeof(size_t));
    if (space == 0L)
      {
       ObjectBinaryData(theEnv)->ClassCount = ObjectBinaryData(theEnv)->HandlerCount = 0L;
       return;
      }
-   GenReadBinary(theEnv,(void *) counts,space);
+   GenReadBinary(theEnv,execStatus,(void *) counts,space);
    ObjectBinaryData(theEnv)->ModuleCount = counts[0];
    ObjectBinaryData(theEnv)->ClassCount = counts[1];
    ObjectBinaryData(theEnv)->LinkCount = counts[2];
@@ -1083,45 +1083,45 @@ static void BloadStorageObjects(
    if (ObjectBinaryData(theEnv)->ModuleCount != 0L)
      {
       space = (sizeof(DEFCLASS_MODULE) * ObjectBinaryData(theEnv)->ModuleCount);
-      ObjectBinaryData(theEnv)->ModuleArray = (DEFCLASS_MODULE *) genalloc(theEnv,space);
+      ObjectBinaryData(theEnv)->ModuleArray = (DEFCLASS_MODULE *) genalloc(theEnv,execStatus,space);
      }
    if (ObjectBinaryData(theEnv)->ClassCount != 0L)
      {
       space = (sizeof(DEFCLASS) * ObjectBinaryData(theEnv)->ClassCount);
-      ObjectBinaryData(theEnv)->DefclassArray = (DEFCLASS *) genalloc(theEnv,space);
-      DefclassData(theEnv)->ClassIDMap = (DEFCLASS **) gm2(theEnv,(sizeof(DEFCLASS *) * DefclassData(theEnv)->MaxClassID));
+      ObjectBinaryData(theEnv)->DefclassArray = (DEFCLASS *) genalloc(theEnv,execStatus,space);
+      DefclassData(theEnv)->ClassIDMap = (DEFCLASS **) gm2(theEnv,execStatus,(sizeof(DEFCLASS *) * DefclassData(theEnv)->MaxClassID));
      }
    if (ObjectBinaryData(theEnv)->LinkCount != 0L)
      {
       space = (sizeof(DEFCLASS *) * ObjectBinaryData(theEnv)->LinkCount);
-      ObjectBinaryData(theEnv)->LinkArray = (DEFCLASS * *) genalloc(theEnv,space);
+      ObjectBinaryData(theEnv)->LinkArray = (DEFCLASS * *) genalloc(theEnv,execStatus,space);
      }
    if (ObjectBinaryData(theEnv)->SlotCount != 0L)
      {
       space = (sizeof(SLOT_DESC) * ObjectBinaryData(theEnv)->SlotCount);
-      ObjectBinaryData(theEnv)->SlotArray = (SLOT_DESC *) genalloc(theEnv,space);
+      ObjectBinaryData(theEnv)->SlotArray = (SLOT_DESC *) genalloc(theEnv,execStatus,space);
      }
    if (ObjectBinaryData(theEnv)->SlotNameCount != 0L)
      {
       space = (sizeof(SLOT_NAME) * ObjectBinaryData(theEnv)->SlotNameCount);
-      ObjectBinaryData(theEnv)->SlotNameArray = (SLOT_NAME *) genalloc(theEnv,space);
+      ObjectBinaryData(theEnv)->SlotNameArray = (SLOT_NAME *) genalloc(theEnv,execStatus,space);
      }
    if (ObjectBinaryData(theEnv)->TemplateSlotCount != 0L)
      {
       space = (sizeof(SLOT_DESC *) * ObjectBinaryData(theEnv)->TemplateSlotCount);
-      ObjectBinaryData(theEnv)->TmpslotArray = (SLOT_DESC * *) genalloc(theEnv,space);
+      ObjectBinaryData(theEnv)->TmpslotArray = (SLOT_DESC * *) genalloc(theEnv,execStatus,space);
      }
    if (ObjectBinaryData(theEnv)->SlotNameMapCount != 0L)
      {
       space = (sizeof(unsigned) * ObjectBinaryData(theEnv)->SlotNameMapCount);
-      ObjectBinaryData(theEnv)->MapslotArray = (unsigned *) genalloc(theEnv,space);
+      ObjectBinaryData(theEnv)->MapslotArray = (unsigned *) genalloc(theEnv,execStatus,space);
      }
    if (ObjectBinaryData(theEnv)->HandlerCount != 0L)
      {
       space = (sizeof(HANDLER) * ObjectBinaryData(theEnv)->HandlerCount);
-      ObjectBinaryData(theEnv)->HandlerArray = (HANDLER *) genalloc(theEnv,space);
+      ObjectBinaryData(theEnv)->HandlerArray = (HANDLER *) genalloc(theEnv,execStatus,space);
       space = (sizeof(unsigned) * ObjectBinaryData(theEnv)->HandlerCount);
-      ObjectBinaryData(theEnv)->MaphandlerArray = (unsigned *) genalloc(theEnv,space);
+      ObjectBinaryData(theEnv)->MaphandlerArray = (unsigned *) genalloc(theEnv,execStatus,space);
      }
   }
 
@@ -1140,29 +1140,29 @@ static void BloadObjects(
   {
    size_t space;
 
-   GenReadBinary(theEnv,(void *) &space,sizeof(size_t));
+   GenReadBinary(theEnv,execStatus,(void *) &space,sizeof(size_t));
    if (space == 0L)
      return;
    if (ObjectBinaryData(theEnv)->ModuleCount != 0L)
-     BloadandRefresh(theEnv,ObjectBinaryData(theEnv)->ModuleCount,sizeof(BSAVE_DEFCLASS_MODULE),UpdateDefclassModule);
+     BloadandRefresh(theEnv,execStatus,ObjectBinaryData(theEnv)->ModuleCount,sizeof(BSAVE_DEFCLASS_MODULE),UpdateDefclassModule);
    if (ObjectBinaryData(theEnv)->ClassCount != 0L)
      {
-      BloadandRefresh(theEnv,ObjectBinaryData(theEnv)->ClassCount,sizeof(BSAVE_DEFCLASS),UpdateDefclass);
-      BloadandRefresh(theEnv,ObjectBinaryData(theEnv)->LinkCount,sizeof(DEFCLASS *),UpdateLink);
-      BloadandRefresh(theEnv,ObjectBinaryData(theEnv)->SlotNameCount,sizeof(BSAVE_SLOT_NAME),UpdateSlotName);
-      BloadandRefresh(theEnv,ObjectBinaryData(theEnv)->SlotCount,sizeof(BSAVE_SLOT_DESC),UpdateSlot);
+      BloadandRefresh(theEnv,execStatus,ObjectBinaryData(theEnv)->ClassCount,sizeof(BSAVE_DEFCLASS),UpdateDefclass);
+      BloadandRefresh(theEnv,execStatus,ObjectBinaryData(theEnv)->LinkCount,sizeof(DEFCLASS *),UpdateLink);
+      BloadandRefresh(theEnv,execStatus,ObjectBinaryData(theEnv)->SlotNameCount,sizeof(BSAVE_SLOT_NAME),UpdateSlotName);
+      BloadandRefresh(theEnv,execStatus,ObjectBinaryData(theEnv)->SlotCount,sizeof(BSAVE_SLOT_DESC),UpdateSlot);
       if (ObjectBinaryData(theEnv)->TemplateSlotCount != 0L)
-        BloadandRefresh(theEnv,ObjectBinaryData(theEnv)->TemplateSlotCount,sizeof(long),UpdateTemplateSlot);
+        BloadandRefresh(theEnv,execStatus,ObjectBinaryData(theEnv)->TemplateSlotCount,sizeof(long),UpdateTemplateSlot);
       if (ObjectBinaryData(theEnv)->SlotNameMapCount != 0L)
         {
          space = (sizeof(unsigned) * ObjectBinaryData(theEnv)->SlotNameMapCount);
-         GenReadBinary(theEnv,(void *) ObjectBinaryData(theEnv)->MapslotArray,space);
+         GenReadBinary(theEnv,execStatus,(void *) ObjectBinaryData(theEnv)->MapslotArray,space);
         }
       if (ObjectBinaryData(theEnv)->HandlerCount != 0L)
         {
-         BloadandRefresh(theEnv,ObjectBinaryData(theEnv)->HandlerCount,sizeof(BSAVE_HANDLER),UpdateHandler);
+         BloadandRefresh(theEnv,execStatus,ObjectBinaryData(theEnv)->HandlerCount,sizeof(BSAVE_HANDLER),UpdateHandler);
          space = (sizeof(unsigned) * ObjectBinaryData(theEnv)->HandlerCount);
-         GenReadBinary(theEnv,(void *) ObjectBinaryData(theEnv)->MaphandlerArray,space);
+         GenReadBinary(theEnv,execStatus,(void *) ObjectBinaryData(theEnv)->MaphandlerArray,space);
         }
       UpdatePrimitiveClassesMap(theEnv);
      }
@@ -1201,7 +1201,7 @@ static void UpdateDefclassModule(
    BSAVE_DEFCLASS_MODULE *bdptr;
 
    bdptr = (BSAVE_DEFCLASS_MODULE *) buf;
-   UpdateDefmoduleItemHeader(theEnv,&bdptr->header,&ObjectBinaryData(theEnv)->ModuleArray[obji].header,
+   UpdateDefmoduleItemHeader(theEnv,execStatus,&bdptr->header,&ObjectBinaryData(theEnv)->ModuleArray[obji].header,
                              (int) sizeof(DEFCLASS),(void *) ObjectBinaryData(theEnv)->DefclassArray);
   }
 
@@ -1217,7 +1217,7 @@ static void UpdateDefclass(
    bcls = (BSAVE_DEFCLASS *) buf;
    cls = (DEFCLASS *) &ObjectBinaryData(theEnv)->DefclassArray[obji];
 
-   UpdateConstructHeader(theEnv,&bcls->header,&cls->header,
+   UpdateConstructHeader(theEnv,execStatus,&bcls->header,&cls->header,
                          (int) sizeof(DEFCLASS_MODULE),(void *) ObjectBinaryData(theEnv)->ModuleArray,
                          (int) sizeof(DEFCLASS),(void *) ObjectBinaryData(theEnv)->DefclassArray);
    cls->abstract = bcls->abstract;
@@ -1256,7 +1256,7 @@ static void UpdateDefclass(
 #else
    cls->scopeMap = NULL;
 #endif
-   PutClassInTable(theEnv,cls);
+   PutClassInTable(theEnv,execStatus,cls);
   }
 
 static void UpdateLink(
@@ -1304,10 +1304,10 @@ static void UpdateSlot(
         sp->defaultValue = (void *) ExpressionPointer(bsp->defaultValue);
       else
         {
-         sp->defaultValue = (void *) get_struct(theEnv,dataObject);
-         EvaluateAndStoreInDataObject(theEnv,(int) sp->multiple,ExpressionPointer(bsp->defaultValue),
+         sp->defaultValue = (void *) get_struct(theEnv,execStatus,dataObject);
+         EvaluateAndStoreInDataObject(theEnv,execStatus,(int) sp->multiple,ExpressionPointer(bsp->defaultValue),
                                       (DATA_OBJECT *) sp->defaultValue,TRUE);
-         ValueInstall(theEnv,(DATA_OBJECT *) sp->defaultValue);
+         ValueInstall(theEnv,execStatus,(DATA_OBJECT *) sp->defaultValue);
         }
      }
    else
@@ -1402,44 +1402,44 @@ static void ClearBloadObjects(
    space = (sizeof(DEFCLASS_MODULE) * ObjectBinaryData(theEnv)->ModuleCount);
    if (space == 0L)
      return;
-   genfree(theEnv,(void *) ObjectBinaryData(theEnv)->ModuleArray,space);
+   genfree(theEnv,execStatus,(void *) ObjectBinaryData(theEnv)->ModuleArray,space);
    ObjectBinaryData(theEnv)->ModuleArray = NULL;
    ObjectBinaryData(theEnv)->ModuleCount = 0L;
 
    if (ObjectBinaryData(theEnv)->ClassCount != 0L)
      {
-      rm(theEnv,(void *) DefclassData(theEnv)->ClassIDMap,(sizeof(DEFCLASS *) * DefclassData(theEnv)->AvailClassID));
+      rm(theEnv,execStatus,(void *) DefclassData(theEnv)->ClassIDMap,(sizeof(DEFCLASS *) * DefclassData(theEnv)->AvailClassID));
       DefclassData(theEnv)->ClassIDMap = NULL;
       DefclassData(theEnv)->MaxClassID = 0;
       DefclassData(theEnv)->AvailClassID = 0;
       for (i = 0L ; i < ObjectBinaryData(theEnv)->ClassCount ; i++)
         {
-         UnmarkConstructHeader(theEnv,&ObjectBinaryData(theEnv)->DefclassArray[i].header);
+         UnmarkConstructHeader(theEnv,execStatus,&ObjectBinaryData(theEnv)->DefclassArray[i].header);
 #if DEFMODULE_CONSTRUCT
-         DecrementBitMapCount(theEnv,ObjectBinaryData(theEnv)->DefclassArray[i].scopeMap);
+         DecrementBitMapCount(theEnv,execStatus,ObjectBinaryData(theEnv)->DefclassArray[i].scopeMap);
 #endif
-         RemoveClassFromTable(theEnv,(DEFCLASS *) &ObjectBinaryData(theEnv)->DefclassArray[i]);
+         RemoveClassFromTable(theEnv,execStatus,(DEFCLASS *) &ObjectBinaryData(theEnv)->DefclassArray[i]);
         }
       for (i = 0L ; i < ObjectBinaryData(theEnv)->SlotCount ; i++)
         {
-         DecrementSymbolCount(theEnv,ObjectBinaryData(theEnv)->SlotArray[i].overrideMessage);
+         DecrementSymbolCount(theEnv,execStatus,ObjectBinaryData(theEnv)->SlotArray[i].overrideMessage);
          if ((ObjectBinaryData(theEnv)->SlotArray[i].defaultValue != NULL) && (ObjectBinaryData(theEnv)->SlotArray[i].dynamicDefault == 0))
            {
-            ValueDeinstall(theEnv,(DATA_OBJECT *) ObjectBinaryData(theEnv)->SlotArray[i].defaultValue);
-            rtn_struct(theEnv,dataObject,ObjectBinaryData(theEnv)->SlotArray[i].defaultValue);
+            ValueDeinstall(theEnv,execStatus,(DATA_OBJECT *) ObjectBinaryData(theEnv)->SlotArray[i].defaultValue);
+            rtn_struct(theEnv,execStatus,dataObject,ObjectBinaryData(theEnv)->SlotArray[i].defaultValue);
            }
         }
       for (i = 0L ; i < ObjectBinaryData(theEnv)->SlotNameCount ; i++)
         {
          DefclassData(theEnv)->SlotNameTable[ObjectBinaryData(theEnv)->SlotNameArray[i].hashTableIndex] = NULL;
-         DecrementSymbolCount(theEnv,ObjectBinaryData(theEnv)->SlotNameArray[i].name);
-         DecrementSymbolCount(theEnv,ObjectBinaryData(theEnv)->SlotNameArray[i].putHandlerName);
+         DecrementSymbolCount(theEnv,execStatus,ObjectBinaryData(theEnv)->SlotNameArray[i].name);
+         DecrementSymbolCount(theEnv,execStatus,ObjectBinaryData(theEnv)->SlotNameArray[i].putHandlerName);
         }
 
       space = (sizeof(DEFCLASS) * ObjectBinaryData(theEnv)->ClassCount);
       if (space != 0L)
         {
-         genfree(theEnv,(void *) ObjectBinaryData(theEnv)->DefclassArray,space);
+         genfree(theEnv,execStatus,(void *) ObjectBinaryData(theEnv)->DefclassArray,space);
          ObjectBinaryData(theEnv)->DefclassArray = NULL;
          ObjectBinaryData(theEnv)->ClassCount = 0L;
         }
@@ -1447,7 +1447,7 @@ static void ClearBloadObjects(
       space = (sizeof(DEFCLASS *) * ObjectBinaryData(theEnv)->LinkCount);
       if (space != 0L)
         {
-         genfree(theEnv,(void *) ObjectBinaryData(theEnv)->LinkArray,space);
+         genfree(theEnv,execStatus,(void *) ObjectBinaryData(theEnv)->LinkArray,space);
          ObjectBinaryData(theEnv)->LinkArray = NULL;
          ObjectBinaryData(theEnv)->LinkCount = 0L;
         }
@@ -1455,7 +1455,7 @@ static void ClearBloadObjects(
       space = (sizeof(SLOT_DESC) * ObjectBinaryData(theEnv)->SlotCount);
       if (space != 0L)
         {
-         genfree(theEnv,(void *) ObjectBinaryData(theEnv)->SlotArray,space);
+         genfree(theEnv,execStatus,(void *) ObjectBinaryData(theEnv)->SlotArray,space);
          ObjectBinaryData(theEnv)->SlotArray = NULL;
          ObjectBinaryData(theEnv)->SlotCount = 0L;
         }
@@ -1463,7 +1463,7 @@ static void ClearBloadObjects(
       space = (sizeof(SLOT_NAME) * ObjectBinaryData(theEnv)->SlotNameCount);
       if (space != 0L)
         {
-         genfree(theEnv,(void *) ObjectBinaryData(theEnv)->SlotNameArray,space);
+         genfree(theEnv,execStatus,(void *) ObjectBinaryData(theEnv)->SlotNameArray,space);
          ObjectBinaryData(theEnv)->SlotNameArray = NULL;
          ObjectBinaryData(theEnv)->SlotNameCount = 0L;
         }
@@ -1471,7 +1471,7 @@ static void ClearBloadObjects(
       space = (sizeof(SLOT_DESC *) * ObjectBinaryData(theEnv)->TemplateSlotCount);
       if (space != 0L)
         {
-         genfree(theEnv,(void *) ObjectBinaryData(theEnv)->TmpslotArray,space);
+         genfree(theEnv,execStatus,(void *) ObjectBinaryData(theEnv)->TmpslotArray,space);
          ObjectBinaryData(theEnv)->TmpslotArray = NULL;
          ObjectBinaryData(theEnv)->TemplateSlotCount = 0L;
         }
@@ -1479,7 +1479,7 @@ static void ClearBloadObjects(
       space = (sizeof(unsigned) * ObjectBinaryData(theEnv)->SlotNameMapCount);
       if (space != 0L)
         {
-         genfree(theEnv,(void *) ObjectBinaryData(theEnv)->MapslotArray,space);
+         genfree(theEnv,execStatus,(void *) ObjectBinaryData(theEnv)->MapslotArray,space);
          ObjectBinaryData(theEnv)->MapslotArray = NULL;
          ObjectBinaryData(theEnv)->SlotNameMapCount = 0L;
         }
@@ -1488,15 +1488,15 @@ static void ClearBloadObjects(
    if (ObjectBinaryData(theEnv)->HandlerCount != 0L)
      {
       for (i = 0L ; i < ObjectBinaryData(theEnv)->HandlerCount ; i++)
-        DecrementSymbolCount(theEnv,ObjectBinaryData(theEnv)->HandlerArray[i].name);
+        DecrementSymbolCount(theEnv,execStatus,ObjectBinaryData(theEnv)->HandlerArray[i].name);
 
       space = (sizeof(HANDLER) * ObjectBinaryData(theEnv)->HandlerCount);
       if (space != 0L)
         {
-         genfree(theEnv,(void *) ObjectBinaryData(theEnv)->HandlerArray,space);
+         genfree(theEnv,execStatus,(void *) ObjectBinaryData(theEnv)->HandlerArray,space);
          ObjectBinaryData(theEnv)->HandlerArray = NULL;
          space = (sizeof(unsigned) * ObjectBinaryData(theEnv)->HandlerCount);
-         genfree(theEnv,(void *) ObjectBinaryData(theEnv)->MaphandlerArray,space);
+         genfree(theEnv,execStatus,(void *) ObjectBinaryData(theEnv)->MaphandlerArray,space);
          ObjectBinaryData(theEnv)->MaphandlerArray = NULL;
          ObjectBinaryData(theEnv)->HandlerCount = 0L;
         }

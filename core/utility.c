@@ -68,7 +68,7 @@ globle void InitializeUtilityData(
   void *theEnv,
   EXEC_STATUS)
   {
-   AllocateEnvironmentData(theEnv,UTILITY_DATA,sizeof(struct utilityData),DeallocateUtilityData);
+   AllocateEnvironmentData(theEnv,execStatus,UTILITY_DATA,sizeof(struct utilityData),DeallocateUtilityData);
    
    UtilityData(theEnv)->GarbageCollectionLocks = 0;
    UtilityData(theEnv)->GarbageCollectionHeuristicsEnabled = TRUE;
@@ -95,8 +95,8 @@ static void DeallocateUtilityData(
    while (tmpTM != NULL)
      {
       nextTM = tmpTM->next;
-      genfree(theEnv,tmpTM->theMemory,tmpTM->memSize);
-      rtn_struct(theEnv,trackedMemory,tmpTM);
+      genfree(theEnv,execStatus,tmpTM->theMemory,tmpTM->memSize);
+      rtn_struct(theEnv,execStatus,trackedMemory,tmpTM);
       tmpTM = nextTM;
      }
    
@@ -104,7 +104,7 @@ static void DeallocateUtilityData(
    while (tmpPtr != NULL)
      {
       nextPtr = tmpPtr->next;
-      rtn_struct(theEnv,callFunctionItem,tmpPtr);
+      rtn_struct(theEnv,execStatus,callFunctionItem,tmpPtr);
       tmpPtr = nextPtr;
      }
 
@@ -112,7 +112,7 @@ static void DeallocateUtilityData(
    while (tmpPtr != NULL)
      {
       nextPtr = tmpPtr->next;
-      rtn_struct(theEnv,callFunctionItem,tmpPtr);
+      rtn_struct(theEnv,execStatus,callFunctionItem,tmpPtr);
       tmpPtr = nextPtr;
      }
   }
@@ -269,7 +269,7 @@ globle intBool AddCleanupFunction(
   int priority)
   {
    UtilityData(theEnv)->ListOfCleanupFunctions =
-     AddFunctionToCallList(theEnv,name,priority,
+     AddFunctionToCallList(theEnv,execStatus,name,priority,
                            (void (*)(void *)) theFunction,
                            UtilityData(theEnv)->ListOfCleanupFunctions,TRUE);
    return(1);
@@ -290,7 +290,7 @@ globle intBool AddPeriodicFunction(
    theEnv = GetCurrentEnvironment();
    
    UtilityData(theEnv)->ListOfPeriodicFunctions =
-     AddFunctionToCallList(theEnv,name,priority,
+     AddFunctionToCallList(theEnv,execStatus,name,priority,
                            (void (*)(void *)) theFunction,
                            UtilityData(theEnv)->ListOfPeriodicFunctions,FALSE);
 
@@ -310,7 +310,7 @@ globle intBool EnvAddPeriodicFunction(
   int priority)
   {
    UtilityData(theEnv)->ListOfPeriodicFunctions =
-     AddFunctionToCallList(theEnv,name,priority,
+     AddFunctionToCallList(theEnv,execStatus,name,priority,
                            (void (*)(void *)) theFunction,
                            UtilityData(theEnv)->ListOfPeriodicFunctions,TRUE);
    return(1);
@@ -329,7 +329,7 @@ globle intBool RemoveCleanupFunction(
    intBool found;
    
    UtilityData(theEnv)->ListOfCleanupFunctions =
-      RemoveFunctionFromCallList(theEnv,name,UtilityData(theEnv)->ListOfCleanupFunctions,&found);
+      RemoveFunctionFromCallList(theEnv,execStatus,name,UtilityData(theEnv)->ListOfCleanupFunctions,&found);
   
    return found;
   }
@@ -346,7 +346,7 @@ globle intBool EnvRemovePeriodicFunction(
    intBool found;
    
    UtilityData(theEnv)->ListOfPeriodicFunctions =
-      RemoveFunctionFromCallList(theEnv,name,UtilityData(theEnv)->ListOfPeriodicFunctions,&found);
+      RemoveFunctionFromCallList(theEnv,execStatus,name,UtilityData(theEnv)->ListOfPeriodicFunctions,&found);
   
    return found;
   }
@@ -366,23 +366,23 @@ globle char *StringPrintForm(
    char *theString = NULL;
    void *thePtr;
 
-   theString = ExpandStringWithChar(theEnv,'"',theString,&pos,&max,max+80);
+   theString = ExpandStringWithChar(theEnv,execStatus,'"',theString,&pos,&max,max+80);
    while (str[i] != EOS)
      {
       if ((str[i] == '"') || (str[i] == '\\'))
         {
-         theString = ExpandStringWithChar(theEnv,'\\',theString,&pos,&max,max+80);
-         theString = ExpandStringWithChar(theEnv,str[i],theString,&pos,&max,max+80);
+         theString = ExpandStringWithChar(theEnv,execStatus,'\\',theString,&pos,&max,max+80);
+         theString = ExpandStringWithChar(theEnv,execStatus,str[i],theString,&pos,&max,max+80);
         }
       else
-        { theString = ExpandStringWithChar(theEnv,str[i],theString,&pos,&max,max+80); }
+        { theString = ExpandStringWithChar(theEnv,execStatus,str[i],theString,&pos,&max,max+80); }
       i++;
      }
 
-   theString = ExpandStringWithChar(theEnv,'"',theString,&pos,&max,max+80);
+   theString = ExpandStringWithChar(theEnv,execStatus,'"',theString,&pos,&max,max+80);
 
-   thePtr = EnvAddSymbol(theEnv,theString);
-   rm(theEnv,theString,max);
+   thePtr = EnvAddSymbol(theEnv,execStatus,theString);
+   rm(theEnv,execStatus,theString,max);
    return(ValueToString(thePtr));
   }
 
@@ -402,11 +402,11 @@ globle char *AppendStrings(
    char *theString = NULL;
    void *thePtr;
 
-   theString = AppendToString(theEnv,str1,theString,&pos,&max);
-   theString = AppendToString(theEnv,str2,theString,&pos,&max);
+   theString = AppendToString(theEnv,execStatus,str1,theString,&pos,&max);
+   theString = AppendToString(theEnv,execStatus,str2,theString,&pos,&max);
 
-   thePtr = EnvAddSymbol(theEnv,theString);
-   rm(theEnv,theString,max);
+   thePtr = EnvAddSymbol(theEnv,execStatus,theString);
+   rm(theEnv,execStatus,theString,max);
    return(ValueToString(thePtr));
   }
 
@@ -435,7 +435,7 @@ globle char *AppendToString(
    /* Return NULL if the old string was not successfully expanded. */
    /*==============================================================*/
 
-   if ((oldStr = EnlargeString(theEnv,length,oldStr,oldPos,oldMax)) == NULL) { return(NULL); }
+   if ((oldStr = EnlargeString(theEnv,execStatus,length,oldStr,oldPos,oldMax)) == NULL) { return(NULL); }
 
    /*===============================================*/
    /* Append the new string to the expanded string. */
@@ -477,7 +477,7 @@ globle char *InsertInString(
    /* Return NULL if the old string was not successfully expanded. */
    /*==============================================================*/
 
-   if ((oldStr = EnlargeString(theEnv,length,oldStr,oldPos,oldMax)) == NULL) { return(NULL); }
+   if ((oldStr = EnlargeString(theEnv,execStatus,length,oldStr,oldPos,oldMax)) == NULL) { return(NULL); }
 
    /*================================================================*/
    /* Shift the contents to the right of insertion point so that the */
@@ -518,7 +518,7 @@ globle char *EnlargeString(
 
    if (length + *oldPos + 1 > *oldMax)
      {
-      oldStr = (char *) genrealloc(theEnv,oldStr,*oldMax,length + *oldPos + 1);
+      oldStr = (char *) genrealloc(theEnv,execStatus,oldStr,*oldMax,length + *oldPos + 1);
       *oldMax = length + *oldPos + 1;
      }
 
@@ -563,7 +563,7 @@ globle char *AppendNToString(
 
    if (lengthWithEOS + *oldPos > *oldMax)
      {
-      oldStr = (char *) genrealloc(theEnv,oldStr,*oldMax,*oldPos + lengthWithEOS);
+      oldStr = (char *) genrealloc(theEnv,execStatus,oldStr,*oldMax,*oldPos + lengthWithEOS);
       *oldMax = *oldPos + lengthWithEOS;
      }
 
@@ -607,7 +607,7 @@ globle char *ExpandStringWithChar(
   {
    if ((*pos + 1) >= *max)
      {
-      str = (char *) genrealloc(theEnv,str,*max,newSize);
+      str = (char *) genrealloc(theEnv,execStatus,str,*max,newSize);
       *max = newSize;
      }
 
@@ -651,7 +651,7 @@ globle struct callFunctionItem *AddFunctionToCallList(
   struct callFunctionItem *head,
   intBool environmentAware)
   {
-   return AddFunctionToCallListWithContext(theEnv,name,priority,func,head,environmentAware,NULL);
+   return AddFunctionToCallListWithContext(theEnv,execStatus,name,priority,func,head,environmentAware,NULL);
   }
   
 /***********************************************************/
@@ -671,7 +671,7 @@ globle struct callFunctionItem *AddFunctionToCallListWithContext(
   {
    struct callFunctionItem *newPtr, *currentPtr, *lastPtr = NULL;
 
-   newPtr = get_struct(theEnv,callFunctionItem);
+   newPtr = get_struct(theEnv,execStatus,callFunctionItem);
 
    newPtr->name = name;
    newPtr->func = func;
@@ -734,7 +734,7 @@ globle struct callFunctionItem *RemoveFunctionFromCallList(
          else
            { lastPtr->next = currentPtr->next; }
 
-         rtn_struct(theEnv,callFunctionItem,currentPtr);
+         rtn_struct(theEnv,execStatus,callFunctionItem,currentPtr);
          return(head);
         }
 
@@ -761,7 +761,7 @@ globle void DeallocateCallList(
    while (tmpPtr != NULL)
      {
       nextPtr = tmpPtr->next;
-      rtn_struct(theEnv,callFunctionItem,tmpPtr);
+      rtn_struct(theEnv,execStatus,callFunctionItem,tmpPtr);
       tmpPtr = nextPtr;
      }
   }
@@ -817,7 +817,7 @@ globle unsigned long ItemHashValue(
         return(fis.uv % theRange);
      }
 
-   SystemError(theEnv,"UTILITY",1);
+   SystemError(theEnv,execStatus,"UTILITY",1);
    return(0);
   }
 
@@ -920,7 +920,7 @@ globle struct trackedMemory *AddTrackedMemory(
   {
    struct trackedMemory *newPtr;
    
-   newPtr = get_struct(theEnv,trackedMemory);
+   newPtr = get_struct(theEnv,execStatus,trackedMemory);
    
    newPtr->prev = NULL;
    newPtr->theMemory = theMemory;
@@ -947,7 +947,7 @@ globle void RemoveTrackedMemory(
    if (theTracker->next != NULL)
      { theTracker->next->prev = theTracker->prev; }
      
-   rtn_struct(theEnv,trackedMemory,theTracker);
+   rtn_struct(theEnv,execStatus,trackedMemory,theTracker);
   }
 
 /******************************************/

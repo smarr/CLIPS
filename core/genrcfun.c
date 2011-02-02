@@ -109,7 +109,7 @@ globle void *AllocateDefgenericModule(
   void *theEnv,
   EXEC_STATUS)
   {
-   return((void *) get_struct(theEnv,defgenericModule));
+   return((void *) get_struct(theEnv,execStatus,defgenericModule));
   }
 
 /***************************************************
@@ -127,9 +127,9 @@ globle void FreeDefgenericModule(
   void *theItem)
   {
 #if (! BLOAD_ONLY)
-   FreeConstructHeaderModule(theEnv,(struct defmoduleItemHeader *) theItem,DefgenericData(theEnv)->DefgenericConstruct);
+   FreeConstructHeaderModule(theEnv,execStatus,(struct defmoduleItemHeader *) theItem,DefgenericData(theEnv)->DefgenericConstruct);
 #endif
-   rtn_struct(theEnv,defgenericModule,theItem);
+   rtn_struct(theEnv,execStatus,defgenericModule,theItem);
   }
 
 #endif
@@ -165,12 +165,12 @@ globle int ClearDefmethods(
    if (Bloaded(theEnv) == TRUE) return(FALSE);
 #endif
 
-   gfunc = (DEFGENERIC *) EnvGetNextDefgeneric(theEnv,NULL);
+   gfunc = (DEFGENERIC *) EnvGetNextDefgeneric(theEnv,execStatus,NULL);
    while (gfunc != NULL)
      {
-      if (RemoveAllExplicitMethods(theEnv,gfunc) == FALSE)
+      if (RemoveAllExplicitMethods(theEnv,execStatus,gfunc) == FALSE)
         success = FALSE;
-      gfunc = (DEFGENERIC *) EnvGetNextDefgeneric(theEnv,(void *) gfunc);
+      gfunc = (DEFGENERIC *) EnvGetNextDefgeneric(theEnv,execStatus,(void *) gfunc);
      }
    return(success);
   }
@@ -201,11 +201,11 @@ globle int RemoveAllExplicitMethods(
          if (gfunc->methods[i].system)
            systemMethodCount++;
          else
-           DeleteMethodInfo(theEnv,gfunc,&gfunc->methods[i]);
+           DeleteMethodInfo(theEnv,execStatus,gfunc,&gfunc->methods[i]);
         }
       if (systemMethodCount != 0)
         {
-         narr = (DEFMETHOD *) gm2(theEnv,(systemMethodCount * sizeof(DEFMETHOD)));
+         narr = (DEFMETHOD *) gm2(theEnv,execStatus,(systemMethodCount * sizeof(DEFMETHOD)));
          i = 0;
          j = 0;
          while (i < gfunc->mcnt)
@@ -214,14 +214,14 @@ globle int RemoveAllExplicitMethods(
               GenCopyMemory(DEFMETHOD,1,&narr[j++],&gfunc->methods[i]);
             i++;
            }
-         rm(theEnv,(void *) gfunc->methods,(sizeof(DEFMETHOD) * gfunc->mcnt));
+         rm(theEnv,execStatus,(void *) gfunc->methods,(sizeof(DEFMETHOD) * gfunc->mcnt));
          gfunc->mcnt = (short) systemMethodCount;
          gfunc->methods = narr;
         }
       else
         {
          if (gfunc->mcnt != 0)
-           rm(theEnv,(void *) gfunc->methods,(sizeof(DEFMETHOD) * gfunc->mcnt));
+           rm(theEnv,execStatus,(void *) gfunc->methods,(sizeof(DEFMETHOD) * gfunc->mcnt));
          gfunc->mcnt = 0;
          gfunc->methods = NULL;
         }
@@ -250,14 +250,14 @@ globle void RemoveDefgeneric(
    long i;
 
    for (i = 0 ; i < gfunc->mcnt ; i++)
-     DeleteMethodInfo(theEnv,gfunc,&gfunc->methods[i]);
+     DeleteMethodInfo(theEnv,execStatus,gfunc,&gfunc->methods[i]);
 
    if (gfunc->mcnt != 0)
-     rm(theEnv,(void *) gfunc->methods,(sizeof(DEFMETHOD) * gfunc->mcnt));
-   DecrementSymbolCount(theEnv,GetDefgenericNamePointer((void *) gfunc));
+     rm(theEnv,execStatus,(void *) gfunc->methods,(sizeof(DEFMETHOD) * gfunc->mcnt));
+   DecrementSymbolCount(theEnv,execStatus,GetDefgenericNamePointer((void *) gfunc));
    SetDefgenericPPForm((void *) gfunc,NULL);
-   ClearUserDataList(theEnv,gfunc->header.usrData);
-   rtn_struct(theEnv,defgeneric,gfunc);
+   ClearUserDataList(theEnv,execStatus,gfunc->header.usrData);
+   rtn_struct(theEnv,execStatus,defgeneric,gfunc);
   }
 
 /****************************************************************
@@ -280,20 +280,20 @@ globle int ClearDefgenerics(
    if (Bloaded(theEnv) == TRUE) return(FALSE);
 #endif
 
-   gfunc = (DEFGENERIC *) EnvGetNextDefgeneric(theEnv,NULL);
+   gfunc = (DEFGENERIC *) EnvGetNextDefgeneric(theEnv,execStatus,NULL);
    while (gfunc != NULL)
      {
       gtmp = gfunc;
-      gfunc = (DEFGENERIC *) EnvGetNextDefgeneric(theEnv,(void *) gfunc);
-      if (RemoveAllExplicitMethods(theEnv,gtmp) == FALSE)
+      gfunc = (DEFGENERIC *) EnvGetNextDefgeneric(theEnv,execStatus,(void *) gfunc);
+      if (RemoveAllExplicitMethods(theEnv,execStatus,gtmp) == FALSE)
         {
-         CantDeleteItemErrorMessage(theEnv,"generic function",EnvGetDefgenericName(theEnv,gtmp));
+         CantDeleteItemErrorMessage(theEnv,execStatus,"generic function",EnvGetDefgenericName(theEnv,execStatus,gtmp));
          success = FALSE;
         }
       else
         {
-         RemoveConstructFromModule(theEnv,(struct constructHeader *) gtmp);
-         RemoveDefgeneric(theEnv,(void *) gtmp);
+         RemoveConstructFromModule(theEnv,execStatus,(struct constructHeader *) gtmp);
+         RemoveDefgeneric(theEnv,execStatus,(void *) gtmp);
         }
      }
    return(success);
@@ -315,10 +315,10 @@ globle void MethodAlterError(
   EXEC_STATUS,
   DEFGENERIC *gfunc)
   {
-   PrintErrorID(theEnv,"GENRCFUN",1,FALSE);
-   EnvPrintRouter(theEnv,WERROR,"Defgeneric ");
-   EnvPrintRouter(theEnv,WERROR,EnvGetDefgenericName(theEnv,(void *) gfunc));
-   EnvPrintRouter(theEnv,WERROR," cannot be modified while one of its methods is executing.\n");
+   PrintErrorID(theEnv,execStatus,"GENRCFUN",1,FALSE);
+   EnvPrintRouter(theEnv,execStatus,WERROR,"Defgeneric ");
+   EnvPrintRouter(theEnv,execStatus,WERROR,EnvGetDefgenericName(theEnv,execStatus,(void *) gfunc));
+   EnvPrintRouter(theEnv,execStatus,WERROR," cannot be modified while one of its methods is executing.\n");
   }
 
 /***************************************************
@@ -342,29 +342,29 @@ globle void DeleteMethodInfo(
    RESTRICTION *rptr;
 
    SaveBusyCount(gfunc);
-   ExpressionDeinstall(theEnv,meth->actions);
-   ReturnPackedExpression(theEnv,meth->actions);
-   ClearUserDataList(theEnv,meth->usrData);
+   ExpressionDeinstall(theEnv,execStatus,meth->actions);
+   ReturnPackedExpression(theEnv,execStatus,meth->actions);
+   ClearUserDataList(theEnv,execStatus,meth->usrData);
    if (meth->ppForm != NULL)
-     rm(theEnv,(void *) meth->ppForm,(sizeof(char) * (strlen(meth->ppForm)+1)));
+     rm(theEnv,execStatus,(void *) meth->ppForm,(sizeof(char) * (strlen(meth->ppForm)+1)));
    for (j = 0 ; j < meth->restrictionCount ; j++)
      {
       rptr = &meth->restrictions[j];
 
       for (k = 0 ; k < rptr->tcnt ; k++)
 #if OBJECT_SYSTEM
-        DecrementDefclassBusyCount(theEnv,rptr->types[k]);
+        DecrementDefclassBusyCount(theEnv,execStatus,rptr->types[k]);
 #else
-        DecrementIntegerCount(theEnv,(INTEGER_HN *) rptr->types[k]);
+        DecrementIntegerCount(theEnv,execStatus,(INTEGER_HN *) rptr->types[k]);
 #endif
 
       if (rptr->types != NULL)
-        rm(theEnv,(void *) rptr->types,(sizeof(void *) * rptr->tcnt));
-      ExpressionDeinstall(theEnv,rptr->query);
-      ReturnPackedExpression(theEnv,rptr->query);
+        rm(theEnv,execStatus,(void *) rptr->types,(sizeof(void *) * rptr->tcnt));
+      ExpressionDeinstall(theEnv,execStatus,rptr->query);
+      ReturnPackedExpression(theEnv,execStatus,rptr->query);
      }
    if (meth->restrictions != NULL)
-     rm(theEnv,(void *) meth->restrictions,
+     rm(theEnv,execStatus,(void *) meth->restrictions,
         (sizeof(RESTRICTION) * meth->restrictionCount));
    RestoreBusyCount(gfunc);
   }
@@ -395,22 +395,22 @@ globle void DestroyMethodInfo(
 #pragma unused(gfunc)
 #endif
 
-   ReturnPackedExpression(theEnv,meth->actions);
+   ReturnPackedExpression(theEnv,execStatus,meth->actions);
    
-   ClearUserDataList(theEnv,meth->usrData);
+   ClearUserDataList(theEnv,execStatus,meth->usrData);
    if (meth->ppForm != NULL)
-     rm(theEnv,(void *) meth->ppForm,(sizeof(char) * (strlen(meth->ppForm)+1)));
+     rm(theEnv,execStatus,(void *) meth->ppForm,(sizeof(char) * (strlen(meth->ppForm)+1)));
    for (j = 0 ; j < meth->restrictionCount ; j++)
      {
       rptr = &meth->restrictions[j];
 
       if (rptr->types != NULL)
-        rm(theEnv,(void *) rptr->types,(sizeof(void *) * rptr->tcnt));
-      ReturnPackedExpression(theEnv,rptr->query);
+        rm(theEnv,execStatus,(void *) rptr->types,(sizeof(void *) * rptr->tcnt));
+      ReturnPackedExpression(theEnv,execStatus,rptr->query);
      }
 
    if (meth->restrictions != NULL)
-     rm(theEnv,(void *) meth->restrictions,
+     rm(theEnv,execStatus,(void *) meth->restrictions,
         (sizeof(RESTRICTION) * meth->restrictionCount));
   }
 
@@ -523,39 +523,39 @@ globle void PreviewGeneric(
    execStatus->EvaluationError = FALSE;
    if (EnvArgTypeCheck(theEnv,execStatus,"preview-generic",1,SYMBOL,&temp) == FALSE)
      return;
-   gfunc = LookupDefgenericByMdlOrScope(theEnv,DOToString(temp));
+   gfunc = LookupDefgenericByMdlOrScope(theEnv,execStatus,DOToString(temp));
    if (gfunc == NULL)
      {
-      PrintErrorID(theEnv,"GENRCFUN",3,FALSE);
-      EnvPrintRouter(theEnv,WERROR,"Unable to find generic function ");
-      EnvPrintRouter(theEnv,WERROR,DOToString(temp));
-      EnvPrintRouter(theEnv,WERROR," in function preview-generic.\n");
+      PrintErrorID(theEnv,execStatus,"GENRCFUN",3,FALSE);
+      EnvPrintRouter(theEnv,execStatus,WERROR,"Unable to find generic function ");
+      EnvPrintRouter(theEnv,execStatus,WERROR,DOToString(temp));
+      EnvPrintRouter(theEnv,execStatus,WERROR," in function preview-generic.\n");
       return;
      }
    oldce = ExecutingConstruct(theEnv);
-   SetExecutingConstruct(theEnv,TRUE);
+   SetExecutingConstruct(theEnv,execStatus,TRUE);
    previousGeneric = DefgenericData(theEnv)->CurrentGeneric;
    DefgenericData(theEnv)->CurrentGeneric = gfunc;
    execStatus->CurrentEvaluationDepth++;
-   PushProcParameters(theEnv,GetFirstArgument()->nextArg,
+   PushProcParameters(theEnv,execStatus,GetFirstArgument()->nextArg,
                           CountArguments(GetFirstArgument()->nextArg),
-                          EnvGetDefgenericName(theEnv,(void *) gfunc),"generic function",
+                          EnvGetDefgenericName(theEnv,execStatus,(void *) gfunc),"generic function",
                           UnboundMethodErr);
    if (execStatus->EvaluationError)
      {
       PopProcParameters(theEnv);
       DefgenericData(theEnv)->CurrentGeneric = previousGeneric;
       execStatus->CurrentEvaluationDepth--;
-      SetExecutingConstruct(theEnv,oldce);
+      SetExecutingConstruct(theEnv,execStatus,oldce);
       return;
      }
    gfunc->busy++;
-   DisplayGenericCore(theEnv,gfunc);
+   DisplayGenericCore(theEnv,execStatus,gfunc);
    gfunc->busy--;
    PopProcParameters(theEnv);
    DefgenericData(theEnv)->CurrentGeneric = previousGeneric;
    execStatus->CurrentEvaluationDepth--;
-   SetExecutingConstruct(theEnv,oldce);
+   SetExecutingConstruct(theEnv,execStatus,oldce);
   }
 
 /******************************************************************
@@ -607,9 +607,9 @@ globle void PrintMethod(
       for (k = 0 ; k < rptr->tcnt ; k++)
         {
 #if OBJECT_SYSTEM
-         genstrncat(buf,EnvGetDefclassName(theEnv,rptr->types[k]),buflen-strlen(buf));
+         genstrncat(buf,EnvGetDefclassName(theEnv,execStatus,rptr->types[k]),buflen-strlen(buf));
 #else
-         genstrncat(buf,TypeName(theEnv,ValueToInteger(rptr->types[k])),buflen-strlen(buf));
+         genstrncat(buf,TypeName(theEnv,execStatus,ValueToInteger(rptr->types[k])),buflen-strlen(buf));
 #endif
          if (((int) k) < (((int) rptr->tcnt) - 1))
            genstrncat(buf," ",buflen-strlen(buf));
@@ -648,16 +648,16 @@ globle DEFGENERIC *CheckGenericExists(
   {
    DEFGENERIC *gfunc;
 
-   gfunc = LookupDefgenericByMdlOrScope(theEnv,gname);
+   gfunc = LookupDefgenericByMdlOrScope(theEnv,execStatus,gname);
    if (gfunc == NULL)
      {
-      PrintErrorID(theEnv,"GENRCFUN",3,FALSE);
-      EnvPrintRouter(theEnv,WERROR,"Unable to find generic function ");
-      EnvPrintRouter(theEnv,WERROR,gname);
-      EnvPrintRouter(theEnv,WERROR," in function ");
-      EnvPrintRouter(theEnv,WERROR,fname);
-      EnvPrintRouter(theEnv,WERROR,".\n");
-      SetEvaluationError(theEnv,TRUE);
+      PrintErrorID(theEnv,execStatus,"GENRCFUN",3,FALSE);
+      EnvPrintRouter(theEnv,execStatus,WERROR,"Unable to find generic function ");
+      EnvPrintRouter(theEnv,execStatus,WERROR,gname);
+      EnvPrintRouter(theEnv,execStatus,WERROR," in function ");
+      EnvPrintRouter(theEnv,execStatus,WERROR,fname);
+      EnvPrintRouter(theEnv,execStatus,WERROR,".\n");
+      SetEvaluationError(theEnv,execStatus,TRUE);
      }
    return(gfunc);
   }
@@ -686,15 +686,15 @@ globle long CheckMethodExists(
    fi = FindMethodByIndex(gfunc,mi);
    if (fi == -1)
      {
-      PrintErrorID(theEnv,"GENRCFUN",2,FALSE);
-      EnvPrintRouter(theEnv,WERROR,"Unable to find method ");
-      EnvPrintRouter(theEnv,WERROR,EnvGetDefgenericName(theEnv,(void *) gfunc));
-      EnvPrintRouter(theEnv,WERROR," #");
-      PrintLongInteger(theEnv,WERROR,mi);
-      EnvPrintRouter(theEnv,WERROR," in function ");
-      EnvPrintRouter(theEnv,WERROR,fname);
-      EnvPrintRouter(theEnv,WERROR,".\n");
-      SetEvaluationError(theEnv,TRUE);
+      PrintErrorID(theEnv,execStatus,"GENRCFUN",2,FALSE);
+      EnvPrintRouter(theEnv,execStatus,WERROR,"Unable to find method ");
+      EnvPrintRouter(theEnv,execStatus,WERROR,EnvGetDefgenericName(theEnv,execStatus,(void *) gfunc));
+      EnvPrintRouter(theEnv,execStatus,WERROR," #");
+      PrintLongInteger(theEnv,execStatus,WERROR,mi);
+      EnvPrintRouter(theEnv,execStatus,WERROR," in function ");
+      EnvPrintRouter(theEnv,execStatus,WERROR,fname);
+      EnvPrintRouter(theEnv,execStatus,WERROR,".\n");
+      SetEvaluationError(theEnv,execStatus,TRUE);
      }
    return(fi);
   }
@@ -736,9 +736,9 @@ globle char *TypeName(
       case LEXEME_TYPE_CODE    : return(LEXEME_TYPE_NAME);
       case ADDRESS_TYPE_CODE   : return(ADDRESS_TYPE_NAME);
       case INSTANCE_TYPE_CODE  : return(INSTANCE_TYPE_NAME);
-      default                  : PrintErrorID(theEnv,"INSCOM",1,FALSE);
-                                 EnvPrintRouter(theEnv,WERROR,"Undefined type in function type.\n");
-                                 SetEvaluationError(theEnv,TRUE);
+      default                  : PrintErrorID(theEnv,execStatus,"INSCOM",1,FALSE);
+                                 EnvPrintRouter(theEnv,execStatus,WERROR,"Undefined type in function type.\n");
+                                 SetEvaluationError(theEnv,execStatus,TRUE);
                                  return("<UNKNOWN-TYPE>");
      }
   }
@@ -764,11 +764,11 @@ globle void PrintGenericName(
   {
    if (gfunc->header.whichModule->theModule != ((struct defmodule *) EnvGetCurrentModule(theEnv)))
      {
-      EnvPrintRouter(theEnv,logName,EnvGetDefmoduleName(theEnv,(void *)
+      EnvPrintRouter(theEnv,execStatus,logName,EnvGetDefmoduleName(theEnv,execStatus,(void *)
                         gfunc->header.whichModule->theModule));
-      EnvPrintRouter(theEnv,logName,"::");
+      EnvPrintRouter(theEnv,execStatus,logName,"::");
      }
-   EnvPrintRouter(theEnv,logName,ValueToString((void *) gfunc->header.name));
+   EnvPrintRouter(theEnv,execStatus,logName,ValueToString((void *) gfunc->header.name));
   }
 
 /* =========================================
@@ -801,22 +801,22 @@ static void DisplayGenericCore(
    for (i = 0 ; i < gfunc->mcnt ; i++)
      {
       gfunc->methods[i].busy++;
-      if (IsMethodApplicable(theEnv,&gfunc->methods[i]))
+      if (IsMethodApplicable(theEnv,execStatus,&gfunc->methods[i]))
         {
          rtn = TRUE;
-         EnvPrintRouter(theEnv,WDISPLAY,EnvGetDefgenericName(theEnv,(void *) gfunc));
-         EnvPrintRouter(theEnv,WDISPLAY," #");
-         PrintMethod(theEnv,buf,255,&gfunc->methods[i]);
-         EnvPrintRouter(theEnv,WDISPLAY,buf);
-         EnvPrintRouter(theEnv,WDISPLAY,"\n");
+         EnvPrintRouter(theEnv,execStatus,WDISPLAY,EnvGetDefgenericName(theEnv,execStatus,(void *) gfunc));
+         EnvPrintRouter(theEnv,execStatus,WDISPLAY," #");
+         PrintMethod(theEnv,execStatus,buf,255,&gfunc->methods[i]);
+         EnvPrintRouter(theEnv,execStatus,WDISPLAY,buf);
+         EnvPrintRouter(theEnv,execStatus,WDISPLAY,"\n");
         }
       gfunc->methods[i].busy--;
      }
    if (rtn == FALSE)
      {
-      EnvPrintRouter(theEnv,WDISPLAY,"No applicable methods for ");
-      EnvPrintRouter(theEnv,WDISPLAY,EnvGetDefgenericName(theEnv,(void *) gfunc));
-      EnvPrintRouter(theEnv,WDISPLAY,".\n");
+      EnvPrintRouter(theEnv,execStatus,WDISPLAY,"No applicable methods for ");
+      EnvPrintRouter(theEnv,execStatus,WDISPLAY,EnvGetDefgenericName(theEnv,execStatus,(void *) gfunc));
+      EnvPrintRouter(theEnv,execStatus,WDISPLAY,".\n");
      }
   }
 

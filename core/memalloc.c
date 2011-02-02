@@ -72,7 +72,7 @@ globle void InitializeMemory(
   {
    int i;
 
-   AllocateEnvironmentData(theEnv,MEMORY_DATA,sizeof(struct memoryData),NULL);
+   AllocateEnvironmentData(theEnv,execStatus,MEMORY_DATA,sizeof(struct memoryData),NULL);
 
    MemoryData(theEnv)->OutOfMemoryFunction = DefaultOutOfMemoryFunction;
    
@@ -81,9 +81,9 @@ globle void InitializeMemory(
 
    if (MemoryData(theEnv)->MemoryTable == NULL)
      {
-      PrintErrorID(theEnv,"MEMORY",1,TRUE);
-      EnvPrintRouter(theEnv,WERROR,"Out of memory.\n");
-      EnvExitRouter(theEnv,EXIT_FAILURE);
+      PrintErrorID(theEnv,execStatus,"MEMORY",1,TRUE);
+      EnvPrintRouter(theEnv,execStatus,WERROR,"Out of memory.\n");
+      EnvExitRouter(theEnv,execStatus,EXIT_FAILURE);
      }
 
    for (i = 0; i < MEM_TABLE_SIZE; i++) MemoryData(theEnv)->MemoryTable[i] = NULL;
@@ -100,20 +100,20 @@ globle void *genalloc(
    char *memPtr;
                
 #if   BLOCK_MEMORY
-   memPtr = (char *) RequestChunk(theEnv,size);
+   memPtr = (char *) RequestChunk(theEnv,execStatus,size);
    if (memPtr == NULL)
      {
-      EnvReleaseMem(theEnv,(long) ((size * 5 > 4096) ? size * 5 : 4096),FALSE);
-      memPtr = (char *) RequestChunk(theEnv,size);
+      EnvReleaseMem(theEnv,execStatus,(long) ((size * 5 > 4096) ? size * 5 : 4096),FALSE);
+      memPtr = (char *) RequestChunk(theEnv,execStatus,size);
       if (memPtr == NULL)
         {
-         EnvReleaseMem(theEnv,-1L,TRUE);
-         memPtr = (char *) RequestChunk(theEnv,size);
+         EnvReleaseMem(theEnv,execStatus,-1L,TRUE);
+         memPtr = (char *) RequestChunk(theEnv,execStatus,size);
          while (memPtr == NULL)
            {
-            if ((*MemoryData(theEnv)->OutOfMemoryFunction)(theEnv,(unsigned long) size))
+            if ((*MemoryData(theEnv)->OutOfMemoryFunction)(theEnv,execStatus,(unsigned long) size))
               return(NULL);
-            memPtr = (char *) RequestChunk(theEnv,size);
+            memPtr = (char *) RequestChunk(theEnv,execStatus,size);
            }
         }
      }
@@ -122,15 +122,15 @@ globle void *genalloc(
         
    if (memPtr == NULL)
      {
-      EnvReleaseMem(theEnv,(long) ((size * 5 > 4096) ? size * 5 : 4096),FALSE);
+      EnvReleaseMem(theEnv,execStatus,(long) ((size * 5 > 4096) ? size * 5 : 4096),FALSE);
       memPtr = (char *) malloc(size);
       if (memPtr == NULL)
         {
-         EnvReleaseMem(theEnv,-1L,TRUE);
+         EnvReleaseMem(theEnv,execStatus,-1L,TRUE);
          memPtr = (char *) malloc(size);
          while (memPtr == NULL)
            {
-            if ((*MemoryData(theEnv)->OutOfMemoryFunction)(theEnv,size))
+            if ((*MemoryData(theEnv)->OutOfMemoryFunction)(theEnv,execStatus,size))
               return(NULL);
             memPtr = (char *) malloc(size);
            }
@@ -160,9 +160,9 @@ globle int DefaultOutOfMemoryFunction(
 #pragma unused(size)
 #endif
 
-   PrintErrorID(theEnv,"MEMORY",1,TRUE);
-   EnvPrintRouter(theEnv,WERROR,"Out of memory.\n");
-   EnvExitRouter(theEnv,EXIT_FAILURE);
+   PrintErrorID(theEnv,execStatus,"MEMORY",1,TRUE);
+   EnvPrintRouter(theEnv,execStatus,WERROR,"Out of memory.\n");
+   EnvExitRouter(theEnv,execStatus,EXIT_FAILURE);
    return(TRUE);
   }
 
@@ -192,10 +192,10 @@ globle int genfree(
   size_t size)
   {   
 #if BLOCK_MEMORY
-   if (ReturnChunk(theEnv,waste,size) == FALSE)
+   if (ReturnChunk(theEnv,execStatus,waste,size) == FALSE)
      {
-      PrintErrorID(theEnv,"MEMORY",2,TRUE);
-      EnvPrintRouter(theEnv,WERROR,"Release error in genfree.\n");
+      PrintErrorID(theEnv,execStatus,"MEMORY",2,TRUE);
+      EnvPrintRouter(theEnv,execStatus,WERROR,"Release error in genfree.\n");
       return(-1);
      }
 #else
@@ -222,7 +222,7 @@ globle void *genrealloc(
    unsigned i;
    size_t limit;
 
-   newaddr = ((newsz != 0) ? (char *) gm2(theEnv,newsz) : NULL);
+   newaddr = ((newsz != 0) ? (char *) gm2(theEnv,execStatus,newsz) : NULL);
 
    if (oldaddr != NULL)
      {
@@ -231,7 +231,7 @@ globle void *genrealloc(
         { newaddr[i] = ((char *) oldaddr)[i]; }
       for ( ; i < newsz; i++)
         { newaddr[i] = '\0'; }
-      rm(theEnv,(void *) oldaddr,oldsz);
+      rm(theEnv,execStatus,(void *) oldaddr,oldsz);
      }
 
    return((void *) newaddr);
@@ -301,7 +301,7 @@ globle long int EnvReleaseMem(
    long int amount = 0;
 
    if (printMessage == TRUE)
-     { EnvPrintRouter(theEnv,WDIALOG,"\n*** DEALLOCATING MEMORY ***\n"); }
+     { EnvPrintRouter(theEnv,execStatus,WDIALOG,"\n*** DEALLOCATING MEMORY ***\n"); }
 
    for (i = (MEM_TABLE_SIZE - 1) ; i >= (int) sizeof(char *) ; i--)
      {
@@ -310,7 +310,7 @@ globle long int EnvReleaseMem(
       while (memPtr != NULL)
         {
          tmpPtr = memPtr->next;
-         genfree(theEnv,(void *) memPtr,(unsigned) i);
+         genfree(theEnv,execStatus,(void *) memPtr,(unsigned) i);
          memPtr = tmpPtr;
          amount += i;
          returns++;
@@ -321,13 +321,13 @@ globle long int EnvReleaseMem(
       if ((amount > maximum) && (maximum > 0))
         {
          if (printMessage == TRUE)
-           { EnvPrintRouter(theEnv,WDIALOG,"*** MEMORY  DEALLOCATED ***\n"); }
+           { EnvPrintRouter(theEnv,execStatus,WDIALOG,"*** MEMORY  DEALLOCATED ***\n"); }
          return(amount);
         }
      }
 
    if (printMessage == TRUE)
-     { EnvPrintRouter(theEnv,WDIALOG,"*** MEMORY  DEALLOCATED ***\n"); }
+     { EnvPrintRouter(theEnv,execStatus,WDIALOG,"*** MEMORY  DEALLOCATED ***\n"); }
 
    return(amount);
   }
@@ -348,7 +348,7 @@ globle void *gm1(
 
    if (size >= MEM_TABLE_SIZE)
      {
-      tmpPtr = (char *) genalloc(theEnv,(unsigned) size);
+      tmpPtr = (char *) genalloc(theEnv,execStatus,(unsigned) size);
       for (i = 0 ; i < size ; i++)
         { tmpPtr[i] = '\0'; }
       return((void *) tmpPtr);
@@ -357,7 +357,7 @@ globle void *gm1(
    memPtr = (struct memoryPtr *) MemoryData(theEnv)->MemoryTable[size];
    if (memPtr == NULL)
      {
-      tmpPtr = (char *) genalloc(theEnv,(unsigned) size);
+      tmpPtr = (char *) genalloc(theEnv,execStatus,(unsigned) size);
       for (i = 0 ; i < size ; i++)
         { tmpPtr[i] = '\0'; }
       return((void *) tmpPtr);
@@ -384,12 +384,12 @@ globle void *gm2(
    
    if (size < sizeof(char *)) size = sizeof(char *);
 
-   if (size >= MEM_TABLE_SIZE) return(genalloc(theEnv,(unsigned) size));
+   if (size >= MEM_TABLE_SIZE) return(genalloc(theEnv,execStatus,(unsigned) size));
 
    memPtr = (struct memoryPtr *) MemoryData(theEnv)->MemoryTable[size];
    if (memPtr == NULL)
      {
-      return(genalloc(theEnv,(unsigned) size));
+      return(genalloc(theEnv,execStatus,(unsigned) size));
      }
 
    MemoryData(theEnv)->MemoryTable[size] = memPtr->next;
@@ -409,11 +409,11 @@ globle void *gm3(
 
    if (size < (long) sizeof(char *)) size = sizeof(char *);
 
-   if (size >= MEM_TABLE_SIZE) return(genalloc(theEnv,size));
+   if (size >= MEM_TABLE_SIZE) return(genalloc(theEnv,execStatus,size));
 
    memPtr = (struct memoryPtr *) MemoryData(theEnv)->MemoryTable[(int) size];
    if (memPtr == NULL)
-     { return(genalloc(theEnv,size)); }
+     { return(genalloc(theEnv,execStatus,size)); }
 
    MemoryData(theEnv)->MemoryTable[(int) size] = memPtr->next;
 
@@ -434,13 +434,13 @@ globle int rm(
 
    if (size == 0)
      {
-      SystemError(theEnv,"MEMORY",1);
-      EnvExitRouter(theEnv,EXIT_FAILURE);
+      SystemError(theEnv,execStatus,"MEMORY",1);
+      EnvExitRouter(theEnv,execStatus,EXIT_FAILURE);
      }
 
    if (size < sizeof(char *)) size = sizeof(char *);
 
-   if (size >= MEM_TABLE_SIZE) return(genfree(theEnv,(void *) str,(unsigned) size));
+   if (size >= MEM_TABLE_SIZE) return(genfree(theEnv,execStatus,(void *) str,(unsigned) size));
 
    memPtr = (struct memoryPtr *) str;
    memPtr->next = MemoryData(theEnv)->MemoryTable[size];
@@ -463,13 +463,13 @@ globle int rm3(
 
    if (size == 0)
      {
-      SystemError(theEnv,"MEMORY",1);
-      EnvExitRouter(theEnv,EXIT_FAILURE);
+      SystemError(theEnv,execStatus,"MEMORY",1);
+      EnvExitRouter(theEnv,execStatus,EXIT_FAILURE);
      }
 
    if (size < (long) sizeof(char *)) size = sizeof(char *);
 
-   if (size >= MEM_TABLE_SIZE) return(genfree(theEnv,(void *) str,(unsigned long) size));
+   if (size >= MEM_TABLE_SIZE) return(genfree(theEnv,execStatus,(void *) str,(unsigned long) size));
 
    memPtr = (struct memoryPtr *) str;
    memPtr->next = MemoryData(theEnv)->MemoryTable[(int) size];
@@ -731,7 +731,7 @@ globle void *RequestChunk(
 
    if (MemoryData(theEnv)->BlockMemoryInitialized == FALSE)
       {
-       if (InitializeBlockMemory(theEnv,requestSize) == 0) return(NULL);
+       if (InitializeBlockMemory(theEnv,execStatus,requestSize) == 0) return(NULL);
       }
 
    /*====================================================*/
@@ -758,7 +758,7 @@ globle void *RequestChunk(
          if ((chunkPtr->size == requestSize) ||
              (chunkPtr->size > (requestSize + MemoryData(theEnv)->ChunkInfoSize)))
            {
-            AllocateChunk(theEnv,blockPtr,chunkPtr,requestSize);
+            AllocateChunk(theEnv,execStatus,blockPtr,chunkPtr,requestSize);
 
             return((void *) (((char *) chunkPtr) + MemoryData(theEnv)->ChunkInfoSize));
            }
@@ -767,14 +767,14 @@ globle void *RequestChunk(
 
       if (blockPtr->nextBlock == NULL)
         {
-         if (AllocateBlock(theEnv,blockPtr,requestSize) == 0)  /* get another block */
+         if (AllocateBlock(theEnv,execStatus,blockPtr,requestSize) == 0)  /* get another block */
            { return(NULL); }
         }
       blockPtr = blockPtr->nextBlock;
      }
 
-   SystemError(theEnv,"MEMORY",2);
-   EnvExitRouter(theEnv,EXIT_FAILURE);
+   SystemError(theEnv,execStatus,"MEMORY",2);
+   EnvExitRouter(theEnv,execStatus,EXIT_FAILURE);
    return(NULL); /* Unreachable, but prevents warning. */
   }
 

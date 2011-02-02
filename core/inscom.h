@@ -51,7 +51,7 @@ struct instanceData
    intBool ObjectModDupMsgValid;
   };
 
-#define InstanceData(theEnv) ((struct instanceData *) GetEnvironmentData(theEnv,INSTANCE_DATA))
+#define InstanceData(theEnv) ((struct instanceData *) GetEnvironmentData(theEnv,execStatus,INSTANCE_DATA))
 
 #ifdef LOCALE
 #undef LOCALE

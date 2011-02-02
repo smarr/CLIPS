@@ -70,12 +70,12 @@ globle void InvalidDeftemplateSlotMessage(
   char *deftemplateName,
   int printCR)
   {
-   PrintErrorID(theEnv,"TMPLTDEF",1,printCR);
-   EnvPrintRouter(theEnv,WERROR,"Invalid slot ");
-   EnvPrintRouter(theEnv,WERROR,slotName);
-   EnvPrintRouter(theEnv,WERROR," not defined in corresponding deftemplate ");
-   EnvPrintRouter(theEnv,WERROR,deftemplateName);
-   EnvPrintRouter(theEnv,WERROR,".\n");
+   PrintErrorID(theEnv,execStatus,"TMPLTDEF",1,printCR);
+   EnvPrintRouter(theEnv,execStatus,WERROR,"Invalid slot ");
+   EnvPrintRouter(theEnv,execStatus,WERROR,slotName);
+   EnvPrintRouter(theEnv,execStatus,WERROR," not defined in corresponding deftemplate ");
+   EnvPrintRouter(theEnv,execStatus,WERROR,deftemplateName);
+   EnvPrintRouter(theEnv,execStatus,WERROR,".\n");
   }
 
 /**********************************************************/
@@ -88,10 +88,10 @@ globle void SingleFieldSlotCardinalityError(
   EXEC_STATUS,
   char *slotName)
   {
-   PrintErrorID(theEnv,"TMPLTDEF",2,TRUE);
-   EnvPrintRouter(theEnv,WERROR,"The single field slot ");
-   EnvPrintRouter(theEnv,WERROR,slotName);
-   EnvPrintRouter(theEnv,WERROR," can only contain a single field value.\n");
+   PrintErrorID(theEnv,execStatus,"TMPLTDEF",2,TRUE);
+   EnvPrintRouter(theEnv,execStatus,WERROR,"The single field slot ");
+   EnvPrintRouter(theEnv,execStatus,WERROR,slotName);
+   EnvPrintRouter(theEnv,execStatus,WERROR," can only contain a single field value.\n");
   }
 
 /**********************************************************************/
@@ -104,17 +104,17 @@ globle void MultiIntoSingleFieldSlotError(
   struct templateSlot *theSlot,
   struct deftemplate *theDeftemplate)
   {
-   PrintErrorID(theEnv,"TMPLTFUN",2,TRUE);
-   EnvPrintRouter(theEnv,WERROR,"Attempted to assert a multifield value \n");
-   EnvPrintRouter(theEnv,WERROR,"into the single field slot ");
-   if (theSlot != NULL) EnvPrintRouter(theEnv,WERROR,theSlot->slotName->contents);
-   else EnvPrintRouter(theEnv,WERROR,"<<unknown>>");
-   EnvPrintRouter(theEnv,WERROR," of deftemplate ");
-   if (theDeftemplate != NULL) EnvPrintRouter(theEnv,WERROR,theDeftemplate->header.name->contents);
-   else EnvPrintRouter(theEnv,WERROR,"<<unknown>>");
-   EnvPrintRouter(theEnv,WERROR,".\n");
+   PrintErrorID(theEnv,execStatus,"TMPLTFUN",2,TRUE);
+   EnvPrintRouter(theEnv,execStatus,WERROR,"Attempted to assert a multifield value \n");
+   EnvPrintRouter(theEnv,execStatus,WERROR,"into the single field slot ");
+   if (theSlot != NULL) EnvPrintRouter(theEnv,execStatus,WERROR,theSlot->slotName->contents);
+   else EnvPrintRouter(theEnv,execStatus,WERROR,"<<unknown>>");
+   EnvPrintRouter(theEnv,execStatus,WERROR," of deftemplate ");
+   if (theDeftemplate != NULL) EnvPrintRouter(theEnv,execStatus,WERROR,theDeftemplate->header.name->contents);
+   else EnvPrintRouter(theEnv,execStatus,WERROR,"<<unknown>>");
+   EnvPrintRouter(theEnv,execStatus,WERROR,".\n");
 
-   SetEvaluationError(theEnv,TRUE);
+   SetEvaluationError(theEnv,execStatus,TRUE);
   }
 
 /**************************************************************/
@@ -182,18 +182,18 @@ globle void CheckTemplateFact(
       /* if a constraint violation occurred.         */
       /*=============================================*/
 
-      rv = ConstraintCheckDataObject(theEnv,&theData,slotPtr->constraints);
+      rv = ConstraintCheckDataObject(theEnv,execStatus,&theData,slotPtr->constraints);
       if (rv != NO_VIOLATION)
         {
          gensprintf(thePlace,"fact f-%-5lld ",theFact->factIndex);
 
-         PrintErrorID(theEnv,"CSTRNCHK",1,TRUE);
-         EnvPrintRouter(theEnv,WERROR,"Slot value ");
-         PrintDataObject(theEnv,WERROR,&theData);
-         EnvPrintRouter(theEnv,WERROR," ");
-         ConstraintViolationErrorMessage(theEnv,NULL,thePlace,FALSE,0,slotPtr->slotName,
+         PrintErrorID(theEnv,execStatus,"CSTRNCHK",1,TRUE);
+         EnvPrintRouter(theEnv,execStatus,WERROR,"Slot value ");
+         PrintDataObject(theEnv,execStatus,WERROR,&theData);
+         EnvPrintRouter(theEnv,execStatus,WERROR," ");
+         ConstraintViolationErrorMessage(theEnv,execStatus,NULL,thePlace,FALSE,0,slotPtr->slotName,
                                          0,rv,slotPtr->constraints,TRUE);
-         SetHaltExecution(theEnv,TRUE);
+         SetHaltExecution(theEnv,execStatus,TRUE);
          return;
         }
      }
@@ -217,12 +217,12 @@ globle intBool CheckRHSSlotTypes(
    char *theName;
 
    if (EnvGetStaticConstraintChecking(theEnv) == FALSE) return(TRUE);
-      rv = ConstraintCheckExpressionChain(theEnv,rhsSlots,slotPtr->constraints);
+      rv = ConstraintCheckExpressionChain(theEnv,execStatus,rhsSlots,slotPtr->constraints);
       if (rv != NO_VIOLATION)
         {
          if (rv != CARDINALITY_VIOLATION) theName = "A literal slot value";
          else theName = "Literal slot values";
-         ConstraintViolationErrorMessage(theEnv,theName,thePlace,TRUE,0,
+         ConstraintViolationErrorMessage(theEnv,execStatus,theName,thePlace,TRUE,0,
                                          slotPtr->slotName,0,rv,slotPtr->constraints,TRUE);
          return(0);
         }
@@ -305,8 +305,8 @@ globle void PrintTemplateFact(
    /* Print the relation name of the deftemplate. */
    /*=============================================*/
 
-   EnvPrintRouter(theEnv,logicalName,"(");
-   EnvPrintRouter(theEnv,logicalName,theDeftemplate->header.name->contents);
+   EnvPrintRouter(theEnv,execStatus,logicalName,"(");
+   EnvPrintRouter(theEnv,execStatus,logicalName,theDeftemplate->header.name->contents);
 
    /*===================================================*/
    /* Print each of the field slots of the deftemplate. */
@@ -325,7 +325,7 @@ globle void PrintTemplateFact(
       
       if (ignoreDefaults && (slotPtr->defaultDynamic == FALSE))
         {
-         DeftemplateSlotDefault(theEnv,theDeftemplate,slotPtr,&tempDO,TRUE);
+         DeftemplateSlotDefault(theEnv,execStatus,theDeftemplate,slotPtr,&tempDO,TRUE);
          
          if (slotPtr->multislot == FALSE)
            {
@@ -354,14 +354,14 @@ globle void PrintTemplateFact(
       if (! slotPrinted) 
         { 
          slotPrinted = TRUE;
-         EnvPrintRouter(theEnv,logicalName," "); 
+         EnvPrintRouter(theEnv,execStatus,logicalName," "); 
         }
 
       if (seperateLines)
-        { EnvPrintRouter(theEnv,logicalName,"\n   "); }
+        { EnvPrintRouter(theEnv,execStatus,logicalName,"\n   "); }
 
-      EnvPrintRouter(theEnv,logicalName,"(");
-      EnvPrintRouter(theEnv,logicalName,slotPtr->slotName->contents);
+      EnvPrintRouter(theEnv,execStatus,logicalName,"(");
+      EnvPrintRouter(theEnv,execStatus,logicalName,slotPtr->slotName->contents);
 
       /*======================================================*/
       /* Print the value of the slot for a single field slot. */
@@ -369,8 +369,8 @@ globle void PrintTemplateFact(
 
       if (slotPtr->multislot == FALSE)
         {
-         EnvPrintRouter(theEnv,logicalName," ");
-         PrintAtom(theEnv,logicalName,sublist[i].type,sublist[i].value);
+         EnvPrintRouter(theEnv,execStatus,logicalName," ");
+         PrintAtom(theEnv,execStatus,logicalName,sublist[i].type,sublist[i].value);
         }
 
       /*==========================================================*/
@@ -384,8 +384,8 @@ globle void PrintTemplateFact(
          theSegment = (struct multifield *) sublist[i].value;
          if (theSegment->multifieldLength > 0)
            {
-            EnvPrintRouter(theEnv,logicalName," ");
-            PrintMultifield(theEnv,logicalName,(struct multifield *) sublist[i].value,
+            EnvPrintRouter(theEnv,execStatus,logicalName," ");
+            PrintMultifield(theEnv,execStatus,logicalName,(struct multifield *) sublist[i].value,
                             0,(long) theSegment->multifieldLength-1,FALSE);
            }
         }
@@ -395,12 +395,12 @@ globle void PrintTemplateFact(
       /*============================================*/
 
       i++;
-      EnvPrintRouter(theEnv,logicalName,")");
+      EnvPrintRouter(theEnv,execStatus,logicalName,")");
       slotPtr = slotPtr->next;
-      if (slotPtr != NULL) EnvPrintRouter(theEnv,logicalName," ");
+      if (slotPtr != NULL) EnvPrintRouter(theEnv,execStatus,logicalName," ");
      }
 
-   EnvPrintRouter(theEnv,logicalName,")");
+   EnvPrintRouter(theEnv,execStatus,logicalName,")");
   }
 
 /***************************************************************************/
@@ -419,27 +419,27 @@ globle void UpdateDeftemplateScope(
    /* Loop through all of the modules. */
    /*==================================*/
 
-   for (theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,NULL);
+   for (theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,NULL);
         theModule != NULL;
-        theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,theModule))
+        theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,theModule))
      {
       /*======================================================*/
       /* Loop through each of the deftemplates in the module. */
       /*======================================================*/
 
       theItem = (struct defmoduleItemHeader *)
-                GetModuleItem(theEnv,theModule,DeftemplateData(theEnv)->DeftemplateModuleIndex);
+                GetModuleItem(theEnv,execStatus,theModule,DeftemplateData(theEnv)->DeftemplateModuleIndex);
 
       for (theDeftemplate = (struct deftemplate *) theItem->firstItem;
            theDeftemplate != NULL ;
-           theDeftemplate = (struct deftemplate *) EnvGetNextDeftemplate(theEnv,theDeftemplate))
+           theDeftemplate = (struct deftemplate *) EnvGetNextDeftemplate(theEnv,execStatus,theDeftemplate))
         {
          /*=======================================*/
          /* If the deftemplate can be seen by the */
          /* current module, then it is in scope.  */
          /*=======================================*/
 
-         if (FindImportedConstruct(theEnv,"deftemplate",theModule,
+         if (FindImportedConstruct(theEnv,execStatus,"deftemplate",theModule,
                                    ValueToString(theDeftemplate->header.name),
                                    &moduleCount,TRUE,NULL) != NULL)
            { theDeftemplate->inScope = TRUE; }
@@ -487,7 +487,7 @@ globle struct deftemplate *CreateImpliedDeftemplate(
   {
    struct deftemplate *newDeftemplate;
 
-   newDeftemplate = get_struct(theEnv,deftemplate);
+   newDeftemplate = get_struct(theEnv,execStatus,deftemplate);
    newDeftemplate->header.name = deftemplateName;
    newDeftemplate->header.ppForm = NULL;
    newDeftemplate->header.usrData = NULL;
@@ -503,15 +503,15 @@ globle struct deftemplate *CreateImpliedDeftemplate(
    newDeftemplate->header.next = NULL;
 
 #if DEBUGGING_FUNCTIONS
-   if (EnvGetWatchItem(theEnv,"facts"))
-     { EnvSetDeftemplateWatch(theEnv,ON,(void *) newDeftemplate); }
+   if (EnvGetWatchItem(theEnv,execStatus,"facts"))
+     { EnvSetDeftemplateWatch(theEnv,execStatus,ON,(void *) newDeftemplate); }
 #endif
 
    newDeftemplate->header.whichModule = (struct defmoduleItemHeader *)
-                                        GetModuleItem(theEnv,NULL,DeftemplateData(theEnv)->DeftemplateModuleIndex);
+                                        GetModuleItem(theEnv,execStatus,NULL,DeftemplateData(theEnv)->DeftemplateModuleIndex);
 
    AddConstructToModule(&newDeftemplate->header);
-   InstallDeftemplate(theEnv,newDeftemplate);
+   InstallDeftemplate(theEnv,execStatus,newDeftemplate);
 
    return(newDeftemplate);
   }

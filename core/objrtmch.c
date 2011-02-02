@@ -115,17 +115,17 @@ globle void ObjectMatchDelay(
   {
    register int ov;
 
-   ov = SetDelayObjectPatternMatching(theEnv,TRUE);
-   EvaluateExpression(theEnv,GetFirstArgument(),result);
+   ov = SetDelayObjectPatternMatching(theEnv,execStatus,TRUE);
+   EvaluateExpression(theEnv,execStatus,GetFirstArgument(),result);
    if (execStatus->EvaluationError)
      {
-      SetHaltExecution(theEnv,FALSE);
-      SetEvaluationError(theEnv,FALSE);
-      SetDelayObjectPatternMatching(theEnv,ov);
-      SetEvaluationError(theEnv,TRUE);
+      SetHaltExecution(theEnv,execStatus,FALSE);
+      SetEvaluationError(theEnv,execStatus,FALSE);
+      SetDelayObjectPatternMatching(theEnv,execStatus,ov);
+      SetEvaluationError(theEnv,execStatus,TRUE);
      }
    else
-     SetDelayObjectPatternMatching(theEnv,ov);
+     SetDelayObjectPatternMatching(theEnv,execStatus,ov);
   }
 
 /***************************************************
@@ -153,7 +153,7 @@ globle intBool SetDelayObjectPatternMatching(
    else
      {
       ObjectReteData(theEnv)->DelayObjectPatternMatching = FALSE;
-      ObjectNetworkAction(theEnv,0,NULL,-1);
+      ObjectNetworkAction(theEnv,execStatus,0,NULL,-1);
      }
    return(oldval);
   }
@@ -306,18 +306,18 @@ globle void ObjectNetworkAction(
         switch (type)
         {
          case OBJECT_ASSERT  :
-           ObjectAssertAction(theEnv,ins);
+           ObjectAssertAction(theEnv,execStatus,ins);
            break;
          case OBJECT_RETRACT :
-           ObjectRetractAction(theEnv,ins,NULL);
+           ObjectRetractAction(theEnv,execStatus,ins,NULL);
            break;
          default             :
-           tmpMap = QueueModifySlotMap(theEnv,NULL,slotNameID);
-           ObjectModifyAction(theEnv,ins,tmpMap);
-           rm(theEnv,(void *) tmpMap,SlotBitMapSize(tmpMap));
+           tmpMap = QueueModifySlotMap(theEnv,execStatus,NULL,slotNameID);
+           ObjectModifyAction(theEnv,execStatus,ins,tmpMap);
+           rm(theEnv,execStatus,(void *) tmpMap,SlotBitMapSize(tmpMap));
         }
       else
-        QueueObjectMatchAction(theEnv,type,ins,slotNameID);
+        QueueObjectMatchAction(theEnv,execStatus,type,ins,slotNameID);
      }
 
    /* ========================================
@@ -452,7 +452,7 @@ static void QueueObjectMatchAction(
                else
                  prv->nxt = cur->nxt;
                cur->ins->busy--;
-               ReturnObjectMatchAction(theEnv,cur);
+               ReturnObjectMatchAction(theEnv,execStatus,cur);
               }
 
             /* =================================================
@@ -470,7 +470,7 @@ static void QueueObjectMatchAction(
             cur->type = OBJECT_RETRACT;
             if (cur->slotNameIDs != NULL)
               {
-               rm(theEnv,(void *) cur->slotNameIDs,SlotBitMapSize(cur->slotNameIDs));
+               rm(theEnv,execStatus,(void *) cur->slotNameIDs,SlotBitMapSize(cur->slotNameIDs));
                cur->slotNameIDs = NULL;
               }
            }
@@ -480,7 +480,7 @@ static void QueueObjectMatchAction(
             queue, ignore this one. Otherwise, merge the slot id
             ==================================================== */
          else
-            cur->slotNameIDs = QueueModifySlotMap(theEnv,cur->slotNameIDs,slotNameID);
+            cur->slotNameIDs = QueueModifySlotMap(theEnv,execStatus,cur->slotNameIDs,slotNameID);
 
          return;
         }
@@ -495,11 +495,11 @@ static void QueueObjectMatchAction(
       If there are no actions for the instance already
       on the queue, the new action is simply appended.
       ================================================ */
-   newMatch = get_struct(theEnv,objectMatchAction);
+   newMatch = get_struct(theEnv,execStatus,objectMatchAction);
    newMatch->type = type;
    newMatch->nxt = NULL; /* If we get here, cur should be NULL */
    newMatch->slotNameIDs = (type != OBJECT_MODIFY) ? NULL :
-                       QueueModifySlotMap(theEnv,NULL,slotNameID);
+                       QueueModifySlotMap(theEnv,execStatus,NULL,slotNameID);
    newMatch->ins = ins;
    newMatch->ins->busy++;
    
@@ -559,13 +559,13 @@ static SLOT_BITMAP *QueueModifySlotMap(
       newmaxid = (unsigned short) (slotNameID * 2);
       newsz = sizeof(SLOT_BITMAP) +
               (sizeof(char) * (newmaxid / BITS_PER_BYTE));
-      newMap = (SLOT_BITMAP *) gm2(theEnv,newsz);
+      newMap = (SLOT_BITMAP *) gm2(theEnv,execStatus,newsz);
       ClearBitString((void *) newMap,newsz);
       if (oldMap != NULL)
         {
          oldsz = SlotBitMapSize(oldMap);
          GenCopyMemory(char,oldsz,newMap,oldMap);
-         rm(theEnv,(void *) oldMap,oldsz);
+         rm(theEnv,execStatus,(void *) oldMap,oldsz);
         }
       newMap->maxid = newmaxid;
      }
@@ -591,8 +591,8 @@ static void ReturnObjectMatchAction(
   OBJECT_MATCH_ACTION *omaPtr)
   {
    if (omaPtr->slotNameIDs != NULL)
-     rm(theEnv,(void *) omaPtr->slotNameIDs,SlotBitMapSize(omaPtr->slotNameIDs));
-   rtn_struct(theEnv,objectMatchAction,omaPtr);
+     rm(theEnv,execStatus,(void *) omaPtr->slotNameIDs,SlotBitMapSize(omaPtr->slotNameIDs));
+   rtn_struct(theEnv,execStatus,objectMatchAction,omaPtr);
   }
 
 /***************************************************
@@ -619,16 +619,16 @@ static void ProcessObjectMatchQueue(
       switch(cur->type)
         {
          case OBJECT_ASSERT  :
-           ObjectAssertAction(theEnv,cur->ins);
+           ObjectAssertAction(theEnv,execStatus,cur->ins);
            break;
          case OBJECT_RETRACT :
-           ObjectRetractAction(theEnv,cur->ins,cur->slotNameIDs);
+           ObjectRetractAction(theEnv,execStatus,cur->ins,cur->slotNameIDs);
            break;
          default             :
-           ObjectModifyAction(theEnv,cur->ins,cur->slotNameIDs);
+           ObjectModifyAction(theEnv,execStatus,cur->ins,cur->slotNameIDs);
         }
       cur->ins->busy--;
-      ReturnObjectMatchAction(theEnv,cur);
+      ReturnObjectMatchAction(theEnv,execStatus,cur);
      }
   }
 
@@ -846,7 +846,7 @@ static void ObjectPatternMatch(
          
          saveSlotLength = ObjectReteData(theEnv)->CurrentObjectSlotLength;
          saveSlot = ObjectReteData(theEnv)->CurrentPatternObjectSlot;
-         ProcessPatternNode(theEnv,offset,patternTop,endMark);
+         ProcessPatternNode(theEnv,execStatus,offset,patternTop,endMark);
          ObjectReteData(theEnv)->CurrentObjectSlotLength = saveSlotLength;
          ObjectReteData(theEnv)->CurrentPatternObjectSlot = saveSlot;
         }
@@ -929,27 +929,27 @@ static void ProcessPatternNode(
      {
       if (patternNode->selector) /* TBD Necessary? */
         {
-         if (EvaluateObjectPatternTest(theEnv,objectSlotField,NULL,patternNode->networkTest->nextArg,patternNode))
+         if (EvaluateObjectPatternTest(theEnv,execStatus,objectSlotField,NULL,patternNode->networkTest->nextArg,patternNode))
            {
-            EvaluateExpression(theEnv,patternNode->networkTest,&theResult);
+            EvaluateExpression(theEnv,execStatus,patternNode->networkTest,&theResult);
             
-            tempPtr = (OBJECT_PATTERN_NODE *) FindHashedPatternNode(theEnv,patternNode,theResult.type,theResult.value);
+            tempPtr = (OBJECT_PATTERN_NODE *) FindHashedPatternNode(theEnv,execStatus,patternNode,theResult.type,theResult.value);
             
             if (tempPtr != NULL)
               {
                if (tempPtr->alphaNode != NULL)
-                 { CreateObjectAlphaMatch(theEnv,tempPtr->alphaNode); }
-               ObjectPatternMatch(theEnv,offset,tempPtr->nextLevel,endMark);              
+                 { CreateObjectAlphaMatch(theEnv,execStatus,tempPtr->alphaNode); }
+               ObjectPatternMatch(theEnv,execStatus,offset,tempPtr->nextLevel,endMark);              
               }
            }
         }
       else if ((patternNode->networkTest == NULL) ? TRUE :
-          (EvaluateObjectPatternTest(theEnv,objectSlotField,NULL,
+          (EvaluateObjectPatternTest(theEnv,execStatus,objectSlotField,NULL,
                                      (EXPRESSION *) patternNode->networkTest,patternNode)))
         {
          if (patternNode->alphaNode != NULL)
-           CreateObjectAlphaMatch(theEnv,patternNode->alphaNode);
-         ObjectPatternMatch(theEnv,offset,patternNode->nextLevel,endMark);
+           CreateObjectAlphaMatch(theEnv,execStatus,patternNode->alphaNode);
+         ObjectPatternMatch(theEnv,execStatus,offset,patternNode->nextLevel,endMark);
         }
       return;
      }
@@ -962,27 +962,27 @@ static void ProcessPatternNode(
      {
       if (patternNode->selector)
         {
-         if (EvaluateObjectPatternTest(theEnv,objectSlotField,NULL,patternNode->networkTest->nextArg,patternNode))
+         if (EvaluateObjectPatternTest(theEnv,execStatus,objectSlotField,NULL,patternNode->networkTest->nextArg,patternNode))
            {
-            EvaluateExpression(theEnv,patternNode->networkTest,&theResult);
+            EvaluateExpression(theEnv,execStatus,patternNode->networkTest,&theResult);
             
-            tempPtr = (OBJECT_PATTERN_NODE *) FindHashedPatternNode(theEnv,patternNode,theResult.type,theResult.value);
+            tempPtr = (OBJECT_PATTERN_NODE *) FindHashedPatternNode(theEnv,execStatus,patternNode,theResult.type,theResult.value);
             
             if (tempPtr != NULL)
               {
                if (tempPtr->alphaNode != NULL)
-                 { CreateObjectAlphaMatch(theEnv,tempPtr->alphaNode); }
-               ObjectPatternMatch(theEnv,offset,tempPtr->nextLevel,endMark);              
+                 { CreateObjectAlphaMatch(theEnv,execStatus,tempPtr->alphaNode); }
+               ObjectPatternMatch(theEnv,execStatus,offset,tempPtr->nextLevel,endMark);              
               }
            }
         }
       else if ((patternNode->networkTest == NULL) ? TRUE :
-          EvaluateObjectPatternTest(theEnv,objectSlotField,NULL,
+          EvaluateObjectPatternTest(theEnv,execStatus,objectSlotField,NULL,
                                     (EXPRESSION *) patternNode->networkTest,patternNode))
         {
          if (patternNode->alphaNode != NULL)
-           CreateObjectAlphaMatch(theEnv,patternNode->alphaNode);
-         ObjectPatternMatch(theEnv,offset,patternNode->nextLevel,endMark);
+           CreateObjectAlphaMatch(theEnv,execStatus,patternNode->alphaNode);
+         ObjectPatternMatch(theEnv,execStatus,offset,patternNode->nextLevel,endMark);
         }
       return;
      }
@@ -993,7 +993,7 @@ static void ProcessPatternNode(
    /* slot the multifield pattern node is bound.                   */
    /*==============================================================*/
    
-   newMark = get_struct(theEnv,multifieldMarker);
+   newMark = get_struct(theEnv,execStatus,multifieldMarker);
    newMark->whichField = patternSlotField;
    newMark->where.whichSlot = (void *) ObjectReteData(theEnv)->CurrentPatternObjectSlot->desc->slotName->name;
    newMark->startPosition = objectSlotField;
@@ -1024,17 +1024,17 @@ static void ProcessPatternNode(
         {
          if (patternNode->selector)
            {
-            if (EvaluateObjectPatternTest(theEnv,objectSlotField,newMark,patternNode->networkTest->nextArg,patternNode))
+            if (EvaluateObjectPatternTest(theEnv,execStatus,objectSlotField,newMark,patternNode->networkTest->nextArg,patternNode))
               {
-               EvaluateExpression(theEnv,patternNode->networkTest,&theResult);
+               EvaluateExpression(theEnv,execStatus,patternNode->networkTest,&theResult);
             
-               tempPtr = (OBJECT_PATTERN_NODE *) FindHashedPatternNode(theEnv,patternNode,theResult.type,theResult.value);
+               tempPtr = (OBJECT_PATTERN_NODE *) FindHashedPatternNode(theEnv,execStatus,patternNode,theResult.type,theResult.value);
             
                if (tempPtr != NULL)
                  {
                   if (tempPtr->alphaNode != NULL)
-                    { CreateObjectAlphaMatch(theEnv,tempPtr->alphaNode); }
-                  ObjectPatternMatch(theEnv,(int) (offset + (newMark->endPosition - objectSlotField)),
+                    { CreateObjectAlphaMatch(theEnv,execStatus,tempPtr->alphaNode); }
+                  ObjectPatternMatch(theEnv,execStatus,(int) (offset + (newMark->endPosition - objectSlotField)),
                                      tempPtr->nextLevel,newMark);
                   ObjectReteData(theEnv)->CurrentObjectSlotLength = objectSlotLength;
                   ObjectReteData(theEnv)->CurrentPatternObjectSlot = objectSlot;
@@ -1042,12 +1042,12 @@ static void ProcessPatternNode(
               }
            }
          else if ((patternNode->networkTest == NULL) ? TRUE :
-              EvaluateObjectPatternTest(theEnv,objectSlotField,newMark,
+              EvaluateObjectPatternTest(theEnv,execStatus,objectSlotField,newMark,
                         (EXPRESSION *) patternNode->networkTest,patternNode))
            {
             if (patternNode->alphaNode != NULL)
-              CreateObjectAlphaMatch(theEnv,patternNode->alphaNode);
-            ObjectPatternMatch(theEnv,(int) (offset + (newMark->endPosition - objectSlotField)),
+              CreateObjectAlphaMatch(theEnv,execStatus,patternNode->alphaNode);
+            ObjectPatternMatch(theEnv,execStatus,(int) (offset + (newMark->endPosition - objectSlotField)),
                                patternNode->nextLevel,newMark);
             ObjectReteData(theEnv)->CurrentObjectSlotLength = objectSlotLength;
             ObjectReteData(theEnv)->CurrentPatternObjectSlot = objectSlot;
@@ -1062,27 +1062,27 @@ static void ProcessPatternNode(
       
       if (patternNode->selector)
         {
-         if (EvaluateObjectPatternTest(theEnv,objectSlotField,newMark,patternNode->networkTest->nextArg,patternNode))
+         if (EvaluateObjectPatternTest(theEnv,execStatus,objectSlotField,newMark,patternNode->networkTest->nextArg,patternNode))
            {
-            EvaluateExpression(theEnv,patternNode->networkTest,&theResult);
+            EvaluateExpression(theEnv,execStatus,patternNode->networkTest,&theResult);
             
-            tempPtr = (OBJECT_PATTERN_NODE *) FindHashedPatternNode(theEnv,patternNode,theResult.type,theResult.value);
+            tempPtr = (OBJECT_PATTERN_NODE *) FindHashedPatternNode(theEnv,execStatus,patternNode,theResult.type,theResult.value);
             
             if (tempPtr != NULL)
               {
                if (tempPtr->alphaNode != NULL)
-                 CreateObjectAlphaMatch(theEnv,tempPtr->alphaNode);
-               ObjectPatternMatch(theEnv,0,tempPtr->nextLevel,newMark);
+                 CreateObjectAlphaMatch(theEnv,execStatus,tempPtr->alphaNode);
+               ObjectPatternMatch(theEnv,execStatus,0,tempPtr->nextLevel,newMark);
               }
            }
         }
       else if ((patternNode->networkTest == NULL) ? TRUE :
-          EvaluateObjectPatternTest(theEnv,objectSlotField,newMark,
+          EvaluateObjectPatternTest(theEnv,execStatus,objectSlotField,newMark,
                                     (EXPRESSION *) patternNode->networkTest,patternNode))
         {
          if (patternNode->alphaNode != NULL)
-           CreateObjectAlphaMatch(theEnv,patternNode->alphaNode);
-         ObjectPatternMatch(theEnv,0,patternNode->nextLevel,newMark);
+           CreateObjectAlphaMatch(theEnv,execStatus,patternNode->alphaNode);
+         ObjectPatternMatch(theEnv,execStatus,0,patternNode->nextLevel,newMark);
         }
      }
 
@@ -1094,7 +1094,7 @@ static void ProcessPatternNode(
      ObjectReteData(theEnv)->CurrentPatternObjectMarks = NULL;
    else
      endMark->next = NULL;
-   rtn_struct(theEnv,multifieldMarker,newMark);
+   rtn_struct(theEnv,execStatus,multifieldMarker,newMark);
   }
 
 /***************************************************
@@ -1122,7 +1122,7 @@ static void CreateObjectAlphaMatch(
      {
       if (alphaPtr->matchTimeTag == ObjectReteData(theEnv)->CurrentObjectMatchTimeTag)
         {
-         hashValue = ComputeRightHashValue(theEnv,&alphaPtr->header);
+         hashValue = ComputeRightHashValue(theEnv,execStatus,&alphaPtr->header);
 
          /* ===================================================
             If we have reached the class bitmap of the pattern,
@@ -1134,7 +1134,7 @@ static void CreateObjectAlphaMatch(
             of this pattern and mark it as busy
             =================================================== */
          ObjectReteData(theEnv)->CurrentPatternObject->busy++;
-         theMatch = CreateAlphaMatch(theEnv,(void *) ObjectReteData(theEnv)->CurrentPatternObject,
+         theMatch = CreateAlphaMatch(theEnv,execStatus,(void *) ObjectReteData(theEnv)->CurrentPatternObject,
                                      ObjectReteData(theEnv)->CurrentPatternObjectMarks,
                                      (struct patternNodeHeader *) alphaPtr,hashValue);
          theMatch->owner = alphaPtr;
@@ -1143,7 +1143,7 @@ static void CreateObjectAlphaMatch(
             Attach the partial match to the object
             to ease later retraction
             ====================================== */
-         newMatch = get_struct(theEnv,patternMatch);
+         newMatch = get_struct(theEnv,execStatus,patternMatch);
          newMatch->next = (struct patternMatch *) ObjectReteData(theEnv)->CurrentPatternObject->partialMatchList;
          newMatch->matchingPattern = (struct patternNodeHeader *) alphaPtr;
          newMatch->theMatch = theMatch;
@@ -1155,7 +1155,7 @@ static void CreateObjectAlphaMatch(
          listOfJoins = alphaPtr->header.entryJoin;
          while (listOfJoins != NULL)
            {
-            NetworkAssert(theEnv,theMatch,listOfJoins);
+            NetworkAssert(theEnv,execStatus,theMatch,listOfJoins);
             listOfJoins = listOfJoins->rightMatchNode;
            }
         }
@@ -1199,7 +1199,7 @@ static intBool EvaluateObjectPatternTest(
 
       oldArgument = execStatus->CurrentExpression;
       execStatus->CurrentExpression = networkTest;
-      rv = ObjectCmpConstantFunction(theEnv,networkTest->value,&vresult);
+      rv = ObjectCmpConstantFunction(theEnv,execStatus,networkTest->value,&vresult);
       execStatus->CurrentExpression = oldArgument;
       if (rv)
         {
@@ -1222,7 +1222,7 @@ static intBool EvaluateObjectPatternTest(
       networkTest = networkTest->argList;
       while (networkTest != NULL)
         {
-         if (EvaluateObjectPatternTest(theEnv,objectSlotField,selfSlotMarker,networkTest,patternNode))
+         if (EvaluateObjectPatternTest(theEnv,execStatus,objectSlotField,selfSlotMarker,networkTest,patternNode))
            {
             /* ============================================
                A node can be blocked ONLY if there were one
@@ -1248,7 +1248,7 @@ static intBool EvaluateObjectPatternTest(
       networkTest = networkTest->argList;
       while (networkTest != NULL)
         {
-         if (EvaluateObjectPatternTest(theEnv,objectSlotField,selfSlotMarker,networkTest,patternNode)
+         if (EvaluateObjectPatternTest(theEnv,execStatus,objectSlotField,selfSlotMarker,networkTest,patternNode)
               == FALSE)
            {
             patternNode->blocked = FALSE;
@@ -1266,9 +1266,9 @@ static intBool EvaluateObjectPatternTest(
    else
      {
       execStatus->HaltExecution = FALSE;
-      if (EvaluateExpression(theEnv,networkTest,&vresult))
+      if (EvaluateExpression(theEnv,execStatus,networkTest,&vresult))
         {
-         ObjectPatternNetErrorMessage(theEnv,patternNode);
+         ObjectPatternNetErrorMessage(theEnv,execStatus,patternNode);
          execStatus->EvaluationError = FALSE;
          execStatus->HaltExecution = FALSE;
          return(FALSE);
@@ -1296,8 +1296,8 @@ static void ObjectAssertAction(
    ins->header.timeTag = ObjectReteData(theEnv)->UseEntityTimeTag;
    ObjectReteData(theEnv)->CurrentPatternObject = ins;
    ObjectReteData(theEnv)->CurrentPatternObjectSlot = NULL;
-   MarkObjectPatternNetwork(theEnv,NULL);
-   ObjectPatternMatch(theEnv,0,ObjectNetworkPointer(theEnv),NULL);
+   MarkObjectPatternNetwork(theEnv,execStatus,NULL);
+   ObjectPatternMatch(theEnv,execStatus,0,ObjectNetworkPointer(theEnv),NULL);
    ins->reteSynchronized = TRUE;
   }
 
@@ -1321,11 +1321,11 @@ static void ObjectModifyAction(
   SLOT_BITMAP *slotNameIDs)
   {
    ins->header.timeTag = ObjectReteData(theEnv)->UseEntityTimeTag;
-   ObjectRetractAction(theEnv,ins,slotNameIDs);
+   ObjectRetractAction(theEnv,execStatus,ins,slotNameIDs);
    ObjectReteData(theEnv)->CurrentPatternObject = ins;
    ObjectReteData(theEnv)->CurrentPatternObjectSlot = NULL;
-   MarkObjectPatternNetwork(theEnv,slotNameIDs);
-   ObjectPatternMatch(theEnv,0,ObjectNetworkPointer(theEnv),NULL);
+   MarkObjectPatternNetwork(theEnv,execStatus,slotNameIDs);
+   ObjectPatternMatch(theEnv,execStatus,0,ObjectNetworkPointer(theEnv),NULL);
    ins->reteSynchronized = TRUE;
   }
 
@@ -1366,7 +1366,7 @@ static void ObjectRetractAction(
             ins->busy--;
             tmpMatch = tmpMatch->next;
            }
-         NetworkRetract(theEnv,(struct patternMatch *) ins->partialMatchList);
+         NetworkRetract(theEnv,execStatus,(struct patternMatch *) ins->partialMatchList);
          ins->partialMatchList = NULL;
         }
      }
@@ -1422,7 +1422,7 @@ static void ObjectRetractAction(
         {
          saveDependents = ins->header.dependents;
          ins->header.dependents = NULL;
-         NetworkRetract(theEnv,deleteMatch);
+         NetworkRetract(theEnv,execStatus,deleteMatch);
          ins->header.dependents = saveDependents;
         }
      }
@@ -1444,18 +1444,18 @@ static void ObjectPatternNetErrorMessage(
   EXEC_STATUS,
   OBJECT_PATTERN_NODE *patternPtr)
   {
-   PrintErrorID(theEnv,"OBJRTMCH",1,TRUE);
-   EnvPrintRouter(theEnv,WERROR,"This error occurred in the object pattern network\n");
-   EnvPrintRouter(theEnv,WERROR,"   Currently active instance: [");
-   EnvPrintRouter(theEnv,WERROR,ValueToString(ObjectReteData(theEnv)->CurrentPatternObject->name));
-   EnvPrintRouter(theEnv,WERROR,"]\n");
-   EnvPrintRouter(theEnv,WERROR,"   Problem resides in slot ");
-   EnvPrintRouter(theEnv,WERROR,ValueToString(FindIDSlotName(theEnv,patternPtr->slotNameID)));
-   EnvPrintRouter(theEnv,WERROR," field #");
-   PrintLongInteger(theEnv,WERROR,(long long) patternPtr->whichField);
-   EnvPrintRouter(theEnv,WERROR,"\n");
-   TraceErrorToObjectPattern(theEnv,TRUE,patternPtr);
-   EnvPrintRouter(theEnv,WERROR,"\n");
+   PrintErrorID(theEnv,execStatus,"OBJRTMCH",1,TRUE);
+   EnvPrintRouter(theEnv,execStatus,WERROR,"This error occurred in the object pattern network\n");
+   EnvPrintRouter(theEnv,execStatus,WERROR,"   Currently active instance: [");
+   EnvPrintRouter(theEnv,execStatus,WERROR,ValueToString(ObjectReteData(theEnv)->CurrentPatternObject->name));
+   EnvPrintRouter(theEnv,execStatus,WERROR,"]\n");
+   EnvPrintRouter(theEnv,execStatus,WERROR,"   Problem resides in slot ");
+   EnvPrintRouter(theEnv,execStatus,WERROR,ValueToString(FindIDSlotName(theEnv,execStatus,patternPtr->slotNameID)));
+   EnvPrintRouter(theEnv,execStatus,WERROR," field #");
+   PrintLongInteger(theEnv,execStatus,WERROR,(long long) patternPtr->whichField);
+   EnvPrintRouter(theEnv,execStatus,WERROR,"\n");
+   TraceErrorToObjectPattern(theEnv,execStatus,TRUE,patternPtr);
+   EnvPrintRouter(theEnv,execStatus,WERROR,"\n");
   }
 
 /*********************************************************
@@ -1486,11 +1486,11 @@ static void TraceErrorToObjectPattern(
          joinPtr = patternPtr->alphaNode->header.entryJoin;
          while (joinPtr != NULL)
            {
-            TraceErrorToRule(theEnv,joinPtr,"      ");
+            TraceErrorToRule(theEnv,execStatus,joinPtr,"      ");
             joinPtr = joinPtr->rightMatchNode;
            }
         }
-      TraceErrorToObjectPattern(theEnv,FALSE,patternPtr->nextLevel);
+      TraceErrorToObjectPattern(theEnv,execStatus,FALSE,patternPtr->nextLevel);
       if (errorNode)
         break;
       patternPtr = patternPtr->rightNode;

@@ -74,14 +74,14 @@ typedef struct exprHashNode
 #define SetValue(target,val)    ((target).value = (void *) (val))
 #define SetpValue(target,val)   ((target)->value = (void *) (val))
 
-#define EnvGetType(theEnv,target)         ((target).type)
-#define EnvGetpType(theEnv,target)        ((target)->type)
-#define EnvSetType(theEnv,target,val)     ((target).type = (unsigned short) (val))
-#define EnvSetpType(theEnv,target,val)    ((target)->type = (unsigned short) (val))
-#define EnvGetValue(theEnv,target)        ((target).value)
-#define EnvGetpValue(theEnv,target)       ((target)->value)
-#define EnvSetValue(theEnv,target,val)    ((target).value = (void *) (val))
-#define EnvSetpValue(theEnv,target,val)   ((target)->value = (void *) (val))
+#define EnvGetType(theEnv,execStatus,target)         ((target).type)
+#define EnvGetpType(theEnv,execStatus,target)        ((target)->type)
+#define EnvSetType(theEnv,execStatus,target,val)     ((target).type = (unsigned short) (val))
+#define EnvSetpType(theEnv,execStatus,target,val)    ((target)->type = (unsigned short) (val))
+#define EnvGetValue(theEnv,execStatus,target)        ((target).value)
+#define EnvGetpValue(theEnv,execStatus,target)       ((target)->value)
+#define EnvSetValue(theEnv,execStatus,target,val)    ((target).value = (void *) (val))
+#define EnvSetpValue(theEnv,execStatus,target,val)   ((target)->value = (void *) (val))
 
 /********************/
 /* ENVIRONMENT DATA */
@@ -114,7 +114,7 @@ struct expressionData
    intBool SequenceOpMode;
   };
 
-#define ExpressionData(theEnv) ((struct expressionData *) GetEnvironmentData(theEnv,EXPRESSION_DATA))
+#define ExpressionData(theEnv) ((struct expressionData *) GetEnvironmentData(theEnv,execStatus,EXPRESSION_DATA))
 
 /********************/
 /* Global Functions */

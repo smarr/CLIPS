@@ -54,13 +54,13 @@ globle void DefglobalCommandDefinitions(
   EXEC_STATUS)
   {
 #if ! RUN_TIME
-   EnvDefineFunction2(theEnv,"set-reset-globals",'b',
+   EnvDefineFunction2(theEnv,execStatus,"set-reset-globals",'b',
                   SetResetGlobalsCommand,"SetResetGlobalsCommand", "11");
-   EnvDefineFunction2(theEnv,"get-reset-globals",'b',
+   EnvDefineFunction2(theEnv,execStatus,"get-reset-globals",'b',
                    GetResetGlobalsCommand,"GetResetGlobalsCommand", "00");
 
 #if DEBUGGING_FUNCTIONS
-   EnvDefineFunction2(theEnv,"show-defglobals",'v',
+   EnvDefineFunction2(theEnv,execStatus,"show-defglobals",'v',
                    PTIEF ShowDefglobalsCommand,"ShowDefglobalsCommand", "01w");
 #endif
 
@@ -102,9 +102,9 @@ globle int SetResetGlobalsCommand(
    EnvRtnUnknown(theEnv,execStatus,1,&arg_ptr);
 
    if ((arg_ptr.value == EnvFalseSymbol(theEnv)) && (arg_ptr.type == SYMBOL))
-     { EnvSetResetGlobals(theEnv,FALSE); }
+     { EnvSetResetGlobals(theEnv,execStatus,FALSE); }
    else
-     { EnvSetResetGlobals(theEnv,TRUE); }
+     { EnvSetResetGlobals(theEnv,execStatus,TRUE); }
 
    /*========================================*/
    /* Return the old value of the attribute. */
@@ -181,7 +181,7 @@ globle void ShowDefglobalsCommand(
    else
      { theModule = ((struct defmodule *) EnvGetCurrentModule(theEnv)); }
 
-   EnvShowDefglobals(theEnv,WDISPLAY,theModule);
+   EnvShowDefglobals(theEnv,execStatus,WDISPLAY,theModule);
   }
 
 /***************************************/
@@ -206,7 +206,7 @@ globle void EnvShowDefglobals(
 
    if (theModule == NULL)
      {
-      theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,NULL);
+      theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,NULL);
       allModules = TRUE;
      }
 
@@ -216,7 +216,7 @@ globle void EnvShowDefglobals(
 
    for (;
         theModule != NULL;
-        theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,theModule))
+        theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,theModule))
      {
       /*===========================================*/
       /* Print the module name before every group  */
@@ -226,8 +226,8 @@ globle void EnvShowDefglobals(
 
       if (allModules)
         {
-         EnvPrintRouter(theEnv,logicalName,EnvGetDefmoduleName(theEnv,theModule));
-         EnvPrintRouter(theEnv,logicalName,":\n");
+         EnvPrintRouter(theEnv,execStatus,logicalName,EnvGetDefmoduleName(theEnv,execStatus,theModule));
+         EnvPrintRouter(theEnv,execStatus,logicalName,":\n");
         }
 
       /*=====================================*/
@@ -235,7 +235,7 @@ globle void EnvShowDefglobals(
       /* currently being examined.           */
       /*=====================================*/
 
-      theModuleItem = (struct defmoduleItemHeader *) GetModuleItem(theEnv,theModule,DefglobalData(theEnv)->DefglobalModuleIndex);
+      theModuleItem = (struct defmoduleItemHeader *) GetModuleItem(theEnv,execStatus,theModule,DefglobalData(theEnv)->DefglobalModuleIndex);
 
       for (constructPtr = theModuleItem->firstItem;
            constructPtr != NULL;
@@ -243,9 +243,9 @@ globle void EnvShowDefglobals(
         {
          if (execStatus->HaltExecution == TRUE) return;
 
-         if (allModules) EnvPrintRouter(theEnv,logicalName,"   ");
-         PrintDefglobalValueForm(theEnv,logicalName,(void *) constructPtr);
-         EnvPrintRouter(theEnv,logicalName,"\n");
+         if (allModules) EnvPrintRouter(theEnv,execStatus,logicalName,"   ");
+         PrintDefglobalValueForm(theEnv,execStatus,logicalName,(void *) constructPtr);
+         EnvPrintRouter(theEnv,execStatus,logicalName,"\n");
         }
 
       /*===================================*/
@@ -270,10 +270,10 @@ static void PrintDefglobalValueForm(
   {
    struct defglobal *theGlobal = (struct defglobal *) vTheGlobal;
 
-   EnvPrintRouter(theEnv,logicalName,"?*");
-   EnvPrintRouter(theEnv,logicalName,ValueToString(theGlobal->header.name));
-   EnvPrintRouter(theEnv,logicalName,"* = ");
-   PrintDataObject(theEnv,logicalName,&theGlobal->current);
+   EnvPrintRouter(theEnv,execStatus,logicalName,"?*");
+   EnvPrintRouter(theEnv,execStatus,logicalName,ValueToString(theGlobal->header.name));
+   EnvPrintRouter(theEnv,execStatus,logicalName,"* = ");
+   PrintDataObject(theEnv,execStatus,logicalName,&theGlobal->current);
   }
 
 #endif /* DEBUGGING_FUNCTIONS */

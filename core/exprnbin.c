@@ -83,13 +83,13 @@ globle void AllocateExpressions(
   {
    size_t space;
 
-   GenReadBinary(theEnv,(void *) &ExpressionData(theEnv)->NumberOfExpressions,sizeof(long));
+   GenReadBinary(theEnv,execStatus,(void *) &ExpressionData(theEnv)->NumberOfExpressions,sizeof(long));
    if (ExpressionData(theEnv)->NumberOfExpressions == 0L)
      ExpressionData(theEnv)->ExpressionArray = NULL;
    else
      {
       space = ExpressionData(theEnv)->NumberOfExpressions * sizeof(struct expr);
-      ExpressionData(theEnv)->ExpressionArray = (struct expr *) genalloc(theEnv,space);
+      ExpressionData(theEnv)->ExpressionArray = (struct expr *) genalloc(theEnv,execStatus,space);
      }
   }
 
@@ -103,7 +103,7 @@ globle void RefreshExpressions(
   {
    if (ExpressionData(theEnv)->ExpressionArray == NULL) return;
 
-   BloadandRefresh(theEnv,ExpressionData(theEnv)->NumberOfExpressions,
+   BloadandRefresh(theEnv,execStatus,ExpressionData(theEnv)->NumberOfExpressions,
                    (unsigned) sizeof(BSAVE_EXPRESSION),UpdateExpression);
   }
 
@@ -201,14 +201,14 @@ static void UpdateExpression(
 #if DEFTEMPLATE_CONSTRUCT
       case FACT_ADDRESS:
         ExpressionData(theEnv)->ExpressionArray[obji].value = (void *) &FactData(theEnv)->DummyFact;
-        EnvIncrementFactCount(theEnv,ExpressionData(theEnv)->ExpressionArray[obji].value);
+        EnvIncrementFactCount(theEnv,execStatus,ExpressionData(theEnv)->ExpressionArray[obji].value);
         break;
 #endif
 
 #if OBJECT_SYSTEM
       case INSTANCE_ADDRESS:
         ExpressionData(theEnv)->ExpressionArray[obji].value = (void *) &InstanceData(theEnv)->DummyInstance;
-        EnvIncrementInstanceCount(theEnv,ExpressionData(theEnv)->ExpressionArray[obji].value);
+        EnvIncrementInstanceCount(theEnv,execStatus,ExpressionData(theEnv)->ExpressionArray[obji].value);
         break;
 #endif
 
@@ -265,24 +265,24 @@ globle void ClearBloadedExpressions(
          case STRING          :
          case INSTANCE_NAME   :
          case GBL_VARIABLE    :
-           DecrementSymbolCount(theEnv,(SYMBOL_HN *) ExpressionData(theEnv)->ExpressionArray[i].value);
+           DecrementSymbolCount(theEnv,execStatus,(SYMBOL_HN *) ExpressionData(theEnv)->ExpressionArray[i].value);
            break;
          case FLOAT           :
-           DecrementFloatCount(theEnv,(FLOAT_HN *) ExpressionData(theEnv)->ExpressionArray[i].value);
+           DecrementFloatCount(theEnv,execStatus,(FLOAT_HN *) ExpressionData(theEnv)->ExpressionArray[i].value);
            break;
          case INTEGER         :
-           DecrementIntegerCount(theEnv,(INTEGER_HN *) ExpressionData(theEnv)->ExpressionArray[i].value);
+           DecrementIntegerCount(theEnv,execStatus,(INTEGER_HN *) ExpressionData(theEnv)->ExpressionArray[i].value);
            break;
 
 #if DEFTEMPLATE_CONSTRUCT
          case FACT_ADDRESS    :
-           EnvDecrementFactCount(theEnv,ExpressionData(theEnv)->ExpressionArray[i].value);
+           EnvDecrementFactCount(theEnv,execStatus,ExpressionData(theEnv)->ExpressionArray[i].value);
            break;
 #endif
 
 #if OBJECT_SYSTEM
          case INSTANCE_ADDRESS :
-           EnvDecrementInstanceCount(theEnv,ExpressionData(theEnv)->ExpressionArray[i].value);
+           EnvDecrementInstanceCount(theEnv,execStatus,ExpressionData(theEnv)->ExpressionArray[i].value);
            break;
 #endif
 
@@ -292,7 +292,7 @@ globle void ClearBloadedExpressions(
          default:
            if (EvaluationData(theEnv)->PrimitivesArray[ExpressionData(theEnv)->ExpressionArray[i].type] == NULL) break;
            if (EvaluationData(theEnv)->PrimitivesArray[ExpressionData(theEnv)->ExpressionArray[i].type]->bitMap)
-             { DecrementBitMapCount(theEnv,(BITMAP_HN *) ExpressionData(theEnv)->ExpressionArray[i].value); }
+             { DecrementBitMapCount(theEnv,execStatus,(BITMAP_HN *) ExpressionData(theEnv)->ExpressionArray[i].value); }
            break;
         }
      }
@@ -302,7 +302,7 @@ globle void ClearBloadedExpressions(
    /*===================================*/
 
    space = ExpressionData(theEnv)->NumberOfExpressions * sizeof(struct expr);
-   if (space != 0) genfree(theEnv,(void *) ExpressionData(theEnv)->ExpressionArray,space);
+   if (space != 0) genfree(theEnv,execStatus,(void *) ExpressionData(theEnv)->ExpressionArray,space);
    ExpressionData(theEnv)->ExpressionArray = 0;
   }
 
@@ -330,7 +330,7 @@ globle void FindHashedExpressions(
    for (i = 0 ; i < EXPRESSION_HASH_SIZE ; i++)
      for (exphash = ExpressionData(theEnv)->ExpressionHashTable[i] ; exphash != NULL ; exphash = exphash->next)
        {
-        MarkNeededItems(theEnv,exphash->exp);
+        MarkNeededItems(theEnv,execStatus,exphash->exp);
         exphash->bsaveID = ExpressionData(theEnv)->ExpressionCount;
         ExpressionData(theEnv)->ExpressionCount += ExpressionSize(exphash->exp);
        }
@@ -354,7 +354,7 @@ globle void BsaveHashedExpressions(
 
    for (i = 0 ; i < EXPRESSION_HASH_SIZE ; i++)
      for (exphash = ExpressionData(theEnv)->ExpressionHashTable[i] ; exphash != NULL ; exphash = exphash->next)
-       BsaveExpression(theEnv,exphash->exp,fp);
+       BsaveExpression(theEnv,execStatus,exphash->exp,fp);
   }
 
 /***************************************************************/
@@ -373,7 +373,7 @@ globle void BsaveConstructExpressions(
         biPtr = biPtr->next)
      {
       if (biPtr->expressionFunction != NULL)
-        { (*biPtr->expressionFunction)(theEnv,fp); }
+        { (*biPtr->expressionFunction)(theEnv,execStatus,fp); }
      }
   }
 
@@ -522,7 +522,7 @@ globle void BsaveExpression(
 
      if (testPtr->argList != NULL)
        {
-        BsaveExpression(theEnv,testPtr->argList,fp);
+        BsaveExpression(theEnv,execStatus,testPtr->argList,fp);
        }
 
      testPtr = testPtr->nextArg;

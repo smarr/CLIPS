@@ -51,7 +51,7 @@ struct messageHandlerData
    HANDLER_LINK *OldCore;
   };
 
-#define MessageHandlerData(theEnv) ((struct messageHandlerData *) GetEnvironmentData(theEnv,MESSAGE_HANDLER_DATA))
+#define MessageHandlerData(theEnv) ((struct messageHandlerData *) GetEnvironmentData(theEnv,execStatus,MESSAGE_HANDLER_DATA))
 
 
 #ifdef LOCALE

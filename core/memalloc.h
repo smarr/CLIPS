@@ -67,54 +67,54 @@ struct memoryPtr
 
 // STEFAN: TODO: make those thread-safe
 
-#define get_struct(theEnv,type) \
+#define get_struct(theEnv,execStatus,type) \
   ((MemoryData(theEnv)->MemoryTable[sizeof(struct type)] == NULL) \
-    ? ((struct type *) genalloc(theEnv,sizeof(struct type))) \
+    ? ((struct type *) genalloc(theEnv,execStatus,sizeof(struct type))) \
     : ((MemoryData(theEnv)->TempMemoryPtr = MemoryData(theEnv)->MemoryTable[sizeof(struct type)]),\
     MemoryData(theEnv)->MemoryTable[sizeof(struct type)] = MemoryData(theEnv)->TempMemoryPtr->next,\
     ((struct type *) MemoryData(theEnv)->TempMemoryPtr)))
 
-#define rtn_struct(theEnv,type,struct_ptr) \
+#define rtn_struct(theEnv,execStatus,type,struct_ptr) \
   (MemoryData(theEnv)->TempMemoryPtr = (struct memoryPtr *) struct_ptr,\
    MemoryData(theEnv)->TempMemoryPtr->next = MemoryData(theEnv)->MemoryTable[sizeof(struct type)], \
    MemoryData(theEnv)->MemoryTable[sizeof(struct type)] = MemoryData(theEnv)->TempMemoryPtr)
 
-#define rtn_sized_struct(theEnv,size,struct_ptr) \
+#define rtn_sized_struct(theEnv,execStatus,size,struct_ptr) \
   (MemoryData(theEnv)->TempMemoryPtr = (struct memoryPtr *) struct_ptr,\
    MemoryData(theEnv)->TempMemoryPtr->next = MemoryData(theEnv)->MemoryTable[size], \
    MemoryData(theEnv)->MemoryTable[size] = MemoryData(theEnv)->TempMemoryPtr)
 
-#define get_var_struct(theEnv,type,vsize) \
+#define get_var_struct(theEnv,execStatus,type,vsize) \
   ((((sizeof(struct type) + vsize) <  MEM_TABLE_SIZE) ? \
     (MemoryData(theEnv)->MemoryTable[sizeof(struct type) + vsize] == NULL) : 1) ? \
-   ((struct type *) genalloc(theEnv,(sizeof(struct type) + vsize))) :\
+   ((struct type *) genalloc(theEnv,execStatus,(sizeof(struct type) + vsize))) :\
    ((MemoryData(theEnv)->TempMemoryPtr = MemoryData(theEnv)->MemoryTable[sizeof(struct type) + vsize]),\
     MemoryData(theEnv)->MemoryTable[sizeof(struct type) + vsize] = MemoryData(theEnv)->TempMemoryPtr->next,\
     ((struct type *) MemoryData(theEnv)->TempMemoryPtr)))
 
-#define rtn_var_struct(theEnv,type,vsize,struct_ptr) \
+#define rtn_var_struct(theEnv,execStatus,type,vsize,struct_ptr) \
   (MemoryData(theEnv)->TempSize = sizeof(struct type) + vsize, \
    ((MemoryData(theEnv)->TempSize < MEM_TABLE_SIZE) ? \
     (MemoryData(theEnv)->TempMemoryPtr = (struct memoryPtr *) struct_ptr,\
      MemoryData(theEnv)->TempMemoryPtr->next = MemoryData(theEnv)->MemoryTable[MemoryData(theEnv)->TempSize], \
      MemoryData(theEnv)->MemoryTable[MemoryData(theEnv)->TempSize] =  MemoryData(theEnv)->TempMemoryPtr) : \
-    (genfree(theEnv,(void *) struct_ptr,MemoryData(theEnv)->TempSize),(struct memoryPtr *) struct_ptr)))
+    (genfree(theEnv,execStatus,(void *) struct_ptr,MemoryData(theEnv)->TempSize),(struct memoryPtr *) struct_ptr)))
 
-#define get_mem(theEnv,size) \
+#define get_mem(theEnv,execStatus,size) \
   (((size <  MEM_TABLE_SIZE) ? \
     (MemoryData(theEnv)->MemoryTable[size] == NULL) : 1) ? \
-   ((struct type *) genalloc(theEnv,(size_t) (size))) :\
+   ((struct type *) genalloc(theEnv,execStatus,(size_t) (size))) :\
    ((MemoryData(theEnv)->TempMemoryPtr = MemoryData(theEnv)->MemoryTable[size]),\
     MemoryData(theEnv)->MemoryTable[size] = MemoryData(theEnv)->TempMemoryPtr->next,\
     ((struct type *) MemoryData(theEnv)->TempMemoryPtr)))
 
-#define rtn_mem(theEnv,size,ptr) \
+#define rtn_mem(theEnv,execStatus,size,ptr) \
   (MemoryData(theEnv)->TempSize = size, \
    ((MemoryData(theEnv)->TempSize < MEM_TABLE_SIZE) ? \
     (MemoryData(theEnv)->TempMemoryPtr = (struct memoryPtr *) ptr,\
      MemoryData(theEnv)->TempMemoryPtr->next = MemoryData(theEnv)->MemoryTable[MemoryData(theEnv)->TempSize], \
      MemoryData(theEnv)->MemoryTable[MemoryData(theEnv)->TempSize] =  MemoryData(theEnv)->TempMemoryPtr) : \
-    (genfree(theEnv,(void *) ptr,MemoryData(theEnv)->TempSize),(struct memoryPtr *) ptr)))
+    (genfree(theEnv,execStatus,(void *) ptr,MemoryData(theEnv)->TempSize),(struct memoryPtr *) ptr)))
 
 #define GenCopyMemory(type,cnt,dst,src) \
    memcpy((void *) (dst),(void *) (src),sizeof(type) * (size_t) (cnt))
@@ -138,7 +138,7 @@ struct memoryData
    size_t TempSize;
   };
 
-#define MemoryData(theEnv) ((struct memoryData *) GetEnvironmentData(theEnv,MEMORY_DATA))
+#define MemoryData(theEnv) ((struct memoryData *) GetEnvironmentData(theEnv,execStatus,MEMORY_DATA))
 
 #define GetConserveMemory() EnvGetConserveMemory(GetCurrentEnvironment())
 #define MemRequests() EnvMemRequests(GetCurrentEnvironment())

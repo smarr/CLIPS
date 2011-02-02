@@ -138,7 +138,7 @@ struct patternData
    unsigned long PatternHashTableSize;
   };
 
-#define PatternData(theEnv) ((struct patternData *) GetEnvironmentData(theEnv,PATTERN_DATA))
+#define PatternData(theEnv) ((struct patternData *) GetEnvironmentData(theEnv,execStatus,PATTERN_DATA))
 
 #ifdef LOCALE
 #undef LOCALE

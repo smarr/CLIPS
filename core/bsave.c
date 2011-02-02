@@ -63,7 +63,7 @@ globle void InitializeBsaveData(
   void *theEnv,
   EXEC_STATUS)
   {
-   AllocateEnvironmentData(theEnv,BSAVE_DATA,sizeof(struct bsaveData),DeallocateBsaveData);
+   AllocateEnvironmentData(theEnv,execStatus,BSAVE_DATA,sizeof(struct bsaveData),DeallocateBsaveData);
   }
   
 /************************************************/
@@ -80,7 +80,7 @@ static void DeallocateBsaveData(
    while (tmpPtr != NULL)
      {
       nextPtr = tmpPtr->next;
-      rtn_struct(theEnv,BinaryItem,tmpPtr);
+      rtn_struct(theEnv,execStatus,BinaryItem,tmpPtr);
       tmpPtr = nextPtr;
      }
   }
@@ -99,7 +99,7 @@ globle int BsaveCommand(
    if (EnvArgCountCheck(theEnv,execStatus,"bsave",EXACTLY,1) == -1) return(FALSE);
    fileName = GetFileName(theEnv,execStatus,"bsave",1);
    if (fileName != NULL)
-     { if (EnvBsave(theEnv,fileName)) return(TRUE); }
+     { if (EnvBsave(theEnv,execStatus,fileName)) return(TRUE); }
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
 #pragma unused(theEnv)
@@ -131,8 +131,8 @@ globle intBool EnvBsave(
 
    if (Bloaded(theEnv))
      {
-      PrintErrorID(theEnv,"BSAVE",1,FALSE);
-      EnvPrintRouter(theEnv,WERROR,
+      PrintErrorID(theEnv,execStatus,"BSAVE",1,FALSE);
+      EnvPrintRouter(theEnv,execStatus,WERROR,
           "Cannot perform a binary save while a binary load is in effect.\n");
       return(0);
      }
@@ -141,9 +141,9 @@ globle intBool EnvBsave(
    /* Open the file. */
    /*================*/
 
-   if ((fp = GenOpen(theEnv,fileName,"wb")) == NULL)
+   if ((fp = GenOpen(theEnv,execStatus,fileName,"wb")) == NULL)
      {
-      OpenErrorMessage(theEnv,"bsave",fileName);
+      OpenErrorMessage(theEnv,execStatus,"bsave",fileName);
       return(0);
      }
 
@@ -157,7 +157,7 @@ globle intBool EnvBsave(
    /* Write binary header to the file. */
    /*==================================*/
 
-   WriteBinaryHeader(theEnv,fp);
+   WriteBinaryHeader(theEnv,execStatus,fp);
 
    /*===========================================*/
    /* Initialize count variables, index values, */
@@ -170,14 +170,14 @@ globle intBool EnvBsave(
    InitAtomicValueNeededFlags(theEnv);
    FindHashedExpressions(theEnv);
    FindNeededItems(theEnv);
-   SetAtomicValueIndices(theEnv,FALSE);
+   SetAtomicValueIndices(theEnv,execStatus,FALSE);
 
    /*===============================*/
    /* Save the functions and atoms. */
    /*===============================*/
 
-   WriteNeededFunctions(theEnv,fp);
-   WriteNeededAtomicValues(theEnv,fp);
+   WriteNeededFunctions(theEnv,execStatus,fp);
+   WriteNeededAtomicValues(theEnv,execStatus,fp);
 
    /*=========================================*/
    /* Write out the number of expression data */
@@ -199,7 +199,7 @@ globle intBool EnvBsave(
         {
          genstrncpy(constructBuffer,biPtr->name,CONSTRUCT_HEADER_SIZE);
          GenWrite(constructBuffer,(unsigned long) CONSTRUCT_HEADER_SIZE,fp);
-         (*biPtr->bsaveStorageFunction)(theEnv,fp);
+         (*biPtr->bsaveStorageFunction)(theEnv,execStatus,fp);
         }
      }
 
@@ -207,23 +207,23 @@ globle intBool EnvBsave(
    /* Write a binary footer to the file. */
    /*====================================*/
 
-   WriteBinaryFooter(theEnv,fp);
+   WriteBinaryFooter(theEnv,execStatus,fp);
 
    /*===================*/
    /* Save expressions. */
    /*===================*/
 
    ExpressionData(theEnv)->ExpressionCount = 0;
-   BsaveHashedExpressions(theEnv,fp);
+   BsaveHashedExpressions(theEnv,execStatus,fp);
    saveExpressionCount = ExpressionData(theEnv)->ExpressionCount;
-   BsaveConstructExpressions(theEnv,fp);
+   BsaveConstructExpressions(theEnv,execStatus,fp);
    ExpressionData(theEnv)->ExpressionCount = saveExpressionCount;
 
    /*===================*/
    /* Save constraints. */
    /*===================*/
 
-   WriteNeededConstraints(theEnv,fp);
+   WriteNeededConstraints(theEnv,execStatus,fp);
 
    /*==================*/
    /* Save constructs. */
@@ -237,7 +237,7 @@ globle intBool EnvBsave(
         {
          genstrncpy(constructBuffer,biPtr->name,CONSTRUCT_HEADER_SIZE);
          GenWrite(constructBuffer,(unsigned long) CONSTRUCT_HEADER_SIZE,fp);
-         (*biPtr->bsaveFunction)(theEnv,fp);
+         (*biPtr->bsaveFunction)(theEnv,execStatus,fp);
         }
      }
 
@@ -245,7 +245,7 @@ globle intBool EnvBsave(
    /* Save a binary footer to the file. */
    /*===================================*/
 
-   WriteBinaryFooter(theEnv,fp);
+   WriteBinaryFooter(theEnv,execStatus,fp);
 
    /*===========*/
    /* Clean up. */
@@ -257,7 +257,7 @@ globle intBool EnvBsave(
    /* Close the file. */
    /*=================*/
 
-   GenClose(theEnv,fp);
+   GenClose(theEnv,execStatus,fp);
 
    /*=============================*/
    /* Restore the current module. */
@@ -404,7 +404,7 @@ globle void SaveBloadCount(
   {
    BLOADCNTSV *tmp, *prv;
 
-   tmp = get_struct(theEnv,bloadcntsv);
+   tmp = get_struct(theEnv,execStatus,bloadcntsv);
    tmp->val = cnt;
    tmp->nxt = NULL;
 
@@ -434,7 +434,7 @@ globle void RestoreBloadCount(
    *cnt = BsaveData(theEnv)->BloadCountSaveTop->val;
    tmp = BsaveData(theEnv)->BloadCountSaveTop;
    BsaveData(theEnv)->BloadCountSaveTop = BsaveData(theEnv)->BloadCountSaveTop->nxt;
-   rtn_struct(theEnv,bloadcntsv,tmp);
+   rtn_struct(theEnv,execStatus,bloadcntsv,tmp);
   }
 
 /**********************************************/
@@ -482,7 +482,7 @@ globle void MarkNeededItems(
         }
 
       if (testPtr->argList != NULL)
-        { MarkNeededItems(theEnv,testPtr->argList); }
+        { MarkNeededItems(theEnv,execStatus,testPtr->argList); }
 
       testPtr = testPtr->nextArg;
      }
@@ -545,7 +545,7 @@ globle intBool AddBinaryItem(
    /* Create the binary item data structure. */
    /*========================================*/
 
-   newPtr = get_struct(theEnv,BinaryItem);
+   newPtr = get_struct(theEnv,execStatus,BinaryItem);
 
    newPtr->name = name;
    newPtr->findFunction = findFunction;

@@ -70,7 +70,7 @@ struct deftemplateBinaryData
    struct deftemplateModule *ModuleArray;
   };
   
-#define DeftemplateBinaryData(theEnv) ((struct deftemplateBinaryData *) GetEnvironmentData(theEnv,TMPLTBIN_DATA))
+#define DeftemplateBinaryData(theEnv) ((struct deftemplateBinaryData *) GetEnvironmentData(theEnv,execStatus,TMPLTBIN_DATA))
 
 #define DeftemplatePointer(i) ((struct deftemplate *) (&DeftemplateBinaryData(theEnv)->DeftemplateArray[i]))
 

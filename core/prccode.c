@@ -145,17 +145,17 @@ globle void InstallProcedurePrimitives(
                        NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL };
 #endif
 
-   AllocateEnvironmentData(theEnv,PROCEDURAL_PRIMITIVE_DATA,sizeof(struct proceduralPrimitiveData),DeallocateProceduralPrimitiveData);
+   AllocateEnvironmentData(theEnv,execStatus,PROCEDURAL_PRIMITIVE_DATA,sizeof(struct proceduralPrimitiveData),DeallocateProceduralPrimitiveData);
 
    memcpy(&ProceduralPrimitiveData(theEnv)->ProcParameterInfo,&procParameterInfo,sizeof(struct entityRecord));  
    memcpy(&ProceduralPrimitiveData(theEnv)->ProcWildInfo,&procWildInfo,sizeof(struct entityRecord));  
    memcpy(&ProceduralPrimitiveData(theEnv)->ProcGetInfo,&procGetInfo,sizeof(struct entityRecord));  
    memcpy(&ProceduralPrimitiveData(theEnv)->ProcBindInfo,&procBindInfo,sizeof(struct entityRecord));  
 
-   InstallPrimitive(theEnv,&ProceduralPrimitiveData(theEnv)->ProcParameterInfo,PROC_PARAM);
-   InstallPrimitive(theEnv,&ProceduralPrimitiveData(theEnv)->ProcWildInfo,PROC_WILD_PARAM);
-   InstallPrimitive(theEnv,&ProceduralPrimitiveData(theEnv)->ProcGetInfo,PROC_GET_BIND);
-   InstallPrimitive(theEnv,&ProceduralPrimitiveData(theEnv)->ProcBindInfo,PROC_BIND);
+   InstallPrimitive(theEnv,execStatus,&ProceduralPrimitiveData(theEnv)->ProcParameterInfo,PROC_PARAM);
+   InstallPrimitive(theEnv,execStatus,&ProceduralPrimitiveData(theEnv)->ProcWildInfo,PROC_WILD_PARAM);
+   InstallPrimitive(theEnv,execStatus,&ProceduralPrimitiveData(theEnv)->ProcGetInfo,PROC_GET_BIND);
+   InstallPrimitive(theEnv,execStatus,&ProceduralPrimitiveData(theEnv)->ProcBindInfo,PROC_BIND);
 
    ProceduralPrimitiveData(theEnv)->Oldindex = -1;
    
@@ -169,12 +169,12 @@ globle void InstallProcedurePrimitives(
 
 #if ! DEFFUNCTION_CONSTRUCT
    memcpy(&ProceduralPrimitiveData(theEnv)->DeffunctionEntityRecord,&deffunctionEntityRecord,sizeof(struct entityRecord));  
-   InstallPrimitive(theEnv,&ProceduralPrimitiveData(theEnv)->DeffunctionEntityRecord,PCALL);
+   InstallPrimitive(theEnv,execStatus,&ProceduralPrimitiveData(theEnv)->DeffunctionEntityRecord,PCALL);
 #endif
 
 #if ! DEFGENERIC_CONSTRUCT
    memcpy(&ProceduralPrimitiveData(theEnv)->GenericEntityRecord,&genericEntityRecord,sizeof(struct entityRecord));  
-   InstallPrimitive(theEnv,&ProceduralPrimitiveData(theEnv)->GenericEntityRecord,GCALL);
+   InstallPrimitive(theEnv,execStatus,&ProceduralPrimitiveData(theEnv)->GenericEntityRecord,GCALL);
 #endif
 
    /* =============================================
@@ -182,8 +182,8 @@ globle void InstallProcedurePrimitives(
       let callers distinguish between no parameters
       and zero-length multifield parameters
       ============================================= */
-   ProceduralPrimitiveData(theEnv)->NoParamValue = CreateMultifield2(theEnv,0L);
-   MultifieldInstall(theEnv,(MULTIFIELD_PTR) ProceduralPrimitiveData(theEnv)->NoParamValue);
+   ProceduralPrimitiveData(theEnv)->NoParamValue = CreateMultifield2(theEnv,execStatus,0L);
+   MultifieldInstall(theEnv,execStatus,(MULTIFIELD_PTR) ProceduralPrimitiveData(theEnv)->NoParamValue);
   }
 
 /**************************************************************/
@@ -194,7 +194,7 @@ static void DeallocateProceduralPrimitiveData(
   void *theEnv,
   EXEC_STATUS)
   {
-   ReturnMultifield(theEnv,(struct multifield *) ProceduralPrimitiveData(theEnv)->NoParamValue);
+   ReturnMultifield(theEnv,execStatus,(struct multifield *) ProceduralPrimitiveData(theEnv)->NoParamValue);
    ReleaseProcParameters(theEnv);
   }
 
@@ -253,34 +253,34 @@ globle EXPRESSION *ParseProcParameters(
      }
    if (tkn->type != LPAREN)
      {
-      SyntaxErrorMessage(theEnv,"parameter list");
-      ReturnExpression(theEnv,parameterList);
+      SyntaxErrorMessage(theEnv,execStatus,"parameter list");
+      ReturnExpression(theEnv,execStatus,parameterList);
       return(NULL);
      }
-   GetToken(theEnv,readSource,tkn);
+   GetToken(theEnv,execStatus,readSource,tkn);
    while ((tkn->type == SF_VARIABLE) || (tkn->type == MF_VARIABLE))
      {
       for (check = parameterList ; check != NULL ; check = check->nextArg)
         if (check->value == tkn->value)
          {
-          PrintErrorID(theEnv,"PRCCODE",7,FALSE);
-          EnvPrintRouter(theEnv,WERROR,"Duplicate parameter names not allowed.\n");
-          ReturnExpression(theEnv,parameterList);
+          PrintErrorID(theEnv,execStatus,"PRCCODE",7,FALSE);
+          EnvPrintRouter(theEnv,execStatus,WERROR,"Duplicate parameter names not allowed.\n");
+          ReturnExpression(theEnv,execStatus,parameterList);
           return(NULL);
          }
       if (*wildcard != NULL)
         {
-         PrintErrorID(theEnv,"PRCCODE",8,FALSE);
-         EnvPrintRouter(theEnv,WERROR,"No parameters allowed after wildcard parameter.\n");
-         ReturnExpression(theEnv,parameterList);
+         PrintErrorID(theEnv,execStatus,"PRCCODE",8,FALSE);
+         EnvPrintRouter(theEnv,execStatus,WERROR,"No parameters allowed after wildcard parameter.\n");
+         ReturnExpression(theEnv,execStatus,parameterList);
          return(NULL);
         }
-      if ((checkfunc != NULL) ? (*checkfunc)(theEnv,ValueToString(tkn->value)) : FALSE)
+      if ((checkfunc != NULL) ? (*checkfunc)(theEnv,execStatus,ValueToString(tkn->value)) : FALSE)
         {
-         ReturnExpression(theEnv,parameterList);
+         ReturnExpression(theEnv,execStatus,parameterList);
          return(NULL);
         }
-      nextOne = GenConstant(theEnv,tkn->type,tkn->value);
+      nextOne = GenConstant(theEnv,execStatus,tkn->type,tkn->value);
       if (tkn->type == MF_VARIABLE)
         *wildcard = (SYMBOL_HN *) tkn->value;
       else
@@ -290,21 +290,21 @@ globle EXPRESSION *ParseProcParameters(
       else
         { lastOne->nextArg = nextOne; }
       lastOne = nextOne;
-      SavePPBuffer(theEnv," ");
+      SavePPBuffer(theEnv,execStatus," ");
       paramprintp = 1;
-      GetToken(theEnv,readSource,tkn);
+      GetToken(theEnv,execStatus,readSource,tkn);
      }
    if (tkn->type != RPAREN)
      {
-      SyntaxErrorMessage(theEnv,"parameter list");
-      ReturnExpression(theEnv,parameterList);
+      SyntaxErrorMessage(theEnv,execStatus,"parameter list");
+      ReturnExpression(theEnv,execStatus,parameterList);
       return(NULL);
      }
    if (paramprintp)
      {
       PPBackup(theEnv);
       PPBackup(theEnv);
-      SavePPBuffer(theEnv,")");
+      SavePPBuffer(theEnv,execStatus,")");
      }
    *error = FALSE;
    *max = (*wildcard != NULL) ? -1 : *min;
@@ -375,7 +375,7 @@ globle EXPRESSION *ParseProcActions(
       "bind" function adds vars to this list.
       ==================================================================== */
    ClearParsedBindNames(theEnv);
-   actions = GroupActions(theEnv,readSource,tkn,TRUE,NULL,FALSE);
+   actions = GroupActions(theEnv,execStatus,readSource,tkn,TRUE,NULL,FALSE);
    if (actions == NULL)
      return(NULL);
 
@@ -387,10 +387,10 @@ globle EXPRESSION *ParseProcActions(
       ==================================================================== */
    if (altbindfunc != NULL)
      {
-      if (ReplaceProcBinds(theEnv,actions,altbindfunc,userBuffer))
+      if (ReplaceProcBinds(theEnv,execStatus,actions,altbindfunc,userBuffer))
         {
          ClearParsedBindNames(theEnv);
-         ReturnExpression(theEnv,actions);
+         ReturnExpression(theEnv,execStatus,actions);
          return(NULL);
         }
      }
@@ -403,10 +403,10 @@ globle EXPRESSION *ParseProcActions(
       or fact field references.
       ====================================================================== */
    *lvarcnt = CountParsedBindNames(theEnv);
-   if (ReplaceProcVars(theEnv,bodytype,actions,params,wildcard,altvarfunc,userBuffer))
+   if (ReplaceProcVars(theEnv,execStatus,bodytype,actions,params,wildcard,altvarfunc,userBuffer))
      {
       ClearParsedBindNames(theEnv);
-      ReturnExpression(theEnv,actions);
+      ReturnExpression(theEnv,execStatus,actions);
       return(NULL);
      }
 
@@ -416,9 +416,9 @@ globle EXPRESSION *ParseProcActions(
       packed into a contiguous array to save on memory overhead.  The
       intermediate parsed bind names are freed to avoid tying up memory.
       ======================================================================= */
-   actions = CompactActions(theEnv,actions);
-   pactions = PackExpression(theEnv,actions);
-   ReturnExpression(theEnv,actions);
+   actions = CompactActions(theEnv,execStatus,actions);
+   pactions = PackExpression(theEnv,execStatus,actions);
+   ReturnExpression(theEnv,execStatus,actions);
    ClearParsedBindNames(theEnv);
    return(pactions);
   }
@@ -487,7 +487,7 @@ globle int ReplaceProcVars(
          /*=============================================================*/
          /* Check to see if the variable is bound within the procedure. */
          /*=============================================================*/
-         boundPosn = SearchParsedBindNames(theEnv,bindName);
+         boundPosn = SearchParsedBindNames(theEnv,execStatus,bindName);
 
          /*=============================================*/
          /* If variable is not defined in the parameter */
@@ -500,14 +500,14 @@ globle int ReplaceProcVars(
             /* Check to see if the variable has a special access function,    */
             /* such as direct slot reference or a rule RHS pattern reference. */
             /*================================================================*/
-            if ((altvarfunc != NULL) ? ((*altvarfunc)(theEnv,actions,specdata) != 1) : TRUE)
+            if ((altvarfunc != NULL) ? ((*altvarfunc)(theEnv,execStatus,actions,specdata) != 1) : TRUE)
               {
-               PrintErrorID(theEnv,"PRCCODE",3,TRUE);
-               EnvPrintRouter(theEnv,WERROR,"Undefined variable ");
-               EnvPrintRouter(theEnv,WERROR,ValueToString(bindName));
-               EnvPrintRouter(theEnv,WERROR," referenced in ");
-               EnvPrintRouter(theEnv,WERROR,bodytype);
-               EnvPrintRouter(theEnv,WERROR,".\n");
+               PrintErrorID(theEnv,execStatus,"PRCCODE",3,TRUE);
+               EnvPrintRouter(theEnv,execStatus,WERROR,"Undefined variable ");
+               EnvPrintRouter(theEnv,execStatus,WERROR,ValueToString(bindName));
+               EnvPrintRouter(theEnv,execStatus,WERROR," referenced in ");
+               EnvPrintRouter(theEnv,execStatus,WERROR,bodytype);
+               EnvPrintRouter(theEnv,execStatus,WERROR,".\n");
                return(TRUE);
               }
            }
@@ -520,7 +520,7 @@ globle int ReplaceProcVars(
          else if ((position > 0) && (boundPosn == 0))
            {
             actions->type = (unsigned short) ((bindName != wildcard) ? PROC_PARAM : PROC_WILD_PARAM);
-            actions->value = EnvAddBitMap(theEnv,(void *) &position,(int) sizeof(int));
+            actions->value = EnvAddBitMap(theEnv,execStatus,(void *) &position,(int) sizeof(int));
            }
 
          /*=========================================================*/
@@ -531,16 +531,16 @@ globle int ReplaceProcVars(
            {
             if (altvarfunc != NULL)
               {
-               altvarexp = GenConstant(theEnv,actions->type,actions->value);
-               altcode = (*altvarfunc)(theEnv,altvarexp,specdata);
+               altvarexp = GenConstant(theEnv,execStatus,actions->type,actions->value);
+               altcode = (*altvarfunc)(theEnv,execStatus,altvarexp,specdata);
                if (altcode == 0)
                  {
-                  rtn_struct(theEnv,expr,altvarexp);
+                  rtn_struct(theEnv,execStatus,expr,altvarexp);
                   altvarexp = NULL;
                  }
                else if (altcode == -1)
                  {
-                  rtn_struct(theEnv,expr,altvarexp);
+                  rtn_struct(theEnv,execStatus,expr,altvarexp);
                   return(TRUE);
                  }
               }
@@ -551,23 +551,23 @@ globle int ReplaceProcVars(
             pvar.first = boundPosn;
             pvar.second = position;
             pvar.secondFlag = (bindName != wildcard) ? 0 : 1;
-            actions->value = EnvAddBitMap(theEnv,(void *) &pvar,(int) sizeof(PACKED_PROC_VAR));
-            actions->argList = GenConstant(theEnv,SYMBOL,(void *) bindName);
+            actions->value = EnvAddBitMap(theEnv,execStatus,(void *) &pvar,(int) sizeof(PACKED_PROC_VAR));
+            actions->argList = GenConstant(theEnv,execStatus,SYMBOL,(void *) bindName);
             actions->argList->nextArg = altvarexp;
            }
         }
 #if DEFGLOBAL_CONSTRUCT
       else if (actions->type == GBL_VARIABLE)
         {
-         if (ReplaceGlobalVariable(theEnv,actions) == FALSE)
+         if (ReplaceGlobalVariable(theEnv,execStatus,actions) == FALSE)
            return(-1);
         }
 #endif
-      if ((altvarfunc != NULL) ? ((*altvarfunc)(theEnv,actions,specdata) == -1) : FALSE)
+      if ((altvarfunc != NULL) ? ((*altvarfunc)(theEnv,execStatus,actions,specdata) == -1) : FALSE)
         return(TRUE);
       if (actions->argList != NULL)
         {
-         if (ReplaceProcVars(theEnv,bodytype,actions->argList,parameterList,
+         if (ReplaceProcVars(theEnv,execStatus,bodytype,actions->argList,parameterList,
                                         wildcard,altvarfunc,specdata))
            return(TRUE);
 
@@ -579,14 +579,14 @@ globle int ReplaceProcVars(
             Replace the call to "bind" with a call to PROC_BIND - the
             special internal function for procedure local variables.
             ==================================================================== */
-         if ((actions->value == (void *) FindFunction(theEnv,"bind")) &&
+         if ((actions->value == (void *) FindFunction(theEnv,execStatus,"bind")) &&
              (actions->argList->type == SYMBOL))
            {
             actions->type = PROC_BIND;
-            boundPosn = SearchParsedBindNames(theEnv,(SYMBOL_HN *) actions->argList->value);
-            actions->value = EnvAddBitMap(theEnv,(void *) &boundPosn,(int) sizeof(intBool));
+            boundPosn = SearchParsedBindNames(theEnv,execStatus,(SYMBOL_HN *) actions->argList->value);
+            actions->value = EnvAddBitMap(theEnv,execStatus,(void *) &boundPosn,(int) sizeof(intBool));
             arg_lvl = actions->argList->nextArg;
-            rtn_struct(theEnv,expr,actions->argList);
+            rtn_struct(theEnv,execStatus,expr,actions->argList);
             actions->argList = arg_lvl;
            }
         }
@@ -612,7 +612,7 @@ globle EXPRESSION *GenProcWildcardReference(
   EXEC_STATUS,
   int theIndex)
   {
-   return(GenConstant(theEnv,PROC_WILD_PARAM,EnvAddBitMap(theEnv,(void *) &theIndex,(int) sizeof(int))));
+   return(GenConstant(theEnv,execStatus,PROC_WILD_PARAM,EnvAddBitMap(theEnv,execStatus,(void *) &theIndex,(int) sizeof(int))));
   }
 
 #endif
@@ -658,18 +658,18 @@ globle void PushProcParameters(
   {
    register PROC_PARAM_STACK *ptmp;
 
-   ptmp = get_struct(theEnv,ProcParamStack);
+   ptmp = get_struct(theEnv,execStatus,ProcParamStack);
    ptmp->ParamArray = ProceduralPrimitiveData(theEnv)->ProcParamArray;
    ptmp->ParamArraySize = ProceduralPrimitiveData(theEnv)->ProcParamArraySize;
    ptmp->UnboundErrFunc = ProceduralPrimitiveData(theEnv)->ProcUnboundErrFunc;
    ptmp->nxt = ProceduralPrimitiveData(theEnv)->pstack;
    ProceduralPrimitiveData(theEnv)->pstack = ptmp;
-   EvaluateProcParameters(theEnv,parameterList,numberOfParameters,pname,bodytype);
+   EvaluateProcParameters(theEnv,execStatus,parameterList,numberOfParameters,pname,bodytype);
    if (execStatus->EvaluationError)
      {
       ptmp = ProceduralPrimitiveData(theEnv)->pstack;
       ProceduralPrimitiveData(theEnv)->pstack = ProceduralPrimitiveData(theEnv)->pstack->nxt;
-      rtn_struct(theEnv,ProcParamStack,ptmp);
+      rtn_struct(theEnv,execStatus,ProcParamStack,ptmp);
       return;
      }
 
@@ -703,11 +703,11 @@ globle void PopProcParameters(
    register PROC_PARAM_STACK *ptmp;
 
    if (ProceduralPrimitiveData(theEnv)->ProcParamArray != NULL)
-     rm(theEnv,(void *) ProceduralPrimitiveData(theEnv)->ProcParamArray,(sizeof(DATA_OBJECT) * ProceduralPrimitiveData(theEnv)->ProcParamArraySize));
+     rm(theEnv,execStatus,(void *) ProceduralPrimitiveData(theEnv)->ProcParamArray,(sizeof(DATA_OBJECT) * ProceduralPrimitiveData(theEnv)->ProcParamArraySize));
 
 #if DEFGENERIC_CONSTRUCT
    if (ProceduralPrimitiveData(theEnv)->ProcParamExpressions != NULL)
-     rm(theEnv,(void *) ProceduralPrimitiveData(theEnv)->ProcParamExpressions,(sizeof(EXPRESSION) * ProceduralPrimitiveData(theEnv)->ProcParamArraySize));
+     rm(theEnv,execStatus,(void *) ProceduralPrimitiveData(theEnv)->ProcParamExpressions,(sizeof(EXPRESSION) * ProceduralPrimitiveData(theEnv)->ProcParamArraySize));
 #endif
 
    ptmp = ProceduralPrimitiveData(theEnv)->pstack;
@@ -721,14 +721,14 @@ globle void PopProcParameters(
 
    if (ProceduralPrimitiveData(theEnv)->WildcardValue != NULL)
      {
-      MultifieldDeinstall(theEnv,(MULTIFIELD_PTR) ProceduralPrimitiveData(theEnv)->WildcardValue->value);
+      MultifieldDeinstall(theEnv,execStatus,(MULTIFIELD_PTR) ProceduralPrimitiveData(theEnv)->WildcardValue->value);
       if (ProceduralPrimitiveData(theEnv)->WildcardValue->value != ProceduralPrimitiveData(theEnv)->NoParamValue)
-        AddToMultifieldList(theEnv,(MULTIFIELD_PTR) ProceduralPrimitiveData(theEnv)->WildcardValue->value);
-      rtn_struct(theEnv,dataObject,ProceduralPrimitiveData(theEnv)->WildcardValue);
+        AddToMultifieldList(theEnv,execStatus,(MULTIFIELD_PTR) ProceduralPrimitiveData(theEnv)->WildcardValue->value);
+      rtn_struct(theEnv,execStatus,dataObject,ProceduralPrimitiveData(theEnv)->WildcardValue);
      }
    ProceduralPrimitiveData(theEnv)->WildcardValue = ptmp->WildcardValue;
    ProceduralPrimitiveData(theEnv)->ProcUnboundErrFunc = ptmp->UnboundErrFunc;
-   rtn_struct(theEnv,ProcParamStack,ptmp);
+   rtn_struct(theEnv,execStatus,ProcParamStack,ptmp);
   }
 
 /******************************************************************
@@ -746,20 +746,20 @@ static void ReleaseProcParameters(
    register PROC_PARAM_STACK *ptmp, *next;
 
    if (ProceduralPrimitiveData(theEnv)->ProcParamArray != NULL)
-     rm(theEnv,(void *) ProceduralPrimitiveData(theEnv)->ProcParamArray,(sizeof(DATA_OBJECT) * ProceduralPrimitiveData(theEnv)->ProcParamArraySize));
+     rm(theEnv,execStatus,(void *) ProceduralPrimitiveData(theEnv)->ProcParamArray,(sizeof(DATA_OBJECT) * ProceduralPrimitiveData(theEnv)->ProcParamArraySize));
 
 
    if (ProceduralPrimitiveData(theEnv)->WildcardValue != NULL)
      {
       if (ProceduralPrimitiveData(theEnv)->WildcardValue->value != ProceduralPrimitiveData(theEnv)->NoParamValue)
-        { ReturnMultifield(theEnv,(struct multifield *) ProceduralPrimitiveData(theEnv)->WildcardValue->value); }
+        { ReturnMultifield(theEnv,execStatus,(struct multifield *) ProceduralPrimitiveData(theEnv)->WildcardValue->value); }
      
-      rtn_struct(theEnv,dataObject,ProceduralPrimitiveData(theEnv)->WildcardValue); 
+      rtn_struct(theEnv,execStatus,dataObject,ProceduralPrimitiveData(theEnv)->WildcardValue); 
      }
      
 #if DEFGENERIC_CONSTRUCT
    if (ProceduralPrimitiveData(theEnv)->ProcParamExpressions != NULL)
-     rm(theEnv,(void *) ProceduralPrimitiveData(theEnv)->ProcParamExpressions,(sizeof(EXPRESSION) * ProceduralPrimitiveData(theEnv)->ProcParamArraySize));
+     rm(theEnv,execStatus,(void *) ProceduralPrimitiveData(theEnv)->ProcParamExpressions,(sizeof(EXPRESSION) * ProceduralPrimitiveData(theEnv)->ProcParamArraySize));
 #endif
 
    ptmp = ProceduralPrimitiveData(theEnv)->pstack;
@@ -769,22 +769,22 @@ static void ReleaseProcParameters(
       next = ptmp->nxt;
 
       if (ptmp->ParamArray != NULL)
-        { rm(theEnv,(void *) ptmp->ParamArray,(sizeof(DATA_OBJECT) * ptmp->ParamArraySize)); }
+        { rm(theEnv,execStatus,(void *) ptmp->ParamArray,(sizeof(DATA_OBJECT) * ptmp->ParamArraySize)); }
 
 #if DEFGENERIC_CONSTRUCT
       if (ptmp->ParamExpressions != NULL)
-        { rm(theEnv,(void *) ptmp->ParamExpressions,(sizeof(EXPRESSION) * ptmp->ParamArraySize)); }
+        { rm(theEnv,execStatus,(void *) ptmp->ParamExpressions,(sizeof(EXPRESSION) * ptmp->ParamArraySize)); }
 #endif
 
       if (ptmp->WildcardValue != NULL)
         { 
          if (ptmp->WildcardValue->value != ProceduralPrimitiveData(theEnv)->NoParamValue)
-           { ReturnMultifield(theEnv,(struct multifield *) ptmp->WildcardValue->value); }
+           { ReturnMultifield(theEnv,execStatus,(struct multifield *) ptmp->WildcardValue->value); }
 
-         rtn_struct(theEnv,dataObject,ptmp->WildcardValue); 
+         rtn_struct(theEnv,execStatus,dataObject,ptmp->WildcardValue); 
         }
      
-      rtn_struct(theEnv,ProcParamStack,ptmp);
+      rtn_struct(theEnv,execStatus,ProcParamStack,ptmp);
       ptmp = next;
      }
   }
@@ -812,7 +812,7 @@ globle EXPRESSION *GetProcParamExpressions(
    if ((ProceduralPrimitiveData(theEnv)->ProcParamArray == NULL) || (ProceduralPrimitiveData(theEnv)->ProcParamExpressions != NULL))
      return(ProceduralPrimitiveData(theEnv)->ProcParamExpressions);
    ProceduralPrimitiveData(theEnv)->ProcParamExpressions = (EXPRESSION *)
-               gm2(theEnv,(sizeof(EXPRESSION) * ProceduralPrimitiveData(theEnv)->ProcParamArraySize));
+               gm2(theEnv,execStatus,(sizeof(EXPRESSION) * ProceduralPrimitiveData(theEnv)->ProcParamArraySize));
    for (i = 0 ; i < ProceduralPrimitiveData(theEnv)->ProcParamArraySize ; i++)
      {
       ProceduralPrimitiveData(theEnv)->ProcParamExpressions[i].type = ProceduralPrimitiveData(theEnv)->ProcParamArray[i].type;
@@ -865,10 +865,10 @@ globle void EvaluateProcActions(
 
    oldLocalVarArray = ProceduralPrimitiveData(theEnv)->LocalVarArray;
    ProceduralPrimitiveData(theEnv)->LocalVarArray = (lvarcnt == 0) ? NULL :
-                   (DATA_OBJECT *) gm2(theEnv,(sizeof(DATA_OBJECT) * lvarcnt));
+                   (DATA_OBJECT *) gm2(theEnv,execStatus,(sizeof(DATA_OBJECT) * lvarcnt));
 
    if (lvarcnt != 0)
-     { theTM = AddTrackedMemory(theEnv,ProceduralPrimitiveData(theEnv)->LocalVarArray,sizeof(DATA_OBJECT) * lvarcnt); }
+     { theTM = AddTrackedMemory(theEnv,execStatus,ProceduralPrimitiveData(theEnv)->LocalVarArray,sizeof(DATA_OBJECT) * lvarcnt); }
    else
      { theTM = NULL; }
      
@@ -877,11 +877,11 @@ globle void EvaluateProcActions(
 
    oldModule = ((struct defmodule *) EnvGetCurrentModule(theEnv));
    if (oldModule != theModule)
-     EnvSetCurrentModule(theEnv,(void *) theModule);
+     EnvSetCurrentModule(theEnv,execStatus,(void *) theModule);
    oldActions = ProceduralPrimitiveData(theEnv)->CurrentProcActions;
    ProceduralPrimitiveData(theEnv)->CurrentProcActions = actions;
 
-   if (EvaluateExpression(theEnv,actions,result))
+   if (EvaluateExpression(theEnv,execStatus,actions,result))
      {
       result->type = SYMBOL;
       result->value = EnvFalseSymbol(theEnv);
@@ -889,29 +889,29 @@ globle void EvaluateProcActions(
 
    ProceduralPrimitiveData(theEnv)->CurrentProcActions = oldActions;
    if (oldModule != ((struct defmodule *) EnvGetCurrentModule(theEnv)))
-     EnvSetCurrentModule(theEnv,(void *) oldModule);
+     EnvSetCurrentModule(theEnv,execStatus,(void *) oldModule);
    if ((crtproc != NULL) ? execStatus->HaltExecution : FALSE)
      {
-      PrintErrorID(theEnv,"PRCCODE",4,FALSE);
-      EnvPrintRouter(theEnv,WERROR,"Execution halted during the actions of ");
+      PrintErrorID(theEnv,execStatus,"PRCCODE",4,FALSE);
+      EnvPrintRouter(theEnv,execStatus,WERROR,"Execution halted during the actions of ");
       (*crtproc)(theEnv);
      }
    if ((ProceduralPrimitiveData(theEnv)->WildcardValue != NULL) ? (result->value == ProceduralPrimitiveData(theEnv)->WildcardValue->value) : FALSE)
      {
-      MultifieldDeinstall(theEnv,(MULTIFIELD_PTR) ProceduralPrimitiveData(theEnv)->WildcardValue->value);
+      MultifieldDeinstall(theEnv,execStatus,(MULTIFIELD_PTR) ProceduralPrimitiveData(theEnv)->WildcardValue->value);
       if (ProceduralPrimitiveData(theEnv)->WildcardValue->value != ProceduralPrimitiveData(theEnv)->NoParamValue)
-        AddToMultifieldList(theEnv,(MULTIFIELD_PTR) ProceduralPrimitiveData(theEnv)->WildcardValue->value);
-      rtn_struct(theEnv,dataObject,ProceduralPrimitiveData(theEnv)->WildcardValue);
+        AddToMultifieldList(theEnv,execStatus,(MULTIFIELD_PTR) ProceduralPrimitiveData(theEnv)->WildcardValue->value);
+      rtn_struct(theEnv,execStatus,dataObject,ProceduralPrimitiveData(theEnv)->WildcardValue);
       ProceduralPrimitiveData(theEnv)->WildcardValue = NULL;
      }
 
    if (lvarcnt != 0)
      {
-      RemoveTrackedMemory(theEnv,theTM);
+      RemoveTrackedMemory(theEnv,execStatus,theTM);
       for (i = 0 ; i < lvarcnt ; i++)
         if (ProceduralPrimitiveData(theEnv)->LocalVarArray[i].supplementalInfo == EnvTrueSymbol(theEnv))
-          ValueDeinstall(theEnv,&ProceduralPrimitiveData(theEnv)->LocalVarArray[i]);
-      rm(theEnv,(void *) ProceduralPrimitiveData(theEnv)->LocalVarArray,(sizeof(DATA_OBJECT) * lvarcnt));
+          ValueDeinstall(theEnv,execStatus,&ProceduralPrimitiveData(theEnv)->LocalVarArray[i]);
+      rm(theEnv,execStatus,(void *) ProceduralPrimitiveData(theEnv)->LocalVarArray,(sizeof(DATA_OBJECT) * lvarcnt));
      }
 
    ProceduralPrimitiveData(theEnv)->LocalVarArray = oldLocalVarArray;
@@ -933,14 +933,14 @@ globle void PrintProcParamArray(
   {
    register int i;
 
-   EnvPrintRouter(theEnv,logName," (");
+   EnvPrintRouter(theEnv,execStatus,logName," (");
    for (i = 0 ; i < ProceduralPrimitiveData(theEnv)->ProcParamArraySize ; i++)
      {
-      PrintDataObject(theEnv,logName,&ProceduralPrimitiveData(theEnv)->ProcParamArray[i]);
+      PrintDataObject(theEnv,execStatus,logName,&ProceduralPrimitiveData(theEnv)->ProcParamArray[i]);
       if (i != ProceduralPrimitiveData(theEnv)->ProcParamArraySize-1)
-        EnvPrintRouter(theEnv,logName," ");
+        EnvPrintRouter(theEnv,execStatus,logName," ");
      }
-   EnvPrintRouter(theEnv,logName,")\n");
+   EnvPrintRouter(theEnv,execStatus,logName,")\n");
   }
 
 /****************************************************************
@@ -971,7 +971,7 @@ globle void GrabProcWildargs(
    result->begin = 0;
    if (ProceduralPrimitiveData(theEnv)->WildcardValue == NULL)
      {
-      ProceduralPrimitiveData(theEnv)->WildcardValue = get_struct(theEnv,dataObject);
+      ProceduralPrimitiveData(theEnv)->WildcardValue = get_struct(theEnv,execStatus,dataObject);
       ProceduralPrimitiveData(theEnv)->WildcardValue->begin = 0;
      }
    else if (theIndex == ProceduralPrimitiveData(theEnv)->Oldindex)
@@ -982,9 +982,9 @@ globle void GrabProcWildargs(
      }
    else
      {
-      MultifieldDeinstall(theEnv,(MULTIFIELD_PTR) ProceduralPrimitiveData(theEnv)->WildcardValue->value);
+      MultifieldDeinstall(theEnv,execStatus,(MULTIFIELD_PTR) ProceduralPrimitiveData(theEnv)->WildcardValue->value);
       if (ProceduralPrimitiveData(theEnv)->WildcardValue->value != ProceduralPrimitiveData(theEnv)->NoParamValue)
-        AddToMultifieldList(theEnv,(MULTIFIELD_PTR) ProceduralPrimitiveData(theEnv)->WildcardValue->value);
+        AddToMultifieldList(theEnv,execStatus,(MULTIFIELD_PTR) ProceduralPrimitiveData(theEnv)->WildcardValue->value);
      }
    ProceduralPrimitiveData(theEnv)->Oldindex = theIndex;
    size = ProceduralPrimitiveData(theEnv)->ProcParamArraySize - theIndex + 1;
@@ -992,7 +992,7 @@ globle void GrabProcWildargs(
      {
       result->end = ProceduralPrimitiveData(theEnv)->WildcardValue->end = -1;
       result->value = ProceduralPrimitiveData(theEnv)->WildcardValue->value = ProceduralPrimitiveData(theEnv)->NoParamValue;
-      MultifieldInstall(theEnv,(MULTIFIELD_PTR) ProceduralPrimitiveData(theEnv)->WildcardValue->value);
+      MultifieldInstall(theEnv,execStatus,(MULTIFIELD_PTR) ProceduralPrimitiveData(theEnv)->WildcardValue->value);
       return;
      }
    for (i = theIndex-1 ; i < ProceduralPrimitiveData(theEnv)->ProcParamArraySize ; i++)
@@ -1001,7 +1001,7 @@ globle void GrabProcWildargs(
         size += ProceduralPrimitiveData(theEnv)->ProcParamArray[i].end - ProceduralPrimitiveData(theEnv)->ProcParamArray[i].begin;
      }
    result->end = ProceduralPrimitiveData(theEnv)->WildcardValue->end = size-1;
-   result->value = ProceduralPrimitiveData(theEnv)->WildcardValue->value = (void *) CreateMultifield2(theEnv,(unsigned long) size);
+   result->value = ProceduralPrimitiveData(theEnv)->WildcardValue->value = (void *) CreateMultifield2(theEnv,execStatus,(unsigned long) size);
    for (i = theIndex-1 , j = 1 ; i < ProceduralPrimitiveData(theEnv)->ProcParamArraySize ; i++)
      {
       if (ProceduralPrimitiveData(theEnv)->ProcParamArray[i].type != MULTIFIELD)
@@ -1020,7 +1020,7 @@ globle void GrabProcWildargs(
            }
         }
      }
-   MultifieldInstall(theEnv,(MULTIFIELD_PTR) ProceduralPrimitiveData(theEnv)->WildcardValue->value);
+   MultifieldInstall(theEnv,execStatus,(MULTIFIELD_PTR) ProceduralPrimitiveData(theEnv)->WildcardValue->value);
   }
 
 /* =========================================
@@ -1067,28 +1067,28 @@ static void EvaluateProcParameters(
       return;
      }
 
-   rva = (DATA_OBJECT *) gm2(theEnv,(sizeof(DATA_OBJECT) * numberOfParameters));
+   rva = (DATA_OBJECT *) gm2(theEnv,execStatus,(sizeof(DATA_OBJECT) * numberOfParameters));
    while (parameterList != NULL)
      {
-      if ((EvaluateExpression(theEnv,parameterList,&temp) == TRUE) ? TRUE :
+      if ((EvaluateExpression(theEnv,execStatus,parameterList,&temp) == TRUE) ? TRUE :
           (temp.type == RVOID))
         {
          if (temp.type == RVOID)
            {
-            PrintErrorID(theEnv,"PRCCODE",2,FALSE);
-            EnvPrintRouter(theEnv,WERROR,"Functions without a return value are illegal as ");
-            EnvPrintRouter(theEnv,WERROR,bodytype);
-            EnvPrintRouter(theEnv,WERROR," arguments.\n");
-            SetEvaluationError(theEnv,TRUE);
+            PrintErrorID(theEnv,execStatus,"PRCCODE",2,FALSE);
+            EnvPrintRouter(theEnv,execStatus,WERROR,"Functions without a return value are illegal as ");
+            EnvPrintRouter(theEnv,execStatus,WERROR,bodytype);
+            EnvPrintRouter(theEnv,execStatus,WERROR," arguments.\n");
+            SetEvaluationError(theEnv,execStatus,TRUE);
            }
-         PrintErrorID(theEnv,"PRCCODE",6,FALSE);
-         EnvPrintRouter(theEnv,WERROR,"This error occurred while evaluating arguments ");
-         EnvPrintRouter(theEnv,WERROR,"for the ");
-         EnvPrintRouter(theEnv,WERROR,bodytype);
-         EnvPrintRouter(theEnv,WERROR," ");
-         EnvPrintRouter(theEnv,WERROR,pname);
-         EnvPrintRouter(theEnv,WERROR,".\n");
-         rm(theEnv,(void *) rva,(sizeof(DATA_OBJECT) * numberOfParameters));
+         PrintErrorID(theEnv,execStatus,"PRCCODE",6,FALSE);
+         EnvPrintRouter(theEnv,execStatus,WERROR,"This error occurred while evaluating arguments ");
+         EnvPrintRouter(theEnv,execStatus,WERROR,"for the ");
+         EnvPrintRouter(theEnv,execStatus,WERROR,bodytype);
+         EnvPrintRouter(theEnv,execStatus,WERROR," ");
+         EnvPrintRouter(theEnv,execStatus,WERROR,pname);
+         EnvPrintRouter(theEnv,execStatus,WERROR,".\n");
+         rm(theEnv,execStatus,(void *) rva,(sizeof(DATA_OBJECT) * numberOfParameters));
          return;
         }
       rva[i].type = temp.type;
@@ -1165,22 +1165,22 @@ static intBool GetProcBind(
      }
    if (GetFirstArgument()->nextArg != NULL)
      {
-      EvaluateExpression(theEnv,GetFirstArgument()->nextArg,result);
+      EvaluateExpression(theEnv,execStatus,GetFirstArgument()->nextArg,result);
       return(TRUE);
      }
    if (pvar->second == 0)
      {
-      PrintErrorID(theEnv,"PRCCODE",5,FALSE);
-      SetEvaluationError(theEnv,TRUE);
-      EnvPrintRouter(theEnv,WERROR,"Variable ");
-      EnvPrintRouter(theEnv,WERROR,ValueToString(GetFirstArgument()->value));
+      PrintErrorID(theEnv,execStatus,"PRCCODE",5,FALSE);
+      SetEvaluationError(theEnv,execStatus,TRUE);
+      EnvPrintRouter(theEnv,execStatus,WERROR,"Variable ");
+      EnvPrintRouter(theEnv,execStatus,WERROR,ValueToString(GetFirstArgument()->value));
       if (ProceduralPrimitiveData(theEnv)->ProcUnboundErrFunc != NULL)
         {
-         EnvPrintRouter(theEnv,WERROR," unbound in ");
+         EnvPrintRouter(theEnv,execStatus,WERROR," unbound in ");
          (*ProceduralPrimitiveData(theEnv)->ProcUnboundErrFunc)(theEnv);
         }
       else
-        EnvPrintRouter(theEnv,WERROR," unbound.\n");
+        EnvPrintRouter(theEnv,execStatus,WERROR," unbound.\n");
       result->type = SYMBOL;
       result->value = EnvFalseSymbol(theEnv);
       return(TRUE);
@@ -1194,7 +1194,7 @@ static intBool GetProcBind(
       result->end = src->end;
      }
    else
-     GrabProcWildargs(theEnv,result,(int) pvar->second);
+     GrabProcWildargs(theEnv,execStatus,result,(int) pvar->second);
    return(TRUE);
   }
 
@@ -1222,7 +1222,7 @@ static intBool PutProcBind(
    if (GetFirstArgument() == NULL)
      {
       if (dst->supplementalInfo == EnvTrueSymbol(theEnv))
-        ValueDeinstall(theEnv,dst);
+        ValueDeinstall(theEnv,execStatus,dst);
       dst->supplementalInfo = EnvFalseSymbol(theEnv);
       result->type = SYMBOL;
       result->value = EnvFalseSymbol(theEnv);
@@ -1230,17 +1230,17 @@ static intBool PutProcBind(
    else
      {
       if (GetFirstArgument()->nextArg != NULL)
-        StoreInMultifield(theEnv,result,GetFirstArgument(),TRUE);
+        StoreInMultifield(theEnv,execStatus,result,GetFirstArgument(),TRUE);
       else
-        EvaluateExpression(theEnv,GetFirstArgument(),result);
+        EvaluateExpression(theEnv,execStatus,GetFirstArgument(),result);
       if (dst->supplementalInfo == EnvTrueSymbol(theEnv))
-        ValueDeinstall(theEnv,dst);
+        ValueDeinstall(theEnv,execStatus,dst);
       dst->supplementalInfo = EnvTrueSymbol(theEnv);
       dst->type = result->type;
       dst->value = result->value;
       dst->begin = result->begin;
       dst->end = result->end;
-      ValueInstall(theEnv,dst);
+      ValueInstall(theEnv,execStatus,dst);
      }
    return(TRUE);
   }
@@ -1264,7 +1264,7 @@ static intBool RtnProcWild(
   void *value,
   DATA_OBJECT *result)
   {
-   GrabProcWildargs(theEnv,result,*(int *) ValueToBitMap(value));
+   GrabProcWildargs(theEnv,execStatus,result,*(int *) ValueToBitMap(value));
    return(TRUE);
   }
 
@@ -1354,17 +1354,17 @@ static int ReplaceProcBinds(
      {
       if (actions->argList != NULL)
         {
-         if (ReplaceProcBinds(theEnv,actions->argList,altbindfunc,userBuffer))
+         if (ReplaceProcBinds(theEnv,execStatus,actions->argList,altbindfunc,userBuffer))
            return(TRUE);
-         if ((actions->value == (void *) FindFunction(theEnv,"bind")) &&
+         if ((actions->value == (void *) FindFunction(theEnv,execStatus,"bind")) &&
              (actions->argList->type == SYMBOL))
            {
             bname = (SYMBOL_HN *) actions->argList->value;
-            bcode = (*altbindfunc)(theEnv,actions,userBuffer);
+            bcode = (*altbindfunc)(theEnv,execStatus,actions,userBuffer);
             if (bcode == -1)
               return(TRUE);
             if (bcode == 1)
-              RemoveParsedBindName(theEnv,bname);
+              RemoveParsedBindName(theEnv,execStatus,bname);
            }
         }
       actions = actions->nextArg;
@@ -1404,7 +1404,7 @@ static EXPRESSION *CompactActions(
      {
       tmp = actions;
       actions = actions->argList;
-      rtn_struct(theEnv,expr,tmp);
+      rtn_struct(theEnv,execStatus,expr,tmp);
      }
    return(actions);
   }
@@ -1440,10 +1440,10 @@ static intBool EvaluateBadCall(
 #if MAC_MCW || WIN_MCW || MAC_XCD
 #pragma unused(value)
 #endif
-   PrintErrorID(theEnv,"PRCCODE",1,FALSE);
-   EnvPrintRouter(theEnv,WERROR,"Attempted to call a deffunction/generic function ");
-   EnvPrintRouter(theEnv,WERROR,"which does not exist.\n");
-   SetEvaluationError(theEnv,TRUE);
+   PrintErrorID(theEnv,execStatus,"PRCCODE",1,FALSE);
+   EnvPrintRouter(theEnv,execStatus,WERROR,"Attempted to call a deffunction/generic function ");
+   EnvPrintRouter(theEnv,execStatus,WERROR,"which does not exist.\n");
+   SetEvaluationError(theEnv,execStatus,TRUE);
    SetpType(result,SYMBOL);
    SetpValue(result,EnvFalseSymbol(theEnv));
    return(FALSE);

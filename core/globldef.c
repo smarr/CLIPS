@@ -97,7 +97,7 @@ globle void InitializeDefglobals(
                                                        IncrementDefglobalBusyCount,
                                                        NULL,NULL,NULL,NULL,NULL };
    
-   AllocateEnvironmentData(theEnv,DEFGLOBAL_DATA,sizeof(struct defglobalData),DeallocateDefglobalData);
+   AllocateEnvironmentData(theEnv,execStatus,DEFGLOBAL_DATA,sizeof(struct defglobalData),DeallocateDefglobalData);
    
    memcpy(&DefglobalData(theEnv)->GlobalInfo,&globalInfo,sizeof(struct entityRecord));   
    memcpy(&DefglobalData(theEnv)->DefglobalPtrRecord,&defglobalPtrRecord,sizeof(struct entityRecord));   
@@ -105,8 +105,8 @@ globle void InitializeDefglobals(
    DefglobalData(theEnv)->ResetGlobals = TRUE;
    DefglobalData(theEnv)->LastModuleIndex = -1;
    
-   InstallPrimitive(theEnv,&DefglobalData(theEnv)->GlobalInfo,GBL_VARIABLE);
-   InstallPrimitive(theEnv,&DefglobalData(theEnv)->DefglobalPtrRecord,DEFGLOBAL_PTR);
+   InstallPrimitive(theEnv,execStatus,&DefglobalData(theEnv)->GlobalInfo,GBL_VARIABLE);
+   InstallPrimitive(theEnv,execStatus,&DefglobalData(theEnv)->DefglobalPtrRecord,DEFGLOBAL_PTR);
 
    InitializeDefglobalModules(theEnv);
 
@@ -114,7 +114,7 @@ globle void InitializeDefglobals(
    DefglobalCommandDefinitions(theEnv);
 
    DefglobalData(theEnv)->DefglobalConstruct =
-      AddConstruct(theEnv,"defglobal","defglobals",ParseDefglobal,EnvFindDefglobal,
+      AddConstruct(theEnv,execStatus,"defglobal","defglobals",ParseDefglobal,EnvFindDefglobal,
                    GetConstructNamePointer,GetConstructPPForm,
                    GetConstructModuleItem,EnvGetNextDefglobal,SetNextConstruct,
                    EnvIsDefglobalDeletable,EnvUndefglobal,ReturnDefglobal);
@@ -136,19 +136,19 @@ static void DeallocateDefglobalData(
    if (Bloaded(theEnv)) return;
 #endif
 
-   DoForAllConstructs(theEnv,DestroyDefglobalAction,DefglobalData(theEnv)->DefglobalModuleIndex,FALSE,NULL); 
+   DoForAllConstructs(theEnv,execStatus,DestroyDefglobalAction,DefglobalData(theEnv)->DefglobalModuleIndex,FALSE,NULL); 
 
-   for (theModule = EnvGetNextDefmodule(theEnv,NULL);
+   for (theModule = EnvGetNextDefmodule(theEnv,execStatus,NULL);
         theModule != NULL;
-        theModule = EnvGetNextDefmodule(theEnv,theModule))
+        theModule = EnvGetNextDefmodule(theEnv,execStatus,theModule))
      {
       theModuleItem = (struct defglobalModule *)
-                      GetModuleItem(theEnv,(struct defmodule *) theModule,
+                      GetModuleItem(theEnv,execStatus,(struct defmodule *) theModule,
                                     DefglobalData(theEnv)->DefglobalModuleIndex);
-      rtn_struct(theEnv,defglobalModule,theModuleItem);
+      rtn_struct(theEnv,execStatus,defglobalModule,theModuleItem);
      }
 #else
-   DoForAllConstructs(theEnv,DestroyDefglobalAction,DefglobalData(theEnv)->DefglobalModuleIndex,FALSE,NULL); 
+   DoForAllConstructs(theEnv,execStatus,DestroyDefglobalAction,DefglobalData(theEnv)->DefglobalModuleIndex,FALSE,NULL); 
 #endif
   }
   
@@ -173,10 +173,10 @@ static void DestroyDefglobalAction(
    
    if (theDefglobal == NULL) return;
 
-   DestroyDefglobal(theEnv,theDefglobal);
+   DestroyDefglobal(theEnv,execStatus,theDefglobal);
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv,theConstruct)
+#pragma unused(theEnv,execStatus,theConstruct)
 #endif
 #endif
   }
@@ -189,7 +189,7 @@ static void InitializeDefglobalModules(
   void *theEnv,
   EXEC_STATUS)
   {
-   DefglobalData(theEnv)->DefglobalModuleIndex = RegisterModuleItem(theEnv,"defglobal",
+   DefglobalData(theEnv)->DefglobalModuleIndex = RegisterModuleItem(theEnv,execStatus,"defglobal",
                                     AllocateModule,
                                     ReturnModule,
 #if BLOAD_AND_BSAVE || BLOAD || BLOAD_ONLY
@@ -205,7 +205,7 @@ static void InitializeDefglobalModules(
                                     EnvFindDefglobal);
 
 #if (! BLOAD_ONLY) && (! RUN_TIME) && DEFMODULE_CONSTRUCT
-   AddPortConstructItem(theEnv,"defglobal",SYMBOL);
+   AddPortConstructItem(theEnv,execStatus,"defglobal",SYMBOL);
 #endif
   }
 
@@ -216,7 +216,7 @@ static void *AllocateModule(
   void *theEnv,
   EXEC_STATUS)
   {   
-   return((void *) get_struct(theEnv,defglobalModule)); 
+   return((void *) get_struct(theEnv,execStatus,defglobalModule)); 
   }
 
 /***********************************************/
@@ -227,8 +227,8 @@ static void ReturnModule(
   EXEC_STATUS,
   void *theItem)
   {
-   FreeConstructHeaderModule(theEnv,(struct defmoduleItemHeader *) theItem,DefglobalData(theEnv)->DefglobalConstruct);
-   rtn_struct(theEnv,defglobalModule,theItem);
+   FreeConstructHeaderModule(theEnv,execStatus,(struct defmoduleItemHeader *) theItem,DefglobalData(theEnv)->DefglobalConstruct);
+   rtn_struct(theEnv,execStatus,defglobalModule,theItem);
   }
 
 /**************************************************************/
@@ -240,7 +240,7 @@ globle struct defglobalModule *GetDefglobalModuleItem(
   EXEC_STATUS,
   struct defmodule *theModule)
   {
-   return((struct defglobalModule *) GetConstructModuleItemByIndex(theEnv,theModule,DefglobalData(theEnv)->DefglobalModuleIndex));
+   return((struct defglobalModule *) GetConstructModuleItemByIndex(theEnv,execStatus,theModule,DefglobalData(theEnv)->DefglobalModuleIndex));
   }
 
 /*****************************************************/
@@ -253,7 +253,7 @@ globle void *EnvFindDefglobal(
   EXEC_STATUS,
   char *defglobalName)
   { 
-   return(FindNamedConstruct(theEnv,defglobalName,DefglobalData(theEnv)->DefglobalConstruct)); 
+   return(FindNamedConstruct(theEnv,execStatus,defglobalName,DefglobalData(theEnv)->DefglobalConstruct)); 
   }
 
 /********************************************************************/
@@ -266,7 +266,7 @@ globle void *EnvGetNextDefglobal(
   EXEC_STATUS,
   void *defglobalPtr)
   { 
-   return((void *) GetNextConstructItem(theEnv,(struct constructHeader *) defglobalPtr,DefglobalData(theEnv)->DefglobalModuleIndex)); 
+   return((void *) GetNextConstructItem(theEnv,execStatus,(struct constructHeader *) defglobalPtr,DefglobalData(theEnv)->DefglobalModuleIndex)); 
   }
 
 /*********************************************************/
@@ -296,7 +296,7 @@ static void ReturnDefglobal(
   void *vTheDefglobal)
   {
 #if (MAC_MCW || WIN_MCW) && (RUN_TIME || BLOAD_ONLY)
-#pragma unused(theEnv,vTheDefglobal)
+#pragma unused(theEnv,execStatus,vTheDefglobal)
 #endif
    
 #if (! BLOAD_ONLY) && (! RUN_TIME)
@@ -308,29 +308,29 @@ static void ReturnDefglobal(
    /* Return the global's current value. */
    /*====================================*/
 
-   ValueDeinstall(theEnv,&theDefglobal->current);
+   ValueDeinstall(theEnv,execStatus,&theDefglobal->current);
    if (theDefglobal->current.type == MULTIFIELD)
-     { ReturnMultifield(theEnv,(struct multifield *) theDefglobal->current.value); }
+     { ReturnMultifield(theEnv,execStatus,(struct multifield *) theDefglobal->current.value); }
 
    /*================================================*/
    /* Return the expression representing the initial */
    /* value of the defglobal when it was defined.    */
    /*================================================*/
 
-   RemoveHashedExpression(theEnv,theDefglobal->initial);
+   RemoveHashedExpression(theEnv,execStatus,theDefglobal->initial);
 
    /*===============================*/
    /* Release items stored in the   */
    /* defglobal's construct header. */
    /*===============================*/
 
-   DeinstallConstructHeader(theEnv,&theDefglobal->header);
+   DeinstallConstructHeader(theEnv,execStatus,&theDefglobal->header);
 
    /*======================================*/
    /* Return the defglobal data structure. */
    /*======================================*/
 
-   rtn_struct(theEnv,defglobal,theDefglobal);
+   rtn_struct(theEnv,execStatus,defglobal,theDefglobal);
 
    /*===========================================*/
    /* Set the variable indicating that a change */
@@ -351,7 +351,7 @@ static void DestroyDefglobal(
   void *vTheDefglobal)
   {
 #if (MAC_MCW || WIN_MCW) && BLOAD_ONLY
-#pragma unused(theEnv,vTheDefglobal)
+#pragma unused(theEnv,execStatus,vTheDefglobal)
 #endif
    
 #if (! BLOAD_ONLY)
@@ -364,7 +364,7 @@ static void DestroyDefglobal(
    /*====================================*/
 
    if (theDefglobal->current.type == MULTIFIELD)
-     { ReturnMultifield(theEnv,(struct multifield *) theDefglobal->current.value); }
+     { ReturnMultifield(theEnv,execStatus,(struct multifield *) theDefglobal->current.value); }
      
 #if (! RUN_TIME)
 
@@ -373,13 +373,13 @@ static void DestroyDefglobal(
    /* defglobal's construct header. */
    /*===============================*/
 
-   DeinstallConstructHeader(theEnv,&theDefglobal->header);
+   DeinstallConstructHeader(theEnv,execStatus,&theDefglobal->header);
 
    /*======================================*/
    /* Return the defglobal data structure. */
    /*======================================*/
 
-   rtn_struct(theEnv,defglobal,theDefglobal);
+   rtn_struct(theEnv,execStatus,defglobal,theDefglobal);
 #endif
 #endif
   }
@@ -403,7 +403,7 @@ globle void QSetDefglobalValue(
 
    if (resetVar)
      {
-      EvaluateExpression(theEnv,theGlobal->initial,vPtr);
+      EvaluateExpression(theEnv,execStatus,theGlobal->initial,vPtr);
       if (execStatus->EvaluationError)
         {
          vPtr->type = SYMBOL;
@@ -419,13 +419,13 @@ globle void QSetDefglobalValue(
 #if DEBUGGING_FUNCTIONS
    if (theGlobal->watch)
      {
-      EnvPrintRouter(theEnv,WTRACE,":== ?*");
-      EnvPrintRouter(theEnv,WTRACE,ValueToString(theGlobal->header.name));
-      EnvPrintRouter(theEnv,WTRACE,"* ==> ");
-      PrintDataObject(theEnv,WTRACE,vPtr);
-      EnvPrintRouter(theEnv,WTRACE," <== ");
-      PrintDataObject(theEnv,WTRACE,&theGlobal->current);
-      EnvPrintRouter(theEnv,WTRACE,"\n");
+      EnvPrintRouter(theEnv,execStatus,WTRACE,":== ?*");
+      EnvPrintRouter(theEnv,execStatus,WTRACE,ValueToString(theGlobal->header.name));
+      EnvPrintRouter(theEnv,execStatus,WTRACE,"* ==> ");
+      PrintDataObject(theEnv,execStatus,WTRACE,vPtr);
+      EnvPrintRouter(theEnv,execStatus,WTRACE," <== ");
+      PrintDataObject(theEnv,execStatus,WTRACE,&theGlobal->current);
+      EnvPrintRouter(theEnv,execStatus,WTRACE,"\n");
      }
 #endif
 
@@ -433,9 +433,9 @@ globle void QSetDefglobalValue(
    /* Remove the old value of the global variable. */
    /*==============================================*/
 
-   ValueDeinstall(theEnv,&theGlobal->current);
+   ValueDeinstall(theEnv,execStatus,&theGlobal->current);
    if (theGlobal->current.type == MULTIFIELD)
-     { ReturnMultifield(theEnv,(struct multifield *) theGlobal->current.value); }
+     { ReturnMultifield(theEnv,execStatus,(struct multifield *) theGlobal->current.value); }
 
    /*===========================================*/
    /* Set the new value of the global variable. */
@@ -443,8 +443,8 @@ globle void QSetDefglobalValue(
 
    theGlobal->current.type = vPtr->type;
    if (vPtr->type != MULTIFIELD) theGlobal->current.value = vPtr->value;
-   else DuplicateMultifield(theEnv,&theGlobal->current,vPtr);
-   ValueInstall(theEnv,&theGlobal->current);
+   else DuplicateMultifield(theEnv,execStatus,&theGlobal->current,vPtr);
+   ValueInstall(theEnv,execStatus,&theGlobal->current);
 
    /*===========================================*/
    /* Set the variable indicating that a change */
@@ -470,9 +470,9 @@ globle struct defglobal *QFindDefglobal(
   {
    struct defglobal *theDefglobal;
 
-   for (theDefglobal = (struct defglobal *) EnvGetNextDefglobal(theEnv,NULL);
+   for (theDefglobal = (struct defglobal *) EnvGetNextDefglobal(theEnv,execStatus,NULL);
         theDefglobal != NULL;
-        theDefglobal = (struct defglobal *) EnvGetNextDefglobal(theEnv,theDefglobal))
+        theDefglobal = (struct defglobal *) EnvGetNextDefglobal(theEnv,execStatus,theDefglobal))
      { if (defglobalName == theDefglobal->header.name) return (theDefglobal); }
 
    return(NULL);
@@ -493,12 +493,12 @@ globle void EnvGetDefglobalValueForm(
   {
    struct defglobal *theGlobal = (struct defglobal *) vTheGlobal;
 
-   OpenStringDestination(theEnv,"GlobalValueForm",buffer,bufferLength);
-   EnvPrintRouter(theEnv,"GlobalValueForm","?*");
-   EnvPrintRouter(theEnv,"GlobalValueForm",ValueToString(theGlobal->header.name));
-   EnvPrintRouter(theEnv,"GlobalValueForm","* = ");
-   PrintDataObject(theEnv,"GlobalValueForm",&theGlobal->current);
-   CloseStringDestination(theEnv,"GlobalValueForm");
+   OpenStringDestination(theEnv,execStatus,"GlobalValueForm",buffer,bufferLength);
+   EnvPrintRouter(theEnv,execStatus,"GlobalValueForm","?*");
+   EnvPrintRouter(theEnv,execStatus,"GlobalValueForm",ValueToString(theGlobal->header.name));
+   EnvPrintRouter(theEnv,execStatus,"GlobalValueForm","* = ");
+   PrintDataObject(theEnv,execStatus,"GlobalValueForm",&theGlobal->current);
+   CloseStringDestination(theEnv,execStatus,"GlobalValueForm");
   }
 
 /************************************************************/
@@ -541,7 +541,7 @@ static intBool GetDefglobalValue2(
    /*===========================================*/
 
    theGlobal = (struct defglobal *)
-               FindImportedConstruct(theEnv,"defglobal",NULL,ValueToString(theValue),
+               FindImportedConstruct(theEnv,execStatus,"defglobal",NULL,ValueToString(theValue),
                &count,TRUE,NULL);
 
    /*=============================================*/
@@ -550,13 +550,13 @@ static intBool GetDefglobalValue2(
 
    if (theGlobal == NULL)
      {
-      PrintErrorID(theEnv,"GLOBLDEF",1,FALSE);
-      EnvPrintRouter(theEnv,WERROR,"Global variable ?*");
-      EnvPrintRouter(theEnv,WERROR,ValueToString(theValue));
-      EnvPrintRouter(theEnv,WERROR,"* is unbound.\n");
+      PrintErrorID(theEnv,execStatus,"GLOBLDEF",1,FALSE);
+      EnvPrintRouter(theEnv,execStatus,WERROR,"Global variable ?*");
+      EnvPrintRouter(theEnv,execStatus,WERROR,ValueToString(theValue));
+      EnvPrintRouter(theEnv,execStatus,WERROR,"* is unbound.\n");
       vPtr->type = SYMBOL;
       vPtr->value = EnvFalseSymbol(theEnv);
-      SetEvaluationError(theEnv,TRUE);
+      SetEvaluationError(theEnv,execStatus,TRUE);
       return(FALSE);
      }
 
@@ -568,10 +568,10 @@ static intBool GetDefglobalValue2(
 
    if (count > 1)
      {
-      AmbiguousReferenceErrorMessage(theEnv,"defglobal",ValueToString(theValue));
+      AmbiguousReferenceErrorMessage(theEnv,execStatus,"defglobal",ValueToString(theValue));
       vPtr->type = SYMBOL;
       vPtr->value = EnvFalseSymbol(theEnv);
-      SetEvaluationError(theEnv,TRUE);
+      SetEvaluationError(theEnv,execStatus,TRUE);
       return(FALSE);
      }
 
@@ -579,7 +579,7 @@ static intBool GetDefglobalValue2(
    /* Get the value of the defglobal. */
    /*=================================*/
 
-   QGetDefglobalValue(theEnv,theGlobal,vPtr);
+   QGetDefglobalValue(theEnv,execStatus,theGlobal,vPtr);
 
    return(TRUE);
   }
@@ -612,7 +612,7 @@ globle int QGetDefglobalValue(
 
    if (vPtr->type == MULTIFIELD)
      {
-      vPtr->value = EnvCreateMultifield(theEnv,(unsigned long) (vPtr->end + 1));
+      vPtr->value = EnvCreateMultifield(theEnv,execStatus,(unsigned long) (vPtr->end + 1));
       GenCopyMemory(struct field,vPtr->end + 1,
                                 &((struct multifield *) vPtr->value)->theFields[0],
                                 &((struct multifield *) theGlobal->current.value)->theFields[theGlobal->current.begin]);
@@ -633,10 +633,10 @@ globle intBool EnvGetDefglobalValue(
   {
    struct defglobal *theDefglobal;
 
-   if ((theDefglobal = (struct defglobal *) EnvFindDefglobal(theEnv,variableName)) == NULL)
+   if ((theDefglobal = (struct defglobal *) EnvFindDefglobal(theEnv,execStatus,variableName)) == NULL)
      { return(FALSE); }
 
-   QGetDefglobalValue(theEnv,theDefglobal,vPtr);
+   QGetDefglobalValue(theEnv,execStatus,theDefglobal,vPtr);
 
    return(TRUE);
   }
@@ -653,10 +653,10 @@ globle intBool EnvSetDefglobalValue(
   {
    struct defglobal *theGlobal;
 
-   if ((theGlobal = QFindDefglobal(theEnv,(SYMBOL_HN *) EnvAddSymbol(theEnv,variableName))) == NULL)
+   if ((theGlobal = QFindDefglobal(theEnv,execStatus,(SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,variableName))) == NULL)
      { return(FALSE); }
 
-   QSetDefglobalValue(theEnv,theGlobal,vPtr,FALSE);
+   QSetDefglobalValue(theEnv,execStatus,theGlobal,vPtr,FALSE);
 
    return(TRUE);
   }
@@ -711,20 +711,20 @@ globle void UpdateDefglobalScope(
    /* Loop through every module. */
    /*============================*/
 
-   for (theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,NULL);
+   for (theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,NULL);
         theModule != NULL;
-        theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,theModule))
+        theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,theModule))
      {
       /*============================================================*/
       /* Loop through every defglobal in the module being examined. */
       /*============================================================*/
 
       theItem = (struct defmoduleItemHeader *)
-                GetModuleItem(theEnv,theModule,DefglobalData(theEnv)->DefglobalModuleIndex);
+                GetModuleItem(theEnv,execStatus,theModule,DefglobalData(theEnv)->DefglobalModuleIndex);
 
       for (theDefglobal = (struct defglobal *) theItem->firstItem;
            theDefglobal != NULL ;
-           theDefglobal = (struct defglobal *) EnvGetNextDefglobal(theEnv,theDefglobal))
+           theDefglobal = (struct defglobal *) EnvGetNextDefglobal(theEnv,execStatus,theDefglobal))
         {
          /*====================================================*/
          /* If the defglobal is visible to the current module, */
@@ -732,7 +732,7 @@ globle void UpdateDefglobalScope(
          /* as being out of scope.                             */
          /*====================================================*/
 
-         if (FindImportedConstruct(theEnv,"defglobal",theModule,
+         if (FindImportedConstruct(theEnv,execStatus,"defglobal",theModule,
                                    ValueToString(theDefglobal->header.name),
                                    &moduleCount,TRUE,NULL) != NULL)
            { theDefglobal->inScope = TRUE; }
@@ -780,9 +780,9 @@ globle void *GetNextDefglobalInScope(
       /* to start the search with.                */
       /*==========================================*/
 
-      DefglobalData(theEnv)->TheDefmodule = (struct defmodule *) EnvGetNextDefmodule(theEnv,NULL);
+      DefglobalData(theEnv)->TheDefmodule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,NULL);
       theItem = (struct defmoduleItemHeader *)
-                GetModuleItem(theEnv,DefglobalData(theEnv)->TheDefmodule,DefglobalData(theEnv)->DefglobalModuleIndex);
+                GetModuleItem(theEnv,execStatus,DefglobalData(theEnv)->TheDefmodule,DefglobalData(theEnv)->DefglobalModuleIndex);
       theGlobal = (struct defglobal *) theItem->firstItem;
      }
 
@@ -792,7 +792,7 @@ globle void *GetNextDefglobalInScope(
    /*==================================================*/
 
    else
-     { theGlobal = (struct defglobal *) EnvGetNextDefglobal(theEnv,theGlobal); }
+     { theGlobal = (struct defglobal *) EnvGetNextDefglobal(theEnv,execStatus,theGlobal); }
 
    /*======================================*/
    /* Continue looping through the modules */
@@ -808,7 +808,7 @@ globle void *GetNextDefglobalInScope(
 
       for (;
            theGlobal != NULL;
-           theGlobal = (struct defglobal *) EnvGetNextDefglobal(theEnv,theGlobal))
+           theGlobal = (struct defglobal *) EnvGetNextDefglobal(theEnv,execStatus,theGlobal))
         { if (theGlobal->inScope) return((void *) theGlobal); }
 
       /*================================================*/
@@ -816,9 +816,9 @@ globle void *GetNextDefglobalInScope(
       /* module, then move on to the next module.       */
       /*================================================*/
 
-      DefglobalData(theEnv)->TheDefmodule = (struct defmodule *) EnvGetNextDefmodule(theEnv,DefglobalData(theEnv)->TheDefmodule);
+      DefglobalData(theEnv)->TheDefmodule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,DefglobalData(theEnv)->TheDefmodule);
       theItem = (struct defmoduleItemHeader *)
-                GetModuleItem(theEnv,DefglobalData(theEnv)->TheDefmodule,DefglobalData(theEnv)->DefglobalModuleIndex);
+                GetModuleItem(theEnv,execStatus,DefglobalData(theEnv)->TheDefmodule,DefglobalData(theEnv)->DefglobalModuleIndex);
       theGlobal = (struct defglobal *) theItem->firstItem;
      }
 

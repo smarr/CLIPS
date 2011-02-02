@@ -49,33 +49,33 @@ globle void PredicateFunctionDefinitions(
   EXEC_STATUS)
   {
 #if ! RUN_TIME
-   EnvDefineFunction2(theEnv,"not", 'b', NotFunction, "NotFunction", "11");
-   EnvDefineFunction2(theEnv,"and", 'b', AndFunction, "AndFunction", "2*");
-   EnvDefineFunction2(theEnv,"or", 'b', OrFunction, "OrFunction", "2*");
+   EnvDefineFunction2(theEnv,execStatus,"not", 'b', NotFunction, "NotFunction", "11");
+   EnvDefineFunction2(theEnv,execStatus,"and", 'b', AndFunction, "AndFunction", "2*");
+   EnvDefineFunction2(theEnv,execStatus,"or", 'b', OrFunction, "OrFunction", "2*");
 
-   EnvDefineFunction2(theEnv,"eq", 'b', EqFunction, "EqFunction", "2*");
-   EnvDefineFunction2(theEnv,"neq", 'b', NeqFunction, "NeqFunction", "2*");
+   EnvDefineFunction2(theEnv,execStatus,"eq", 'b', EqFunction, "EqFunction", "2*");
+   EnvDefineFunction2(theEnv,execStatus,"neq", 'b', NeqFunction, "NeqFunction", "2*");
 
-   EnvDefineFunction2(theEnv,"<=", 'b', LessThanOrEqualFunction, "LessThanOrEqualFunction", "2*n");
-   EnvDefineFunction2(theEnv,">=", 'b', GreaterThanOrEqualFunction, "GreaterThanOrEqualFunction", "2*n");
-   EnvDefineFunction2(theEnv,"<", 'b', LessThanFunction, "LessThanFunction", "2*n");
-   EnvDefineFunction2(theEnv,">", 'b', GreaterThanFunction, "GreaterThanFunction", "2*n");
-   EnvDefineFunction2(theEnv,"=", 'b', NumericEqualFunction, "NumericEqualFunction", "2*n");
-   EnvDefineFunction2(theEnv,"<>", 'b', NumericNotEqualFunction, "NumericNotEqualFunction", "2*n");
-   EnvDefineFunction2(theEnv,"!=", 'b', NumericNotEqualFunction, "NumericNotEqualFunction", "2*n");
+   EnvDefineFunction2(theEnv,execStatus,"<=", 'b', LessThanOrEqualFunction, "LessThanOrEqualFunction", "2*n");
+   EnvDefineFunction2(theEnv,execStatus,">=", 'b', GreaterThanOrEqualFunction, "GreaterThanOrEqualFunction", "2*n");
+   EnvDefineFunction2(theEnv,execStatus,"<", 'b', LessThanFunction, "LessThanFunction", "2*n");
+   EnvDefineFunction2(theEnv,execStatus,">", 'b', GreaterThanFunction, "GreaterThanFunction", "2*n");
+   EnvDefineFunction2(theEnv,execStatus,"=", 'b', NumericEqualFunction, "NumericEqualFunction", "2*n");
+   EnvDefineFunction2(theEnv,execStatus,"<>", 'b', NumericNotEqualFunction, "NumericNotEqualFunction", "2*n");
+   EnvDefineFunction2(theEnv,execStatus,"!=", 'b', NumericNotEqualFunction, "NumericNotEqualFunction", "2*n");
 
-   EnvDefineFunction2(theEnv,"symbolp", 'b', SymbolpFunction, "SymbolpFunction", "11");
-   EnvDefineFunction2(theEnv,"wordp", 'b', SymbolpFunction, "SymbolpFunction", "11");
-   EnvDefineFunction2(theEnv,"stringp", 'b', StringpFunction, "StringpFunction", "11");
-   EnvDefineFunction2(theEnv,"lexemep", 'b', LexemepFunction, "LexemepFunction", "11");
-   EnvDefineFunction2(theEnv,"numberp", 'b', NumberpFunction, "NumberpFunction", "11");
-   EnvDefineFunction2(theEnv,"integerp", 'b', IntegerpFunction, "IntegerpFunction", "11");
-   EnvDefineFunction2(theEnv,"floatp", 'b', FloatpFunction, "FloatpFunction", "11");
-   EnvDefineFunction2(theEnv,"oddp", 'b', OddpFunction, "OddpFunction", "11i");
-   EnvDefineFunction2(theEnv,"evenp", 'b', EvenpFunction, "EvenpFunction", "11i");
-   EnvDefineFunction2(theEnv,"multifieldp",'b', MultifieldpFunction, "MultifieldpFunction", "11");
-   EnvDefineFunction2(theEnv,"sequencep",'b', MultifieldpFunction, "MultifieldpFunction", "11");
-   EnvDefineFunction2(theEnv,"pointerp", 'b', PointerpFunction, "PointerpFunction", "11");
+   EnvDefineFunction2(theEnv,execStatus,"symbolp", 'b', SymbolpFunction, "SymbolpFunction", "11");
+   EnvDefineFunction2(theEnv,execStatus,"wordp", 'b', SymbolpFunction, "SymbolpFunction", "11");
+   EnvDefineFunction2(theEnv,execStatus,"stringp", 'b', StringpFunction, "StringpFunction", "11");
+   EnvDefineFunction2(theEnv,execStatus,"lexemep", 'b', LexemepFunction, "LexemepFunction", "11");
+   EnvDefineFunction2(theEnv,execStatus,"numberp", 'b', NumberpFunction, "NumberpFunction", "11");
+   EnvDefineFunction2(theEnv,execStatus,"integerp", 'b', IntegerpFunction, "IntegerpFunction", "11");
+   EnvDefineFunction2(theEnv,execStatus,"floatp", 'b', FloatpFunction, "FloatpFunction", "11");
+   EnvDefineFunction2(theEnv,execStatus,"oddp", 'b', OddpFunction, "OddpFunction", "11i");
+   EnvDefineFunction2(theEnv,execStatus,"evenp", 'b', EvenpFunction, "EvenpFunction", "11i");
+   EnvDefineFunction2(theEnv,execStatus,"multifieldp",'b', MultifieldpFunction, "MultifieldpFunction", "11");
+   EnvDefineFunction2(theEnv,execStatus,"sequencep",'b', MultifieldpFunction, "MultifieldpFunction", "11");
+   EnvDefineFunction2(theEnv,execStatus,"pointerp", 'b', PointerpFunction, "PointerpFunction", "11");
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
 #pragma unused(theEnv)
@@ -108,7 +108,7 @@ globle intBool EqFunction(
    /*==============================================*/
 
    theExpression = GetFirstArgument();
-   EvaluateExpression(theEnv,theExpression,&item);
+   EvaluateExpression(theEnv,execStatus,theExpression,&item);
 
    /*=====================================*/
    /* Compare all arguments to the first. */
@@ -118,7 +118,7 @@ globle intBool EqFunction(
    theExpression = GetNextArgument(theExpression);
    for (i = 2 ; i <= numArgs ; i++)
      {
-      EvaluateExpression(theEnv,theExpression,&nextItem);
+      EvaluateExpression(theEnv,execStatus,theExpression,&nextItem);
 
       if (GetType(nextItem) != GetType(item))
         { return(FALSE); }
@@ -167,7 +167,7 @@ globle intBool NeqFunction(
    /*==============================================*/
 
    theExpression = GetFirstArgument();
-   EvaluateExpression(theEnv,theExpression,&item);
+   EvaluateExpression(theEnv,execStatus,theExpression,&item);
 
    /*=====================================*/
    /* Compare all arguments to the first. */
@@ -178,7 +178,7 @@ globle intBool NeqFunction(
         i <= numArgs;
         i++, theExpression = GetNextArgument(theExpression))
      {
-      EvaluateExpression(theEnv,theExpression,&nextItem);
+      EvaluateExpression(theEnv,execStatus,theExpression,&nextItem);
       if (GetType(nextItem) != GetType(item))
         { continue; }
       else if (nextItem.type == MULTIFIELD)
@@ -208,9 +208,9 @@ globle intBool StringpFunction(
   {
    DATA_OBJECT item;
 
-   if (EnvArgCountCheck(theEnv,"stringp",EXACTLY,1) == -1) return(FALSE);
+   if (EnvArgCountCheck(theEnv,execStatus,"stringp",EXACTLY,1) == -1) return(FALSE);
 
-   EnvRtnUnknown(theEnv,1,&item);
+   EnvRtnUnknown(theEnv,execStatus,1,&item);
 
    if (GetType(item) == STRING)
      { return(TRUE); }
@@ -228,9 +228,9 @@ globle intBool SymbolpFunction(
   {
    DATA_OBJECT item;
 
-   if (EnvArgCountCheck(theEnv,"symbolp",EXACTLY,1) == -1) return(FALSE);
+   if (EnvArgCountCheck(theEnv,execStatus,"symbolp",EXACTLY,1) == -1) return(FALSE);
 
-   EnvRtnUnknown(theEnv,1,&item);
+   EnvRtnUnknown(theEnv,execStatus,1,&item);
 
    if (GetType(item) == SYMBOL)
      { return(TRUE); }
@@ -248,9 +248,9 @@ globle intBool LexemepFunction(
   {
    DATA_OBJECT item;
 
-   if (EnvArgCountCheck(theEnv,"lexemep",EXACTLY,1) == -1) return(FALSE);
+   if (EnvArgCountCheck(theEnv,execStatus,"lexemep",EXACTLY,1) == -1) return(FALSE);
 
-   EnvRtnUnknown(theEnv,1,&item);
+   EnvRtnUnknown(theEnv,execStatus,1,&item);
 
    if ((GetType(item) == SYMBOL) || (GetType(item) == STRING))
      { return(TRUE); }
@@ -268,9 +268,9 @@ globle intBool NumberpFunction(
   {
    DATA_OBJECT item;
 
-   if (EnvArgCountCheck(theEnv,"numberp",EXACTLY,1) == -1) return(FALSE);
+   if (EnvArgCountCheck(theEnv,execStatus,"numberp",EXACTLY,1) == -1) return(FALSE);
 
-   EnvRtnUnknown(theEnv,1,&item);
+   EnvRtnUnknown(theEnv,execStatus,1,&item);
 
    if ((GetType(item) == FLOAT) || (GetType(item) == INTEGER))
      { return(TRUE); }
@@ -288,9 +288,9 @@ globle intBool FloatpFunction(
   {
    DATA_OBJECT item;
 
-   if (EnvArgCountCheck(theEnv,"floatp",EXACTLY,1) == -1) return(FALSE);
+   if (EnvArgCountCheck(theEnv,execStatus,"floatp",EXACTLY,1) == -1) return(FALSE);
 
-   EnvRtnUnknown(theEnv,1,&item);
+   EnvRtnUnknown(theEnv,execStatus,1,&item);
 
    if (GetType(item) == FLOAT)
      { return(TRUE); }
@@ -308,9 +308,9 @@ globle intBool IntegerpFunction(
   {
    DATA_OBJECT item;
 
-   if (EnvArgCountCheck(theEnv,"integerp",EXACTLY,1) == -1) return(FALSE);
+   if (EnvArgCountCheck(theEnv,execStatus,"integerp",EXACTLY,1) == -1) return(FALSE);
 
-   EnvRtnUnknown(theEnv,1,&item);
+   EnvRtnUnknown(theEnv,execStatus,1,&item);
 
    if (GetType(item) != INTEGER) return(FALSE);
 
@@ -327,9 +327,9 @@ globle intBool MultifieldpFunction(
   {
    DATA_OBJECT item;
 
-   if (EnvArgCountCheck(theEnv,"multifieldp",EXACTLY,1) == -1) return(FALSE);
+   if (EnvArgCountCheck(theEnv,execStatus,"multifieldp",EXACTLY,1) == -1) return(FALSE);
 
-   EnvRtnUnknown(theEnv,1,&item);
+   EnvRtnUnknown(theEnv,execStatus,1,&item);
 
    if (GetType(item) != MULTIFIELD) return(FALSE);
 
@@ -346,9 +346,9 @@ globle intBool PointerpFunction(
   {
    DATA_OBJECT item;
 
-   if (EnvArgCountCheck(theEnv,"pointerp",EXACTLY,1) == -1) return(FALSE);
+   if (EnvArgCountCheck(theEnv,execStatus,"pointerp",EXACTLY,1) == -1) return(FALSE);
 
-   EnvRtnUnknown(theEnv,1,&item);
+   EnvRtnUnknown(theEnv,execStatus,1,&item);
 
    if (GetType(item) != EXTERNAL_ADDRESS) return(FALSE);
 
@@ -369,7 +369,7 @@ globle intBool NotFunction(
    theArgument = GetFirstArgument();
    if (theArgument == NULL) { return(FALSE); }
 
-   if (EvaluateExpression(theEnv,theArgument,&result)) return(FALSE);
+   if (EvaluateExpression(theEnv,execStatus,theArgument,&result)) return(FALSE);
 
    if ((result.value == EnvFalseSymbol(theEnv)) && (result.type == SYMBOL))
      { return(TRUE); }
@@ -392,7 +392,7 @@ globle intBool AndFunction(
         theArgument != NULL;
         theArgument = GetNextArgument(theArgument))
      {
-      if (EvaluateExpression(theEnv,theArgument,&result)) return(FALSE);
+      if (EvaluateExpression(theEnv,execStatus,theArgument,&result)) return(FALSE);
       if ((result.value == EnvFalseSymbol(theEnv)) && (result.type == SYMBOL))
         { return(FALSE); }
      }
@@ -415,7 +415,7 @@ globle intBool OrFunction(
         theArgument != NULL;
         theArgument = GetNextArgument(theArgument))
      {
-      if (EvaluateExpression(theEnv,theArgument,&result)) return(FALSE);
+      if (EvaluateExpression(theEnv,execStatus,theArgument,&result)) return(FALSE);
 
       if ((result.value != EnvFalseSymbol(theEnv)) || (result.type != SYMBOL))
         { return(TRUE); }
@@ -442,7 +442,7 @@ globle intBool LessThanOrEqualFunction(
 
    theArgument = GetFirstArgument();
    if (theArgument == NULL) { return(TRUE); }
-   if (! GetNumericArgument(theEnv,theArgument,"<=",&rv1,FALSE,pos)) return(FALSE);
+   if (! GetNumericArgument(theEnv,execStatus,theArgument,"<=",&rv1,FALSE,pos)) return(FALSE);
    pos++;
 
    /*====================================================*/
@@ -454,7 +454,7 @@ globle intBool LessThanOrEqualFunction(
         theArgument != NULL;
         theArgument = GetNextArgument(theArgument), pos++)
      {
-      if (! GetNumericArgument(theEnv,theArgument,"<=",&rv2,FALSE,pos)) return(FALSE);
+      if (! GetNumericArgument(theEnv,execStatus,theArgument,"<=",&rv2,FALSE,pos)) return(FALSE);
       if (rv1.type == INTEGER)
         {
          if (rv2.type == INTEGER)
@@ -512,7 +512,7 @@ globle intBool GreaterThanOrEqualFunction(
 
    theArgument = GetFirstArgument();
    if (theArgument == NULL) { return(TRUE); }
-   if (! GetNumericArgument(theEnv,theArgument,">=",&rv1,FALSE,pos)) return(FALSE);
+   if (! GetNumericArgument(theEnv,execStatus,theArgument,">=",&rv1,FALSE,pos)) return(FALSE);
    pos++;
 
    /*===================================================*/
@@ -524,7 +524,7 @@ globle intBool GreaterThanOrEqualFunction(
         theArgument != NULL;
         theArgument = GetNextArgument(theArgument), pos++)
      {
-      if (! GetNumericArgument(theEnv,theArgument,">=",&rv2,FALSE,pos)) return(FALSE);
+      if (! GetNumericArgument(theEnv,execStatus,theArgument,">=",&rv2,FALSE,pos)) return(FALSE);
       if (rv1.type == INTEGER)
         {
          if (rv2.type == INTEGER)
@@ -582,7 +582,7 @@ globle intBool LessThanFunction(
 
    theArgument = GetFirstArgument();
    if (theArgument == NULL) { return(TRUE); }
-   if (! GetNumericArgument(theEnv,theArgument,"<",&rv1,FALSE,pos)) return(FALSE);
+   if (! GetNumericArgument(theEnv,execStatus,theArgument,"<",&rv1,FALSE,pos)) return(FALSE);
    pos++;
 
    /*==========================================*/
@@ -595,7 +595,7 @@ globle intBool LessThanFunction(
         theArgument != NULL;
         theArgument = GetNextArgument(theArgument), pos++)
      {
-      if (! GetNumericArgument(theEnv,theArgument,"<",&rv2,FALSE,pos)) return(FALSE);
+      if (! GetNumericArgument(theEnv,execStatus,theArgument,"<",&rv2,FALSE,pos)) return(FALSE);
       if (rv1.type == INTEGER)
         {
          if (rv2.type == INTEGER)
@@ -653,7 +653,7 @@ globle intBool GreaterThanFunction(
 
    theArgument = GetFirstArgument();
    if (theArgument == NULL) { return(TRUE); }
-   if (! GetNumericArgument(theEnv,theArgument,">",&rv1,FALSE,pos)) return(FALSE);
+   if (! GetNumericArgument(theEnv,execStatus,theArgument,">",&rv1,FALSE,pos)) return(FALSE);
    pos++;
 
    /*==========================================*/
@@ -666,7 +666,7 @@ globle intBool GreaterThanFunction(
         theArgument != NULL;
         theArgument = GetNextArgument(theArgument), pos++)
      {
-      if (! GetNumericArgument(theEnv,theArgument,">",&rv2,FALSE,pos)) return(FALSE);
+      if (! GetNumericArgument(theEnv,execStatus,theArgument,">",&rv2,FALSE,pos)) return(FALSE);
       if (rv1.type == INTEGER)
         {
          if (rv2.type == INTEGER)
@@ -725,7 +725,7 @@ globle intBool NumericEqualFunction(
    theArgument = GetFirstArgument();
 
    if (theArgument == NULL) { return(TRUE); }
-   if (! GetNumericArgument(theEnv,theArgument,"=",&rv1,FALSE,pos)) return(FALSE);
+   if (! GetNumericArgument(theEnv,execStatus,theArgument,"=",&rv1,FALSE,pos)) return(FALSE);
    pos++;
 
    /*=================================================*/
@@ -737,7 +737,7 @@ globle intBool NumericEqualFunction(
         theArgument != NULL;
         theArgument = GetNextArgument(theArgument), pos++)
      {
-      if (! GetNumericArgument(theEnv,theArgument,"=",&rv2,FALSE,pos)) return(FALSE);
+      if (! GetNumericArgument(theEnv,execStatus,theArgument,"=",&rv2,FALSE,pos)) return(FALSE);
       if (rv1.type == INTEGER)
         {
          if (rv2.type == INTEGER)
@@ -792,7 +792,7 @@ globle intBool NumericNotEqualFunction(
 
    theArgument = GetFirstArgument();
    if (theArgument == NULL) { return(TRUE); }
-   if (! GetNumericArgument(theEnv,theArgument,"<>",&rv1,FALSE,pos)) return(FALSE);
+   if (! GetNumericArgument(theEnv,execStatus,theArgument,"<>",&rv1,FALSE,pos)) return(FALSE);
    pos++;
 
    /*=================================================*/
@@ -804,7 +804,7 @@ globle intBool NumericNotEqualFunction(
         theArgument != NULL;
         theArgument = GetNextArgument(theArgument), pos++)
      {
-      if (! GetNumericArgument(theEnv,theArgument,"<>",&rv2,FALSE,pos)) return(FALSE);
+      if (! GetNumericArgument(theEnv,execStatus,theArgument,"<>",&rv2,FALSE,pos)) return(FALSE);
       if (rv1.type == INTEGER)
         {
          if (rv2.type == INTEGER)
@@ -852,8 +852,8 @@ globle intBool OddpFunction(
    DATA_OBJECT item;
    long long num, halfnum;
 
-   if (EnvArgCountCheck(theEnv,"oddp",EXACTLY,1) == -1) return(FALSE);
-   if (EnvArgTypeCheck(theEnv,"oddp",1,INTEGER,&item) == FALSE) return(FALSE);
+   if (EnvArgCountCheck(theEnv,execStatus,"oddp",EXACTLY,1) == -1) return(FALSE);
+   if (EnvArgTypeCheck(theEnv,execStatus,"oddp",1,INTEGER,&item) == FALSE) return(FALSE);
 
    num = DOToLong(item);
 
@@ -874,8 +874,8 @@ globle intBool EvenpFunction(
    DATA_OBJECT item;
    long long num, halfnum;
 
-   if (EnvArgCountCheck(theEnv,"evenp",EXACTLY,1) == -1) return(FALSE);
-   if (EnvArgTypeCheck(theEnv,"evenp",1,INTEGER,&item) == FALSE) return(FALSE);
+   if (EnvArgCountCheck(theEnv,execStatus,"evenp",EXACTLY,1) == -1) return(FALSE);
+   if (EnvArgTypeCheck(theEnv,execStatus,"evenp",1,INTEGER,&item) == FALSE) return(FALSE);
 
    num = DOToLong(item);
 

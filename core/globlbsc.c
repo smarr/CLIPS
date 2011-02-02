@@ -81,18 +81,18 @@ globle void DefglobalBasicCommands(
   void *theEnv,
   EXEC_STATUS)
   {
-   AddSaveFunction(theEnv,"defglobal",SaveDefglobals,40);
-   EnvAddResetFunction(theEnv,"defglobal",ResetDefglobals,50);
+   AddSaveFunction(theEnv,execStatus,"defglobal",SaveDefglobals,40);
+   EnvAddResetFunction(theEnv,execStatus,"defglobal",ResetDefglobals,50);
 
 #if ! RUN_TIME
-   EnvDefineFunction2(theEnv,"get-defglobal-list",'m',PTIEF GetDefglobalListFunction,"GetDefglobalListFunction","01w");
-   EnvDefineFunction2(theEnv,"undefglobal",'v',PTIEF UndefglobalCommand,"UndefglobalCommand","11w");
-   EnvDefineFunction2(theEnv,"defglobal-module",'w',PTIEF DefglobalModuleFunction,"DefglobalModuleFunction","11w");
+   EnvDefineFunction2(theEnv,execStatus,"get-defglobal-list",'m',PTIEF GetDefglobalListFunction,"GetDefglobalListFunction","01w");
+   EnvDefineFunction2(theEnv,execStatus,"undefglobal",'v',PTIEF UndefglobalCommand,"UndefglobalCommand","11w");
+   EnvDefineFunction2(theEnv,execStatus,"defglobal-module",'w',PTIEF DefglobalModuleFunction,"DefglobalModuleFunction","11w");
 
 #if DEBUGGING_FUNCTIONS
-   EnvDefineFunction2(theEnv,"list-defglobals",'v', PTIEF ListDefglobalsCommand,"ListDefglobalsCommand","01w");
-   EnvDefineFunction2(theEnv,"ppdefglobal",'v',PTIEF PPDefglobalCommand,"PPDefglobalCommand","11w");
-   AddWatchItem(theEnv,"globals",0,&WatchGlobals,0,DefglobalWatchAccess,DefglobalWatchPrint);
+   EnvDefineFunction2(theEnv,execStatus,"list-defglobals",'v', PTIEF ListDefglobalsCommand,"ListDefglobalsCommand","01w");
+   EnvDefineFunction2(theEnv,execStatus,"ppdefglobal",'v',PTIEF PPDefglobalCommand,"PPDefglobalCommand","11w");
+   AddWatchItem(theEnv,execStatus,"globals",0,&WatchGlobals,0,DefglobalWatchAccess,DefglobalWatchPrint);
 #endif
 
 #if (BLOAD || BLOAD_ONLY || BLOAD_AND_BSAVE)
@@ -115,7 +115,7 @@ globle void ResetDefglobals(
   EXEC_STATUS)
   {
    if (! EnvGetResetGlobals(theEnv)) return;
-   DoForAllConstructs(theEnv,ResetDefglobalAction,DefglobalData(theEnv)->DefglobalModuleIndex,TRUE,NULL);
+   DoForAllConstructs(theEnv,execStatus,ResetDefglobalAction,DefglobalData(theEnv)->DefglobalModuleIndex,TRUE,NULL);
   }
 
 /******************************************************/
@@ -137,13 +137,13 @@ static void ResetDefglobalAction(
    struct defglobal *theDefglobal = (struct defglobal *) theConstruct;
    DATA_OBJECT assignValue;
 
-   if (EvaluateExpression(theEnv,theDefglobal->initial,&assignValue))
+   if (EvaluateExpression(theEnv,execStatus,theDefglobal->initial,&assignValue))
      {
       assignValue.type = SYMBOL;
       assignValue.value = EnvFalseSymbol(theEnv);
      }
 
-   QSetDefglobalValue(theEnv,theDefglobal,&assignValue,FALSE);
+   QSetDefglobalValue(theEnv,execStatus,theDefglobal,&assignValue,FALSE);
   }
 
 /******************************************/
@@ -156,7 +156,7 @@ static void SaveDefglobals(
   void *theModule,
   char *logicalName)
   {
-   SaveConstruct(theEnv,theModule,logicalName,DefglobalData(theEnv)->DefglobalConstruct); 
+   SaveConstruct(theEnv,execStatus,theModule,logicalName,DefglobalData(theEnv)->DefglobalConstruct); 
   }
 
 /********************************************/
@@ -167,7 +167,7 @@ globle void UndefglobalCommand(
   void *theEnv,
   EXEC_STATUS)
   {
-   UndefconstructCommand(theEnv,"undefglobal",DefglobalData(theEnv)->DefglobalConstruct); 
+   UndefconstructCommand(theEnv,execStatus,"undefglobal",DefglobalData(theEnv)->DefglobalConstruct); 
   }
 
 /************************************/
@@ -179,7 +179,7 @@ globle intBool EnvUndefglobal(
   EXEC_STATUS,
   void *theDefglobal)
   {
-   return(Undefconstruct(theEnv,theDefglobal,DefglobalData(theEnv)->DefglobalConstruct)); 
+   return(Undefconstruct(theEnv,execStatus,theDefglobal,DefglobalData(theEnv)->DefglobalConstruct)); 
   }
 
 /**************************************************/
@@ -191,7 +191,7 @@ globle void GetDefglobalListFunction(
   EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   { 
-   GetConstructListFunction(theEnv,"get-defglobal-list",returnValue,DefglobalData(theEnv)->DefglobalConstruct); 
+   GetConstructListFunction(theEnv,execStatus,"get-defglobal-list",returnValue,DefglobalData(theEnv)->DefglobalConstruct); 
   }
 
 /******************************************/
@@ -204,7 +204,7 @@ globle void EnvGetDefglobalList(
   DATA_OBJECT_PTR returnValue,
   void *theModule)
   {
-   GetConstructList(theEnv,returnValue,DefglobalData(theEnv)->DefglobalConstruct,(struct defmodule *) theModule); 
+   GetConstructList(theEnv,execStatus,returnValue,DefglobalData(theEnv)->DefglobalConstruct,(struct defmodule *) theModule); 
   }
 
 /*************************************************/
@@ -215,7 +215,7 @@ globle void *DefglobalModuleFunction(
   void *theEnv,
   EXEC_STATUS)
   { 
-   return(GetConstructModuleCommand(theEnv,"defglobal-module",DefglobalData(theEnv)->DefglobalConstruct)); 
+   return(GetConstructModuleCommand(theEnv,execStatus,"defglobal-module",DefglobalData(theEnv)->DefglobalConstruct)); 
   }
 
 #if DEBUGGING_FUNCTIONS
@@ -228,7 +228,7 @@ globle void PPDefglobalCommand(
   void *theEnv,
   EXEC_STATUS)
   {
-   PPConstructCommand(theEnv,"ppdefglobal",DefglobalData(theEnv)->DefglobalConstruct); 
+   PPConstructCommand(theEnv,execStatus,"ppdefglobal",DefglobalData(theEnv)->DefglobalConstruct); 
   }
 
 /*************************************/
@@ -241,7 +241,7 @@ globle int PPDefglobal(
   char *defglobalName,
   char *logicalName)
   {
-   return(PPConstruct(theEnv,defglobalName,logicalName,DefglobalData(theEnv)->DefglobalConstruct)); 
+   return(PPConstruct(theEnv,execStatus,defglobalName,logicalName,DefglobalData(theEnv)->DefglobalConstruct)); 
   }
 
 /***********************************************/
@@ -252,7 +252,7 @@ globle void ListDefglobalsCommand(
   void *theEnv,
   EXEC_STATUS)
   {
-   ListConstructCommand(theEnv,"list-defglobals",DefglobalData(theEnv)->DefglobalConstruct);
+   ListConstructCommand(theEnv,execStatus,"list-defglobals",DefglobalData(theEnv)->DefglobalConstruct);
   }
 
 /***************************************/
@@ -267,7 +267,7 @@ globle void EnvListDefglobals(
   {
    struct defmodule *theModule = (struct defmodule *) vTheModule;
 
-   ListConstruct(theEnv,DefglobalData(theEnv)->DefglobalConstruct,logicalName,theModule);
+   ListConstruct(theEnv,execStatus,DefglobalData(theEnv)->DefglobalConstruct,logicalName,theModule);
   }
 
 /*********************************************************/
@@ -329,7 +329,7 @@ static unsigned DefglobalWatchAccess(
 #pragma unused(code)
 #endif
 
-   return(ConstructSetWatchAccess(theEnv,DefglobalData(theEnv)->DefglobalConstruct,newState,argExprs,
+   return(ConstructSetWatchAccess(theEnv,execStatus,DefglobalData(theEnv)->DefglobalConstruct,newState,argExprs,
                                   EnvGetDefglobalWatch,EnvSetDefglobalWatch));
   }
 
@@ -351,7 +351,7 @@ static unsigned DefglobalWatchPrint(
 #pragma unused(code)
 #endif
 
-   return(ConstructPrintWatchAccess(theEnv,DefglobalData(theEnv)->DefglobalConstruct,logName,argExprs,
+   return(ConstructPrintWatchAccess(theEnv,execStatus,DefglobalData(theEnv)->DefglobalConstruct,logName,argExprs,
                                     EnvGetDefglobalWatch,EnvSetDefglobalWatch));
   }
 

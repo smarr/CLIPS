@@ -48,7 +48,7 @@ struct defglobalBinaryData
    long NumberOfDefglobalModules;
   };
   
-#define DefglobalBinaryData(theEnv) ((struct defglobalBinaryData *) GetEnvironmentData(theEnv,GLOBLBIN_DATA))
+#define DefglobalBinaryData(theEnv) ((struct defglobalBinaryData *) GetEnvironmentData(theEnv,execStatus,GLOBLBIN_DATA))
 
 #define DefglobalPointer(i) ((struct defglobal *) (&DefglobalBinaryData(theEnv)->DefglobalArray[i]))
 

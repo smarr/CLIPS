@@ -61,7 +61,7 @@ globle void DeftemplateCompilerSetup(
   void *theEnv,
   EXEC_STATUS)
   {
-   DeftemplateData(theEnv)->DeftemplateCodeItem = AddCodeGeneratorItem(theEnv,"deftemplate",0,NULL,InitDeftemplateCode,ConstructToCode,3);
+   DeftemplateData(theEnv)->DeftemplateCodeItem = AddCodeGeneratorItem(theEnv,execStatus,"deftemplate",0,NULL,InitDeftemplateCode,ConstructToCode,3);
   }
 
 /*************************************************************/
@@ -100,49 +100,49 @@ static int ConstructToCode(
    /* to the file as they are traversed.                          */
    /*=============================================================*/
 
-   theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,NULL);
+   theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,NULL);
 
    while (theModule != NULL)
      {
-      EnvSetCurrentModule(theEnv,(void *) theModule);
+      EnvSetCurrentModule(theEnv,execStatus,(void *) theModule);
 
-      moduleFile = OpenFileIfNeeded(theEnv,moduleFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
+      moduleFile = OpenFileIfNeeded(theEnv,execStatus,moduleFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
                                     moduleArrayVersion,headerFP,
                                     "struct deftemplateModule",ModulePrefix(DeftemplateData(theEnv)->DeftemplateCodeItem),
                                     FALSE,NULL);
 
       if (moduleFile == NULL)
         {
-         CloseDeftemplateFiles(theEnv,moduleFile,templateFile,slotFile,maxIndices);
+         CloseDeftemplateFiles(theEnv,execStatus,moduleFile,templateFile,slotFile,maxIndices);
          return(0);
         }
 
-      DeftemplateModuleToCode(theEnv,moduleFile,theModule,imageID,maxIndices,moduleCount);
-      moduleFile = CloseFileIfNeeded(theEnv,moduleFile,&moduleArrayCount,&moduleArrayVersion,
+      DeftemplateModuleToCode(theEnv,execStatus,moduleFile,theModule,imageID,maxIndices,moduleCount);
+      moduleFile = CloseFileIfNeeded(theEnv,execStatus,moduleFile,&moduleArrayCount,&moduleArrayVersion,
                                      maxIndices,NULL,NULL);
 
       /*=======================================================*/
       /* Loop through each of the deftemplates in this module. */
       /*=======================================================*/
 
-      theTemplate = (struct deftemplate *) EnvGetNextDeftemplate(theEnv,NULL);
+      theTemplate = (struct deftemplate *) EnvGetNextDeftemplate(theEnv,execStatus,NULL);
 
       while (theTemplate != NULL)
         {
-         templateFile = OpenFileIfNeeded(theEnv,templateFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
+         templateFile = OpenFileIfNeeded(theEnv,execStatus,templateFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
                                          templateArrayVersion,headerFP,
                                          "struct deftemplate",ConstructPrefix(DeftemplateData(theEnv)->DeftemplateCodeItem),
                                          FALSE,NULL);
          if (templateFile == NULL)
            {
-            CloseDeftemplateFiles(theEnv,moduleFile,templateFile,slotFile,maxIndices);
+            CloseDeftemplateFiles(theEnv,execStatus,moduleFile,templateFile,slotFile,maxIndices);
             return(0);
            }
 
-         DeftemplateToCode(theEnv,templateFile,theTemplate,imageID,maxIndices,
+         DeftemplateToCode(theEnv,execStatus,templateFile,theTemplate,imageID,maxIndices,
                         moduleCount,slotCount);
          templateArrayCount++;
-         templateFile = CloseFileIfNeeded(theEnv,templateFile,&templateArrayCount,&templateArrayVersion,
+         templateFile = CloseFileIfNeeded(theEnv,execStatus,templateFile,&templateArrayCount,&templateArrayVersion,
                                           maxIndices,NULL,NULL);
 
          /*======================================================*/
@@ -152,33 +152,33 @@ static int ConstructToCode(
          slotPtr = theTemplate->slotList;
          while (slotPtr != NULL)
            {
-            slotFile = OpenFileIfNeeded(theEnv,slotFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
+            slotFile = OpenFileIfNeeded(theEnv,execStatus,slotFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
                                         slotArrayVersion,headerFP,
                                        "struct templateSlot",SlotPrefix(),FALSE,NULL);
             if (slotFile == NULL)
               {
-               CloseDeftemplateFiles(theEnv,moduleFile,templateFile,slotFile,maxIndices);
+               CloseDeftemplateFiles(theEnv,execStatus,moduleFile,templateFile,slotFile,maxIndices);
                return(0);
               }
 
-            SlotToCode(theEnv,slotFile,slotPtr,imageID,maxIndices,slotCount);
+            SlotToCode(theEnv,execStatus,slotFile,slotPtr,imageID,maxIndices,slotCount);
             slotCount++;
             slotArrayCount++;
-            slotFile = CloseFileIfNeeded(theEnv,slotFile,&slotArrayCount,&slotArrayVersion,
+            slotFile = CloseFileIfNeeded(theEnv,execStatus,slotFile,&slotArrayCount,&slotArrayVersion,
                                          maxIndices,NULL,NULL);
             slotPtr = slotPtr->next;
            }
 
-         theTemplate = (struct deftemplate *) EnvGetNextDeftemplate(theEnv,theTemplate);
+         theTemplate = (struct deftemplate *) EnvGetNextDeftemplate(theEnv,execStatus,theTemplate);
         }
 
-      theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,theModule);
+      theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,theModule);
       moduleCount++;
       moduleArrayCount++;
 
      }
 
-   CloseDeftemplateFiles(theEnv,moduleFile,templateFile,slotFile,maxIndices);
+   CloseDeftemplateFiles(theEnv,execStatus,moduleFile,templateFile,slotFile,maxIndices);
 
    return(1);
   }
@@ -202,19 +202,19 @@ static void CloseDeftemplateFiles(
    if (slotFile != NULL)
      {
       count = maxIndices;
-      CloseFileIfNeeded(theEnv,slotFile,&count,&arrayVersion,maxIndices,NULL,NULL);
+      CloseFileIfNeeded(theEnv,execStatus,slotFile,&count,&arrayVersion,maxIndices,NULL,NULL);
      }
 
    if (templateFile != NULL)
      {
       count = maxIndices;
-      CloseFileIfNeeded(theEnv,templateFile,&count,&arrayVersion,maxIndices,NULL,NULL);
+      CloseFileIfNeeded(theEnv,execStatus,templateFile,&count,&arrayVersion,maxIndices,NULL,NULL);
      }
 
    if (moduleFile != NULL)
      {
       count = maxIndices;
-      CloseFileIfNeeded(theEnv,moduleFile,&count,&arrayVersion,maxIndices,NULL,NULL);
+      CloseFileIfNeeded(theEnv,execStatus,moduleFile,&count,&arrayVersion,maxIndices,NULL,NULL);
      }
   }
 
@@ -240,7 +240,7 @@ static void DeftemplateModuleToCode(
 
    fprintf(theFile,"{");
 
-   ConstructModuleToCode(theEnv,theFile,theModule,imageID,maxIndices,
+   ConstructModuleToCode(theEnv,execStatus,theFile,theModule,imageID,maxIndices,
                          DeftemplateData(theEnv)->DeftemplateModuleIndex,ConstructPrefix(DeftemplateData(theEnv)->DeftemplateCodeItem));
 
    fprintf(theFile,"}");
@@ -266,7 +266,7 @@ static void DeftemplateToCode(
 
    fprintf(theFile,"{");
 
-   ConstructHeaderToCode(theEnv,theFile,&theTemplate->header,imageID,maxIndices,
+   ConstructHeaderToCode(theEnv,execStatus,theFile,&theTemplate->header,imageID,maxIndices,
                                   moduleCount,ModulePrefix(DeftemplateData(theEnv)->DeftemplateCodeItem),
                                   ConstructPrefix(DeftemplateData(theEnv)->DeftemplateCodeItem));
    fprintf(theFile,",");
@@ -299,7 +299,7 @@ static void DeftemplateToCode(
    if (theTemplate->patternNetwork == NULL)
      { fprintf(theFile,"NULL"); }
    else
-     { FactPatternNodeReference(theEnv,theTemplate->patternNetwork,theFile,imageID,maxIndices); }
+     { FactPatternNodeReference(theEnv,execStatus,theTemplate->patternNetwork,theFile,imageID,maxIndices); }
 
    /*============================================*/
    /* Print the factList and lastFact references */
@@ -327,7 +327,7 @@ static void SlotToCode(
    /*===========*/
 
    fprintf(theFile,"{");
-   PrintSymbolReference(theEnv,theFile,theSlot->slotName);
+   PrintSymbolReference(theEnv,execStatus,theFile,theSlot->slotName);
 
    /*=============================*/
    /* Multislot and Default Flags */
@@ -340,21 +340,21 @@ static void SlotToCode(
    /* Constraints */
    /*=============*/
 
-   PrintConstraintReference(theEnv,theFile,theSlot->constraints,imageID,maxIndices);
+   PrintConstraintReference(theEnv,execStatus,theFile,theSlot->constraints,imageID,maxIndices);
 
    /*===============*/
    /* Default Value */
    /*===============*/
 
    fprintf(theFile,",");
-   PrintHashedExpressionReference(theEnv,theFile,theSlot->defaultList,imageID,maxIndices);
+   PrintHashedExpressionReference(theEnv,execStatus,theFile,theSlot->defaultList,imageID,maxIndices);
    
    /*============*/
    /* Facet List */
    /*============*/
    
    fprintf(theFile,",");
-   PrintHashedExpressionReference(theEnv,theFile,theSlot->facetList,imageID,maxIndices);
+   PrintHashedExpressionReference(theEnv,execStatus,theFile,theSlot->facetList,imageID,maxIndices);
    fprintf(theFile,",");
 
    /*===========*/

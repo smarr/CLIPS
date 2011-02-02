@@ -187,7 +187,7 @@ struct defmoduleData
 #endif
   };
   
-#define DefmoduleData(theEnv) ((struct defmoduleData *) GetEnvironmentData(theEnv,DEFMODULE_DATA))
+#define DefmoduleData(theEnv) ((struct defmoduleData *) GetEnvironmentData(theEnv,execStatus,DEFMODULE_DATA))
 
 #ifdef LOCALE
 #undef LOCALE

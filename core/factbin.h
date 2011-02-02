@@ -32,7 +32,7 @@ struct factBinaryData
    long NumberOfPatterns;
   };
   
-#define FactBinaryData(theEnv) ((struct factBinaryData *) GetEnvironmentData(theEnv,FACTBIN_DATA))
+#define FactBinaryData(theEnv) ((struct factBinaryData *) GetEnvironmentData(theEnv,execStatus,FACTBIN_DATA))
 
 #ifdef LOCALE
 #undef LOCALE

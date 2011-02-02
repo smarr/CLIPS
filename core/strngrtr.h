@@ -44,7 +44,7 @@ struct stringRouterData
    struct stringRouter *ListOfStringRouters;
   };
 
-#define StringRouterData(theEnv) ((struct stringRouterData *) GetEnvironmentData(theEnv,STRING_ROUTER_DATA))
+#define StringRouterData(theEnv) ((struct stringRouterData *) GetEnvironmentData(theEnv,execStatus,STRING_ROUTER_DATA))
 
 #ifdef LOCALE
 #undef LOCALE

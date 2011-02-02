@@ -82,14 +82,14 @@ globle void AddImplicitMethods(
    struct FunctionDefinition *sysfunc;
    EXPRESSION action;
 
-   sysfunc = FindFunction(theEnv,ValueToString(gfunc->header.name));
+   sysfunc = FindFunction(theEnv,execStatus,ValueToString(gfunc->header.name));
    if (sysfunc == NULL)
      return;
    action.type = FCALL;
    action.value = (void *) sysfunc;
    action.nextArg = NULL;
    action.argList = NULL;
-   FormMethodsFromRestrictions(theEnv,gfunc,sysfunc->restrictions,&action);
+   FormMethodsFromRestrictions(theEnv,execStatus,gfunc,sysfunc->restrictions,&action);
   }
 
 /* =========================================
@@ -130,16 +130,16 @@ static void FormMethodsFromRestrictions(
       =================================== */
    if (rstring == NULL)
      {
-      tmp = get_struct(theEnv,expr);
-      rptr = get_struct(theEnv,restriction);
-      PackRestrictionTypes(theEnv,rptr,NULL);
+      tmp = get_struct(theEnv,execStatus,expr);
+      rptr = get_struct(theEnv,execStatus,restriction);
+      PackRestrictionTypes(theEnv,execStatus,rptr,NULL);
       rptr->query = NULL;
       tmp->argList = (EXPRESSION *) rptr;
       tmp->nextArg = NULL;
-      meth = AddMethod(theEnv,gfunc,NULL,0,0,tmp,1,0,(SYMBOL_HN *) EnvTrueSymbol(theEnv),
-                       PackExpression(theEnv,actions),NULL,FALSE);
+      meth = AddMethod(theEnv,execStatus,gfunc,NULL,0,0,tmp,1,0,(SYMBOL_HN *) EnvTrueSymbol(theEnv),
+                       PackExpression(theEnv,execStatus,actions),NULL,FALSE);
       meth->system = 1;
-      DeleteTempRestricts(theEnv,tmp);
+      DeleteTempRestricts(theEnv,execStatus,tmp);
       return;
      }
 
@@ -181,8 +181,8 @@ static void FormMethodsFromRestrictions(
    for (i = 0 ; i < min ; i++)
      {
       theChar[0] = (rstring[j] != '\0') ? rstring[j++] : defaultc;
-      rptr = ParseRestrictionType(theEnv,(int) theChar[0]);
-      tmp = get_struct(theEnv,expr);
+      rptr = ParseRestrictionType(theEnv,execStatus,(int) theChar[0]);
+      tmp = get_struct(theEnv,execStatus,expr);
       tmp->argList = (EXPRESSION *) rptr;
       tmp->nextArg = NULL;
       if (plist == NULL)
@@ -213,8 +213,8 @@ static void FormMethodsFromRestrictions(
          defaultc = rstring[j];
          break;
         }
-      rptr = ParseRestrictionType(theEnv,(int) rstring[j]);
-      tmp = get_struct(theEnv,expr);
+      rptr = ParseRestrictionType(theEnv,execStatus,(int) rstring[j]);
+      tmp = get_struct(theEnv,execStatus,expr);
       tmp->argList = (EXPRESSION *) rptr;
       tmp->nextArg = NULL;
       if (plist == NULL)
@@ -227,8 +227,8 @@ static void FormMethodsFromRestrictions(
       if ((rstring[j] != '\0') || ((min + i) == max))
         {
          FindMethodByRestrictions(gfunc,plist,min + i,NULL,&mposn);
-         meth = AddMethod(theEnv,gfunc,NULL,mposn,0,plist,min + i,0,NULL,
-                          PackExpression(theEnv,actions),NULL,TRUE);
+         meth = AddMethod(theEnv,execStatus,gfunc,NULL,mposn,0,plist,min + i,0,NULL,
+                          PackExpression(theEnv,execStatus,actions),NULL,TRUE);
          meth->system = 1;
         }
      }
@@ -248,16 +248,16 @@ static void FormMethodsFromRestrictions(
       if (i == 0)
         needMinimumMethod = FALSE;
 
-      rptr = ParseRestrictionType(theEnv,(int) defaultc);
+      rptr = ParseRestrictionType(theEnv,execStatus,(int) defaultc);
       if (max != -1)
         {
-         rptr->query = GenConstant(theEnv,FCALL,(void *) FindFunction(theEnv,"<="));
-         rptr->query->argList = GenConstant(theEnv,FCALL,(void *) FindFunction(theEnv,"length$"));
-         rptr->query->argList->argList = GenProcWildcardReference(theEnv,min + i + 1);
+         rptr->query = GenConstant(theEnv,execStatus,FCALL,(void *) FindFunction(theEnv,execStatus,"<="));
+         rptr->query->argList = GenConstant(theEnv,execStatus,FCALL,(void *) FindFunction(theEnv,execStatus,"length$"));
+         rptr->query->argList->argList = GenProcWildcardReference(theEnv,execStatus,min + i + 1);
          rptr->query->argList->nextArg =
-               GenConstant(theEnv,INTEGER,(void *) EnvAddLong(theEnv,(long long) (max - min - i)));
+               GenConstant(theEnv,execStatus,INTEGER,(void *) EnvAddLong(theEnv,execStatus,(long long) (max - min - i)));
         }
-      tmp = get_struct(theEnv,expr);
+      tmp = get_struct(theEnv,execStatus,expr);
       tmp->argList = (EXPRESSION *) rptr;
       tmp->nextArg = NULL;
       if (plist == NULL)
@@ -265,8 +265,8 @@ static void FormMethodsFromRestrictions(
       else
         bot->nextArg = tmp;
       FindMethodByRestrictions(gfunc,plist,min + i + 1,(SYMBOL_HN *) EnvTrueSymbol(theEnv),&mposn);
-      meth = AddMethod(theEnv,gfunc,NULL,mposn,0,plist,min + i + 1,0,(SYMBOL_HN *) EnvTrueSymbol(theEnv),
-                       PackExpression(theEnv,actions),NULL,FALSE);
+      meth = AddMethod(theEnv,execStatus,gfunc,NULL,mposn,0,plist,min + i + 1,0,(SYMBOL_HN *) EnvTrueSymbol(theEnv),
+                       PackExpression(theEnv,execStatus,actions),NULL,FALSE);
       meth->system = 1;
      }
 
@@ -283,14 +283,14 @@ static void FormMethodsFromRestrictions(
         {
          bot = svBot->nextArg;
          svBot->nextArg = NULL;
-         DeleteTempRestricts(theEnv,bot);
+         DeleteTempRestricts(theEnv,execStatus,bot);
         }
       FindMethodByRestrictions(gfunc,plist,min,NULL,&mposn);
-      meth = AddMethod(theEnv,gfunc,NULL,mposn,0,plist,min,0,NULL,
-                       PackExpression(theEnv,actions),NULL,TRUE);
+      meth = AddMethod(theEnv,execStatus,gfunc,NULL,mposn,0,plist,min,0,NULL,
+                       PackExpression(theEnv,execStatus,actions),NULL,TRUE);
       meth->system = 1;
      }
-   DeleteTempRestricts(theEnv,plist);
+   DeleteTempRestricts(theEnv,execStatus,plist);
   }
 
 /*******************************************************************
@@ -312,50 +312,50 @@ static RESTRICTION *ParseRestrictionType(
    CONSTRAINT_RECORD *rv;
    EXPRESSION *types = NULL;
 
-   rptr = get_struct(theEnv,restriction);
+   rptr = get_struct(theEnv,execStatus,restriction);
    rptr->query = NULL;
-   rv = ArgumentTypeToConstraintRecord(theEnv,code);
+   rv = ArgumentTypeToConstraintRecord(theEnv,execStatus,code);
    if (rv->anyAllowed == FALSE)
      {
       if (rv->symbolsAllowed && rv->stringsAllowed)
-        types = GenTypeExpression(theEnv,types,LEXEME_TYPE_CODE,-1,LEXEME_TYPE_NAME);
+        types = GenTypeExpression(theEnv,execStatus,types,LEXEME_TYPE_CODE,-1,LEXEME_TYPE_NAME);
       else if (rv->symbolsAllowed)
-        types = GenTypeExpression(theEnv,types,SYMBOL,SYMBOL,NULL);
+        types = GenTypeExpression(theEnv,execStatus,types,SYMBOL,SYMBOL,NULL);
       else if (rv->stringsAllowed)
-        types = GenTypeExpression(theEnv,types,STRING,STRING,NULL);
+        types = GenTypeExpression(theEnv,execStatus,types,STRING,STRING,NULL);
 
       if (rv->floatsAllowed && rv->integersAllowed)
-        types = GenTypeExpression(theEnv,types,NUMBER_TYPE_CODE,-1,NUMBER_TYPE_NAME);
+        types = GenTypeExpression(theEnv,execStatus,types,NUMBER_TYPE_CODE,-1,NUMBER_TYPE_NAME);
       else if (rv->integersAllowed)
-        types = GenTypeExpression(theEnv,types,INTEGER,INTEGER,NULL);
+        types = GenTypeExpression(theEnv,execStatus,types,INTEGER,INTEGER,NULL);
       else if (rv->floatsAllowed)
-        types = GenTypeExpression(theEnv,types,FLOAT,FLOAT,NULL);
+        types = GenTypeExpression(theEnv,execStatus,types,FLOAT,FLOAT,NULL);
 
       if (rv->instanceNamesAllowed && rv->instanceAddressesAllowed)
-        types = GenTypeExpression(theEnv,types,INSTANCE_TYPE_CODE,-1,INSTANCE_TYPE_NAME);
+        types = GenTypeExpression(theEnv,execStatus,types,INSTANCE_TYPE_CODE,-1,INSTANCE_TYPE_NAME);
       else if (rv->instanceNamesAllowed)
-        types = GenTypeExpression(theEnv,types,INSTANCE_NAME,INSTANCE_NAME,NULL);
+        types = GenTypeExpression(theEnv,execStatus,types,INSTANCE_NAME,INSTANCE_NAME,NULL);
       else if (rv->instanceAddressesAllowed)
-        types = GenTypeExpression(theEnv,types,INSTANCE_ADDRESS,INSTANCE_ADDRESS,NULL);
+        types = GenTypeExpression(theEnv,execStatus,types,INSTANCE_ADDRESS,INSTANCE_ADDRESS,NULL);
 
       if (rv->externalAddressesAllowed && rv->instanceAddressesAllowed &&
           rv->factAddressesAllowed)
-        types = GenTypeExpression(theEnv,types,ADDRESS_TYPE_CODE,-1,ADDRESS_TYPE_NAME);
+        types = GenTypeExpression(theEnv,execStatus,types,ADDRESS_TYPE_CODE,-1,ADDRESS_TYPE_NAME);
       else
         {
          if (rv->externalAddressesAllowed)
-           types = GenTypeExpression(theEnv,types,EXTERNAL_ADDRESS,EXTERNAL_ADDRESS,NULL);
+           types = GenTypeExpression(theEnv,execStatus,types,EXTERNAL_ADDRESS,EXTERNAL_ADDRESS,NULL);
          if (rv->instanceAddressesAllowed && (rv->instanceNamesAllowed == 0))
-           types = GenTypeExpression(theEnv,types,INSTANCE_ADDRESS,INSTANCE_ADDRESS,NULL);
+           types = GenTypeExpression(theEnv,execStatus,types,INSTANCE_ADDRESS,INSTANCE_ADDRESS,NULL);
          if (rv->factAddressesAllowed)
-           types = GenTypeExpression(theEnv,types,FACT_ADDRESS,FACT_ADDRESS,NULL);
+           types = GenTypeExpression(theEnv,execStatus,types,FACT_ADDRESS,FACT_ADDRESS,NULL);
         }
 
       if (rv->multifieldsAllowed)
-        types = GenTypeExpression(theEnv,types,MULTIFIELD,MULTIFIELD,NULL);
+        types = GenTypeExpression(theEnv,execStatus,types,MULTIFIELD,MULTIFIELD,NULL);
      }
-   RemoveConstraint(theEnv,rv);
-   PackRestrictionTypes(theEnv,rptr,types);
+   RemoveConstraint(theEnv,execStatus,rv);
+   PackRestrictionTypes(theEnv,execStatus,rptr,types);
    return(rptr);
   }
 
@@ -405,11 +405,11 @@ static EXPRESSION *GenTypeExpression(
 
 #if OBJECT_SYSTEM
    if (primitiveCode != -1)
-     tmp = GenConstant(theEnv,0,(void *) DefclassData(theEnv)->PrimitiveClassMap[primitiveCode]);
+     tmp = GenConstant(theEnv,execStatus,0,(void *) DefclassData(theEnv)->PrimitiveClassMap[primitiveCode]);
    else
-     tmp = GenConstant(theEnv,0,(void *) LookupDefclassByMdlOrScope(theEnv,COOLName));
+     tmp = GenConstant(theEnv,execStatus,0,(void *) LookupDefclassByMdlOrScope(theEnv,execStatus,COOLName));
 #else
-   tmp = GenConstant(theEnv,0,EnvAddLong(theEnv,(long long) nonCOOLCode));
+   tmp = GenConstant(theEnv,execStatus,0,EnvAddLong(theEnv,execStatus,(long long) nonCOOLCode));
 #endif
    tmp->nextArg = top;
    return(tmp);

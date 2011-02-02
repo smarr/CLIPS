@@ -92,25 +92,25 @@ globle void FactCommandDefinitions(
   {
 #if ! RUN_TIME
 #if DEBUGGING_FUNCTIONS
-   EnvDefineFunction2(theEnv,"facts", 'v', PTIEF FactsCommand,        "FactsCommand", "*4iu");
+   EnvDefineFunction2(theEnv,execStatus,"facts", 'v', PTIEF FactsCommand,        "FactsCommand", "*4iu");
 #endif
 
-   EnvDefineFunction(theEnv,"assert", 'u', PTIEF AssertCommand,  "AssertCommand");
-   EnvDefineFunction2(theEnv,"retract", 'v', PTIEF RetractCommand, "RetractCommand","1*z");
-   EnvDefineFunction2(theEnv,"assert-string", 'u', PTIEF AssertStringFunction,   "AssertStringFunction", "11s");
-   EnvDefineFunction2(theEnv,"str-assert", 'u', PTIEF AssertStringFunction,   "AssertStringFunction", "11s");
+   EnvDefineFunction(theEnv,execStatus,"assert", 'u', PTIEF AssertCommand,  "AssertCommand");
+   EnvDefineFunction2(theEnv,execStatus,"retract", 'v', PTIEF RetractCommand, "RetractCommand","1*z");
+   EnvDefineFunction2(theEnv,execStatus,"assert-string", 'u', PTIEF AssertStringFunction,   "AssertStringFunction", "11s");
+   EnvDefineFunction2(theEnv,execStatus,"str-assert", 'u', PTIEF AssertStringFunction,   "AssertStringFunction", "11s");
 
-   EnvDefineFunction2(theEnv,"get-fact-duplication",'b',
+   EnvDefineFunction2(theEnv,execStatus,"get-fact-duplication",'b',
                    GetFactDuplicationCommand,"GetFactDuplicationCommand", "00");
-   EnvDefineFunction2(theEnv,"set-fact-duplication",'b',
+   EnvDefineFunction2(theEnv,execStatus,"set-fact-duplication",'b',
                    SetFactDuplicationCommand,"SetFactDuplicationCommand", "11");
 
-   EnvDefineFunction2(theEnv,"save-facts", 'b', PTIEF SaveFactsCommand, "SaveFactsCommand", "1*wk");
-   EnvDefineFunction2(theEnv,"load-facts", 'b', PTIEF LoadFactsCommand, "LoadFactsCommand", "11k");
-   EnvDefineFunction2(theEnv,"fact-index", 'g', PTIEF FactIndexFunction,"FactIndexFunction", "11y");
+   EnvDefineFunction2(theEnv,execStatus,"save-facts", 'b', PTIEF SaveFactsCommand, "SaveFactsCommand", "1*wk");
+   EnvDefineFunction2(theEnv,execStatus,"load-facts", 'b', PTIEF LoadFactsCommand, "LoadFactsCommand", "11k");
+   EnvDefineFunction2(theEnv,execStatus,"fact-index", 'g', PTIEF FactIndexFunction,"FactIndexFunction", "11y");
 
-   AddFunctionParser(theEnv,"assert",AssertParse);
-   FuncSeqOvlFlags(theEnv,"assert",FALSE,FALSE);
+   AddFunctionParser(theEnv,execStatus,"assert",AssertParse);
+   FuncSeqOvlFlags(theEnv,execStatus,"assert",FALSE,FALSE);
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
 #pragma unused(theEnv)
@@ -165,7 +165,7 @@ static void AssertOrProcessEvent(
       if (theExpression->nextArg == NULL)
         {
          newFact->theProposition.theFields[0].type = MULTIFIELD;
-         newFact->theProposition.theFields[0].value = CreateMultifield2(theEnv,0L);
+         newFact->theProposition.theFields[0].value = CreateMultifield2(theEnv,execStatus,0L);
         }
       slotPtr = NULL;
      }
@@ -188,7 +188,7 @@ static void AssertOrProcessEvent(
       /* Evaluate the expression to be stored in the slot. */
       /*===================================================*/
 
-      EvaluateExpression(theEnv,theExpression,&theValue);
+      EvaluateExpression(theEnv,execStatus,theExpression,&theValue);
 
       /*============================================================*/
       /* A multifield value can't be stored in a single field slot. */
@@ -198,7 +198,7 @@ static void AssertOrProcessEvent(
           (slotPtr->multislot == FALSE) && (theValue.type == MULTIFIELD) :
           FALSE)
         {
-         MultiIntoSingleFieldSlotError(theEnv,slotPtr,theDeftemplate);
+         MultiIntoSingleFieldSlotError(theEnv,execStatus,slotPtr,theDeftemplate);
          theValue.type = SYMBOL;
          theValue.value = EnvFalseSymbol(theEnv);
          error = TRUE;
@@ -225,7 +225,7 @@ static void AssertOrProcessEvent(
 
    if (error)
      {
-      ReturnFact(theEnv,newFact);
+      ReturnFact(theEnv,execStatus,newFact);
       return;
      }
 
@@ -292,7 +292,7 @@ globle void ProcessEventCommand(
      struct paramsForProcessEvent * parameters = (struct paramsForProcessEvent *)malloc(sizeof(struct paramsForProcessEvent));
      
      if (!parameters) {
-       SystemError(theEnv,"malloc failed",1);
+       SystemError(theEnv,execStatus,"malloc failed",1);
      }
      else {
        parameters->theEnv = theEnv;
@@ -303,7 +303,7 @@ globle void ProcessEventCommand(
                                  parameters,
                                  0, NULL);
        if (apr_rv) {
-         SystemError(theEnv,"Putting task on thread pool failed",1);
+         SystemError(theEnv,execStatus,"Putting task on thread pool failed",1);
        }
      }
      
@@ -340,7 +340,7 @@ globle void RetractCommand(
       /* Evaluate the argument. */
       /*========================*/
 
-      EvaluateExpression(theEnv,theArgument,&theResult);
+      EvaluateExpression(theEnv,execStatus,theArgument,&theResult);
 
       /*===============================================*/
       /* If the argument evaluates to an integer, then */
@@ -357,7 +357,7 @@ globle void RetractCommand(
          factIndex = ValueToLong(theResult.value);
          if (factIndex < 0)
            {
-            ExpectedTypeError1(theEnv,"retract",argNumber,"fact-address, fact-index, or the symbol *");
+            ExpectedTypeError1(theEnv,execStatus,"retract",argNumber,"fact-address, fact-index, or the symbol *");
             return;
            }
 
@@ -365,7 +365,7 @@ globle void RetractCommand(
          /* See if a fact with the specified index exists. */
          /*================================================*/
 
-         ptr = FindIndexedFact(theEnv,factIndex);
+         ptr = FindIndexedFact(theEnv,execStatus,factIndex);
 
          /*=====================================*/
          /* If the fact exists then retract it, */
@@ -378,7 +378,7 @@ globle void RetractCommand(
            {
             char tempBuffer[20];
             gensprintf(tempBuffer,"f-%lld",factIndex);
-            CantFindItemErrorMessage(theEnv,"fact",tempBuffer);
+            CantFindItemErrorMessage(theEnv,execStatus,"fact",tempBuffer);
            }
         }
 
@@ -398,7 +398,7 @@ globle void RetractCommand(
       else if ((theResult.type == SYMBOL) ?
                (strcmp(ValueToString(theResult.value),"*") == 0) : FALSE)
         {
-         RemoveAllFacts(theEnv,execStatus);
+         RemoveAllFacts(theEnv,execStatus,execStatus);
          return;
         }
 
@@ -409,8 +409,8 @@ globle void RetractCommand(
 
       else
         {
-         ExpectedTypeError1(theEnv,"retract",argNumber,"fact-address, fact-index, or the symbol *");
-         SetEvaluationError(theEnv,TRUE);
+         ExpectedTypeError1(theEnv,execStatus,"retract",argNumber,"fact-address, fact-index, or the symbol *");
+         SetEvaluationError(theEnv,execStatus,TRUE);
         }
      }
   }
@@ -450,9 +450,9 @@ globle int SetFactDuplicationCommand(
    /*===============================================================*/
 
    if ((theValue.value == EnvFalseSymbol(theEnv)) && (theValue.type == SYMBOL))
-     { EnvSetFactDuplication(theEnv,FALSE); }
+     { EnvSetFactDuplication(theEnv,execStatus,FALSE); }
    else
-     { EnvSetFactDuplication(theEnv,TRUE); }
+     { EnvSetFactDuplication(theEnv,execStatus,TRUE); }
 
    /*========================================================*/
    /* Return the old value of the fact duplication behavior. */
@@ -517,7 +517,7 @@ globle long long FactIndexFunction(
 
    if (GetType(item) != FACT_ADDRESS)
      {
-      ExpectedTypeError1(theEnv,"fact-index",1,"fact-address");
+      ExpectedTypeError1(theEnv,execStatus,"fact-index",1,"fact-address");
       return(-1L);
      }
 
@@ -529,7 +529,7 @@ globle long long FactIndexFunction(
 
    if (((struct fact *) GetValue(item))->garbage) return(-1LL);
 
-   return (EnvFactIndex(theEnv,GetValue(item)));
+   return (EnvFactIndex(theEnv,execStatus,GetValue(item)));
   }
 
 #if DEBUGGING_FUNCTIONS
@@ -567,7 +567,7 @@ globle void FactsCommand(
 
    if (argumentCount == 0)
      {
-      EnvFacts(theEnv,WDISPLAY,theModule,start,end,max);
+      EnvFacts(theEnv,execStatus,WDISPLAY,theModule,start,end,max);
       return;
      }
 
@@ -585,15 +585,15 @@ globle void FactsCommand(
 
    if (theValue.type == SYMBOL)
      {
-      theModule = (struct defmodule *) EnvFindDefmodule(theEnv,ValueToString(theValue.value));
+      theModule = (struct defmodule *) EnvFindDefmodule(theEnv,execStatus,ValueToString(theValue.value));
       if ((theModule == NULL) && (strcmp(ValueToString(theValue.value),"*") != 0))
         {
-         SetEvaluationError(theEnv,TRUE);
-         CantFindItemErrorMessage(theEnv,"defmodule",ValueToString(theValue.value));
+         SetEvaluationError(theEnv,execStatus,TRUE);
+         CantFindItemErrorMessage(theEnv,execStatus,"defmodule",ValueToString(theValue.value));
          return;
         }
 
-      if ((start = GetFactsArgument(theEnv,2,argumentCount)) == INVALID) return;
+      if ((start = GetFactsArgument(theEnv,execStatus,2,argumentCount)) == INVALID) return;
 
       argOffset = 1;
      }
@@ -608,9 +608,9 @@ globle void FactsCommand(
       start = DOToLong(theValue);
       if (start < 0)
         {
-         ExpectedTypeError1(theEnv,"facts",1,"symbol or positive number");
-         SetHaltExecution(theEnv,TRUE);
-         SetEvaluationError(theEnv,TRUE);
+         ExpectedTypeError1(theEnv,execStatus,"facts",1,"symbol or positive number");
+         SetHaltExecution(theEnv,execStatus,TRUE);
+         SetEvaluationError(theEnv,execStatus,TRUE);
          return;
         }
       argOffset = 0;
@@ -622,9 +622,9 @@ globle void FactsCommand(
 
    else
      {
-      ExpectedTypeError1(theEnv,"facts",1,"symbol or positive number");
-      SetHaltExecution(theEnv,TRUE);
-      SetEvaluationError(theEnv,TRUE);
+      ExpectedTypeError1(theEnv,execStatus,"facts",1,"symbol or positive number");
+      SetHaltExecution(theEnv,execStatus,TRUE);
+      SetEvaluationError(theEnv,execStatus,TRUE);
       return;
      }
 
@@ -632,14 +632,14 @@ globle void FactsCommand(
    /* Get the other arguments. */
    /*==========================*/
 
-   if ((end = GetFactsArgument(theEnv,2 + argOffset,argumentCount)) == INVALID) return;
-   if ((max = GetFactsArgument(theEnv,3 + argOffset,argumentCount)) == INVALID) return;
+   if ((end = GetFactsArgument(theEnv,execStatus,2 + argOffset,argumentCount)) == INVALID) return;
+   if ((max = GetFactsArgument(theEnv,execStatus,3 + argOffset,argumentCount)) == INVALID) return;
 
    /*=================*/
    /* List the facts. */
    /*=================*/
 
-   EnvFacts(theEnv,WDISPLAY,theModule,start,end,max);
+   EnvFacts(theEnv,execStatus,WDISPLAY,theModule,start,end,max);
   }
 
 /*****************************************************/
@@ -670,14 +670,14 @@ globle void EnvFacts(
    /*=========================================================*/
 
    if (theModule == NULL) allModules = TRUE;
-   else EnvSetCurrentModule(theEnv,(void *) theModule);
+   else EnvSetCurrentModule(theEnv,execStatus,(void *) theModule);
 
    /*=====================================*/
    /* Get the first fact to be displayed. */
    /*=====================================*/
 
-   if (allModules) factPtr = (struct fact *) EnvGetNextFact(theEnv,NULL);
-   else factPtr = (struct fact *) GetNextFactInScope(theEnv,NULL);
+   if (allModules) factPtr = (struct fact *) EnvGetNextFact(theEnv,execStatus,NULL);
+   else factPtr = (struct fact *) GetNextFactInScope(theEnv,execStatus,NULL);
 
    /*===============================*/
    /* Display facts until there are */
@@ -693,7 +693,7 @@ globle void EnvFacts(
 
       if (GetHaltExecution(theEnv) == TRUE)
         {
-         EnvSetCurrentModule(theEnv,(void *) oldModule);
+         EnvSetCurrentModule(theEnv,execStatus,(void *) oldModule);
          return;
         }
 
@@ -704,8 +704,8 @@ globle void EnvFacts(
 
       if ((factPtr->factIndex > end) && (end != UNSPECIFIED))
         {
-         PrintTally(theEnv,logicalName,count,"fact","facts");
-         EnvSetCurrentModule(theEnv,(void *) oldModule);
+         PrintTally(theEnv,execStatus,logicalName,count,"fact","facts");
+         EnvSetCurrentModule(theEnv,execStatus,(void *) oldModule);
          return;
         }
 
@@ -716,8 +716,8 @@ globle void EnvFacts(
 
       if (max == 0)
         {
-         PrintTally(theEnv,logicalName,count,"fact","facts");
-         EnvSetCurrentModule(theEnv,(void *) oldModule);
+         PrintTally(theEnv,execStatus,logicalName,count,"fact","facts");
+         EnvSetCurrentModule(theEnv,execStatus,(void *) oldModule);
          return;
         }
 
@@ -728,8 +728,8 @@ globle void EnvFacts(
 
       if (factPtr->factIndex >= start)
         {
-         PrintFactWithIdentifier(theEnv,logicalName,factPtr);
-         EnvPrintRouter(theEnv,logicalName,"\n");
+         PrintFactWithIdentifier(theEnv,execStatus,logicalName,factPtr);
+         EnvPrintRouter(theEnv,execStatus,logicalName,"\n");
          count++;
          if (max > 0) max--;
         }
@@ -738,21 +738,21 @@ globle void EnvFacts(
       /* Proceed to the next fact to be listed. */
       /*========================================*/
 
-      if (allModules) factPtr = (struct fact *) EnvGetNextFact(theEnv,factPtr);
-      else factPtr = (struct fact *) GetNextFactInScope(theEnv,factPtr);
+      if (allModules) factPtr = (struct fact *) EnvGetNextFact(theEnv,execStatus,factPtr);
+      else factPtr = (struct fact *) GetNextFactInScope(theEnv,execStatus,factPtr);
      }
 
    /*===================================================*/
    /* Print the total of the number of facts displayed. */
    /*===================================================*/
 
-   PrintTally(theEnv,logicalName,count,"fact","facts");
+   PrintTally(theEnv,execStatus,logicalName,count,"fact","facts");
 
    /*=============================*/
    /* Restore the current module. */
    /*=============================*/
 
-   EnvSetCurrentModule(theEnv,(void *) oldModule);
+   EnvSetCurrentModule(theEnv,execStatus,(void *) oldModule);
   }
 
 /****************************************************************/
@@ -778,9 +778,9 @@ static long long GetFactsArgument(
 
    if (factIndex < 0)
      {
-      ExpectedTypeError1(theEnv,"facts",whichOne,"positive number");
-      SetHaltExecution(theEnv,TRUE);
-      SetEvaluationError(theEnv,TRUE);
+      ExpectedTypeError1(theEnv,execStatus,"facts",whichOne,"positive number");
+      SetHaltExecution(theEnv,execStatus,TRUE);
+      SetEvaluationError(theEnv,execStatus,TRUE);
       return(INVALID);
      }
 
@@ -866,7 +866,7 @@ globle int SaveFactsCommand(
 
    if (numArgs > 1)
      {
-      if (EnvArgTypeCheck(theEnv,"save-facts",2,SYMBOL,&theValue) == FALSE) return(FALSE);
+      if (EnvArgTypeCheck(theEnv,execStatus,"save-facts",2,SYMBOL,&theValue) == FALSE) return(FALSE);
 
       argument = DOToString(theValue);
 
@@ -876,7 +876,7 @@ globle int SaveFactsCommand(
         { saveCode = VISIBLE_SAVE; }
       else
         {
-         ExpectedTypeError1(theEnv,"save-facts",2,"symbol with value local or visible");
+         ExpectedTypeError1(theEnv,execStatus,"save-facts",2,"symbol with value local or visible");
          return(FALSE);
         }
      }
@@ -893,7 +893,7 @@ globle int SaveFactsCommand(
    /* Call the SaveFacts driver routine. */
    /*====================================*/
 
-   if (EnvSaveFacts(theEnv,fileName,saveCode,theList) == FALSE)
+   if (EnvSaveFacts(theEnv,execStatus,fileName,saveCode,theList) == FALSE)
      { return(FALSE); }
 
    return(TRUE);
@@ -912,19 +912,19 @@ globle int LoadFactsCommand(
    /* Check for the correct number of arguments. */
    /*============================================*/
 
-   if (EnvArgCountCheck(theEnv,"load-facts",EXACTLY,1) == -1) return(FALSE);
+   if (EnvArgCountCheck(theEnv,execStatus,"load-facts",EXACTLY,1) == -1) return(FALSE);
 
    /*====================================================*/
    /* Get the file name from which facts will be loaded. */
    /*====================================================*/
 
-   if ((fileName = GetFileName(theEnv,"load-facts",1)) == NULL) return(FALSE);
+   if ((fileName = GetFileName(theEnv,execStatus,"load-facts",1)) == NULL) return(FALSE);
 
    /*====================================*/
    /* Call the LoadFacts driver routine. */
    /*====================================*/
 
-   if (EnvLoadFacts(theEnv,fileName) == FALSE) return(FALSE);
+   if (EnvLoadFacts(theEnv,execStatus,fileName) == FALSE) return(FALSE);
 
    return(TRUE);
   }
@@ -949,13 +949,13 @@ globle intBool EnvSaveFacts(
    /* Open the file. Use either "fast save" or I/O Router. */
    /*======================================================*/
 
-   if ((filePtr = GenOpen(theEnv,fileName,"w")) == NULL)
+   if ((filePtr = GenOpen(theEnv,execStatus,fileName,"w")) == NULL)
      {
-      OpenErrorMessage(theEnv,"save-facts",fileName);
+      OpenErrorMessage(theEnv,execStatus,"save-facts",fileName);
       return(FALSE);
      }
 
-   SetFastSave(theEnv,filePtr);
+   SetFastSave(theEnv,execStatus,filePtr);
 
    /*===========================================*/
    /* Set the print flags so that addresses and */
@@ -973,15 +973,15 @@ globle intBool EnvSaveFacts(
    /* Determine the list of specific facts to be saved. */
    /*===================================================*/
 
-   theDOArray = GetSaveFactsDeftemplateNames(theEnv,theList,saveCode,&count,&error);
+   theDOArray = GetSaveFactsDeftemplateNames(theEnv,execStatus,theList,saveCode,&count,&error);
 
    if (error)
      {
       PrintUtilityData(theEnv)->PreserveEscapedCharacters = tempValue1;
       PrintUtilityData(theEnv)->AddressesToStrings = tempValue2;
       PrintUtilityData(theEnv)->InstanceAddressesToNames = tempValue3;
-      GenClose(theEnv,filePtr);
-      SetFastSave(theEnv,NULL);
+      GenClose(theEnv,execStatus,filePtr);
+      SetFastSave(theEnv,execStatus,NULL);
       return(FALSE);
      }
 
@@ -991,9 +991,9 @@ globle intBool EnvSaveFacts(
 
    theModule = ((struct defmodule *) EnvGetCurrentModule(theEnv));
 
-   for (theFact = (struct fact *) GetNextFactInScope(theEnv,NULL);
+   for (theFact = (struct fact *) GetNextFactInScope(theEnv,execStatus,NULL);
         theFact != NULL;
-        theFact = (struct fact *) GetNextFactInScope(theEnv,theFact))
+        theFact = (struct fact *) GetNextFactInScope(theEnv,execStatus,theFact))
      {
       /*===========================================================*/
       /* If we're doing a local save and the facts's corresponding */
@@ -1040,8 +1040,8 @@ globle intBool EnvSaveFacts(
 
       if (printFact)
         {
-         PrintFact(theEnv,(char *) filePtr,theFact,FALSE,FALSE);
-         EnvPrintRouter(theEnv,(char *) filePtr,"\n");
+         PrintFact(theEnv,execStatus,(char *) filePtr,theFact,FALSE,FALSE);
+         EnvPrintRouter(theEnv,execStatus,(char *) filePtr,"\n");
         }
      }
 
@@ -1057,14 +1057,14 @@ globle intBool EnvSaveFacts(
    /* Close the file. */
    /*=================*/
 
-   GenClose(theEnv,filePtr);
-   SetFastSave(theEnv,NULL);
+   GenClose(theEnv,execStatus,filePtr);
+   SetFastSave(theEnv,execStatus,NULL);
 
    /*==================================*/
    /* Free the deftemplate name array. */
    /*==================================*/
 
-   if (theList != NULL) rm3(theEnv,theDOArray,(long) sizeof(DATA_OBJECT) * count);
+   if (theList != NULL) rm3(theEnv,execStatus,theDOArray,(long) sizeof(DATA_OBJECT) * count);
 
    /*===================================*/
    /* Return TRUE to indicate no errors */
@@ -1121,7 +1121,7 @@ static DATA_OBJECT_PTR GetSaveFactsDeftemplateNames(
    /* Allocate the storage for the name list. */
    /*=========================================*/
 
-   theDOArray = (DATA_OBJECT_PTR) gm3(theEnv,(long) sizeof(DATA_OBJECT) * *count);
+   theDOArray = (DATA_OBJECT_PTR) gm3(theEnv,execStatus,(long) sizeof(DATA_OBJECT) * *count);
 
    /*=====================================*/
    /* Loop through each of the arguments. */
@@ -1135,12 +1135,12 @@ static DATA_OBJECT_PTR GetSaveFactsDeftemplateNames(
       /* Evaluate the argument. */
       /*========================*/
 
-      EvaluateExpression(theEnv,tempList,&theDOArray[i]);
+      EvaluateExpression(theEnv,execStatus,tempList,&theDOArray[i]);
 
       if (execStatus->EvaluationError)
         {
          *error = TRUE;
-         rm3(theEnv,theDOArray,(long) sizeof(DATA_OBJECT) * *count);
+         rm3(theEnv,execStatus,theDOArray,(long) sizeof(DATA_OBJECT) * *count);
          return(NULL);
         }
 
@@ -1151,8 +1151,8 @@ static DATA_OBJECT_PTR GetSaveFactsDeftemplateNames(
       if (theDOArray[i].type != SYMBOL)
         {
          *error = TRUE;
-         ExpectedTypeError1(theEnv,"save-facts",3+i,"symbol");
-         rm3(theEnv,theDOArray,(long) sizeof(DATA_OBJECT) * *count);
+         ExpectedTypeError1(theEnv,execStatus,"save-facts",3+i,"symbol");
+         rm3(theEnv,execStatus,theDOArray,(long) sizeof(DATA_OBJECT) * *count);
          return(NULL);
         }
 
@@ -1165,26 +1165,26 @@ static DATA_OBJECT_PTR GetSaveFactsDeftemplateNames(
       if (saveCode == LOCAL_SAVE)
         {
          theDeftemplate = (struct deftemplate *)
-                         EnvFindDeftemplate(theEnv,ValueToString(theDOArray[i].value));
+                         EnvFindDeftemplate(theEnv,execStatus,ValueToString(theDOArray[i].value));
          if (theDeftemplate == NULL)
            {
             *error = TRUE;
-            ExpectedTypeError1(theEnv,"save-facts",3+i,"local deftemplate name");
-            rm3(theEnv,theDOArray,(long) sizeof(DATA_OBJECT) * *count);
+            ExpectedTypeError1(theEnv,execStatus,"save-facts",3+i,"local deftemplate name");
+            rm3(theEnv,execStatus,theDOArray,(long) sizeof(DATA_OBJECT) * *count);
             return(NULL);
            }
         }
       else if (saveCode == VISIBLE_SAVE)
         {
          theDeftemplate = (struct deftemplate *)
-           FindImportedConstruct(theEnv,"deftemplate",NULL,
+           FindImportedConstruct(theEnv,execStatus,"deftemplate",NULL,
                                  ValueToString(theDOArray[i].value),
                                  &tempCount,TRUE,NULL);
          if (theDeftemplate == NULL)
            {
             *error = TRUE;
-            ExpectedTypeError1(theEnv,"save-facts",3+i,"visible deftemplate name");
-            rm3(theEnv,theDOArray,(long) sizeof(DATA_OBJECT) * *count);
+            ExpectedTypeError1(theEnv,execStatus,"save-facts",3+i,"visible deftemplate name");
+            rm3(theEnv,execStatus,theDOArray,(long) sizeof(DATA_OBJECT) * *count);
             return(NULL);
            }
         }
@@ -1221,13 +1221,13 @@ globle intBool EnvLoadFacts(
    /* Open the file. Use either "fast save" or I/O Router. */
    /*======================================================*/
 
-   if ((filePtr = GenOpen(theEnv,fileName,"r")) == NULL)
+   if ((filePtr = GenOpen(theEnv,execStatus,fileName,"r")) == NULL)
      {
-      OpenErrorMessage(theEnv,"load-facts",fileName);
+      OpenErrorMessage(theEnv,execStatus,"load-facts",fileName);
       return(FALSE);
      }
 
-   SetFastLoad(theEnv,filePtr);
+   SetFastLoad(theEnv,execStatus,filePtr);
 
    /*=================*/
    /* Load the facts. */
@@ -1236,18 +1236,18 @@ globle intBool EnvLoadFacts(
    theToken.type = LPAREN;
    while (theToken.type != STOP)
      {
-      testPtr = StandardLoadFact(theEnv,(char *) filePtr,&theToken);
+      testPtr = StandardLoadFact(theEnv,execStatus,(char *) filePtr,&theToken);
       if (testPtr == NULL) theToken.type = STOP;
-      else EvaluateExpression(theEnv,testPtr,&rv);
-      ReturnExpression(theEnv,testPtr);
+      else EvaluateExpression(theEnv,execStatus,testPtr,&rv);
+      ReturnExpression(theEnv,execStatus,testPtr);
      }
 
    /*=================*/
    /* Close the file. */
    /*=================*/
 
-   SetFastLoad(theEnv,NULL);
-   GenClose(theEnv,filePtr);
+   SetFastLoad(theEnv,execStatus,NULL);
+   GenClose(theEnv,execStatus,filePtr);
 
    /*================================================*/
    /* Return TRUE if no error occurred while loading */
@@ -1275,8 +1275,8 @@ globle intBool EnvLoadFactsFromString(
    /* Initialize string router */
    /*==========================*/
 
-   if ((theMax == -1) ? (!OpenStringSource(theEnv,theStrRouter,theString,0)) :
-                        (!OpenTextSource(theEnv,theStrRouter,theString,0,(unsigned) theMax)))
+   if ((theMax == -1) ? (!OpenStringSource(theEnv,execStatus,theStrRouter,theString,0)) :
+                        (!OpenTextSource(theEnv,execStatus,theStrRouter,theString,0,(unsigned) theMax)))
      return(FALSE);
 
    /*=================*/
@@ -1286,17 +1286,17 @@ globle intBool EnvLoadFactsFromString(
    theToken.type = LPAREN;
    while (theToken.type != STOP)
      {
-      testPtr = StandardLoadFact(theEnv,theStrRouter,&theToken);
+      testPtr = StandardLoadFact(theEnv,execStatus,theStrRouter,&theToken);
       if (testPtr == NULL) theToken.type = STOP;
-      else EvaluateExpression(theEnv,testPtr,&rv);
-      ReturnExpression(theEnv,testPtr);
+      else EvaluateExpression(theEnv,execStatus,testPtr,&rv);
+      ReturnExpression(theEnv,execStatus,testPtr);
      }
 
    /*=================*/
    /* Close router.   */
    /*=================*/
 
-   CloseStringSource(theEnv,theStrRouter);
+   CloseStringSource(theEnv,execStatus,theStrRouter);
 
    /*================================================*/
    /* Return TRUE if no error occurred while loading */
@@ -1318,24 +1318,24 @@ static struct expr *StandardLoadFact(
    int error = FALSE;
    struct expr *temp;
 
-   GetToken(theEnv,logicalName,theToken);
+   GetToken(theEnv,execStatus,logicalName,theToken);
    if (theToken->type != LPAREN) return(NULL);
 
-   temp = GenConstant(theEnv,FCALL,FindFunction(theEnv,"assert"));
-   temp->argList = GetRHSPattern(theEnv,logicalName,theToken,&error,
+   temp = GenConstant(theEnv,execStatus,FCALL,FindFunction(theEnv,execStatus,"assert"));
+   temp->argList = GetRHSPattern(theEnv,execStatus,logicalName,theToken,&error,
                                   TRUE,FALSE,TRUE,RPAREN);
 
    if (error == TRUE)
      {
-      EnvPrintRouter(theEnv,WERROR,"Function load-facts encountered an error\n");
-      SetEvaluationError(theEnv,TRUE);
-      ReturnExpression(theEnv,temp);
+      EnvPrintRouter(theEnv,execStatus,WERROR,"Function load-facts encountered an error\n");
+      SetEvaluationError(theEnv,execStatus,TRUE);
+      ReturnExpression(theEnv,execStatus,temp);
       return(NULL);
      }
 
    if (ExpressionContainsVariables(temp,TRUE))
      {
-      ReturnExpression(theEnv,temp);
+      ReturnExpression(theEnv,execStatus,temp);
       return(NULL);
      }
 
@@ -1356,11 +1356,11 @@ static struct expr *AssertParse(
    struct expr *rv;
    struct token theToken;
 
-   ReturnExpression(theEnv,top);
-   SavePPBuffer(theEnv," ");
-   IncrementIndentDepth(theEnv,8);
-   rv = BuildRHSAssert(theEnv,logicalName,&theToken,&error,TRUE,TRUE,"assert command","assert");
-   DecrementIndentDepth(theEnv,8);
+   ReturnExpression(theEnv,execStatus,top);
+   SavePPBuffer(theEnv,execStatus," ");
+   IncrementIndentDepth(theEnv,execStatus,8);
+   rv = BuildRHSAssert(theEnv,execStatus,logicalName,&theToken,&error,TRUE,TRUE,"assert command","assert");
+   DecrementIndentDepth(theEnv,execStatus,8);
    return(rv);
   }
 

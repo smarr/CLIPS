@@ -75,7 +75,7 @@ globle void ReturnDefrule(
   void *vWaste)
   {
 #if (MAC_MCW || WIN_MCW) && (RUN_TIME || BLOAD_ONLY)
-#pragma unused(theEnv,vWaste)
+#pragma unused(theEnv,execStatus,vWaste)
 #endif
 
 #if (! RUN_TIME) && (! BLOAD_ONLY)
@@ -102,7 +102,7 @@ globle void ReturnDefrule(
    /* activations added by the rule. */
    /*================================*/
 
-   ClearRuleFromAgenda(theEnv,waste);
+   ClearRuleFromAgenda(theEnv,execStatus,waste);
 
    /*======================*/
    /* Get rid of the rule. */
@@ -114,7 +114,7 @@ globle void ReturnDefrule(
       /* Remove the rule's joins from the join network. */
       /*================================================*/
 
-      DetachJoinsDriver(theEnv,waste,FALSE);
+      DetachJoinsDriver(theEnv,execStatus,waste,FALSE);
 
       /*=============================================*/
       /* If this is the first disjunct, get rid of   */
@@ -125,13 +125,13 @@ globle void ReturnDefrule(
         {
          if (waste->dynamicSalience != NULL)
           {
-           ExpressionDeinstall(theEnv,waste->dynamicSalience);
-           ReturnPackedExpression(theEnv,waste->dynamicSalience);
+           ExpressionDeinstall(theEnv,execStatus,waste->dynamicSalience);
+           ReturnPackedExpression(theEnv,execStatus,waste->dynamicSalience);
            waste->dynamicSalience = NULL;
           }
          if (waste->header.ppForm != NULL)
            {
-            rm(theEnv,waste->header.ppForm,strlen(waste->header.ppForm) + 1);
+            rm(theEnv,execStatus,waste->header.ppForm,strlen(waste->header.ppForm) + 1);
             waste->header.ppForm = NULL;
             
             /*=======================================================*/
@@ -151,13 +151,13 @@ globle void ReturnDefrule(
       /*===========================*/
       
       if (waste->header.usrData != NULL)
-        { ClearUserDataList(theEnv,waste->header.usrData); }
+        { ClearUserDataList(theEnv,execStatus,waste->header.usrData); }
         
       /*===========================================*/
       /* Decrement the count for the defrule name. */
       /*===========================================*/
 
-      DecrementSymbolCount(theEnv,waste->header.name);
+      DecrementSymbolCount(theEnv,execStatus,waste->header.name);
 
       /*========================================*/
       /* Get rid of the the rule's RHS actions. */
@@ -165,8 +165,8 @@ globle void ReturnDefrule(
 
       if (waste->actions != NULL)
         {
-         ExpressionDeinstall(theEnv,waste->actions);
-         ReturnPackedExpression(theEnv,waste->actions);
+         ExpressionDeinstall(theEnv,execStatus,waste->actions);
+         ReturnPackedExpression(theEnv,execStatus,waste->actions);
         }
 
       /*===============================*/
@@ -174,7 +174,7 @@ globle void ReturnDefrule(
       /*===============================*/
 
       nextPtr = waste->disjunct;
-      rtn_struct(theEnv,defrule,waste);
+      rtn_struct(theEnv,execStatus,defrule,waste);
       waste = nextPtr;
      }
 
@@ -203,17 +203,17 @@ globle void DestroyDefrule(
    
    while (theDefrule != NULL)
      {
-      DetachJoinsDriver(theEnv,theDefrule,TRUE);
+      DetachJoinsDriver(theEnv,execStatus,theDefrule,TRUE);
 
       if (first)
         {
 #if (! BLOAD_ONLY) && (! RUN_TIME)
          if (theDefrule->dynamicSalience != NULL)
-           { ReturnPackedExpression(theEnv,theDefrule->dynamicSalience); }
+           { ReturnPackedExpression(theEnv,execStatus,theDefrule->dynamicSalience); }
 
          if (theDefrule->header.ppForm != NULL)
            { 
-            rm(theEnv,theDefrule->header.ppForm,strlen(theDefrule->header.ppForm) + 1);
+            rm(theEnv,execStatus,theDefrule->header.ppForm,strlen(theDefrule->header.ppForm) + 1);
             
             /*=======================================================*/
             /* All of the rule disjuncts share the same pretty print */
@@ -229,17 +229,17 @@ globle void DestroyDefrule(
         }
      
       if (theDefrule->header.usrData != NULL)
-        { ClearUserDataList(theEnv,theDefrule->header.usrData); }
+        { ClearUserDataList(theEnv,execStatus,theDefrule->header.usrData); }
         
 #if (! BLOAD_ONLY) && (! RUN_TIME)
       if (theDefrule->actions != NULL)
-        { ReturnPackedExpression(theEnv,theDefrule->actions); }
+        { ReturnPackedExpression(theEnv,execStatus,theDefrule->actions); }
 #endif
      
       nextDisjunct = theDefrule->disjunct;
       
 #if (! BLOAD_ONLY) && (! RUN_TIME)
-      rtn_struct(theEnv,defrule,theDefrule);
+      rtn_struct(theEnv,execStatus,defrule,theDefrule);
 #endif
 
       theDefrule = nextDisjunct;
@@ -275,7 +275,7 @@ static void DetachJoinsDriver(
    join->ruleToActivate = NULL;
    if (join->nextLinks != NULL) return;
    
-   DetachJoins(theEnv,join,destroy);
+   DetachJoins(theEnv,execStatus,join,destroy);
   }
    
 /**********************************************************************/
@@ -327,7 +327,7 @@ static void DetachJoins(
       if (! destroy)
         {
          if ((join->rightSideEntryStructure != NULL) && (join->joinFromTheRight == FALSE))
-           { RemoveIntranetworkLink(theEnv,join); }
+           { RemoveIntranetworkLink(theEnv,execStatus,join); }
         }
 #endif
         
@@ -338,17 +338,17 @@ static void DetachJoins(
       
       if (destroy)
         { 
-         DestroyBetaMemory(theEnv,join,LHS); 
-         DestroyBetaMemory(theEnv,join,RHS); 
+         DestroyBetaMemory(theEnv,execStatus,join,LHS); 
+         DestroyBetaMemory(theEnv,execStatus,join,RHS); 
         }
       else
         {
-         FlushBetaMemory(theEnv,join,LHS);
-         FlushBetaMemory(theEnv,join,RHS);
+         FlushBetaMemory(theEnv,execStatus,join,LHS);
+         FlushBetaMemory(theEnv,execStatus,join,RHS);
         }
       
-      ReturnLeftMemory(theEnv,join);
-      ReturnRightMemory(theEnv,join);
+      ReturnLeftMemory(theEnv,execStatus,join);
+      ReturnRightMemory(theEnv,execStatus,join);
 
       /*===================================*/
       /* Remove the expressions associated */
@@ -358,10 +358,10 @@ static void DetachJoins(
 #if (! RUN_TIME) && (! BLOAD_ONLY)
       if (! destroy)
         { 
-         RemoveHashedExpression(theEnv,join->networkTest); 
-         RemoveHashedExpression(theEnv,join->secondaryNetworkTest); 
-         RemoveHashedExpression(theEnv,join->leftHash); 
-         RemoveHashedExpression(theEnv,join->rightHash); 
+         RemoveHashedExpression(theEnv,execStatus,join->networkTest); 
+         RemoveHashedExpression(theEnv,execStatus,join->secondaryNetworkTest); 
+         RemoveHashedExpression(theEnv,execStatus,join->leftHash); 
+         RemoveHashedExpression(theEnv,execStatus,join->rightHash); 
         }
 #endif
 
@@ -384,7 +384,7 @@ static void DetachJoins(
                  { lastLink->next = theLink->next; }
 
 #if (! RUN_TIME) && (! BLOAD_ONLY)
-               rtn_struct(theEnv,joinLink,theLink);
+               rtn_struct(theEnv,execStatus,joinLink,theLink);
 #endif
 
                theLink = NULL;
@@ -415,7 +415,7 @@ static void DetachJoins(
                  { lastLink->next = theLink->next; }
 
 #if (! RUN_TIME) && (! BLOAD_ONLY)
-               rtn_struct(theEnv,joinLink,theLink);
+               rtn_struct(theEnv,execStatus,joinLink,theLink);
 #endif
 
                theLink = NULL;
@@ -446,7 +446,7 @@ static void DetachJoins(
                  { lastLink->next = theLink->next; }
                  
 #if (! RUN_TIME) && (! BLOAD_ONLY)
-               rtn_struct(theEnv,joinLink,theLink);
+               rtn_struct(theEnv,execStatus,joinLink,theLink);
 #endif
 
                theLink = NULL;
@@ -477,7 +477,7 @@ static void DetachJoins(
                  { lastLink->next = theLink->next; }
                  
 #if (! RUN_TIME) && (! BLOAD_ONLY)
-               rtn_struct(theEnv,joinLink,theLink);
+               rtn_struct(theEnv,execStatus,joinLink,theLink);
 #endif
                theLink = NULL;
               }
@@ -495,11 +495,11 @@ static void DetachJoins(
               {
                lastMark = prevJoin->marked;  
                prevJoin->marked = TRUE; 
-               DetachJoins(theEnv,rightJoin,destroy);
+               DetachJoins(theEnv,execStatus,rightJoin,destroy);
                prevJoin->marked = lastMark;
               }
             else
-              { DetachJoins(theEnv,rightJoin,destroy); }
+              { DetachJoins(theEnv,execStatus,rightJoin,destroy); }
            }
         }
         
@@ -508,7 +508,7 @@ static void DetachJoins(
       /*==================*/
 
 #if (! RUN_TIME) && (! BLOAD_ONLY)
-      rtn_struct(theEnv,joinNode,join);
+      rtn_struct(theEnv,execStatus,joinNode,join);
 #endif
 
       /*===========================================================*/
@@ -587,7 +587,7 @@ static void RemoveIntranetworkLink(
    /*===================================================*/
 
    if (patternPtr->entryJoin == NULL)
-     { DetachPattern(theEnv,(int) join->rhsType,patternPtr); }
+     { DetachPattern(theEnv,execStatus,(int) join->rhsType,patternPtr); }
   }
 
 #endif /* (! RUN_TIME) && (! BLOAD_ONLY) */

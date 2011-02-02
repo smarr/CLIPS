@@ -140,7 +140,7 @@ globle void AddHashedFact(
    if (FactData(theEnv)->NumberOfFacts > FactData(theEnv)->FactHashTableSize)
      { ResizeFactHashTable(theEnv); }
 
-   newhash = get_struct(theEnv,factHashEntry);
+   newhash = get_struct(theEnv,execStatus,factHashEntry);
    newhash->theFact = theFact;
 	  
     
@@ -183,7 +183,7 @@ globle intBool RemoveHashedFact(
          if (prev == NULL)
            {
             FactData(theEnv)->FactHashTable[hashValue] = hptr->next;
-            rtn_struct(theEnv,factHashEntry,hptr);
+            rtn_struct(theEnv,execStatus,factHashEntry,hptr);
             if (FactData(theEnv)->NumberOfFacts == 1)
               { ResetFactHashTable(theEnv); }
 			apr_thread_rwlock_unlock(Env(theEnv)->factHashLock); // Lode: Unlock
@@ -192,7 +192,7 @@ globle intBool RemoveHashedFact(
          else
            {
             prev->next = hptr->next;
-            rtn_struct(theEnv,factHashEntry,hptr);
+            rtn_struct(theEnv,execStatus,factHashEntry,hptr);
             if (FactData(theEnv)->NumberOfFacts == 1)
               { ResetFactHashTable(theEnv); }
 			apr_thread_rwlock_unlock(Env(theEnv)->factHashLock); // Lode: Unlock
@@ -232,7 +232,7 @@ globle unsigned long HandleFactDuplication(
 
    if (FactData(theEnv)->FactDuplication) return(hashValue);
 
-   tempPtr = FactExists(theEnv,(struct fact *) theFact,hashValue);
+   tempPtr = FactExists(theEnv,execStatus,(struct fact *) theFact,hashValue);
 	  if (tempPtr == NULL) {
 		  apr_thread_rwlock_unlock(Env(theEnv)->factHashLock); // Lode: Unlock
 		  return(hashValue);
@@ -242,9 +242,9 @@ globle unsigned long HandleFactDuplication(
 	apr_thread_rwlock_unlock(Env(theEnv)->factHashLock);
 	  
    // Lode: TODO check thread-safety
-   ReturnFact(theEnv,(struct fact *) theFact);
+   ReturnFact(theEnv,execStatus,(struct fact *) theFact);
 #if DEFRULE_CONSTRUCT
-   AddLogicalDependencies(theEnv,(struct patternEntity *) tempPtr,TRUE);
+   AddLogicalDependencies(theEnv,execStatus,(struct patternEntity *) tempPtr,TRUE);
 #endif
    *duplicate = TRUE;
 	  
@@ -286,7 +286,7 @@ globle void InitializeFactHashTable(
    void *theEnv,
   EXEC_STATUS)
    {
-    FactData(theEnv)->FactHashTable = CreateFactHashTable(theEnv,SIZE_FACT_HASH);
+    FactData(theEnv)->FactHashTable = CreateFactHashTable(theEnv,execStatus,SIZE_FACT_HASH);
     FactData(theEnv)->FactHashTableSize = SIZE_FACT_HASH;
    }
 
@@ -302,9 +302,9 @@ static struct factHashEntry **CreateFactHashTable(
     struct factHashEntry **theTable;
 
     theTable = (struct factHashEntry **)
-               gm3(theEnv,sizeof (struct factHashEntry *) * tableSize);
+               gm3(theEnv,execStatus,sizeof (struct factHashEntry *) * tableSize);
 
-    if (theTable == NULL) EnvExitRouter(theEnv,EXIT_FAILURE);
+    if (theTable == NULL) EnvExitRouter(theEnv,execStatus,EXIT_FAILURE);
     
     for (i = 0; i < tableSize; i++) theTable[i] = NULL;
     
@@ -326,7 +326,7 @@ static void ResizeFactHashTable(
     theTable = FactData(theEnv)->FactHashTable;
     
     newSize = (FactData(theEnv)->FactHashTableSize * 2) + 1;
-    newTable = CreateFactHashTable(theEnv,newSize);
+    newTable = CreateFactHashTable(theEnv,execStatus,newSize);
 
     /*========================================*/
     /* Copy the old entries to the new table. */
@@ -351,7 +351,7 @@ static void ResizeFactHashTable(
     /* Replace the old hash table with the new hash table. */
     /*=====================================================*/
     
-    rm3(theEnv,theTable,sizeof(struct factHashEntry *) * FactData(theEnv)->FactHashTableSize);
+    rm3(theEnv,execStatus,theTable,sizeof(struct factHashEntry *) * FactData(theEnv)->FactHashTableSize);
     FactData(theEnv)->FactHashTableSize = newSize;
     FactData(theEnv)->FactHashTable = newTable;
    }
@@ -377,13 +377,13 @@ static void ResetFactHashTable(
     /* Create the new table. */
     /*=======================*/
     
-    newTable = CreateFactHashTable(theEnv,SIZE_FACT_HASH);
+    newTable = CreateFactHashTable(theEnv,execStatus,SIZE_FACT_HASH);
     
     /*=====================================================*/
     /* Replace the old hash table with the new hash table. */
     /*=====================================================*/
     
-    rm3(theEnv,FactData(theEnv)->FactHashTable,sizeof(struct factHashEntry *) * FactData(theEnv)->FactHashTableSize);
+    rm3(theEnv,execStatus,FactData(theEnv)->FactHashTable,sizeof(struct factHashEntry *) * FactData(theEnv)->FactHashTableSize);
     FactData(theEnv)->FactHashTableSize = SIZE_FACT_HASH;
     FactData(theEnv)->FactHashTable = newTable;
    }
@@ -412,7 +412,7 @@ globle void ShowFactHashTable(
        if (count != 0)
          {
           gensprintf(buffer,"%4d: %4d\n",i,count);
-          EnvPrintRouter(theEnv,WDISPLAY,buffer);
+          EnvPrintRouter(theEnv,execStatus,WDISPLAY,buffer);
          }
       }
    }

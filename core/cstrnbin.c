@@ -124,9 +124,9 @@ globle void WriteNeededConstraints(
    if ((! EnvGetDynamicConstraintChecking(theEnv)) && (numberOfUsedConstraints != 0))
      {
       numberOfUsedConstraints = 0;
-      PrintWarningID(theEnv,"CSTRNBIN",1,FALSE);
-      EnvPrintRouter(theEnv,WWARNING,"Constraints are not saved with a binary image\n");
-      EnvPrintRouter(theEnv,WWARNING,"  when dynamic constraint checking is disabled.\n");
+      PrintWarningID(theEnv,execStatus,"CSTRNBIN",1,FALSE);
+      EnvPrintRouter(theEnv,execStatus,WWARNING,"Constraints are not saved with a binary image\n");
+      EnvPrintRouter(theEnv,execStatus,WWARNING,"  when dynamic constraint checking is disabled.\n");
      }
 
    /*============================================*/
@@ -144,7 +144,7 @@ globle void WriteNeededConstraints(
            tmpPtr != NULL;
            tmpPtr = tmpPtr->next)
         {
-         CopyToBsaveConstraintRecord(theEnv,tmpPtr,&bsaveConstraints);
+         CopyToBsaveConstraintRecord(theEnv,execStatus,tmpPtr,&bsaveConstraints);
          GenWrite(&bsaveConstraints,sizeof(BSAVE_CONSTRAINT_RECORD),fp);
         }
      }
@@ -180,12 +180,12 @@ static void CopyToBsaveConstraintRecord(
    bsaveConstraints->classRestriction = constraints->classRestriction;
    bsaveConstraints->instanceNameRestriction = constraints->instanceNameRestriction;
 
-   bsaveConstraints->restrictionList = HashedExpressionIndex(theEnv,constraints->restrictionList);
-   bsaveConstraints->classList = HashedExpressionIndex(theEnv,constraints->classList);
-   bsaveConstraints->minValue = HashedExpressionIndex(theEnv,constraints->minValue);
-   bsaveConstraints->maxValue = HashedExpressionIndex(theEnv,constraints->maxValue);
-   bsaveConstraints->minFields = HashedExpressionIndex(theEnv,constraints->minFields);
-   bsaveConstraints->maxFields = HashedExpressionIndex(theEnv,constraints->maxFields);
+   bsaveConstraints->restrictionList = HashedExpressionIndex(theEnv,execStatus,constraints->restrictionList);
+   bsaveConstraints->classList = HashedExpressionIndex(theEnv,execStatus,constraints->classList);
+   bsaveConstraints->minValue = HashedExpressionIndex(theEnv,execStatus,constraints->minValue);
+   bsaveConstraints->maxValue = HashedExpressionIndex(theEnv,execStatus,constraints->maxValue);
+   bsaveConstraints->minFields = HashedExpressionIndex(theEnv,execStatus,constraints->minFields);
+   bsaveConstraints->maxFields = HashedExpressionIndex(theEnv,execStatus,constraints->maxFields);
   }
 
 #endif /* BLOAD_AND_BSAVE */
@@ -198,13 +198,13 @@ globle void ReadNeededConstraints(
   void *theEnv,
   EXEC_STATUS)
   {
-   GenReadBinary(theEnv,(void *) &ConstraintData(theEnv)->NumberOfConstraints,sizeof(unsigned long int));
+   GenReadBinary(theEnv,execStatus,(void *) &ConstraintData(theEnv)->NumberOfConstraints,sizeof(unsigned long int));
    if (ConstraintData(theEnv)->NumberOfConstraints == 0) return;
 
    ConstraintData(theEnv)->ConstraintArray = (CONSTRAINT_RECORD *)
-           genalloc(theEnv,(sizeof(CONSTRAINT_RECORD) * ConstraintData(theEnv)->NumberOfConstraints));
+           genalloc(theEnv,execStatus,(sizeof(CONSTRAINT_RECORD) * ConstraintData(theEnv)->NumberOfConstraints));
 
-   BloadandRefresh(theEnv,ConstraintData(theEnv)->NumberOfConstraints,sizeof(BSAVE_CONSTRAINT_RECORD),
+   BloadandRefresh(theEnv,execStatus,ConstraintData(theEnv)->NumberOfConstraints,sizeof(BSAVE_CONSTRAINT_RECORD),
                    CopyFromBsaveConstraintRecord);
   }
 
@@ -264,7 +264,7 @@ globle void ClearBloadedConstraints(
   {
    if (ConstraintData(theEnv)->NumberOfConstraints != 0)
      {
-      genfree(theEnv,(void *) ConstraintData(theEnv)->ConstraintArray,
+      genfree(theEnv,execStatus,(void *) ConstraintData(theEnv)->ConstraintArray,
                      (sizeof(CONSTRAINT_RECORD) * ConstraintData(theEnv)->NumberOfConstraints));
       ConstraintData(theEnv)->NumberOfConstraints = 0;
      }

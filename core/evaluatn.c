@@ -89,9 +89,9 @@ globle void InitializeEvaluationData(
   {
    struct externalAddressType cPointer = { "C", PrintCAddress, PrintCAddress, NULL, NewCAddress, NULL };
    
-   AllocateEnvironmentData(theEnv,EVALUATION_DATA,sizeof(struct evaluationData),DeallocateEvaluationData);
+   AllocateEnvironmentData(theEnv,execStatus,EVALUATION_DATA,sizeof(struct evaluationData),DeallocateEvaluationData);
 
-   InstallExternalAddressType(theEnv,&cPointer);
+   InstallExternalAddressType(theEnv,execStatus,&cPointer);
   }
 
 /*****************************************************/
@@ -105,7 +105,7 @@ static void DeallocateEvaluationData(
    int i;
    
    for (i = 0; i < EvaluationData(theEnv)->numberOfAddressTypes; i++)
-     { rtn_struct(theEnv,externalAddressType,EvaluationData(theEnv)->ExternalAddressTypes[i]); }
+     { rtn_struct(theEnv,execStatus,externalAddressType,EvaluationData(theEnv)->ExternalAddressTypes[i]); }
   }
 
 /**************************************************************/
@@ -155,10 +155,10 @@ globle int EvaluateExpression(
       case FCALL:
         {
          fptr = (struct FunctionDefinition *) problem->value;
-         oldContext = SetEnvironmentFunctionContext(theEnv,fptr->context);
+         oldContext = SetEnvironmentFunctionContext(theEnv,execStatus,fptr->context);
 
 #if PROFILING_FUNCTIONS   
-         StartProfile(theEnv,&profileFrame,
+         StartProfile(theEnv,execStatus,&profileFrame,
                       &fptr->usrData,
                       ProfileFunctionData(theEnv)->ProfileUserFunctions);
 #endif
@@ -211,12 +211,12 @@ globle int EvaluateExpression(
               if (fptr->environmentAware)
                 {
                  returnValue->value = (void *)
-                   EnvAddLong(theEnv,(* (long long (*)(void *)) fptr->functionPointer)(theEnv));
+                   EnvAddLong(theEnv,execStatus,(* (long long (*)(void *)) fptr->functionPointer)(theEnv));
                 }
               else
                 {
                  returnValue->value = (void *)
-                   EnvAddLong(theEnv,(* (long long (*)(void)) fptr->functionPointer)());
+                   EnvAddLong(theEnv,execStatus,(* (long long (*)(void)) fptr->functionPointer)());
                 }
               break;
             case 'i' :
@@ -224,12 +224,12 @@ globle int EvaluateExpression(
               if (fptr->environmentAware)
                 {
                  returnValue->value = (void *)
-                   EnvAddLong(theEnv,(long long) (* (int (*)(void *)) fptr->functionPointer)(theEnv));
+                   EnvAddLong(theEnv,execStatus,(long long) (* (int (*)(void *)) fptr->functionPointer)(theEnv));
                 }
               else
                 {
                  returnValue->value = (void *)
-                   EnvAddLong(theEnv,(long long) (* (int (*)(void)) fptr->functionPointer)());
+                   EnvAddLong(theEnv,execStatus,(long long) (* (int (*)(void)) fptr->functionPointer)());
                 }
               break;
             case 'l' :
@@ -237,12 +237,12 @@ globle int EvaluateExpression(
               if (fptr->environmentAware)
                 {
                  returnValue->value = (void *)
-                    EnvAddLong(theEnv,(long long) (* (long int (*)(void *)) fptr->functionPointer)(theEnv));
+                    EnvAddLong(theEnv,execStatus,(long long) (* (long int (*)(void *)) fptr->functionPointer)(theEnv));
                 }
               else
                 {
                  returnValue->value = (void *)
-                    EnvAddLong(theEnv,(long long) (* (long int (*)(void)) fptr->functionPointer)());
+                    EnvAddLong(theEnv,execStatus,(long long) (* (long int (*)(void)) fptr->functionPointer)());
                 }
               break;
             case 'f' :
@@ -250,12 +250,12 @@ globle int EvaluateExpression(
               if (fptr->environmentAware)
                 {
                  returnValue->value = (void *)
-                    EnvAddDouble(theEnv,(double) (* (float (*)(void *)) fptr->functionPointer)(theEnv));
+                    EnvAddDouble(theEnv,execStatus,(double) (* (float (*)(void *)) fptr->functionPointer)(theEnv));
                 }
               else
                 {
                  returnValue->value = (void *)
-                    EnvAddDouble(theEnv,(double) (* (float (*)(void)) fptr->functionPointer)());
+                    EnvAddDouble(theEnv,execStatus,(double) (* (float (*)(void)) fptr->functionPointer)());
                 }
               break;
             case 'd' :
@@ -263,12 +263,12 @@ globle int EvaluateExpression(
               if (fptr->environmentAware)
                 {
                  returnValue->value = (void *)
-                    EnvAddDouble(theEnv,(* (double (*)(void *)) fptr->functionPointer)(theEnv));
+                    EnvAddDouble(theEnv,execStatus,(* (double (*)(void *)) fptr->functionPointer)(theEnv));
                 }
               else
                 {
                  returnValue->value = (void *)
-                    EnvAddDouble(theEnv,(* (double (*)(void)) fptr->functionPointer)());
+                    EnvAddDouble(theEnv,execStatus,(* (double (*)(void)) fptr->functionPointer)());
                 }
               break;
             case 's' :
@@ -338,7 +338,7 @@ globle int EvaluateExpression(
                  }
                cbuff[1] = EOS;
                returnValue->type = SYMBOL;
-               returnValue->value = (void *) EnvAddSymbol(theEnv,cbuff);
+               returnValue->value = (void *) EnvAddSymbol(theEnv,execStatus,cbuff);
                break;
               }
 
@@ -349,7 +349,7 @@ globle int EvaluateExpression(
             case 'u' :
                if (fptr->environmentAware)
                  {
-                  (* (void (*)(void *,DATA_OBJECT_PTR)) fptr->functionPointer)(theEnv,returnValue);
+                  (* (void (*)(void *,DATA_OBJECT_PTR)) fptr->functionPointer)(theEnv,execStatus,returnValue);
                  }
                else
                  {
@@ -358,16 +358,16 @@ globle int EvaluateExpression(
               break;
 
             default :
-               SystemError(theEnv,"EVALUATN",2);
-               EnvExitRouter(theEnv,EXIT_FAILURE);
+               SystemError(theEnv,execStatus,"EVALUATN",2);
+               EnvExitRouter(theEnv,execStatus,EXIT_FAILURE);
                break;
             }
 
 #if PROFILING_FUNCTIONS 
-        EndProfile(theEnv,&profileFrame);
+        EndProfile(theEnv,execStatus,&profileFrame);
 #endif
 
-        SetEnvironmentFunctionContext(theEnv,oldContext);
+        SetEnvironmentFunctionContext(theEnv,execStatus,oldContext);
         execStatus->CurrentExpression = oldArgument;
         break;
         }
@@ -381,23 +381,23 @@ globle int EvaluateExpression(
 
      case MF_VARIABLE:
      case SF_VARIABLE:
-        if (GetBoundVariable(theEnv,returnValue,(SYMBOL_HN *) problem->value) == FALSE)
+        if (GetBoundVariable(theEnv,execStatus,returnValue,(SYMBOL_HN *) problem->value) == FALSE)
           {
-           PrintErrorID(theEnv,"EVALUATN",1,FALSE);
-           EnvPrintRouter(theEnv,WERROR,"Variable ");
-           EnvPrintRouter(theEnv,WERROR,ValueToString(problem->value));
-           EnvPrintRouter(theEnv,WERROR," is unbound\n");
+           PrintErrorID(theEnv,execStatus,"EVALUATN",1,FALSE);
+           EnvPrintRouter(theEnv,execStatus,WERROR,"Variable ");
+           EnvPrintRouter(theEnv,execStatus,WERROR,ValueToString(problem->value));
+           EnvPrintRouter(theEnv,execStatus,WERROR," is unbound\n");
            returnValue->type = SYMBOL;
            returnValue->value = EnvFalseSymbol(theEnv);
-           SetEvaluationError(theEnv,TRUE);
+           SetEvaluationError(theEnv,execStatus,TRUE);
           }
         break;
 
       default:
         if (EvaluationData(theEnv)->PrimitivesArray[problem->type] == NULL)
           {
-           SystemError(theEnv,"EVALUATN",3);
-           EnvExitRouter(theEnv,EXIT_FAILURE);
+           SystemError(theEnv,execStatus,"EVALUATN",3);
+           EnvExitRouter(theEnv,execStatus,EXIT_FAILURE);
           }
 
         if (EvaluationData(theEnv)->PrimitivesArray[problem->type]->copyToEvaluate)
@@ -409,30 +409,30 @@ globle int EvaluateExpression(
 
         if (EvaluationData(theEnv)->PrimitivesArray[problem->type]->evaluateFunction == NULL)
           {
-           SystemError(theEnv,"EVALUATN",4);
-           EnvExitRouter(theEnv,EXIT_FAILURE);
+           SystemError(theEnv,execStatus,"EVALUATN",4);
+           EnvExitRouter(theEnv,execStatus,EXIT_FAILURE);
           }
 
         oldArgument = execStatus->CurrentExpression;
         execStatus->CurrentExpression = problem;
 
 #if PROFILING_FUNCTIONS 
-        StartProfile(theEnv,&profileFrame,
+        StartProfile(theEnv,execStatus,&profileFrame,
                      &EvaluationData(theEnv)->PrimitivesArray[problem->type]->usrData,
                      ProfileFunctionData(theEnv)->ProfileUserFunctions);
 #endif
 
-        (*EvaluationData(theEnv)->PrimitivesArray[problem->type]->evaluateFunction)(theEnv,problem->value,returnValue);
+        (*EvaluationData(theEnv)->PrimitivesArray[problem->type]->evaluateFunction)(theEnv,execStatus,problem->value,returnValue);
 
 #if PROFILING_FUNCTIONS
-        EndProfile(theEnv,&profileFrame);
+        EndProfile(theEnv,execStatus,&profileFrame);
 #endif
 
         execStatus->CurrentExpression = oldArgument;
         break;
      }
 
-   PropagateReturnValue(theEnv,returnValue);
+   PropagateReturnValue(theEnv,execStatus,returnValue);
    return(execStatus->EvaluationError);
   }
 
@@ -448,8 +448,8 @@ globle void InstallPrimitive(
   {
    if (EvaluationData(theEnv)->PrimitivesArray[whichPosition] != NULL)
      {
-      SystemError(theEnv,"EVALUATN",5);
-      EnvExitRouter(theEnv,EXIT_FAILURE);
+      SystemError(theEnv,execStatus,"EVALUATN",5);
+      EnvExitRouter(theEnv,execStatus,EXIT_FAILURE);
      }
 
    EvaluationData(theEnv)->PrimitivesArray[whichPosition] = thePrimitive;
@@ -470,11 +470,11 @@ globle int InstallExternalAddressType(
    
    if (EvaluationData(theEnv)->numberOfAddressTypes == MAXIMUM_EXTERNAL_ADDRESS_TYPES)
      {
-      SystemError(theEnv,"EVALUATN",6);
-      EnvExitRouter(theEnv,EXIT_FAILURE);
+      SystemError(theEnv,execStatus,"EVALUATN",6);
+      EnvExitRouter(theEnv,execStatus,EXIT_FAILURE);
      }
 
-   copyEAT = (struct externalAddressType *) genalloc(theEnv,sizeof(struct externalAddressType));
+   copyEAT = (struct externalAddressType *) genalloc(theEnv,execStatus,sizeof(struct externalAddressType));
    memcpy(copyEAT,theAddressType,sizeof(struct externalAddressType));   
    EvaluationData(theEnv)->ExternalAddressTypes[EvaluationData(theEnv)->numberOfAddressTypes++] = copyEAT;
    
@@ -540,10 +540,10 @@ globle void ReturnValues(
    while (garbagePtr != NULL)
      {
       nextPtr = garbagePtr->next;
-      ValueDeinstall(theEnv,garbagePtr);
+      ValueDeinstall(theEnv,execStatus,garbagePtr);
       if ((garbagePtr->supplementalInfo != NULL) && decrementSupplementalInfo)
-        { DecrementSymbolCount(theEnv,(struct symbolHashNode *) garbagePtr->supplementalInfo); }
-      rtn_struct(theEnv,dataObject,garbagePtr);
+        { DecrementSymbolCount(theEnv,execStatus,(struct symbolHashNode *) garbagePtr->supplementalInfo); }
+      rtn_struct(theEnv,execStatus,dataObject,garbagePtr);
       garbagePtr = nextPtr;
      }
   }
@@ -571,11 +571,11 @@ globle void PrintDataObject(
       case INSTANCE_NAME:
       case INSTANCE_ADDRESS:
 #endif
-        PrintAtom(theEnv,fileid,argPtr->type,argPtr->value);
+        PrintAtom(theEnv,execStatus,fileid,argPtr->type,argPtr->value);
         break;
 
       case MULTIFIELD:
-        PrintMultifield(theEnv,fileid,(struct multifield *) argPtr->value,
+        PrintMultifield(theEnv,execStatus,fileid,(struct multifield *) argPtr->value,
                         argPtr->begin,argPtr->end,TRUE);
         break;
 
@@ -584,21 +584,21 @@ globle void PrintDataObject(
           {
            if (EvaluationData(theEnv)->PrimitivesArray[argPtr->type]->longPrintFunction)
              {
-              (*EvaluationData(theEnv)->PrimitivesArray[argPtr->type]->longPrintFunction)(theEnv,fileid,argPtr->value);
+              (*EvaluationData(theEnv)->PrimitivesArray[argPtr->type]->longPrintFunction)(theEnv,execStatus,fileid,argPtr->value);
               break;
              }
            else if (EvaluationData(theEnv)->PrimitivesArray[argPtr->type]->shortPrintFunction)
              {
-              (*EvaluationData(theEnv)->PrimitivesArray[argPtr->type]->shortPrintFunction)(theEnv,fileid,argPtr->value);
+              (*EvaluationData(theEnv)->PrimitivesArray[argPtr->type]->shortPrintFunction)(theEnv,execStatus,fileid,argPtr->value);
               break;
              }
           }
 
-        EnvPrintRouter(theEnv,fileid,"<UnknownPrintType");
-        PrintLongInteger(theEnv,fileid,(long int) argPtr->type);
-        EnvPrintRouter(theEnv,fileid,">");
-        SetHaltExecution(theEnv,TRUE);
-        SetEvaluationError(theEnv,TRUE);
+        EnvPrintRouter(theEnv,execStatus,fileid,"<UnknownPrintType");
+        PrintLongInteger(theEnv,execStatus,fileid,(long int) argPtr->type);
+        EnvPrintRouter(theEnv,execStatus,fileid,">");
+        SetHaltExecution(theEnv,execStatus,TRUE);
+        SetEvaluationError(theEnv,execStatus,TRUE);
         break;
      }
   }
@@ -613,7 +613,7 @@ globle void EnvSetMultifieldErrorValue(
   DATA_OBJECT_PTR returnValue)
   {
    returnValue->type = MULTIFIELD;
-   returnValue->value = EnvCreateMultifield(theEnv,0L);
+   returnValue->value = EnvCreateMultifield(theEnv,execStatus,0L);
    returnValue->begin = 1;
    returnValue->end = 0;
   }
@@ -627,8 +627,8 @@ globle void ValueInstall(
   EXEC_STATUS,
   DATA_OBJECT *vPtr)
   {
-   if (vPtr->type == MULTIFIELD) MultifieldInstall(theEnv,(struct multifield *) vPtr->value);
-   else AtomInstall(theEnv,vPtr->type,vPtr->value);
+   if (vPtr->type == MULTIFIELD) MultifieldInstall(theEnv,execStatus,(struct multifield *) vPtr->value);
+   else AtomInstall(theEnv,execStatus,vPtr->type,vPtr->value);
   }
 
 /****************************************************/
@@ -640,8 +640,8 @@ globle void ValueDeinstall(
   EXEC_STATUS,
   DATA_OBJECT *vPtr)
   {
-   if (vPtr->type == MULTIFIELD) MultifieldDeinstall(theEnv,(struct multifield *) vPtr->value);
-   else AtomDeinstall(theEnv,vPtr->type,vPtr->value);
+   if (vPtr->type == MULTIFIELD) MultifieldDeinstall(theEnv,execStatus,(struct multifield *) vPtr->value);
+   else AtomDeinstall(theEnv,execStatus,vPtr->type,vPtr->value);
   }
 
 /*****************************************/
@@ -680,7 +680,7 @@ globle void AtomInstall(
         break;
 
       case MULTIFIELD:
-        MultifieldInstall(theEnv,(struct multifield *) vPtr);
+        MultifieldInstall(theEnv,execStatus,(struct multifield *) vPtr);
         break;
 
       case RVOID:
@@ -690,7 +690,7 @@ globle void AtomInstall(
         if (EvaluationData(theEnv)->PrimitivesArray[type] == NULL) break;
         if (EvaluationData(theEnv)->PrimitivesArray[type]->bitMap) IncrementBitMapCount(vPtr);
         else if (EvaluationData(theEnv)->PrimitivesArray[type]->incrementBusyCount)
-          { (*EvaluationData(theEnv)->PrimitivesArray[type]->incrementBusyCount)(theEnv,vPtr); }
+          { (*EvaluationData(theEnv)->PrimitivesArray[type]->incrementBusyCount)(theEnv,execStatus,vPtr); }
         break;
      }
   }
@@ -715,23 +715,23 @@ globle void AtomDeinstall(
 #if OBJECT_SYSTEM
       case INSTANCE_NAME:
 #endif
-        DecrementSymbolCount(theEnv,(SYMBOL_HN *) vPtr);
+        DecrementSymbolCount(theEnv,execStatus,(SYMBOL_HN *) vPtr);
         break;
 
       case FLOAT:
-        DecrementFloatCount(theEnv,(FLOAT_HN *) vPtr);
+        DecrementFloatCount(theEnv,execStatus,(FLOAT_HN *) vPtr);
         break;
 
       case INTEGER:
-        DecrementIntegerCount(theEnv,(INTEGER_HN *) vPtr);
+        DecrementIntegerCount(theEnv,execStatus,(INTEGER_HN *) vPtr);
         break;
 
       case EXTERNAL_ADDRESS:
-        DecrementExternalAddressCount(theEnv,(EXTERNAL_ADDRESS_HN *) vPtr);
+        DecrementExternalAddressCount(theEnv,execStatus,(EXTERNAL_ADDRESS_HN *) vPtr);
         break;
 
       case MULTIFIELD:
-        MultifieldDeinstall(theEnv,(struct multifield *) vPtr);
+        MultifieldDeinstall(theEnv,execStatus,(struct multifield *) vPtr);
         break;
 
       case RVOID:
@@ -739,9 +739,9 @@ globle void AtomDeinstall(
 
       default:
         if (EvaluationData(theEnv)->PrimitivesArray[type] == NULL) break;
-        if (EvaluationData(theEnv)->PrimitivesArray[type]->bitMap) DecrementBitMapCount(theEnv,(BITMAP_HN *) vPtr);
+        if (EvaluationData(theEnv)->PrimitivesArray[type]->bitMap) DecrementBitMapCount(theEnv,execStatus,(BITMAP_HN *) vPtr);
         else if (EvaluationData(theEnv)->PrimitivesArray[type]->decrementBusyCount)
-          { (*EvaluationData(theEnv)->PrimitivesArray[type]->decrementBusyCount)(theEnv,vPtr); }
+          { (*EvaluationData(theEnv)->PrimitivesArray[type]->decrementBusyCount)(theEnv,execStatus,vPtr); }
      }
   }
 
@@ -764,7 +764,7 @@ globle void PropagateReturnValue(
    struct field *theMultifield;
 
    if (vPtr->type != MULTIFIELD)
-     { PropagateReturnAtom(theEnv,vPtr->type,vPtr->value); }
+     { PropagateReturnAtom(theEnv,execStatus,vPtr->type,vPtr->value); }
    else
      {
       theSegment = (struct multifield *) vPtr->value;
@@ -775,7 +775,7 @@ globle void PropagateReturnValue(
       theMultifield = theSegment->theFields;
 
       for (i = 0; i < theSegment->multifieldLength; i++)
-        { PropagateReturnAtom(theEnv,theMultifield[i].type,theMultifield[i].value); }
+        { PropagateReturnAtom(theEnv,execStatus,theMultifield[i].type,theMultifield[i].value); }
      }
   }
 
@@ -836,8 +836,8 @@ globle int EnvFunctionCall(
    /* Call the function if it can be found. */
    /*=======================================*/
 
-   if (GetFunctionReference(theEnv,name,&theReference))
-     { return(FunctionCall2(theEnv,&theReference,args,result)); }
+   if (GetFunctionReference(theEnv,execStatus,name,&theReference))
+     { return(FunctionCall2(theEnv,execStatus,&theReference,args,result)); }
 
    /*=========================================================*/
    /* Otherwise signal an error if a deffunction, defgeneric, */
@@ -845,10 +845,10 @@ globle int EnvFunctionCall(
    /* the specified function name.                            */
    /*=========================================================*/
 
-   PrintErrorID(theEnv,"EVALUATN",2,FALSE);
-   EnvPrintRouter(theEnv,WERROR,"No function, generic function or deffunction of name ");
-   EnvPrintRouter(theEnv,WERROR,name);
-   EnvPrintRouter(theEnv,WERROR," exists for external call.\n");
+   PrintErrorID(theEnv,execStatus,"EVALUATN",2,FALSE);
+   EnvPrintRouter(theEnv,execStatus,WERROR,"No function, generic function or deffunction of name ");
+   EnvPrintRouter(theEnv,execStatus,WERROR,name);
+   EnvPrintRouter(theEnv,execStatus,WERROR," exists for external call.\n");
    return(TRUE);
   }
 
@@ -874,13 +874,13 @@ globle int FunctionCall2(
 
    if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
        (execStatus->CurrentExpression == NULL))
-     { PeriodicCleanup(theEnv,TRUE,FALSE); }
+     { PeriodicCleanup(theEnv,execStatus,TRUE,FALSE); }
 
    /*========================*/
    /* Reset the error state. */
    /*========================*/
 
-   if (execStatus->CurrentEvaluationDepth == 0) SetHaltExecution(theEnv,FALSE);
+   if (execStatus->CurrentEvaluationDepth == 0) SetHaltExecution(theEnv,execStatus,FALSE);
    execStatus->EvaluationError = FALSE;
 
    /*======================================*/
@@ -894,7 +894,7 @@ globle int FunctionCall2(
    /* Parse the argument string. */
    /*============================*/
 
-   argexps = ParseConstantArguments(theEnv,args,&error);
+   argexps = ParseConstantArguments(theEnv,execStatus,args,&error);
    if (error == TRUE) return(TRUE);
 
    /*====================*/
@@ -902,13 +902,13 @@ globle int FunctionCall2(
    /*====================*/
 
    theReference->argList = argexps;
-   error = EvaluateExpression(theEnv,theReference,result);
+   error = EvaluateExpression(theEnv,execStatus,theReference,result);
 
    /*========================*/
    /* Return the expression. */
    /*========================*/
 
-   ReturnExpression(theEnv,argexps);
+   ReturnExpression(theEnv,execStatus,argexps);
    theReference->argList = NULL;
 
    /*==========================*/
@@ -938,9 +938,9 @@ globle void CopyDataObject(
      }
    else
      {
-      DuplicateMultifield(theEnv,dst,src);
+      DuplicateMultifield(theEnv,execStatus,dst,src);
       if (garbageMultifield)
-        { AddToMultifieldList(theEnv,(struct multifield *) dst->value); }
+        { AddToMultifieldList(theEnv,execStatus,(struct multifield *) dst->value); }
      }
   }
 
@@ -976,11 +976,11 @@ globle struct expr *ConvertValueToExpression(
    struct expr *head = NULL, *last = NULL, *newItem;
 
    if (GetpType(theValue) != MULTIFIELD)
-     { return(GenConstant(theEnv,GetpType(theValue),GetpValue(theValue))); }
+     { return(GenConstant(theEnv,execStatus,GetpType(theValue),GetpValue(theValue))); }
 
    for (i = GetpDOBegin(theValue); i <= GetpDOEnd(theValue); i++)
      {
-      newItem = GenConstant(theEnv,GetMFType(GetpValue(theValue),i),
+      newItem = GenConstant(theEnv,execStatus,GetMFType(GetpValue(theValue),i),
                         GetMFValue(GetpValue(theValue),i));
       if (last == NULL) head = newItem;
       else last->nextArg = newItem;
@@ -988,7 +988,7 @@ globle struct expr *ConvertValueToExpression(
      }
 
    if (head == NULL)
-     return(GenConstant(theEnv,FCALL,(void *) FindFunction(theEnv,"create$")));
+     return(GenConstant(theEnv,execStatus,FCALL,(void *) FindFunction(theEnv,execStatus,"create$")));
 
    return(head);
   }
@@ -1078,8 +1078,8 @@ globle struct expr *FunctionReferenceExpression(
    /*=====================================================*/
 
 #if DEFFUNCTION_CONSTRUCT
-   if ((dptr = (void *) LookupDeffunctionInScope(theEnv,name)) != NULL)
-     { return(GenConstant(theEnv,PCALL,dptr)); }
+   if ((dptr = (void *) LookupDeffunctionInScope(theEnv,execStatus,name)) != NULL)
+     { return(GenConstant(theEnv,execStatus,PCALL,dptr)); }
 #endif
 
    /*====================================================*/
@@ -1087,8 +1087,8 @@ globle struct expr *FunctionReferenceExpression(
    /*====================================================*/
 
 #if DEFGENERIC_CONSTRUCT
-   if ((gfunc = (void *) LookupDefgenericInScope(theEnv,name)) != NULL)
-     { return(GenConstant(theEnv,GCALL,gfunc)); }
+   if ((gfunc = (void *) LookupDefgenericInScope(theEnv,execStatus,name)) != NULL)
+     { return(GenConstant(theEnv,execStatus,GCALL,gfunc)); }
 #endif
 
    /*======================================*/
@@ -1096,8 +1096,8 @@ globle struct expr *FunctionReferenceExpression(
    /* a system or user defined function.   */
    /*======================================*/
 
-   if ((fptr = FindFunction(theEnv,name)) != NULL)
-     { return(GenConstant(theEnv,FCALL,fptr)); }
+   if ((fptr = FindFunction(theEnv,execStatus,name)) != NULL)
+     { return(GenConstant(theEnv,execStatus,FCALL,fptr)); }
 
    /*===================================================*/
    /* The specified function name is not a deffunction, */
@@ -1137,7 +1137,7 @@ globle intBool GetFunctionReference(
    /*=====================================================*/
 
 #if DEFFUNCTION_CONSTRUCT
-   if ((dptr = (void *) LookupDeffunctionInScope(theEnv,name)) != NULL)
+   if ((dptr = (void *) LookupDeffunctionInScope(theEnv,execStatus,name)) != NULL)
      {
       theReference->type = PCALL;
       theReference->value = dptr;
@@ -1150,7 +1150,7 @@ globle intBool GetFunctionReference(
    /*====================================================*/
 
 #if DEFGENERIC_CONSTRUCT
-   if ((gfunc = (void *) LookupDefgenericInScope(theEnv,name)) != NULL)
+   if ((gfunc = (void *) LookupDefgenericInScope(theEnv,execStatus,name)) != NULL)
      {
       theReference->type = GCALL;
       theReference->value = gfunc;
@@ -1163,7 +1163,7 @@ globle intBool GetFunctionReference(
    /* a system or user defined function.   */
    /*======================================*/
 
-   if ((fptr = FindFunction(theEnv,name)) != NULL)
+   if ((fptr = FindFunction(theEnv,execStatus,name)) != NULL)
      {
       theReference->type = FCALL;
       theReference->value = fptr;
@@ -1228,16 +1228,16 @@ globle int EvaluateAndStoreInDataObject(
    
    if (theExp == NULL)
      {
-      if (garbageSegment) val->value = EnvCreateMultifield(theEnv,0L);
-      else val->value = CreateMultifield2(theEnv,0L);
+      if (garbageSegment) val->value = EnvCreateMultifield(theEnv,execStatus,0L);
+      else val->value = CreateMultifield2(theEnv,execStatus,0L);
 
       return(TRUE);
      }
 
    if ((mfp == 0) && (theExp->nextArg == NULL))
-     EvaluateExpression(theEnv,theExp,val);
+     EvaluateExpression(theEnv,execStatus,theExp,val);
    else
-     StoreInMultifield(theEnv,val,theExp,garbageSegment);
+     StoreInMultifield(theEnv,execStatus,val,theExp,garbageSegment);
    
    return(execStatus->EvaluationError ? FALSE : TRUE);
   }
@@ -1253,11 +1253,11 @@ static void PrintCAddress(
   {
    char buffer[20];
 
-   EnvPrintRouter(theEnv,logicalName,"<Pointer-C-");
+   EnvPrintRouter(theEnv,execStatus,logicalName,"<Pointer-C-");
         
    gensprintf(buffer,"%p",ValueToExternalAddress(theValue));
-   EnvPrintRouter(theEnv,logicalName,buffer);
-   EnvPrintRouter(theEnv,logicalName,">");
+   EnvPrintRouter(theEnv,execStatus,logicalName,buffer);
+   EnvPrintRouter(theEnv,execStatus,logicalName,">");
   }
 
 /*******************************************************/
@@ -1274,14 +1274,14 @@ static void NewCAddress(
       
    if (numberOfArguments != 1)
      {
-      PrintErrorID(theEnv,"NEW",1,FALSE);
-      EnvPrintRouter(theEnv,WERROR,"Function new expected no additional arguments for the C external language type.\n");
-      SetEvaluationError(theEnv,TRUE);
+      PrintErrorID(theEnv,execStatus,"NEW",1,FALSE);
+      EnvPrintRouter(theEnv,execStatus,WERROR,"Function new expected no additional arguments for the C external language type.\n");
+      SetEvaluationError(theEnv,execStatus,TRUE);
       return;
      }
 
    SetpType(rv,EXTERNAL_ADDRESS);
-   SetpValue(rv,EnvAddExternalAddress(theEnv,NULL,0));
+   SetpValue(rv,EnvAddExternalAddress(theEnv,execStatus,NULL,0));
   }
 
 /*******************************************************/
@@ -1293,7 +1293,7 @@ static intBool DiscardCAddress(
   EXEC_STATUS,
   void *theValue)
   {
-   EnvPrintRouter(theEnv,WDISPLAY,"Discarding C Address\n");
+   EnvPrintRouter(theEnv,execStatus,WDISPLAY,"Discarding C Address\n");
    
    return TRUE;
   }

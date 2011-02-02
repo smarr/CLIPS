@@ -66,7 +66,7 @@ struct miscFunctionData
    long long GensymNumber;
   };
 
-#define MiscFunctionData(theEnv) ((struct miscFunctionData *) GetEnvironmentData(theEnv,MISCFUN_DATA))
+#define MiscFunctionData(theEnv) ((struct miscFunctionData *) GetEnvironmentData(theEnv,execStatus,MISCFUN_DATA))
 
 /***************************************/
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
@@ -83,47 +83,47 @@ globle void MiscFunctionDefinitions(
   void *theEnv,
   EXEC_STATUS)
   {
-   AllocateEnvironmentData(theEnv,MISCFUN_DATA,sizeof(struct miscFunctionData),NULL);
+   AllocateEnvironmentData(theEnv,execStatus,MISCFUN_DATA,sizeof(struct miscFunctionData),NULL);
    MiscFunctionData(theEnv)->GensymNumber = 1;
    
 #if ! RUN_TIME
-   EnvDefineFunction2(theEnv,"gensym",           'w', PTIEF GensymFunction,      "GensymFunction", "00");
-   EnvDefineFunction2(theEnv,"gensym*",          'w', PTIEF GensymStarFunction,  "GensymStarFunction", "00");
-   EnvDefineFunction2(theEnv,"setgen",           'g', PTIEF SetgenFunction,      "SetgenFunction", "11i");
-   EnvDefineFunction2(theEnv,"system",           'v', PTIEF gensystem,           "gensystem", "1*k");
-   EnvDefineFunction2(theEnv,"length",           'g', PTIEF LengthFunction,      "LengthFunction", "11q");
-   EnvDefineFunction2(theEnv,"length$",          'g', PTIEF LengthFunction,      "LengthFunction", "11q");
-   EnvDefineFunction2(theEnv,"time",             'd', PTIEF TimeFunction,        "TimeFunction", "00");
-   EnvDefineFunction2(theEnv,"random",           'g', PTIEF RandomFunction,      "RandomFunction", "02i");
-   EnvDefineFunction2(theEnv,"seed",             'v', PTIEF SeedFunction,        "SeedFunction", "11i");
-   EnvDefineFunction2(theEnv,"conserve-mem",     'v', PTIEF ConserveMemCommand,  "ConserveMemCommand", "11w");
-   EnvDefineFunction2(theEnv,"release-mem",      'g', PTIEF ReleaseMemCommand,   "ReleaseMemCommand", "00");
+   EnvDefineFunction2(theEnv,execStatus,"gensym",           'w', PTIEF GensymFunction,      "GensymFunction", "00");
+   EnvDefineFunction2(theEnv,execStatus,"gensym*",          'w', PTIEF GensymStarFunction,  "GensymStarFunction", "00");
+   EnvDefineFunction2(theEnv,execStatus,"setgen",           'g', PTIEF SetgenFunction,      "SetgenFunction", "11i");
+   EnvDefineFunction2(theEnv,execStatus,"system",           'v', PTIEF gensystem,           "gensystem", "1*k");
+   EnvDefineFunction2(theEnv,execStatus,"length",           'g', PTIEF LengthFunction,      "LengthFunction", "11q");
+   EnvDefineFunction2(theEnv,execStatus,"length$",          'g', PTIEF LengthFunction,      "LengthFunction", "11q");
+   EnvDefineFunction2(theEnv,execStatus,"time",             'd', PTIEF TimeFunction,        "TimeFunction", "00");
+   EnvDefineFunction2(theEnv,execStatus,"random",           'g', PTIEF RandomFunction,      "RandomFunction", "02i");
+   EnvDefineFunction2(theEnv,execStatus,"seed",             'v', PTIEF SeedFunction,        "SeedFunction", "11i");
+   EnvDefineFunction2(theEnv,execStatus,"conserve-mem",     'v', PTIEF ConserveMemCommand,  "ConserveMemCommand", "11w");
+   EnvDefineFunction2(theEnv,execStatus,"release-mem",      'g', PTIEF ReleaseMemCommand,   "ReleaseMemCommand", "00");
 #if DEBUGGING_FUNCTIONS
-   EnvDefineFunction2(theEnv,"mem-used",         'g', PTIEF MemUsedCommand,      "MemUsedCommand", "00");
-   EnvDefineFunction2(theEnv,"mem-requests",     'g', PTIEF MemRequestsCommand,  "MemRequestsCommand", "00");
+   EnvDefineFunction2(theEnv,execStatus,"mem-used",         'g', PTIEF MemUsedCommand,      "MemUsedCommand", "00");
+   EnvDefineFunction2(theEnv,execStatus,"mem-requests",     'g', PTIEF MemRequestsCommand,  "MemRequestsCommand", "00");
 #endif
-   EnvDefineFunction2(theEnv,"options",          'v', PTIEF OptionsCommand,      "OptionsCommand", "00");
-   EnvDefineFunction2(theEnv,"operating-system", 'w', PTIEF OperatingSystemFunction,"OperatingSystemFunction", "00");
-   EnvDefineFunction2(theEnv,"(expansion-call)", 'u', PTIEF ExpandFuncCall,      "ExpandFuncCall",NULL);
-   EnvDefineFunction2(theEnv,"expand$",'u', PTIEF DummyExpandFuncMultifield,
+   EnvDefineFunction2(theEnv,execStatus,"options",          'v', PTIEF OptionsCommand,      "OptionsCommand", "00");
+   EnvDefineFunction2(theEnv,execStatus,"operating-system", 'w', PTIEF OperatingSystemFunction,"OperatingSystemFunction", "00");
+   EnvDefineFunction2(theEnv,execStatus,"(expansion-call)", 'u', PTIEF ExpandFuncCall,      "ExpandFuncCall",NULL);
+   EnvDefineFunction2(theEnv,execStatus,"expand$",'u', PTIEF DummyExpandFuncMultifield,
                                            "DummyExpandFuncMultifield","11m");
-   FuncSeqOvlFlags(theEnv,"expand$",FALSE,FALSE);
-   EnvDefineFunction2(theEnv,"(set-evaluation-error)",
+   FuncSeqOvlFlags(theEnv,execStatus,"expand$",FALSE,FALSE);
+   EnvDefineFunction2(theEnv,execStatus,"(set-evaluation-error)",
                                        'w', PTIEF CauseEvaluationError,"CauseEvaluationError",NULL);
-   EnvDefineFunction2(theEnv,"set-sequence-operator-recognition",
+   EnvDefineFunction2(theEnv,execStatus,"set-sequence-operator-recognition",
                                        'b', PTIEF SetSORCommand,"SetSORCommand","11w");
-   EnvDefineFunction2(theEnv,"get-sequence-operator-recognition",'b',
+   EnvDefineFunction2(theEnv,execStatus,"get-sequence-operator-recognition",'b',
                     PTIEF EnvGetSequenceOperatorRecognition,"EnvGetSequenceOperatorRecognition","00");
-   EnvDefineFunction2(theEnv,"get-function-restrictions",'s',
+   EnvDefineFunction2(theEnv,execStatus,"get-function-restrictions",'s',
                    PTIEF GetFunctionRestrictions,"GetFunctionRestrictions","11w");
-   EnvDefineFunction2(theEnv,"create$",     'm', PTIEF CreateFunction,  "CreateFunction", NULL);
-   EnvDefineFunction2(theEnv,"mv-append",   'm', PTIEF CreateFunction,  "CreateFunction", NULL);
-   EnvDefineFunction2(theEnv,"apropos",   'v', PTIEF AproposCommand,  "AproposCommand", "11w");
-   EnvDefineFunction2(theEnv,"get-function-list",   'm', PTIEF GetFunctionListFunction,  "GetFunctionListFunction", "00");
-   EnvDefineFunction2(theEnv,"funcall",'u', PTIEF FuncallFunction,"FuncallFunction","1**k");
-   EnvDefineFunction2(theEnv,"new",'u', PTIEF NewFunction,"NewFunction","1*uw");
-   EnvDefineFunction2(theEnv,"call",'u', PTIEF CallFunction,"CallFunction","1*u");
-   EnvDefineFunction2(theEnv,"timer",'d', PTIEF TimerFunction,"TimerFunction","**");
+   EnvDefineFunction2(theEnv,execStatus,"create$",     'm', PTIEF CreateFunction,  "CreateFunction", NULL);
+   EnvDefineFunction2(theEnv,execStatus,"mv-append",   'm', PTIEF CreateFunction,  "CreateFunction", NULL);
+   EnvDefineFunction2(theEnv,execStatus,"apropos",   'v', PTIEF AproposCommand,  "AproposCommand", "11w");
+   EnvDefineFunction2(theEnv,execStatus,"get-function-list",   'm', PTIEF GetFunctionListFunction,  "GetFunctionListFunction", "00");
+   EnvDefineFunction2(theEnv,execStatus,"funcall",'u', PTIEF FuncallFunction,"FuncallFunction","1**k");
+   EnvDefineFunction2(theEnv,execStatus,"new",'u', PTIEF NewFunction,"NewFunction","1*uw");
+   EnvDefineFunction2(theEnv,execStatus,"call",'u', PTIEF CallFunction,"CallFunction","1*u");
+   EnvDefineFunction2(theEnv,execStatus,"timer",'d', PTIEF TimerFunction,"TimerFunction","**");
 #endif
   }
 
@@ -163,7 +163,7 @@ globle long long SetgenFunction(
 
    if (theLong < 1LL)
      {
-      ExpectedTypeError1(theEnv,"setgen",1,"number (greater than or equal to 1)");
+      ExpectedTypeError1(theEnv,execStatus,"setgen",1,"number (greater than or equal to 1)");
       return(MiscFunctionData(theEnv)->GensymNumber);
      }
 
@@ -204,7 +204,7 @@ globle void *GensymFunction(
    /* Return the symbol. */
    /*====================*/
 
-   return(EnvAddSymbol(theEnv,genstring));
+   return(EnvAddSymbol(theEnv,execStatus,genstring));
   }
 
 /************************************************/
@@ -250,13 +250,13 @@ globle void *GensymStar(
       gensprintf(genstring,"gen%lld",MiscFunctionData(theEnv)->GensymNumber);
       MiscFunctionData(theEnv)->GensymNumber++;
      }
-   while (FindSymbolHN(theEnv,genstring) != NULL);
+   while (FindSymbolHN(theEnv,execStatus,genstring) != NULL);
 
    /*====================*/
    /* Return the symbol. */
    /*====================*/
 
-   return(EnvAddSymbol(theEnv,genstring));
+   return(EnvAddSymbol(theEnv,execStatus,genstring));
   }
 
 /********************************************/
@@ -277,12 +277,12 @@ globle long long RandomFunction(
    /* zero or two arguments.             */
    /*====================================*/
 
-   argCount = EnvRtnArgCount(theEnv,execStatus);
+   argCount = EnvRtnArgCount(theEnv,execStatus,execStatus);
    
    if ((argCount != 0) && (argCount != 2))
      {
-      PrintErrorID(theEnv,"MISCFUN",2,FALSE);
-      EnvPrintRouter(theEnv,WERROR,"Function random expected either 0 or 2 arguments\n"); 
+      PrintErrorID(theEnv,execStatus,"MISCFUN",2,FALSE);
+      EnvPrintRouter(theEnv,execStatus,WERROR,"Function random expected either 0 or 2 arguments\n"); 
      }
 
    /*========================================*/
@@ -299,8 +299,8 @@ globle long long RandomFunction(
       end = DOToLong(theValue);
       if (end < begin)
         {
-         PrintErrorID(theEnv,"MISCFUN",3,FALSE);
-         EnvPrintRouter(theEnv,WERROR,"Function random expected argument #1 to be less than argument #2\n"); 
+         PrintErrorID(theEnv,execStatus,"MISCFUN",3,FALSE);
+         EnvPrintRouter(theEnv,execStatus,WERROR,"Function random expected argument #1 to be less than argument #2\n"); 
          return(rv);
         }
         
@@ -373,8 +373,8 @@ globle long long LengthFunction(
    /* multifield value, then generate an error.   */
    /*=============================================*/
 
-   SetEvaluationError(theEnv,TRUE);
-   ExpectedTypeError2(theEnv,"length$",1);
+   SetEvaluationError(theEnv,execStatus,TRUE);
+   ExpectedTypeError2(theEnv,execStatus,"length$",1);
    return(-1L);
   }
 
@@ -428,7 +428,7 @@ globle void ConserveMemCommand(
    /*====================================================*/
 
    if (strcmp(argument,"on") == 0)
-     { EnvSetConserveMemory(theEnv,TRUE); }
+     { EnvSetConserveMemory(theEnv,execStatus,TRUE); }
 
    /*======================================================*/
    /* Otherwise, if the argument is the symbol "off", then */
@@ -437,7 +437,7 @@ globle void ConserveMemCommand(
    /*======================================================*/
 
    else if (strcmp(argument,"off") == 0)
-     { EnvSetConserveMemory(theEnv,FALSE); }
+     { EnvSetConserveMemory(theEnv,execStatus,FALSE); }
 
    /*=====================================================*/
    /* Otherwise, generate an error since the only allowed */
@@ -446,7 +446,7 @@ globle void ConserveMemCommand(
 
    else
      {
-      ExpectedTypeError1(theEnv,"conserve-mem",1,"symbol with value on or off");
+      ExpectedTypeError1(theEnv,execStatus,"conserve-mem",1,"symbol with value on or off");
       return;
      }
 
@@ -535,10 +535,10 @@ globle void AproposCommand(
    /* are printed.                                                       */
    /*====================================================================*/
 
-   while ((hashPtr = GetNextSymbolMatch(theEnv,argument,theLength,hashPtr,TRUE,NULL)) != NULL)
+   while ((hashPtr = GetNextSymbolMatch(theEnv,execStatus,argument,theLength,hashPtr,TRUE,NULL)) != NULL)
      {
-      EnvPrintRouter(theEnv,WDISPLAY,ValueToString(hashPtr));
-      EnvPrintRouter(theEnv,WDISPLAY,"\n");
+      EnvPrintRouter(theEnv,execStatus,WDISPLAY,ValueToString(hashPtr));
+      EnvPrintRouter(theEnv,execStatus,WDISPLAY,"\n");
      }
   }
 
@@ -554,256 +554,256 @@ globle void OptionsCommand(
    /* The options command accepts no arguments. */
    /*===========================================*/
 
-   if (EnvArgCountCheck(theEnv,"options",EXACTLY,0) == -1) return;
+   if (EnvArgCountCheck(theEnv,execStatus,"options",EXACTLY,0) == -1) return;
 
    /*=================================*/
    /* Print the state of the compiler */
    /* flags for this executable.      */
    /*=================================*/
 
-   EnvPrintRouter(theEnv,WDISPLAY,"Machine type: ");
+   EnvPrintRouter(theEnv,execStatus,WDISPLAY,"Machine type: ");
 
 #if GENERIC
-   EnvPrintRouter(theEnv,WDISPLAY,"Generic ");
+   EnvPrintRouter(theEnv,execStatus,WDISPLAY,"Generic ");
 #endif
 #if VAX_VMS
-   EnvPrintRouter(theEnv,WDISPLAY,"VAX VMS ");
+   EnvPrintRouter(theEnv,execStatus,WDISPLAY,"VAX VMS ");
 #endif
 #if UNIX_V
-   EnvPrintRouter(theEnv,WDISPLAY,"UNIX System V or 4.2BSD ");
+   EnvPrintRouter(theEnv,execStatus,WDISPLAY,"UNIX System V or 4.2BSD ");
 #endif
 #if DARWIN
-   EnvPrintRouter(theEnv,WDISPLAY,"Darwin ");
+   EnvPrintRouter(theEnv,execStatus,WDISPLAY,"Darwin ");
 #endif
 #if LINUX
-   EnvPrintRouter(theEnv,WDISPLAY,"Linux ");
+   EnvPrintRouter(theEnv,execStatus,WDISPLAY,"Linux ");
 #endif
 #if UNIX_7
-   EnvPrintRouter(theEnv,WDISPLAY,"UNIX System III Version 7 or Sun Unix ");
+   EnvPrintRouter(theEnv,execStatus,WDISPLAY,"UNIX System III Version 7 or Sun Unix ");
 #endif
 #if MAC_MCW
-   EnvPrintRouter(theEnv,WDISPLAY,"Apple Macintosh with CodeWarrior");
+   EnvPrintRouter(theEnv,execStatus,WDISPLAY,"Apple Macintosh with CodeWarrior");
 #endif
 #if MAC_XCD
-   EnvPrintRouter(theEnv,WDISPLAY,"Apple Macintosh with Xcode");
+   EnvPrintRouter(theEnv,execStatus,WDISPLAY,"Apple Macintosh with Xcode");
 #endif
 #if WIN_MVC
-   EnvPrintRouter(theEnv,WDISPLAY,"Microsoft Windows with Microsoft Visual C++");
+   EnvPrintRouter(theEnv,execStatus,WDISPLAY,"Microsoft Windows with Microsoft Visual C++");
 #endif
 #if WIN_BTC
-   EnvPrintRouter(theEnv,WDISPLAY,"Microsoft Windows with Borland Turbo C++");
+   EnvPrintRouter(theEnv,execStatus,WDISPLAY,"Microsoft Windows with Borland Turbo C++");
 #endif
 #if WIN_MCW
-   EnvPrintRouter(theEnv,WDISPLAY,"Microsoft Windows with Metrowerks CodeWarrior");
+   EnvPrintRouter(theEnv,execStatus,WDISPLAY,"Microsoft Windows with Metrowerks CodeWarrior");
 #endif
 #if WIN_GCC
-   EnvPrintRouter(theEnv,WDISPLAY,"Microsoft Windows with DJGPP");
+   EnvPrintRouter(theEnv,execStatus,WDISPLAY,"Microsoft Windows with DJGPP");
 #endif
-EnvPrintRouter(theEnv,WDISPLAY,"\n");
+EnvPrintRouter(theEnv,execStatus,WDISPLAY,"\n");
 
-EnvPrintRouter(theEnv,WDISPLAY,"Defrule construct is ");
+EnvPrintRouter(theEnv,execStatus,WDISPLAY,"Defrule construct is ");
 #if DEFRULE_CONSTRUCT
-  EnvPrintRouter(theEnv,WDISPLAY,"ON\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"ON\n");
 #else
-  EnvPrintRouter(theEnv,WDISPLAY,"OFF\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"OFF\n");
 #endif
 
-EnvPrintRouter(theEnv,WDISPLAY,"Defmodule construct is ");
+EnvPrintRouter(theEnv,execStatus,WDISPLAY,"Defmodule construct is ");
 #if DEFMODULE_CONSTRUCT
-  EnvPrintRouter(theEnv,WDISPLAY,"ON\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"ON\n");
 #else
-  EnvPrintRouter(theEnv,WDISPLAY,"OFF\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"OFF\n");
 #endif
 
-EnvPrintRouter(theEnv,WDISPLAY,"Deftemplate construct is ");
+EnvPrintRouter(theEnv,execStatus,WDISPLAY,"Deftemplate construct is ");
 #if DEFTEMPLATE_CONSTRUCT
-  EnvPrintRouter(theEnv,WDISPLAY,"ON\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"ON\n");
 #else
-  EnvPrintRouter(theEnv,WDISPLAY,"OFF\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"OFF\n");
 #endif
 
-EnvPrintRouter(theEnv,WDISPLAY,"  Fact-set queries are ");
+EnvPrintRouter(theEnv,execStatus,WDISPLAY,"  Fact-set queries are ");
 #if FACT_SET_QUERIES
-  EnvPrintRouter(theEnv,WDISPLAY,"ON\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"ON\n");
 #else
-  EnvPrintRouter(theEnv,WDISPLAY,"OFF\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"OFF\n");
 #endif
 
 #if DEFTEMPLATE_CONSTRUCT
 
-EnvPrintRouter(theEnv,WDISPLAY,"  Deffacts construct is ");
+EnvPrintRouter(theEnv,execStatus,WDISPLAY,"  Deffacts construct is ");
 #if DEFFACTS_CONSTRUCT
-  EnvPrintRouter(theEnv,WDISPLAY,"ON\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"ON\n");
 #else
-  EnvPrintRouter(theEnv,WDISPLAY,"OFF\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"OFF\n");
 #endif
 
 #endif
 
-EnvPrintRouter(theEnv,WDISPLAY,"Defglobal construct is ");
+EnvPrintRouter(theEnv,execStatus,WDISPLAY,"Defglobal construct is ");
 #if DEFGLOBAL_CONSTRUCT
-  EnvPrintRouter(theEnv,WDISPLAY,"ON\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"ON\n");
 #else
-  EnvPrintRouter(theEnv,WDISPLAY,"OFF\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"OFF\n");
 #endif
 
-EnvPrintRouter(theEnv,WDISPLAY,"Deffunction construct is ");
+EnvPrintRouter(theEnv,execStatus,WDISPLAY,"Deffunction construct is ");
 #if DEFFUNCTION_CONSTRUCT
-  EnvPrintRouter(theEnv,WDISPLAY,"ON\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"ON\n");
 #else
-  EnvPrintRouter(theEnv,WDISPLAY,"OFF\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"OFF\n");
 #endif
 
-EnvPrintRouter(theEnv,WDISPLAY,"Defgeneric/Defmethod constructs are ");
+EnvPrintRouter(theEnv,execStatus,WDISPLAY,"Defgeneric/Defmethod constructs are ");
 #if DEFGENERIC_CONSTRUCT
-  EnvPrintRouter(theEnv,WDISPLAY,"ON\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"ON\n");
 #else
-  EnvPrintRouter(theEnv,WDISPLAY,"OFF\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"OFF\n");
 #endif
 
-EnvPrintRouter(theEnv,WDISPLAY,"Object System is ");
+EnvPrintRouter(theEnv,execStatus,WDISPLAY,"Object System is ");
 #if OBJECT_SYSTEM
-  EnvPrintRouter(theEnv,WDISPLAY,"ON\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"ON\n");
 #else
-  EnvPrintRouter(theEnv,WDISPLAY,"OFF\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"OFF\n");
 #endif
 
 #if OBJECT_SYSTEM
 
-EnvPrintRouter(theEnv,WDISPLAY,"  Definstances construct is ");
+EnvPrintRouter(theEnv,execStatus,WDISPLAY,"  Definstances construct is ");
 #if DEFINSTANCES_CONSTRUCT
-  EnvPrintRouter(theEnv,WDISPLAY,"ON\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"ON\n");
 #else
-  EnvPrintRouter(theEnv,WDISPLAY,"OFF\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"OFF\n");
 #endif
 
-EnvPrintRouter(theEnv,WDISPLAY,"  Instance-set queries are ");
+EnvPrintRouter(theEnv,execStatus,WDISPLAY,"  Instance-set queries are ");
 #if INSTANCE_SET_QUERIES
-  EnvPrintRouter(theEnv,WDISPLAY,"ON\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"ON\n");
 #else
-  EnvPrintRouter(theEnv,WDISPLAY,"OFF\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"OFF\n");
 #endif
 
-EnvPrintRouter(theEnv,WDISPLAY,"  Binary loading of instances is ");
+EnvPrintRouter(theEnv,execStatus,WDISPLAY,"  Binary loading of instances is ");
 #if BLOAD_INSTANCES
-  EnvPrintRouter(theEnv,WDISPLAY,"ON\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"ON\n");
 #else
-  EnvPrintRouter(theEnv,WDISPLAY,"OFF\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"OFF\n");
 #endif
 
-EnvPrintRouter(theEnv,WDISPLAY,"  Binary saving of instances is ");
+EnvPrintRouter(theEnv,execStatus,WDISPLAY,"  Binary saving of instances is ");
 #if BSAVE_INSTANCES
-  EnvPrintRouter(theEnv,WDISPLAY,"ON\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"ON\n");
 #else
-  EnvPrintRouter(theEnv,WDISPLAY,"OFF\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"OFF\n");
 #endif
 
 #endif
 
-EnvPrintRouter(theEnv,WDISPLAY,"Extended math function package is ");
+EnvPrintRouter(theEnv,execStatus,WDISPLAY,"Extended math function package is ");
 #if EXTENDED_MATH_FUNCTIONS
-  EnvPrintRouter(theEnv,WDISPLAY,"ON\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"ON\n");
 #else
-  EnvPrintRouter(theEnv,WDISPLAY,"OFF\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"OFF\n");
 #endif
 
-EnvPrintRouter(theEnv,WDISPLAY,"Text processing function package is ");
+EnvPrintRouter(theEnv,execStatus,WDISPLAY,"Text processing function package is ");
 #if TEXTPRO_FUNCTIONS
-  EnvPrintRouter(theEnv,WDISPLAY,"ON\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"ON\n");
 #else
-  EnvPrintRouter(theEnv,WDISPLAY,"OFF\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"OFF\n");
 #endif
 
-EnvPrintRouter(theEnv,WDISPLAY,"Help system is ");
+EnvPrintRouter(theEnv,execStatus,WDISPLAY,"Help system is ");
 #if HELP_FUNCTIONS
-  EnvPrintRouter(theEnv,WDISPLAY,"ON\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"ON\n");
 #else
-  EnvPrintRouter(theEnv,WDISPLAY,"OFF\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"OFF\n");
 #endif
 
-EnvPrintRouter(theEnv,WDISPLAY,"Bload capability is ");
+EnvPrintRouter(theEnv,execStatus,WDISPLAY,"Bload capability is ");
 #if BLOAD_ONLY
-  EnvPrintRouter(theEnv,WDISPLAY,"BLOAD ONLY");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"BLOAD ONLY");
 #endif
 #if BLOAD
-  EnvPrintRouter(theEnv,WDISPLAY,"BLOAD");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"BLOAD");
 #endif
 #if BLOAD_AND_BSAVE
-  EnvPrintRouter(theEnv,WDISPLAY,"BLOAD AND BSAVE");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"BLOAD AND BSAVE");
 #endif
 #if (! BLOAD_ONLY) && (! BLOAD) && (! BLOAD_AND_BSAVE)
-  EnvPrintRouter(theEnv,WDISPLAY,"OFF ");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"OFF ");
 #endif
-EnvPrintRouter(theEnv,WDISPLAY,"\n");
+EnvPrintRouter(theEnv,execStatus,WDISPLAY,"\n");
 
-EnvPrintRouter(theEnv,WDISPLAY,"EMACS Editor is ");
+EnvPrintRouter(theEnv,execStatus,WDISPLAY,"EMACS Editor is ");
 #if EMACS_EDITOR
-  EnvPrintRouter(theEnv,WDISPLAY,"ON\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"ON\n");
 #else
-  EnvPrintRouter(theEnv,WDISPLAY,"OFF\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"OFF\n");
 #endif
 
-EnvPrintRouter(theEnv,WDISPLAY,"Construct compiler is ");
+EnvPrintRouter(theEnv,execStatus,WDISPLAY,"Construct compiler is ");
 #if CONSTRUCT_COMPILER
-  EnvPrintRouter(theEnv,WDISPLAY,"ON\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"ON\n");
 #else
-  EnvPrintRouter(theEnv,WDISPLAY,"OFF\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"OFF\n");
 #endif
 
-EnvPrintRouter(theEnv,WDISPLAY,"I/O function package is ");
+EnvPrintRouter(theEnv,execStatus,WDISPLAY,"I/O function package is ");
 #if IO_FUNCTIONS
-  EnvPrintRouter(theEnv,WDISPLAY,"ON\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"ON\n");
 #else
-  EnvPrintRouter(theEnv,WDISPLAY,"OFF\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"OFF\n");
 #endif
 
-EnvPrintRouter(theEnv,WDISPLAY,"String function package is ");
+EnvPrintRouter(theEnv,execStatus,WDISPLAY,"String function package is ");
 #if STRING_FUNCTIONS
-  EnvPrintRouter(theEnv,WDISPLAY,"ON\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"ON\n");
 #else
-  EnvPrintRouter(theEnv,WDISPLAY,"OFF\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"OFF\n");
 #endif
 
-EnvPrintRouter(theEnv,WDISPLAY,"Multifield function package is ");
+EnvPrintRouter(theEnv,execStatus,WDISPLAY,"Multifield function package is ");
 #if MULTIFIELD_FUNCTIONS
-  EnvPrintRouter(theEnv,WDISPLAY,"ON\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"ON\n");
 #else
-  EnvPrintRouter(theEnv,WDISPLAY,"OFF\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"OFF\n");
 #endif
 
-EnvPrintRouter(theEnv,WDISPLAY,"Debugging function package is ");
+EnvPrintRouter(theEnv,execStatus,WDISPLAY,"Debugging function package is ");
 #if DEBUGGING_FUNCTIONS
-  EnvPrintRouter(theEnv,WDISPLAY,"ON\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"ON\n");
 #else
-  EnvPrintRouter(theEnv,WDISPLAY,"OFF\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"OFF\n");
 #endif
 
-EnvPrintRouter(theEnv,WDISPLAY,"Block memory is ");
+EnvPrintRouter(theEnv,execStatus,WDISPLAY,"Block memory is ");
 #if BLOCK_MEMORY
-  EnvPrintRouter(theEnv,WDISPLAY,"ON\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"ON\n");
 #else
-  EnvPrintRouter(theEnv,WDISPLAY,"OFF\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"OFF\n");
 #endif
 
-EnvPrintRouter(theEnv,WDISPLAY,"Window Interface flag is ");
+EnvPrintRouter(theEnv,execStatus,WDISPLAY,"Window Interface flag is ");
 #if WINDOW_INTERFACE
-   EnvPrintRouter(theEnv,WDISPLAY,"ON\n");
+   EnvPrintRouter(theEnv,execStatus,WDISPLAY,"ON\n");
 #else
-   EnvPrintRouter(theEnv,WDISPLAY,"OFF\n");
+   EnvPrintRouter(theEnv,execStatus,WDISPLAY,"OFF\n");
 #endif
 
-EnvPrintRouter(theEnv,WDISPLAY,"Developer flag is ");
+EnvPrintRouter(theEnv,execStatus,WDISPLAY,"Developer flag is ");
 #if DEVELOPER
-   EnvPrintRouter(theEnv,WDISPLAY,"ON\n");
+   EnvPrintRouter(theEnv,execStatus,WDISPLAY,"ON\n");
 #else
-   EnvPrintRouter(theEnv,WDISPLAY,"OFF\n");
+   EnvPrintRouter(theEnv,execStatus,WDISPLAY,"OFF\n");
 #endif
 
-EnvPrintRouter(theEnv,WDISPLAY,"Run time module is ");
+EnvPrintRouter(theEnv,execStatus,WDISPLAY,"Run time module is ");
 #if RUN_TIME
-  EnvPrintRouter(theEnv,WDISPLAY,"ON\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"ON\n");
 #else
-  EnvPrintRouter(theEnv,WDISPLAY,"OFF\n");
+  EnvPrintRouter(theEnv,execStatus,WDISPLAY,"OFF\n");
 #endif
   }
 
@@ -815,45 +815,45 @@ globle void *OperatingSystemFunction(
   void *theEnv,
   EXEC_STATUS)
   {
-   EnvArgCountCheck(theEnv,"operating-system",EXACTLY,0);
+   EnvArgCountCheck(theEnv,execStatus,"operating-system",EXACTLY,0);
 
 #if GENERIC
-   return(EnvAddSymbol(theEnv,"UNKNOWN"));
+   return(EnvAddSymbol(theEnv,execStatus,"UNKNOWN"));
 #endif
 
 #if VAX_VMS
-   return(EnvAddSymbol(theEnv,"VMS"));
+   return(EnvAddSymbol(theEnv,execStatus,"VMS"));
 #endif
 
 #if UNIX_V
-   return(EnvAddSymbol(theEnv,"UNIX-V"));
+   return(EnvAddSymbol(theEnv,execStatus,"UNIX-V"));
 #endif
 
 #if UNIX_7
-   return(EnvAddSymbol(theEnv,"UNIX-7"));
+   return(EnvAddSymbol(theEnv,execStatus,"UNIX-7"));
 #endif
 
 #if LINUX
-   return(EnvAddSymbol(theEnv,"LINUX"));
+   return(EnvAddSymbol(theEnv,execStatus,"LINUX"));
 #endif
 
 #if DARWIN
-   return(EnvAddSymbol(theEnv,"DARWIN"));
+   return(EnvAddSymbol(theEnv,execStatus,"DARWIN"));
 #endif
 
 #if MAC_XCD || MAC_MCW
-   return(EnvAddSymbol(theEnv,"MAC-OS-X"));
+   return(EnvAddSymbol(theEnv,execStatus,"MAC-OS-X"));
 #endif
 
 #if IBM && (! WINDOW_INTERFACE)
-   return(EnvAddSymbol(theEnv,"DOS"));
+   return(EnvAddSymbol(theEnv,execStatus,"DOS"));
 #endif
 
 #if IBM && WINDOW_INTERFACE
-   return(EnvAddSymbol(theEnv,"WINDOWS"));
+   return(EnvAddSymbol(theEnv,execStatus,"WINDOWS"));
 #endif
 
-   return(EnvAddSymbol(theEnv,"UNKNOWN"));
+   return(EnvAddSymbol(theEnv,execStatus,"UNKNOWN"));
   }
   
 /********************************************************************
@@ -885,15 +885,15 @@ globle void ExpandFuncCall(
         with the equivalent expressions of the expansions of evaluations
         of the arguments.
       ====================================================================== */
-   newargexp = CopyExpression(theEnv,GetFirstArgument()->argList);
-   ExpandFuncMultifield(theEnv,result,newargexp,&newargexp,
-                        (void *) FindFunction(theEnv,"expand$"));
+   newargexp = CopyExpression(theEnv,execStatus,GetFirstArgument()->argList);
+   ExpandFuncMultifield(theEnv,execStatus,result,newargexp,&newargexp,
+                        (void *) FindFunction(theEnv,execStatus,"expand$"));
 
    /* ===================================================================
       Build the new function call expression with the expanded arguments.
       Check the number of arguments, if necessary, and call the thing.
       =================================================================== */
-   fcallexp = get_struct(theEnv,expr);
+   fcallexp = get_struct(theEnv,execStatus,expr);
    fcallexp->type = GetFirstArgument()->type;
    fcallexp->value = GetFirstArgument()->value;
    fcallexp->nextArg = NULL;
@@ -901,32 +901,32 @@ globle void ExpandFuncCall(
    if (fcallexp->type == FCALL)
      {
       func = (struct FunctionDefinition *) fcallexp->value;
-      if (CheckFunctionArgCount(theEnv,ValueToString(func->callFunctionName),
+      if (CheckFunctionArgCount(theEnv,execStatus,ValueToString(func->callFunctionName),
                                 func->restrictions,CountArguments(newargexp)) == FALSE)
         {
          result->type = SYMBOL;
          result->value = EnvFalseSymbol(theEnv);
-         ReturnExpression(theEnv,fcallexp);
+         ReturnExpression(theEnv,execStatus,fcallexp);
          return;
         }
      }
 #if DEFFUNCTION_CONSTRUCT
    else if (fcallexp->type == PCALL)
      {
-      if (CheckDeffunctionCall(theEnv,fcallexp->value,
+      if (CheckDeffunctionCall(theEnv,execStatus,fcallexp->value,
               CountArguments(fcallexp->argList)) == FALSE)
         {
          result->type = SYMBOL;
          result->value = EnvFalseSymbol(theEnv);
-         ReturnExpression(theEnv,fcallexp);
-         SetEvaluationError(theEnv,TRUE);
+         ReturnExpression(theEnv,execStatus,fcallexp);
+         SetEvaluationError(theEnv,execStatus,TRUE);
          return;
         }
      }
 #endif
 
-   EvaluateExpression(theEnv,fcallexp,result);
-   ReturnExpression(theEnv,fcallexp);
+   EvaluateExpression(theEnv,execStatus,fcallexp,result);
+   ReturnExpression(theEnv,execStatus,fcallexp);
   }
 
 /***********************************************************************
@@ -949,9 +949,9 @@ globle void DummyExpandFuncMultifield(
   {
    result->type = SYMBOL;
    result->value = EnvFalseSymbol(theEnv);
-   SetEvaluationError(theEnv,TRUE);
-   PrintErrorID(theEnv,"MISCFUN",1,FALSE);
-   EnvPrintRouter(theEnv,WERROR,"expand$ must be used in the argument list of a function call.\n");
+   SetEvaluationError(theEnv,execStatus,TRUE);
+   PrintErrorID(theEnv,execStatus,"MISCFUN",1,FALSE);
+   EnvPrintRouter(theEnv,execStatus,WERROR,"expand$ must be used in the argument list of a function call.\n");
   }
 
 /***********************************************************************
@@ -988,14 +988,14 @@ static void ExpandFuncMultifield(
      {
       if (theExp->value == expmult)
         {
-         EvaluateExpression(theEnv,theExp->argList,result);
-         ReturnExpression(theEnv,theExp->argList);
+         EvaluateExpression(theEnv,execStatus,theExp->argList,result);
+         ReturnExpression(theEnv,execStatus,theExp->argList);
          if ((execStatus->EvaluationError) || (result->type != MULTIFIELD))
            {
             theExp->argList = NULL;
             if ((execStatus->EvaluationError == FALSE) && (result->type != MULTIFIELD))
-              ExpectedTypeError2(theEnv,"expand$",1);
-            theExp->value = (void *) FindFunction(theEnv,"(set-evaluation-error)");
+              ExpectedTypeError2(theEnv,execStatus,"expand$",1);
+            theExp->value = (void *) FindFunction(theEnv,execStatus,"(set-evaluation-error)");
             execStatus->EvaluationError = FALSE;
             execStatus->HaltExecution = FALSE;
             return;
@@ -1003,7 +1003,7 @@ static void ExpandFuncMultifield(
          top = bot = NULL;
          for (i = GetpDOBegin(result) ; i <= GetpDOEnd(result) ; i++)
            {
-            newexp = get_struct(theEnv,expr);
+            newexp = get_struct(theEnv,execStatus,expr);
             newexp->type = GetMFType(result->value,i);
             newexp->value = GetMFValue(result->value,i);
             newexp->argList = NULL;
@@ -1017,14 +1017,14 @@ static void ExpandFuncMultifield(
          if (top == NULL)
            {
             *sto = theExp->nextArg;
-            rtn_struct(theEnv,expr,theExp);
+            rtn_struct(theEnv,execStatus,expr,theExp);
             theExp = *sto;
            }
          else
            {
             bot->nextArg = theExp->nextArg;
             *sto = top;
-            rtn_struct(theEnv,expr,theExp);
+            rtn_struct(theEnv,execStatus,expr,theExp);
             sto = &bot->nextArg;
             theExp = bot->nextArg;
            }
@@ -1032,7 +1032,7 @@ static void ExpandFuncMultifield(
       else
         {
          if (theExp->argList != NULL)
-           ExpandFuncMultifield(theEnv,result,theExp->argList,&theExp->argList,expmult);
+           ExpandFuncMultifield(theEnv,execStatus,result,theExp->argList,&theExp->argList,expmult);
          sto = &theExp->nextArg;
          theExp = theExp->nextArg;
         }
@@ -1052,7 +1052,7 @@ globle void *CauseEvaluationError(
   void *theEnv,
   EXEC_STATUS)
   {
-   SetEvaluationError(theEnv,TRUE);
+   SetEvaluationError(theEnv,execStatus,TRUE);
    return((SYMBOL_HN *) EnvFalseSymbol(theEnv));
   }
 
@@ -1073,9 +1073,9 @@ globle intBool SetSORCommand(
 #if (! RUN_TIME) && (! BLOAD_ONLY)
    DATA_OBJECT arg;
 
-   if (EnvArgTypeCheck(theEnv,"set-sequence-operator-recognition",1,SYMBOL,&arg) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"set-sequence-operator-recognition",1,SYMBOL,&arg) == FALSE)
      return(ExpressionData(theEnv)->SequenceOpMode);
-   return(EnvSetSequenceOperatorRecognition(theEnv,(arg.value == EnvFalseSymbol(theEnv)) ?
+   return(EnvSetSequenceOperatorRecognition(theEnv,execStatus,(arg.value == EnvFalseSymbol(theEnv)) ?
                                          FALSE : TRUE));
 #else
      return(ExpressionData(theEnv)->SequenceOpMode);
@@ -1097,18 +1097,18 @@ globle void *GetFunctionRestrictions(
    DATA_OBJECT temp;
    struct FunctionDefinition *fptr;
 
-   if (EnvArgTypeCheck(theEnv,"get-function-restrictions",1,SYMBOL,&temp) == FALSE)
-     return((SYMBOL_HN *) EnvAddSymbol(theEnv,""));
-   fptr = FindFunction(theEnv,DOToString(temp));
+   if (EnvArgTypeCheck(theEnv,execStatus,"get-function-restrictions",1,SYMBOL,&temp) == FALSE)
+     return((SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,""));
+   fptr = FindFunction(theEnv,execStatus,DOToString(temp));
    if (fptr == NULL)
      {
-      CantFindItemErrorMessage(theEnv,"function",DOToString(temp));
-      SetEvaluationError(theEnv,TRUE);
-      return((SYMBOL_HN *) EnvAddSymbol(theEnv,""));
+      CantFindItemErrorMessage(theEnv,execStatus,"function",DOToString(temp));
+      SetEvaluationError(theEnv,execStatus,TRUE);
+      return((SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,""));
      }
    if (fptr->restrictions == NULL)
-     return((SYMBOL_HN *) EnvAddSymbol(theEnv,"0**"));
-   return((SYMBOL_HN *) EnvAddSymbol(theEnv,fptr->restrictions));
+     return((SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,"0**"));
+   return((SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,fptr->restrictions));
   }
 
 /*************************************************/
@@ -1124,9 +1124,9 @@ globle void GetFunctionListFunction(
    struct multifield *theList;
    unsigned long functionCount = 0;
 
-   if (EnvArgCountCheck(theEnv,"get-function-list",EXACTLY,0) == -1)
+   if (EnvArgCountCheck(theEnv,execStatus,"get-function-list",EXACTLY,0) == -1)
      {
-      EnvSetMultifieldErrorValue(theEnv,returnValue);
+      EnvSetMultifieldErrorValue(theEnv,execStatus,returnValue);
       return;
      }
 
@@ -1138,7 +1138,7 @@ globle void GetFunctionListFunction(
    SetpType(returnValue,MULTIFIELD);
    SetpDOBegin(returnValue,1);
    SetpDOEnd(returnValue,functionCount);
-   theList = (struct multifield *) EnvCreateMultifield(theEnv,functionCount);
+   theList = (struct multifield *) EnvCreateMultifield(theEnv,execStatus,functionCount);
    SetpValue(returnValue,(void *) theList);
 
    for (theFunction = GetFunctionList(theEnv), functionCount = 1;
@@ -1179,13 +1179,13 @@ globle void FuncallFunction(
    /* the name of the function being called.          */
    /*=================================================*/
    
-   if ((argCount = EnvArgCountCheck(theEnv,"funcall",AT_LEAST,1)) == -1) return;
+   if ((argCount = EnvArgCountCheck(theEnv,execStatus,"funcall",AT_LEAST,1)) == -1) return;
    
    /*============================================*/
    /* Get the name of the function to be called. */
    /*============================================*/
    
-   if (EnvArgTypeCheck(theEnv,"funcall",1,SYMBOL_OR_STRING,&theValue) == FALSE) 
+   if (EnvArgTypeCheck(theEnv,execStatus,"funcall",1,SYMBOL_OR_STRING,&theValue) == FALSE) 
      { return; }
    
    /*====================*/
@@ -1193,9 +1193,9 @@ globle void FuncallFunction(
    /*====================*/
 
    name = DOToString(theValue);
-   if (! GetFunctionReference(theEnv,name,&theReference))
+   if (! GetFunctionReference(theEnv,execStatus,name,&theReference))
      {
-      ExpectedTypeError1(theEnv,"funcall",1,"function, deffunction, or generic function name");
+      ExpectedTypeError1(theEnv,execStatus,"funcall",1,"function, deffunction, or generic function name");
       return; 
      }
      
@@ -1206,10 +1206,10 @@ globle void FuncallFunction(
 
    if (theReference.type == FCALL)
      {
-      theFunction = FindFunction(theEnv,name);
+      theFunction = FindFunction(theEnv,execStatus,name);
       if (theFunction->parser != NULL)
         {
-         ExpectedTypeError1(theEnv,"funcall",1,"function without specialized parser");
+         ExpectedTypeError1(theEnv,execStatus,"funcall",1,"function without specialized parser");
          return; 
         }
      }
@@ -1218,21 +1218,21 @@ globle void FuncallFunction(
    /* Add the arguments to the expression. */
    /*======================================*/
      
-   ExpressionInstall(theEnv,&theReference);
+   ExpressionInstall(theEnv,execStatus,&theReference);
 
    for (i = 2; i <= argCount; i++)
      {
-      EnvRtnUnknown(theEnv,i,&theValue);
+      EnvRtnUnknown(theEnv,execStatus,i,&theValue);
       if (GetEvaluationError(theEnv))
         {  
-         ExpressionDeinstall(theEnv,&theReference);
+         ExpressionDeinstall(theEnv,execStatus,&theReference);
          return; 
         }
       
       switch(GetType(theValue))
         {
          case MULTIFIELD:
-           nextAdd = GenConstant(theEnv,FCALL,(void *) FindFunction(theEnv,"create$"));
+           nextAdd = GenConstant(theEnv,execStatus,FCALL,(void *) FindFunction(theEnv,execStatus,"create$"));
 
            if (lastAdd == NULL)
              { theReference.argList = nextAdd; }
@@ -1244,7 +1244,7 @@ globle void FuncallFunction(
            theMultifield = (struct multifield *) GetValue(theValue);
            for (j = GetDOBegin(theValue); j <= GetDOEnd(theValue); j++)
              {
-              nextAdd = GenConstant(theEnv,GetMFType(theMultifield,j),GetMFValue(theMultifield,j));
+              nextAdd = GenConstant(theEnv,execStatus,GetMFType(theMultifield,j),GetMFValue(theMultifield,j));
               if (multiAdd == NULL)
                 { lastAdd->argList = nextAdd; }
               else
@@ -1252,17 +1252,17 @@ globle void FuncallFunction(
               multiAdd = nextAdd;
              }
 
-           ExpressionInstall(theEnv,lastAdd);
+           ExpressionInstall(theEnv,execStatus,lastAdd);
            break;
          
          default:
-           nextAdd = GenConstant(theEnv,GetType(theValue),GetValue(theValue));
+           nextAdd = GenConstant(theEnv,execStatus,GetType(theValue),GetValue(theValue));
            if (lastAdd == NULL)
              { theReference.argList = nextAdd; }
            else
              { lastAdd->nextArg = nextAdd; }
            lastAdd = nextAdd;
-           ExpressionInstall(theEnv,lastAdd);
+           ExpressionInstall(theEnv,execStatus,lastAdd);
            break;    
         }
      }
@@ -1274,14 +1274,14 @@ globle void FuncallFunction(
 #if DEFFUNCTION_CONSTRUCT
    if (theReference.type == PCALL)
      {
-      if (CheckDeffunctionCall(theEnv,theReference.value,CountArguments(theReference.argList)) == FALSE)
+      if (CheckDeffunctionCall(theEnv,execStatus,theReference.value,CountArguments(theReference.argList)) == FALSE)
         {
-         PrintErrorID(theEnv,"MISCFUN",4,FALSE);
-         EnvPrintRouter(theEnv,WERROR,"Function funcall called with the wrong number of arguments for deffunction ");
-         EnvPrintRouter(theEnv,WERROR,EnvGetDeffunctionName(theEnv,theReference.value));
-         EnvPrintRouter(theEnv,WERROR,"\n");
-         ExpressionDeinstall(theEnv,&theReference);   
-         ReturnExpression(theEnv,theReference.argList);
+         PrintErrorID(theEnv,execStatus,"MISCFUN",4,FALSE);
+         EnvPrintRouter(theEnv,execStatus,WERROR,"Function funcall called with the wrong number of arguments for deffunction ");
+         EnvPrintRouter(theEnv,execStatus,WERROR,EnvGetDeffunctionName(theEnv,execStatus,theReference.value));
+         EnvPrintRouter(theEnv,execStatus,WERROR,"\n");
+         ExpressionDeinstall(theEnv,execStatus,&theReference);   
+         ReturnExpression(theEnv,execStatus,theReference.argList);
          return;
         }
      }
@@ -1291,14 +1291,14 @@ globle void FuncallFunction(
    /* Call the expression. */
    /*======================*/
    
-   EvaluateExpression(theEnv,&theReference,returnValue);
+   EvaluateExpression(theEnv,execStatus,&theReference,returnValue);
    
    /*========================================*/
    /* Return the expression data structures. */
    /*========================================*/
    
-   ExpressionDeinstall(theEnv,&theReference);
-   ReturnExpression(theEnv,theReference.argList);
+   ExpressionDeinstall(theEnv,execStatus,&theReference);
+   ReturnExpression(theEnv,execStatus,theReference.argList);
   }
   
 /***********************************/
@@ -1326,13 +1326,13 @@ globle void NewFunction(
    /* of the class (e.g. java, .net, c++) and the name of the class. */
    /*================================================================*/
    
-   if (EnvArgCountCheck(theEnv,"new",AT_LEAST,1) == -1) return;
+   if (EnvArgCountCheck(theEnv,execStatus,"new",AT_LEAST,1) == -1) return;
    
    /*====================================*/
    /* Get the name of the language type. */
    /*====================================*/
    
-   if (EnvArgTypeCheck(theEnv,"new",1,SYMBOL,&theValue) == FALSE) 
+   if (EnvArgTypeCheck(theEnv,execStatus,"new",1,SYMBOL,&theValue) == FALSE) 
      { return; }
    
    /*=========================*/
@@ -1341,11 +1341,11 @@ globle void NewFunction(
 
    name = DOToString(theValue);
    
-   theType = FindLanguageType(theEnv,name);
+   theType = FindLanguageType(theEnv,execStatus,name);
    
    if (theType == -1)
      {
-      ExpectedTypeError1(theEnv,"new",1,"external language");
+      ExpectedTypeError1(theEnv,execStatus,"new",1,"external language");
       return; 
      }
 
@@ -1355,7 +1355,7 @@ globle void NewFunction(
    
    if ((EvaluationData(theEnv)->ExternalAddressTypes[theType] != NULL) &&
        (EvaluationData(theEnv)->ExternalAddressTypes[theType]->newFunction != NULL))
-     { (*EvaluationData(theEnv)->ExternalAddressTypes[theType]->newFunction)(theEnv,returnValue); }
+     { (*EvaluationData(theEnv)->ExternalAddressTypes[theType]->newFunction)(theEnv,execStatus,returnValue); }
   }
   
 /************************************/
@@ -1386,13 +1386,13 @@ globle void CallFunction(
    /* method being called (e.g. java, .net, c++).         */
    /*=====================================================*/
    
-   if ((argumentCount = EnvArgCountCheck(theEnv,"call",AT_LEAST,1)) == -1) return;
+   if ((argumentCount = EnvArgCountCheck(theEnv,execStatus,"call",AT_LEAST,1)) == -1) return;
       
    /*=========================*/
    /* Get the first argument. */
    /*=========================*/
    
-   EnvRtnUnknown(theEnv,1,&theValue);
+   EnvRtnUnknown(theEnv,execStatus,1,&theValue);
 
    /*============================================*/
    /* If the first argument is a symbol, then it */
@@ -1403,11 +1403,11 @@ globle void CallFunction(
      { 
       name = DOToString(theValue);
       
-      theType = FindLanguageType(theEnv,name);
+      theType = FindLanguageType(theEnv,execStatus,name);
       
       if (theType == -1)
         { 
-         ExpectedTypeError1(theEnv,"call",1,"external language symbol or external address");
+         ExpectedTypeError1(theEnv,execStatus,"call",1,"external language symbol or external address");
          return;
         }
 
@@ -1419,7 +1419,7 @@ globle void CallFunction(
       
       if ((EvaluationData(theEnv)->ExternalAddressTypes[theType] != NULL) &&
           (EvaluationData(theEnv)->ExternalAddressTypes[theType]->callFunction != NULL))
-        { (*EvaluationData(theEnv)->ExternalAddressTypes[theType]->callFunction)(theEnv,&theValue,returnValue); }
+        { (*EvaluationData(theEnv)->ExternalAddressTypes[theType]->callFunction)(theEnv,execStatus,&theValue,returnValue); }
         
       return;
      }
@@ -1438,12 +1438,12 @@ globle void CallFunction(
       
       if ((EvaluationData(theEnv)->ExternalAddressTypes[theType] != NULL) &&
           (EvaluationData(theEnv)->ExternalAddressTypes[theType]->callFunction != NULL))
-        { (*EvaluationData(theEnv)->ExternalAddressTypes[theType]->callFunction)(theEnv,&theValue,returnValue); }
+        { (*EvaluationData(theEnv)->ExternalAddressTypes[theType]->callFunction)(theEnv,execStatus,&theValue,returnValue); }
         
       return;
      }
      
-   ExpectedTypeError1(theEnv,"call",1,"external language symbol or external address");
+   ExpectedTypeError1(theEnv,execStatus,"call",1,"external language symbol or external address");
   }
 
 /************************************/
@@ -1477,7 +1477,7 @@ globle double TimeFunction(
    /* The time function accepts no arguments. */
    /*=========================================*/
 
-   EnvArgCountCheck(theEnv,"time",EXACTLY,0);
+   EnvArgCountCheck(theEnv,execStatus,"time",EXACTLY,0);
 
    /*==================*/
    /* Return the time. */
@@ -1505,7 +1505,7 @@ globle double TimerFunction(
    i = 1;
    while ((i <= numa) && (GetHaltExecution(theEnv) != TRUE))
      {
-      EnvRtnUnknown(theEnv,i,&returnValue);
+      EnvRtnUnknown(theEnv,execStatus,i,&returnValue);
       i++;
      }
 

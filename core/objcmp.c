@@ -154,9 +154,9 @@ globle void SetupObjectsCompiler(
   void *theEnv,
   EXEC_STATUS)
   {
-   AllocateEnvironmentData(theEnv,OBJECT_COMPILER_DATA,sizeof(struct objectCompilerData),NULL);
+   AllocateEnvironmentData(theEnv,execStatus,OBJECT_COMPILER_DATA,sizeof(struct objectCompilerData),NULL);
 
-   ObjectCompilerData(theEnv)->ObjectCodeItem = AddCodeGeneratorItem(theEnv,"objects",0,ReadyObjectsForCode,
+   ObjectCompilerData(theEnv)->ObjectCodeItem = AddCodeGeneratorItem(theEnv,execStatus,"objects",0,ReadyObjectsForCode,
                                          InitObjectsCode,ObjectsToCode,13);
   }
 
@@ -253,7 +253,7 @@ static void ReadyObjectsForCode(
       from the global in CONSCOMP.C
       ===================================== */
    markInfo.maxIndices = ConstructCompilerData(theEnv)->MaxIndices;
-   DoForAllConstructs(theEnv,MarkDefclassAndSlots,DefclassData(theEnv)->DefclassModuleIndex,
+   DoForAllConstructs(theEnv,execStatus,MarkDefclassAndSlots,DefclassData(theEnv)->DefclassModuleIndex,
                       FALSE,(void *) &markInfo);
    i = 0L;
    for (j = 0 ; j < SLOT_NAME_TABLE_HASH_SIZE ; j++)
@@ -372,7 +372,7 @@ static void InitObjectsCode(
 #pragma unused(maxIndices)
 #endif
 
-   fprintf(initFP,"   ObjectsRunTimeInitialize(theEnv,%s%d_1,%s%d_1,%s%d_1,%s%d);\n",
+   fprintf(initFP,"   ObjectsRunTimeInitialize(theEnv,execStatus,%s%d_1,%s%d_1,%s%d_1,%s%d);\n",
                       ClassHashPrefix(),imageID,SlotNameHashPrefix(),imageID,
                       ClassIDPrefix(),imageID,MaxClassIDPrefix(),imageID);
   }
@@ -427,16 +427,16 @@ static int ObjectsToCode(
      }
    fprintf(headerFP,"#include \"classcom.h\"\n");
    fprintf(headerFP,"#include \"classini.h\"\n");
-   if (ClassIDMapToCode(theEnv,fileName,pathName,fileNameBuffer,fileID,headerFP,imageID,maxIndices,&fileCount)
+   if (ClassIDMapToCode(theEnv,execStatus,fileName,pathName,fileNameBuffer,fileID,headerFP,imageID,maxIndices,&fileCount)
        == FALSE)
      return(0);
-   if (ClassHashTableToCode(theEnv,fileName,pathName,fileNameBuffer,fileID,headerFP,imageID,maxIndices,&fileCount)
+   if (ClassHashTableToCode(theEnv,execStatus,fileName,pathName,fileNameBuffer,fileID,headerFP,imageID,maxIndices,&fileCount)
        == FALSE)
      return(0);
-   if (SlotNameHashTableToCode(theEnv,fileName,pathName,fileNameBuffer,fileID,headerFP,imageID,maxIndices,&fileCount)
+   if (SlotNameHashTableToCode(theEnv,execStatus,fileName,pathName,fileNameBuffer,fileID,headerFP,imageID,maxIndices,&fileCount)
        == FALSE)
      return(0);
-   if (SlotNameEntriesToCode(theEnv,fileName,pathName,fileNameBuffer,fileID,headerFP,imageID,maxIndices,&fileCount)
+   if (SlotNameEntriesToCode(theEnv,execStatus,fileName,pathName,fileNameBuffer,fileID,headerFP,imageID,maxIndices,&fileCount)
        == FALSE)
      return(0);
 
@@ -444,38 +444,38 @@ static int ObjectsToCode(
       Loop through all the modules and all the defclasses writing
       their C code representation to the file as they are traversed
       ============================================================= */
-   theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,NULL);
+   theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,NULL);
 
    while (theModule != NULL)
      {
-      EnvSetCurrentModule(theEnv,(void *) theModule);
+      EnvSetCurrentModule(theEnv,execStatus,(void *) theModule);
 
       itemFiles[MODULEI] =
-            OpenFileIfNeeded(theEnv,itemFiles[MODULEI],fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
+            OpenFileIfNeeded(theEnv,execStatus,itemFiles[MODULEI],fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
                              itemArrayVersions[MODULEI],headerFP,
                              "DEFCLASS_MODULE",ModulePrefix(ObjectCompilerData(theEnv)->ObjectCodeItem),
                              itemReopenFlags[MODULEI],&itemCodeFiles[MODULEI]);
       if (itemFiles[MODULEI] == NULL)
         goto ObjectCodeError;
 
-      DefclassModuleToCode(theEnv,itemFiles[MODULEI],theModule,imageID,maxIndices);
+      DefclassModuleToCode(theEnv,execStatus,itemFiles[MODULEI],theModule,imageID,maxIndices);
       itemFiles[MODULEI] =
-          CloseFileIfNeeded(theEnv,itemFiles[MODULEI],&itemArrayCounts[MODULEI],
+          CloseFileIfNeeded(theEnv,execStatus,itemFiles[MODULEI],&itemArrayCounts[MODULEI],
                             &itemArrayVersions[MODULEI],maxIndices,
                             &itemReopenFlags[MODULEI],&itemCodeFiles[MODULEI]);
 
-      for (theDefclass = (DEFCLASS *) EnvGetNextDefclass(theEnv,NULL) ;
+      for (theDefclass = (DEFCLASS *) EnvGetNextDefclass(theEnv,execStatus,NULL) ;
            theDefclass != NULL ;
-           theDefclass = (DEFCLASS *) EnvGetNextDefclass(theEnv,(void *) theDefclass))
+           theDefclass = (DEFCLASS *) EnvGetNextDefclass(theEnv,execStatus,(void *) theDefclass))
         {
          itemFiles[CLASSI] =
-            OpenFileIfNeeded(theEnv,itemFiles[CLASSI],fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
+            OpenFileIfNeeded(theEnv,execStatus,itemFiles[CLASSI],fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
                              itemArrayVersions[CLASSI],headerFP,
                              "DEFCLASS",ClassPrefix(),
                              itemReopenFlags[CLASSI],&itemCodeFiles[CLASSI]);
          if (itemFiles[CLASSI] == NULL)
            goto ObjectCodeError;
-         SingleDefclassToCode(theEnv,itemFiles[CLASSI],imageID,maxIndices,
+         SingleDefclassToCode(theEnv,execStatus,itemFiles[CLASSI],imageID,maxIndices,
                               theDefclass,moduleCount,
                               itemArrayVersions[LINKI],itemArrayCounts[LINKI],
                               itemArrayVersions[SLOTI],itemArrayCounts[SLOTI],
@@ -485,46 +485,46 @@ static int ObjectsToCode(
                               itemArrayVersions[OHANDLERI],itemArrayCounts[OHANDLERI]);
          itemArrayCounts[CLASSI]++;
          itemFiles[CLASSI] =
-           CloseFileIfNeeded(theEnv,itemFiles[CLASSI],&itemArrayCounts[CLASSI],
+           CloseFileIfNeeded(theEnv,execStatus,itemFiles[CLASSI],&itemArrayCounts[CLASSI],
                              &itemArrayVersions[CLASSI],maxIndices,
                              &itemReopenFlags[CLASSI],&itemCodeFiles[CLASSI]);
 
-         if (InheritanceLinksToCode(theEnv,&itemFiles[LINKI],fileName,pathName,fileNameBuffer,fileID,imageID,
+         if (InheritanceLinksToCode(theEnv,execStatus,&itemFiles[LINKI],fileName,pathName,fileNameBuffer,fileID,imageID,
                                     headerFP,&fileCount,maxIndices,theDefclass,
                                     &itemArrayVersions[LINKI],&itemArrayCounts[LINKI],
                                     &itemReopenFlags[LINKI],&itemCodeFiles[LINKI])
               == FALSE)
            goto ObjectCodeError;
 
-         if (SlotsToCode(theEnv,&itemFiles[SLOTI],fileName,pathName,fileNameBuffer,fileID,imageID,
+         if (SlotsToCode(theEnv,execStatus,&itemFiles[SLOTI],fileName,pathName,fileNameBuffer,fileID,imageID,
                          headerFP,&fileCount,maxIndices,theDefclass,
                          &itemArrayVersions[SLOTI],&itemArrayCounts[SLOTI],
                          &itemReopenFlags[SLOTI],&itemCodeFiles[SLOTI])
               == FALSE)
            goto ObjectCodeError;
 
-         if (TemplateSlotsToCode(theEnv,&itemFiles[TSLOTI],fileName,pathName,fileNameBuffer,fileID,imageID,
+         if (TemplateSlotsToCode(theEnv,execStatus,&itemFiles[TSLOTI],fileName,pathName,fileNameBuffer,fileID,imageID,
                                  headerFP,&fileCount,maxIndices,theDefclass,
                                  &itemArrayVersions[TSLOTI],&itemArrayCounts[TSLOTI],
                                  &itemReopenFlags[TSLOTI],&itemCodeFiles[TSLOTI])
               == FALSE)
            goto ObjectCodeError;
 
-         if (OrderedSlotsToCode(theEnv,&itemFiles[OSLOTI],fileName,pathName,fileNameBuffer,fileID,imageID,
+         if (OrderedSlotsToCode(theEnv,execStatus,&itemFiles[OSLOTI],fileName,pathName,fileNameBuffer,fileID,imageID,
                                 headerFP,&fileCount,maxIndices,theDefclass,
                                 &itemArrayVersions[OSLOTI],&itemArrayCounts[OSLOTI],
                                 &itemReopenFlags[OSLOTI],&itemCodeFiles[OSLOTI])
               == FALSE)
            goto ObjectCodeError;
 
-         if (HandlersToCode(theEnv,&itemFiles[HANDLERI],fileName,pathName,fileNameBuffer,fileID,imageID,
+         if (HandlersToCode(theEnv,execStatus,&itemFiles[HANDLERI],fileName,pathName,fileNameBuffer,fileID,imageID,
                             headerFP,&fileCount,maxIndices,theDefclass,
                             &itemArrayVersions[HANDLERI],&itemArrayCounts[HANDLERI],
                             &itemReopenFlags[HANDLERI],&itemCodeFiles[HANDLERI])
               == FALSE)
            goto ObjectCodeError;
 
-         if (OrderedHandlersToCode(theEnv,&itemFiles[OHANDLERI],fileName,pathName,fileNameBuffer,fileID,imageID,
+         if (OrderedHandlersToCode(theEnv,execStatus,&itemFiles[OHANDLERI],fileName,pathName,fileNameBuffer,fileID,imageID,
                                    headerFP,&fileCount,maxIndices,theDefclass,
                                    &itemArrayVersions[OHANDLERI],&itemArrayCounts[OHANDLERI],
                                    &itemReopenFlags[OHANDLERI],&itemCodeFiles[OHANDLERI])
@@ -532,16 +532,16 @@ static int ObjectsToCode(
            goto ObjectCodeError;
         }
 
-      theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,theModule);
+      theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,theModule);
       moduleCount++;
       itemArrayCounts[MODULEI]++;
      }
 
-   CloseObjectFiles(theEnv,itemFiles,itemReopenFlags,itemCodeFiles,maxIndices);
+   CloseObjectFiles(theEnv,execStatus,itemFiles,itemReopenFlags,itemCodeFiles,maxIndices);
    return(1);
 
 ObjectCodeError:
-   CloseObjectFiles(theEnv,itemFiles,itemReopenFlags,itemCodeFiles,maxIndices);
+   CloseObjectFiles(theEnv,execStatus,itemFiles,itemReopenFlags,itemCodeFiles,maxIndices);
    return(0);
   }
 
@@ -573,7 +573,7 @@ static int ClassIDMapToCode(
    int classIDMapArrayCount,
        classIDMapArrayVersion = 1;
 
-   classIDMapFile = OpenFileIfNeeded(theEnv,classIDMapFile,fileName,pathName,fileNameBuffer,fileID,imageID,fileCount,
+   classIDMapFile = OpenFileIfNeeded(theEnv,execStatus,classIDMapFile,fileName,pathName,fileNameBuffer,fileID,imageID,fileCount,
                                      classIDMapArrayVersion,headerFP,
                                      "DEFCLASS *",ClassIDPrefix(),FALSE,NULL);
    if (classIDMapFile == NULL)
@@ -584,14 +584,14 @@ static int ClassIDMapToCode(
      {
       if (classIDMapArrayCount > 0)
         fprintf(classIDMapFile,",\n");
-      PrintClassReference(theEnv,classIDMapFile,DefclassData(theEnv)->ClassIDMap[classIDMapArrayCount],
+      PrintClassReference(theEnv,execStatus,classIDMapFile,DefclassData(theEnv)->ClassIDMap[classIDMapArrayCount],
                           imageID,maxIndices);
      }
    fprintf(classIDMapFile,"};\n\n");
    fprintf(classIDMapFile,"unsigned %s%d = %u;\n",
                           MaxClassIDPrefix(),imageID,(unsigned) DefclassData(theEnv)->MaxClassID);
    fprintf(headerFP,"extern unsigned %s%d;\n",MaxClassIDPrefix(),imageID);
-   GenClose(theEnv,classIDMapFile);
+   GenClose(theEnv,execStatus,classIDMapFile);
    return(TRUE);
   }
 
@@ -623,7 +623,7 @@ static int ClassHashTableToCode(
    int classHashArrayCount,
        classHashArrayVersion = 1;
 
-   classHashFile = OpenFileIfNeeded(theEnv,classHashFile,fileName,pathName,fileNameBuffer,fileID,imageID,fileCount,
+   classHashFile = OpenFileIfNeeded(theEnv,execStatus,classHashFile,fileName,pathName,fileNameBuffer,fileID,imageID,fileCount,
                                     classHashArrayVersion,headerFP,
                                     "DEFCLASS *",ClassHashPrefix(),FALSE,NULL);
    if (classHashFile == NULL)
@@ -634,11 +634,11 @@ static int ClassHashTableToCode(
      {
       if (classHashArrayCount > 0)
         fprintf(classHashFile,",\n");
-      PrintClassReference(theEnv,classHashFile,DefclassData(theEnv)->ClassTable[classHashArrayCount],
+      PrintClassReference(theEnv,execStatus,classHashFile,DefclassData(theEnv)->ClassTable[classHashArrayCount],
                           imageID,maxIndices);
      }
 
-   CloseFileIfNeeded(theEnv,classHashFile,&classHashArrayCount,
+   CloseFileIfNeeded(theEnv,execStatus,classHashFile,&classHashArrayCount,
                      &classHashArrayVersion,classHashArrayCount,NULL,NULL);
    return(TRUE);
   }
@@ -671,7 +671,7 @@ static int SlotNameHashTableToCode(
    int slotNameHashArrayCount,
        slotNameHashArrayVersion = 1;
 
-   slotNameHashFile = OpenFileIfNeeded(theEnv,slotNameHashFile,fileName,pathName,fileNameBuffer,fileID,
+   slotNameHashFile = OpenFileIfNeeded(theEnv,execStatus,slotNameHashFile,fileName,pathName,fileNameBuffer,fileID,
                                        imageID,fileCount,
                                        slotNameHashArrayVersion,headerFP,
                                        "SLOT_NAME *",SlotNameHashPrefix(),FALSE,NULL);
@@ -683,10 +683,10 @@ static int SlotNameHashTableToCode(
      {
       if (slotNameHashArrayCount > 0)
         fprintf(slotNameHashFile,",\n");
-      PrintSlotNameReference(theEnv,slotNameHashFile,DefclassData(theEnv)->SlotNameTable[slotNameHashArrayCount],
+      PrintSlotNameReference(theEnv,execStatus,slotNameHashFile,DefclassData(theEnv)->SlotNameTable[slotNameHashArrayCount],
                              imageID,maxIndices);
      }
-   CloseFileIfNeeded(theEnv,slotNameHashFile,&slotNameHashArrayCount,
+   CloseFileIfNeeded(theEnv,execStatus,slotNameHashFile,&slotNameHashArrayCount,
                                         &slotNameHashArrayVersion,slotNameHashArrayCount,
                                         NULL,NULL);
    return(TRUE);
@@ -726,26 +726,26 @@ static int SlotNameEntriesToCode(
      {
       for (snp = DefclassData(theEnv)->SlotNameTable[i] ; snp != NULL ; snp = snp->nxt)
         {
-         slotNameFile = OpenFileIfNeeded(theEnv,slotNameFile,fileName,pathName,fileNameBuffer,fileID,
+         slotNameFile = OpenFileIfNeeded(theEnv,execStatus,slotNameFile,fileName,pathName,fileNameBuffer,fileID,
                                        imageID,fileCount,
                                        slotNameArrayVersion,headerFP,
                                        "SLOT_NAME",SlotNamePrefix(),FALSE,NULL);
          if (slotNameFile == NULL)
            return(FALSE);
          fprintf(slotNameFile,"{ %u,1,%d,",snp->hashTableIndex,snp->id);
-         PrintSymbolReference(theEnv,slotNameFile,snp->name);
+         PrintSymbolReference(theEnv,execStatus,slotNameFile,snp->name);
          fprintf(slotNameFile,",");
-         PrintSymbolReference(theEnv,slotNameFile,snp->putHandlerName);
+         PrintSymbolReference(theEnv,execStatus,slotNameFile,snp->putHandlerName);
          fprintf(slotNameFile,",");
-         PrintSlotNameReference(theEnv,slotNameFile,snp->nxt,imageID,maxIndices);
+         PrintSlotNameReference(theEnv,execStatus,slotNameFile,snp->nxt,imageID,maxIndices);
          fprintf(slotNameFile,",0L }");
          slotNameArrayCount++;
-         slotNameFile = CloseFileIfNeeded(theEnv,slotNameFile,&slotNameArrayCount,
+         slotNameFile = CloseFileIfNeeded(theEnv,execStatus,slotNameFile,&slotNameArrayCount,
                                           &slotNameArrayVersion,maxIndices,NULL,NULL);
         }
      }
    if (slotNameFile != NULL)
-     CloseFileIfNeeded(theEnv,slotNameFile,&slotNameArrayCount,
+     CloseFileIfNeeded(theEnv,execStatus,slotNameFile,&slotNameArrayCount,
                        &slotNameArrayVersion,slotNameArrayCount,NULL,NULL);
    return(TRUE);
   }
@@ -781,7 +781,7 @@ static void CloseObjectFiles(
    for (i = 0 ; i < SAVE_ITEMS ; i++)
      {
       count = maxIndices;
-      itemFiles[i] = CloseFileIfNeeded(theEnv,itemFiles[i],&count,&arrayVersion,
+      itemFiles[i] = CloseFileIfNeeded(theEnv,execStatus,itemFiles[i],&count,&arrayVersion,
                                        maxIndices,&itemReopenFlags[i],
                                        &itemCodeFiles[i]);
      }
@@ -809,7 +809,7 @@ static void DefclassModuleToCode(
   int maxIndices)
   {
    fprintf(theFile,"{");
-   ConstructModuleToCode(theEnv,theFile,theModule,imageID,maxIndices,
+   ConstructModuleToCode(theEnv,execStatus,theFile,theModule,imageID,maxIndices,
                          DefclassData(theEnv)->DefclassModuleIndex,ClassPrefix());
    fprintf(theFile,"}");
   }
@@ -877,7 +877,7 @@ static void SingleDefclassToCode(
       Defclass Header
       ================== */
    fprintf(theFile,"{");
-   ConstructHeaderToCode(theEnv,theFile,&theDefclass->header,imageID,maxIndices,moduleCount,
+   ConstructHeaderToCode(theEnv,execStatus,theFile,&theDefclass->header,imageID,maxIndices,moduleCount,
                          ModulePrefix(ObjectCompilerData(theEnv)->ObjectCodeItem),ClassPrefix());
 
    /* =========================
@@ -954,9 +954,9 @@ static void SingleDefclassToCode(
      fprintf(theFile,"NULL,");
 
    fprintf(theFile,"%hd,",theDefclass->handlerCount);
-   PrintClassReference(theEnv,theFile,theDefclass->nxtHash,imageID,maxIndices);
+   PrintClassReference(theEnv,execStatus,theFile,theDefclass->nxtHash,imageID,maxIndices);
    fprintf(theFile,",");
-   PrintBitMapReference(theEnv,theFile,theDefclass->scopeMap);
+   PrintBitMapReference(theEnv,execStatus,theFile,theDefclass->scopeMap);
    fprintf(theFile,",\"\"}");
   }
 
@@ -1018,7 +1018,7 @@ static intBool InheritanceLinksToCode(
    if (inheritanceLinkCount == 0)
      return(TRUE);
 
-   *classLinkFile = OpenFileIfNeeded(theEnv,*classLinkFile,fileName,pathName,fileNameBuffer,fileID,
+   *classLinkFile = OpenFileIfNeeded(theEnv,execStatus,*classLinkFile,fileName,pathName,fileNameBuffer,fileID,
                                       imageID,fileCount,
                                       *classLinkArrayVersion,headerFP,
                                       "DEFCLASS *",ClassLinkPrefix(),
@@ -1030,7 +1030,7 @@ static intBool InheritanceLinksToCode(
      {
       if (linkPrinted)
         fprintf(*classLinkFile,",");
-      PrintClassReference(theEnv,*classLinkFile,
+      PrintClassReference(theEnv,execStatus,*classLinkFile,
                           theDefclass->directSuperclasses.classArray[i],
                           imageID,maxIndices);
       linkPrinted = TRUE;
@@ -1039,7 +1039,7 @@ static intBool InheritanceLinksToCode(
      {
       if (linkPrinted)
         fprintf(*classLinkFile,",");
-      PrintClassReference(theEnv,*classLinkFile,
+      PrintClassReference(theEnv,execStatus,*classLinkFile,
                           theDefclass->directSubclasses.classArray[i],
                           imageID,maxIndices);
       linkPrinted = TRUE;
@@ -1048,13 +1048,13 @@ static intBool InheritanceLinksToCode(
      {
       if (linkPrinted)
         fprintf(*classLinkFile,",");
-      PrintClassReference(theEnv,*classLinkFile,
+      PrintClassReference(theEnv,execStatus,*classLinkFile,
                           theDefclass->allSuperclasses.classArray[i],
                           imageID,maxIndices);
       linkPrinted = TRUE;
      }
    *classLinkArrayCount += inheritanceLinkCount;
-   *classLinkFile = CloseFileIfNeeded(theEnv,*classLinkFile,classLinkArrayCount,
+   *classLinkFile = CloseFileIfNeeded(theEnv,execStatus,*classLinkFile,classLinkArrayCount,
                                        classLinkArrayVersion,maxIndices,
                                        reopenClassLinkFile,classLinkCodeFile);
    return(TRUE);
@@ -1114,7 +1114,7 @@ static intBool SlotsToCode(
    if (theDefclass->slotCount == 0)
      return(TRUE);
 
-   *slotFile = OpenFileIfNeeded(theEnv,*slotFile,fileName,pathName,fileNameBuffer,fileID,
+   *slotFile = OpenFileIfNeeded(theEnv,execStatus,*slotFile,fileName,pathName,fileNameBuffer,fileID,
                                 imageID,fileCount,
                                 *slotArrayVersion,headerFP,
                                 "SLOT_DESC",SlotPrefix(),
@@ -1135,27 +1135,27 @@ static intBool SlotsToCode(
                         sd->noDefault,sd->reactive,
                         sd->publicVisibility,sd->createReadAccessor,
                         sd->createWriteAccessor,sd->overrideMessageSpecified);
-      PrintClassReference(theEnv,*slotFile,sd->cls,imageID,maxIndices);
+      PrintClassReference(theEnv,execStatus,*slotFile,sd->cls,imageID,maxIndices);
       fprintf(*slotFile,",");
-      PrintSlotNameReference(theEnv,*slotFile,sd->slotName,imageID,maxIndices);
+      PrintSlotNameReference(theEnv,execStatus,*slotFile,sd->slotName,imageID,maxIndices);
       fprintf(*slotFile,",\n   ");
-      PrintSymbolReference(theEnv,*slotFile,sd->overrideMessage);
+      PrintSymbolReference(theEnv,execStatus,*slotFile,sd->overrideMessage);
       if (sd->defaultValue != NULL)
         {
          fprintf(*slotFile,",(void *) ");
          if (sd->dynamicDefault)
-           ExpressionToCode(theEnv,*slotFile,(EXPRESSION *) sd->defaultValue);
+           ExpressionToCode(theEnv,execStatus,*slotFile,(EXPRESSION *) sd->defaultValue);
          else
            {
-            tmpexp = ConvertValueToExpression(theEnv,(DATA_OBJECT *) sd->defaultValue);
-            ExpressionToCode(theEnv,*slotFile,tmpexp);
-            ReturnExpression(theEnv,tmpexp);
+            tmpexp = ConvertValueToExpression(theEnv,execStatus,(DATA_OBJECT *) sd->defaultValue);
+            ExpressionToCode(theEnv,execStatus,*slotFile,tmpexp);
+            ReturnExpression(theEnv,execStatus,tmpexp);
            }
         }
       else
         fprintf(*slotFile,",NULL");
       fprintf(*slotFile,",");
-      PrintConstraintReference(theEnv,*slotFile,sd->constraint,imageID,maxIndices);
+      PrintConstraintReference(theEnv,execStatus,*slotFile,sd->constraint,imageID,maxIndices);
       fprintf(*slotFile,",0,0L,");
       if (sd->shared)
         {
@@ -1169,7 +1169,7 @@ static intBool SlotsToCode(
         fprintf(*slotFile,"{ NULL,0,0,0,NULL } }");
      }
    *slotArrayCount += (int) theDefclass->slotCount;
-   *slotFile = CloseFileIfNeeded(theEnv,*slotFile,slotArrayCount,
+   *slotFile = CloseFileIfNeeded(theEnv,execStatus,*slotFile,slotArrayCount,
                                  slotArrayVersion,maxIndices,
                                  reopenSlotFile,slotCodeFile);
    return(TRUE);
@@ -1229,7 +1229,7 @@ static intBool TemplateSlotsToCode(
    if (theDefclass->instanceSlotCount == 0)
      return(TRUE);
 
-   *templateSlotFile = OpenFileIfNeeded(theEnv,*templateSlotFile,fileName,pathName,fileNameBuffer,fileID,
+   *templateSlotFile = OpenFileIfNeeded(theEnv,execStatus,*templateSlotFile,fileName,pathName,fileNameBuffer,fileID,
                                         imageID,fileCount,
                                         *templateSlotArrayVersion,headerFP,
                                         "SLOT_DESC *",TemplateSlotPrefix(),
@@ -1249,7 +1249,7 @@ static intBool TemplateSlotsToCode(
                                 theLocationInfo.theLocation.theOffset);
      }
    *templateSlotArrayCount += (int) theDefclass->instanceSlotCount;
-   *templateSlotFile = CloseFileIfNeeded(theEnv,*templateSlotFile,templateSlotArrayCount,
+   *templateSlotFile = CloseFileIfNeeded(theEnv,execStatus,*templateSlotFile,templateSlotArrayCount,
                                          templateSlotArrayVersion,maxIndices,
                                          reopenTemplateSlotFile,templateSlotCodeFile);
    return(TRUE);
@@ -1307,7 +1307,7 @@ static intBool OrderedSlotsToCode(
    if (theDefclass->instanceSlotCount == 0)
      return(TRUE);
 
-   *orderedSlotFile = OpenFileIfNeeded(theEnv,*orderedSlotFile,fileName,pathName,fileNameBuffer,fileID,
+   *orderedSlotFile = OpenFileIfNeeded(theEnv,execStatus,*orderedSlotFile,fileName,pathName,fileNameBuffer,fileID,
                                         imageID,fileCount,
                                         *orderedSlotArrayVersion,headerFP,
                                         "unsigned",OrderedSlotPrefix(),
@@ -1322,7 +1322,7 @@ static intBool OrderedSlotsToCode(
       fprintf(*orderedSlotFile,"%u",theDefclass->slotNameMap[i]);
      }
    *orderedSlotArrayCount += (int) theDefclass->maxSlotNameID + 1;
-   *orderedSlotFile = CloseFileIfNeeded(theEnv,*orderedSlotFile,orderedSlotArrayCount,
+   *orderedSlotFile = CloseFileIfNeeded(theEnv,execStatus,*orderedSlotFile,orderedSlotArrayCount,
                                         orderedSlotArrayVersion,maxIndices,
                                         reopenOrderedSlotFile,orderedSlotCodeFile);
    return(TRUE);
@@ -1380,7 +1380,7 @@ static intBool HandlersToCode(
    if (theDefclass->handlerCount == 0)
      return(TRUE);
 
-   *handlerFile = OpenFileIfNeeded(theEnv,*handlerFile,fileName,pathName,fileNameBuffer,fileID,
+   *handlerFile = OpenFileIfNeeded(theEnv,execStatus,*handlerFile,fileName,pathName,fileNameBuffer,fileID,
                                         imageID,fileCount,
                                         *handlerArrayVersion,headerFP,
                                         "HANDLER",HandlerPrefix(),*reopenHandlerFile,
@@ -1394,16 +1394,16 @@ static intBool HandlersToCode(
         fprintf(*handlerFile,",\n");
       hnd = &theDefclass->handlers[i];
       fprintf(*handlerFile,"{ %u,%u,0,0,0,",hnd->system,hnd->type);
-      PrintSymbolReference(theEnv,*handlerFile,hnd->name);
+      PrintSymbolReference(theEnv,execStatus,*handlerFile,hnd->name);
       fprintf(*handlerFile,",");
-      PrintClassReference(theEnv,*handlerFile,hnd->cls,imageID,maxIndices);
+      PrintClassReference(theEnv,execStatus,*handlerFile,hnd->cls,imageID,maxIndices);
       fprintf(*handlerFile,",%hd,%hd,%hd,",hnd->minParams,hnd->maxParams,
                                         hnd->localVarCount);
-      ExpressionToCode(theEnv,*handlerFile,hnd->actions);
+      ExpressionToCode(theEnv,execStatus,*handlerFile,hnd->actions);
       fprintf(*handlerFile,",NULL }");
      }
    *handlerArrayCount += (int) theDefclass->handlerCount;
-   *handlerFile = CloseFileIfNeeded(theEnv,*handlerFile,handlerArrayCount,
+   *handlerFile = CloseFileIfNeeded(theEnv,execStatus,*handlerFile,handlerArrayCount,
                                     handlerArrayVersion,maxIndices,
                                     reopenHandlerFile,handlerCodeFile);
    return(TRUE);
@@ -1461,7 +1461,7 @@ static intBool OrderedHandlersToCode(
    if (theDefclass->handlerCount == 0)
      return(TRUE);
 
-   *orderedHandlerFile = OpenFileIfNeeded(theEnv,*orderedHandlerFile,fileName,pathName,fileNameBuffer,fileID,
+   *orderedHandlerFile = OpenFileIfNeeded(theEnv,execStatus,*orderedHandlerFile,fileName,pathName,fileNameBuffer,fileID,
                                           imageID,fileCount,
                                           *orderedHandlerArrayVersion,headerFP,
                                           "unsigned",OrderedHandlerPrefix(),
@@ -1477,7 +1477,7 @@ static intBool OrderedHandlersToCode(
       fprintf(*orderedHandlerFile,"%u",theDefclass->handlerOrderMap[i]);
      }
    *orderedHandlerArrayCount += (int) theDefclass->handlerCount;
-   *orderedHandlerFile = CloseFileIfNeeded(theEnv,*orderedHandlerFile,orderedHandlerArrayCount,
+   *orderedHandlerFile = CloseFileIfNeeded(theEnv,execStatus,*orderedHandlerFile,orderedHandlerArrayCount,
                                            orderedHandlerArrayVersion,maxIndices,
                                            reopenOrderedHandlerFile,
                                            orderedHandlerCodeFile);

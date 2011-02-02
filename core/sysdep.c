@@ -225,7 +225,7 @@ struct systemDependentData
    jmp_buf *jmpBuffer;
   };
 
-#define SystemDependentData(theEnv) ((struct systemDependentData *) GetEnvironmentData(theEnv,SYSTEM_DEPENDENT_DATA))
+#define SystemDependentData(theEnv) ((struct systemDependentData *) GetEnvironmentData(theEnv,execStatus,SYSTEM_DEPENDENT_DATA))
 
 /****************************************/
 /* GLOBAL EXTERNAL FUNCTION DEFINITIONS */
@@ -260,7 +260,7 @@ static void InitializeSystemDependentData(
   void *theEnv,
   EXEC_STATUS)
   {
-   AllocateEnvironmentData(theEnv,SYSTEM_DEPENDENT_DATA,sizeof(struct systemDependentData),NULL);
+   AllocateEnvironmentData(theEnv,execStatus,SYSTEM_DEPENDENT_DATA,sizeof(struct systemDependentData),NULL);
   }
 
 /**************************************************/
@@ -327,7 +327,7 @@ globle void EnvInitializeEnvironment(
    /* Initialize the hash tables for atomic values. */
    /*===============================================*/
 
-   InitializeAtomTables(theEnvironment,symbolTable,floatTable,integerTable,bitmapTable,externalAddressTable);
+   InitializeAtomTables(theEnvironment,execStatus,symbolTable,floatTable,integerTable,bitmapTable,externalAddressTable);
 
    /*=========================================*/
    /* Initialize file and string I/O routers. */
@@ -577,46 +577,46 @@ globle void RerouteStdin(
 #endif
       else if (theSwitch == NO_SWITCH)
         {
-         PrintErrorID(theEnv,"SYSDEP",2,FALSE);
-         EnvPrintRouter(theEnv,WERROR,"Invalid option\n");
+         PrintErrorID(theEnv,execStatus,"SYSDEP",2,FALSE);
+         EnvPrintRouter(theEnv,execStatus,WERROR,"Invalid option\n");
         }
 
       if (i > (argc-1))
         {
-         PrintErrorID(theEnv,"SYSDEP",1,FALSE);
-         EnvPrintRouter(theEnv,WERROR,"No file found for ");
+         PrintErrorID(theEnv,execStatus,"SYSDEP",1,FALSE);
+         EnvPrintRouter(theEnv,execStatus,WERROR,"No file found for ");
 
          switch(theSwitch)
            {
             case BATCH_SWITCH:
-               EnvPrintRouter(theEnv,WERROR,"-f");
+               EnvPrintRouter(theEnv,execStatus,WERROR,"-f");
                break;
 
             case BATCH_STAR_SWITCH:
-               EnvPrintRouter(theEnv,WERROR,"-f2");
+               EnvPrintRouter(theEnv,execStatus,WERROR,"-f2");
                break;
 
             case LOAD_SWITCH:
-               EnvPrintRouter(theEnv,WERROR,"-l");
+               EnvPrintRouter(theEnv,execStatus,WERROR,"-l");
            }
 
-         EnvPrintRouter(theEnv,WERROR," option\n");
+         EnvPrintRouter(theEnv,execStatus,WERROR," option\n");
          return;
         }
 
       switch(theSwitch)
         {
          case BATCH_SWITCH:
-            OpenBatch(theEnv,argv[++i],TRUE);
+            OpenBatch(theEnv,execStatus,argv[++i],TRUE);
             break;
 
 #if (! RUN_TIME) && (! BLOAD_ONLY)
          case BATCH_STAR_SWITCH:
-            EnvBatchStar(theEnv,argv[++i]);
+            EnvBatchStar(theEnv,execStatus,argv[++i]);
             break;
 
          case LOAD_SWITCH:
-            EnvLoad(theEnv,argv[++i]);
+            EnvLoad(theEnv,execStatus,argv[++i]);
             break;
 #endif
         }
@@ -639,7 +639,7 @@ static void SystemFunctionDefinitions(
 #endif
 
    PredicateFunctionDefinitions(theEnv);
-   BasicMathFunctionDefinitions(theEnv,execStatus);
+   BasicMathFunctionDefinitions(theEnv,execStatus,execStatus);
    FileCommandDefinitions(theEnv);
    SortFunctionDefinitions(theEnv);
 
@@ -784,15 +784,15 @@ globle void gensystem(
       if ((GetType(tempValue) != STRING) &&
           (GetType(tempValue) != SYMBOL))
         {
-         SetHaltExecution(theEnv,TRUE);
-         SetEvaluationError(theEnv,TRUE);
-         ExpectedTypeError2(theEnv,"system",i);
+         SetHaltExecution(theEnv,execStatus,TRUE);
+         SetEvaluationError(theEnv,execStatus,TRUE);
+         ExpectedTypeError2(theEnv,execStatus,"system",i);
          return;
         }
 
      theString = DOToString(tempValue);
 
-     commandBuffer = AppendToString(theEnv,theString,commandBuffer,&bufferPosition,&bufferMaximum);
+     commandBuffer = AppendToString(theEnv,execStatus,theString,commandBuffer,&bufferPosition,&bufferMaximum);
     }
 
    if (commandBuffer == NULL) return;
@@ -805,19 +805,19 @@ globle void gensystem(
    if (SystemDependentData(theEnv)->PauseEnvFunction != NULL) (*SystemDependentData(theEnv)->PauseEnvFunction)(theEnv);
    VMSSystem(commandBuffer);
    putchar('\n');
-   if (SystemDependentData(theEnv)->ContinueEnvFunction != NULL) (*SystemDependentData(theEnv)->ContinueEnvFunction)(theEnv,1);
+   if (SystemDependentData(theEnv)->ContinueEnvFunction != NULL) (*SystemDependentData(theEnv)->ContinueEnvFunction)(theEnv,execStatus,1);
    if (SystemDependentData(theEnv)->RedrawScreenFunction != NULL) (*SystemDependentData(theEnv)->RedrawScreenFunction)(theEnv);
 #endif
 
 #if   UNIX_7 || UNIX_V || LINUX || DARWIN || WIN_MVC || WIN_BTC || WIN_MCW || WIN_GCC || MAC_XCD
    if (SystemDependentData(theEnv)->PauseEnvFunction != NULL) (*SystemDependentData(theEnv)->PauseEnvFunction)(theEnv);
    system(commandBuffer);
-   if (SystemDependentData(theEnv)->ContinueEnvFunction != NULL) (*SystemDependentData(theEnv)->ContinueEnvFunction)(theEnv,1);
+   if (SystemDependentData(theEnv)->ContinueEnvFunction != NULL) (*SystemDependentData(theEnv)->ContinueEnvFunction)(theEnv,execStatus,1);
    if (SystemDependentData(theEnv)->RedrawScreenFunction != NULL) (*SystemDependentData(theEnv)->RedrawScreenFunction)(theEnv);
 #else
 
 #if ! VAX_VMS
-   EnvPrintRouter(theEnv,WDIALOG,
+   EnvPrintRouter(theEnv,execStatus,WDIALOG,
             "System function not fully defined for this system.\n");
 #endif
 
@@ -827,7 +827,7 @@ globle void gensystem(
    /* Return the string buffer containing the command. */
    /*==================================================*/
 
-   rm(theEnv,commandBuffer,bufferMaximum);
+   rm(theEnv,execStatus,commandBuffer,bufferMaximum);
 
    return;
   }
@@ -931,12 +931,12 @@ globle void genprintfile(
       wchar_t *wbuffer;
       size_t len = strlen(str);
 
-      wbuffer = genalloc(theEnv,sizeof(wchar_t) * (len + 1));
+      wbuffer = genalloc(theEnv,execStatus,sizeof(wchar_t) * (len + 1));
       rv = MultiByteToWideChar(CP_UTF8,MB_ERR_INVALID_CHARS,str,-1,wbuffer,len+1);
       
       fwprintf(fptr,L"%ls",wbuffer);
       fflush(fptr);
-      genfree(theEnv,wbuffer,sizeof(wchar_t) * (len + 1));
+      genfree(theEnv,execStatus,wbuffer,sizeof(wchar_t) * (len + 1));
 */
       fprintf(fptr,"%s",str);
       fflush(fptr);
@@ -1306,7 +1306,7 @@ globle int GenOpenReadBinary(
      {
       if (SystemDependentData(theEnv)->AfterOpenFunction != NULL)
         { (*SystemDependentData(theEnv)->AfterOpenFunction)(theEnv); }
-      OpenErrorMessage(theEnv,funcName,fileName);
+      OpenErrorMessage(theEnv,execStatus,funcName,fileName);
       return(FALSE);
      }
 #endif
@@ -1317,7 +1317,7 @@ globle int GenOpenReadBinary(
      {
       if (SystemDependentData(theEnv)->AfterOpenFunction != NULL)
         { (*SystemDependentData(theEnv)->AfterOpenFunction)(theEnv); }
-      OpenErrorMessage(theEnv,funcName,fileName);
+      OpenErrorMessage(theEnv,execStatus,funcName,fileName);
       return(FALSE);
      }
 #endif
@@ -1502,223 +1502,223 @@ static void InitializeKeywords(
    /* construct keywords */
    /*====================*/
 
-   ts = EnvAddSymbol(theEnv,"defrule");
+   ts = EnvAddSymbol(theEnv,execStatus,"defrule");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"defglobal");
+   ts = EnvAddSymbol(theEnv,execStatus,"defglobal");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"deftemplate");
+   ts = EnvAddSymbol(theEnv,execStatus,"deftemplate");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"deffacts");
+   ts = EnvAddSymbol(theEnv,execStatus,"deffacts");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"deffunction");
+   ts = EnvAddSymbol(theEnv,execStatus,"deffunction");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"defmethod");
+   ts = EnvAddSymbol(theEnv,execStatus,"defmethod");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"defgeneric");
+   ts = EnvAddSymbol(theEnv,execStatus,"defgeneric");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"defclass");
+   ts = EnvAddSymbol(theEnv,execStatus,"defclass");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"defmessage-handler");
+   ts = EnvAddSymbol(theEnv,execStatus,"defmessage-handler");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"definstances");
+   ts = EnvAddSymbol(theEnv,execStatus,"definstances");
    IncrementSymbolCount(ts);
 
    /*=======================*/
    /* set-strategy keywords */
    /*=======================*/
 
-   ts = EnvAddSymbol(theEnv,"depth");
+   ts = EnvAddSymbol(theEnv,execStatus,"depth");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"breadth");
+   ts = EnvAddSymbol(theEnv,execStatus,"breadth");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"lex");
+   ts = EnvAddSymbol(theEnv,execStatus,"lex");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"mea");
+   ts = EnvAddSymbol(theEnv,execStatus,"mea");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"simplicity");
+   ts = EnvAddSymbol(theEnv,execStatus,"simplicity");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"complexity");
+   ts = EnvAddSymbol(theEnv,execStatus,"complexity");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"random");
+   ts = EnvAddSymbol(theEnv,execStatus,"random");
    IncrementSymbolCount(ts);
 
    /*==================================*/
    /* set-salience-evaluation keywords */
    /*==================================*/
 
-   ts = EnvAddSymbol(theEnv,"when-defined");
+   ts = EnvAddSymbol(theEnv,execStatus,"when-defined");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"when-activated");
+   ts = EnvAddSymbol(theEnv,execStatus,"when-activated");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"every-cycle");
+   ts = EnvAddSymbol(theEnv,execStatus,"every-cycle");
    IncrementSymbolCount(ts);
 
    /*======================*/
    /* deftemplate keywords */
    /*======================*/
 
-   ts = EnvAddSymbol(theEnv,"field");
+   ts = EnvAddSymbol(theEnv,execStatus,"field");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"multifield");
+   ts = EnvAddSymbol(theEnv,execStatus,"multifield");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"default");
+   ts = EnvAddSymbol(theEnv,execStatus,"default");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"type");
+   ts = EnvAddSymbol(theEnv,execStatus,"type");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"allowed-symbols");
+   ts = EnvAddSymbol(theEnv,execStatus,"allowed-symbols");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"allowed-strings");
+   ts = EnvAddSymbol(theEnv,execStatus,"allowed-strings");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"allowed-numbers");
+   ts = EnvAddSymbol(theEnv,execStatus,"allowed-numbers");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"allowed-integers");
+   ts = EnvAddSymbol(theEnv,execStatus,"allowed-integers");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"allowed-floats");
+   ts = EnvAddSymbol(theEnv,execStatus,"allowed-floats");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"allowed-values");
+   ts = EnvAddSymbol(theEnv,execStatus,"allowed-values");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"min-number-of-elements");
+   ts = EnvAddSymbol(theEnv,execStatus,"min-number-of-elements");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"max-number-of-elements");
+   ts = EnvAddSymbol(theEnv,execStatus,"max-number-of-elements");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"NONE");
+   ts = EnvAddSymbol(theEnv,execStatus,"NONE");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"VARIABLE");
+   ts = EnvAddSymbol(theEnv,execStatus,"VARIABLE");
    IncrementSymbolCount(ts);
 
    /*==================*/
    /* defrule keywords */
    /*==================*/
 
-   ts = EnvAddSymbol(theEnv,"declare");
+   ts = EnvAddSymbol(theEnv,execStatus,"declare");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"salience");
+   ts = EnvAddSymbol(theEnv,execStatus,"salience");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"test");
+   ts = EnvAddSymbol(theEnv,execStatus,"test");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"or");
+   ts = EnvAddSymbol(theEnv,execStatus,"or");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"and");
+   ts = EnvAddSymbol(theEnv,execStatus,"and");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"not");
+   ts = EnvAddSymbol(theEnv,execStatus,"not");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"logical");
+   ts = EnvAddSymbol(theEnv,execStatus,"logical");
    IncrementSymbolCount(ts);
 
    /*===============*/
    /* COOL keywords */
    /*===============*/
 
-   ts = EnvAddSymbol(theEnv,"is-a");
+   ts = EnvAddSymbol(theEnv,execStatus,"is-a");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"role");
+   ts = EnvAddSymbol(theEnv,execStatus,"role");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"abstract");
+   ts = EnvAddSymbol(theEnv,execStatus,"abstract");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"concrete");
+   ts = EnvAddSymbol(theEnv,execStatus,"concrete");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"pattern-match");
+   ts = EnvAddSymbol(theEnv,execStatus,"pattern-match");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"reactive");
+   ts = EnvAddSymbol(theEnv,execStatus,"reactive");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"non-reactive");
+   ts = EnvAddSymbol(theEnv,execStatus,"non-reactive");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"slot");
+   ts = EnvAddSymbol(theEnv,execStatus,"slot");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"field");
+   ts = EnvAddSymbol(theEnv,execStatus,"field");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"multiple");
+   ts = EnvAddSymbol(theEnv,execStatus,"multiple");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"single");
+   ts = EnvAddSymbol(theEnv,execStatus,"single");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"storage");
+   ts = EnvAddSymbol(theEnv,execStatus,"storage");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"shared");
+   ts = EnvAddSymbol(theEnv,execStatus,"shared");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"local");
+   ts = EnvAddSymbol(theEnv,execStatus,"local");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"access");
+   ts = EnvAddSymbol(theEnv,execStatus,"access");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"read");
+   ts = EnvAddSymbol(theEnv,execStatus,"read");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"write");
+   ts = EnvAddSymbol(theEnv,execStatus,"write");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"read-only");
+   ts = EnvAddSymbol(theEnv,execStatus,"read-only");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"read-write");
+   ts = EnvAddSymbol(theEnv,execStatus,"read-write");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"initialize-only");
+   ts = EnvAddSymbol(theEnv,execStatus,"initialize-only");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"propagation");
+   ts = EnvAddSymbol(theEnv,execStatus,"propagation");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"inherit");
+   ts = EnvAddSymbol(theEnv,execStatus,"inherit");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"no-inherit");
+   ts = EnvAddSymbol(theEnv,execStatus,"no-inherit");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"source");
+   ts = EnvAddSymbol(theEnv,execStatus,"source");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"composite");
+   ts = EnvAddSymbol(theEnv,execStatus,"composite");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"exclusive");
+   ts = EnvAddSymbol(theEnv,execStatus,"exclusive");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"allowed-lexemes");
+   ts = EnvAddSymbol(theEnv,execStatus,"allowed-lexemes");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"allowed-instances");
+   ts = EnvAddSymbol(theEnv,execStatus,"allowed-instances");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"around");
+   ts = EnvAddSymbol(theEnv,execStatus,"around");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"before");
+   ts = EnvAddSymbol(theEnv,execStatus,"before");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"primary");
+   ts = EnvAddSymbol(theEnv,execStatus,"primary");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"after");
+   ts = EnvAddSymbol(theEnv,execStatus,"after");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"of");
+   ts = EnvAddSymbol(theEnv,execStatus,"of");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"self");
+   ts = EnvAddSymbol(theEnv,execStatus,"self");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"visibility");
+   ts = EnvAddSymbol(theEnv,execStatus,"visibility");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"override-message");
+   ts = EnvAddSymbol(theEnv,execStatus,"override-message");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"private");
+   ts = EnvAddSymbol(theEnv,execStatus,"private");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"public");
+   ts = EnvAddSymbol(theEnv,execStatus,"public");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"create-accessor");
+   ts = EnvAddSymbol(theEnv,execStatus,"create-accessor");
    IncrementSymbolCount(ts);
 
    /*================*/
    /* watch keywords */
    /*================*/
 
-   ts = EnvAddSymbol(theEnv,"compilations");
+   ts = EnvAddSymbol(theEnv,execStatus,"compilations");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"deffunctions");
+   ts = EnvAddSymbol(theEnv,execStatus,"deffunctions");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"globals");
+   ts = EnvAddSymbol(theEnv,execStatus,"globals");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"rules");
+   ts = EnvAddSymbol(theEnv,execStatus,"rules");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"activations");
+   ts = EnvAddSymbol(theEnv,execStatus,"activations");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"statistics");
+   ts = EnvAddSymbol(theEnv,execStatus,"statistics");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"facts");
+   ts = EnvAddSymbol(theEnv,execStatus,"facts");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"generic-functions");
+   ts = EnvAddSymbol(theEnv,execStatus,"generic-functions");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"methods");
+   ts = EnvAddSymbol(theEnv,execStatus,"methods");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"instances");
+   ts = EnvAddSymbol(theEnv,execStatus,"instances");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"slots");
+   ts = EnvAddSymbol(theEnv,execStatus,"slots");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"messages");
+   ts = EnvAddSymbol(theEnv,execStatus,"messages");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"message-handlers");
+   ts = EnvAddSymbol(theEnv,execStatus,"message-handlers");
    IncrementSymbolCount(ts);
-   ts = EnvAddSymbol(theEnv,"focus");
+   ts = EnvAddSymbol(theEnv,execStatus,"focus");
    IncrementSymbolCount(ts);
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD

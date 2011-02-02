@@ -192,12 +192,12 @@ struct symbolMatch
 #define ValueToBitMap(target) ((void *) ((struct bitMapHashNode *) (target))->contents)
 #define ValueToExternalAddress(target) ((void *) ((struct externalAddressHashNode *) (target))->externalAddress)
 
-#define EnvValueToString(theEnv,target) (((struct symbolHashNode *) (target))->contents)
-#define EnvValueToDouble(theEnv,target) (((struct floatHashNode *) (target))->contents)
-#define EnvValueToLong(theEnv,target) (((struct integerHashNode *) (target))->contents)
-#define EnvValueToInteger(theEnv,target) ((int) (((struct integerHashNode *) (target))->contents))
-#define EnvValueToBitMap(theEnv,target) ((void *) ((struct bitMapHashNode *) (target))->contents)
-#define EnvValueToExternalAddress(theEnv,target) ((void *) ((struct externalAddressHashNode *) (target))->externalAddress)
+#define EnvValueToString(theEnv,execStatus,target) (((struct symbolHashNode *) (target))->contents)
+#define EnvValueToDouble(theEnv,execStatus,target) (((struct floatHashNode *) (target))->contents)
+#define EnvValueToLong(theEnv,execStatus,target) (((struct integerHashNode *) (target))->contents)
+#define EnvValueToInteger(theEnv,execStatus,target) ((int) (((struct integerHashNode *) (target))->contents))
+#define EnvValueToBitMap(theEnv,execStatus,target) ((void *) ((struct bitMapHashNode *) (target))->contents)
+#define EnvValueToExternalAddress(theEnv,execStatus,target) ((void *) ((struct externalAddressHashNode *) (target))->externalAddress)
 
 #define IncrementSymbolCount(theValue) (((SYMBOL_HN *) theValue)->count++)
 #define IncrementFloatCount(theValue) (((FLOAT_HN *) theValue)->count++)
@@ -242,7 +242,7 @@ struct symbolData
 #endif
   };
 
-#define SymbolData(theEnv) ((struct symbolData *) GetEnvironmentData(theEnv,SYMBOL_DATA))
+#define SymbolData(theEnv) ((struct symbolData *) GetEnvironmentData(theEnv,execStatus,SYMBOL_DATA))
 #define EnvFalseSymbol(theEnv) SymbolData(theEnv)->FalseSymbolHN
 #define EnvTrueSymbol(theEnv) SymbolData(theEnv)->TrueSymbolHN
 

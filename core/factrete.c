@@ -126,7 +126,7 @@ globle intBool FactPNGetVar1(
    /*==========================================================*/
 
    extent = -1;
-   theField = AdjustFieldPosition(theEnv,marks,theField,theSlot,&extent);
+   theField = AdjustFieldPosition(theEnv,execStatus,marks,theField,theSlot,&extent);
 
    /*=============================================================*/
    /* If a range of values are being retrieved (i.e. a multifield */
@@ -474,7 +474,7 @@ globle intBool FactJNGetVar1(
    /*==========================================================*/
 
    extent = -1;
-   theField = AdjustFieldPosition(theEnv,marks,theField,theSlot,&extent);
+   theField = AdjustFieldPosition(theEnv,execStatus,marks,theField,theSlot,&extent);
 
    /*=============================================================*/
    /* If a range of values are being retrieved (i.e. a multifield */
@@ -945,7 +945,7 @@ globle int FactStoreMultifield(
 #pragma unused(theValue)
 #endif
 
-   StoreInMultifield(theEnv,theResult,GetFirstArgument(),FALSE);
+   StoreInMultifield(theEnv,execStatus,theResult,GetFirstArgument(),FALSE);
    return(TRUE);
   }
 

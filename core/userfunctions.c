@@ -71,11 +71,11 @@ static struct expr *ProcessEventParse(
   struct expr *rv;
   struct token theToken;
   
-  ReturnExpression(theEnv,top);
-  SavePPBuffer(theEnv," ");
-  IncrementIndentDepth(theEnv,8);
-  rv = BuildRHSAssert(theEnv,logicalName,&theToken,&error,TRUE,TRUE,"proc-event command", "proc-event");
-  DecrementIndentDepth(theEnv,8);
+  ReturnExpression(theEnv,execStatus,top);
+  SavePPBuffer(theEnv,execStatus," ");
+  IncrementIndentDepth(theEnv,execStatus,8);
+  rv = BuildRHSAssert(theEnv,execStatus,logicalName,&theToken,&error,TRUE,TRUE,"proc-event command", "proc-event");
+  DecrementIndentDepth(theEnv,execStatus,8);
   return(rv);
 }
   
@@ -98,11 +98,11 @@ void EnvUserFunctions(
     
     // STEFAN: try to add a new primitive which enters a event/fact into our
     //         parallel processing system
-    EnvDefineFunction(theEnv, "proc-event", 'v', PTIEF ProcessEventCommand,
+    EnvDefineFunction(theEnv,execStatus, "proc-event", 'v', PTIEF ProcessEventCommand,
                       "ProcessEventCommand"); 
 
-    AddFunctionParser(theEnv,"proc-event",ProcessEventParse);
-    FuncSeqOvlFlags(theEnv,"proc-event",FALSE,FALSE);
+    AddFunctionParser(theEnv,execStatus,"proc-event",ProcessEventParse);
+    FuncSeqOvlFlags(theEnv,execStatus,"proc-event",FALSE,FALSE);
 
     
 #if MAC_MCW || WIN_MCW || MAC_XCD

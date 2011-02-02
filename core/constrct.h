@@ -95,7 +95,7 @@ struct constructData
    int ParsingConstruct;
   };
 
-#define ConstructData(theEnv) ((struct constructData *) GetEnvironmentData(theEnv,CONSTRUCT_DATA))
+#define ConstructData(theEnv) ((struct constructData *) GetEnvironmentData(theEnv,execStatus,CONSTRUCT_DATA))
 
 #ifdef LOCALE
 #undef LOCALE

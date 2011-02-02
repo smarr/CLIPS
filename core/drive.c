@@ -92,7 +92,7 @@ globle void NetworkAssert(
 
    if (join->firstJoin)
      {
-      EmptyDrive(theEnv,join,binds);
+      EmptyDrive(theEnv,execStatus,join,binds);
       return;
      }
 
@@ -100,7 +100,7 @@ globle void NetworkAssert(
    /* Enter the join from the right. */
    /*================================*/
 
-   NetworkAssertRight(theEnv,binds,join);
+   NetworkAssertRight(theEnv,execStatus,binds,join);
 
    return;
   }
@@ -133,7 +133,7 @@ globle void NetworkAssertRight(
 
    if (join->firstJoin)
      {
-      EmptyDrive(theEnv,join,rhsBinds);
+      EmptyDrive(theEnv,execStatus,join,rhsBinds);
       return;
      }
   
@@ -234,11 +234,11 @@ globle void NetworkAssertRight(
          EngineData(theEnv)->rightToLeftComparisons++;
 #endif
          EngineData(theEnv)->GlobalLHSBinds = lhsBinds;
-         exprResult = EvaluateJoinExpression(theEnv,join->networkTest,join);
+         exprResult = EvaluateJoinExpression(theEnv,execStatus,join->networkTest,join);
          if (execStatus->EvaluationError)
            {
             if (join->patternIsNegated) exprResult = TRUE;
-            SetEvaluationError(theEnv,FALSE);
+            SetEvaluationError(theEnv,execStatus,FALSE);
            }
 
 #if DEVELOPER
@@ -251,9 +251,9 @@ globle void NetworkAssertRight(
         {
          /* EngineData(theEnv)->GlobalRHSBinds = NULL; */
          
-         exprResult = EvaluateJoinExpression(theEnv,join->secondaryNetworkTest,join);
+         exprResult = EvaluateJoinExpression(theEnv,execStatus,join->secondaryNetworkTest,join);
          if (execStatus->EvaluationError)
-           { SetEvaluationError(theEnv,FALSE); }
+           { SetEvaluationError(theEnv,execStatus,FALSE); }
         }
 
       /*====================================================*/
@@ -268,20 +268,20 @@ globle void NetworkAssertRight(
          if (join->patternIsExists)
            {
             AddBlockedLink(lhsBinds,rhsBinds);
-            PPDrive(theEnv,lhsBinds,NULL,join);
+            PPDrive(theEnv,execStatus,lhsBinds,NULL,join);
            }
          else if (join->patternIsNegated || join->joinFromTheRight)
            {
             AddBlockedLink(lhsBinds,rhsBinds);
             if (lhsBinds->children != NULL)
-              { PosEntryRetractBeta(theEnv,lhsBinds,lhsBinds->children); }
+              { PosEntryRetractBeta(theEnv,execStatus,lhsBinds,lhsBinds->children); }
             /*
             if (lhsBinds->dependents != NULL) 
-              { RemoveLogicalSupport(theEnv,lhsBinds); }
+              { RemoveLogicalSupport(theEnv,execStatus,lhsBinds); }
             */
            } 
          else
-           { PPDrive(theEnv,lhsBinds,rhsBinds,join); }
+           { PPDrive(theEnv,execStatus,lhsBinds,rhsBinds,join); }
         }
 
       /*====================================*/
@@ -339,7 +339,7 @@ globle void NetworkAssertLeft(
    
    if (join->ruleToActivate != NULL)
      {
-      AddActivation(theEnv,join->ruleToActivate,lhsBinds);
+      AddActivation(theEnv,execStatus,join->ruleToActivate,lhsBinds);
       return;
      }
 
@@ -352,7 +352,7 @@ globle void NetworkAssertLeft(
    if (join->joinFromTheRight)
      { rhsBinds = GetRightBetaMemory(join,entryHashValue); }
    else
-     { rhsBinds = GetAlphaMemory(theEnv,(struct patternNodeHeader *) join->rightSideEntryStructure,entryHashValue); }
+     { rhsBinds = GetAlphaMemory(theEnv,execStatus,(struct patternNodeHeader *) join->rightSideEntryStructure,entryHashValue); }
        
 #if DEVELOPER
    if (rhsBinds != NULL)
@@ -408,11 +408,11 @@ globle void NetworkAssertLeft(
 #endif
          EngineData(theEnv)->GlobalRHSBinds = rhsBinds;
          
-         exprResult = EvaluateJoinExpression(theEnv,join->networkTest,join);
+         exprResult = EvaluateJoinExpression(theEnv,execStatus,join->networkTest,join);
          if (execStatus->EvaluationError)
            {
             if (join->patternIsNegated) exprResult = TRUE;
-            SetEvaluationError(theEnv,FALSE);
+            SetEvaluationError(theEnv,execStatus,FALSE);
            }
 
 #if DEVELOPER
@@ -439,7 +439,7 @@ globle void NetworkAssertLeft(
          if ((join->patternIsNegated == FALSE) &&
              (join->patternIsExists == FALSE) &&
              (join->joinFromTheRight == FALSE))
-           { PPDrive(theEnv,lhsBinds,rhsBinds,join); }
+           { PPDrive(theEnv,execStatus,lhsBinds,rhsBinds,join); }
 
          /*==================================================*/
          /* At most, one partial match will be generated for */
@@ -449,7 +449,7 @@ globle void NetworkAssertLeft(
          else if (join->patternIsExists)
            { 
             AddBlockedLink(lhsBinds,rhsBinds);
-            PPDrive(theEnv,lhsBinds,NULL,join);
+            PPDrive(theEnv,execStatus,lhsBinds,NULL,join);
             EngineData(theEnv)->GlobalLHSBinds = oldLHSBinds;
             EngineData(theEnv)->GlobalRHSBinds = oldRHSBinds;
             EngineData(theEnv)->GlobalJoin = oldJoin;
@@ -500,15 +500,15 @@ globle void NetworkAssertLeft(
         {
          EngineData(theEnv)->GlobalRHSBinds = NULL;
          
-         exprResult = EvaluateJoinExpression(theEnv,join->secondaryNetworkTest,join);
+         exprResult = EvaluateJoinExpression(theEnv,execStatus,join->secondaryNetworkTest,join);
          if (execStatus->EvaluationError)
-           { SetEvaluationError(theEnv,FALSE); }
+           { SetEvaluationError(theEnv,execStatus,FALSE); }
            
          if (exprResult)
-            { PPDrive(theEnv,lhsBinds,NULL,join); }
+            { PPDrive(theEnv,execStatus,lhsBinds,NULL,join); }
 		}
       else
-        { PPDrive(theEnv,lhsBinds,NULL,join); } 
+        { PPDrive(theEnv,execStatus,lhsBinds,NULL,join); } 
      }
 
    /*=========================================*/
@@ -586,7 +586,7 @@ globle intBool EvaluateJoinExpression(
 
          oldArgument = execStatus->CurrentExpression;
          execStatus->CurrentExpression = joinExpr;
-         result = (*EvaluationData(theEnv)->PrimitivesArray[joinExpr->type]->evaluateFunction)(theEnv,joinExpr->value,&theResult);
+         result = (*EvaluationData(theEnv)->PrimitivesArray[joinExpr->type]->evaluateFunction)(theEnv,execStatus,joinExpr->value,&theResult);
          execStatus->CurrentExpression = oldArgument;
         }
 
@@ -597,7 +597,7 @@ globle intBool EvaluateJoinExpression(
       else if (joinExpr->value == ExpressionData(theEnv)->PTR_OR)
         {
          result = FALSE;
-         if (EvaluateJoinExpression(theEnv,joinExpr,joinPtr) == TRUE)
+         if (EvaluateJoinExpression(theEnv,execStatus,joinExpr,joinPtr) == TRUE)
            {
             if (execStatus->EvaluationError)
               { return(FALSE); }
@@ -614,7 +614,7 @@ globle intBool EvaluateJoinExpression(
       else if (joinExpr->value == ExpressionData(theEnv)->PTR_AND)
         {
          result = TRUE;
-         if (EvaluateJoinExpression(theEnv,joinExpr,joinPtr) == FALSE)
+         if (EvaluateJoinExpression(theEnv,execStatus,joinExpr,joinPtr) == FALSE)
            {
             if (execStatus->EvaluationError)
               { return(FALSE); }
@@ -630,11 +630,11 @@ globle intBool EvaluateJoinExpression(
 
       else
         {
-         EvaluateExpression(theEnv,joinExpr,&theResult);
+         EvaluateExpression(theEnv,execStatus,joinExpr,&theResult);
 
          if (execStatus->EvaluationError)
            {
-            JoinNetErrorMessage(theEnv,joinPtr);
+            JoinNetErrorMessage(theEnv,execStatus,joinPtr);
             return(FALSE);
            }
 
@@ -695,7 +695,7 @@ globle intBool EvaluateSecondaryNetworkTest(
    EngineData(theEnv)->GlobalRHSBinds = NULL;
    EngineData(theEnv)->GlobalJoin = joinPtr;
 
-   joinExpr = EvaluateJoinExpression(theEnv,joinPtr->secondaryNetworkTest,joinPtr);
+   joinExpr = EvaluateJoinExpression(theEnv,execStatus,joinPtr->secondaryNetworkTest,joinPtr);
    execStatus->EvaluationError = FALSE;
 
    EngineData(theEnv)->GlobalLHSBinds = oldLHSBinds;
@@ -760,7 +760,7 @@ globle unsigned long BetaMemoryHashValue(
 
          oldArgument = execStatus->CurrentExpression;
          execStatus->CurrentExpression = hashExpr;
-         (*EvaluationData(theEnv)->PrimitivesArray[hashExpr->type]->evaluateFunction)(theEnv,hashExpr->value,&theResult);
+         (*EvaluationData(theEnv)->PrimitivesArray[hashExpr->type]->evaluateFunction)(theEnv,execStatus,hashExpr->value,&theResult);
          execStatus->CurrentExpression = oldArgument;
         }
 
@@ -769,7 +769,7 @@ globle unsigned long BetaMemoryHashValue(
       /*==========================================================*/
 
       else
-        { EvaluateExpression(theEnv,hashExpr,&theResult); }
+        { EvaluateExpression(theEnv,execStatus,hashExpr,&theResult); }
 
       switch (theResult.type)
         {
@@ -849,7 +849,7 @@ globle void PPDrive(
       /* Merge the alpha and beta memory partial matches. */
       /*==================================================*/
 
-      linker = MergePartialMatches(theEnv,lhsBinds,rhsBinds);
+      linker = MergePartialMatches(theEnv,execStatus,lhsBinds,rhsBinds);
 
       /*================================================*/
       /* Determine the hash value of the partial match. */
@@ -858,14 +858,14 @@ globle void PPDrive(
       if (listOfJoins->enterDirection == LHS)
         {
          if (listOfJoins->join->leftHash != NULL)
-           { hashValue = BetaMemoryHashValue(theEnv,listOfJoins->join->leftHash,linker,NULL,listOfJoins->join); }
+           { hashValue = BetaMemoryHashValue(theEnv,execStatus,listOfJoins->join->leftHash,linker,NULL,listOfJoins->join); }
          else
            { hashValue = 0; }
         }
       else
         { 
          if (listOfJoins->join->rightHash != NULL)
-           { hashValue = BetaMemoryHashValue(theEnv,listOfJoins->join->rightHash,linker,NULL,listOfJoins->join); }
+           { hashValue = BetaMemoryHashValue(theEnv,execStatus,listOfJoins->join->rightHash,linker,NULL,listOfJoins->join); }
          else
            { hashValue = 0; }
         }
@@ -874,12 +874,12 @@ globle void PPDrive(
       /* Add the partial match to the beta memory of the join. */
       /*=======================================================*/
 
-      UpdateBetaPMLinks(theEnv,linker,lhsBinds,rhsBinds,listOfJoins->join,hashValue,listOfJoins->enterDirection);
+      UpdateBetaPMLinks(theEnv,execStatus,linker,lhsBinds,rhsBinds,listOfJoins->join,hashValue,listOfJoins->enterDirection);
       
       if (listOfJoins->enterDirection == LHS)
-        { NetworkAssertLeft(theEnv,linker,listOfJoins->join); }
+        { NetworkAssertLeft(theEnv,execStatus,linker,listOfJoins->join); }
       else
-        { NetworkAssertRight(theEnv,linker,listOfJoins->join); }
+        { NetworkAssertRight(theEnv,execStatus,linker,listOfJoins->join); }
       
       listOfJoins = listOfJoins->next;
      }
@@ -908,12 +908,12 @@ globle void EPMDrive(
      {
       linker = CreateEmptyPartialMatch(theEnv);
          
-      UpdateBetaPMLinks(theEnv,linker,parent,NULL,listOfJoins->join,0,listOfJoins->enterDirection); 
+      UpdateBetaPMLinks(theEnv,execStatus,linker,parent,NULL,listOfJoins->join,0,listOfJoins->enterDirection); 
 
       if (listOfJoins->enterDirection == LHS)
-        { NetworkAssertLeft(theEnv,linker,listOfJoins->join); }
+        { NetworkAssertLeft(theEnv,execStatus,linker,listOfJoins->join); }
       else
-        { NetworkAssertRight(theEnv,linker,listOfJoins->join); }
+        { NetworkAssertRight(theEnv,execStatus,linker,listOfJoins->join); }
         
       listOfJoins = listOfJoins->next;
      }
@@ -960,7 +960,7 @@ static void EmptyDrive(
       EngineData(theEnv)->GlobalRHSBinds = rhsBinds;
       EngineData(theEnv)->GlobalJoin = join;
 
-      joinExpr = EvaluateJoinExpression(theEnv,join->networkTest,join);
+      joinExpr = EvaluateJoinExpression(theEnv,execStatus,join->networkTest,join);
       execStatus->EvaluationError = FALSE;
 
       EngineData(theEnv)->GlobalLHSBinds = oldLHSBinds;
@@ -983,10 +983,10 @@ static void EmptyDrive(
       AddBlockedLink(notParent,rhsBinds);
       
       if (notParent->children != NULL)
-        { PosEntryRetractBeta(theEnv,notParent,notParent->children); }
+        { PosEntryRetractBeta(theEnv,execStatus,notParent,notParent->children); }
       /*
       if (notParent->dependents != NULL) 
-		{ RemoveLogicalSupport(theEnv,notParent); } 
+		{ RemoveLogicalSupport(theEnv,execStatus,notParent); } 
         */
               
       return;
@@ -1035,7 +1035,7 @@ static void EmptyDrive(
       /*=============================================================*/
 
       else
-        { linker = CopyPartialMatch(theEnv,rhsBinds); }
+        { linker = CopyPartialMatch(theEnv,execStatus,rhsBinds); }
      
       /*================================================*/
       /* Determine the hash value of the partial match. */
@@ -1044,14 +1044,14 @@ static void EmptyDrive(
       if (listOfJoins->enterDirection == LHS)
         {
          if (listOfJoins->join->leftHash != NULL)
-           { hashValue = BetaMemoryHashValue(theEnv,listOfJoins->join->leftHash,linker,NULL,listOfJoins->join); }
+           { hashValue = BetaMemoryHashValue(theEnv,execStatus,listOfJoins->join->leftHash,linker,NULL,listOfJoins->join); }
          else
            { hashValue = 0; }
         }
       else
         { 
          if (listOfJoins->join->rightHash != NULL)
-           { hashValue = BetaMemoryHashValue(theEnv,listOfJoins->join->rightHash,linker,NULL,listOfJoins->join); }
+           { hashValue = BetaMemoryHashValue(theEnv,execStatus,listOfJoins->join->rightHash,linker,NULL,listOfJoins->join); }
          else
            { hashValue = 0; }
         }
@@ -1061,14 +1061,14 @@ static void EmptyDrive(
       /*=======================================================*/
 
       if (join->patternIsExists)
-        { UpdateBetaPMLinks(theEnv,linker,existsParent,NULL,listOfJoins->join,hashValue,listOfJoins->enterDirection); }
+        { UpdateBetaPMLinks(theEnv,execStatus,linker,existsParent,NULL,listOfJoins->join,hashValue,listOfJoins->enterDirection); }
       else
-        { UpdateBetaPMLinks(theEnv,linker,NULL,rhsBinds,listOfJoins->join,hashValue,listOfJoins->enterDirection); }
+        { UpdateBetaPMLinks(theEnv,execStatus,linker,NULL,rhsBinds,listOfJoins->join,hashValue,listOfJoins->enterDirection); }
 
       if (listOfJoins->enterDirection == LHS)
-        { NetworkAssertLeft(theEnv,linker,listOfJoins->join); }
+        { NetworkAssertLeft(theEnv,execStatus,linker,listOfJoins->join); }
       else
-        { NetworkAssertRight(theEnv,linker,listOfJoins->join); }
+        { NetworkAssertRight(theEnv,execStatus,linker,listOfJoins->join); }
         
       listOfJoins = listOfJoins->next;
      }
@@ -1084,16 +1084,16 @@ static void JoinNetErrorMessage(
   EXEC_STATUS,
   struct joinNode *joinPtr)
   {
-   PrintErrorID(theEnv,"DRIVE",1,TRUE);
-   EnvPrintRouter(theEnv,WERROR,"This error occurred in the join network\n");
+   PrintErrorID(theEnv,execStatus,"DRIVE",1,TRUE);
+   EnvPrintRouter(theEnv,execStatus,WERROR,"This error occurred in the join network\n");
 
-   EnvPrintRouter(theEnv,WERROR,"   Problem resides in associated join\n"); /* TBD generate test case for join with JFTR */
+   EnvPrintRouter(theEnv,execStatus,WERROR,"   Problem resides in associated join\n"); /* TBD generate test case for join with JFTR */
 /*
    sprintf(buffer,"   Problem resides in join #%d in rule(s):\n",joinPtr->depth);
-   EnvPrintRouter(theEnv,WERROR,buffer);
+   EnvPrintRouter(theEnv,execStatus,WERROR,buffer);
 */
-   TraceErrorToRule(theEnv,joinPtr,"      ");
-   EnvPrintRouter(theEnv,WERROR,"\n");
+   TraceErrorToRule(theEnv,execStatus,joinPtr,"      ");
+   EnvPrintRouter(theEnv,execStatus,WERROR,"\n");
   }
 
 #endif /* DEFRULE_CONSTRUCT */

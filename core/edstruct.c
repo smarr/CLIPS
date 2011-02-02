@@ -85,13 +85,13 @@ globle int usebuffer(
         char            prompt[NBUFN + 15];
 
         gensprintf(prompt,"Use buffer [%s]: ",lastbufn);
-        if ((s=mlreply(theEnv,prompt, bufn, NBUFN)) != TRUE) {
+        if ((s=mlreply(theEnv,execStatus,prompt, bufn, NBUFN)) != TRUE) {
                 if (( s == FALSE) && (strlen(lastbufn) != 0))
                    genstrcpy(bufn, lastbufn);
                 else
                    return (s);
                 }
-        if ((bp=bfind(theEnv,bufn, TRUE, 0)) == NULL)
+        if ((bp=bfind(theEnv,execStatus,bufn, TRUE, 0)) == NULL)
                 return (FALSE);
         genstrcpy(lastbufn, curbp->b_bname);       /* Save current bufname */
         if (--curbp->b_nwnd == 0) {             /* Last use.            */
@@ -148,17 +148,17 @@ globle int killbuffer(
         register int    s;
         char            bufn[NBUFN];
 
-        if ((s=mlreply(theEnv,"Kill buffer: ", bufn, NBUFN)) != TRUE)
+        if ((s=mlreply(theEnv,execStatus,"Kill buffer: ", bufn, NBUFN)) != TRUE)
                 return (s);
-        if ((bp=bfind(theEnv,bufn, FALSE, 0)) == NULL) /* Easy if unknown.     */
+        if ((bp=bfind(theEnv,execStatus,bufn, FALSE, 0)) == NULL) /* Easy if unknown.     */
                 return (TRUE);
         if (bp->b_nwnd != 0) {                  /* Error if on screen.  */
                 mlwrite("Buffer is being displayed");
                 return (FALSE);
         }
-        if ((s=bclear(theEnv,bp)) != TRUE)             /* Blow text away.      */
+        if ((s=bclear(theEnv,execStatus,bp)) != TRUE)             /* Blow text away.      */
                 return (s);
-        genfree(theEnv,(void *) bp->b_linep,(unsigned) (sizeof(LINE) + bp->b_linep->l_size));
+        genfree(theEnv,execStatus,(void *) bp->b_linep,(unsigned) (sizeof(LINE) + bp->b_linep->l_size));
         bp1 = NULL;                             /* Find the header.     */
         bp2 = bheadp;
         while (bp2 != bp) {
@@ -170,7 +170,7 @@ globle int killbuffer(
                 bheadp = bp2;
         else
                 bp1->b_bufp = bp2;
-        genfree(theEnv,(void *) bp, (unsigned) sizeof(BUFFER));   /* Release buffer block */
+        genfree(theEnv,execStatus,(void *) bp, (unsigned) sizeof(BUFFER));   /* Release buffer block */
         mlwrite("Buffer Killed!");
         return (TRUE);
 }
@@ -251,11 +251,11 @@ globle int makelist(
         char            line[128];
 
         blistp->b_flag &= ~BFCHG;               /* Don't complain!      */
-        if ((s=bclear(theEnv,blistp)) != TRUE)         /* Blow old text away   */
+        if ((s=bclear(theEnv,execStatus,blistp)) != TRUE)         /* Blow old text away   */
                 return (s);
         genstrcpy(blistp->b_fname, "");
-        if (addline(theEnv,blistp,"C   Size Buffer           File") == FALSE
-        ||  addline(theEnv,blistp,"-   ---- ------           ----") == FALSE)
+        if (addline(theEnv,execStatus,blistp,"C   Size Buffer           File") == FALSE
+        ||  addline(theEnv,execStatus,blistp,"-   ---- ------           ----") == FALSE)
                 return (FALSE);
         bp = bheadp;                            /* For all buffers      */
         while (bp != NULL) {
@@ -293,7 +293,7 @@ globle int makelist(
                         }
                 }
                 *cp1 = 0;                       /* Add to the buffer.   */
-                if (addline(theEnv,blistp,line) == FALSE)
+                if (addline(theEnv,execStatus,blistp,line) == FALSE)
                         return (FALSE);
                 bp = bp->b_bufp;
         }
@@ -318,7 +318,7 @@ globle int addline(
         register int    ntext;
 
         ntext = strlen(text);
-        if ((lp=lalloc(theEnv,ntext)) == NULL)
+        if ((lp=lalloc(theEnv,execStatus,ntext)) == NULL)
                 return (FALSE);
         for (i=0; i<ntext; ++i)
                 lputc(lp, i, text[i]);
@@ -384,10 +384,10 @@ int bflag)
                 bp = bp->b_bufp;
         }
         if (cflag != FALSE) {
-                if ((bp=(BUFFER *)genalloc(theEnv,(unsigned) sizeof(BUFFER))) == NULL)
+                if ((bp=(BUFFER *)genalloc(theEnv,execStatus,(unsigned) sizeof(BUFFER))) == NULL)
                         return (NULL);
-                if ((lp=lalloc(theEnv,0)) == NULL) {
-                        genfree(theEnv,(void *) bp,(unsigned) sizeof(BUFFER));
+                if ((lp=lalloc(theEnv,execStatus,0)) == NULL) {
+                        genfree(theEnv,execStatus,(void *) bp,(unsigned) sizeof(BUFFER));
                         return (NULL);
                 }
                 bp->b_bufp  = bheadp;
@@ -427,12 +427,12 @@ globle int bclear(
 
         if ((bp->b_flag&BFTEMP) == 0            /* Not scratch buffer.  */
            && (bp->b_flag&BFCHG) != 0              /* Something changed    */
-           && (s=mlyesno(theEnv,"Discard changes")) != TRUE)
+           && (s=mlyesno(theEnv,execStatus,"Discard changes")) != TRUE)
                 return (s);
         bp->b_flag  &= ~BFCHG;                  /* Not changed          */
 
         while ((lp=lforw(bp->b_linep)) != bp->b_linep)
-                lfree(theEnv,lp);
+                lfree(theEnv,execStatus,lp);
         bp->b_dotp  = bp->b_linep;              /* Fix "."              */
         bp->b_doto  = 0;
         bp->b_markp = NULL;                     /* Invalidate "mark"    */
@@ -475,7 +475,7 @@ globle LINE    *lalloc(
         size = (used+NBLOCK-1) & ~(NBLOCK-1);
         if (size == 0)                          /* Assume that an empty */
                 size = NBLOCK;                  /* line is for type-in. */
-        lp = (LINE *) genalloc(theEnv,(unsigned) sizeof(LINE)+size);
+        lp = (LINE *) genalloc(theEnv,execStatus,(unsigned) sizeof(LINE)+size);
         lp->l_size = size;
         lp->l_used = used;
         return (lp);
@@ -525,7 +525,7 @@ globle void lfree(
         }
         lp->l_bp->l_fp = lp->l_fp;
         lp->l_fp->l_bp = lp->l_bp;
-        genfree(theEnv,(void *) lp, (unsigned) (sizeof(LINE) + lp->l_size));
+        genfree(theEnv,execStatus,(void *) lp, (unsigned) (sizeof(LINE) + lp->l_size));
 }
 
 /*
@@ -585,7 +585,7 @@ globle int linsert(
                         mlwrite("bug: linsert");
                         return (FALSE);
                 }
-                if ((lp2=lalloc(theEnv,n)) == NULL)    /* Allocate new line    */
+                if ((lp2=lalloc(theEnv,execStatus,n)) == NULL)    /* Allocate new line    */
                         return (FALSE);
                 lp3 = lp1->l_bp;                /* Previous line        */
                 lp3->l_fp = lp2;                /* Link in              */
@@ -600,7 +600,7 @@ globle int linsert(
         }
         doto = curwp->w_doto;                   /* Save for later.      */
         if (lp1->l_used+n > lp1->l_size) {      /* Hard: reallocate     */
-                if ((lp2=lalloc(theEnv,lp1->l_used+n)) == NULL)
+                if ((lp2=lalloc(theEnv,execStatus,lp1->l_used+n)) == NULL)
                         return (FALSE);
                 cp1 = &lp1->l_text[0];
                 cp2 = &lp2->l_text[0];
@@ -613,7 +613,7 @@ globle int linsert(
                 lp2->l_fp = lp1->l_fp;
                 lp1->l_fp->l_bp = lp2;
                 lp2->l_bp = lp1->l_bp;
-                genfree(theEnv,(void *) lp1, (unsigned) (sizeof(LINE) + lp1->l_size));
+                genfree(theEnv,execStatus,(void *) lp1, (unsigned) (sizeof(LINE) + lp1->l_size));
         } else {                                /* Easy: in place       */
                 lp2 = lp1;                      /* Pretend new line     */
                 lp2->l_used += n;
@@ -665,7 +665,7 @@ globle int lnewline(
         lchange(WFHARD);
         lp1  = curwp->w_dotp;                   /* Get the address and  */
         doto = curwp->w_doto;                   /* offset of "."        */
-        if ((lp2=lalloc(theEnv,doto)) == NULL)         /* New first half line  */
+        if ((lp2=lalloc(theEnv,execStatus,doto)) == NULL)         /* New first half line  */
                 return (FALSE);
         cp1 = &lp1->l_text[0];                  /* Shuffle text around  */
         cp2 = &lp2->l_text[0];
@@ -730,7 +730,7 @@ globle int ldelete(
                 if (chunk == 0) {               /* End of line, merge.  */
                         lchange(WFHARD);
                         if (ldelnewline(theEnv) == FALSE
-                        || (kflag!=FALSE && kinsert(theEnv,'\n')==FALSE))
+                        || (kflag!=FALSE && kinsert(theEnv,execStatus,'\n')==FALSE))
                                 return (FALSE);
                         --n;
                         continue;
@@ -740,7 +740,7 @@ globle int ldelete(
                 cp2 = cp1 + chunk;
                 if (kflag != FALSE) {           /* Kill?                */
                         while (cp1 != cp2) {
-                                if (kinsert(theEnv,*cp1) == FALSE)
+                                if (kinsert(theEnv,execStatus,*cp1) == FALSE)
                                         return (FALSE);
                                 ++cp1;
                         }
@@ -792,7 +792,7 @@ globle int ldelnewline(
         lp2 = lp1->l_fp;
         if (lp2 == curbp->b_linep) {            /* At the buffer end.   */
                 if (lp1->l_used == 0)           /* Blank line.          */
-                        lfree(theEnv,lp1);
+                        lfree(theEnv,execStatus,lp1);
                 return (TRUE);
         }
         if (lp2->l_used <= lp1->l_size-lp1->l_used) {
@@ -817,10 +817,10 @@ globle int ldelnewline(
                 lp1->l_used += lp2->l_used;
                 lp1->l_fp = lp2->l_fp;
                 lp2->l_fp->l_bp = lp1;
-                genfree(theEnv,(void *) lp2, (unsigned) (sizeof(LINE) + lp2->l_size));
+                genfree(theEnv,execStatus,(void *) lp2, (unsigned) (sizeof(LINE) + lp2->l_size));
                 return (TRUE);
         }
-        if ((lp3=lalloc(theEnv,lp1->l_used+lp2->l_used)) == NULL)
+        if ((lp3=lalloc(theEnv,execStatus,lp1->l_used+lp2->l_used)) == NULL)
                 return (FALSE);
         cp1 = &lp1->l_text[0];
         cp2 = &lp3->l_text[0];
@@ -851,8 +851,8 @@ globle int ldelnewline(
                 }
                 wp = wp->w_wndp;
         }
-        genfree(theEnv,(void *) lp1, (unsigned) (sizeof(LINE) + lp1->l_size));
-        genfree(theEnv,(void *) lp2, (unsigned) (sizeof(LINE) + lp2->l_size));
+        genfree(theEnv,execStatus,(void *) lp1, (unsigned) (sizeof(LINE) + lp1->l_size));
+        genfree(theEnv,execStatus,(void *) lp2, (unsigned) (sizeof(LINE) + lp2->l_size));
         return (TRUE);
 }
 
@@ -866,7 +866,7 @@ globle void kdelete(
   EXEC_STATUS)
 {
         if (kbufp != NULL) {
-                genfree(theEnv,(void *) kbufp, (unsigned) ksize);
+                genfree(theEnv,execStatus,(void *) kbufp, (unsigned) ksize);
                 kbufp = NULL;
                 kused = 0;
                 ksize = 0;
@@ -892,12 +892,12 @@ globle int kinsert(
         register int    i;
 
         if (kused == ksize) {
-                if ((nbufp= (char *) genalloc(theEnv,(unsigned) ksize+KBLOCK)) == NULL)
+                if ((nbufp= (char *) genalloc(theEnv,execStatus,(unsigned) ksize+KBLOCK)) == NULL)
                         return (FALSE);
                 for (i=0; i<ksize; ++i)
                         nbufp[i] = kbufp[i];
                 if (kbufp != NULL)
-                        genfree(theEnv,(void *) kbufp, (unsigned) ksize);
+                        genfree(theEnv,execStatus,(void *) kbufp, (unsigned) ksize);
                 kbufp  = nbufp;
                 ksize += KBLOCK;
         }
@@ -1043,7 +1043,7 @@ globle int mvdnwind(
   int f,
   int n)
     {
-    return (mvupwind(theEnv,f, -n));
+    return (mvupwind(theEnv,execStatus,f, -n));
     }
 
 /*
@@ -1130,7 +1130,7 @@ globle int onlywind(
                         wp->w_bufp->b_markp = wp->w_markp;
                         wp->w_bufp->b_marko = wp->w_marko;
                 }
-                genfree(theEnv,(void *) wp, (unsigned) sizeof(WINDOW));
+                genfree(theEnv,execStatus,(void *) wp, (unsigned) sizeof(WINDOW));
         }
         while (curwp->w_wndp != NULL) {
                 wp = curwp->w_wndp;
@@ -1141,7 +1141,7 @@ globle int onlywind(
                         wp->w_bufp->b_markp = wp->w_markp;
                         wp->w_bufp->b_marko = wp->w_marko;
                 }
-                genfree(theEnv,(void *) wp, (unsigned) sizeof(WINDOW));
+                genfree(theEnv,execStatus,(void *) wp, (unsigned) sizeof(WINDOW));
         }
         lp = curwp->w_linep;
         i  = curwp->w_toprow;
@@ -1182,7 +1182,7 @@ globle int splitwind(
                 mlwrite("Cannot split a %d line window", curwp->w_ntrows);
                 return (FALSE);
         }
-        if ((wp = (WINDOW *) genalloc(theEnv,(unsigned) sizeof(WINDOW))) == NULL) {
+        if ((wp = (WINDOW *) genalloc(theEnv,execStatus,(unsigned) sizeof(WINDOW))) == NULL) {
                 mlwrite("Cannot allocate WINDOW block");
                 return (FALSE);
         }
@@ -1255,7 +1255,7 @@ globle int enlargewind(
         register int    i;
 
         if (n < 0)
-                return (shrinkwind(theEnv,f, -n));
+                return (shrinkwind(theEnv,execStatus,f, -n));
         if (wheadp->w_wndp == NULL) {
                 mlwrite("Only one window");
                 return (FALSE);
@@ -1305,7 +1305,7 @@ globle int shrinkwind(
         register int    i;
 
         if (n < 0)
-                return (enlargewind(theEnv,f, -n));
+                return (enlargewind(theEnv,execStatus,f, -n));
         if (wheadp->w_wndp == NULL) {
                 mlwrite("Only one window");
                 return (FALSE);
@@ -1351,7 +1351,7 @@ globle WINDOW  *wpopup(
         register WINDOW *wp;
 
         if (wheadp->w_wndp == NULL              /* Only 1 window        */
-        && splitwind(theEnv,FALSE, 0) == FALSE)        /* and it won't split   */
+        && splitwind(theEnv,execStatus,FALSE, 0) == FALSE)        /* and it won't split   */
                 return (NULL);
         wp = wheadp;                            /* Find window to use   */
         while (wp!=NULL && wp==curwp)
@@ -1395,25 +1395,25 @@ globle void vtinit(
     register VIDEO *vp;
 
     (*term.t_open)();
-    vscreen = (VIDEO **) genalloc(theEnv,(unsigned) term.t_nrow*sizeof(VIDEO *));
+    vscreen = (VIDEO **) genalloc(theEnv,execStatus,(unsigned) term.t_nrow*sizeof(VIDEO *));
 
     if (vscreen == NULL)
         exit(1);
 
-    pscreen = (VIDEO **) genalloc(theEnv,(unsigned) term.t_nrow*sizeof(VIDEO *));
+    pscreen = (VIDEO **) genalloc(theEnv,execStatus,(unsigned) term.t_nrow*sizeof(VIDEO *));
 
     if (pscreen == NULL)
         exit(1);
 
     for (i = 0; i < term.t_nrow; ++i)
         {
-        vp = (VIDEO *) genalloc(theEnv,(unsigned) sizeof(VIDEO)+term.t_ncol);
+        vp = (VIDEO *) genalloc(theEnv,execStatus,(unsigned) sizeof(VIDEO)+term.t_ncol);
 
         if (vp == NULL)
             exit(1);
 
         vscreen[i] = vp;
-        vp = (VIDEO *) genalloc(theEnv,(unsigned) sizeof(VIDEO)+term.t_ncol);
+        vp = (VIDEO *) genalloc(theEnv,execStatus,(unsigned) sizeof(VIDEO)+term.t_ncol);
 
         if (vp == NULL)
             exit(1);
@@ -1910,7 +1910,7 @@ globle int mlyesno(
         {
         genstrcpy(buf, prompt);
         genstrcat(buf, " [y/n]? ");
-        s = mlreply(theEnv,buf, buf, sizeof(buf));
+        s = mlreply(theEnv,execStatus,buf, buf, sizeof(buf));
 
         if (s == ABORT)
             return (ABORT);
@@ -1974,7 +1974,7 @@ globle int mlreply(
                     {
                     if (kbdmip+cpos > &kbdm[NKBDM-3])
                         {
-                        ctrlg(theEnv,FALSE, 0);
+                        ctrlg(theEnv,execStatus,FALSE, 0);
                         (*term.t_flush)();
                         return (ABORT);
                         }
@@ -1996,7 +1996,7 @@ globle int mlreply(
                 (*term.t_putchar)('^');
                 (*term.t_putchar)('G');
                 ttcol += 2;
-                ctrlg(theEnv,FALSE, 0);
+                ctrlg(theEnv,execStatus,FALSE, 0);
                 (*term.t_flush)();
                 return (ABORT);
 
@@ -2192,12 +2192,12 @@ globle void kill_video_buffers(
     int i;
 
     for (i = 0; i < term.t_nrow; ++i) {
-        genfree(theEnv,(void *) vscreen[i],(unsigned) (sizeof(VIDEO)+term.t_ncol));
-        genfree(theEnv,(void *) pscreen[i],(unsigned) (sizeof(VIDEO)+term.t_ncol));
+        genfree(theEnv,execStatus,(void *) vscreen[i],(unsigned) (sizeof(VIDEO)+term.t_ncol));
+        genfree(theEnv,execStatus,(void *) pscreen[i],(unsigned) (sizeof(VIDEO)+term.t_ncol));
         }
 
-    genfree(theEnv,(void *) vscreen, (unsigned) (term.t_nrow*sizeof(VIDEO *)));
-    genfree(theEnv,(void *) pscreen, (unsigned) (term.t_nrow*sizeof(VIDEO *)));
+    genfree(theEnv,execStatus,(void *) vscreen, (unsigned) (term.t_nrow*sizeof(VIDEO *)));
+    genfree(theEnv,execStatus,(void *) pscreen, (unsigned) (term.t_nrow*sizeof(VIDEO *)));
    }
 
 static void int_to_ascii(

@@ -51,7 +51,7 @@ globle struct constraintRecord *GetConstraintRecord(
    CONSTRAINT_RECORD *constraints;
    unsigned i;
 
-   constraints = get_struct(theEnv,constraintRecord);
+   constraints = get_struct(theEnv,execStatus,constraintRecord);
 
    for (i = 0 ; i < sizeof(CONSTRAINT_RECORD) ; i++)
      { ((char *) constraints)[i] = '\0'; }
@@ -70,10 +70,10 @@ globle struct constraintRecord *GetConstraintRecord(
    constraints->instanceNameRestriction = FALSE;
    constraints->classList = NULL;
    constraints->restrictionList = NULL;
-   constraints->minValue = GenConstant(theEnv,SYMBOL,SymbolData(theEnv)->NegativeInfinity);
-   constraints->maxValue = GenConstant(theEnv,SYMBOL,SymbolData(theEnv)->PositiveInfinity);
-   constraints->minFields = GenConstant(theEnv,INTEGER,SymbolData(theEnv)->Zero);
-   constraints->maxFields = GenConstant(theEnv,SYMBOL,SymbolData(theEnv)->PositiveInfinity);
+   constraints->minValue = GenConstant(theEnv,execStatus,SYMBOL,SymbolData(theEnv)->NegativeInfinity);
+   constraints->maxValue = GenConstant(theEnv,execStatus,SYMBOL,SymbolData(theEnv)->PositiveInfinity);
+   constraints->minFields = GenConstant(theEnv,execStatus,INTEGER,SymbolData(theEnv)->Zero);
+   constraints->maxFields = GenConstant(theEnv,execStatus,SYMBOL,SymbolData(theEnv)->PositiveInfinity);
    constraints->bucket = -1;
    constraints->count = 0;
    constraints->multifield = NULL;
@@ -130,7 +130,7 @@ globle struct constraintRecord *CopyConstraintRecord(
 
    if (sourceConstraint == NULL) return(NULL);
 
-   theConstraint = get_struct(theEnv,constraintRecord);
+   theConstraint = get_struct(theEnv,execStatus,constraintRecord);
 
    theConstraint->anyAllowed = sourceConstraint->anyAllowed;
    theConstraint->symbolsAllowed = sourceConstraint->symbolsAllowed;
@@ -151,15 +151,15 @@ globle struct constraintRecord *CopyConstraintRecord(
    theConstraint->integerRestriction = sourceConstraint->integerRestriction;
    theConstraint->classRestriction = sourceConstraint->classRestriction;
    theConstraint->instanceNameRestriction = sourceConstraint->instanceNameRestriction;
-   theConstraint->classList = CopyExpression(theEnv,sourceConstraint->classList);
-   theConstraint->restrictionList = CopyExpression(theEnv,sourceConstraint->restrictionList);
-   theConstraint->minValue = CopyExpression(theEnv,sourceConstraint->minValue);
-   theConstraint->maxValue = CopyExpression(theEnv,sourceConstraint->maxValue);
-   theConstraint->minFields = CopyExpression(theEnv,sourceConstraint->minFields);
-   theConstraint->maxFields = CopyExpression(theEnv,sourceConstraint->maxFields);
+   theConstraint->classList = CopyExpression(theEnv,execStatus,sourceConstraint->classList);
+   theConstraint->restrictionList = CopyExpression(theEnv,execStatus,sourceConstraint->restrictionList);
+   theConstraint->minValue = CopyExpression(theEnv,execStatus,sourceConstraint->minValue);
+   theConstraint->maxValue = CopyExpression(theEnv,execStatus,sourceConstraint->maxValue);
+   theConstraint->minFields = CopyExpression(theEnv,execStatus,sourceConstraint->minFields);
+   theConstraint->maxFields = CopyExpression(theEnv,execStatus,sourceConstraint->maxFields);
    theConstraint->bucket = -1;
    theConstraint->count = 0;
-   theConstraint->multifield = CopyConstraintRecord(theEnv,sourceConstraint->multifield);
+   theConstraint->multifield = CopyConstraintRecord(theEnv,execStatus,sourceConstraint->multifield);
    theConstraint->next = NULL;
 
    return(theConstraint);
@@ -436,7 +436,7 @@ globle CONSTRAINT_RECORD *ExpressionToConstraintRecord(
       return(rv);
      }
    else if (theExpression->type == FCALL)
-     { return(FunctionCallToConstraintRecord(theEnv,theExpression->value)); }
+     { return(FunctionCallToConstraintRecord(theEnv,execStatus,theExpression->value)); }
 
    /*============================================*/
    /* Convert a constant to a constraint record. */
@@ -475,7 +475,7 @@ globle CONSTRAINT_RECORD *ExpressionToConstraintRecord(
 
    if (rv->floatsAllowed || rv->integersAllowed || rv->symbolsAllowed ||
        rv->stringsAllowed || rv->instanceNamesAllowed)
-     { rv->restrictionList = GenConstant(theEnv,theExpression->type,theExpression->value); }
+     { rv->restrictionList = GenConstant(theEnv,execStatus,theExpression->type,theExpression->value); }
 
    return(rv);
   }

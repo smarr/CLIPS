@@ -55,7 +55,7 @@ globle void InitializePrettyPrintData(
   void *theEnv,
   EXEC_STATUS)
   {
-   AllocateEnvironmentData(theEnv,PRETTY_PRINT_DATA,sizeof(struct prettyPrintData),DeallocatePrettyPrintData);
+   AllocateEnvironmentData(theEnv,execStatus,PRETTY_PRINT_DATA,sizeof(struct prettyPrintData),DeallocatePrettyPrintData);
    
    PrettyPrintData(theEnv)->PPBufferEnabled = TRUE;
   }
@@ -69,7 +69,7 @@ static void DeallocatePrettyPrintData(
   EXEC_STATUS)
   {
    if (PrettyPrintData(theEnv)->PrettyPrintBuffer != NULL) 
-     { rm(theEnv,PrettyPrintData(theEnv)->PrettyPrintBuffer,PrettyPrintData(theEnv)->PPBufferMax); }
+     { rm(theEnv,execStatus,PrettyPrintData(theEnv)->PrettyPrintBuffer,PrettyPrintData(theEnv)->PPBufferMax); }
   }
 
 /*******************************************************/
@@ -97,7 +97,7 @@ globle void DestroyPPBuffer(
    PrettyPrintData(theEnv)->PPBackupOnce = 0;
    PrettyPrintData(theEnv)->PPBackupTwice = 0;
    PrettyPrintData(theEnv)->PPBufferPos = 0;
-   if (PrettyPrintData(theEnv)->PrettyPrintBuffer != NULL) rm(theEnv,PrettyPrintData(theEnv)->PrettyPrintBuffer,PrettyPrintData(theEnv)->PPBufferMax);
+   if (PrettyPrintData(theEnv)->PrettyPrintBuffer != NULL) rm(theEnv,execStatus,PrettyPrintData(theEnv)->PrettyPrintBuffer,PrettyPrintData(theEnv)->PPBufferMax);
    PrettyPrintData(theEnv)->PrettyPrintBuffer = NULL;
    PrettyPrintData(theEnv)->PPBufferMax = 0;
   }
@@ -137,7 +137,7 @@ globle void SavePPBuffer(
    if (strlen(str) + PrettyPrintData(theEnv)->PPBufferPos + 1 >= PrettyPrintData(theEnv)->PPBufferMax)
      {
       PrettyPrintData(theEnv)->PrettyPrintBuffer = 
-         (char *) genrealloc(theEnv,PrettyPrintData(theEnv)->PrettyPrintBuffer,
+         (char *) genrealloc(theEnv,execStatus,PrettyPrintData(theEnv)->PrettyPrintBuffer,
                                     PrettyPrintData(theEnv)->PPBufferMax,
                                     PrettyPrintData(theEnv)->PPBufferMax + increment);
       PrettyPrintData(theEnv)->PPBufferMax += increment;
@@ -155,7 +155,7 @@ globle void SavePPBuffer(
    /* Save the string to the pretty print buffer. */
    /*=============================================*/
 
-   PrettyPrintData(theEnv)->PrettyPrintBuffer = AppendToString(theEnv,str,PrettyPrintData(theEnv)->PrettyPrintBuffer,&PrettyPrintData(theEnv)->PPBufferPos,&PrettyPrintData(theEnv)->PPBufferMax);
+   PrettyPrintData(theEnv)->PrettyPrintBuffer = AppendToString(theEnv,execStatus,str,PrettyPrintData(theEnv)->PrettyPrintBuffer,&PrettyPrintData(theEnv)->PPBufferPos,&PrettyPrintData(theEnv)->PPBufferMax);
   }
 
 /***************************************************/
@@ -189,7 +189,7 @@ globle char *CopyPPBuffer(
    char *newString;
 
    length = (1 + strlen(PrettyPrintData(theEnv)->PrettyPrintBuffer)) * (int) sizeof (char);
-   newString = (char *) gm2(theEnv,length);
+   newString = (char *) gm2(theEnv,execStatus,length);
 
    genstrcpy(newString,PrettyPrintData(theEnv)->PrettyPrintBuffer);
    return(newString);
@@ -226,7 +226,7 @@ globle void PPCRAndIndent(
      { buffer[i] = ' '; }
    buffer[i] = EOS;
 
-   SavePPBuffer(theEnv,buffer);
+   SavePPBuffer(theEnv,execStatus,buffer);
   }
 
 /************************************************/

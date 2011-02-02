@@ -71,7 +71,7 @@ globle void IncrementalReset(
   struct defrule *tempRule)
   {
 #if (MAC_MCW || WIN_MCW) && (RUN_TIME || BLOAD_ONLY)
-#pragma unused(theEnv,tempRule)
+#pragma unused(theEnv,execStatus,tempRule)
 #endif
 
 #if (! RUN_TIME) && (! BLOAD_ONLY)
@@ -89,7 +89,7 @@ globle void IncrementalReset(
    /* associated with the rule being incrementally reset. */
    /*=====================================================*/
 
-   MarkNetworkForIncrementalReset(theEnv,tempRule,TRUE);
+   MarkNetworkForIncrementalReset(theEnv,execStatus,tempRule,TRUE);
 
    /*==========================*/
    /* Begin incremental reset. */
@@ -106,7 +106,7 @@ globle void IncrementalReset(
    for (tempPtr = tempRule;
         tempPtr != NULL;
         tempPtr = tempPtr->disjunct)
-     { CheckForPrimableJoins(theEnv,tempPtr,tempPtr->lastJoin); }
+     { CheckForPrimableJoins(theEnv,execStatus,tempPtr,tempPtr->lastJoin); }
 
    /*===============================================*/
    /* Filter existing data entities through the new */
@@ -131,7 +131,7 @@ globle void IncrementalReset(
    /* Remove the marks in the pattern and join networks. */
    /*====================================================*/
 
-   MarkNetworkForIncrementalReset(theEnv,tempRule,FALSE);
+   MarkNetworkForIncrementalReset(theEnv,execStatus,tempRule,FALSE);
 #endif
   }
 
@@ -155,7 +155,7 @@ static void MarkNetworkForIncrementalReset(
    for (;
         tempRule != NULL;
         tempRule = tempRule->disjunct)
-     { MarkJoinsForIncrementalReset(theEnv,tempRule->lastJoin,value); }
+     { MarkJoinsForIncrementalReset(theEnv,execStatus,tempRule->lastJoin,value); }
   }
 
 /**********************************************************************/
@@ -183,7 +183,7 @@ static void MarkJoinsForIncrementalReset(
         }
         
       if (joinPtr->joinFromTheRight)
-        { MarkJoinsForIncrementalReset(theEnv,(struct joinNode *) joinPtr->rightSideEntryStructure,value); }
+        { MarkJoinsForIncrementalReset(theEnv,execStatus,(struct joinNode *) joinPtr->rightSideEntryStructure,value); }
 
       /*================*/
       /* Mark the join. */
@@ -198,7 +198,7 @@ static void MarkJoinsForIncrementalReset(
            {
             patternPtr = (struct patternNodeHeader *) GetPatternForJoin(joinPtr);
             if (patternPtr != NULL)
-              { MarkPatternForIncrementalReset(theEnv,(int) joinPtr->rhsType,patternPtr,value); }
+              { MarkPatternForIncrementalReset(theEnv,execStatus,(int) joinPtr->rhsType,patternPtr,value); }
            }
         }
      }
@@ -240,31 +240,31 @@ static void CheckForPrimableJoins(
                    (joinPtr->patternIsNegated) ||
                    (((struct patternNodeHeader *) joinPtr->rightSideEntryStructure)->initialize == FALSE))
                  {
-                  PrimeJoinFromLeftMemory(theEnv,joinPtr);
+                  PrimeJoinFromLeftMemory(theEnv,execStatus,joinPtr);
                   joinPtr->marked = TRUE;
                  }
               }
             else
               {
-               PrimeJoinFromRightMemory(theEnv,joinPtr);
+               PrimeJoinFromRightMemory(theEnv,execStatus,joinPtr);
                joinPtr->marked = TRUE;
               }
            }
          else if (joinPtr->lastLevel->initialize == FALSE)
            { 
-            PrimeJoinFromLeftMemory(theEnv,joinPtr); 
+            PrimeJoinFromLeftMemory(theEnv,execStatus,joinPtr); 
             joinPtr->marked = TRUE;
            }
          else if ((joinPtr->joinFromTheRight) &&
                 (((struct joinNode *) joinPtr->rightSideEntryStructure)->initialize == FALSE))
            {
-            PrimeJoinFromRightMemory(theEnv,joinPtr);
+            PrimeJoinFromRightMemory(theEnv,execStatus,joinPtr);
             joinPtr->marked = TRUE;
            }
         }
         
       if (joinPtr->joinFromTheRight)
-        { CheckForPrimableJoins(theEnv,tempRule,(struct joinNode *) joinPtr->rightSideEntryStructure); }
+        { CheckForPrimableJoins(theEnv,execStatus,tempRule,(struct joinNode *) joinPtr->rightSideEntryStructure); }
      }
   }
 
@@ -299,14 +299,14 @@ static void PrimeJoinFromLeftMemory(
    if (joinPtr->firstJoin == TRUE)
      {
       if (joinPtr->rightSideEntryStructure == NULL)
-        { NetworkAssert(theEnv,joinPtr->rightMemory->beta[0],joinPtr); }
+        { NetworkAssert(theEnv,execStatus,joinPtr->rightMemory->beta[0],joinPtr); }
       else if (joinPtr->patternIsNegated)
         { 
          notParent = joinPtr->leftMemory->beta[0];
          
          if (joinPtr->secondaryNetworkTest != NULL)
            {
-            if (EvaluateSecondaryNetworkTest(theEnv,notParent,joinPtr) == FALSE)
+            if (EvaluateSecondaryNetworkTest(theEnv,execStatus,notParent,joinPtr) == FALSE)
               { return; }
            }
 
@@ -321,7 +321,7 @@ static void PrimeJoinFromLeftMemory(
               }
            }
 
-         EPMDrive(theEnv,notParent,joinPtr);
+         EPMDrive(theEnv,execStatus,notParent,joinPtr);
         }
       else
         {  
@@ -332,7 +332,7 @@ static void PrimeJoinFromLeftMemory(
             for (theList = listOfHashNodes->alphaMemory;
                  theList != NULL;
                  theList = theList->nextInMemory)
-              { NetworkAssert(theEnv,theList,joinPtr); }
+              { NetworkAssert(theEnv,execStatus,theList,joinPtr); }
            }
         }  
       return;
@@ -372,16 +372,16 @@ static void PrimeJoinFromLeftMemory(
            theList != NULL;
            theList = theList->nextInMemory)
         {
-         linker = CopyPartialMatch(theEnv,theList);
+         linker = CopyPartialMatch(theEnv,execStatus,theList);
                                    
          if (joinPtr->leftHash != NULL)
-           { hashValue = BetaMemoryHashValue(theEnv,joinPtr->leftHash,linker,NULL,joinPtr); }
+           { hashValue = BetaMemoryHashValue(theEnv,execStatus,joinPtr->leftHash,linker,NULL,joinPtr); }
          else
            { hashValue = 0; }
          
-         UpdateBetaPMLinks(theEnv,linker,theList->leftParent,theList->rightParent,joinPtr,hashValue,LHS);
+         UpdateBetaPMLinks(theEnv,execStatus,linker,theList->leftParent,theList->rightParent,joinPtr,hashValue,LHS);
          
-         NetworkAssertLeft(theEnv,linker,joinPtr);
+         NetworkAssertLeft(theEnv,execStatus,linker,joinPtr);
         }
      }
   }
@@ -438,11 +438,11 @@ static void PrimeJoinFromRightMemory(
 
          if (joinPtr->secondaryNetworkTest != NULL)
            {
-            if (EvaluateSecondaryNetworkTest(theEnv,notParent,joinPtr) == FALSE)
+            if (EvaluateSecondaryNetworkTest(theEnv,execStatus,notParent,joinPtr) == FALSE)
               { return; }
            }
 
-         EPMDrive(theEnv,notParent,joinPtr);
+         EPMDrive(theEnv,execStatus,notParent,joinPtr);
         }
 
       return;
@@ -464,15 +464,15 @@ static void PrimeJoinFromRightMemory(
            theList != NULL;
            theList = theList->nextInMemory)
         {
-         linker = CopyPartialMatch(theEnv,theList);
+         linker = CopyPartialMatch(theEnv,execStatus,theList);
                                    
          if (joinPtr->rightHash != NULL)
-           { hashValue = BetaMemoryHashValue(theEnv,joinPtr->rightHash,linker,NULL,joinPtr); }
+           { hashValue = BetaMemoryHashValue(theEnv,execStatus,joinPtr->rightHash,linker,NULL,joinPtr); }
          else
            { hashValue = 0; }
          
-         UpdateBetaPMLinks(theEnv,linker,theList->leftParent,theList->rightParent,joinPtr,hashValue,RHS);
-         NetworkAssert(theEnv,linker,joinPtr); 
+         UpdateBetaPMLinks(theEnv,execStatus,linker,theList->leftParent,theList->rightParent,joinPtr,hashValue,RHS);
+         NetworkAssert(theEnv,execStatus,linker,joinPtr); 
         }
      }
            
@@ -484,11 +484,11 @@ static void PrimeJoinFromRightMemory(
 
       if (joinPtr->secondaryNetworkTest != NULL)
         {
-         if (EvaluateSecondaryNetworkTest(theEnv,notParent,joinPtr) == FALSE)
+         if (EvaluateSecondaryNetworkTest(theEnv,execStatus,notParent,joinPtr) == FALSE)
            { return; }
         }
 
-      EPMDrive(theEnv,notParent,joinPtr);
+      EPMDrive(theEnv,execStatus,notParent,joinPtr);
      }
   }
   
@@ -507,12 +507,12 @@ static void MarkPatternForIncrementalReset(
   {
    struct patternParser *tempParser;
    
-   tempParser = GetPatternParser(theEnv,rhsType);
+   tempParser = GetPatternParser(theEnv,execStatus,rhsType);
 
    if (tempParser != NULL)
      {
       if (tempParser->markIRPatternFunction != NULL)
-        { (*tempParser->markIRPatternFunction)(theEnv,theHeader,value); }
+        { (*tempParser->markIRPatternFunction)(theEnv,execStatus,theHeader,value); }
      }
   }
 
@@ -543,12 +543,12 @@ globle intBool EnvSetIncrementalReset(
 
    SaveCurrentModule(theEnv);
 
-   for (theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,NULL);
+   for (theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,NULL);
         theModule != NULL;
-        theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,theModule))
+        theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,theModule))
      {
-      EnvSetCurrentModule(theEnv,(void *) theModule);
-      if (EnvGetNextDefrule(theEnv,NULL) != NULL)
+      EnvSetCurrentModule(theEnv,execStatus,(void *) theModule);
+      if (EnvGetNextDefrule(theEnv,execStatus,NULL) != NULL)
         {
          RestoreCurrentModule(theEnv);
          return(-1);
@@ -590,17 +590,17 @@ globle int SetIncrementalResetCommand(
 
    SaveCurrentModule(theEnv);
 
-   for (theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,NULL);
+   for (theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,NULL);
         theModule != NULL;
-        theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,theModule))
+        theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,theModule))
      {
-      EnvSetCurrentModule(theEnv,(void *) theModule);
-      if (EnvGetNextDefrule(theEnv,NULL) != NULL)
+      EnvSetCurrentModule(theEnv,execStatus,(void *) theModule);
+      if (EnvGetNextDefrule(theEnv,execStatus,NULL) != NULL)
         {
          RestoreCurrentModule(theEnv);
-         PrintErrorID(theEnv,"INCRRSET",1,FALSE);
-         EnvPrintRouter(theEnv,WERROR,"The incremental reset behavior cannot be changed with rules loaded.\n");
-         SetEvaluationError(theEnv,TRUE);
+         PrintErrorID(theEnv,execStatus,"INCRRSET",1,FALSE);
+         EnvPrintRouter(theEnv,execStatus,WERROR,"The incremental reset behavior cannot be changed with rules loaded.\n");
+         SetEvaluationError(theEnv,execStatus,TRUE);
          return(oldValue);
         }
      }
@@ -615,9 +615,9 @@ globle int SetIncrementalResetCommand(
    EnvRtnUnknown(theEnv,execStatus,1,&argPtr);
 
    if ((argPtr.value == EnvFalseSymbol(theEnv)) && (argPtr.type == SYMBOL))
-     { EnvSetIncrementalReset(theEnv,FALSE); }
+     { EnvSetIncrementalReset(theEnv,execStatus,FALSE); }
    else
-     { EnvSetIncrementalReset(theEnv,TRUE); }
+     { EnvSetIncrementalReset(theEnv,execStatus,TRUE); }
 
    /*=======================*/
    /* Return the old value. */

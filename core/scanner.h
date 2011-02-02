@@ -56,7 +56,7 @@ struct scannerData
    int IgnoreCompletionErrors;
   };
 
-#define ScannerData(theEnv) ((struct scannerData *) GetEnvironmentData(theEnv,SCANNER_DATA))
+#define ScannerData(theEnv) ((struct scannerData *) GetEnvironmentData(theEnv,execStatus,SCANNER_DATA))
 
    LOCALE void                           InitializeScannerData(void *);
    LOCALE void                           GetToken(void *,char *,struct token *);

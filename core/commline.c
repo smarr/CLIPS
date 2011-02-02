@@ -77,7 +77,7 @@ globle void InitializeCommandLineData(
   void *theEnv,
   EXEC_STATUS)
   {
-   AllocateEnvironmentData(theEnv,COMMANDLINE_DATA,sizeof(struct commandLineData),DeallocateCommandLineData);
+   AllocateEnvironmentData(theEnv,execStatus,COMMANDLINE_DATA,sizeof(struct commandLineData),DeallocateCommandLineData);
 
 #if ! RUN_TIME   
    CommandLineData(theEnv)->BannerString = BANNER_STRING;
@@ -95,10 +95,10 @@ static void DeallocateCommandLineData(
   {
 #if ! RUN_TIME
    if (CommandLineData(theEnv)->CommandString != NULL) 
-     { rm(theEnv,CommandLineData(theEnv)->CommandString,CommandLineData(theEnv)->MaximumCharacters); }
+     { rm(theEnv,execStatus,CommandLineData(theEnv)->CommandString,CommandLineData(theEnv)->MaximumCharacters); }
      
    if (CommandLineData(theEnv)->CurrentCommand != NULL) 
-     { ReturnExpression(theEnv,CommandLineData(theEnv)->CurrentCommand); }
+     { ReturnExpression(theEnv,execStatus,CommandLineData(theEnv)->CurrentCommand); }
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
 #pragma unused(theEnv)
@@ -124,7 +124,7 @@ globle int ExpandCommandString(
    size_t k;
 
    k = RouterData(theEnv)->CommandBufferInputCount;
-   CommandLineData(theEnv)->CommandString = ExpandStringWithChar(theEnv,inchar,CommandLineData(theEnv)->CommandString,&RouterData(theEnv)->CommandBufferInputCount,
+   CommandLineData(theEnv)->CommandString = ExpandStringWithChar(theEnv,execStatus,inchar,CommandLineData(theEnv)->CommandString,&RouterData(theEnv)->CommandBufferInputCount,
                                         &CommandLineData(theEnv)->MaximumCharacters,CommandLineData(theEnv)->MaximumCharacters+80);
    return((RouterData(theEnv)->CommandBufferInputCount != k) ? TRUE : FALSE);
   }
@@ -136,7 +136,7 @@ globle void FlushCommandString(
   void *theEnv,
   EXEC_STATUS)
   {
-   if (CommandLineData(theEnv)->CommandString != NULL) rm(theEnv,CommandLineData(theEnv)->CommandString,CommandLineData(theEnv)->MaximumCharacters);
+   if (CommandLineData(theEnv)->CommandString != NULL) rm(theEnv,execStatus,CommandLineData(theEnv)->CommandString,CommandLineData(theEnv)->MaximumCharacters);
    CommandLineData(theEnv)->CommandString = NULL;
    CommandLineData(theEnv)->MaximumCharacters = 0;
    RouterData(theEnv)->CommandBufferInputCount = 0;
@@ -156,7 +156,7 @@ globle void SetCommandString(
    FlushCommandString(theEnv);
    length = strlen(str);
    CommandLineData(theEnv)->CommandString = (char *)
-                   genrealloc(theEnv,CommandLineData(theEnv)->CommandString,(unsigned) CommandLineData(theEnv)->MaximumCharacters,
+                   genrealloc(theEnv,execStatus,CommandLineData(theEnv)->CommandString,(unsigned) CommandLineData(theEnv)->MaximumCharacters,
                               (unsigned) CommandLineData(theEnv)->MaximumCharacters + length + 1);
 
    genstrcpy(CommandLineData(theEnv)->CommandString,str);
@@ -176,7 +176,7 @@ globle void SetNCommandString(
   {
    FlushCommandString(theEnv);
    CommandLineData(theEnv)->CommandString = (char *)
-                   genrealloc(theEnv,CommandLineData(theEnv)->CommandString,(unsigned) CommandLineData(theEnv)->MaximumCharacters,
+                   genrealloc(theEnv,execStatus,CommandLineData(theEnv)->CommandString,(unsigned) CommandLineData(theEnv)->MaximumCharacters,
                               (unsigned) CommandLineData(theEnv)->MaximumCharacters + length + 1);
 
    genstrncpy(CommandLineData(theEnv)->CommandString,str,length);
@@ -193,7 +193,7 @@ globle void AppendCommandString(
   EXEC_STATUS,
   char *str)
   {
-   CommandLineData(theEnv)->CommandString = AppendToString(theEnv,str,CommandLineData(theEnv)->CommandString,&RouterData(theEnv)->CommandBufferInputCount,&CommandLineData(theEnv)->MaximumCharacters);
+   CommandLineData(theEnv)->CommandString = AppendToString(theEnv,execStatus,str,CommandLineData(theEnv)->CommandString,&RouterData(theEnv)->CommandBufferInputCount,&CommandLineData(theEnv)->MaximumCharacters);
   }
 
 /******************************************************************************/
@@ -206,7 +206,7 @@ globle void InsertCommandString(
   unsigned int position)
   {
    CommandLineData(theEnv)->CommandString = 
-      InsertInString(theEnv,str,position,CommandLineData(theEnv)->CommandString,
+      InsertInString(theEnv,execStatus,str,position,CommandLineData(theEnv)->CommandString,
                      &RouterData(theEnv)->CommandBufferInputCount,&CommandLineData(theEnv)->MaximumCharacters);
   }
   
@@ -220,7 +220,7 @@ globle void AppendNCommandString(
   char *str,
   unsigned length)
   {
-   CommandLineData(theEnv)->CommandString = AppendNToString(theEnv,str,CommandLineData(theEnv)->CommandString,length,&RouterData(theEnv)->CommandBufferInputCount,&CommandLineData(theEnv)->MaximumCharacters);
+   CommandLineData(theEnv)->CommandString = AppendNToString(theEnv,execStatus,str,CommandLineData(theEnv)->CommandString,length,&RouterData(theEnv)->CommandBufferInputCount,&CommandLineData(theEnv)->MaximumCharacters);
   }
 
 /*****************************************************************************/
@@ -497,9 +497,9 @@ globle void CommandLoop(
   {
    int inchar;
 
-   EnvPrintRouter(theEnv,WPROMPT,CommandLineData(theEnv)->BannerString);
-   SetHaltExecution(theEnv,FALSE);
-   SetEvaluationError(theEnv,FALSE);
+   EnvPrintRouter(theEnv,execStatus,WPROMPT,CommandLineData(theEnv)->BannerString);
+   SetHaltExecution(theEnv,execStatus,FALSE);
+   SetEvaluationError(theEnv,execStatus,FALSE);
    PeriodicCleanup(theEnv,execStatus,TRUE,FALSE);
    PrintPrompt(theEnv);
    RouterData(theEnv)->CommandBufferInputCount = 0;
@@ -515,11 +515,11 @@ globle void CommandLoop(
 
       if (BatchActive(theEnv) == TRUE)
         {
-         inchar = LLGetcBatch(theEnv,"stdin",TRUE);
+         inchar = LLGetcBatch(theEnv,execStatus,"stdin",TRUE);
          if (inchar == EOF)
            { (*CommandLineData(theEnv)->EventFunction)(theEnv); }
          else
-           { ExpandCommandString(theEnv,(char) inchar); }
+           { ExpandCommandString(theEnv,execStatus,(char) inchar); }
         }
       else
         { (*CommandLineData(theEnv)->EventFunction)(theEnv); }
@@ -531,13 +531,13 @@ globle void CommandLoop(
 
       if (GetHaltExecution(theEnv) == TRUE)
         {
-         SetHaltExecution(theEnv,FALSE);
-         SetEvaluationError(theEnv,FALSE);
+         SetHaltExecution(theEnv,execStatus,FALSE);
+         SetEvaluationError(theEnv,execStatus,FALSE);
          FlushCommandString(theEnv);
 #if ! WINDOW_INTERFACE
          fflush(stdin);
 #endif
-         EnvPrintRouter(theEnv,WPROMPT,"\n");
+         EnvPrintRouter(theEnv,execStatus,WPROMPT,"\n");
          PrintPrompt(theEnv);
         }
 
@@ -546,7 +546,7 @@ globle void CommandLoop(
       /* buffer, then execute it.                */
       /*=========================================*/
 
-      ExecuteIfCommandComplete(theEnv,execStatus);
+      ExecuteIfCommandComplete(theEnv,execStatus,execStatus);
      }
   }
   
@@ -559,14 +559,14 @@ globle void CommandLoopBatch(
   void *theEnv,
 	EXEC_STATUS)
   {
-   SetHaltExecution(theEnv,FALSE);
-   SetEvaluationError(theEnv,FALSE);
+   SetHaltExecution(theEnv,execStatus,FALSE);
+   SetEvaluationError(theEnv,execStatus,FALSE);
    PeriodicCleanup(theEnv,execStatus,TRUE,FALSE);
    PrintPrompt(theEnv);
    RouterData(theEnv)->CommandBufferInputCount = 0;
    RouterData(theEnv)->AwaitingInput = TRUE;
 
-   CommandLoopBatchDriver(theEnv,execStatus);
+   CommandLoopBatchDriver(theEnv,execStatus,execStatus);
   }
 
 /************************************************************/
@@ -578,9 +578,9 @@ globle void CommandLoopOnceThenBatch(
   void *theEnv,
 	EXEC_STATUS)
   {
-   if (! ExecuteIfCommandComplete(theEnv,execStatus)) return;
+   if (! ExecuteIfCommandComplete(theEnv,execStatus,execStatus)) return;
 
-   CommandLoopBatchDriver(theEnv,execStatus);
+   CommandLoopBatchDriver(theEnv,execStatus,execStatus);
   }
   
 /*********************************************************/
@@ -599,7 +599,7 @@ globle void CommandLoopBatchDriver(
       if (GetHaltCommandLoopBatch(theEnv) == TRUE)
         { 
          CloseAllBatchSources(theEnv);
-         SetHaltCommandLoopBatch(theEnv,FALSE);
+         SetHaltCommandLoopBatch(theEnv,execStatus,FALSE);
         }
         
       /*===================================================*/
@@ -610,11 +610,11 @@ globle void CommandLoopBatchDriver(
 
       if (BatchActive(theEnv) == TRUE)
         {
-         inchar = LLGetcBatch(theEnv,"stdin",TRUE);
+         inchar = LLGetcBatch(theEnv,execStatus,"stdin",TRUE);
          if (inchar == EOF)
            { return; }
          else
-           { ExpandCommandString(theEnv,(char) inchar); }
+           { ExpandCommandString(theEnv,execStatus,(char) inchar); }
         }
       else
         { return; }
@@ -626,13 +626,13 @@ globle void CommandLoopBatchDriver(
 
       if (GetHaltExecution(theEnv) == TRUE)
         {
-         SetHaltExecution(theEnv,FALSE);
-         SetEvaluationError(theEnv,FALSE);
+         SetHaltExecution(theEnv,execStatus,FALSE);
+         SetEvaluationError(theEnv,execStatus,FALSE);
          FlushCommandString(theEnv);
 #if ! WINDOW_INTERFACE
          fflush(stdin);
 #endif
-         EnvPrintRouter(theEnv,WPROMPT,"\n");
+         EnvPrintRouter(theEnv,execStatus,WPROMPT,"\n");
          PrintPrompt(theEnv);
         }
 
@@ -641,7 +641,7 @@ globle void CommandLoopBatchDriver(
       /* buffer, then execute it.                */
       /*=========================================*/
 
-      ExecuteIfCommandComplete(theEnv,execStatus);
+      ExecuteIfCommandComplete(theEnv,execStatus,execStatus);
      }
   }
 
@@ -665,13 +665,13 @@ globle intBool ExecuteIfCommandComplete(
      }
        
    FlushPPBuffer(theEnv);
-   SetPPBufferStatus(theEnv,OFF);
+   SetPPBufferStatus(theEnv,execStatus,OFF);
    RouterData(theEnv)->CommandBufferInputCount = 0;
    RouterData(theEnv)->AwaitingInput = FALSE;
    RouteCommand(theEnv,execStatus,CommandLineData(theEnv)->CommandString,TRUE);
    FlushPPBuffer(theEnv);
-   SetHaltExecution(theEnv,FALSE);
-   SetEvaluationError(theEnv,FALSE);
+   SetHaltExecution(theEnv,execStatus,FALSE);
+   SetEvaluationError(theEnv,execStatus,FALSE);
    FlushCommandString(theEnv);
    PeriodicCleanup(theEnv,execStatus,TRUE,FALSE);
    PrintPrompt(theEnv);
@@ -701,7 +701,7 @@ globle void PrintPrompt(
    void *theEnv,
   EXEC_STATUS)
    {
-    EnvPrintRouter(theEnv,WPROMPT,COMMAND_PROMPT);
+    EnvPrintRouter(theEnv,execStatus,WPROMPT,COMMAND_PROMPT);
 
     if (CommandLineData(theEnv)->AfterPromptFunction != NULL)
       { (*CommandLineData(theEnv)->AfterPromptFunction)(theEnv); }
@@ -714,7 +714,7 @@ globle void PrintBanner(
    void *theEnv,
   EXEC_STATUS)
    {
-    EnvPrintRouter(theEnv,WPROMPT,CommandLineData(theEnv)->BannerString);
+    EnvPrintRouter(theEnv,execStatus,WPROMPT,CommandLineData(theEnv)->BannerString);
    }
 
 /************************************************/
@@ -763,9 +763,9 @@ globle intBool RouteCommand(
    /* first token from that source.          */
    /*========================================*/
 
-   OpenStringSource(theEnv,"command",command,0);
+   OpenStringSource(theEnv,execStatus,"command",command,0);
 
-   GetToken(theEnv,"command",&theToken);
+   GetToken(theEnv,execStatus,"command",&theToken);
 
    /*=====================*/
    /* Evaluate constants. */
@@ -775,11 +775,11 @@ globle intBool RouteCommand(
        (theToken.type == FLOAT) || (theToken.type == INTEGER) ||
        (theToken.type == INSTANCE_NAME))
      {
-      CloseStringSource(theEnv,"command");
+      CloseStringSource(theEnv,execStatus,"command");
       if (printResult)
         {
-         PrintAtom(theEnv,"stdout",theToken.type,theToken.value);
-         EnvPrintRouter(theEnv,"stdout","\n");
+         PrintAtom(theEnv,execStatus,"stdout",theToken.type,theToken.value);
+         EnvPrintRouter(theEnv,execStatus,"stdout","\n");
         }
       return(1);
      }
@@ -792,14 +792,14 @@ globle intBool RouteCommand(
        (theToken.type == SF_VARIABLE) ||
        (theToken.type == MF_VARIABLE))
      {
-      CloseStringSource(theEnv,"command");
-      top = GenConstant(theEnv,theToken.type,theToken.value);
-      EvaluateExpression(theEnv,top,&result);
-      rtn_struct(theEnv,expr,top);
+      CloseStringSource(theEnv,execStatus,"command");
+      top = GenConstant(theEnv,execStatus,theToken.type,theToken.value);
+      EvaluateExpression(theEnv,execStatus,top,&result);
+      rtn_struct(theEnv,execStatus,expr,top);
       if (printResult)
         {
-         PrintDataObject(theEnv,"stdout",&result);
-         EnvPrintRouter(theEnv,"stdout","\n");
+         PrintDataObject(theEnv,execStatus,"stdout",&result);
+         EnvPrintRouter(theEnv,execStatus,"stdout","\n");
         }
       return(1);
      }
@@ -812,9 +812,9 @@ globle intBool RouteCommand(
 
    if (theToken.type != LPAREN)
      {
-      PrintErrorID(theEnv,"COMMLINE",1,FALSE);
-      EnvPrintRouter(theEnv,WERROR,"Expected a '(', constant, or variable\n");
-      CloseStringSource(theEnv,"command");
+      PrintErrorID(theEnv,execStatus,"COMMLINE",1,FALSE);
+      EnvPrintRouter(theEnv,execStatus,WERROR,"Expected a '(', constant, or variable\n");
+      CloseStringSource(theEnv,execStatus,"command");
       return(0);
      }
 
@@ -822,12 +822,12 @@ globle intBool RouteCommand(
    /* The next token must be a function name or construct type. */
    /*===========================================================*/
 
-   GetToken(theEnv,"command",&theToken);
+   GetToken(theEnv,execStatus,"command",&theToken);
    if (theToken.type != SYMBOL)
      {
-      PrintErrorID(theEnv,"COMMLINE",2,FALSE);
-      EnvPrintRouter(theEnv,WERROR,"Expected a command.\n");
-      CloseStringSource(theEnv,"command");
+      PrintErrorID(theEnv,execStatus,"COMMLINE",2,FALSE);
+      EnvPrintRouter(theEnv,execStatus,WERROR,"Expected a command.\n");
+      CloseStringSource(theEnv,execStatus,"command");
       return(0);
      }
 
@@ -844,12 +844,12 @@ globle intBool RouteCommand(
     errorFlag = ParseConstruct(theEnv,execStatus,commandName,"command");
     if (errorFlag != -1)
       {
-       CloseStringSource(theEnv,"command");
+       CloseStringSource(theEnv,execStatus,"command");
        if (errorFlag == 1)
          {
-          EnvPrintRouter(theEnv,WERROR,"\nERROR:\n");
-          PrintInChunks(theEnv,WERROR,GetPPBuffer(theEnv));
-          EnvPrintRouter(theEnv,WERROR,"\n");
+          EnvPrintRouter(theEnv,execStatus,WERROR,"\nERROR:\n");
+          PrintInChunks(theEnv,execStatus,WERROR,GetPPBuffer(theEnv));
+          EnvPrintRouter(theEnv,execStatus,WERROR,"\n");
          }
        DestroyPPBuffer(theEnv);
        return(errorFlag);
@@ -862,7 +862,7 @@ globle intBool RouteCommand(
    /*========================*/
 
    CommandLineData(theEnv)->ParsingTopLevelCommand = TRUE;
-   top = Function2Parse(theEnv,"command",commandName);
+   top = Function2Parse(theEnv,execStatus,"command",commandName);
    CommandLineData(theEnv)->ParsingTopLevelCommand = FALSE;
    ClearParsedBindNames(theEnv);
 
@@ -870,7 +870,7 @@ globle intBool RouteCommand(
    /* Close the string input source. */
    /*================================*/
 
-   CloseStringSource(theEnv,"command");
+   CloseStringSource(theEnv,execStatus,"command");
 
    /*=========================*/
    /* Evaluate function call. */
@@ -878,21 +878,21 @@ globle intBool RouteCommand(
 
    if (top == NULL) return(0);
    
-   ExpressionInstall(theEnv,top);
+   ExpressionInstall(theEnv,execStatus,top);
    
    CommandLineData(theEnv)->EvaluatingTopLevelCommand = TRUE;
    CommandLineData(theEnv)->CurrentCommand = top;
-   EvaluateExpression(theEnv,top,&result);
+   EvaluateExpression(theEnv,execStatus,top,&result);
    CommandLineData(theEnv)->CurrentCommand = NULL;
    CommandLineData(theEnv)->EvaluatingTopLevelCommand = FALSE;
    
-   ExpressionDeinstall(theEnv,top);
-   ReturnExpression(theEnv,top);
+   ExpressionDeinstall(theEnv,execStatus,top);
+   ReturnExpression(theEnv,execStatus,top);
    
    if ((result.type != RVOID) && printResult)
      {
-      PrintDataObject(theEnv,"stdout",&result);
-      EnvPrintRouter(theEnv,"stdout","\n");
+      PrintDataObject(theEnv,execStatus,"stdout",&result);
+      EnvPrintRouter(theEnv,execStatus,"stdout","\n");
      }
 
    return(1);
@@ -910,11 +910,11 @@ static int DefaultGetNextEvent(
   {
    int inchar;
 
-   inchar = EnvGetcRouter(theEnv,"stdin");
+   inchar = EnvGetcRouter(theEnv,execStatus,"stdin");
 
    if (inchar == EOF) inchar = '\n';
 
-   ExpandCommandString(theEnv,(char) inchar);
+   ExpandCommandString(theEnv,execStatus,(char) inchar);
    
    return 0;
   }
@@ -983,16 +983,16 @@ globle char *GetCommandCompletionString(
    /* Find the last token in the command string. */
    /*============================================*/
 
-   OpenTextSource(theEnv,"CommandCompletion",theString,0,maxPosition);
+   OpenTextSource(theEnv,execStatus,"CommandCompletion",theString,0,maxPosition);
    ScannerData(theEnv)->IgnoreCompletionErrors = TRUE;
-   GetToken(theEnv,"CommandCompletion",&theToken);
+   GetToken(theEnv,execStatus,"CommandCompletion",&theToken);
    CopyToken(&lastToken,&theToken);
    while (theToken.type != STOP)
      {
       CopyToken(&lastToken,&theToken);
-      GetToken(theEnv,"CommandCompletion",&theToken);
+      GetToken(theEnv,execStatus,"CommandCompletion",&theToken);
      }
-   CloseStringSource(theEnv,"CommandCompletion");
+   CloseStringSource(theEnv,execStatus,"CommandCompletion");
    ScannerData(theEnv)->IgnoreCompletionErrors = FALSE;
 
    /*===============================================*/
@@ -1015,7 +1015,7 @@ globle char *GetCommandCompletionString(
    else if (lastToken.type == STRING)
      {
       length = strlen(ValueToString(lastToken.value));
-      return(GetCommandCompletionString(theEnv,ValueToString(lastToken.value),length));
+      return(GetCommandCompletionString(theEnv,execStatus,ValueToString(lastToken.value),length));
      }
    else if ((lastToken.type == FLOAT) || (lastToken.type == INTEGER))
      { return(NULL); }

@@ -59,8 +59,8 @@ globle void InitializeBloadData(
   void *theEnv,
   EXEC_STATUS)
   {
-   AllocateEnvironmentData(theEnv,BLOAD_DATA,sizeof(struct bloadData),NULL);
-   AddEnvironmentCleanupFunction(theEnv,"bload",DeallocateBloadData,-1500);
+   AllocateEnvironmentData(theEnv,execStatus,BLOAD_DATA,sizeof(struct bloadData),NULL);
+   AddEnvironmentCleanupFunction(theEnv,execStatus,"bload",DeallocateBloadData,-1500);
 
    BloadData(theEnv)->BinaryPrefixID = "\1\2\3\4CLIPS";
    BloadData(theEnv)->BinaryVersionID = "V6.30";
@@ -74,10 +74,10 @@ static void DeallocateBloadData(
   void *theEnv,
   EXEC_STATUS)
   {   
-   DeallocateCallList(theEnv,BloadData(theEnv)->BeforeBloadFunctions);
-   DeallocateCallList(theEnv,BloadData(theEnv)->AfterBloadFunctions);
-   DeallocateCallList(theEnv,BloadData(theEnv)->ClearBloadReadyFunctions);
-   DeallocateCallList(theEnv,BloadData(theEnv)->AbortBloadFunctions);
+   DeallocateCallList(theEnv,execStatus,BloadData(theEnv)->BeforeBloadFunctions);
+   DeallocateCallList(theEnv,execStatus,BloadData(theEnv)->AfterBloadFunctions);
+   DeallocateCallList(theEnv,execStatus,BloadData(theEnv)->ClearBloadReadyFunctions);
+   DeallocateCallList(theEnv,execStatus,BloadData(theEnv)->AbortBloadFunctions);
   }
 
 /******************************/
@@ -101,19 +101,19 @@ globle int EnvBload(
    /* Open the file. */
    /*================*/
 
-   if (GenOpenReadBinary(theEnv,"bload",fileName) == 0) return(FALSE);
+   if (GenOpenReadBinary(theEnv,execStatus,"bload",fileName) == 0) return(FALSE);
 
    /*=====================================*/
    /* Determine if this is a binary file. */
    /*=====================================*/
 
-   GenReadBinary(theEnv,IDbuffer,(unsigned long) strlen(BloadData(theEnv)->BinaryPrefixID) + 1);
+   GenReadBinary(theEnv,execStatus,IDbuffer,(unsigned long) strlen(BloadData(theEnv)->BinaryPrefixID) + 1);
    if (strcmp(IDbuffer,BloadData(theEnv)->BinaryPrefixID) != 0)
      {
-      PrintErrorID(theEnv,"BLOAD",2,FALSE);
-      EnvPrintRouter(theEnv,WERROR,"File ");
-      EnvPrintRouter(theEnv,WERROR,fileName);
-      EnvPrintRouter(theEnv,WERROR," is not a binary construct file.\n");
+      PrintErrorID(theEnv,execStatus,"BLOAD",2,FALSE);
+      EnvPrintRouter(theEnv,execStatus,WERROR,"File ");
+      EnvPrintRouter(theEnv,execStatus,WERROR,fileName);
+      EnvPrintRouter(theEnv,execStatus,WERROR," is not a binary construct file.\n");
       GenCloseBinary(theEnv);
       return(FALSE);
      }
@@ -123,13 +123,13 @@ globle int EnvBload(
    /* a format from a different version.    */
    /*=======================================*/
 
-   GenReadBinary(theEnv,IDbuffer,(unsigned long) strlen(BloadData(theEnv)->BinaryVersionID) + 1);
+   GenReadBinary(theEnv,execStatus,IDbuffer,(unsigned long) strlen(BloadData(theEnv)->BinaryVersionID) + 1);
    if (strcmp(IDbuffer,BloadData(theEnv)->BinaryVersionID) != 0)
      {
-      PrintErrorID(theEnv,"BLOAD",3,FALSE);
-      EnvPrintRouter(theEnv,WERROR,"File ");
-      EnvPrintRouter(theEnv,WERROR,fileName);
-      EnvPrintRouter(theEnv,WERROR," is an incompatible binary construct file.\n");
+      PrintErrorID(theEnv,execStatus,"BLOAD",3,FALSE);
+      EnvPrintRouter(theEnv,execStatus,WERROR,"File ");
+      EnvPrintRouter(theEnv,execStatus,WERROR,fileName);
+      EnvPrintRouter(theEnv,execStatus,WERROR," is an incompatible binary construct file.\n");
       GenCloseBinary(theEnv);
       return(FALSE);
      }
@@ -155,10 +155,10 @@ globle int EnvBload(
    if (ClearReady(theEnv) == FALSE)
      {
       GenCloseBinary(theEnv);
-      EnvPrintRouter(theEnv,WERROR,"The ");
-      EnvPrintRouter(theEnv,WERROR,APPLICATION_NAME);
-      EnvPrintRouter(theEnv,WERROR," environment could not be cleared.\n");
-      EnvPrintRouter(theEnv,WERROR,"Binary load cannot continue.\n");
+      EnvPrintRouter(theEnv,execStatus,WERROR,"The ");
+      EnvPrintRouter(theEnv,execStatus,WERROR,APPLICATION_NAME);
+      EnvPrintRouter(theEnv,execStatus,WERROR," environment could not be cleared.\n");
+      EnvPrintRouter(theEnv,execStatus,WERROR,"Binary load cannot continue.\n");
       return(FALSE);
      }
 
@@ -181,7 +181,7 @@ globle int EnvBload(
    /* Read in the functions needed by this binary image. */
    /*====================================================*/
 
-   BloadData(theEnv)->FunctionArray = ReadNeededFunctions(theEnv,&numberOfFunctions,&error);
+   BloadData(theEnv)->FunctionArray = ReadNeededFunctions(theEnv,execStatus,&numberOfFunctions,&error);
    if (error)
      {
       GenCloseBinary(theEnv);
@@ -207,9 +207,9 @@ globle int EnvBload(
    /* in this binary image and allocate the necessary space    */
    /*==========================================================*/
 
-   for (GenReadBinary(theEnv,constructBuffer,(unsigned long) CONSTRUCT_HEADER_SIZE);
+   for (GenReadBinary(theEnv,execStatus,constructBuffer,(unsigned long) CONSTRUCT_HEADER_SIZE);
         strncmp(constructBuffer,BloadData(theEnv)->BinaryPrefixID,CONSTRUCT_HEADER_SIZE) != 0;
-        GenReadBinary(theEnv,constructBuffer,(unsigned long) CONSTRUCT_HEADER_SIZE))
+        GenReadBinary(theEnv,execStatus,constructBuffer,(unsigned long) CONSTRUCT_HEADER_SIZE))
      {
       intBool found;
 
@@ -243,13 +243,13 @@ globle int EnvBload(
 
       if (! found)
         {
-         GenReadBinary(theEnv,&space,(unsigned long) sizeof(unsigned long));
-         GetSeekCurBinary(theEnv,(long) space);
+         GenReadBinary(theEnv,execStatus,&space,(unsigned long) sizeof(unsigned long));
+         GetSeekCurBinary(theEnv,execStatus,(long) space);
          if (space != 0)
            {
-            EnvPrintRouter(theEnv,WDIALOG,"\nSkipping ");
-            EnvPrintRouter(theEnv,WDIALOG,constructBuffer);
-            EnvPrintRouter(theEnv,WDIALOG," constructs because of unavailability\n");
+            EnvPrintRouter(theEnv,execStatus,WDIALOG,"\nSkipping ");
+            EnvPrintRouter(theEnv,execStatus,WDIALOG,constructBuffer);
+            EnvPrintRouter(theEnv,execStatus,WDIALOG," constructs because of unavailability\n");
            }
         }
      }
@@ -270,9 +270,9 @@ globle int EnvBload(
    /* Read in the constructs stored in this binary image.  */
    /*======================================================*/
 
-   for (GenReadBinary(theEnv,constructBuffer,(unsigned long) CONSTRUCT_HEADER_SIZE);
+   for (GenReadBinary(theEnv,execStatus,constructBuffer,(unsigned long) CONSTRUCT_HEADER_SIZE);
         strncmp(constructBuffer,BloadData(theEnv)->BinaryPrefixID,CONSTRUCT_HEADER_SIZE) != 0;
-        GenReadBinary(theEnv,constructBuffer,(unsigned long) CONSTRUCT_HEADER_SIZE))
+        GenReadBinary(theEnv,execStatus,constructBuffer,(unsigned long) CONSTRUCT_HEADER_SIZE))
      {
       intBool found;
 
@@ -305,8 +305,8 @@ globle int EnvBload(
 
       if (! found)
         {
-         GenReadBinary(theEnv,&space,(unsigned long) sizeof(unsigned long));
-         GetSeekCurBinary(theEnv,(long) space);
+         GenReadBinary(theEnv,execStatus,&space,(unsigned long) sizeof(unsigned long));
+         GetSeekCurBinary(theEnv,execStatus,(long) space);
         }
      }
 
@@ -323,7 +323,7 @@ globle int EnvBload(
 
    if (BloadData(theEnv)->FunctionArray != NULL)
      {
-      genfree(theEnv,(void *) BloadData(theEnv)->FunctionArray,
+      genfree(theEnv,execStatus,(void *) BloadData(theEnv)->FunctionArray,
               sizeof(struct FunctionDefinition *) * numberOfFunctions);
      }
    FreeAtomicValueStorage(theEnv);
@@ -349,7 +349,7 @@ globle int EnvBload(
    /*=======================================*/
 
    BloadData(theEnv)->BloadActive = TRUE;
-   EnvAddClearFunction(theEnv,"bload",(void (*)(void *)) ClearBload,10000);
+   EnvAddClearFunction(theEnv,execStatus,"bload",(void (*)(void *)) ClearBload,10000);
 
    /*=============================*/
    /* Return TRUE to indicate the */
@@ -390,19 +390,19 @@ globle void BloadandRefresh(
 
    if (objcnt == 0L) return;
 
-   oldOutOfMemoryFunction = EnvSetOutOfMemoryFunction(theEnv,BloadOutOfMemoryFunction);
+   oldOutOfMemoryFunction = EnvSetOutOfMemoryFunction(theEnv,execStatus,BloadOutOfMemoryFunction);
    objsmaxread = objcnt;
    do
      {
       space = objsmaxread * objsz;
-      buf = (char *) genalloc(theEnv,space);
+      buf = (char *) genalloc(theEnv,execStatus,space);
       if (buf == NULL)
         {
          if ((objsmaxread / 2) == 0)
            {
-            if ((*oldOutOfMemoryFunction)(theEnv,space) == TRUE)
+            if ((*oldOutOfMemoryFunction)(theEnv,execStatus,space) == TRUE)
               {
-               EnvSetOutOfMemoryFunction(theEnv,oldOutOfMemoryFunction);
+               EnvSetOutOfMemoryFunction(theEnv,execStatus,oldOutOfMemoryFunction);
                return;
               }
            }
@@ -412,18 +412,18 @@ globle void BloadandRefresh(
      }
    while (buf == NULL);
 
-   EnvSetOutOfMemoryFunction(theEnv,oldOutOfMemoryFunction);
+   EnvSetOutOfMemoryFunction(theEnv,execStatus,oldOutOfMemoryFunction);
 
    i = 0L;
    do
      {
       objsread = (objsmaxread > (objcnt - i)) ? (objcnt - i) : objsmaxread;
-      GenReadBinary(theEnv,(void *) buf,objsread * objsz);
+      GenReadBinary(theEnv,execStatus,(void *) buf,objsread * objsz);
       for (bi = 0L ; bi < objsread ; bi++ , i++)
-        (*objupdate)(theEnv,buf + objsz * bi,i);
+        (*objupdate)(theEnv,execStatus,buf + objsz * bi,i);
      }
    while (i < objcnt);
-   genfree(theEnv,(void *) buf,space);
+   genfree(theEnv,execStatus,(void *) buf,space);
   }
 
 /**********************************************/
@@ -448,8 +448,8 @@ static struct FunctionDefinition **ReadNeededFunctions(
    /* and the space required for them.                  */
    /*===================================================*/
 
-   GenReadBinary(theEnv,numberOfFunctions,(unsigned long) sizeof(long int));
-   GenReadBinary(theEnv,&space,(unsigned long) sizeof(unsigned long int));
+   GenReadBinary(theEnv,execStatus,numberOfFunctions,(unsigned long) sizeof(long int));
+   GenReadBinary(theEnv,execStatus,&space,(unsigned long) sizeof(unsigned long int));
    if (*numberOfFunctions == 0)
      {
       *error = FALSE;
@@ -460,31 +460,31 @@ static struct FunctionDefinition **ReadNeededFunctions(
    /* Allocate area for strings to be read. */
    /*=======================================*/
 
-   functionNames = (char *) genalloc(theEnv,space);
-   GenReadBinary(theEnv,(void *) functionNames,space);
+   functionNames = (char *) genalloc(theEnv,execStatus,space);
+   GenReadBinary(theEnv,execStatus,(void *) functionNames,space);
 
    /*====================================================*/
    /* Store the function pointers in the function array. */
    /*====================================================*/
 
    temp = (unsigned long) sizeof(struct FunctionDefinition *) * *numberOfFunctions;
-   newFunctionArray = (struct FunctionDefinition **) genalloc(theEnv,temp);
+   newFunctionArray = (struct FunctionDefinition **) genalloc(theEnv,execStatus,temp);
    namePtr = functionNames;
    functionPtr = NULL;
    for (i = 0; i < *numberOfFunctions; i++)
      {
-      if ((functionPtr = FastFindFunction(theEnv,namePtr,functionPtr)) == NULL)
+      if ((functionPtr = FastFindFunction(theEnv,execStatus,namePtr,functionPtr)) == NULL)
         {
          if (! functionsNotFound)
            {
-            PrintErrorID(theEnv,"BLOAD",6,FALSE);
-            EnvPrintRouter(theEnv,WERROR,"The following undefined functions are ");
-            EnvPrintRouter(theEnv,WERROR,"referenced by this binary image:\n");
+            PrintErrorID(theEnv,execStatus,"BLOAD",6,FALSE);
+            EnvPrintRouter(theEnv,execStatus,WERROR,"The following undefined functions are ");
+            EnvPrintRouter(theEnv,execStatus,WERROR,"referenced by this binary image:\n");
            }
 
-         EnvPrintRouter(theEnv,WERROR,"   ");
-         EnvPrintRouter(theEnv,WERROR,namePtr);
-         EnvPrintRouter(theEnv,WERROR,"\n");
+         EnvPrintRouter(theEnv,execStatus,WERROR,"   ");
+         EnvPrintRouter(theEnv,execStatus,WERROR,namePtr);
+         EnvPrintRouter(theEnv,execStatus,WERROR,"\n");
          functionsNotFound = 1;
         }
 
@@ -496,7 +496,7 @@ static struct FunctionDefinition **ReadNeededFunctions(
    /* Free the memory used by the name buffer. */
    /*==========================================*/
 
-   genfree(theEnv,(void *) functionNames,space);
+   genfree(theEnv,execStatus,(void *) functionNames,space);
 
    /*==================================================*/
    /* If any of the required functions were not found, */
@@ -505,7 +505,7 @@ static struct FunctionDefinition **ReadNeededFunctions(
 
    if (functionsNotFound)
      {
-      genfree(theEnv,(void *) newFunctionArray,temp);
+      genfree(theEnv,execStatus,(void *) newFunctionArray,temp);
       newFunctionArray = NULL;
      }
 
@@ -609,13 +609,13 @@ static int ClearBload(
         {
          if (! error)
            {
-            PrintErrorID(theEnv,"BLOAD",5,FALSE);
-            EnvPrintRouter(theEnv,WERROR,
+            PrintErrorID(theEnv,execStatus,"BLOAD",5,FALSE);
+            EnvPrintRouter(theEnv,execStatus,WERROR,
                        "Some constructs are still in use by the current binary image:\n");
            }
-         EnvPrintRouter(theEnv,WERROR,"   ");
-         EnvPrintRouter(theEnv,WERROR,bfPtr->name);
-         EnvPrintRouter(theEnv,WERROR,"\n");
+         EnvPrintRouter(theEnv,execStatus,WERROR,"   ");
+         EnvPrintRouter(theEnv,execStatus,WERROR,bfPtr->name);
+         EnvPrintRouter(theEnv,execStatus,WERROR,"\n");
          error = TRUE;
         }
      }
@@ -628,7 +628,7 @@ static int ClearBload(
 
    if (error == TRUE)
      {
-      EnvPrintRouter(theEnv,WERROR,"Binary clear cannot continue.\n");
+      EnvPrintRouter(theEnv,execStatus,WERROR,"Binary clear cannot continue.\n");
       return(FALSE);
      }
 
@@ -658,7 +658,7 @@ static int ClearBload(
    /*==================================*/
 
    BloadData(theEnv)->BloadActive = FALSE;
-   EnvRemoveClearFunction(theEnv,"bload");
+   EnvRemoveClearFunction(theEnv,execStatus,"bload");
 
    /*====================================*/
    /* Return TRUE to indicate the binary */
@@ -702,7 +702,7 @@ globle void AddBeforeBloadFunction(
   int priority)
   {
    BloadData(theEnv)->BeforeBloadFunctions =
-     AddFunctionToCallList(theEnv,name,priority,func,BloadData(theEnv)->BeforeBloadFunctions,TRUE);
+     AddFunctionToCallList(theEnv,execStatus,name,priority,func,BloadData(theEnv)->BeforeBloadFunctions,TRUE);
   }
 
 /*******************************************/
@@ -718,7 +718,7 @@ globle void AddAfterBloadFunction(
   int priority)
   {
    BloadData(theEnv)->AfterBloadFunctions =
-      AddFunctionToCallList(theEnv,name,priority,func,BloadData(theEnv)->AfterBloadFunctions,TRUE);
+      AddFunctionToCallList(theEnv,execStatus,name,priority,func,BloadData(theEnv)->AfterBloadFunctions,TRUE);
   }
 
 /**************************************************/
@@ -734,7 +734,7 @@ globle void AddClearBloadReadyFunction(
   int priority)
   {
    BloadData(theEnv)->ClearBloadReadyFunctions =
-      AddFunctionToCallList(theEnv,name,priority,
+      AddFunctionToCallList(theEnv,execStatus,name,priority,
                             (void (*)(void *)) func,
                             BloadData(theEnv)->ClearBloadReadyFunctions,TRUE);
   }
@@ -751,7 +751,7 @@ globle void AddAbortBloadFunction(
   void (*func)(void *),
   int priority)
   {
-   BloadData(theEnv)->AbortBloadFunctions = AddFunctionToCallList(theEnv,name,priority,func,BloadData(theEnv)->AbortBloadFunctions,TRUE);
+   BloadData(theEnv)->AbortBloadFunctions = AddFunctionToCallList(theEnv,execStatus,name,priority,func,BloadData(theEnv)->AbortBloadFunctions,TRUE);
   }
 
 /*******************************************************
@@ -790,10 +790,10 @@ globle void CannotLoadWithBloadMessage(
   EXEC_STATUS,
   char *constructName)
   {
-   PrintErrorID(theEnv,"BLOAD",1,TRUE);
-   EnvPrintRouter(theEnv,WERROR,"Cannot load ");
-   EnvPrintRouter(theEnv,WERROR,constructName);
-   EnvPrintRouter(theEnv,WERROR," construct with binary load in effect.\n");
+   PrintErrorID(theEnv,execStatus,"BLOAD",1,TRUE);
+   EnvPrintRouter(theEnv,execStatus,WERROR,"Cannot load ");
+   EnvPrintRouter(theEnv,execStatus,WERROR,constructName);
+   EnvPrintRouter(theEnv,execStatus,WERROR," construct with binary load in effect.\n");
   }
 
 #endif /* (BLOAD || BLOAD_ONLY || BLOAD_AND_BSAVE) */
@@ -811,7 +811,7 @@ globle int BloadCommand(
 
    if (EnvArgCountCheck(theEnv,execStatus,"bload",EXACTLY,1) == -1) return(FALSE);
    fileName = GetFileName(theEnv,execStatus,"bload",1);
-   if (fileName != NULL) return(EnvBload(theEnv,fileName));
+   if (fileName != NULL) return(EnvBload(theEnv,execStatus,fileName));
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
 #pragma unused(theEnv)

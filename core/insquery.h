@@ -69,7 +69,7 @@ struct instanceQueryData
    int AbortQuery;
   };
 
-#define InstanceQueryData(theEnv) ((struct instanceQueryData *) GetEnvironmentData(theEnv,INSTANCE_QUERY_DATA))
+#define InstanceQueryData(theEnv) ((struct instanceQueryData *) GetEnvironmentData(theEnv,execStatus,INSTANCE_QUERY_DATA))
 
 
 #ifdef LOCALE

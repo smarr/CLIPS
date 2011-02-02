@@ -39,7 +39,7 @@ struct defgenericBinaryData
    void **TypeArray;
   };
   
-#define DefgenericBinaryData(theEnv) ((struct defgenericBinaryData *) GetEnvironmentData(theEnv,GENRCBIN_DATA))
+#define DefgenericBinaryData(theEnv) ((struct defgenericBinaryData *) GetEnvironmentData(theEnv,execStatus,GENRCBIN_DATA))
 
 #define GenericPointer(i) (((i) == -1L) ? NULL : (DEFGENERIC *) &DefgenericBinaryData(theEnv)->DefgenericArray[i])
 

@@ -86,7 +86,7 @@ globle void ObjectPatternsCompilerSetup(
   EXEC_STATUS)
   {
    ObjectReteData(theEnv)->ObjectPatternCodeItem =
-         AddCodeGeneratorItem(theEnv,"object-patterns",0,BeforeObjectPatternsToCode,
+         AddCodeGeneratorItem(theEnv,execStatus,"object-patterns",0,BeforeObjectPatternsToCode,
                               InitObjectPatternsCode,ObjectPatternsToCode,2);
   }
 
@@ -222,19 +222,19 @@ static void InitObjectPatternsCode(
      {
       firstIntermediateNode = ObjectNetworkPointer(theEnv)->bsaveID;
       firstAlphaNode = ObjectNetworkTerminalPointer(theEnv)->bsaveID;
-      fprintf(initFP,"   SetObjectNetworkPointer(theEnv,&%s%d_%d[%d]);\n",
+      fprintf(initFP,"   SetObjectNetworkPointer(theEnv,execStatus,&%s%d_%d[%d]);\n",
                        ObjectPNPrefix(),imageID,
                        (int) ((firstIntermediateNode / maxIndices) + 1),
                        (int) (firstIntermediateNode % maxIndices));
-      fprintf(initFP,"   SetObjectNetworkTerminalPointer(theEnv,&%s%d_%d[%d]);\n",
+      fprintf(initFP,"   SetObjectNetworkTerminalPointer(theEnv,execStatus,&%s%d_%d[%d]);\n",
                        ObjectANPrefix(),imageID,
                        (int) ((firstAlphaNode / maxIndices) + 1),
                        (int) (firstAlphaNode % maxIndices));
      }
    else
      {
-      fprintf(initFP,"   SetObjectNetworkPointer(theEnv,NULL);\n");
-      fprintf(initFP,"   SetObjectNetworkTerminalPointer(theEnv,NULL);\n");
+      fprintf(initFP,"   SetObjectNetworkPointer(theEnv,execStatus,NULL);\n");
+      fprintf(initFP,"   SetObjectNetworkTerminalPointer(theEnv,execStatus,NULL);\n");
      }
   }
 
@@ -266,11 +266,11 @@ static int ObjectPatternsToCode(
   {
    int version;
    
-   version = IntermediatePatternNodesToCode(theEnv,fileName,pathName,fileNameBuffer,
+   version = IntermediatePatternNodesToCode(theEnv,execStatus,fileName,pathName,fileNameBuffer,
                                             fileID,headerFP,imageID,maxIndices,1);
    if (version == 0)
      return(0);
-   if (! AlphaPatternNodesToCode(theEnv,fileName,pathName,fileNameBuffer,fileID,headerFP,imageID,maxIndices,version))
+   if (! AlphaPatternNodesToCode(theEnv,execStatus,fileName,pathName,fileNameBuffer,fileID,headerFP,imageID,maxIndices,version))
      return(0);
    return(1);
   }
@@ -354,7 +354,7 @@ static int IntermediatePatternNodesToCode(
    /* =================================
       Dump the pattern node structures.
       ================================= */
-   if ((fp = NewCFile(theEnv,fileName,pathName,fileNameBuffer,fileID,version,FALSE)) == NULL)
+   if ((fp = NewCFile(theEnv,execStatus,fileName,pathName,fileNameBuffer,fileID,version,FALSE)) == NULL)
      return(0);
    newHeader = TRUE;
 
@@ -379,17 +379,17 @@ static int IntermediatePatternNodesToCode(
                                         thePattern->leaveFields,
                                         thePattern->slotNameID);
 
-      PrintHashedExpressionReference(theEnv,fp,thePattern->networkTest,imageID,maxIndices);
+      PrintHashedExpressionReference(theEnv,execStatus,fp,thePattern->networkTest,imageID,maxIndices);
       fprintf(fp,",");
-      IntermediatePatternNodeReference(theEnv,thePattern->nextLevel,fp,imageID,maxIndices);
+      IntermediatePatternNodeReference(theEnv,execStatus,thePattern->nextLevel,fp,imageID,maxIndices);
       fprintf(fp,",");
-      IntermediatePatternNodeReference(theEnv,thePattern->lastLevel,fp,imageID,maxIndices);
+      IntermediatePatternNodeReference(theEnv,execStatus,thePattern->lastLevel,fp,imageID,maxIndices);
       fprintf(fp,",");
-      IntermediatePatternNodeReference(theEnv,thePattern->leftNode,fp,imageID,maxIndices);
+      IntermediatePatternNodeReference(theEnv,execStatus,thePattern->leftNode,fp,imageID,maxIndices);
       fprintf(fp,",");
-      IntermediatePatternNodeReference(theEnv,thePattern->rightNode,fp,imageID,maxIndices);
+      IntermediatePatternNodeReference(theEnv,execStatus,thePattern->rightNode,fp,imageID,maxIndices);
       fprintf(fp,",");
-      ObjectPatternNodeReference(theEnv,(void *) thePattern->alphaNode,fp,imageID,maxIndices);
+      ObjectPatternNodeReference(theEnv,execStatus,(void *) thePattern->alphaNode,fp,imageID,maxIndices);
       fprintf(fp,",0L}");
 
       i++;
@@ -398,13 +398,13 @@ static int IntermediatePatternNodesToCode(
       if ((i > maxIndices) || (thePattern == NULL))
         {
          fprintf(fp,"};\n");
-         GenClose(theEnv,fp);
+         GenClose(theEnv,execStatus,fp);
          i = 1;
          version++;
          arrayVersion++;
          if (thePattern != NULL)
            {
-            if ((fp = NewCFile(theEnv,fileName,pathName,fileNameBuffer,fileID,version,FALSE)) == NULL)
+            if ((fp = NewCFile(theEnv,execStatus,fileName,pathName,fileNameBuffer,fileID,version,FALSE)) == NULL)
               return(0);
             newHeader = TRUE;
            }
@@ -458,7 +458,7 @@ static int AlphaPatternNodesToCode(
    /* =================================
       Dump the pattern node structures.
       ================================= */
-   if ((fp = NewCFile(theEnv,fileName,pathName,fileNameBuffer,fileID,version,FALSE)) == NULL)
+   if ((fp = NewCFile(theEnv,execStatus,fileName,pathName,fileNameBuffer,fileID,version,FALSE)) == NULL)
      return(0);
    newHeader = TRUE;
 
@@ -479,18 +479,18 @@ static int AlphaPatternNodesToCode(
 
       fprintf(fp,"{");
 
-      PatternNodeHeaderToCode(theEnv,fp,&thePattern->header,imageID,maxIndices);
+      PatternNodeHeaderToCode(theEnv,execStatus,fp,&thePattern->header,imageID,maxIndices);
 
       fprintf(fp,",0L,");
-      PrintBitMapReference(theEnv,fp,thePattern->classbmp);
+      PrintBitMapReference(theEnv,execStatus,fp,thePattern->classbmp);
       fprintf(fp,",");
-      PrintBitMapReference(theEnv,fp,thePattern->slotbmp);
+      PrintBitMapReference(theEnv,execStatus,fp,thePattern->slotbmp);
       fprintf(fp,",");
-      IntermediatePatternNodeReference(theEnv,thePattern->patternNode,fp,imageID,maxIndices);
+      IntermediatePatternNodeReference(theEnv,execStatus,thePattern->patternNode,fp,imageID,maxIndices);
       fprintf(fp,",");
-      ObjectPatternNodeReference(theEnv,thePattern->nxtInGroup,fp,imageID,maxIndices);
+      ObjectPatternNodeReference(theEnv,execStatus,thePattern->nxtInGroup,fp,imageID,maxIndices);
       fprintf(fp,",");
-      ObjectPatternNodeReference(theEnv,thePattern->nxtTerminal,fp,imageID,maxIndices);
+      ObjectPatternNodeReference(theEnv,execStatus,thePattern->nxtTerminal,fp,imageID,maxIndices);
       fprintf(fp,",0L}");
 
       i++;
@@ -499,13 +499,13 @@ static int AlphaPatternNodesToCode(
       if ((i > maxIndices) || (thePattern == NULL))
         {
          fprintf(fp,"};\n");
-         GenClose(theEnv,fp);
+         GenClose(theEnv,execStatus,fp);
          i = 1;
          version++;
          arrayVersion++;
          if (thePattern != NULL)
            {
-            if ((fp = NewCFile(theEnv,fileName,pathName,fileNameBuffer,fileID,version,FALSE)) == NULL)
+            if ((fp = NewCFile(theEnv,execStatus,fileName,pathName,fileNameBuffer,fileID,version,FALSE)) == NULL)
               return(0);
             newHeader = TRUE;
            }

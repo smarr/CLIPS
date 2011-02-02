@@ -45,7 +45,7 @@ struct basicMathFunctionData
    intBool AutoFloatDividend;
   };
 
-#define BasicMathFunctionData(theEnv) ((struct basicMathFunctionData *) GetEnvironmentData(theEnv,BMATHFUN_DATA))
+#define BasicMathFunctionData(theEnv) ((struct basicMathFunctionData *) GetEnvironmentData(theEnv,execStatus,BMATHFUN_DATA))
 
 /***************************************************************/
 /* BasicMathFunctionDefinitions: Defines basic math functions. */
@@ -54,27 +54,27 @@ globle void BasicMathFunctionDefinitions(
   void *theEnv,
 	EXEC_STATUS)
   {   
-   AllocateEnvironmentData(theEnv,BMATHFUN_DATA,sizeof(struct basicMathFunctionData),NULL);
+   AllocateEnvironmentData(theEnv,execStatus,BMATHFUN_DATA,sizeof(struct basicMathFunctionData),NULL);
    
    BasicMathFunctionData(theEnv)->AutoFloatDividend = TRUE;
 
 #if ! RUN_TIME
-   EnvDefineFunction2(theEnv,"+", 'n',PTIEF AdditionFunction, "AdditionFunction", "2*n");
-   EnvDefineFunction2(theEnv,"*", 'n', PTIEF MultiplicationFunction, "MultiplicationFunction", "2*n");
-   EnvDefineFunction2(theEnv,"-", 'n', PTIEF SubtractionFunction, "SubtractionFunction", "2*n");
+   EnvDefineFunction2(theEnv,execStatus,"+", 'n',PTIEF AdditionFunction, "AdditionFunction", "2*n");
+   EnvDefineFunction2(theEnv,execStatus,"*", 'n', PTIEF MultiplicationFunction, "MultiplicationFunction", "2*n");
+   EnvDefineFunction2(theEnv,execStatus,"-", 'n', PTIEF SubtractionFunction, "SubtractionFunction", "2*n");
     
-   EnvDefineFunction2(theEnv,"/", 'n', PTIEF DivisionFunction, "DivisionFunction", "2*n");
-   EnvDefineFunction2(theEnv,"div", 'g', PTIEF DivFunction, "DivFunction", "2*n");
-   EnvDefineFunction2(theEnv,"set-auto-float-dividend", 'b',
+   EnvDefineFunction2(theEnv,execStatus,"/", 'n', PTIEF DivisionFunction, "DivisionFunction", "2*n");
+   EnvDefineFunction2(theEnv,execStatus,"div", 'g', PTIEF DivFunction, "DivFunction", "2*n");
+   EnvDefineFunction2(theEnv,execStatus,"set-auto-float-dividend", 'b',
                    SetAutoFloatDividendCommand, "SetAutoFloatDividendCommand", "11");
-   EnvDefineFunction2(theEnv,"get-auto-float-dividend", 'b',
+   EnvDefineFunction2(theEnv,execStatus,"get-auto-float-dividend", 'b',
                   GetAutoFloatDividendCommand, "GetAutoFloatDividendCommand", "00");
 
-   EnvDefineFunction2(theEnv,"integer", 'g', PTIEF IntegerFunction, "IntegerFunction", "11n");
-   EnvDefineFunction2(theEnv,"float", 'd', PTIEF FloatFunction, "FloatFunction", "11n");
-   EnvDefineFunction2(theEnv,"abs", 'n', PTIEF AbsFunction, "AbsFunction", "11n");
-   EnvDefineFunction2(theEnv,"min", 'n', PTIEF MinFunction, "MinFunction", "2*n");
-   EnvDefineFunction2(theEnv,"max", 'n', PTIEF MaxFunction, "MaxFunction", "2*n");
+   EnvDefineFunction2(theEnv,execStatus,"integer", 'g', PTIEF IntegerFunction, "IntegerFunction", "11n");
+   EnvDefineFunction2(theEnv,execStatus,"float", 'd', PTIEF FloatFunction, "FloatFunction", "11n");
+   EnvDefineFunction2(theEnv,execStatus,"abs", 'n', PTIEF AbsFunction, "AbsFunction", "11n");
+   EnvDefineFunction2(theEnv,execStatus,"min", 'n', PTIEF MinFunction, "MinFunction", "2*n");
+   EnvDefineFunction2(theEnv,execStatus,"max", 'n', PTIEF MaxFunction, "MaxFunction", "2*n");
 #endif
   }
 
@@ -105,7 +105,7 @@ globle void AdditionFunction(
 
    while (theExpression != NULL)
      {
-      if (! GetNumericArgument(theEnv,theExpression,"+",&theArgument,useFloatTotal,pos)) theExpression = NULL;
+      if (! GetNumericArgument(theEnv,execStatus,theExpression,"+",&theArgument,useFloatTotal,pos)) theExpression = NULL;
       else theExpression = GetNextArgument(theExpression);
 
       if (useFloatTotal)
@@ -132,12 +132,12 @@ globle void AdditionFunction(
    if (useFloatTotal)
      {
       returnValue->type = FLOAT;
-      returnValue->value = (void *) EnvAddDouble(theEnv,ftotal);
+      returnValue->value = (void *) EnvAddDouble(theEnv,execStatus,ftotal);
      }
    else
      {
       returnValue->type = INTEGER;
-      returnValue->value = (void *) EnvAddLong(theEnv,ltotal);
+      returnValue->value = (void *) EnvAddLong(theEnv,execStatus,ltotal);
      }
   }
 
@@ -168,7 +168,7 @@ globle void MultiplicationFunction(
 
    while (theExpression != NULL)
      {
-      if (! GetNumericArgument(theEnv,theExpression,"*",&theArgument,useFloatTotal,pos)) theExpression = NULL;
+      if (! GetNumericArgument(theEnv,execStatus,theExpression,"*",&theArgument,useFloatTotal,pos)) theExpression = NULL;
       else theExpression = GetNextArgument(theExpression);
 
       if (useFloatTotal)
@@ -194,12 +194,12 @@ globle void MultiplicationFunction(
    if (useFloatTotal)
      {
       returnValue->type = FLOAT;
-      returnValue->value = (void *) EnvAddDouble(theEnv,ftotal);
+      returnValue->value = (void *) EnvAddDouble(theEnv,execStatus,ftotal);
      }
    else
      {
       returnValue->type = INTEGER;
-      returnValue->value = (void *) EnvAddLong(theEnv,ltotal);
+      returnValue->value = (void *) EnvAddLong(theEnv,execStatus,ltotal);
      }
   }
 
@@ -228,7 +228,7 @@ globle void SubtractionFunction(
    theExpression = GetFirstArgument();
    if (theExpression != NULL)
      {
-      if (! GetNumericArgument(theEnv,theExpression,"-",&theArgument,useFloatTotal,pos)) theExpression = NULL;
+      if (! GetNumericArgument(theEnv,execStatus,theExpression,"-",&theArgument,useFloatTotal,pos)) theExpression = NULL;
       else theExpression = GetNextArgument(theExpression);
 
       if (theArgument.type == INTEGER)
@@ -250,7 +250,7 @@ globle void SubtractionFunction(
 
    while (theExpression != NULL)
      {
-      if (! GetNumericArgument(theEnv,theExpression,"-",&theArgument,useFloatTotal,pos)) theExpression = NULL;
+      if (! GetNumericArgument(theEnv,execStatus,theExpression,"-",&theArgument,useFloatTotal,pos)) theExpression = NULL;
       else theExpression = GetNextArgument(theExpression);
 
       if (useFloatTotal)
@@ -276,12 +276,12 @@ globle void SubtractionFunction(
    if (useFloatTotal)
      {
       returnValue->type = FLOAT;
-      returnValue->value = (void *) EnvAddDouble(theEnv,ftotal);
+      returnValue->value = (void *) EnvAddDouble(theEnv,execStatus,ftotal);
      }
    else
      {
       returnValue->type = INTEGER;
-      returnValue->value = (void *) EnvAddLong(theEnv,ltotal);
+      returnValue->value = (void *) EnvAddLong(theEnv,execStatus,ltotal);
      }
   }
 
@@ -314,7 +314,7 @@ globle void DivisionFunction(
    theExpression = GetFirstArgument();
    if (theExpression != NULL)
      {
-      if (! GetNumericArgument(theEnv,theExpression,"/",&theArgument,useFloatTotal,pos)) theExpression = NULL;
+      if (! GetNumericArgument(theEnv,execStatus,theExpression,"/",&theArgument,useFloatTotal,pos)) theExpression = NULL;
       else theExpression = GetNextArgument(theExpression);
 
       if (theArgument.type == INTEGER)
@@ -337,17 +337,17 @@ globle void DivisionFunction(
 
    while (theExpression != NULL)
      {
-      if (! GetNumericArgument(theEnv,theExpression,"/",&theArgument,useFloatTotal,pos)) theExpression = NULL;
+      if (! GetNumericArgument(theEnv,execStatus,theExpression,"/",&theArgument,useFloatTotal,pos)) theExpression = NULL;
       else theExpression = GetNextArgument(theExpression);
 
       if ((theArgument.type == INTEGER) ? (ValueToLong(theArgument.value) == 0L) :
                                  ((theArgument.type == FLOAT) ? ValueToDouble(theArgument.value) == 0.0 : FALSE))
         {
-         DivideByZeroErrorMessage(theEnv,"/");
-         SetHaltExecution(theEnv,TRUE);
-         SetEvaluationError(theEnv,TRUE);
+         DivideByZeroErrorMessage(theEnv,execStatus,"/");
+         SetHaltExecution(theEnv,execStatus,TRUE);
+         SetEvaluationError(theEnv,execStatus,TRUE);
          returnValue->type = FLOAT;
-         returnValue->value = (void *) EnvAddDouble(theEnv,1.0);
+         returnValue->value = (void *) EnvAddDouble(theEnv,execStatus,1.0);
          return;
         }
 
@@ -374,12 +374,12 @@ globle void DivisionFunction(
    if (useFloatTotal)
      {
       returnValue->type = FLOAT;
-      returnValue->value = (void *) EnvAddDouble(theEnv,ftotal);
+      returnValue->value = (void *) EnvAddDouble(theEnv,execStatus,ftotal);
      }
    else
      {
       returnValue->type = INTEGER;
-      returnValue->value = (void *) EnvAddLong(theEnv,ltotal);
+      returnValue->value = (void *) EnvAddLong(theEnv,execStatus,ltotal);
      }
   }
 
@@ -406,7 +406,7 @@ globle long long DivFunction(
    theExpression = GetFirstArgument();
    if (theExpression != NULL)
      {
-      if (! GetNumericArgument(theEnv,theExpression,"div",&theArgument,FALSE,pos)) theExpression = NULL;
+      if (! GetNumericArgument(theEnv,execStatus,theExpression,"div",&theArgument,FALSE,pos)) theExpression = NULL;
       else theExpression = GetNextArgument(theExpression);
 
       if (theArgument.type == INTEGER)
@@ -425,7 +425,7 @@ globle long long DivFunction(
 
    while (theExpression != NULL)
      {
-      if (! GetNumericArgument(theEnv,theExpression,"div",&theArgument,FALSE,pos)) theExpression = NULL;
+      if (! GetNumericArgument(theEnv,execStatus,theExpression,"div",&theArgument,FALSE,pos)) theExpression = NULL;
       else theExpression = GetNextArgument(theExpression);
 
       if (theArgument.type == INTEGER) theNumber = ValueToLong(theArgument.value);
@@ -434,9 +434,9 @@ globle long long DivFunction(
 
       if (theNumber == 0LL)
         {
-         DivideByZeroErrorMessage(theEnv,"div");
-         SetHaltExecution(theEnv,TRUE);
-         SetEvaluationError(theEnv,TRUE);
+         DivideByZeroErrorMessage(theEnv,execStatus,"div");
+         SetHaltExecution(theEnv,execStatus,TRUE);
+         SetEvaluationError(theEnv,execStatus,TRUE);
          return(1L);
         }
 
@@ -623,7 +623,7 @@ globle void AbsFunction(
    if (EnvArgCountCheck(theEnv,execStatus,"abs",EXACTLY,1) == -1)
      {
       returnValue->type = INTEGER;
-      returnValue->value = (void *) EnvAddLong(theEnv,0L);
+      returnValue->value = (void *) EnvAddLong(theEnv,execStatus,0L);
       return;
      }
 
@@ -634,7 +634,7 @@ globle void AbsFunction(
    if (EnvArgTypeCheck(theEnv,execStatus,"abs",1,INTEGER_OR_FLOAT,returnValue) == FALSE)
      {
       returnValue->type = INTEGER;
-      returnValue->value = (void *) EnvAddLong(theEnv,0L);
+      returnValue->value = (void *) EnvAddLong(theEnv,execStatus,0L);
       return;
      }
 
@@ -645,10 +645,10 @@ globle void AbsFunction(
    if (returnValue->type == INTEGER)
      {
       if (ValueToLong(returnValue->value) < 0L)
-        { returnValue->value = (void *) EnvAddLong(theEnv,- ValueToLong(returnValue->value)); }
+        { returnValue->value = (void *) EnvAddLong(theEnv,execStatus,- ValueToLong(returnValue->value)); }
      }
    else if (ValueToDouble(returnValue->value) < 0.0)
-     { returnValue->value = (void *) EnvAddDouble(theEnv,- ValueToDouble(returnValue->value)); }
+     { returnValue->value = (void *) EnvAddDouble(theEnv,execStatus,- ValueToDouble(returnValue->value)); }
   }
 
 /*************************************/
@@ -670,7 +670,7 @@ globle void MinFunction(
    if ((numberOfArguments = EnvArgCountCheck(theEnv,execStatus,"min",AT_LEAST,1)) == -1)
      {
       returnValue->type = INTEGER;
-      returnValue->value = (void *) EnvAddLong(theEnv,0L);
+      returnValue->value = (void *) EnvAddLong(theEnv,execStatus,0L);
       return;
      }
 
@@ -681,7 +681,7 @@ globle void MinFunction(
    if (EnvArgTypeCheck(theEnv,execStatus,"min",1,INTEGER_OR_FLOAT,returnValue) == FALSE)
      {
       returnValue->type = INTEGER;
-      returnValue->value = (void *) EnvAddLong(theEnv,0L);
+      returnValue->value = (void *) EnvAddLong(theEnv,execStatus,0L);
       return;
      }
 
@@ -760,7 +760,7 @@ globle void MaxFunction(
    if ((numberOfArguments = EnvArgCountCheck(theEnv,execStatus,"max",AT_LEAST,1)) == -1)
      {
       returnValue->type = INTEGER;
-      returnValue->value = (void *) EnvAddLong(theEnv,0L);
+      returnValue->value = (void *) EnvAddLong(theEnv,execStatus,0L);
       return;
      }
 
@@ -771,7 +771,7 @@ globle void MaxFunction(
    if (EnvArgTypeCheck(theEnv,execStatus,"max",1,INTEGER_OR_FLOAT,returnValue) == FALSE)
      {
       returnValue->type = INTEGER;
-      returnValue->value = (void *) EnvAddLong(theEnv,0L);
+      returnValue->value = (void *) EnvAddLong(theEnv,execStatus,0L);
       return;
      }
 

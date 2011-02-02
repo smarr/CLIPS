@@ -71,7 +71,7 @@ struct factgenData
    globle struct entityRecord   FactPNConstant2Info;
   };
   
-#define FactgenData(theEnv) ((struct factgenData *) GetEnvironmentData(theEnv,FACTGEN_DATA))
+#define FactgenData(theEnv) ((struct factgenData *) GetEnvironmentData(theEnv,execStatus,FACTGEN_DATA))
 
 /***************************************/
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
@@ -176,7 +176,7 @@ globle void InitializeFactReteFunctions(
                                                         FactPNConstant2,
                                                         NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL };
 
-   AllocateEnvironmentData(theEnv,FACTGEN_DATA,sizeof(struct factgenData),NULL);
+   AllocateEnvironmentData(theEnv,execStatus,FACTGEN_DATA,sizeof(struct factgenData),NULL);
    
    memcpy(&FactgenData(theEnv)->FactJNGV1Info,&factJNGV1Info,sizeof(struct entityRecord));   
    memcpy(&FactgenData(theEnv)->FactJNGV2Info,&factJNGV2Info,sizeof(struct entityRecord));   
@@ -192,20 +192,20 @@ globle void InitializeFactReteFunctions(
    memcpy(&FactgenData(theEnv)->FactPNConstant1Info,&factPNConstant1Info,sizeof(struct entityRecord));   
    memcpy(&FactgenData(theEnv)->FactPNConstant2Info,&factPNConstant2Info,sizeof(struct entityRecord));   
                                                         
-   InstallPrimitive(theEnv,(ENTITY_RECORD_PTR) &FactData(theEnv)->FactInfo,FACT_ADDRESS);
-   InstallPrimitive(theEnv,&FactgenData(theEnv)->FactJNGV1Info,FACT_JN_VAR1);
-   InstallPrimitive(theEnv,&FactgenData(theEnv)->FactJNGV2Info,FACT_JN_VAR2);
-   InstallPrimitive(theEnv,&FactgenData(theEnv)->FactJNGV3Info,FACT_JN_VAR3);
-   InstallPrimitive(theEnv,&FactgenData(theEnv)->FactPNGV1Info,FACT_PN_VAR1);
-   InstallPrimitive(theEnv,&FactgenData(theEnv)->FactPNGV2Info,FACT_PN_VAR2);
-   InstallPrimitive(theEnv,&FactgenData(theEnv)->FactPNGV3Info,FACT_PN_VAR3);
-   InstallPrimitive(theEnv,&FactgenData(theEnv)->FactJNCV1Info,FACT_JN_CMP1);
-   InstallPrimitive(theEnv,&FactgenData(theEnv)->FactJNCV2Info,FACT_JN_CMP2);
-   InstallPrimitive(theEnv,&FactgenData(theEnv)->FactPNCV1Info,FACT_PN_CMP1);
-   InstallPrimitive(theEnv,&FactgenData(theEnv)->FactStoreMFInfo,FACT_STORE_MULTIFIELD);
-   InstallPrimitive(theEnv,&FactgenData(theEnv)->FactSlotLengthInfo,FACT_SLOT_LENGTH);
-   InstallPrimitive(theEnv,&FactgenData(theEnv)->FactPNConstant1Info,FACT_PN_CONSTANT1);
-   InstallPrimitive(theEnv,&FactgenData(theEnv)->FactPNConstant2Info,FACT_PN_CONSTANT2);
+   InstallPrimitive(theEnv,execStatus,(ENTITY_RECORD_PTR) &FactData(theEnv)->FactInfo,FACT_ADDRESS);
+   InstallPrimitive(theEnv,execStatus,&FactgenData(theEnv)->FactJNGV1Info,FACT_JN_VAR1);
+   InstallPrimitive(theEnv,execStatus,&FactgenData(theEnv)->FactJNGV2Info,FACT_JN_VAR2);
+   InstallPrimitive(theEnv,execStatus,&FactgenData(theEnv)->FactJNGV3Info,FACT_JN_VAR3);
+   InstallPrimitive(theEnv,execStatus,&FactgenData(theEnv)->FactPNGV1Info,FACT_PN_VAR1);
+   InstallPrimitive(theEnv,execStatus,&FactgenData(theEnv)->FactPNGV2Info,FACT_PN_VAR2);
+   InstallPrimitive(theEnv,execStatus,&FactgenData(theEnv)->FactPNGV3Info,FACT_PN_VAR3);
+   InstallPrimitive(theEnv,execStatus,&FactgenData(theEnv)->FactJNCV1Info,FACT_JN_CMP1);
+   InstallPrimitive(theEnv,execStatus,&FactgenData(theEnv)->FactJNCV2Info,FACT_JN_CMP2);
+   InstallPrimitive(theEnv,execStatus,&FactgenData(theEnv)->FactPNCV1Info,FACT_PN_CMP1);
+   InstallPrimitive(theEnv,execStatus,&FactgenData(theEnv)->FactStoreMFInfo,FACT_STORE_MULTIFIELD);
+   InstallPrimitive(theEnv,execStatus,&FactgenData(theEnv)->FactSlotLengthInfo,FACT_SLOT_LENGTH);
+   InstallPrimitive(theEnv,execStatus,&FactgenData(theEnv)->FactPNConstant1Info,FACT_PN_CONSTANT1);
+   InstallPrimitive(theEnv,execStatus,&FactgenData(theEnv)->FactPNConstant2Info,FACT_PN_CONSTANT2);
 #endif
   }
 
@@ -241,9 +241,9 @@ globle struct expr *FactGenPNConstant(
 
       hack1.whichSlot = (unsigned short) (theField->slotNumber - 1);
 
-      top = GenConstant(theEnv,FACT_PN_CONSTANT1,EnvAddBitMap(theEnv,&hack1,sizeof(struct factConstantPN1Call)));
+      top = GenConstant(theEnv,execStatus,FACT_PN_CONSTANT1,EnvAddBitMap(theEnv,execStatus,&hack1,sizeof(struct factConstantPN1Call)));
 
-      top->argList = GenConstant(theEnv,theField->type,theField->value);
+      top->argList = GenConstant(theEnv,execStatus,theField->type,theField->value);
 
       return(top);
      }
@@ -276,9 +276,9 @@ globle struct expr *FactGenPNConstant(
          hack2.offset = theField->singleFieldsAfter;
         }
 
-      top = GenConstant(theEnv,FACT_PN_CONSTANT2,EnvAddBitMap(theEnv,&hack2,sizeof(struct factConstantPN2Call)));
+      top = GenConstant(theEnv,execStatus,FACT_PN_CONSTANT2,EnvAddBitMap(theEnv,execStatus,&hack2,sizeof(struct factConstantPN2Call)));
 
-      top->argList = GenConstant(theEnv,theField->type,theField->value);
+      top->argList = GenConstant(theEnv,execStatus,theField->type,theField->value);
 
       return(top);
      }
@@ -292,16 +292,16 @@ globle struct expr *FactGenPNConstant(
    else
      {
       if (theField->negated)
-        { top = GenConstant(theEnv,FCALL,ExpressionData(theEnv)->PTR_NEQ); }
+        { top = GenConstant(theEnv,execStatus,FCALL,ExpressionData(theEnv)->PTR_NEQ); }
       else
-        { top = GenConstant(theEnv,FCALL,ExpressionData(theEnv)->PTR_EQ); }
+        { top = GenConstant(theEnv,execStatus,FCALL,ExpressionData(theEnv)->PTR_EQ); }
 
       tempValue = theField->type;
       theField->type = SF_VARIABLE;
-      top->argList = FactGenGetfield(theEnv,theField);
+      top->argList = FactGenGetfield(theEnv,execStatus,theField);
       theField->type = tempValue;
 
-      top->argList->nextArg = GenConstant(theEnv,theField->type,theField->value);
+      top->argList->nextArg = GenConstant(theEnv,execStatus,theField->type,theField->value);
      }
 
    /*===============================================================*/
@@ -327,7 +327,7 @@ globle struct expr *FactGenGetfield(
    /*===================================================*/
 
    if ((theNode->slotNumber > 0) && (theNode->withinMultifieldSlot == FALSE))
-     { return(GenConstant(theEnv,FACT_PN_VAR2,FactGetVarPN2(theEnv,theNode))); }
+     { return(GenConstant(theEnv,execStatus,FACT_PN_VAR2,FactGetVarPN2(theEnv,execStatus,theNode))); }
 
    /*=====================================================*/
    /* Generate call to retrieve a value from a multifield */
@@ -339,18 +339,18 @@ globle struct expr *FactGenGetfield(
    if (((theNode->type == SF_WILDCARD) || (theNode->type == SF_VARIABLE) || ConstantType(theNode->type)) &&
        ((theNode->multiFieldsBefore == 0) ||
         ((theNode->multiFieldsBefore == 1) && (theNode->multiFieldsAfter == 0))))
-     { return(GenConstant(theEnv,FACT_PN_VAR3,FactGetVarPN3(theEnv,theNode))); }
+     { return(GenConstant(theEnv,execStatus,FACT_PN_VAR3,FactGetVarPN3(theEnv,execStatus,theNode))); }
 
    if (((theNode->type == MF_WILDCARD) || (theNode->type == MF_VARIABLE)) && 
        (theNode->multiFieldsBefore == 0) && (theNode->multiFieldsAfter == 0))
-     { return(GenConstant(theEnv,FACT_PN_VAR3,FactGetVarPN3(theEnv,theNode))); }
+     { return(GenConstant(theEnv,execStatus,FACT_PN_VAR3,FactGetVarPN3(theEnv,execStatus,theNode))); }
 
    /*=========================================*/
    /* Generate call to retrieve a value using */
    /* the most general retrieval function.    */
    /*=========================================*/
 
-   return(GenConstant(theEnv,FACT_PN_VAR1,FactGetVarPN1(theEnv,theNode)));
+   return(GenConstant(theEnv,execStatus,FACT_PN_VAR1,FactGetVarPN1(theEnv,execStatus,theNode)));
   }
 
 /**************************************************/
@@ -369,7 +369,7 @@ globle struct expr *FactGenGetvar(
    /*====================================================*/
 
    if ((theNode->slotNumber > 0) && (theNode->withinMultifieldSlot == FALSE))
-     { return(GenConstant(theEnv,FACT_JN_VAR2,FactGetVarJN2(theEnv,theNode,side))); }
+     { return(GenConstant(theEnv,execStatus,FACT_JN_VAR2,FactGetVarJN2(theEnv,execStatus,theNode,side))); }
 
    /*=====================================================*/
    /* Generate call to retrieve a value from a multifield */
@@ -381,19 +381,19 @@ globle struct expr *FactGenGetvar(
    if (((theNode->type == SF_WILDCARD) || (theNode->type == SF_VARIABLE)) &&
        ((theNode->multiFieldsBefore == 0) ||
         ((theNode->multiFieldsBefore == 1) && (theNode->multiFieldsAfter == 0))))
-     { return(GenConstant(theEnv,FACT_JN_VAR3,FactGetVarJN3(theEnv,theNode,side))); }
+     { return(GenConstant(theEnv,execStatus,FACT_JN_VAR3,FactGetVarJN3(theEnv,execStatus,theNode,side))); }
 
    if (((theNode->type == MF_WILDCARD) || (theNode->type == MF_VARIABLE)) &&
        (theNode->multiFieldsBefore == 0) &&
        (theNode->multiFieldsAfter == 0))
-     { return(GenConstant(theEnv,FACT_JN_VAR3,FactGetVarJN3(theEnv,theNode,side))); }
+     { return(GenConstant(theEnv,execStatus,FACT_JN_VAR3,FactGetVarJN3(theEnv,execStatus,theNode,side))); }
 
    /*=========================================*/
    /* Generate call to retrieve a value using */
    /* the most general retrieval function.    */
    /*=========================================*/
 
-   return(GenConstant(theEnv,FACT_JN_VAR1,FactGetVarJN1(theEnv,theNode,side)));
+   return(GenConstant(theEnv,execStatus,FACT_JN_VAR1,FactGetVarJN1(theEnv,execStatus,theNode,side)));
   }
 
 /**************************************************************/
@@ -454,7 +454,7 @@ globle struct expr *FactGenCheckLength(
    /* Generate call to test the length of a multifield slot. */
    /*========================================================*/
 
-   return(GenConstant(theEnv,FACT_SLOT_LENGTH,EnvAddBitMap(theEnv,&hack,sizeof(struct factCheckLengthPNCall))));
+   return(GenConstant(theEnv,execStatus,FACT_SLOT_LENGTH,EnvAddBitMap(theEnv,execStatus,&hack,sizeof(struct factCheckLengthPNCall))));
   }
 
 /**************************************************************/
@@ -475,7 +475,7 @@ globle struct expr *FactGenCheckZeroLength(
    hack.exactly = 1;
    hack.minLength = 0;
 
-   return(GenConstant(theEnv,FACT_SLOT_LENGTH,EnvAddBitMap(theEnv,&hack,sizeof(struct factCheckLengthPNCall))));
+   return(GenConstant(theEnv,execStatus,FACT_SLOT_LENGTH,EnvAddBitMap(theEnv,execStatus,&hack,sizeof(struct factCheckLengthPNCall))));
   }
 
 /*********************************************************************/
@@ -497,7 +497,7 @@ globle void FactReplaceGetvar(
    if ((theNode->slotNumber > 0) && (theNode->withinMultifieldSlot == FALSE))
      {
       theItem->type = FACT_JN_VAR2;
-      theItem->value = FactGetVarJN2(theEnv,theNode,side);
+      theItem->value = FactGetVarJN2(theEnv,execStatus,theNode,side);
       return;
      }
 
@@ -513,7 +513,7 @@ globle void FactReplaceGetvar(
         ((theNode->multiFieldsBefore == 1) && (theNode->multiFieldsAfter == 0))))
      {
       theItem->type = FACT_JN_VAR3;
-      theItem->value = FactGetVarJN3(theEnv,theNode,side);
+      theItem->value = FactGetVarJN3(theEnv,execStatus,theNode,side);
       return;
      }
 
@@ -522,7 +522,7 @@ globle void FactReplaceGetvar(
        (theNode->multiFieldsAfter == 0))
      {
       theItem->type = FACT_JN_VAR3;
-      theItem->value = FactGetVarJN3(theEnv,theNode,side);
+      theItem->value = FactGetVarJN3(theEnv,execStatus,theNode,side);
       return;
      }
 
@@ -532,7 +532,7 @@ globle void FactReplaceGetvar(
    /*=========================================*/
 
    theItem->type = FACT_JN_VAR1;
-   theItem->value = FactGetVarJN1(theEnv,theNode,side);
+   theItem->value = FactGetVarJN1(theEnv,execStatus,theNode,side);
   }
 
 /***********************************************************************/
@@ -553,7 +553,7 @@ globle void FactReplaceGetfield(
    if (theNode->withinMultifieldSlot == FALSE)
      {
       theItem->type = FACT_PN_VAR2;
-      theItem->value = FactGetVarPN2(theEnv,theNode);
+      theItem->value = FactGetVarPN2(theEnv,execStatus,theNode);
       return;
      }
 
@@ -569,7 +569,7 @@ globle void FactReplaceGetfield(
         ((theNode->multiFieldsBefore == 1) && (theNode->multiFieldsAfter == 0))))
      {
       theItem->type = FACT_PN_VAR3;
-      theItem->value = FactGetVarPN3(theEnv,theNode);
+      theItem->value = FactGetVarPN3(theEnv,execStatus,theNode);
       return;
      }
 
@@ -578,7 +578,7 @@ globle void FactReplaceGetfield(
        (theNode->multiFieldsAfter == 0))
      {
       theItem->type = FACT_PN_VAR3;
-      theItem->value = FactGetVarPN3(theEnv,theNode);
+      theItem->value = FactGetVarPN3(theEnv,execStatus,theNode);
       return;
      }
 
@@ -588,7 +588,7 @@ globle void FactReplaceGetfield(
    /*=========================================*/
 
    theItem->type = FACT_PN_VAR1;
-   theItem->value = FactGetVarPN1(theEnv,theNode);
+   theItem->value = FactGetVarPN1(theEnv,execStatus,theNode);
   }
 
 /*************************************************************/
@@ -682,7 +682,7 @@ static void *FactGetVarJN1(
    /* Return the argument bitmap. */
    /*=============================*/
 
-   return(EnvAddBitMap(theEnv,&hack,sizeof(struct factGetVarJN1Call)));
+   return(EnvAddBitMap(theEnv,execStatus,&hack,sizeof(struct factGetVarJN1Call)));
   }
 
 /**************************************************************/
@@ -737,7 +737,7 @@ static void *FactGetVarJN2(
    /* Return the argument bitmap. */
    /*=============================*/
 
-   return(EnvAddBitMap(theEnv,&hack,sizeof(struct factGetVarJN2Call)));
+   return(EnvAddBitMap(theEnv,execStatus,&hack,sizeof(struct factGetVarJN2Call)));
   }
 
 /*************************************************************/
@@ -831,7 +831,7 @@ static void *FactGetVarJN3(
       /* Return the argument bitmap. */
       /*=============================*/
 
-      return(EnvAddBitMap(theEnv,&hack,sizeof(struct factGetVarJN3Call)));
+      return(EnvAddBitMap(theEnv,execStatus,&hack,sizeof(struct factGetVarJN3Call)));
      }
 
    /*============================================================*/
@@ -854,7 +854,7 @@ static void *FactGetVarJN3(
    /* Return the argument bitmap. */
    /*=============================*/
 
-   return(EnvAddBitMap(theEnv,&hack,sizeof(struct factGetVarJN3Call)));
+   return(EnvAddBitMap(theEnv,execStatus,&hack,sizeof(struct factGetVarJN3Call)));
   }
 
 /**************************************************************/
@@ -924,7 +924,7 @@ static void *FactGetVarPN1(
    /* Return the argument bitmap. */
    /*=============================*/
 
-   return(EnvAddBitMap(theEnv,&hack,sizeof(struct factGetVarPN1Call)));
+   return(EnvAddBitMap(theEnv,execStatus,&hack,sizeof(struct factGetVarPN1Call)));
   }
 
 /***************************************************************/
@@ -958,7 +958,7 @@ static void *FactGetVarPN2(
    /* Return the argument bitmap. */
    /*=============================*/
 
-   return(EnvAddBitMap(theEnv,&hack,sizeof(struct factGetVarPN2Call)));
+   return(EnvAddBitMap(theEnv,execStatus,&hack,sizeof(struct factGetVarPN2Call)));
   }
 
 /*************************************************************/
@@ -1027,7 +1027,7 @@ static void *FactGetVarPN3(
          hack.endOffset = theNode->singleFieldsAfter;
         }
 
-      return(EnvAddBitMap(theEnv,&hack,sizeof(struct factGetVarPN3Call)));
+      return(EnvAddBitMap(theEnv,execStatus,&hack,sizeof(struct factGetVarPN3Call)));
      }
 
    /*============================================================*/
@@ -1050,7 +1050,7 @@ static void *FactGetVarPN3(
    /* Return the argument bitmap. */
    /*=============================*/
 
-   return(EnvAddBitMap(theEnv,&hack,sizeof(struct factGetVarPN3Call)));
+   return(EnvAddBitMap(theEnv,execStatus,&hack,sizeof(struct factGetVarPN3Call)));
   }
 
 /*************************************************************/
@@ -1091,7 +1091,7 @@ globle struct expr *FactPNVariableComparison(
       if (selfNode->negated) hack.fail = 1;
       else hack.pass = 1;
 
-      top = GenConstant(theEnv,FACT_PN_CMP1,EnvAddBitMap(theEnv,&hack,sizeof(struct factCompVarsPN1Call)));
+      top = GenConstant(theEnv,execStatus,FACT_PN_CMP1,EnvAddBitMap(theEnv,execStatus,&hack,sizeof(struct factCompVarsPN1Call)));
      }
 
    /*================================================================*/
@@ -1101,11 +1101,11 @@ globle struct expr *FactPNVariableComparison(
 
    else
      {
-      if (selfNode->negated) top = GenConstant(theEnv,FCALL,ExpressionData(theEnv)->PTR_NEQ);
-      else top = GenConstant(theEnv,FCALL,ExpressionData(theEnv)->PTR_EQ);
+      if (selfNode->negated) top = GenConstant(theEnv,execStatus,FCALL,ExpressionData(theEnv)->PTR_NEQ);
+      else top = GenConstant(theEnv,execStatus,FCALL,ExpressionData(theEnv)->PTR_EQ);
 
-      top->argList = FactGenGetfield(theEnv,selfNode);
-      top->argList->nextArg = FactGenGetfield(theEnv,referringNode);
+      top->argList = FactGenGetfield(theEnv,execStatus,selfNode);
+      top->argList->nextArg = FactGenGetfield(theEnv,execStatus,referringNode);
      }
 
    /*======================================*/
@@ -1166,7 +1166,7 @@ globle struct expr *FactJNVariableComparison(
       if (selfNode->negated) hack1.fail = 1;
       else hack1.pass = 1;
 
-      top = GenConstant(theEnv,FACT_JN_CMP1,EnvAddBitMap(theEnv,&hack1,sizeof(struct factCompVarsJN1Call)));
+      top = GenConstant(theEnv,execStatus,FACT_JN_CMP1,EnvAddBitMap(theEnv,execStatus,&hack1,sizeof(struct factCompVarsJN1Call)));
      }
 
    /*===============================================================*/
@@ -1231,7 +1231,7 @@ globle struct expr *FactJNVariableComparison(
       if (selfNode->negated) hack2.fail = 1;
       else hack2.pass = 1;
 
-      top = GenConstant(theEnv,FACT_JN_CMP2,EnvAddBitMap(theEnv,&hack2,sizeof(struct factCompVarsJN2Call)));
+      top = GenConstant(theEnv,execStatus,FACT_JN_CMP2,EnvAddBitMap(theEnv,execStatus,&hack2,sizeof(struct factCompVarsJN2Call)));
      }
 
    /*===============================================================*/
@@ -1243,19 +1243,19 @@ globle struct expr *FactJNVariableComparison(
    else
      {
       if (selfNode->negated)
-        { top = GenConstant(theEnv,FCALL,ExpressionData(theEnv)->PTR_NEQ); }
+        { top = GenConstant(theEnv,execStatus,FCALL,ExpressionData(theEnv)->PTR_NEQ); }
       else
-        { top = GenConstant(theEnv,FCALL,ExpressionData(theEnv)->PTR_EQ); }
+        { top = GenConstant(theEnv,execStatus,FCALL,ExpressionData(theEnv)->PTR_EQ); }
 
       if (nandJoin)
-        { top->argList = FactGenGetvar(theEnv,selfNode,NESTED_RHS); }
+        { top->argList = FactGenGetvar(theEnv,execStatus,selfNode,NESTED_RHS); }
       else
-        { top->argList = FactGenGetvar(theEnv,selfNode,RHS); }
+        { top->argList = FactGenGetvar(theEnv,execStatus,selfNode,RHS); }
         
       if (nandJoin && (selfNode->beginNandDepth == referringNode->beginNandDepth))
-        { top->argList->nextArg = FactGenGetvar(theEnv,referringNode,NESTED_RHS); }
+        { top->argList->nextArg = FactGenGetvar(theEnv,execStatus,referringNode,NESTED_RHS); }
       else
-        { top->argList->nextArg = FactGenGetvar(theEnv,referringNode,LHS); }
+        { top->argList->nextArg = FactGenGetvar(theEnv,execStatus,referringNode,LHS); }
      }
 
    /*======================================*/

@@ -73,17 +73,17 @@ globle void StringFunctionDefinitions(
   EXEC_STATUS)
   {
 #if ! RUN_TIME
-   EnvDefineFunction2(theEnv,"str-cat", 'k', PTIEF StrCatFunction, "StrCatFunction", "1*");
-   EnvDefineFunction2(theEnv,"sym-cat", 'k', PTIEF SymCatFunction, "SymCatFunction", "1*");
-   EnvDefineFunction2(theEnv,"str-length", 'g', PTIEF StrLengthFunction, "StrLengthFunction", "11j");
-   EnvDefineFunction2(theEnv,"str-compare", 'g', PTIEF StrCompareFunction, "StrCompareFunction", "23*jji");
-   EnvDefineFunction2(theEnv,"upcase", 'j', PTIEF UpcaseFunction, "UpcaseFunction", "11j");
-   EnvDefineFunction2(theEnv,"lowcase", 'j', PTIEF LowcaseFunction, "LowcaseFunction", "11j");
-   EnvDefineFunction2(theEnv,"sub-string", 's', PTIEF SubStringFunction, "SubStringFunction", "33*iij");
-   EnvDefineFunction2(theEnv,"str-index", 'u', PTIEF StrIndexFunction, "StrIndexFunction", "22j");
-   EnvDefineFunction2(theEnv,"eval", 'u', PTIEF EvalFunction, "EvalFunction", "11k");
-   EnvDefineFunction2(theEnv,"build", 'b', PTIEF BuildFunction, "BuildFunction", "11k");
-   EnvDefineFunction2(theEnv,"string-to-field", 'u', PTIEF StringToFieldFunction, "StringToFieldFunction", "11j");
+   EnvDefineFunction2(theEnv,execStatus,"str-cat", 'k', PTIEF StrCatFunction, "StrCatFunction", "1*");
+   EnvDefineFunction2(theEnv,execStatus,"sym-cat", 'k', PTIEF SymCatFunction, "SymCatFunction", "1*");
+   EnvDefineFunction2(theEnv,execStatus,"str-length", 'g', PTIEF StrLengthFunction, "StrLengthFunction", "11j");
+   EnvDefineFunction2(theEnv,execStatus,"str-compare", 'g', PTIEF StrCompareFunction, "StrCompareFunction", "23*jji");
+   EnvDefineFunction2(theEnv,execStatus,"upcase", 'j', PTIEF UpcaseFunction, "UpcaseFunction", "11j");
+   EnvDefineFunction2(theEnv,execStatus,"lowcase", 'j', PTIEF LowcaseFunction, "LowcaseFunction", "11j");
+   EnvDefineFunction2(theEnv,execStatus,"sub-string", 's', PTIEF SubStringFunction, "SubStringFunction", "33*iij");
+   EnvDefineFunction2(theEnv,execStatus,"str-index", 'u', PTIEF StrIndexFunction, "StrIndexFunction", "22j");
+   EnvDefineFunction2(theEnv,execStatus,"eval", 'u', PTIEF EvalFunction, "EvalFunction", "11k");
+   EnvDefineFunction2(theEnv,execStatus,"build", 'b', PTIEF BuildFunction, "BuildFunction", "11k");
+   EnvDefineFunction2(theEnv,execStatus,"string-to-field", 'u', PTIEF StringToFieldFunction, "StringToFieldFunction", "11j");
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
 #pragma unused(theEnv)
@@ -100,7 +100,7 @@ globle void StrCatFunction(
   EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {   
-   StrOrSymCatFunction(theEnv,returnValue,STRING);
+   StrOrSymCatFunction(theEnv,execStatus,returnValue,STRING);
   }
 
 /****************************************/
@@ -112,7 +112,7 @@ globle void SymCatFunction(
   EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
-   StrOrSymCatFunction(theEnv,returnValue,SYMBOL);
+   StrOrSymCatFunction(theEnv,execStatus,returnValue,SYMBOL);
   }
 
 /********************************************************/
@@ -142,12 +142,12 @@ static void StrOrSymCatFunction(
    if (returnType == STRING)
      {
       functionName = "str-cat";
-      SetpValue(returnValue,(void *) EnvAddSymbol(theEnv,""));
+      SetpValue(returnValue,(void *) EnvAddSymbol(theEnv,execStatus,""));
      }
    else
      {
       functionName = "sym-cat";
-      SetpValue(returnValue,(void *) EnvAddSymbol(theEnv,"nil"));
+      SetpValue(returnValue,(void *) EnvAddSymbol(theEnv,execStatus,"nil"));
      }
 
    /*===============================================*/
@@ -156,8 +156,8 @@ static void StrOrSymCatFunction(
    /* the string representation of each argument.   */
    /*===============================================*/
 
-   numArgs = EnvRtnArgCount(theEnv,execStatus);
-   arrayOfStrings = (SYMBOL_HN **) gm1(theEnv,(int) sizeof(SYMBOL_HN *) * numArgs);
+   numArgs = EnvRtnArgCount(theEnv,execStatus,execStatus);
+   arrayOfStrings = (SYMBOL_HN **) gm1(theEnv,execStatus,(int) sizeof(SYMBOL_HN *) * numArgs);
    for (i = 0; i < numArgs; i++)   
      { arrayOfStrings[i] = NULL; }
 
@@ -184,20 +184,20 @@ static void StrOrSymCatFunction(
            break;
 
          case FLOAT:
-           hashPtr = (SYMBOL_HN *) EnvAddSymbol(theEnv,FloatToString(theEnv,ValueToDouble(GetValue(theArg))));
+           hashPtr = (SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,FloatToString(theEnv,execStatus,ValueToDouble(GetValue(theArg))));
            arrayOfStrings[i-1] = hashPtr;
            IncrementSymbolCount(hashPtr);
            break;
 
          case INTEGER:
-           hashPtr = (SYMBOL_HN *) EnvAddSymbol(theEnv,LongIntegerToString(theEnv,ValueToLong(GetValue(theArg))));
+           hashPtr = (SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,LongIntegerToString(theEnv,execStatus,ValueToLong(GetValue(theArg))));
            arrayOfStrings[i-1] = hashPtr;
            IncrementSymbolCount(hashPtr);
            break;
 
          default:
-           ExpectedTypeError1(theEnv,functionName,i,"string, instance name, symbol, float, or integer");
-           SetEvaluationError(theEnv,TRUE);
+           ExpectedTypeError1(theEnv,execStatus,functionName,i,"string, instance name, symbol, float, or integer");
+           SetEvaluationError(theEnv,execStatus,TRUE);
            break;
         }
 
@@ -206,10 +206,10 @@ static void StrOrSymCatFunction(
          for (i = 0; i < numArgs; i++)
            {
             if (arrayOfStrings[i] != NULL)
-              { DecrementSymbolCount(theEnv,arrayOfStrings[i]); }
+              { DecrementSymbolCount(theEnv,execStatus,arrayOfStrings[i]); }
            }
 
-         rm(theEnv,arrayOfStrings,sizeof(SYMBOL_HN *) * numArgs);
+         rm(theEnv,execStatus,arrayOfStrings,sizeof(SYMBOL_HN *) * numArgs);
          return;
         }
 
@@ -222,7 +222,7 @@ static void StrOrSymCatFunction(
    /* memory just allocated.                                  */
    /*=========================================================*/
 
-   theString = (char *) gm2(theEnv,(sizeof(char) * total));
+   theString = (char *) gm2(theEnv,execStatus,(sizeof(char) * total));
 
    j = 0;
    for (i = 0 ; i < numArgs ; i++)
@@ -236,16 +236,16 @@ static void StrOrSymCatFunction(
    /* up the temporary memory used.           */
    /*=========================================*/
 
-   SetpValue(returnValue,(void *) EnvAddSymbol(theEnv,theString));
-   rm(theEnv,theString,sizeof(char) * total);
+   SetpValue(returnValue,(void *) EnvAddSymbol(theEnv,execStatus,theString));
+   rm(theEnv,execStatus,theString,sizeof(char) * total);
 
    for (i = 0; i < numArgs; i++)
      {
       if (arrayOfStrings[i] != NULL)
-        { DecrementSymbolCount(theEnv,arrayOfStrings[i]); }
+        { DecrementSymbolCount(theEnv,execStatus,arrayOfStrings[i]); }
      }
 
-   rm(theEnv,arrayOfStrings,sizeof(SYMBOL_HN *) * numArgs);
+   rm(theEnv,execStatus,arrayOfStrings,sizeof(SYMBOL_HN *) * numArgs);
   }
 
 /*******************************************/
@@ -300,7 +300,7 @@ globle void UpcaseFunction(
    if (EnvArgCountCheck(theEnv,execStatus,"upcase",EXACTLY,1) == -1)
      {
       SetpType(returnValue,STRING);
-      SetpValue(returnValue,(void *) EnvAddSymbol(theEnv,""));
+      SetpValue(returnValue,(void *) EnvAddSymbol(theEnv,execStatus,""));
       return;
      }
 
@@ -311,7 +311,7 @@ globle void UpcaseFunction(
    if (EnvArgTypeCheck(theEnv,execStatus,"upcase",1,SYMBOL_OR_STRING,&theArg) == FALSE)
      {
       SetpType(returnValue,STRING);
-      SetpValue(returnValue,(void *) EnvAddSymbol(theEnv,""));
+      SetpValue(returnValue,(void *) EnvAddSymbol(theEnv,execStatus,""));
       return;
      }
 
@@ -323,7 +323,7 @@ globle void UpcaseFunction(
 
    osptr = DOToString(theArg);
    slen = strlen(osptr) + 1;
-   nsptr = (char *) gm2(theEnv,slen);
+   nsptr = (char *) gm2(theEnv,execStatus,slen);
 
    for (i = 0  ; i < slen ; i++)
      {
@@ -339,8 +339,8 @@ globle void UpcaseFunction(
    /*========================================*/
 
    SetpType(returnValue,GetType(theArg));
-   SetpValue(returnValue,(void *) EnvAddSymbol(theEnv,nsptr));
-   rm(theEnv,nsptr,slen);
+   SetpValue(returnValue,(void *) EnvAddSymbol(theEnv,execStatus,nsptr));
+   rm(theEnv,execStatus,nsptr,slen);
   }
 
 /*****************************************/
@@ -364,7 +364,7 @@ globle void LowcaseFunction(
    if (EnvArgCountCheck(theEnv,execStatus,"lowcase",EXACTLY,1) == -1)
      {
       SetpType(returnValue,STRING);
-      SetpValue(returnValue,(void *) EnvAddSymbol(theEnv,""));
+      SetpValue(returnValue,(void *) EnvAddSymbol(theEnv,execStatus,""));
       return;
      }
 
@@ -375,7 +375,7 @@ globle void LowcaseFunction(
    if (EnvArgTypeCheck(theEnv,execStatus,"lowcase",1,SYMBOL_OR_STRING,&theArg) == FALSE)
      {
       SetpType(returnValue,STRING);
-      SetpValue(returnValue,(void *) EnvAddSymbol(theEnv,""));
+      SetpValue(returnValue,(void *) EnvAddSymbol(theEnv,execStatus,""));
       return;
      }
 
@@ -387,7 +387,7 @@ globle void LowcaseFunction(
 
    osptr = DOToString(theArg);
    slen = strlen(osptr) + 1;
-   nsptr = (char *) gm2(theEnv,slen);
+   nsptr = (char *) gm2(theEnv,execStatus,slen);
 
    for (i = 0  ; i < slen ; i++)
      {
@@ -403,8 +403,8 @@ globle void LowcaseFunction(
    /*========================================*/
 
    SetpType(returnValue,GetType(theArg));
-   SetpValue(returnValue,(void *) EnvAddSymbol(theEnv,nsptr));
-   rm(theEnv,nsptr,slen);
+   SetpValue(returnValue,(void *) EnvAddSymbol(theEnv,execStatus,nsptr));
+   rm(theEnv,execStatus,nsptr,slen);
   }
 
 /********************************************/
@@ -482,10 +482,10 @@ globle void *SubStringFunction(
    /*===================================*/
 
    if (EnvArgCountCheck(theEnv,execStatus,"sub-string",EXACTLY,3) == -1)
-     { return((void *) EnvAddSymbol(theEnv,"")); }
+     { return((void *) EnvAddSymbol(theEnv,execStatus,"")); }
 
    if (EnvArgTypeCheck(theEnv,execStatus,"sub-string",1,INTEGER,&theArgument) == FALSE)
-     { return((void *) EnvAddSymbol(theEnv,"")); }
+     { return((void *) EnvAddSymbol(theEnv,execStatus,"")); }
 
    if (CoerceToLongInteger(theArgument.type,theArgument.value) < 1)
      { start = 0; }
@@ -493,15 +493,15 @@ globle void *SubStringFunction(
      { start = (size_t) CoerceToLongInteger(theArgument.type,theArgument.value) - 1; }
 
    if (EnvArgTypeCheck(theEnv,execStatus,"sub-string",2,INTEGER,&theArgument) == FALSE)
-     {  return((void *) EnvAddSymbol(theEnv,"")); }
+     {  return((void *) EnvAddSymbol(theEnv,execStatus,"")); }
 
    if (CoerceToLongInteger(theArgument.type,theArgument.value) < 1)
-     { return((void *) EnvAddSymbol(theEnv,"")); }
+     { return((void *) EnvAddSymbol(theEnv,execStatus,"")); }
    else
      { end = (size_t) CoerceToLongInteger(theArgument.type,theArgument.value) - 1; }
 
    if (EnvArgTypeCheck(theEnv,execStatus,"sub-string",3,SYMBOL_OR_STRING,&theArgument) == FALSE)
-     { return((void *) EnvAddSymbol(theEnv,"")); }
+     { return((void *) EnvAddSymbol(theEnv,execStatus,"")); }
    
    tempString = DOToString(theArgument);
    
@@ -520,7 +520,7 @@ globle void *SubStringFunction(
    /*==================================*/
 
    if ((start > end) || (length == 0))
-     { return((void *) EnvAddSymbol(theEnv,"")); }
+     { return((void *) EnvAddSymbol(theEnv,execStatus,"")); }
 
    /*=============================================*/
    /* Otherwise, allocate the string and copy the */
@@ -533,7 +533,7 @@ globle void *SubStringFunction(
       start = UTF8Offset(tempString,start);
       end = UTF8Offset(tempString,end + 1) - 1;
       
-      returnString = (char *) gm2(theEnv,(unsigned) (end - start + 2));  /* (end - start) inclusive + EOS */
+      returnString = (char *) gm2(theEnv,execStatus,(unsigned) (end - start + 2));  /* (end - start) inclusive + EOS */
       for(j=0, i=start;i <= end; i++, j++)
         { *(returnString+j) = *(tempString+i); }
       *(returnString+j) = '\0';
@@ -543,8 +543,8 @@ globle void *SubStringFunction(
    /* Return the new string. */
    /*========================*/
 
-   returnValue = (void *) EnvAddSymbol(theEnv,returnString);
-   rm(theEnv,returnString,(unsigned) (end - start + 2));
+   returnValue = (void *) EnvAddSymbol(theEnv,execStatus,returnString);
+   rm(theEnv,execStatus,returnString,(unsigned) (end - start + 2));
    return(returnValue);
   }
 
@@ -572,7 +572,7 @@ globle void StrIndexFunction(
 
    if (EnvArgTypeCheck(theEnv,execStatus,"str-index",1,SYMBOL_OR_STRING,&theArgument1) == FALSE) return;
 
-   if (EnvArgTypeCheck(theEnv,"str-index",2,SYMBOL_OR_STRING,&theArgument2) == FALSE) return;
+   if (EnvArgTypeCheck(theEnv,execStatus,"str-index",2,SYMBOL_OR_STRING,&theArgument2) == FALSE) return;
 
    strg1 = DOToString(theArgument1);
    strg2 = DOToString(theArgument2);
@@ -585,7 +585,7 @@ globle void StrIndexFunction(
    if (strlen(strg1) == 0)
      {
       result->type = INTEGER;
-      result->value = (void *) EnvAddLong(theEnv,(long long) UTF8Length(strg2) + 1LL);
+      result->value = (void *) EnvAddLong(theEnv,execStatus,(long long) UTF8Length(strg2) + 1LL);
       return;
      }
      
@@ -598,7 +598,7 @@ globle void StrIndexFunction(
       if (*(strg1+j) == '\0')
         {
          result->type = INTEGER;
-         result->value = (void *) EnvAddLong(theEnv,(long long) UTF8CharNum(strg3,i));
+         result->value = (void *) EnvAddLong(theEnv,execStatus,(long long) UTF8CharNum(strg3,i));
          return;
         }
      }
@@ -621,10 +621,10 @@ globle void StringToFieldFunction(
    /* Function string-to-field expects exactly one argument. */
    /*========================================================*/
 
-   if (EnvArgCountCheck(theEnv,"string-to-field",EXACTLY,1) == -1)
+   if (EnvArgCountCheck(theEnv,execStatus,"string-to-field",EXACTLY,1) == -1)
      {
       returnValue->type = STRING;
-      returnValue->value = (void *) EnvAddSymbol(theEnv,"*** ERROR ***");
+      returnValue->value = (void *) EnvAddSymbol(theEnv,execStatus,"*** ERROR ***");
       return;
      }
 
@@ -632,10 +632,10 @@ globle void StringToFieldFunction(
    /* The argument should be of type symbol or string. */
    /*==================================================*/
 
-   if (EnvArgTypeCheck(theEnv,"string-to-field",1,SYMBOL_OR_STRING,&theArg) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"string-to-field",1,SYMBOL_OR_STRING,&theArg) == FALSE)
      {
       returnValue->type = STRING;
-      returnValue->value = (void *) EnvAddSymbol(theEnv,"*** ERROR ***");
+      returnValue->value = (void *) EnvAddSymbol(theEnv,execStatus,"*** ERROR ***");
       return;
      }
 
@@ -643,7 +643,7 @@ globle void StringToFieldFunction(
    /* Convert the string to an atom. */
    /*================================*/
 
-   StringToField(theEnv,DOToString(theArg),returnValue);
+   StringToField(theEnv,execStatus,DOToString(theArg),returnValue);
   }
 
 /*************************************************************/
@@ -662,9 +662,9 @@ globle void StringToField(
    /* and retrieve the first value.      */
    /*====================================*/
 
-   OpenStringSource(theEnv,"string-to-field-str",theString,0);
-   GetToken(theEnv,"string-to-field-str",&theToken);
-   CloseStringSource(theEnv,"string-to-field-str");
+   OpenStringSource(theEnv,execStatus,"string-to-field-str",theString,0);
+   GetToken(theEnv,execStatus,"string-to-field-str",&theToken);
+   CloseStringSource(theEnv,execStatus,"string-to-field-str");
 
    /*====================================================*/
    /* Copy the token to the return value data structure. */
@@ -680,17 +680,17 @@ globle void StringToField(
    else if (theToken.type == STOP)
      {
       returnValue->type = SYMBOL;
-      returnValue->value = (void *) EnvAddSymbol(theEnv,"EOF");
+      returnValue->value = (void *) EnvAddSymbol(theEnv,execStatus,"EOF");
      }
    else if (theToken.type == UNKNOWN_VALUE)
      {
       returnValue->type = STRING;
-      returnValue->value = (void *) EnvAddSymbol(theEnv,"*** ERROR ***");
+      returnValue->value = (void *) EnvAddSymbol(theEnv,execStatus,"*** ERROR ***");
      }
    else
      {
       returnValue->type = STRING;
-      returnValue->value = (void *) EnvAddSymbol(theEnv,theToken.printForm);
+      returnValue->value = (void *) EnvAddSymbol(theEnv,execStatus,theToken.printForm);
      }
   }
   
@@ -711,7 +711,7 @@ globle void EvalFunction(
    /* Function eval expects exactly one argument. */
    /*=============================================*/
 
-   if (EnvArgCountCheck(theEnv,"eval",EXACTLY,1) == -1)
+   if (EnvArgCountCheck(theEnv,execStatus,"eval",EXACTLY,1) == -1)
      {
       SetpType(returnValue,SYMBOL);
       SetpValue(returnValue,EnvFalseSymbol(theEnv));
@@ -722,7 +722,7 @@ globle void EvalFunction(
    /* The argument should be of type SYMBOL or STRING. */
    /*==================================================*/
 
-   if (EnvArgTypeCheck(theEnv,"eval",1,SYMBOL_OR_STRING,&theArg) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"eval",1,SYMBOL_OR_STRING,&theArg) == FALSE)
      {
       SetpType(returnValue,SYMBOL);
       SetpValue(returnValue,EnvFalseSymbol(theEnv));
@@ -733,7 +733,7 @@ globle void EvalFunction(
    /* Evaluate the string. */
    /*======================*/
 
-   EnvEval(theEnv,DOToString(theArg),returnValue);
+   EnvEval(theEnv,execStatus,DOToString(theArg),returnValue);
   }
 
 /****************************/
@@ -772,7 +772,7 @@ globle int EnvEval(
 
    depth++;
    gensprintf(logicalNameBuffer,"Eval-%d",depth);
-   if (OpenStringSource(theEnv,logicalNameBuffer,theString,0) == 0)
+   if (OpenStringSource(theEnv,execStatus,logicalNameBuffer,theString,0) == 0)
      {
       SetpType(returnValue,SYMBOL);
       SetpValue(returnValue,EnvFalseSymbol(theEnv));
@@ -786,23 +786,23 @@ globle int EnvEval(
    /*================================================*/
 
    ov = GetPPBufferStatus(theEnv);
-   SetPPBufferStatus(theEnv,FALSE);
+   SetPPBufferStatus(theEnv,execStatus,FALSE);
    oldBinds = GetParsedBindNames(theEnv);
-   SetParsedBindNames(theEnv,NULL);
+   SetParsedBindNames(theEnv,execStatus,NULL);
 
    /*========================================================*/
    /* Parse the string argument passed to the eval function. */
    /*========================================================*/
 
-   top = ParseAtomOrExpression(theEnv,logicalNameBuffer,NULL);
+   top = ParseAtomOrExpression(theEnv,execStatus,logicalNameBuffer,NULL);
 
    /*============================*/
    /* Restore the parsing state. */
    /*============================*/
 
-   SetPPBufferStatus(theEnv,ov);
+   SetPPBufferStatus(theEnv,execStatus,ov);
    ClearParsedBindNames(theEnv);
-   SetParsedBindNames(theEnv,oldBinds);
+   SetParsedBindNames(theEnv,execStatus,oldBinds);
 
    /*===========================================*/
    /* Return if an error occured while parsing. */
@@ -810,8 +810,8 @@ globle int EnvEval(
 
    if (top == NULL)
      {
-      SetEvaluationError(theEnv,TRUE);
-      CloseStringSource(theEnv,logicalNameBuffer);
+      SetEvaluationError(theEnv,execStatus,TRUE);
+      CloseStringSource(theEnv,execStatus,logicalNameBuffer);
       SetpType(returnValue,SYMBOL);
       SetpValue(returnValue,EnvFalseSymbol(theEnv));
       depth--;
@@ -825,13 +825,13 @@ globle int EnvEval(
 
    if ((top->type == MF_GBL_VARIABLE) || (top->type == MF_VARIABLE))
      {
-      PrintErrorID(theEnv,"MISCFUN",1,FALSE);
-      EnvPrintRouter(theEnv,WERROR,"expand$ must be used in the argument list of a function call.\n");
-      SetEvaluationError(theEnv,TRUE);
-      CloseStringSource(theEnv,logicalNameBuffer);
+      PrintErrorID(theEnv,execStatus,"MISCFUN",1,FALSE);
+      EnvPrintRouter(theEnv,execStatus,WERROR,"expand$ must be used in the argument list of a function call.\n");
+      SetEvaluationError(theEnv,execStatus,TRUE);
+      CloseStringSource(theEnv,execStatus,logicalNameBuffer);
       SetpType(returnValue,SYMBOL);
       SetpValue(returnValue,EnvFalseSymbol(theEnv));
-      ReturnExpression(theEnv,top);
+      ReturnExpression(theEnv,execStatus,top);
       depth--;
       return(FALSE);
      }
@@ -843,13 +843,13 @@ globle int EnvEval(
 
    if (ExpressionContainsVariables(top,FALSE))
      {
-      PrintErrorID(theEnv,"STRNGFUN",2,FALSE);
-      EnvPrintRouter(theEnv,WERROR,"Some variables could not be accessed by the eval function.\n");
-      SetEvaluationError(theEnv,TRUE);
-      CloseStringSource(theEnv,logicalNameBuffer);
+      PrintErrorID(theEnv,execStatus,"STRNGFUN",2,FALSE);
+      EnvPrintRouter(theEnv,execStatus,WERROR,"Some variables could not be accessed by the eval function.\n");
+      SetEvaluationError(theEnv,execStatus,TRUE);
+      CloseStringSource(theEnv,execStatus,logicalNameBuffer);
       SetpType(returnValue,SYMBOL);
       SetpValue(returnValue,EnvFalseSymbol(theEnv));
-      ReturnExpression(theEnv,top);
+      ReturnExpression(theEnv,execStatus,top);
       depth--;
       return(FALSE);
      }
@@ -859,13 +859,13 @@ globle int EnvEval(
    /* the memory used to parse it.       */
    /*====================================*/
 
-   ExpressionInstall(theEnv,top);
-   EvaluateExpression(theEnv,top,returnValue);
-   ExpressionDeinstall(theEnv,top);
+   ExpressionInstall(theEnv,execStatus,top);
+   EvaluateExpression(theEnv,execStatus,top,returnValue);
+   ExpressionDeinstall(theEnv,execStatus,top);
 
    depth--;
-   ReturnExpression(theEnv,top);
-   CloseStringSource(theEnv,logicalNameBuffer);
+   ReturnExpression(theEnv,execStatus,top);
+   CloseStringSource(theEnv,execStatus,logicalNameBuffer);
 
    /*==========================================*/
    /* Perform periodic cleanup if the eval was */
@@ -875,9 +875,9 @@ globle int EnvEval(
    if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
        (execStatus->CurrentExpression == NULL))
      { 
-      ValueInstall(theEnv,returnValue);
-      PeriodicCleanup(theEnv,TRUE,FALSE); 
-      ValueDeinstall(theEnv,returnValue);
+      ValueInstall(theEnv,execStatus,returnValue);
+      PeriodicCleanup(theEnv,execStatus,TRUE,FALSE); 
+      ValueDeinstall(theEnv,execStatus,returnValue);
      }
 
    if (GetEvaluationError(theEnv)) return(FALSE);
@@ -895,8 +895,8 @@ globle void EvalFunction(
   EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
-   PrintErrorID(theEnv,"STRNGFUN",1,FALSE);
-   EnvPrintRouter(theEnv,WERROR,"Function eval does not work in run time modules.\n");
+   PrintErrorID(theEnv,execStatus,"STRNGFUN",1,FALSE);
+   EnvPrintRouter(theEnv,execStatus,WERROR,"Function eval does not work in run time modules.\n");
    SetpType(returnValue,SYMBOL);
    SetpValue(returnValue,EnvFalseSymbol(theEnv));
   }
@@ -915,8 +915,8 @@ globle int EnvEval(
 #pragma unused(theString)
 #endif
 
-   PrintErrorID(theEnv,"STRNGFUN",1,FALSE);
-   EnvPrintRouter(theEnv,WERROR,"Function eval does not work in run time modules.\n");
+   PrintErrorID(theEnv,execStatus,"STRNGFUN",1,FALSE);
+   EnvPrintRouter(theEnv,execStatus,WERROR,"Function eval does not work in run time modules.\n");
    SetpType(returnValue,SYMBOL);
    SetpValue(returnValue,EnvFalseSymbol(theEnv));
    return(FALSE);
@@ -939,20 +939,20 @@ globle int BuildFunction(
    /* Function build expects exactly one argument. */
    /*==============================================*/
 
-   if (EnvArgCountCheck(theEnv,"build",EXACTLY,1) == -1) return(FALSE);
+   if (EnvArgCountCheck(theEnv,execStatus,"build",EXACTLY,1) == -1) return(FALSE);
 
    /*==================================================*/
    /* The argument should be of type SYMBOL or STRING. */
    /*==================================================*/
 
-   if (EnvArgTypeCheck(theEnv,"build",1,SYMBOL_OR_STRING,&theArg) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"build",1,SYMBOL_OR_STRING,&theArg) == FALSE)
      { return(FALSE); }
 
    /*======================*/
    /* Build the construct. */
    /*======================*/
 
-   return(EnvBuild(theEnv,DOToString(theArg)));
+   return(EnvBuild(theEnv,execStatus,DOToString(theArg)));
   }
 
 /*****************************/
@@ -993,7 +993,7 @@ globle int EnvBuild(
    /* string can be used as an input source.    */
    /*===========================================*/
 
-   if (OpenStringSource(theEnv,"build",theString,0) == 0)
+   if (OpenStringSource(theEnv,execStatus,"build",theString,0) == 0)
      { return(FALSE); }
 
    /*================================*/
@@ -1001,11 +1001,11 @@ globle int EnvBuild(
    /* must be a left parenthesis.    */
    /*================================*/
 
-   GetToken(theEnv,"build",&theToken);
+   GetToken(theEnv,execStatus,"build",&theToken);
 
    if (theToken.type != LPAREN)
      {
-      CloseStringSource(theEnv,"build");
+      CloseStringSource(theEnv,execStatus,"build");
       return(FALSE);
      }
 
@@ -1013,10 +1013,10 @@ globle int EnvBuild(
    /* The next token should be the construct type. */
    /*==============================================*/
 
-   GetToken(theEnv,"build",&theToken);
+   GetToken(theEnv,execStatus,"build",&theToken);
    if (theToken.type != SYMBOL)
      {
-      CloseStringSource(theEnv,"build");
+      CloseStringSource(theEnv,execStatus,"build");
       return(FALSE);
      }
 
@@ -1026,13 +1026,13 @@ globle int EnvBuild(
    /* Parse the construct. */
    /*======================*/
    
-   errorFlag = ParseConstruct(theEnv,constructType,"build");
+   errorFlag = ParseConstruct(theEnv,execStatus,constructType,"build");
 
    /*=================================*/
    /* Close the string source router. */
    /*=================================*/
 
-   CloseStringSource(theEnv,"build");
+   CloseStringSource(theEnv,execStatus,"build");
 
    /*=========================================*/
    /* If an error occured while parsing the   */
@@ -1041,9 +1041,9 @@ globle int EnvBuild(
 
    if (errorFlag == 1)
      {
-      EnvPrintRouter(theEnv,WERROR,"\nERROR:\n");
-      PrintInChunks(theEnv,WERROR,GetPPBuffer(theEnv));
-      EnvPrintRouter(theEnv,WERROR,"\n");
+      EnvPrintRouter(theEnv,execStatus,WERROR,"\nERROR:\n");
+      PrintInChunks(theEnv,execStatus,WERROR,GetPPBuffer(theEnv));
+      EnvPrintRouter(theEnv,execStatus,WERROR,"\n");
      }
 
    DestroyPPBuffer(theEnv);
@@ -1055,7 +1055,7 @@ globle int EnvBuild(
 
    if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
        (execStatus->CurrentExpression == NULL))
-     { PeriodicCleanup(theEnv,TRUE,FALSE); }
+     { PeriodicCleanup(theEnv,execStatus,TRUE,FALSE); }
 
    /*===============================================*/
    /* Return TRUE if the construct was successfully */
@@ -1075,8 +1075,8 @@ globle int BuildFunction(
   void *theEnv,
   EXEC_STATUS)
   {
-   PrintErrorID(theEnv,"STRNGFUN",1,FALSE);
-   EnvPrintRouter(theEnv,WERROR,"Function build does not work in run time modules.\n");
+   PrintErrorID(theEnv,execStatus,"STRNGFUN",1,FALSE);
+   EnvPrintRouter(theEnv,execStatus,WERROR,"Function build does not work in run time modules.\n");
    return(FALSE);
   }
 
@@ -1093,8 +1093,8 @@ globle int EnvBuild(
 #pragma unused(theString)
 #endif
 
-   PrintErrorID(theEnv,"STRNGFUN",1,FALSE);
-   EnvPrintRouter(theEnv,WERROR,"Function build does not work in run time modules.\n");
+   PrintErrorID(theEnv,execStatus,"STRNGFUN",1,FALSE);
+   EnvPrintRouter(theEnv,execStatus,WERROR,"Function build does not work in run time modules.\n");
    return(FALSE);
   }
 #endif /* (! RUN_TIME) && (! BLOAD_ONLY) */

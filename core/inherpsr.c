@@ -123,23 +123,23 @@ globle PACKED_CLASS_LINKS *ParseSuperclasses(
 
    if (GetType(DefclassData(theEnv)->ObjectParseToken) != LPAREN)
      {
-      SyntaxErrorMessage(theEnv,"defclass inheritance");
+      SyntaxErrorMessage(theEnv,execStatus,"defclass inheritance");
       return(NULL);
      }
-   GetToken(theEnv,readSource,&DefclassData(theEnv)->ObjectParseToken);
+   GetToken(theEnv,execStatus,readSource,&DefclassData(theEnv)->ObjectParseToken);
    if ((GetType(DefclassData(theEnv)->ObjectParseToken) != SYMBOL) ? TRUE :
        (DefclassData(theEnv)->ObjectParseToken.value != (void *) DefclassData(theEnv)->ISA_SYMBOL))
      {
-      SyntaxErrorMessage(theEnv,"defclass inheritance");
+      SyntaxErrorMessage(theEnv,execStatus,"defclass inheritance");
       return(NULL);
      }
-   SavePPBuffer(theEnv," ");
-   GetToken(theEnv,readSource,&DefclassData(theEnv)->ObjectParseToken);
+   SavePPBuffer(theEnv,execStatus," ");
+   GetToken(theEnv,execStatus,readSource,&DefclassData(theEnv)->ObjectParseToken);
    while (GetType(DefclassData(theEnv)->ObjectParseToken) != RPAREN)
      {
       if (GetType(DefclassData(theEnv)->ObjectParseToken) != SYMBOL)
         {
-         SyntaxErrorMessage(theEnv,"defclass");
+         SyntaxErrorMessage(theEnv,execStatus,"defclass");
          goto SuperclassParseError;
         }
       if (FindModuleSeparator(ValueToString(newClassName)))
@@ -149,37 +149,37 @@ globle PACKED_CLASS_LINKS *ParseSuperclasses(
         }
       if (GetValue(DefclassData(theEnv)->ObjectParseToken) == (void *) newClassName)
         {
-         PrintErrorID(theEnv,"INHERPSR",1,FALSE);
-         EnvPrintRouter(theEnv,WERROR,"A class may not have itself as a superclass.\n");
+         PrintErrorID(theEnv,execStatus,"INHERPSR",1,FALSE);
+         EnvPrintRouter(theEnv,execStatus,WERROR,"A class may not have itself as a superclass.\n");
          goto SuperclassParseError;
         }
       for (ctmp = clink ; ctmp != NULL ; ctmp = ctmp->nxt)
         {
          if (GetValue(DefclassData(theEnv)->ObjectParseToken) == (void *) ctmp->cls->header.name)
            {
-            PrintErrorID(theEnv,"INHERPSR",2,FALSE);
-            EnvPrintRouter(theEnv,WERROR,"A class may inherit from a superclass only once.\n");
+            PrintErrorID(theEnv,execStatus,"INHERPSR",2,FALSE);
+            EnvPrintRouter(theEnv,execStatus,WERROR,"A class may inherit from a superclass only once.\n");
             goto SuperclassParseError;
            }
         }
-      sclass = LookupDefclassInScope(theEnv,ValueToString(GetValue(DefclassData(theEnv)->ObjectParseToken)));
+      sclass = LookupDefclassInScope(theEnv,execStatus,ValueToString(GetValue(DefclassData(theEnv)->ObjectParseToken)));
       if (sclass == NULL)
         {
-         PrintErrorID(theEnv,"INHERPSR",3,FALSE);
-         EnvPrintRouter(theEnv,WERROR,"A class must be defined after all its superclasses.\n");
+         PrintErrorID(theEnv,execStatus,"INHERPSR",3,FALSE);
+         EnvPrintRouter(theEnv,execStatus,WERROR,"A class must be defined after all its superclasses.\n");
          goto SuperclassParseError;
         }
       if ((sclass == DefclassData(theEnv)->PrimitiveClassMap[INSTANCE_NAME]) ||
           (sclass == DefclassData(theEnv)->PrimitiveClassMap[INSTANCE_ADDRESS]) ||
           (sclass == DefclassData(theEnv)->PrimitiveClassMap[INSTANCE_NAME]->directSuperclasses.classArray[0]))
         {
-         PrintErrorID(theEnv,"INHERPSR",6,FALSE);
-         EnvPrintRouter(theEnv,WERROR,"A user-defined class cannot be a subclass of ");
-         EnvPrintRouter(theEnv,WERROR,EnvGetDefclassName(theEnv,(void *) sclass));
-         EnvPrintRouter(theEnv,WERROR,".\n");
+         PrintErrorID(theEnv,execStatus,"INHERPSR",6,FALSE);
+         EnvPrintRouter(theEnv,execStatus,WERROR,"A user-defined class cannot be a subclass of ");
+         EnvPrintRouter(theEnv,execStatus,WERROR,EnvGetDefclassName(theEnv,execStatus,(void *) sclass));
+         EnvPrintRouter(theEnv,execStatus,WERROR,".\n");
          goto SuperclassParseError;
         }
-      ctmp = get_struct(theEnv,classLink);
+      ctmp = get_struct(theEnv,execStatus,classLink);
       ctmp->cls = sclass;
       if (clink == NULL)
         clink = ctmp;
@@ -188,24 +188,24 @@ globle PACKED_CLASS_LINKS *ParseSuperclasses(
       ctmp->nxt = NULL;
       cbot = ctmp;
 
-      SavePPBuffer(theEnv," ");
-      GetToken(theEnv,readSource,&DefclassData(theEnv)->ObjectParseToken);
+      SavePPBuffer(theEnv,execStatus," ");
+      GetToken(theEnv,execStatus,readSource,&DefclassData(theEnv)->ObjectParseToken);
      }
    if (clink == NULL)
      {
-      PrintErrorID(theEnv,"INHERPSR",4,FALSE);
-      EnvPrintRouter(theEnv,WERROR,"Must have at least one superclass.\n");
+      PrintErrorID(theEnv,execStatus,"INHERPSR",4,FALSE);
+      EnvPrintRouter(theEnv,execStatus,WERROR,"Must have at least one superclass.\n");
       return(NULL);
      }
    PPBackup(theEnv);
    PPBackup(theEnv);
-   SavePPBuffer(theEnv,")");
-   plinks = get_struct(theEnv,packedClassLinks);
-   PackClassLinks(theEnv,plinks,clink);
+   SavePPBuffer(theEnv,execStatus,")");
+   plinks = get_struct(theEnv,execStatus,packedClassLinks);
+   PackClassLinks(theEnv,execStatus,plinks,clink);
    return(plinks);
 
 SuperclassParseError:
-   DeleteClassLinks(theEnv,clink);
+   DeleteClassLinks(theEnv,execStatus,clink);
    return(NULL);
   }
 
@@ -322,7 +322,7 @@ globle PACKED_CLASS_LINKS *FindPrecedenceList(
       Recursively add all superclasses in a pre-order depth-first traversal
       to the partial order table.  There should be only one node per class.
       ===================================================================== */
-   po_table = InitializePartialOrderTable(theEnv,po_table,supers);
+   po_table = InitializePartialOrderTable(theEnv,execStatus,po_table,supers);
 
    /* =============================================================
       If the class already exists, record the rule 1 partial orders
@@ -331,14 +331,14 @@ globle PACKED_CLASS_LINKS *FindPrecedenceList(
       ============================================================= */
    if (cls != NULL)
      {
-      pop = get_struct(theEnv,partialOrder);
+      pop = get_struct(theEnv,execStatus,partialOrder);
       pop->cls = cls;
       pop->pre = 0;
       pop->suc = NULL;
       pop->nxt = po_table;
       po_table = pop;
       pop = po_table->nxt;
-      RecordPartialOrders(theEnv,po_table,cls,supers,0);
+      RecordPartialOrders(theEnv,execStatus,po_table,cls,supers,0);
      }
    else
      pop = po_table;
@@ -353,9 +353,9 @@ globle PACKED_CLASS_LINKS *FindPrecedenceList(
       ================================================================== */
    for ( ; pop != NULL ; pop = pop->nxt)
      {
-      RecordPartialOrders(theEnv,po_table,pop->cls,&pop->cls->directSuperclasses,0);
+      RecordPartialOrders(theEnv,execStatus,po_table,pop->cls,&pop->cls->directSuperclasses,0);
       for (i = 0 ; i < pop->cls->directSuperclasses.classCount ; i++)
-        RecordPartialOrders(theEnv,po_table,pop->cls->directSuperclasses.classArray[i],
+        RecordPartialOrders(theEnv,execStatus,po_table,pop->cls->directSuperclasses.classArray[i],
                             &pop->cls->directSuperclasses,i+1);
      }
 
@@ -363,7 +363,7 @@ globle PACKED_CLASS_LINKS *FindPrecedenceList(
       Record the rule 2 partial orders given by the superclass list
       ============================================================= */
    for (i = 0 ; i < supers->classCount ; i++)
-     RecordPartialOrders(theEnv,po_table,supers->classArray[i],supers,i+1);
+     RecordPartialOrders(theEnv,execStatus,po_table,supers->classArray[i],supers,i+1);
 
    start = NULL;
    poprv = NULL;
@@ -404,7 +404,7 @@ globle PACKED_CLASS_LINKS *FindPrecedenceList(
             stmp = pop->suc;
             pop->suc = stmp->nxt;
             stmp->po->pre--;
-            rtn_struct(theEnv,successor,stmp);
+            rtn_struct(theEnv,execStatus,successor,stmp);
            }
 
          /* =============================================
@@ -418,10 +418,10 @@ globle PACKED_CLASS_LINKS *FindPrecedenceList(
            poprv->nxt = pop->nxt;
          pop = pop->nxt;
          start = poprv;
-         ptmp = get_struct(theEnv,classLink);
+         ptmp = get_struct(theEnv,execStatus,classLink);
          ptmp->cls = potmp->cls;
          ptmp->nxt = NULL;
-         rtn_struct(theEnv,partialOrder,potmp);
+         rtn_struct(theEnv,execStatus,partialOrder,potmp);
          if (ptop == NULL)
            ptop = ptmp;
          else
@@ -443,22 +443,22 @@ globle PACKED_CLASS_LINKS *FindPrecedenceList(
       ====================================================================== */
    if (po_table != NULL)
      {
-      PrintErrorID(theEnv,"INHERPSR",5,FALSE);
-      PrintClassLinks(theEnv,WERROR,"Partial precedence list formed:",ptop);
-      PrintPartialOrderLoop(theEnv,po_table);
+      PrintErrorID(theEnv,execStatus,"INHERPSR",5,FALSE);
+      PrintClassLinks(theEnv,execStatus,WERROR,"Partial precedence list formed:",ptop);
+      PrintPartialOrderLoop(theEnv,execStatus,po_table);
       while (po_table != NULL)
         {
          while (po_table->suc != NULL)
            {
             stmp = po_table->suc;
             po_table->suc = stmp->nxt;
-            rtn_struct(theEnv,successor,stmp);
+            rtn_struct(theEnv,execStatus,successor,stmp);
            }
          potmp = po_table;
          po_table = po_table->nxt;
-         rtn_struct(theEnv,partialOrder,potmp);
+         rtn_struct(theEnv,execStatus,partialOrder,potmp);
         }
-      DeleteClassLinks(theEnv,ptop);
+      DeleteClassLinks(theEnv,execStatus,ptop);
       return(NULL);
      }
 
@@ -473,7 +473,7 @@ globle PACKED_CLASS_LINKS *FindPrecedenceList(
       ============================================================================= */
    if (cls == NULL)
      {
-      ptmp = get_struct(theEnv,classLink);
+      ptmp = get_struct(theEnv,execStatus,classLink);
       ptmp->nxt = ptop;
       ptop = ptmp;
      }
@@ -483,8 +483,8 @@ globle PACKED_CLASS_LINKS *FindPrecedenceList(
       ============================================================ */
    ptop->cls = NULL;
 
-   plinks = get_struct(theEnv,packedClassLinks);
-   PackClassLinks(theEnv,plinks,ptop);
+   plinks = get_struct(theEnv,execStatus,packedClassLinks);
+   PackClassLinks(theEnv,execStatus,plinks,ptop);
    return(plinks);
   }
 
@@ -513,12 +513,12 @@ globle void PackClassLinks(
    for (count = 0 , lp = lptop ; lp != NULL ; lp = lp->nxt)
      count++;
    if (count > 0)
-     plinks->classArray = (DEFCLASS **) gm2(theEnv,(sizeof(DEFCLASS *) * count));
+     plinks->classArray = (DEFCLASS **) gm2(theEnv,execStatus,(sizeof(DEFCLASS *) * count));
    else
      plinks->classArray = NULL;
    for (count = 0 , lp = lptop ; lp != NULL ; lp = lp->nxt , count++)
      plinks->classArray[count] = lp->cls;
-   DeleteClassLinks(theEnv,lptop);
+   DeleteClassLinks(theEnv,execStatus,lptop);
    plinks->classCount = (unsigned short) count;
   }
 
@@ -568,7 +568,7 @@ static PARTIAL_ORDER *InitializePartialOrderTable(
         }
       if (pop == NULL)
         {
-         pop = get_struct(theEnv,partialOrder);
+         pop = get_struct(theEnv,execStatus,partialOrder);
          pop->cls = supers->classArray[i];
          pop->nxt = NULL;
          pop->suc = NULL;
@@ -583,7 +583,7 @@ static PARTIAL_ORDER *InitializePartialOrderTable(
             This order will allow us to preserve the "family" heuristic
             in the precedence list.
             ============================================================= */
-         po_table = InitializePartialOrderTable(theEnv,po_table,
+         po_table = InitializePartialOrderTable(theEnv,execStatus,po_table,
                      &supers->classArray[i]->directSuperclasses);
         }
      }
@@ -639,7 +639,7 @@ static void RecordPartialOrders(
    clspo = FindPartialOrder(po_table,cls);
    while (starti < successors->classCount)
      {
-      stmp = get_struct(theEnv,successor);
+      stmp = get_struct(theEnv,execStatus,successor);
       stmp->po = FindPartialOrder(po_table,successors->classArray[starti]);
       stmp->nxt = clspo->suc;
       clspo->suc = stmp;
@@ -766,7 +766,7 @@ static void PrintPartialOrderLoop(
          pop2 = FindPartialOrder(po_table,prc->po->cls);
          if (pop2->pre == 0)
            {
-            stmp = get_struct(theEnv,successor);
+            stmp = get_struct(theEnv,execStatus,successor);
             stmp->po = pop1;
             stmp->nxt = pop2->suc;
             pop2->suc = stmp;
@@ -774,7 +774,7 @@ static void PrintPartialOrderLoop(
            }
          stmp = prc;
          prc = prc->nxt;
-         rtn_struct(theEnv,successor,stmp);
+         rtn_struct(theEnv,execStatus,successor,stmp);
         }
      }
 
@@ -800,16 +800,16 @@ static void PrintPartialOrderLoop(
       pop1 = pop1->suc->po;
      }
 
-   EnvPrintRouter(theEnv,WERROR,"Precedence loop in superclasses:");
+   EnvPrintRouter(theEnv,execStatus,WERROR,"Precedence loop in superclasses:");
    while (pop1->pre == 1)
      {
-      EnvPrintRouter(theEnv,WERROR," ");
-      PrintClassName(theEnv,WERROR,pop1->cls,FALSE);
+      EnvPrintRouter(theEnv,execStatus,WERROR," ");
+      PrintClassName(theEnv,execStatus,WERROR,pop1->cls,FALSE);
       pop1->pre = 0;
       pop1 = pop1->suc->po;
      }
-   EnvPrintRouter(theEnv,WERROR," ");
-   PrintClassName(theEnv,WERROR,pop1->cls,TRUE);
+   EnvPrintRouter(theEnv,execStatus,WERROR," ");
+   PrintClassName(theEnv,execStatus,WERROR,pop1->cls,TRUE);
   }
 
 /***************************************************
@@ -831,14 +831,14 @@ static void PrintClassLinks(
   CLASS_LINK *clink)
   {
    if (title != NULL)
-     EnvPrintRouter(theEnv,logicalName,title);
+     EnvPrintRouter(theEnv,execStatus,logicalName,title);
    while (clink != NULL)
      {
-      EnvPrintRouter(theEnv,logicalName," ");
-      PrintClassName(theEnv,logicalName,clink->cls,FALSE);
+      EnvPrintRouter(theEnv,execStatus,logicalName," ");
+      PrintClassName(theEnv,execStatus,logicalName,clink->cls,FALSE);
       clink = clink->nxt;
      }
-   EnvPrintRouter(theEnv,logicalName,"\n");
+   EnvPrintRouter(theEnv,execStatus,logicalName,"\n");
   }
 
 #endif

@@ -191,7 +191,7 @@ struct objectReteData
 #endif
   };
 
-#define ObjectReteData(theEnv) ((struct objectReteData *) GetEnvironmentData(theEnv,OBJECT_RETE_DATA))
+#define ObjectReteData(theEnv) ((struct objectReteData *) GetEnvironmentData(theEnv,execStatus,OBJECT_RETE_DATA))
 
 
 #ifdef LOCALE

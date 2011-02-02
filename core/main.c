@@ -60,7 +60,7 @@ int main(
    void *theEnv;
    // Lode: TODO EXEC_STATUS ?
    theEnv = CreateEnvironment();
-   RerouteStdin(theEnv,argc,argv);
+   RerouteStdin(theEnv,execStatus,argc,argv);
    CommandLoop(theEnv);
 
    /*==================================================================*/

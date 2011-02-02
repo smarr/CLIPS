@@ -57,17 +57,17 @@ globle void DefmoduleBasicCommands(
   void *theEnv,
   EXEC_STATUS)
   {
-   EnvAddClearFunction(theEnv,"defmodule",ClearDefmodules,2000);
+   EnvAddClearFunction(theEnv,execStatus,"defmodule",ClearDefmodules,2000);
 
 #if DEFMODULE_CONSTRUCT
-   AddSaveFunction(theEnv,"defmodule",SaveDefmodules,1100);
+   AddSaveFunction(theEnv,execStatus,"defmodule",SaveDefmodules,1100);
 
 #if ! RUN_TIME
-   EnvDefineFunction2(theEnv,"get-defmodule-list",'m',PTIEF EnvGetDefmoduleList,"EnvGetDefmoduleList","00");
+   EnvDefineFunction2(theEnv,execStatus,"get-defmodule-list",'m',PTIEF EnvGetDefmoduleList,"EnvGetDefmoduleList","00");
 
 #if DEBUGGING_FUNCTIONS
-   EnvDefineFunction2(theEnv,"list-defmodules",'v', PTIEF ListDefmodulesCommand,"ListDefmodulesCommand","00");
-   EnvDefineFunction2(theEnv,"ppdefmodule",'v',PTIEF PPDefmoduleCommand,"PPDefmoduleCommand","11w");
+   EnvDefineFunction2(theEnv,execStatus,"list-defmodules",'v', PTIEF ListDefmodulesCommand,"ListDefmodulesCommand","00");
+   EnvDefineFunction2(theEnv,execStatus,"ppdefmodule",'v',PTIEF PPDefmoduleCommand,"PPDefmoduleCommand","11w");
 #endif
 #endif
 #endif
@@ -118,11 +118,11 @@ static void SaveDefmodules(
   {
    char *ppform;
 
-   ppform = EnvGetDefmodulePPForm(theEnv,theModule);
+   ppform = EnvGetDefmodulePPForm(theEnv,execStatus,theModule);
    if (ppform != NULL)
      {
-      PrintInChunks(theEnv,logicalName,ppform);
-      EnvPrintRouter(theEnv,logicalName,"\n");
+      PrintInChunks(theEnv,execStatus,logicalName,ppform);
+      EnvPrintRouter(theEnv,execStatus,logicalName,"\n");
      }
   }
 
@@ -135,7 +135,7 @@ globle void EnvGetDefmoduleList(
   EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
-   OldGetConstructList(theEnv,returnValue,EnvGetNextDefmodule,EnvGetDefmoduleName); 
+   OldGetConstructList(theEnv,execStatus,returnValue,EnvGetNextDefmodule,EnvGetDefmoduleName); 
   }
 
 #if DEBUGGING_FUNCTIONS
@@ -153,7 +153,7 @@ globle void PPDefmoduleCommand(
    defmoduleName = GetConstructName(theEnv,execStatus,"ppdefmodule","defmodule name");
    if (defmoduleName == NULL) return;
 
-   PPDefmodule(theEnv,defmoduleName,WDISPLAY);
+   PPDefmodule(theEnv,execStatus,defmoduleName,WDISPLAY);
 
    return;
   }
@@ -170,15 +170,15 @@ globle int PPDefmodule(
   {
    void *defmodulePtr;
 
-   defmodulePtr = EnvFindDefmodule(theEnv,defmoduleName);
+   defmodulePtr = EnvFindDefmodule(theEnv,execStatus,defmoduleName);
    if (defmodulePtr == NULL)
      {
-      CantFindItemErrorMessage(theEnv,"defmodule",defmoduleName);
+      CantFindItemErrorMessage(theEnv,execStatus,"defmodule",defmoduleName);
       return(FALSE);
      }
 
-   if (EnvGetDefmodulePPForm(theEnv,defmodulePtr) == NULL) return(TRUE);
-   PrintInChunks(theEnv,logicalName,EnvGetDefmodulePPForm(theEnv,defmodulePtr));
+   if (EnvGetDefmodulePPForm(theEnv,execStatus,defmodulePtr) == NULL) return(TRUE);
+   PrintInChunks(theEnv,execStatus,logicalName,EnvGetDefmodulePPForm(theEnv,execStatus,defmodulePtr));
    return(TRUE);
   }
 
@@ -192,7 +192,7 @@ globle void ListDefmodulesCommand(
   {
    if (EnvArgCountCheck(theEnv,execStatus,"list-defmodules",EXACTLY,0) == -1) return;
 
-   EnvListDefmodules(theEnv,WDISPLAY);
+   EnvListDefmodules(theEnv,execStatus,WDISPLAY);
   }
 
 /***************************************/
@@ -207,16 +207,16 @@ globle void EnvListDefmodules(
    void *theModule;
    int count = 0;
 
-   for (theModule = EnvGetNextDefmodule(theEnv,NULL);
+   for (theModule = EnvGetNextDefmodule(theEnv,execStatus,NULL);
         theModule != NULL;
-        theModule = EnvGetNextDefmodule(theEnv,theModule))
+        theModule = EnvGetNextDefmodule(theEnv,execStatus,theModule))
     {
-     EnvPrintRouter(theEnv,logicalName,EnvGetDefmoduleName(theEnv,theModule));
-     EnvPrintRouter(theEnv,logicalName,"\n");
+     EnvPrintRouter(theEnv,execStatus,logicalName,EnvGetDefmoduleName(theEnv,execStatus,theModule));
+     EnvPrintRouter(theEnv,execStatus,logicalName,"\n");
      count++;
     }
 
-   PrintTally(theEnv,logicalName,count,"defmodule","defmodules");
+   PrintTally(theEnv,execStatus,logicalName,count,"defmodule","defmodules");
   }
 
 #endif /* DEBUGGING_FUNCTIONS */

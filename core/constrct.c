@@ -67,7 +67,7 @@ globle void InitializeConstructData(
   void *theEnv,
   EXEC_STATUS)
   {
-   AllocateEnvironmentData(theEnv,CONSTRUCT_DATA,sizeof(struct constructData),DeallocateConstructData);
+   AllocateEnvironmentData(theEnv,execStatus,CONSTRUCT_DATA,sizeof(struct constructData),DeallocateConstructData);
 
 #if (! RUN_TIME) && (! BLOAD_ONLY)   
    ConstructData(theEnv)->WatchCompilations = ON;
@@ -85,17 +85,17 @@ static void DeallocateConstructData(
    struct construct *tmpPtr, *nextPtr;
 
 #if (! RUN_TIME) && (! BLOAD_ONLY)
-   DeallocateCallList(theEnv,ConstructData(theEnv)->ListOfSaveFunctions);
+   DeallocateCallList(theEnv,execStatus,ConstructData(theEnv)->ListOfSaveFunctions);
 #endif
-   DeallocateCallList(theEnv,ConstructData(theEnv)->ListOfResetFunctions);
-   DeallocateCallList(theEnv,ConstructData(theEnv)->ListOfClearFunctions);
-   DeallocateCallList(theEnv,ConstructData(theEnv)->ListOfClearReadyFunctions);
+   DeallocateCallList(theEnv,execStatus,ConstructData(theEnv)->ListOfResetFunctions);
+   DeallocateCallList(theEnv,execStatus,ConstructData(theEnv)->ListOfClearFunctions);
+   DeallocateCallList(theEnv,execStatus,ConstructData(theEnv)->ListOfClearReadyFunctions);
    
    tmpPtr = ConstructData(theEnv)->ListOfConstructs;
    while (tmpPtr != NULL)
      {
       nextPtr = tmpPtr->next;
-      rtn_struct(theEnv,construct,tmpPtr);
+      rtn_struct(theEnv,execStatus,construct,tmpPtr);
       tmpPtr = nextPtr;
      }
   }
@@ -147,7 +147,7 @@ globle int RemoveConstruct(
            { ConstructData(theEnv)->ListOfConstructs = currentPtr->next; }
          else
            { lastPtr->next = currentPtr->next; }
-         rtn_struct(theEnv,construct,currentPtr);
+         rtn_struct(theEnv,execStatus,construct,currentPtr);
          return(TRUE);
         }
 
@@ -185,28 +185,28 @@ globle int EnvSave(
    /* Open the save file. */
    /*=====================*/
 
-   if ((filePtr = GenOpen(theEnv,fileName,"w")) == NULL)
+   if ((filePtr = GenOpen(theEnv,execStatus,fileName,"w")) == NULL)
      { return(FALSE); }
 
    /*===========================*/
    /* Bypass the router system. */
    /*===========================*/
 
-   SetFastSave(theEnv,filePtr);
+   SetFastSave(theEnv,execStatus,filePtr);
 
    /*======================*/
    /* Save the constructs. */
    /*======================*/
    
-   for (defmodulePtr = EnvGetNextDefmodule(theEnv,NULL);
+   for (defmodulePtr = EnvGetNextDefmodule(theEnv,execStatus,NULL);
         defmodulePtr != NULL;
-        defmodulePtr = EnvGetNextDefmodule(theEnv,defmodulePtr))
+        defmodulePtr = EnvGetNextDefmodule(theEnv,execStatus,defmodulePtr))
      {
       for (saveFunction = ConstructData(theEnv)->ListOfSaveFunctions;
            saveFunction != NULL;
            saveFunction = saveFunction->next)
         {
-         ((* (void (*)(void *,void *,char *)) saveFunction->func))(theEnv,defmodulePtr,(char *) filePtr);
+         ((* (void (*)(void *,void *,char *)) saveFunction->func))(theEnv,execStatus,defmodulePtr,(char *) filePtr);
         }
      }
 
@@ -214,13 +214,13 @@ globle int EnvSave(
    /* Close the save file. */
    /*======================*/
 
-   GenClose(theEnv,filePtr);
+   GenClose(theEnv,execStatus,filePtr);
 
    /*===========================*/
    /* Remove the router bypass. */
    /*===========================*/
 
-   SetFastSave(theEnv,NULL);
+   SetFastSave(theEnv,execStatus,NULL);
 
    /*=========================*/
    /* Return TRUE to indicate */
@@ -243,7 +243,7 @@ globle intBool RemoveSaveFunction(
    int found;
 
    ConstructData(theEnv)->ListOfSaveFunctions =
-     RemoveFunctionFromCallList(theEnv,name,ConstructData(theEnv)->ListOfSaveFunctions,&found);
+     RemoveFunctionFromCallList(theEnv,execStatus,name,ConstructData(theEnv)->ListOfSaveFunctions,&found);
 
    if (found) return(TRUE);
 
@@ -306,11 +306,11 @@ globle void InitializeConstructs(
   EXEC_STATUS)
   {
 #if (! RUN_TIME)
-   EnvDefineFunction2(theEnv,"clear",   'v', PTIEF ClearCommand,   "ClearCommand", "00");
-   EnvDefineFunction2(theEnv,"reset",   'v', PTIEF ResetCommand,   "ResetCommand", "00");
+   EnvDefineFunction2(theEnv,execStatus,"clear",   'v', PTIEF ClearCommand,   "ClearCommand", "00");
+   EnvDefineFunction2(theEnv,execStatus,"reset",   'v', PTIEF ResetCommand,   "ResetCommand", "00");
 
 #if DEBUGGING_FUNCTIONS && (! BLOAD_ONLY)
-   AddWatchItem(theEnv,"compilations",0,&ConstructData(theEnv)->WatchCompilations,30,NULL,NULL);
+   AddWatchItem(theEnv,execStatus,"compilations",0,&ConstructData(theEnv)->WatchCompilations,30,NULL,NULL);
 #endif
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
@@ -328,7 +328,7 @@ globle void ClearCommand(
   EXEC_STATUS)
   {
    if (EnvArgCountCheck(theEnv,execStatus,"clear",EXACTLY,0) == -1) return;
-   EnvClear(theEnv,execStatus);
+   EnvClear(theEnv,execStatus,execStatus);
    return;
   }
 
@@ -341,7 +341,7 @@ globle void ResetCommand(
   EXEC_STATUS)
   {
    if (EnvArgCountCheck(theEnv,execStatus,"reset",EXACTLY,0) == -1) return;
-   EnvReset(theEnv,execStatus);
+   EnvReset(theEnv,execStatus,execStatus);
    return;
   }
 
@@ -381,7 +381,7 @@ globle void EnvReset(
    /* command prompt, reset the halt execution flag. */
    /*================================================*/
 
-   if (execStatus->CurrentEvaluationDepth == 0) SetHaltExecution(theEnv,FALSE);
+   if (execStatus->CurrentEvaluationDepth == 0) SetHaltExecution(theEnv,execStatus,FALSE);
 
    /*=======================================================*/
    /* Call the before reset function to determine if the    */
@@ -418,7 +418,7 @@ globle void EnvReset(
    /* Set the current module to the MAIN module. */
    /*============================================*/
 
-   EnvSetCurrentModule(theEnv,(void *) EnvFindDefmodule(theEnv,"MAIN"));
+   EnvSetCurrentModule(theEnv,execStatus,(void *) EnvFindDefmodule(theEnv,execStatus,"MAIN"));
 
    /*===========================================*/
    /* Perform periodic cleanup if the reset was */
@@ -468,7 +468,7 @@ globle intBool AddResetFunction(
    theEnv = GetCurrentEnvironment();
    
    ConstructData(theEnv)->ListOfResetFunctions = 
-      AddFunctionToCallList(theEnv,name,priority,(void (*)(void *)) functionPtr,
+      AddFunctionToCallList(theEnv,execStatus,name,priority,(void (*)(void *)) functionPtr,
                             ConstructData(theEnv)->ListOfResetFunctions,FALSE);
    return(TRUE);
   }
@@ -485,7 +485,7 @@ globle intBool EnvAddResetFunction(
   void (*functionPtr)(void *),
   int priority)
   {
-   ConstructData(theEnv)->ListOfResetFunctions = AddFunctionToCallList(theEnv,name,priority,
+   ConstructData(theEnv)->ListOfResetFunctions = AddFunctionToCallList(theEnv,execStatus,name,priority,
                                                 functionPtr,
                                                 ConstructData(theEnv)->ListOfResetFunctions,TRUE);
    return(TRUE);
@@ -503,7 +503,7 @@ globle intBool EnvRemoveResetFunction(
    int found;
 
    ConstructData(theEnv)->ListOfResetFunctions =
-      RemoveFunctionFromCallList(theEnv,name,ConstructData(theEnv)->ListOfResetFunctions,&found);
+      RemoveFunctionFromCallList(theEnv,execStatus,name,ConstructData(theEnv)->ListOfResetFunctions,&found);
 
    if (found) return(TRUE);
 
@@ -537,7 +537,7 @@ globle void EnvClear(
    /*==========================================*/
 
 #if DEBUGGING_FUNCTIONS
-   EnvActivateRouter(theEnv,WTRACE);
+   EnvActivateRouter(theEnv,execStatus,WTRACE);
 #endif
 
    /*===================================*/
@@ -547,10 +547,10 @@ globle void EnvClear(
    ConstructData(theEnv)->ClearReadyInProgress = TRUE;
    if (ClearReady(theEnv) == FALSE)
      {
-      PrintErrorID(theEnv,"CONSTRCT",1,FALSE);
-      EnvPrintRouter(theEnv,WERROR,"Some constructs are still in use. Clear cannot continue.\n");
+      PrintErrorID(theEnv,execStatus,"CONSTRCT",1,FALSE);
+      EnvPrintRouter(theEnv,execStatus,WERROR,"Some constructs are still in use. Clear cannot continue.\n");
 #if DEBUGGING_FUNCTIONS
-      EnvDeactivateRouter(theEnv,WTRACE);
+      EnvDeactivateRouter(theEnv,execStatus,WTRACE);
 #endif
       ConstructData(theEnv)->ClearReadyInProgress = FALSE;
       return;
@@ -579,7 +579,7 @@ globle void EnvClear(
    /*=============================*/
 
 #if DEBUGGING_FUNCTIONS
-   EnvDeactivateRouter(theEnv,WTRACE);
+   EnvDeactivateRouter(theEnv,execStatus,WTRACE);
 #endif
 
    /*===========================================*/
@@ -599,13 +599,13 @@ globle void EnvClear(
    
    if ((DefruleData(theEnv)->RightPrimeJoins != NULL) ||
        (DefruleData(theEnv)->LeftPrimeJoins != NULL))
-     { SystemError(theEnv,"CONSTRCT",1); }
+     { SystemError(theEnv,execStatus,"CONSTRCT",1); }
        
    /*============================*/
    /* Perform reset after clear. */
    /*============================*/
    
-   EnvReset(theEnv,execStatus);
+   EnvReset(theEnv,execStatus,execStatus);
   }
 
 /*********************************************************/
@@ -645,7 +645,7 @@ globle intBool AddClearReadyFunction(
   int priority)
   {
    ConstructData(theEnv)->ListOfClearReadyFunctions =
-     AddFunctionToCallList(theEnv,name,priority,
+     AddFunctionToCallList(theEnv,execStatus,name,priority,
                            (void (*)(void *)) functionPtr,
                            ConstructData(theEnv)->ListOfClearReadyFunctions,TRUE);
    return(1);
@@ -663,7 +663,7 @@ globle intBool RemoveClearReadyFunction(
    int found;
 
    ConstructData(theEnv)->ListOfClearReadyFunctions =
-      RemoveFunctionFromCallList(theEnv,name,ConstructData(theEnv)->ListOfClearReadyFunctions,&found);
+      RemoveFunctionFromCallList(theEnv,execStatus,name,ConstructData(theEnv)->ListOfClearReadyFunctions,&found);
 
    if (found) return(TRUE);
 
@@ -686,7 +686,7 @@ globle intBool AddClearFunction(
    theEnv = GetCurrentEnvironment();
    
    ConstructData(theEnv)->ListOfClearFunctions =
-      AddFunctionToCallList(theEnv,name,priority,
+      AddFunctionToCallList(theEnv,execStatus,name,priority,
                             (void (*)(void *)) functionPtr,
                             ConstructData(theEnv)->ListOfClearFunctions,FALSE);
    return(1);
@@ -705,7 +705,7 @@ globle intBool EnvAddClearFunction(
   int priority)
   {
    ConstructData(theEnv)->ListOfClearFunctions =
-      AddFunctionToCallList(theEnv,name,priority,
+      AddFunctionToCallList(theEnv,execStatus,name,priority,
                             (void (*)(void *)) functionPtr,
                             ConstructData(theEnv)->ListOfClearFunctions,TRUE);
    return(1);
@@ -723,7 +723,7 @@ globle intBool EnvRemoveClearFunction(
    int found;
 
    ConstructData(theEnv)->ListOfClearFunctions =
-     RemoveFunctionFromCallList(theEnv,name,ConstructData(theEnv)->ListOfClearFunctions,&found);
+     RemoveFunctionFromCallList(theEnv,execStatus,name,ConstructData(theEnv)->ListOfClearFunctions,&found);
 
    if (found) return(TRUE);
 
@@ -778,9 +778,9 @@ globle void OldGetConstructList(
    /* of the specified type.             */
    /*====================================*/
 
-   for (theConstruct = (*nextFunction)(theEnv,NULL);
+   for (theConstruct = (*nextFunction)(theEnv,execStatus,NULL);
         theConstruct != NULL;
-        theConstruct = (*nextFunction)(theEnv,theConstruct))
+        theConstruct = (*nextFunction)(theEnv,execStatus,theConstruct))
      { count++; }
 
    /*===========================*/
@@ -791,24 +791,24 @@ globle void OldGetConstructList(
    SetpType(returnValue,MULTIFIELD);
    SetpDOBegin(returnValue,1);
    SetpDOEnd(returnValue,(long) count);
-   theList = (struct multifield *) EnvCreateMultifield(theEnv,count);
+   theList = (struct multifield *) EnvCreateMultifield(theEnv,execStatus,count);
    SetpValue(returnValue,(void *) theList);
 
    /*====================================*/
    /* Store the names in the multifield. */
    /*====================================*/
 
-   for (theConstruct = (*nextFunction)(theEnv,NULL), count = 1;
+   for (theConstruct = (*nextFunction)(theEnv,execStatus,NULL), count = 1;
         theConstruct != NULL;
-        theConstruct = (*nextFunction)(theEnv,theConstruct), count++)
+        theConstruct = (*nextFunction)(theEnv,execStatus,theConstruct), count++)
      {
       if (execStatus->HaltExecution == TRUE)
         {
-         EnvSetMultifieldErrorValue(theEnv,returnValue);
+         EnvSetMultifieldErrorValue(theEnv,execStatus,returnValue);
          return;
         }
       SetMFType(theList,count,SYMBOL);
-      SetMFValue(theList,count,EnvAddSymbol(theEnv,(*nameFunction)(theEnv,theConstruct)));
+      SetMFValue(theList,count,EnvAddSymbol(theEnv,execStatus,(*nameFunction)(theEnv,execStatus,theConstruct)));
      }
   }
 
@@ -823,17 +823,17 @@ globle void DeinstallConstructHeader(
   EXEC_STATUS,
   struct constructHeader *theHeader)
   {
-   DecrementSymbolCount(theEnv,theHeader->name);
+   DecrementSymbolCount(theEnv,execStatus,theHeader->name);
    if (theHeader->ppForm != NULL)
      {
-      rm(theEnv,theHeader->ppForm,
+      rm(theEnv,execStatus,theHeader->ppForm,
          sizeof(char) * (strlen(theHeader->ppForm) + 1));
       theHeader->ppForm = NULL;
      }
 
    if (theHeader->usrData != NULL)
      {
-      ClearUserDataList(theEnv,theHeader->usrData);
+      ClearUserDataList(theEnv,execStatus,theHeader->usrData);
       theHeader->usrData = NULL;
      }
   }
@@ -851,14 +851,14 @@ globle void DestroyConstructHeader(
   {
    if (theHeader->ppForm != NULL)
      {
-      rm(theEnv,theHeader->ppForm,
+      rm(theEnv,execStatus,theHeader->ppForm,
          sizeof(char) * (strlen(theHeader->ppForm) + 1));
       theHeader->ppForm = NULL;
      }
 
    if (theHeader->usrData != NULL)
      {
-      ClearUserDataList(theEnv,theHeader->usrData);
+      ClearUserDataList(theEnv,execStatus,theHeader->usrData);
       theHeader->usrData = NULL;
      }
   }
@@ -890,7 +890,7 @@ globle struct construct *AddConstruct(
    /* construct data structure.   */
    /*=============================*/
 
-   newPtr = get_struct(theEnv,construct);
+   newPtr = get_struct(theEnv,execStatus,construct);
 
    newPtr->constructName = name;
    newPtr->pluralName = pluralName;
@@ -934,7 +934,7 @@ globle intBool AddSaveFunction(
 
 #if (! RUN_TIME) && (! BLOAD_ONLY)
    ConstructData(theEnv)->ListOfSaveFunctions =
-     AddFunctionToCallList(theEnv,name,priority,
+     AddFunctionToCallList(theEnv,execStatus,name,priority,
                            (void (*)(void *)) functionPtr,
                            ConstructData(theEnv)->ListOfSaveFunctions,TRUE);
 #else

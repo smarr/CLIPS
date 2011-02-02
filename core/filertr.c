@@ -58,9 +58,9 @@ globle void InitializeFileRouter(
   void *theEnv,
   EXEC_STATUS)
   {
-   AllocateEnvironmentData(theEnv,FILE_ROUTER_DATA,sizeof(struct fileRouterData),DeallocateFileRouterData);
+   AllocateEnvironmentData(theEnv,execStatus,FILE_ROUTER_DATA,sizeof(struct fileRouterData),DeallocateFileRouterData);
 
-   EnvAddRouter(theEnv,"fileio",0,FindFile,
+   EnvAddRouter(theEnv,execStatus,"fileio",0,FindFile,
              PrintFile,GetcFile,
              UngetcFile,ExitFile);
   }
@@ -79,9 +79,9 @@ static void DeallocateFileRouterData(
    while (tmpPtr != NULL)
      {
       nextPtr = tmpPtr->next;
-      GenClose(theEnv,tmpPtr->stream);
-      rm(theEnv,tmpPtr->logicalName,strlen(tmpPtr->logicalName) + 1);
-      rtn_struct(theEnv,fileRouter,tmpPtr);
+      GenClose(theEnv,execStatus,tmpPtr->stream);
+      rm(theEnv,execStatus,tmpPtr->logicalName,strlen(tmpPtr->logicalName) + 1);
+      rtn_struct(theEnv,execStatus,fileRouter,tmpPtr);
       tmpPtr = nextPtr;
      }
   }
@@ -143,7 +143,7 @@ globle int FindFile(
   EXEC_STATUS,
   char *logicalName)
   {
-   if (FindFptr(theEnv,logicalName) != NULL) return(TRUE);
+   if (FindFptr(theEnv,execStatus,logicalName) != NULL) return(TRUE);
 
    return(FALSE);
   }
@@ -183,9 +183,9 @@ static int PrintFile(
   {
    FILE *fptr;
 
-   fptr = FindFptr(theEnv,logicalName);
+   fptr = FindFptr(theEnv,execStatus,logicalName);
    
-   genprintfile(theEnv,fptr,str);
+   genprintfile(theEnv,execStatus,fptr,str);
    
    return(1);
   }
@@ -201,7 +201,7 @@ static int GetcFile(
    FILE *fptr;
    int theChar;
 
-   fptr = FindFptr(theEnv,logicalName);
+   fptr = FindFptr(theEnv,execStatus,logicalName);
 
    if (fptr == stdin)
      { theChar = gengetchar(theEnv); }
@@ -229,10 +229,10 @@ static int UngetcFile(
   {
    FILE *fptr;
 
-   fptr = FindFptr(theEnv,logicalName);
+   fptr = FindFptr(theEnv,execStatus,logicalName);
    
    if (fptr == stdin)
-     { return(genungetchar(theEnv,ch)); }
+     { return(genungetchar(theEnv,execStatus,ch)); }
    else
      { return(ungetc(ch,fptr)); }
   }
@@ -258,15 +258,15 @@ globle int OpenAFile(
    /* with the specified access mode.  */
    /*==================================*/
 
-   if ((newstream = GenOpen(theEnv,fileName,accessMode)) == NULL)
+   if ((newstream = GenOpen(theEnv,execStatus,fileName,accessMode)) == NULL)
      { return(FALSE); }
 
    /*===========================*/
    /* Create a new file router. */
    /*===========================*/
 
-   newRouter = get_struct(theEnv,fileRouter);
-   newRouter->logicalName = (char *) gm2(theEnv,strlen(logicalName) + 1);
+   newRouter = get_struct(theEnv,execStatus,fileRouter);
+   newRouter->logicalName = (char *) gm2(theEnv,execStatus,strlen(logicalName) + 1);
    genstrcpy(newRouter->logicalName,logicalName);
    newRouter->stream = newstream;
 
@@ -304,13 +304,13 @@ globle int CloseFile(
      {
       if (strcmp(fptr->logicalName,fid) == 0)
         {
-         GenClose(theEnv,fptr->stream);
-         rm(theEnv,fptr->logicalName,strlen(fptr->logicalName) + 1);
+         GenClose(theEnv,execStatus,fptr->stream);
+         rm(theEnv,execStatus,fptr->logicalName,strlen(fptr->logicalName) + 1);
          if (prev == NULL)
            { FileRouterData(theEnv)->ListOfFileRouters = fptr->next; }
          else
            { prev->next = fptr->next; }
-         rm(theEnv,fptr,(int) sizeof(struct fileRouter));
+         rm(theEnv,execStatus,fptr,(int) sizeof(struct fileRouter));
 
          return(TRUE);
         }
@@ -338,11 +338,11 @@ globle int CloseAllFiles(
 
    while (fptr != NULL)
      {
-      GenClose(theEnv,fptr->stream);
+      GenClose(theEnv,execStatus,fptr->stream);
       prev = fptr;
-      rm(theEnv,fptr->logicalName,strlen(fptr->logicalName) + 1);
+      rm(theEnv,execStatus,fptr->logicalName,strlen(fptr->logicalName) + 1);
       fptr = fptr->next;
-      rm(theEnv,prev,(int) sizeof(struct fileRouter));
+      rm(theEnv,execStatus,prev,(int) sizeof(struct fileRouter));
      }
 
    FileRouterData(theEnv)->ListOfFileRouters = NULL;

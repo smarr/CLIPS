@@ -429,7 +429,7 @@ globle intBool CheckAllowedClassesConstraint(
    if (type == INSTANCE_ADDRESS)
      { ins = (INSTANCE_TYPE *) vPtr; }
    else
-     { ins = FindInstanceBySymbol(theEnv,(SYMBOL_HN *) vPtr); }
+     { ins = FindInstanceBySymbol(theEnv,execStatus,(SYMBOL_HN *) vPtr); }
     
    if (ins == NULL)
      { return(FALSE); }
@@ -439,15 +439,15 @@ globle intBool CheckAllowedClassesConstraint(
    /* belongs to one of the allowed classes in the list.   */
    /*======================================================*/
 
-   insClass = (DEFCLASS *) EnvGetInstanceClass(theEnv,ins);
+   insClass = (DEFCLASS *) EnvGetInstanceClass(theEnv,execStatus,ins);
    for (tmpPtr = constraints->classList;
         tmpPtr != NULL;
         tmpPtr = tmpPtr->nextArg)
      {
-      cmpClass = (DEFCLASS *) EnvFindDefclass(theEnv,ValueToString(tmpPtr->value));
+      cmpClass = (DEFCLASS *) EnvFindDefclass(theEnv,execStatus,ValueToString(tmpPtr->value));
       if (cmpClass == NULL) continue;
       if (cmpClass == insClass) return(TRUE);
-      if (EnvSubclassP(theEnv,insClass,cmpClass)) return(TRUE);
+      if (EnvSubclassP(theEnv,execStatus,insClass,cmpClass)) return(TRUE);
      }
 
    /*=========================================================*/
@@ -508,12 +508,12 @@ static intBool CheckRangeConstraint(
 
    while (minList != NULL)
      {
-      if (CompareNumbers(theEnv,type,vPtr,minList->type,minList->value) == LESS_THAN)
+      if (CompareNumbers(theEnv,execStatus,type,vPtr,minList->type,minList->value) == LESS_THAN)
         {
          minList = minList->nextArg;
          maxList = maxList->nextArg;
         }
-      else if (CompareNumbers(theEnv,type,vPtr,maxList->type,maxList->value) == GREATER_THAN)
+      else if (CompareNumbers(theEnv,execStatus,type,vPtr,maxList->type,maxList->value) == GREATER_THAN)
         {
          minList = minList->nextArg;
          maxList = maxList->nextArg;
@@ -561,14 +561,14 @@ globle void ConstraintViolationErrorMessage(
 
       if (violationType == FUNCTION_RETURN_TYPE_VIOLATION)
         {
-         PrintErrorID(theEnv,"CSTRNCHK",1,TRUE);
-         EnvPrintRouter(theEnv,WERROR,"The function return value ");
+         PrintErrorID(theEnv,execStatus,"CSTRNCHK",1,TRUE);
+         EnvPrintRouter(theEnv,execStatus,WERROR,"The function return value ");
         }
       else if (theWhat != NULL)
         {
-         PrintErrorID(theEnv,"CSTRNCHK",1,TRUE);
-         EnvPrintRouter(theEnv,WERROR,theWhat);
-         EnvPrintRouter(theEnv,WERROR," ");
+         PrintErrorID(theEnv,execStatus,"CSTRNCHK",1,TRUE);
+         EnvPrintRouter(theEnv,execStatus,WERROR,theWhat);
+         EnvPrintRouter(theEnv,execStatus,WERROR," ");
         }
 
       /*=======================================*/
@@ -578,10 +578,10 @@ globle void ConstraintViolationErrorMessage(
 
       if (thePlace != NULL)
         {
-         EnvPrintRouter(theEnv,WERROR,"found in ");
-         if (command) EnvPrintRouter(theEnv,WERROR,"the ");
-         EnvPrintRouter(theEnv,WERROR,thePlace);
-         if (command) EnvPrintRouter(theEnv,WERROR," command");
+         EnvPrintRouter(theEnv,execStatus,WERROR,"found in ");
+         if (command) EnvPrintRouter(theEnv,execStatus,WERROR,"the ");
+         EnvPrintRouter(theEnv,execStatus,WERROR,thePlace);
+         if (command) EnvPrintRouter(theEnv,execStatus,WERROR," command");
         }
 
       /*================================================*/
@@ -591,8 +591,8 @@ globle void ConstraintViolationErrorMessage(
 
       if (thePattern > 0)
         {
-         EnvPrintRouter(theEnv,WERROR,"found in CE #");
-         PrintLongInteger(theEnv,WERROR,(long int) thePattern);
+         EnvPrintRouter(theEnv,execStatus,WERROR,"found in CE #");
+         PrintLongInteger(theEnv,execStatus,WERROR,(long int) thePattern);
         }
      }
 
@@ -602,18 +602,18 @@ globle void ConstraintViolationErrorMessage(
 
    if ((violationType == TYPE_VIOLATION) ||
        (violationType == FUNCTION_RETURN_TYPE_VIOLATION))
-     { EnvPrintRouter(theEnv,WERROR,"\ndoes not match the allowed types"); }
+     { EnvPrintRouter(theEnv,execStatus,WERROR,"\ndoes not match the allowed types"); }
    else if (violationType == RANGE_VIOLATION)
      {
-      EnvPrintRouter(theEnv,WERROR,"\ndoes not fall in the allowed range ");
-      PrintRange(theEnv,WERROR,theConstraint);
+      EnvPrintRouter(theEnv,execStatus,WERROR,"\ndoes not fall in the allowed range ");
+      PrintRange(theEnv,execStatus,WERROR,theConstraint);
      }
    else if (violationType == ALLOWED_VALUES_VIOLATION)
-     { EnvPrintRouter(theEnv,WERROR,"\ndoes not match the allowed values"); }
+     { EnvPrintRouter(theEnv,execStatus,WERROR,"\ndoes not match the allowed values"); }
    else if (violationType == CARDINALITY_VIOLATION)
-     { EnvPrintRouter(theEnv,WERROR,"\ndoes not satisfy the cardinality restrictions"); }
+     { EnvPrintRouter(theEnv,execStatus,WERROR,"\ndoes not satisfy the cardinality restrictions"); }
    else if (violationType == ALLOWED_CLASSES_VIOLATION)
-     { EnvPrintRouter(theEnv,WERROR,"\ndoes not match the allowed classes"); }
+     { EnvPrintRouter(theEnv,execStatus,WERROR,"\ndoes not match the allowed classes"); }
 
    /*==============================================*/
    /* Print either the slot name or field position */
@@ -622,16 +622,16 @@ globle void ConstraintViolationErrorMessage(
 
    if (theSlot != NULL)
      {
-      EnvPrintRouter(theEnv,WERROR," for slot ");
-      EnvPrintRouter(theEnv,WERROR,ValueToString(theSlot));
+      EnvPrintRouter(theEnv,execStatus,WERROR," for slot ");
+      EnvPrintRouter(theEnv,execStatus,WERROR,ValueToString(theSlot));
      }
    else if (theField > 0)
      {
-      EnvPrintRouter(theEnv,WERROR," for field #");
-      PrintLongInteger(theEnv,WERROR,(long long) theField);
+      EnvPrintRouter(theEnv,execStatus,WERROR," for field #");
+      PrintLongInteger(theEnv,execStatus,WERROR,(long long) theField);
      }
 
-   EnvPrintRouter(theEnv,WERROR,".\n");
+   EnvPrintRouter(theEnv,execStatus,WERROR,".\n");
   }
 
 /********************************************************************/
@@ -645,12 +645,12 @@ static void PrintRange(
   CONSTRAINT_RECORD *theConstraint)
   {
    if (theConstraint->minValue->value == SymbolData(theEnv)->NegativeInfinity)
-     { EnvPrintRouter(theEnv,logicalName,ValueToString(SymbolData(theEnv)->NegativeInfinity)); }
-   else PrintExpression(theEnv,logicalName,theConstraint->minValue);
-   EnvPrintRouter(theEnv,logicalName," to ");
+     { EnvPrintRouter(theEnv,execStatus,logicalName,ValueToString(SymbolData(theEnv)->NegativeInfinity)); }
+   else PrintExpression(theEnv,execStatus,logicalName,theConstraint->minValue);
+   EnvPrintRouter(theEnv,execStatus,logicalName," to ");
    if (theConstraint->maxValue->value == SymbolData(theEnv)->PositiveInfinity)
-     { EnvPrintRouter(theEnv,logicalName,ValueToString(SymbolData(theEnv)->PositiveInfinity)); }
-   else PrintExpression(theEnv,logicalName,theConstraint->maxValue);
+     { EnvPrintRouter(theEnv,execStatus,logicalName,ValueToString(SymbolData(theEnv)->PositiveInfinity)); }
+   else PrintExpression(theEnv,execStatus,logicalName,theConstraint->maxValue);
   }
 
 /*************************************************************/
@@ -672,14 +672,14 @@ globle int ConstraintCheckDataObject(
 
    if (theData->type == MULTIFIELD)
      {
-      if (CheckCardinalityConstraint(theEnv,(theData->end - theData->begin) + 1,
+      if (CheckCardinalityConstraint(theEnv,execStatus,(theData->end - theData->begin) + 1,
                                      theConstraints) == FALSE)
         { return(CARDINALITY_VIOLATION); }
 
       theMultifield = ((struct multifield *) theData->value)->theFields;
       for (i = theData->begin; i <= theData->end; i++)
         {
-         if ((rv = ConstraintCheckValue(theEnv,theMultifield[i].type,
+         if ((rv = ConstraintCheckValue(theEnv,execStatus,theMultifield[i].type,
                                         theMultifield[i].value,
                                         theConstraints)) != NO_VIOLATION)
            { return(rv); }
@@ -688,10 +688,10 @@ globle int ConstraintCheckDataObject(
       return(NO_VIOLATION);
      }
 
-   if (CheckCardinalityConstraint(theEnv,1L,theConstraints) == FALSE)
+   if (CheckCardinalityConstraint(theEnv,execStatus,1L,theConstraints) == FALSE)
     { return(CARDINALITY_VIOLATION); }
 
-   return(ConstraintCheckValue(theEnv,theData->type,theData->value,theConstraints));
+   return(ConstraintCheckValue(theEnv,execStatus,theData->type,theData->value,theConstraints));
   }
 
 /****************************************************************/
@@ -711,10 +711,10 @@ globle int ConstraintCheckValue(
    else if (CheckAllowedValuesConstraint(theType,theValue,theConstraints) == FALSE)
      { return(ALLOWED_VALUES_VIOLATION); }
 
-   else if (CheckAllowedClassesConstraint(theEnv,theType,theValue,theConstraints) == FALSE)
+   else if (CheckAllowedClassesConstraint(theEnv,execStatus,theType,theValue,theConstraints) == FALSE)
      { return(ALLOWED_CLASSES_VIOLATION); }
 
-   else if (CheckRangeConstraint(theEnv,theType,theValue,theConstraints) == FALSE)
+   else if (CheckRangeConstraint(theEnv,execStatus,theType,theValue,theConstraints) == FALSE)
      { return(RANGE_VIOLATION); }
 
    else if (theType == FCALL)
@@ -762,7 +762,7 @@ globle int ConstraintCheckExpressionChain(
    /*====================================*/
 
    if (max == 0) max = min;
-   if (CheckRangeAgainstCardinalityConstraint(theEnv,min,max,theConstraints) == FALSE)
+   if (CheckRangeAgainstCardinalityConstraint(theEnv,execStatus,min,max,theConstraints) == FALSE)
      { return(CARDINALITY_VIOLATION); }
 
    /*========================================*/
@@ -771,7 +771,7 @@ globle int ConstraintCheckExpressionChain(
 
    for (theExp = theExpression ; theExp != NULL ; theExp = theExp->nextArg)
      {
-      vCode = ConstraintCheckValue(theEnv,theExp->type,theExp->value,theConstraints);
+      vCode = ConstraintCheckValue(theEnv,execStatus,theExp->type,theExp->value,theConstraints);
       if (vCode != NO_VIOLATION)
         return(vCode);
      }
@@ -798,11 +798,11 @@ globle int ConstraintCheckExpression(
 
    while (theExpression != NULL)
      {
-      rv = ConstraintCheckValue(theEnv,theExpression->type,
+      rv = ConstraintCheckValue(theEnv,execStatus,theExpression->type,
                                 theExpression->value,
                                 theConstraints);
       if (rv != NO_VIOLATION) return(rv);
-      rv = ConstraintCheckExpression(theEnv,theExpression->argList,theConstraints);
+      rv = ConstraintCheckExpression(theEnv,execStatus,theExpression->argList,theConstraints);
       if (rv != NO_VIOLATION) return(rv);
       theExpression = theExpression->nextArg;
      }

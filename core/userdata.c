@@ -35,7 +35,7 @@ globle void InitializeUserDataData(
   void *theEnv,
   EXEC_STATUS)
   {
-   AllocateEnvironmentData(theEnv,USER_DATA_DATA,sizeof(struct userDataData),NULL);
+   AllocateEnvironmentData(theEnv,execStatus,USER_DATA_DATA,sizeof(struct userDataData),NULL);
   }
 
 /******************************************************/
@@ -118,7 +118,7 @@ globle void ClearUserDataList(
    while (theList != NULL)
      {
       nextData = theList->next;
-      (*UserDataData(theEnv)->UserDataRecordArray[theList->dataID]->deleteUserData)(theEnv,theList);
+      (*UserDataData(theEnv)->UserDataRecordArray[theList->dataID]->deleteUserData)(theEnv,execStatus,theList);
       theList = nextData;
      }
   }
@@ -146,7 +146,7 @@ globle struct userData *DeleteUserData(
          else
            { lastData->next = theData->next; }
             
-         (*UserDataData(theEnv)->UserDataRecordArray[userDataID]->deleteUserData)(theEnv,theData);
+         (*UserDataData(theEnv)->UserDataRecordArray[userDataID]->deleteUserData)(theEnv,execStatus,theData);
          return(theList);
         }
         

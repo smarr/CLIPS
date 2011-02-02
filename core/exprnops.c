@@ -87,24 +87,24 @@ globle int CheckArgumentAgainstRestriction(
    /* argument passed to the function.            */
    /*=============================================*/
 
-   cr1 = ExpressionToConstraintRecord(theEnv,theExpression);
+   cr1 = ExpressionToConstraintRecord(theEnv,execStatus,theExpression);
 
    /*================================================*/
    /* Generate a constraint record based on the type */
    /* of argument expected by the function.          */
    /*================================================*/
 
-   cr2 = ArgumentTypeToConstraintRecord(theEnv,theRestriction);
+   cr2 = ArgumentTypeToConstraintRecord(theEnv,execStatus,theRestriction);
 
    /*===============================================*/
    /* Intersect the two constraint records and then */
    /* discard them.                                 */
    /*===============================================*/
 
-   cr3 = IntersectConstraints(theEnv,cr1,cr2);
+   cr3 = IntersectConstraints(theEnv,execStatus,cr1,cr2);
 
-   RemoveConstraint(theEnv,cr1);
-   RemoveConstraint(theEnv,cr2);
+   RemoveConstraint(theEnv,execStatus,cr1);
+   RemoveConstraint(theEnv,execStatus,cr2);
 
    /*====================================================*/
    /* If the intersection of the two constraint records  */
@@ -114,7 +114,7 @@ globle int CheckArgumentAgainstRestriction(
 
    if (UnmatchableConstraint(cr3))
      {
-      RemoveConstraint(theEnv,cr3);
+      RemoveConstraint(theEnv,execStatus,cr3);
       return(TRUE);
      }
 
@@ -122,7 +122,7 @@ globle int CheckArgumentAgainstRestriction(
    /* The argument satisfies the function restrictions. */
    /*===================================================*/
 
-   RemoveConstraint(theEnv,cr3);
+   RemoveConstraint(theEnv,execStatus,cr3);
    return(FALSE);
   }
 
@@ -254,15 +254,15 @@ globle struct expr *CopyExpression(
 
    if (original == NULL) return(NULL);
 
-   topLevel = GenConstant(theEnv,original->type,original->value);
-   topLevel->argList = CopyExpression(theEnv,original->argList);
+   topLevel = GenConstant(theEnv,execStatus,original->type,original->value);
+   topLevel->argList = CopyExpression(theEnv,execStatus,original->argList);
 
    last = topLevel;
    original = original->nextArg;
    while (original != NULL)
      {
-      next = GenConstant(theEnv,original->type,original->value);
-      next->argList = CopyExpression(theEnv,original->argList);
+      next = GenConstant(theEnv,execStatus,original->type,original->value);
+      next->argList = CopyExpression(theEnv,execStatus,original->argList);
 
       last->nextArg = next;
       last = next;
@@ -334,7 +334,7 @@ globle struct expr *GenConstant(
   {
    struct expr *top;
 
-   top = get_struct(theEnv,expr);
+   top = get_struct(theEnv,execStatus,expr);
    top->nextArg = NULL;
    top->argList = NULL;
    top->type = type;
@@ -363,34 +363,34 @@ globle void PrintExpression(
         {
          case SF_VARIABLE:
          case GBL_VARIABLE:
-            EnvPrintRouter(theEnv,fileid,"?");
-            EnvPrintRouter(theEnv,fileid,ValueToString(theExpression->value));
+            EnvPrintRouter(theEnv,execStatus,fileid,"?");
+            EnvPrintRouter(theEnv,execStatus,fileid,ValueToString(theExpression->value));
             break;
 
          case MF_VARIABLE:
          case MF_GBL_VARIABLE:
-            EnvPrintRouter(theEnv,fileid,"$?");
-            EnvPrintRouter(theEnv,fileid,ValueToString(theExpression->value));
+            EnvPrintRouter(theEnv,execStatus,fileid,"$?");
+            EnvPrintRouter(theEnv,execStatus,fileid,ValueToString(theExpression->value));
             break;
 
          case FCALL:
-           EnvPrintRouter(theEnv,fileid,"(");
-           EnvPrintRouter(theEnv,fileid,ValueToString(ExpressionFunctionCallName(theExpression)));
-           if (theExpression->argList != NULL) { EnvPrintRouter(theEnv,fileid," "); }
-           PrintExpression(theEnv,fileid,theExpression->argList);
-           EnvPrintRouter(theEnv,fileid,")");
+           EnvPrintRouter(theEnv,execStatus,fileid,"(");
+           EnvPrintRouter(theEnv,execStatus,fileid,ValueToString(ExpressionFunctionCallName(theExpression)));
+           if (theExpression->argList != NULL) { EnvPrintRouter(theEnv,execStatus,fileid," "); }
+           PrintExpression(theEnv,execStatus,fileid,theExpression->argList);
+           EnvPrintRouter(theEnv,execStatus,fileid,")");
            break;
 
          default:
            oldExpression = execStatus->CurrentExpression;
            execStatus->CurrentExpression = theExpression;
-           PrintAtom(theEnv,fileid,theExpression->type,theExpression->value);
+           PrintAtom(theEnv,execStatus,fileid,theExpression->type,theExpression->value);
            execStatus->CurrentExpression = oldExpression;
            break;
         }
 
       theExpression = theExpression->nextArg;
-      if (theExpression != NULL) EnvPrintRouter(theEnv,fileid," ");
+      if (theExpression != NULL) EnvPrintRouter(theEnv,execStatus,fileid," ");
      }
 
    return;
@@ -437,7 +437,7 @@ globle struct expr *CombineExpressions(
       tempPtr = expr1->argList;
       if (tempPtr == NULL)
         {
-         rtn_struct(theEnv,expr,expr1);
+         rtn_struct(theEnv,execStatus,expr,expr1);
          return(expr2);
         }
 
@@ -460,7 +460,7 @@ globle struct expr *CombineExpressions(
       tempPtr = expr2->argList;
       if (tempPtr == NULL)
         {
-         rtn_struct(theEnv,expr,expr2);
+         rtn_struct(theEnv,execStatus,expr,expr2);
          return(expr1);
         }
 
@@ -482,7 +482,7 @@ globle struct expr *CombineExpressions(
       tempPtr = expr1->argList;
       if (tempPtr == NULL)
         {
-         rtn_struct(theEnv,expr,expr1);
+         rtn_struct(theEnv,execStatus,expr,expr1);
          return(expr2);
         }
 
@@ -490,7 +490,7 @@ globle struct expr *CombineExpressions(
         { tempPtr = tempPtr->nextArg; }
 
       tempPtr->nextArg = expr2->argList;
-      rtn_struct(theEnv,expr,expr2);
+      rtn_struct(theEnv,execStatus,expr,expr2);
 
       return(expr1);
      }
@@ -501,7 +501,7 @@ globle struct expr *CombineExpressions(
    /* to the argument list of that "and" expression.      */
    /*=====================================================*/
 
-   tempPtr = GenConstant(theEnv,FCALL,ExpressionData(theEnv)->PTR_AND);
+   tempPtr = GenConstant(theEnv,execStatus,FCALL,ExpressionData(theEnv)->PTR_AND);
    tempPtr->argList = expr1;
    expr1->nextArg = expr2;
    return(tempPtr);

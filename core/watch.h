@@ -47,7 +47,7 @@ struct watchData
    struct watchItem *ListOfWatchItems;
   };
 
-#define WatchData(theEnv) ((struct watchData *) GetEnvironmentData(theEnv,WATCH_DATA))
+#define WatchData(theEnv) ((struct watchData *) GetEnvironmentData(theEnv,execStatus,WATCH_DATA))
 
 #ifdef LOCALE
 #undef LOCALE

@@ -91,7 +91,7 @@ globle intBool AddLogicalDependencies(
 
    if (EngineData(theEnv)->TheLogicalJoin == NULL)
      {
-      if (existingEntity) RemoveEntityDependencies(theEnv,theEntity);
+      if (existingEntity) RemoveEntityDependencies(theEnv,execStatus,theEntity);
       return(TRUE);
      }
    else if (existingEntity && (theEntity->dependents == NULL))
@@ -118,7 +118,7 @@ globle intBool AddLogicalDependencies(
    /* activation link, if any.                                     */
    /*==============================================================*/
 
-   newDependency = get_struct(theEnv,dependency);
+   newDependency = get_struct(theEnv,execStatus,dependency);
    newDependency->dPtr = (void *) theEntity;
    newDependency->next = (struct dependency *) theBinds->dependents;
    theBinds->dependents = (void *) newDependency;
@@ -127,7 +127,7 @@ globle intBool AddLogicalDependencies(
    /* Add a dependency link between the entity and the partialMatch. */
    /*================================================================*/
 
-   newDependency = get_struct(theEnv,dependency);
+   newDependency = get_struct(theEnv,execStatus,dependency);
    newDependency->dPtr = (void *) theBinds;
    newDependency->next = (struct dependency *) theEntity->dependents;
    theEntity->dependents = (void *) newDependency;
@@ -209,14 +209,14 @@ globle void RemoveEntityDependencies(
 
       theBinds = (struct partialMatch *) fdPtr->dPtr;
       theList = (struct dependency *) theBinds->dependents;
-      theList = DetachAssociatedDependencies(theEnv,theList,(void *) theEntity);
+      theList = DetachAssociatedDependencies(theEnv,execStatus,theList,(void *) theEntity);
       theBinds->dependents = (void *) theList;
 
       /*========================*/
       /* Return the dependency. */
       /*========================*/
 
-      rtn_struct(theEnv,dependency,fdPtr);
+      rtn_struct(theEnv,execStatus,dependency,fdPtr);
 
       /*=================================*/
       /* Move on to the next dependency. */
@@ -249,7 +249,7 @@ globle void ReturnEntityDependencies(
    while (fdPtr != NULL)
      {
       nextPtr = fdPtr->next;
-      rtn_struct(theEnv,dependency,fdPtr);
+      rtn_struct(theEnv,execStatus,dependency,fdPtr);
       fdPtr = nextPtr;
      }
 
@@ -280,7 +280,7 @@ static struct dependency *DetachAssociatedDependencies(
          nextPtr = fdPtr->next;
          if (lastPtr == NULL) theList = nextPtr;
          else lastPtr->next = nextPtr;
-         rtn_struct(theEnv,dependency,fdPtr);
+         rtn_struct(theEnv,execStatus,dependency,fdPtr);
          fdPtr = nextPtr;
         }
       else
@@ -315,10 +315,10 @@ globle void RemovePMDependencies(
       theEntity = (struct patternEntity *) fdPtr->dPtr;
 
       theList = (struct dependency *) theEntity->dependents;
-      theList = DetachAssociatedDependencies(theEnv,theList,(void *) theBinds);
+      theList = DetachAssociatedDependencies(theEnv,execStatus,theList,(void *) theBinds);
       theEntity->dependents = (void *) theList;
 
-      rtn_struct(theEnv,dependency,fdPtr);
+      rtn_struct(theEnv,execStatus,dependency,fdPtr);
       fdPtr = nextPtr;
      }
 
@@ -342,7 +342,7 @@ globle void DestroyPMDependencies(
      {
       nextPtr = fdPtr->next;
 
-      rtn_struct(theEnv,dependency,fdPtr);
+      rtn_struct(theEnv,execStatus,dependency,fdPtr);
       fdPtr = nextPtr;
      }
 
@@ -398,7 +398,7 @@ globle void RemoveLogicalSupport(
       theEntity = (struct patternEntity *) dlPtr->dPtr;
 
       theList = (struct dependency *) theEntity->dependents;
-      theList = DetachAssociatedDependencies(theEnv,theList,(void *) theBinds);
+      theList = DetachAssociatedDependencies(theEnv,execStatus,theList,(void *) theBinds);
       theEntity->dependents = (void *) theList;
 
       /*==============================================================*/
@@ -410,12 +410,12 @@ globle void RemoveLogicalSupport(
 
       if (theEntity->dependents == NULL)
         {
-         (*theEntity->theInfo->base.incrementBusyCount)(theEnv,theEntity);
+         (*theEntity->theInfo->base.incrementBusyCount)(theEnv,execStatus,theEntity);
          dlPtr->next = EngineData(theEnv)->UnsupportedDataEntities;
          EngineData(theEnv)->UnsupportedDataEntities = dlPtr;
         }
       else
-        { rtn_struct(theEnv,dependency,dlPtr); }
+        { rtn_struct(theEnv,execStatus,dependency,dlPtr); }
 
       /*==================================*/
       /* Move on to the next dependency.  */
@@ -478,14 +478,14 @@ globle void ForceLogicalRetractions(
 
       tempPtr = EngineData(theEnv)->UnsupportedDataEntities;
       EngineData(theEnv)->UnsupportedDataEntities = EngineData(theEnv)->UnsupportedDataEntities->next;
-      rtn_struct(theEnv,dependency,tempPtr);
+      rtn_struct(theEnv,execStatus,dependency,tempPtr);
 
       /*=========================*/
       /* Delete the data entity. */
       /*=========================*/
 
-      (*theEntity->theInfo->base.decrementBusyCount)(theEnv,theEntity);
-      (*theEntity->theInfo->base.deleteFunction)(theEnv,theEntity);
+      (*theEntity->theInfo->base.decrementBusyCount)(theEnv,execStatus,theEntity);
+      (*theEntity->theInfo->base.deleteFunction)(theEnv,execStatus,theEntity);
      }
 
    /*============================================*/
@@ -512,7 +512,7 @@ globle void Dependencies(
 
    if (theEntity->dependents == NULL)
      {
-      EnvPrintRouter(theEnv,WDISPLAY,"None\n");
+      EnvPrintRouter(theEnv,execStatus,WDISPLAY,"None\n");
       return;
      }
 
@@ -526,8 +526,8 @@ globle void Dependencies(
         fdPtr = fdPtr->next)
      {
       if (GetHaltExecution(theEnv) == TRUE) return;
-      PrintPartialMatch(theEnv,WDISPLAY,(struct partialMatch *) fdPtr->dPtr);
-      EnvPrintRouter(theEnv,WDISPLAY,"\n");
+      PrintPartialMatch(theEnv,execStatus,WDISPLAY,(struct partialMatch *) fdPtr->dPtr);
+      EnvPrintRouter(theEnv,execStatus,WDISPLAY,"\n");
      }
   }
 
@@ -549,9 +549,9 @@ globle void Dependents(
    /* Loop through every data entity. */
    /*=================================*/
 
-   for (GetNextPatternEntity(theEnv,&theParser,&entityPtr);
+   for (GetNextPatternEntity(theEnv,execStatus,&theParser,&entityPtr);
         entityPtr != NULL;
-        GetNextPatternEntity(theEnv,&theParser,&entityPtr))
+        GetNextPatternEntity(theEnv,execStatus,&theParser,&entityPtr))
      {
       if (GetHaltExecution(theEnv) == TRUE) return;
 
@@ -578,8 +578,8 @@ globle void Dependents(
          theBinds = (struct partialMatch *) fdPtr->dPtr;
          if (FindEntityInPartialMatch(theEntity,theBinds) == TRUE)
            {
-            if (found) EnvPrintRouter(theEnv,WDISPLAY,",");
-            (*entityPtr->theInfo->base.shortPrintFunction)(theEnv,WDISPLAY,entityPtr);
+            if (found) EnvPrintRouter(theEnv,execStatus,WDISPLAY,",");
+            (*entityPtr->theInfo->base.shortPrintFunction)(theEnv,execStatus,WDISPLAY,entityPtr);
             found = TRUE;
             break;
            }
@@ -592,8 +592,8 @@ globle void Dependents(
    /* list of dependents.                             */
    /*=================================================*/
 
-   if (! found) EnvPrintRouter(theEnv,WDISPLAY,"None\n");
-   else EnvPrintRouter(theEnv,WDISPLAY,"\n");
+   if (! found) EnvPrintRouter(theEnv,execStatus,WDISPLAY,"None\n");
+   else EnvPrintRouter(theEnv,execStatus,WDISPLAY,"\n");
   }
 
 #if DEBUGGING_FUNCTIONS
@@ -616,9 +616,9 @@ globle void DependenciesCommand(
    if (ptr == NULL) return;
 
 #if DEFRULE_CONSTRUCT
-   Dependencies(theEnv,(struct patternEntity *) ptr);
+   Dependencies(theEnv,execStatus,(struct patternEntity *) ptr);
 #else
-   EnvPrintRouter(theEnv,WDISPLAY,"None\n");
+   EnvPrintRouter(theEnv,execStatus,WDISPLAY,"None\n");
 #endif
   }
 
@@ -640,9 +640,9 @@ globle void DependentsCommand(
    if (ptr == NULL) return;
 
 #if DEFRULE_CONSTRUCT
-   Dependents(theEnv,(struct patternEntity *) ptr);
+   Dependents(theEnv,execStatus,(struct patternEntity *) ptr);
 #else
-   EnvPrintRouter(theEnv,WDISPLAY,"None\n");
+   EnvPrintRouter(theEnv,execStatus,WDISPLAY,"None\n");
 #endif
   }
 

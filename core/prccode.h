@@ -81,7 +81,7 @@ struct proceduralPrimitiveData
    int Oldindex;
   };
 
-#define ProceduralPrimitiveData(theEnv) ((struct proceduralPrimitiveData *) GetEnvironmentData(theEnv,PROCEDURAL_PRIMITIVE_DATA))
+#define ProceduralPrimitiveData(theEnv) ((struct proceduralPrimitiveData *) GetEnvironmentData(theEnv,execStatus,PROCEDURAL_PRIMITIVE_DATA))
 
 #ifdef LOCALE
 #undef LOCALE

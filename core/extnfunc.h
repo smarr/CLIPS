@@ -75,7 +75,7 @@ struct externalFunctionData
    struct FunctionHash **FunctionHashtable;
   };
 
-#define ExternalFunctionData(theEnv) ((struct externalFunctionData *) GetEnvironmentData(theEnv,EXTERNAL_FUNCTION_DATA))
+#define ExternalFunctionData(theEnv) ((struct externalFunctionData *) GetEnvironmentData(theEnv,execStatus,EXTERNAL_FUNCTION_DATA))
 
 #ifdef LOCALE
 #undef LOCALE

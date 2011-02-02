@@ -127,11 +127,11 @@ struct defruleData
 #endif
   };
 
-#define EnvGetDefruleName(theEnv,x) GetConstructNameString((struct constructHeader *) x)
-#define EnvGetDefrulePPForm(theEnv,x) GetConstructPPForm(theEnv,(struct constructHeader *) x)
-#define EnvDefruleModule(theEnv,x) GetConstructModuleName((struct constructHeader *) x)
+#define EnvGetDefruleName(theEnv,execStatus,x) GetConstructNameString((struct constructHeader *) x)
+#define EnvGetDefrulePPForm(theEnv,execStatus,x) GetConstructPPForm(theEnv,execStatus,(struct constructHeader *) x)
+#define EnvDefruleModule(theEnv,execStatus,x) GetConstructModuleName((struct constructHeader *) x)
 
-#define DefruleData(theEnv) ((struct defruleData *) GetEnvironmentData(theEnv,DEFRULE_DATA))
+#define DefruleData(theEnv) ((struct defruleData *) GetEnvironmentData(theEnv,execStatus,DEFRULE_DATA))
 
 #define GetPreviousJoin(theJoin) \
    (((theJoin)->joinFromTheRight) ? \

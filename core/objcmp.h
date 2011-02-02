@@ -42,7 +42,7 @@ struct objectCompilerData
 #endif
   };
 
-#define ObjectCompilerData(theEnv) ((struct objectCompilerData *) GetEnvironmentData(theEnv,OBJECT_COMPILER_DATA))
+#define ObjectCompilerData(theEnv) ((struct objectCompilerData *) GetEnvironmentData(theEnv,execStatus,OBJECT_COMPILER_DATA))
 
 #ifdef LOCALE
 #undef LOCALE

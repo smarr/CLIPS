@@ -92,10 +92,10 @@ globle void *EnvFindDefclass(
    char *className;
 
    SaveCurrentModule(theEnv);
-   className = ExtractModuleAndConstructName(theEnv,classAndModuleName);
+   className = ExtractModuleAndConstructName(theEnv,execStatus,classAndModuleName);
    if (className != NULL)
      {
-      classSymbol = FindSymbolHN(theEnv,ExtractModuleAndConstructName(theEnv,classAndModuleName));
+      classSymbol = FindSymbolHN(theEnv,execStatus,ExtractModuleAndConstructName(theEnv,execStatus,classAndModuleName));
       theModule = ((struct defmodule *) EnvGetCurrentModule(theEnv));
      }
    RestoreCurrentModule(theEnv);
@@ -138,15 +138,15 @@ globle DEFCLASS *LookupDefclassByMdlOrScope(
    struct defmodule *theModule;
 
    if (FindModuleSeparator(classAndModuleName) == FALSE)
-     return(LookupDefclassInScope(theEnv,classAndModuleName));
+     return(LookupDefclassInScope(theEnv,execStatus,classAndModuleName));
 
    SaveCurrentModule(theEnv);
-   className = ExtractModuleAndConstructName(theEnv,classAndModuleName);
+   className = ExtractModuleAndConstructName(theEnv,execStatus,classAndModuleName);
    theModule = ((struct defmodule *) EnvGetCurrentModule(theEnv));
    RestoreCurrentModule(theEnv);
    if(className == NULL)
      return(NULL);
-   if ((classSymbol = FindSymbolHN(theEnv,className)) == NULL)
+   if ((classSymbol = FindSymbolHN(theEnv,execStatus,className)) == NULL)
      return(NULL);
    cls = DefclassData(theEnv)->ClassTable[HashClass(classSymbol)];
    while (cls != NULL)
@@ -179,12 +179,12 @@ globle DEFCLASS *LookupDefclassInScope(
    DEFCLASS *cls;
    SYMBOL_HN *classSymbol;
 
-   if ((classSymbol = FindSymbolHN(theEnv,className)) == NULL)
+   if ((classSymbol = FindSymbolHN(theEnv,execStatus,className)) == NULL)
      return(NULL);
    cls = DefclassData(theEnv)->ClassTable[HashClass(classSymbol)];
    while (cls != NULL)
      {
-      if ((cls->header.name == classSymbol) && DefclassInScope(theEnv,cls,NULL))
+      if ((cls->header.name == classSymbol) && DefclassInScope(theEnv,execStatus,cls,NULL))
         return(cls->installed ? cls : NULL);
       cls = cls->nxtHash;
      }
@@ -213,7 +213,7 @@ globle DEFCLASS *LookupDefclassAnywhere(
    DEFCLASS *cls;
    SYMBOL_HN *classSymbol;
 
-   if ((classSymbol = FindSymbolHN(theEnv,className)) == NULL)
+   if ((classSymbol = FindSymbolHN(theEnv,execStatus,className)) == NULL)
      return(NULL);
    cls = DefclassData(theEnv)->ClassTable[HashClass(classSymbol)];
    while (cls != NULL)
@@ -259,7 +259,7 @@ globle intBool DefclassInScope(
    return(TestBitMap(scopeMap,moduleID) ? TRUE : FALSE);
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv,theDefclass,theModule)
+#pragma unused(theEnv,execStatus,theDefclass,theModule)
 #endif
    return(TRUE);
 #endif
@@ -280,7 +280,7 @@ globle void *EnvGetNextDefclass(
   EXEC_STATUS,
   void *ptr)
   {
-   return((void *) GetNextConstructItem(theEnv,(struct constructHeader *) ptr,DefclassData(theEnv)->DefclassModuleIndex));
+   return((void *) GetNextConstructItem(theEnv,execStatus,(struct constructHeader *) ptr,DefclassData(theEnv)->DefclassModuleIndex));
   }
 
 /***************************************************
@@ -344,7 +344,7 @@ globle intBool EnvUndefclass(
   void *theDefclass)
   {
 #if (MAC_MCW || WIN_MCW) && (RUN_TIME || BLOAD_ONLY)
-#pragma unused(theEnv,theDefclass)
+#pragma unused(theEnv,execStatus,theDefclass)
 #endif
 
 #if RUN_TIME || BLOAD_ONLY
@@ -359,7 +359,7 @@ globle intBool EnvUndefclass(
 #endif
    if (cls == NULL)
      return(RemoveAllUserClasses(theEnv));
-   return(DeleteClassUAG(theEnv,cls));
+   return(DeleteClassUAG(theEnv,execStatus,cls));
 #endif
   }
 
@@ -546,10 +546,10 @@ globle unsigned DefclassWatchAccess(
   EXPRESSION *argExprs)
   {
    if (code)
-     return(ConstructSetWatchAccess(theEnv,DefclassData(theEnv)->DefclassConstruct,newState,argExprs,
+     return(ConstructSetWatchAccess(theEnv,execStatus,DefclassData(theEnv)->DefclassConstruct,newState,argExprs,
                                     EnvGetDefclassWatchSlots,EnvSetDefclassWatchSlots));
    else
-     return(ConstructSetWatchAccess(theEnv,DefclassData(theEnv)->DefclassConstruct,newState,argExprs,
+     return(ConstructSetWatchAccess(theEnv,execStatus,DefclassData(theEnv)->DefclassConstruct,newState,argExprs,
                                     EnvGetDefclassWatchInstances,EnvSetDefclassWatchInstances));
   }
 
@@ -575,10 +575,10 @@ globle unsigned DefclassWatchPrint(
   EXPRESSION *argExprs)
   {
    if (code)
-     return(ConstructPrintWatchAccess(theEnv,DefclassData(theEnv)->DefclassConstruct,logName,argExprs,
+     return(ConstructPrintWatchAccess(theEnv,execStatus,DefclassData(theEnv)->DefclassConstruct,logName,argExprs,
                                       EnvGetDefclassWatchSlots,EnvSetDefclassWatchSlots));
    else
-     return(ConstructPrintWatchAccess(theEnv,DefclassData(theEnv)->DefclassConstruct,logName,argExprs,
+     return(ConstructPrintWatchAccess(theEnv,execStatus,DefclassData(theEnv)->DefclassConstruct,logName,argExprs,
                                       EnvGetDefclassWatchInstances,EnvSetDefclassWatchInstances));
   }
 
@@ -618,7 +618,7 @@ globle void EnvGetDefclassList(
   DATA_OBJECT *returnValue,
   struct defmodule *theModule)
   {
-   GetConstructList(theEnv,returnValue,DefclassData(theEnv)->DefclassConstruct,theModule);
+   GetConstructList(theEnv,execStatus,returnValue,DefclassData(theEnv)->DefclassConstruct,theModule);
   }
 
 /*****************************************************
@@ -663,10 +663,10 @@ globle SYMBOL_HN *CheckClassAndSlot(
 
    if (EnvArgTypeCheck(theEnv,execStatus,func,1,SYMBOL,&temp) == FALSE)
      return(NULL);
-   *cls = LookupDefclassByMdlOrScope(theEnv,DOToString(temp));
+   *cls = LookupDefclassByMdlOrScope(theEnv,execStatus,DOToString(temp));
    if (*cls == NULL)
      {
-      ClassExistError(theEnv,func,DOToString(temp));
+      ClassExistError(theEnv,execStatus,func,DOToString(temp));
       return(NULL);
      }
    if (EnvArgTypeCheck(theEnv,execStatus,func,2,SYMBOL,&temp) == FALSE)
@@ -695,10 +695,10 @@ globle void SaveDefclasses(
   char *logName)
   {
 #if DEBUGGING_FUNCTIONS
-   DoForAllConstructsInModule(theEnv,theModule,SaveDefclass,DefclassData(theEnv)->DefclassModuleIndex,FALSE,(void *) logName);
+   DoForAllConstructsInModule(theEnv,execStatus,theModule,SaveDefclass,DefclassData(theEnv)->DefclassModuleIndex,FALSE,(void *) logName);
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv,theModule,logName)
+#pragma unused(theEnv,execStatus,theModule,logName)
 #endif
 #endif
   }
@@ -733,21 +733,21 @@ static void SaveDefclass(
    unsigned hnd;
    char *ppForm;
 
-   ppForm = EnvGetDefclassPPForm(theEnv,(void *) theDefclass);
+   ppForm = EnvGetDefclassPPForm(theEnv,execStatus,(void *) theDefclass);
    if (ppForm != NULL)
      {
-      PrintInChunks(theEnv,logName,ppForm);
-      EnvPrintRouter(theEnv,logName,"\n");
-      hnd = EnvGetNextDefmessageHandler(theEnv,(void *) theDefclass,0);
+      PrintInChunks(theEnv,execStatus,logName,ppForm);
+      EnvPrintRouter(theEnv,execStatus,logName,"\n");
+      hnd = EnvGetNextDefmessageHandler(theEnv,execStatus,(void *) theDefclass,0);
       while (hnd != 0)
         {
-         ppForm = EnvGetDefmessageHandlerPPForm(theEnv,(void *) theDefclass,hnd);
+         ppForm = EnvGetDefmessageHandlerPPForm(theEnv,execStatus,(void *) theDefclass,hnd);
          if (ppForm != NULL)
            {
-            PrintInChunks(theEnv,logName,ppForm);
-            EnvPrintRouter(theEnv,logName,"\n");
+            PrintInChunks(theEnv,execStatus,logName,ppForm);
+            EnvPrintRouter(theEnv,execStatus,logName,"\n");
            }
-         hnd = EnvGetNextDefmessageHandler(theEnv,(void *) theDefclass,hnd);
+         hnd = EnvGetNextDefmessageHandler(theEnv,execStatus,(void *) theDefclass,hnd);
         }
      }
   }
@@ -791,7 +791,7 @@ globle void *GetClassDefaultsModeCommand(
   {
    EnvArgCountCheck(theEnv,execStatus,"get-class-defaults-mode",EXACTLY,0);
 
-   return((SYMBOL_HN *) EnvAddSymbol(theEnv,GetClassDefaultsModeName(EnvGetClassDefaultsMode(theEnv))));
+   return((SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,GetClassDefaultsModeName(EnvGetClassDefaultsMode(theEnv))));
   }
 
 /***************************************************/
@@ -813,10 +813,10 @@ globle void *SetClassDefaultsModeCommand(
    /*=====================================================*/
 
    if (EnvArgCountCheck(theEnv,execStatus,"set-class-defaults-mode",EXACTLY,1) == -1)
-     { return((SYMBOL_HN *) EnvAddSymbol(theEnv,GetClassDefaultsModeName(EnvGetClassDefaultsMode(theEnv)))); }
+     { return((SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,GetClassDefaultsModeName(EnvGetClassDefaultsMode(theEnv)))); }
 
    if (EnvArgTypeCheck(theEnv,execStatus,"set-class-defaults-mode",1,SYMBOL,&argPtr) == FALSE)
-     { return((SYMBOL_HN *) EnvAddSymbol(theEnv,GetClassDefaultsModeName(EnvGetClassDefaultsMode(theEnv)))); }
+     { return((SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,GetClassDefaultsModeName(EnvGetClassDefaultsMode(theEnv)))); }
 
    argument = DOToString(argPtr);
 
@@ -825,21 +825,21 @@ globle void *SetClassDefaultsModeCommand(
    /*=============================================*/
 
    if (strcmp(argument,"conservation") == 0)
-     { EnvSetClassDefaultsMode(theEnv,CONSERVATION_MODE); }
+     { EnvSetClassDefaultsMode(theEnv,execStatus,CONSERVATION_MODE); }
    else if (strcmp(argument,"convenience") == 0)
-     { EnvSetClassDefaultsMode(theEnv,CONVENIENCE_MODE); }
+     { EnvSetClassDefaultsMode(theEnv,execStatus,CONVENIENCE_MODE); }
    else
      {
-      ExpectedTypeError1(theEnv,"set-class-defaults-mode",1,
+      ExpectedTypeError1(theEnv,execStatus,"set-class-defaults-mode",1,
       "symbol with value conservation or convenience");
-      return((SYMBOL_HN *) EnvAddSymbol(theEnv,GetClassDefaultsModeName(EnvGetClassDefaultsMode(theEnv))));
+      return((SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,GetClassDefaultsModeName(EnvGetClassDefaultsMode(theEnv))));
      }
 
    /*===================================*/
    /* Return the old value of the mode. */
    /*===================================*/
 
-   return((SYMBOL_HN *) EnvAddSymbol(theEnv,GetClassDefaultsModeName(oldMode)));
+   return((SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,GetClassDefaultsModeName(oldMode)));
   }
 
 /*******************************************************************/

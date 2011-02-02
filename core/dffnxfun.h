@@ -26,13 +26,13 @@
 #ifndef _H_dffnxfun
 #define _H_dffnxfun
 
-#define EnvGetDeffunctionName(theEnv,x) GetConstructNameString((struct constructHeader *) x)
-#define EnvGetDeffunctionPPForm(theEnv,x) GetConstructPPForm(theEnv,(struct constructHeader *) x)
+#define EnvGetDeffunctionName(theEnv,execStatus,x) GetConstructNameString((struct constructHeader *) x)
+#define EnvGetDeffunctionPPForm(theEnv,execStatus,x) GetConstructPPForm(theEnv,execStatus,(struct constructHeader *) x)
 
 #define GetDeffunctionNamePointer(x) GetConstructNamePointer((struct constructHeader *) x)
-#define SetDeffunctionPPForm(d,ppf) SetConstructPPForm(theEnv,(struct constructHeader *) d,ppf)
+#define SetDeffunctionPPForm(d,ppf) SetConstructPPForm(theEnv,execStatus,(struct constructHeader *) d,ppf)
 
-#define EnvDeffunctionModule(theEnv,x) GetConstructModuleName((struct constructHeader *) x)
+#define EnvDeffunctionModule(theEnv,execStatus,x) GetConstructModuleName((struct constructHeader *) x)
 
 typedef struct deffunctionStruct DEFFUNCTION;
 typedef struct deffunctionModule DEFFUNCTION_MODULE;
@@ -99,7 +99,7 @@ struct deffunctionData
 #endif
   };
 
-#define DeffunctionData(theEnv) ((struct deffunctionData *) GetEnvironmentData(theEnv,DEFFUNCTION_DATA))
+#define DeffunctionData(theEnv) ((struct deffunctionData *) GetEnvironmentData(theEnv,execStatus,DEFFUNCTION_DATA))
 
 #define DeffunctionModule(x) GetConstructModuleName((struct constructHeader *) x)
 #define FindDeffunction(a) EnvFindDeffunction(GetCurrentEnvironment(),a)

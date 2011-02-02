@@ -27,14 +27,14 @@
 
 #if DEFINSTANCES_CONSTRUCT
 
-#define EnvGetDefinstancesName(theEnv,x) GetConstructNameString((struct constructHeader *) x)
-#define EnvGetDefinstancesPPForm(theEnv,x) GetConstructPPForm(theEnv,(struct constructHeader *) x)
+#define EnvGetDefinstancesName(theEnv,execStatus,x) GetConstructNameString((struct constructHeader *) x)
+#define EnvGetDefinstancesPPForm(theEnv,execStatus,x) GetConstructPPForm(theEnv,execStatus,(struct constructHeader *) x)
 
 #define GetDefinstancesNamePointer(x) GetConstructNamePointer((struct constructHeader *) x)
-#define SetDefinstancesPPForm(d,ppf) SetConstructPPForm(theEnv,(struct constructHeader *) d,ppf)
+#define SetDefinstancesPPForm(d,ppf) SetConstructPPForm(theEnv,execStatus,(struct constructHeader *) d,ppf)
 
 #define GetDefinstancesModuleName(x) GetConstructModuleName((struct constructHeader *) x)
-#define EnvDefinstancesModule(theEnv,x) GetConstructModuleName((struct constructHeader *) x)
+#define EnvDefinstancesModule(theEnv,execStatus,x) GetConstructModuleName((struct constructHeader *) x)
 
 struct definstances;
 
@@ -77,7 +77,7 @@ struct definstancesData
 #endif
   };
 
-#define DefinstancesData(theEnv) ((struct definstancesData *) GetEnvironmentData(theEnv,DEFINSTANCES_DATA))
+#define DefinstancesData(theEnv) ((struct definstancesData *) GetEnvironmentData(theEnv,execStatus,DEFINSTANCES_DATA))
 
 
 #ifdef LOCALE

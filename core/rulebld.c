@@ -103,7 +103,7 @@ globle struct joinNode *ConstructJoins(
    /*===================================================*/
 
    if (startDepth == 1)
-     { AttachTestCEsToPatternCEs(theEnv,theLHS); }
+     { AttachTestCEsToPatternCEs(theEnv,execStatus,theLHS); }
 
    if (theLHS == NULL)
      {
@@ -111,7 +111,7 @@ globle struct joinNode *ConstructJoins(
                                    FALSE,FALSE,FALSE,NULL,NULL,NULL,NULL);
                                         
       if (lastJoin == NULL)
-        { lastJoin = CreateNewJoin(theEnv,NULL,NULL,NULL,NULL,FALSE,FALSE,FALSE,NULL,NULL); }
+        { lastJoin = CreateNewJoin(theEnv,execStatus,NULL,NULL,NULL,NULL,FALSE,FALSE,FALSE,NULL,NULL); }
      }
 
    /*=====================================================*/
@@ -186,7 +186,7 @@ globle struct joinNode *ConstructJoins(
          joinFromTheRight = TRUE;
          isExists = theLHS->existsNand;
 
-         lastRightJoin = ConstructJoins(theEnv,logicalJoin,theLHS,startDepth+1);
+         lastRightJoin = ConstructJoins(theEnv,execStatus,logicalJoin,theLHS,startDepth+1);
            
          rhsStruct = lastRightJoin;
          rhsType = 0;
@@ -220,7 +220,7 @@ globle struct joinNode *ConstructJoins(
         {
          joinFromTheRight = FALSE;
          rhsType = theLHS->patternType->positionInArray;
-         lastPattern = (*theLHS->patternType->addPatternFunction)(theEnv,theLHS);
+         lastPattern = (*theLHS->patternType->addPatternFunction)(theEnv,execStatus,theLHS);
          rhsStruct = lastPattern;
          lastRightJoin = NULL;
          isExists = theLHS->exists;
@@ -270,8 +270,8 @@ globle struct joinNode *ConstructJoins(
                                         leftHash,rightHash)) != NULL) )
         {
 #if DEBUGGING_FUNCTIONS
-         if ((EnvGetWatchItem(theEnv,"compilations") == TRUE) && GetPrintWhileLoading(theEnv))
-           { EnvPrintRouter(theEnv,WDIALOG,"=j"); }
+         if ((EnvGetWatchItem(theEnv,execStatus,"compilations") == TRUE) && GetPrintWhileLoading(theEnv))
+           { EnvPrintRouter(theEnv,execStatus,WDIALOG,"=j"); }
 #endif
          lastJoin = oldJoin;
         }
@@ -280,14 +280,14 @@ globle struct joinNode *ConstructJoins(
          tryToReuse = FALSE;
          if (! joinFromTheRight)
            {
-            lastJoin = CreateNewJoin(theEnv,networkTest,secondaryNetworkTest,lastJoin,
+            lastJoin = CreateNewJoin(theEnv,execStatus,networkTest,secondaryNetworkTest,lastJoin,
                                      lastPattern,FALSE,(int) theLHS->negated, isExists,
                                      leftHash,rightHash);
             lastJoin->rhsType = rhsType;
            }
          else
            {
-            lastJoin = CreateNewJoin(theEnv,networkTest,secondaryNetworkTest,lastJoin,
+            lastJoin = CreateNewJoin(theEnv,execStatus,networkTest,secondaryNetworkTest,lastJoin,
                                      lastRightJoin,TRUE,(int) theLHS->negated, isExists,
                                      leftHash,rightHash);
             lastJoin->rhsType = rhsType;
@@ -318,7 +318,7 @@ globle struct joinNode *ConstructJoins(
    
    if (startDepth == 1)
      {
-      lastJoin = CreateNewJoin(theEnv,NULL,NULL,lastJoin,NULL,
+      lastJoin = CreateNewJoin(theEnv,execStatus,NULL,NULL,lastJoin,NULL,
                                FALSE,FALSE,FALSE,NULL,NULL);
      }
 
@@ -329,9 +329,9 @@ globle struct joinNode *ConstructJoins(
 
 #if DEBUGGING_FUNCTIONS
    if ((startDepth == 1) &&
-       (EnvGetWatchItem(theEnv,"compilations") == TRUE) && 
+       (EnvGetWatchItem(theEnv,execStatus,"compilations") == TRUE) && 
        GetPrintWhileLoading(theEnv))
-     { EnvPrintRouter(theEnv,WDIALOG,"\n"); }
+     { EnvPrintRouter(theEnv,execStatus,WDIALOG,"\n"); }
 #endif
 
    /*=============================*/
@@ -376,12 +376,12 @@ static void AttachTestCEsToPatternCEs(
       if (lastNode->negated)
         {
          lastNode->secondaryNetworkTest =
-            CombineExpressions(theEnv,lastNode->secondaryNetworkTest,theLHS->networkTest);
+            CombineExpressions(theEnv,execStatus,lastNode->secondaryNetworkTest,theLHS->networkTest);
         }
       else
         {
          lastNode->networkTest =
-            CombineExpressions(theEnv,lastNode->networkTest,theLHS->networkTest);
+            CombineExpressions(theEnv,execStatus,lastNode->networkTest,theLHS->networkTest);
         }
         
       theLHS->networkTest = NULL;
@@ -389,7 +389,7 @@ static void AttachTestCEsToPatternCEs(
       theLHS->bottom = NULL;
       lastNode->bottom = tempNode;
       lastNode->endNandDepth = theLHS->endNandDepth;
-      ReturnLHSParseNodes(theEnv,theLHS);
+      ReturnLHSParseNodes(theEnv,execStatus,theLHS);
       theLHS = tempNode;
      }
   }
@@ -579,15 +579,15 @@ static struct joinNode *CreateNewJoin(
    /*===============================================*/
 
 #if DEBUGGING_FUNCTIONS
-   if ((EnvGetWatchItem(theEnv,"compilations") == TRUE) && GetPrintWhileLoading(theEnv))
-     { EnvPrintRouter(theEnv,WDIALOG,"+j"); }
+   if ((EnvGetWatchItem(theEnv,execStatus,"compilations") == TRUE) && GetPrintWhileLoading(theEnv))
+     { EnvPrintRouter(theEnv,execStatus,WDIALOG,"+j"); }
 #endif
 
    /*======================*/
    /* Create the new join. */
    /*======================*/
 
-   newJoin = get_struct(theEnv,joinNode);
+   newJoin = get_struct(theEnv,execStatus,joinNode);
    
    /*======================================================*/
    /* The first join of a rule does not have a beta memory */
@@ -598,16 +598,16 @@ static struct joinNode *CreateNewJoin(
      {
       if (leftHash == NULL)     
         {      
-         newJoin->leftMemory = get_struct(theEnv,betaMemory); 
-         newJoin->leftMemory->beta = (struct partialMatch **) genalloc(theEnv,sizeof(struct partialMatch *));
+         newJoin->leftMemory = get_struct(theEnv,execStatus,betaMemory); 
+         newJoin->leftMemory->beta = (struct partialMatch **) genalloc(theEnv,execStatus,sizeof(struct partialMatch *));
          newJoin->leftMemory->beta[0] = NULL;
          newJoin->leftMemory->size = 1;
          newJoin->leftMemory->count = 0;
          }
       else
         {
-         newJoin->leftMemory = get_struct(theEnv,betaMemory); 
-         newJoin->leftMemory->beta = (struct partialMatch **) genalloc(theEnv,sizeof(struct partialMatch *) * INITIAL_BETA_HASH_SIZE);
+         newJoin->leftMemory = get_struct(theEnv,execStatus,betaMemory); 
+         newJoin->leftMemory->beta = (struct partialMatch **) genalloc(theEnv,execStatus,sizeof(struct partialMatch *) * INITIAL_BETA_HASH_SIZE);
          memset(newJoin->leftMemory->beta,0,sizeof(struct partialMatch *) * INITIAL_BETA_HASH_SIZE);
          newJoin->leftMemory->size = INITIAL_BETA_HASH_SIZE;
          newJoin->leftMemory->count = 0;
@@ -634,9 +634,9 @@ static struct joinNode *CreateNewJoin(
      {
       if (leftHash == NULL)     
         {      
-         newJoin->rightMemory = get_struct(theEnv,betaMemory); 
-         newJoin->rightMemory->beta = (struct partialMatch **) genalloc(theEnv,sizeof(struct partialMatch *));
-         newJoin->rightMemory->last = (struct partialMatch **) genalloc(theEnv,sizeof(struct partialMatch *));
+         newJoin->rightMemory = get_struct(theEnv,execStatus,betaMemory); 
+         newJoin->rightMemory->beta = (struct partialMatch **) genalloc(theEnv,execStatus,sizeof(struct partialMatch *));
+         newJoin->rightMemory->last = (struct partialMatch **) genalloc(theEnv,execStatus,sizeof(struct partialMatch *));
          newJoin->rightMemory->beta[0] = NULL;
          newJoin->rightMemory->last[0] = NULL;
          newJoin->rightMemory->size = 1;
@@ -644,9 +644,9 @@ static struct joinNode *CreateNewJoin(
          }
       else
         {
-         newJoin->rightMemory = get_struct(theEnv,betaMemory); 
-         newJoin->rightMemory->beta = (struct partialMatch **) genalloc(theEnv,sizeof(struct partialMatch *) * INITIAL_BETA_HASH_SIZE);
-         newJoin->rightMemory->last = (struct partialMatch **) genalloc(theEnv,sizeof(struct partialMatch *) * INITIAL_BETA_HASH_SIZE);
+         newJoin->rightMemory = get_struct(theEnv,execStatus,betaMemory); 
+         newJoin->rightMemory->beta = (struct partialMatch **) genalloc(theEnv,execStatus,sizeof(struct partialMatch *) * INITIAL_BETA_HASH_SIZE);
+         newJoin->rightMemory->last = (struct partialMatch **) genalloc(theEnv,execStatus,sizeof(struct partialMatch *) * INITIAL_BETA_HASH_SIZE);
          memset(newJoin->rightMemory->beta,0,sizeof(struct partialMatch *) * INITIAL_BETA_HASH_SIZE);
          memset(newJoin->rightMemory->last,0,sizeof(struct partialMatch *) * INITIAL_BETA_HASH_SIZE);
          newJoin->rightMemory->size = INITIAL_BETA_HASH_SIZE;
@@ -655,9 +655,9 @@ static struct joinNode *CreateNewJoin(
      }
    else if ((lhsEntryStruct == NULL) && (rhsEntryStruct == NULL))
      {
-      newJoin->rightMemory = get_struct(theEnv,betaMemory); 
-      newJoin->rightMemory->beta = (struct partialMatch **) genalloc(theEnv,sizeof(struct partialMatch *));
-      newJoin->rightMemory->last = (struct partialMatch **) genalloc(theEnv,sizeof(struct partialMatch *));
+      newJoin->rightMemory = get_struct(theEnv,execStatus,betaMemory); 
+      newJoin->rightMemory->beta = (struct partialMatch **) genalloc(theEnv,execStatus,sizeof(struct partialMatch *));
+      newJoin->rightMemory->last = (struct partialMatch **) genalloc(theEnv,execStatus,sizeof(struct partialMatch *));
       newJoin->rightMemory->beta[0] = CreateEmptyPartialMatch(theEnv);
       newJoin->rightMemory->beta[0]->owner = newJoin;
       newJoin->rightMemory->beta[0]->rhsMemory = TRUE;
@@ -691,8 +691,8 @@ static struct joinNode *CreateNewJoin(
    /* associated with this join.                   */
    /*==============================================*/
 
-   newJoin->networkTest = AddHashedExpression(theEnv,joinTest);
-   newJoin->secondaryNetworkTest = AddHashedExpression(theEnv,secondaryJoinTest);
+   newJoin->networkTest = AddHashedExpression(theEnv,execStatus,joinTest);
+   newJoin->secondaryNetworkTest = AddHashedExpression(theEnv,execStatus,secondaryJoinTest);
    
    /*=====================================================*/
    /* Install the expression used to hash the beta memory */
@@ -700,8 +700,8 @@ static struct joinNode *CreateNewJoin(
    /* in the alpha memory.                                */
    /*=====================================================*/
    
-   newJoin->leftHash = AddHashedExpression(theEnv,leftHash);
-   newJoin->rightHash = AddHashedExpression(theEnv,rightHash);
+   newJoin->leftHash = AddHashedExpression(theEnv,execStatus,leftHash);
+   newJoin->rightHash = AddHashedExpression(theEnv,execStatus,rightHash);
 
    /*============================================================*/
    /* Initialize the values associated with the LHS of the join. */
@@ -720,7 +720,7 @@ static struct joinNode *CreateNewJoin(
       newJoin->depth = lhsEntryStruct->depth;
       newJoin->depth++; /* To work around Sparcworks C compiler bug */
       
-      theLink = get_struct(theEnv,joinLink);
+      theLink = get_struct(theEnv,execStatus,joinLink);
       theLink->join = newJoin;
       theLink->enterDirection = LHS;
       theLink->next = lhsEntryStruct->nextLinks;
@@ -739,7 +739,7 @@ static struct joinNode *CreateNewJoin(
      { 
       if (newJoin->firstJoin)
         {
-         theLink = get_struct(theEnv,joinLink);
+         theLink = get_struct(theEnv,execStatus,joinLink);
          theLink->join = newJoin;
          theLink->enterDirection = RHS;
          theLink->next = DefruleData(theEnv)->RightPrimeJoins;
@@ -761,7 +761,7 @@ static struct joinNode *CreateNewJoin(
      
    if (newJoin->firstJoin && (newJoin->patternIsNegated || newJoin->joinFromTheRight) && (! newJoin->patternIsExists))
      {
-      theLink = get_struct(theEnv,joinLink);
+      theLink = get_struct(theEnv,execStatus,joinLink);
       theLink->join = newJoin;
       theLink->enterDirection = LHS;
       theLink->next = DefruleData(theEnv)->LeftPrimeJoins;
@@ -770,7 +770,7 @@ static struct joinNode *CreateNewJoin(
        
    if (joinFromTheRight)
      {
-      theLink = get_struct(theEnv,joinLink);
+      theLink = get_struct(theEnv,execStatus,joinLink);
       theLink->join = newJoin;
       theLink->enterDirection = RHS;
       theLink->next = ((struct joinNode *) rhsEntryStruct)->nextLinks;

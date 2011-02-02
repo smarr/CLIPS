@@ -85,7 +85,7 @@ struct bsaveData
 #endif
   };
 
-#define BsaveData(theEnv) ((struct bsaveData *) GetEnvironmentData(theEnv,BSAVE_DATA))
+#define BsaveData(theEnv) ((struct bsaveData *) GetEnvironmentData(theEnv,execStatus,BSAVE_DATA))
 
 #define Bsave(a) EnvBsave(GetCurrentEnvironment(),a)
 

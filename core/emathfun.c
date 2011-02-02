@@ -76,43 +76,43 @@ globle void ExtendedMathFunctionDefinitions(
   EXEC_STATUS)
   {
 #if ! RUN_TIME
-   EnvDefineFunction2(theEnv,"cos",      'd', PTIEF CosFunction,      "CosFunction", "11n");
-   EnvDefineFunction2(theEnv,"sin",      'd', PTIEF SinFunction,      "SinFunction", "11n");
-   EnvDefineFunction2(theEnv,"tan",      'd', PTIEF TanFunction,      "TanFunction", "11n");
-   EnvDefineFunction2(theEnv,"sec",      'd', PTIEF SecFunction,      "SecFunction", "11n");
-   EnvDefineFunction2(theEnv,"csc",      'd', PTIEF CscFunction,      "CscFunction", "11n");
-   EnvDefineFunction2(theEnv,"cot",      'd', PTIEF CotFunction,      "CotFunction", "11n");
-   EnvDefineFunction2(theEnv,"acos",     'd', PTIEF AcosFunction,     "AcosFunction", "11n");
-   EnvDefineFunction2(theEnv,"asin",     'd', PTIEF AsinFunction,     "AsinFunction", "11n");
-   EnvDefineFunction2(theEnv,"atan",     'd', PTIEF AtanFunction,     "AtanFunction", "11n");
-   EnvDefineFunction2(theEnv,"asec",     'd', PTIEF AsecFunction,     "AsecFunction", "11n");
-   EnvDefineFunction2(theEnv,"acsc",     'd', PTIEF AcscFunction,     "AcscFunction", "11n");
-   EnvDefineFunction2(theEnv,"acot",     'd', PTIEF AcotFunction,     "AcotFunction", "11n");
-   EnvDefineFunction2(theEnv,"cosh",     'd', PTIEF CoshFunction,     "CoshFunction", "11n");
-   EnvDefineFunction2(theEnv,"sinh",     'd', PTIEF SinhFunction,     "SinhFunction", "11n");
-   EnvDefineFunction2(theEnv,"tanh",     'd', PTIEF TanhFunction,     "TanhFunction", "11n");
-   EnvDefineFunction2(theEnv,"sech",     'd', PTIEF SechFunction,     "SechFunction", "11n");
-   EnvDefineFunction2(theEnv,"csch",     'd', PTIEF CschFunction,     "CschFunction", "11n");
-   EnvDefineFunction2(theEnv,"coth",     'd', PTIEF CothFunction,     "CothFunction", "11n");
-   EnvDefineFunction2(theEnv,"acosh",    'd', PTIEF AcoshFunction,    "AcoshFunction", "11n");
-   EnvDefineFunction2(theEnv,"asinh",    'd', PTIEF AsinhFunction,    "AsinhFunction", "11n");
-   EnvDefineFunction2(theEnv,"atanh",    'd', PTIEF AtanhFunction,    "AtanhFunction", "11n");
-   EnvDefineFunction2(theEnv,"asech",    'd', PTIEF AsechFunction,    "AsechFunction", "11n");
-   EnvDefineFunction2(theEnv,"acsch",    'd', PTIEF AcschFunction,    "AcschFunction", "11n");
-   EnvDefineFunction2(theEnv,"acoth",    'd', PTIEF AcothFunction,    "AcothFunction", "11n");
+   EnvDefineFunction2(theEnv,execStatus,"cos",      'd', PTIEF CosFunction,      "CosFunction", "11n");
+   EnvDefineFunction2(theEnv,execStatus,"sin",      'd', PTIEF SinFunction,      "SinFunction", "11n");
+   EnvDefineFunction2(theEnv,execStatus,"tan",      'd', PTIEF TanFunction,      "TanFunction", "11n");
+   EnvDefineFunction2(theEnv,execStatus,"sec",      'd', PTIEF SecFunction,      "SecFunction", "11n");
+   EnvDefineFunction2(theEnv,execStatus,"csc",      'd', PTIEF CscFunction,      "CscFunction", "11n");
+   EnvDefineFunction2(theEnv,execStatus,"cot",      'd', PTIEF CotFunction,      "CotFunction", "11n");
+   EnvDefineFunction2(theEnv,execStatus,"acos",     'd', PTIEF AcosFunction,     "AcosFunction", "11n");
+   EnvDefineFunction2(theEnv,execStatus,"asin",     'd', PTIEF AsinFunction,     "AsinFunction", "11n");
+   EnvDefineFunction2(theEnv,execStatus,"atan",     'd', PTIEF AtanFunction,     "AtanFunction", "11n");
+   EnvDefineFunction2(theEnv,execStatus,"asec",     'd', PTIEF AsecFunction,     "AsecFunction", "11n");
+   EnvDefineFunction2(theEnv,execStatus,"acsc",     'd', PTIEF AcscFunction,     "AcscFunction", "11n");
+   EnvDefineFunction2(theEnv,execStatus,"acot",     'd', PTIEF AcotFunction,     "AcotFunction", "11n");
+   EnvDefineFunction2(theEnv,execStatus,"cosh",     'd', PTIEF CoshFunction,     "CoshFunction", "11n");
+   EnvDefineFunction2(theEnv,execStatus,"sinh",     'd', PTIEF SinhFunction,     "SinhFunction", "11n");
+   EnvDefineFunction2(theEnv,execStatus,"tanh",     'd', PTIEF TanhFunction,     "TanhFunction", "11n");
+   EnvDefineFunction2(theEnv,execStatus,"sech",     'd', PTIEF SechFunction,     "SechFunction", "11n");
+   EnvDefineFunction2(theEnv,execStatus,"csch",     'd', PTIEF CschFunction,     "CschFunction", "11n");
+   EnvDefineFunction2(theEnv,execStatus,"coth",     'd', PTIEF CothFunction,     "CothFunction", "11n");
+   EnvDefineFunction2(theEnv,execStatus,"acosh",    'd', PTIEF AcoshFunction,    "AcoshFunction", "11n");
+   EnvDefineFunction2(theEnv,execStatus,"asinh",    'd', PTIEF AsinhFunction,    "AsinhFunction", "11n");
+   EnvDefineFunction2(theEnv,execStatus,"atanh",    'd', PTIEF AtanhFunction,    "AtanhFunction", "11n");
+   EnvDefineFunction2(theEnv,execStatus,"asech",    'd', PTIEF AsechFunction,    "AsechFunction", "11n");
+   EnvDefineFunction2(theEnv,execStatus,"acsch",    'd', PTIEF AcschFunction,    "AcschFunction", "11n");
+   EnvDefineFunction2(theEnv,execStatus,"acoth",    'd', PTIEF AcothFunction,    "AcothFunction", "11n");
 
-   EnvDefineFunction2(theEnv,"mod",      'n', PTIEF ModFunction,      "ModFunction", "22n");
-   EnvDefineFunction2(theEnv,"exp",      'd', PTIEF ExpFunction,      "ExpFunction", "11n");
-   EnvDefineFunction2(theEnv,"log",      'd', PTIEF LogFunction,      "LogFunction", "11n");
-   EnvDefineFunction2(theEnv,"log10",    'd', PTIEF Log10Function,    "Log10Function", "11n");
-   EnvDefineFunction2(theEnv,"sqrt",     'd', PTIEF SqrtFunction,     "SqrtFunction", "11n");
-   EnvDefineFunction2(theEnv,"pi",       'd', PTIEF PiFunction,       "PiFunction", "00");
-   EnvDefineFunction2(theEnv,"deg-rad",  'd', PTIEF DegRadFunction,   "DegRadFunction", "11n");
-   EnvDefineFunction2(theEnv,"rad-deg",  'd', PTIEF RadDegFunction,   "RadDegFunction", "11n");
-   EnvDefineFunction2(theEnv,"deg-grad", 'd', PTIEF DegGradFunction,  "DegGradFunction", "11n");
-   EnvDefineFunction2(theEnv,"grad-deg", 'd', PTIEF GradDegFunction,  "GradDegFunction", "11n");
-   EnvDefineFunction2(theEnv,"**",       'd', PTIEF PowFunction,      "PowFunction", "22n");
-   EnvDefineFunction2(theEnv,"round",    'g', PTIEF RoundFunction,    "RoundFunction", "11n");
+   EnvDefineFunction2(theEnv,execStatus,"mod",      'n', PTIEF ModFunction,      "ModFunction", "22n");
+   EnvDefineFunction2(theEnv,execStatus,"exp",      'd', PTIEF ExpFunction,      "ExpFunction", "11n");
+   EnvDefineFunction2(theEnv,execStatus,"log",      'd', PTIEF LogFunction,      "LogFunction", "11n");
+   EnvDefineFunction2(theEnv,execStatus,"log10",    'd', PTIEF Log10Function,    "Log10Function", "11n");
+   EnvDefineFunction2(theEnv,execStatus,"sqrt",     'd', PTIEF SqrtFunction,     "SqrtFunction", "11n");
+   EnvDefineFunction2(theEnv,execStatus,"pi",       'd', PTIEF PiFunction,       "PiFunction", "00");
+   EnvDefineFunction2(theEnv,execStatus,"deg-rad",  'd', PTIEF DegRadFunction,   "DegRadFunction", "11n");
+   EnvDefineFunction2(theEnv,execStatus,"rad-deg",  'd', PTIEF RadDegFunction,   "RadDegFunction", "11n");
+   EnvDefineFunction2(theEnv,execStatus,"deg-grad", 'd', PTIEF DegGradFunction,  "DegGradFunction", "11n");
+   EnvDefineFunction2(theEnv,execStatus,"grad-deg", 'd', PTIEF GradDegFunction,  "GradDegFunction", "11n");
+   EnvDefineFunction2(theEnv,execStatus,"**",       'd', PTIEF PowFunction,      "PowFunction", "22n");
+   EnvDefineFunction2(theEnv,execStatus,"round",    'g', PTIEF RoundFunction,    "RoundFunction", "11n");
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
 #pragma unused(theEnv)
@@ -162,12 +162,12 @@ static void DomainErrorMessage(
   EXEC_STATUS,
   char *functionName)
   {
-   PrintErrorID(theEnv,"EMATHFUN",1,FALSE);
-   EnvPrintRouter(theEnv,WERROR,"Domain error for ");
-   EnvPrintRouter(theEnv,WERROR,functionName);
-   EnvPrintRouter(theEnv,WERROR," function.\n");
-   SetHaltExecution(theEnv,TRUE);
-   SetEvaluationError(theEnv,TRUE);
+   PrintErrorID(theEnv,execStatus,"EMATHFUN",1,FALSE);
+   EnvPrintRouter(theEnv,execStatus,WERROR,"Domain error for ");
+   EnvPrintRouter(theEnv,execStatus,WERROR,functionName);
+   EnvPrintRouter(theEnv,execStatus,WERROR," function.\n");
+   SetHaltExecution(theEnv,execStatus,TRUE);
+   SetEvaluationError(theEnv,execStatus,TRUE);
   }
 
 /************************************************************/
@@ -180,12 +180,12 @@ static void ArgumentOverflowErrorMessage(
   EXEC_STATUS,
   char *functionName)
   {
-   PrintErrorID(theEnv,"EMATHFUN",2,FALSE);
-   EnvPrintRouter(theEnv,WERROR,"Argument overflow for ");
-   EnvPrintRouter(theEnv,WERROR,functionName);
-   EnvPrintRouter(theEnv,WERROR," function.\n");
-   SetHaltExecution(theEnv,TRUE);
-   SetEvaluationError(theEnv,TRUE);
+   PrintErrorID(theEnv,execStatus,"EMATHFUN",2,FALSE);
+   EnvPrintRouter(theEnv,execStatus,WERROR,"Argument overflow for ");
+   EnvPrintRouter(theEnv,execStatus,WERROR,functionName);
+   EnvPrintRouter(theEnv,execStatus,WERROR," function.\n");
+   SetHaltExecution(theEnv,execStatus,TRUE);
+   SetEvaluationError(theEnv,execStatus,TRUE);
   }
 
 /************************************************************/
@@ -198,12 +198,12 @@ static void SingularityErrorMessage(
   EXEC_STATUS,
   char *functionName)
   {
-   PrintErrorID(theEnv,"EMATHFUN",3,FALSE);
-   EnvPrintRouter(theEnv,WERROR,"Singularity at asymptote in ");
-   EnvPrintRouter(theEnv,WERROR,functionName);
-   EnvPrintRouter(theEnv,WERROR," function.\n");
-   SetHaltExecution(theEnv,TRUE);
-   SetEvaluationError(theEnv,TRUE);
+   PrintErrorID(theEnv,execStatus,"EMATHFUN",3,FALSE);
+   EnvPrintRouter(theEnv,execStatus,WERROR,"Singularity at asymptote in ");
+   EnvPrintRouter(theEnv,execStatus,WERROR,functionName);
+   EnvPrintRouter(theEnv,execStatus,WERROR," function.\n");
+   SetHaltExecution(theEnv,execStatus,TRUE);
+   SetEvaluationError(theEnv,execStatus,TRUE);
   }
 
 /*************************************/
@@ -248,7 +248,7 @@ globle double TanFunction(
    tv = cos(num);
    if ((tv < SMALLEST_ALLOWED_NUMBER) && (tv > -SMALLEST_ALLOWED_NUMBER))
      {
-      SingularityErrorMessage(theEnv,"tan");
+      SingularityErrorMessage(theEnv,execStatus,"tan");
       return(0.0);
      }
 
@@ -270,7 +270,7 @@ globle double SecFunction(
    tv = cos(num);
    if ((tv < SMALLEST_ALLOWED_NUMBER) && (tv > -SMALLEST_ALLOWED_NUMBER))
      {
-      SingularityErrorMessage(theEnv,"sec");
+      SingularityErrorMessage(theEnv,execStatus,"sec");
       return(0.0);
      }
 
@@ -291,7 +291,7 @@ globle double CscFunction(
    tv = sin(num);
    if ((tv < SMALLEST_ALLOWED_NUMBER) && (tv > -SMALLEST_ALLOWED_NUMBER))
      {
-      SingularityErrorMessage(theEnv,"csc");
+      SingularityErrorMessage(theEnv,execStatus,"csc");
       return(0.0);
      }
 
@@ -313,7 +313,7 @@ globle double CotFunction(
     tv = sin(num);
     if ((tv < SMALLEST_ALLOWED_NUMBER) && (tv > -SMALLEST_ALLOWED_NUMBER))
       {
-       SingularityErrorMessage(theEnv,"cot");
+       SingularityErrorMessage(theEnv,execStatus,"cot");
        return(0.0);
       }
 
@@ -333,7 +333,7 @@ globle double AcosFunction(
    if (SingleNumberCheck(theEnv,execStatus,"acos",&num) == FALSE) return(0.0);
    if ((num > 1.0) || (num < -1.0))
      {
-      DomainErrorMessage(theEnv,"acos");
+      DomainErrorMessage(theEnv,execStatus,"acos");
       return(0.0);
      }
     return(acos(num));
@@ -352,7 +352,7 @@ globle double AsinFunction(
    if (SingleNumberCheck(theEnv,execStatus,"asin",&num) == FALSE) return(0.0);
    if ((num > 1.0) || (num < -1.0))
      {
-      DomainErrorMessage(theEnv,"asin");
+      DomainErrorMessage(theEnv,execStatus,"asin");
       return(0.0);
      }
    return(asin(num));
@@ -385,7 +385,7 @@ globle double AsecFunction(
    if (SingleNumberCheck(theEnv,execStatus,"asec",&num) == FALSE) return(0.0);
    if ((num < 1.0) && (num > -1.0))
      {
-      DomainErrorMessage(theEnv,"asec");
+      DomainErrorMessage(theEnv,execStatus,"asec");
       return(0.0);
      }
     num = 1.0 / num;
@@ -405,7 +405,7 @@ globle double AcscFunction(
    if (SingleNumberCheck(theEnv,execStatus,"acsc",&num) == FALSE) return(0.0);
    if ((num < 1.0) && (num > -1.0))
      {
-      DomainErrorMessage(theEnv,"acsc");
+      DomainErrorMessage(theEnv,execStatus,"acsc");
       return(0.0);
      }
     num = 1.0 / num;
@@ -497,12 +497,12 @@ globle double CschFunction(
    if (SingleNumberCheck(theEnv,execStatus,"csch",&num) == FALSE) return(0.0);
    if (num == 0.0)
      {
-      SingularityErrorMessage(theEnv,"csch");
+      SingularityErrorMessage(theEnv,execStatus,"csch");
       return(0.0);
      }
    else if (TestProximity(num,1e-25) == TRUE)
      {
-      ArgumentOverflowErrorMessage(theEnv,"csch");
+      ArgumentOverflowErrorMessage(theEnv,execStatus,"csch");
       return(0.0);
      }
    return(1.0 / sinh(num));
@@ -521,12 +521,12 @@ globle double CothFunction(
    if (SingleNumberCheck(theEnv,execStatus,"coth",&num) == FALSE) return(0.0);
    if (num == 0.0)
      {
-      SingularityErrorMessage(theEnv,"coth");
+      SingularityErrorMessage(theEnv,execStatus,"coth");
       return(0.0);
      }
    else if (TestProximity(num,1e-25) == TRUE)
      {
-      ArgumentOverflowErrorMessage(theEnv,"coth");
+      ArgumentOverflowErrorMessage(theEnv,execStatus,"coth");
       return(0.0);
      }
    return(1.0 / tanh(num));
@@ -545,7 +545,7 @@ globle double AcoshFunction(
    if (SingleNumberCheck(theEnv,execStatus,"acosh",&num) == FALSE) return(0.0);
    if (num < 1.0)
      {
-      DomainErrorMessage(theEnv,"acosh");
+      DomainErrorMessage(theEnv,execStatus,"acosh");
       return(0.0);
      }
    return(genacosh(num));
@@ -578,7 +578,7 @@ globle double AtanhFunction(
    if (SingleNumberCheck(theEnv,execStatus,"atanh",&num) == FALSE) return(0.0);
    if ((num >= 1.0) || (num <= -1.0))
      {
-      DomainErrorMessage(theEnv,"atanh");
+      DomainErrorMessage(theEnv,execStatus,"atanh");
       return(0.0);
      }
    return(genatanh(num));
@@ -597,7 +597,7 @@ globle double AsechFunction(
    if (SingleNumberCheck(theEnv,execStatus,"asech",&num) == FALSE) return(0.0);
    if ((num > 1.0) || (num <= 0.0))
      {
-      DomainErrorMessage(theEnv,"asech");
+      DomainErrorMessage(theEnv,execStatus,"asech");
       return(0.0);
      }
    return(genasech(num));
@@ -616,7 +616,7 @@ globle double AcschFunction(
    if (SingleNumberCheck(theEnv,execStatus,"acsch",&num) == FALSE) return(0.0);
    if (num == 0.0)
      {
-      DomainErrorMessage(theEnv,"acsch");
+      DomainErrorMessage(theEnv,execStatus,"acsch");
       return(0.0);
      }
    return(genacsch(num));
@@ -635,7 +635,7 @@ globle double AcothFunction(
    if (SingleNumberCheck(theEnv,execStatus,"acoth",&num) == FALSE) return(0.0);
    if ((num <= 1.0) && (num >= -1.0))
      {
-      DomainErrorMessage(theEnv,"acoth");
+      DomainErrorMessage(theEnv,execStatus,"acoth");
       return(0.0);
      }
    return(genacoth(num));
@@ -668,12 +668,12 @@ globle double LogFunction(
    if (SingleNumberCheck(theEnv,execStatus,"log",&num) == FALSE) return(0.0);
    if (num < 0.0)
      {
-      DomainErrorMessage(theEnv,"log");
+      DomainErrorMessage(theEnv,execStatus,"log");
       return(0.0);
      }
    else if (num == 0.0)
      {
-      ArgumentOverflowErrorMessage(theEnv,"log");
+      ArgumentOverflowErrorMessage(theEnv,execStatus,"log");
       return(0.0);
      }
 
@@ -693,12 +693,12 @@ globle double Log10Function(
    if (SingleNumberCheck(theEnv,execStatus,"log10",&num) == FALSE) return(0.0);
    if (num < 0.0)
      {
-      DomainErrorMessage(theEnv,"log10");
+      DomainErrorMessage(theEnv,execStatus,"log10");
       return(0.0);
      }
    else if (num == 0.0)
      {
-      ArgumentOverflowErrorMessage(theEnv,"log10");
+      ArgumentOverflowErrorMessage(theEnv,execStatus,"log10");
       return(0.0);
      }
 
@@ -718,7 +718,7 @@ globle double SqrtFunction(
    if (SingleNumberCheck(theEnv,execStatus,"sqrt",&num) == FALSE) return(0.0);
    if (num < 0.00000)
      {
-      DomainErrorMessage(theEnv,"sqrt");
+      DomainErrorMessage(theEnv,execStatus,"sqrt");
       return(0.0);
      }
    return(sqrt(num));
@@ -744,9 +744,9 @@ globle double PowFunction(
        ((DOToDouble(value1) < 0.0) &&
         (dtrunc((double) DOToDouble(value2)) != DOToDouble(value2))))
      {
-      DomainErrorMessage(theEnv,"**");
-      SetHaltExecution(theEnv,TRUE);
-      SetEvaluationError(theEnv,TRUE);
+      DomainErrorMessage(theEnv,execStatus,"**");
+      SetHaltExecution(theEnv,execStatus,TRUE);
+      SetEvaluationError(theEnv,execStatus,TRUE);
       return(0.0);
      }
 
@@ -769,31 +769,31 @@ globle void ModFunction(
    if (EnvArgCountCheck(theEnv,execStatus,"mod",EXACTLY,2) == -1)
      {
       result->type = INTEGER;
-      result->value = (void *) EnvAddLong(theEnv,0L);
+      result->value = (void *) EnvAddLong(theEnv,execStatus,0L);
       return;
      }
 
    if (EnvArgTypeCheck(theEnv,execStatus,"mod",1,INTEGER_OR_FLOAT,&item1) == FALSE)
      {
       result->type = INTEGER;
-      result->value = (void *) EnvAddLong(theEnv,0L);
+      result->value = (void *) EnvAddLong(theEnv,execStatus,0L);
       return;
      }
 
    if (EnvArgTypeCheck(theEnv,execStatus,"mod",2,INTEGER_OR_FLOAT,&item2) == FALSE)
      {
       result->type = INTEGER;
-      result->value = (void *) EnvAddLong(theEnv,0L);
+      result->value = (void *) EnvAddLong(theEnv,execStatus,0L);
       return;
      }
 
    if (((item2.type == INTEGER) ? (ValueToLong(item2.value) == 0L) : FALSE) ||
        ((item2.type == FLOAT) ? ValueToDouble(item2.value) == 0.0 : FALSE))
      {
-      DivideByZeroErrorMessage(theEnv,"mod");
-      SetEvaluationError(theEnv,TRUE);
+      DivideByZeroErrorMessage(theEnv,execStatus,"mod");
+      SetEvaluationError(theEnv,execStatus,TRUE);
       result->type = INTEGER;
-      result->value = (void *) EnvAddLong(theEnv,0L);
+      result->value = (void *) EnvAddLong(theEnv,execStatus,0L);
       return;
      }
 
@@ -802,14 +802,14 @@ globle void ModFunction(
       fnum1 = CoerceToDouble(item1.type,item1.value);
       fnum2 = CoerceToDouble(item2.type,item2.value);
       result->type = FLOAT;
-      result->value = (void *) EnvAddDouble(theEnv,fnum1 - (dtrunc(fnum1 / fnum2) * fnum2));
+      result->value = (void *) EnvAddDouble(theEnv,execStatus,fnum1 - (dtrunc(fnum1 / fnum2) * fnum2));
      }
    else
      {
       lnum1 = DOToLong(item1);
       lnum2 = DOToLong(item2);
       result->type = INTEGER;
-      result->value = (void *) EnvAddLong(theEnv,lnum1 - (lnum1 / lnum2) * lnum2);
+      result->value = (void *) EnvAddLong(theEnv,execStatus,lnum1 - (lnum1 / lnum2) * lnum2);
      }
   }
 

@@ -63,13 +63,13 @@ globle void InitializeDefaultRouters(
   void *theEnv,
   EXEC_STATUS)
   {
-   AllocateEnvironmentData(theEnv,ROUTER_DATA,sizeof(struct routerData),DeallocateRouterData);
+   AllocateEnvironmentData(theEnv,execStatus,ROUTER_DATA,sizeof(struct routerData),DeallocateRouterData);
 
    RouterData(theEnv)->CommandBufferInputCount = 0;
    RouterData(theEnv)->AwaitingInput = TRUE;
    
 #if (! RUN_TIME)
-   EnvDefineFunction2(theEnv,"exit",    'v', PTIEF ExitCommand,    "ExitCommand", "*1i");
+   EnvDefineFunction2(theEnv,execStatus,"exit",    'v', PTIEF ExitCommand,    "ExitCommand", "*1i");
 #endif
    InitializeFileRouter(theEnv);
    InitializeStringRouter(theEnv);
@@ -89,8 +89,8 @@ static void DeallocateRouterData(
    while (tmpPtr != NULL)
      {
       nextPtr = tmpPtr->next;
-      genfree(theEnv,tmpPtr->name,strlen(tmpPtr->name) + 1);
-      rtn_struct(theEnv,router,tmpPtr);
+      genfree(theEnv,execStatus,tmpPtr->name,strlen(tmpPtr->name) + 1);
+      rtn_struct(theEnv,execStatus,router,tmpPtr);
       tmpPtr = nextPtr;
      }
   }
@@ -127,11 +127,11 @@ globle int EnvPrintRouter(
    currentPtr = RouterData(theEnv)->ListOfRouters;
    while (currentPtr != NULL)
      {
-      if ((currentPtr->printer != NULL) ? QueryRouter(theEnv,logicalName,currentPtr) : FALSE)
+      if ((currentPtr->printer != NULL) ? QueryRouter(theEnv,execStatus,logicalName,currentPtr) : FALSE)
         {
-         SetEnvironmentRouterContext(theEnv,currentPtr->context);
+         SetEnvironmentRouterContext(theEnv,execStatus,currentPtr->context);
          if (currentPtr->environmentAware)
-           { (*currentPtr->printer)(theEnv,logicalName,str); }
+           { (*currentPtr->printer)(theEnv,execStatus,logicalName,str); }
          else            
            { ((int (*)(char *,char *)) (*currentPtr->printer))(logicalName,str); }
          
@@ -144,7 +144,7 @@ globle int EnvPrintRouter(
    /* The logical name was not recognized by any routers. */
    /*=====================================================*/
 
-   if (strcmp(WERROR,logicalName) != 0) UnrecognizedRouterMessage(theEnv,logicalName);
+   if (strcmp(WERROR,logicalName) != 0) UnrecognizedRouterMessage(theEnv,execStatus,logicalName);
    return(0);
   }
 
@@ -213,11 +213,11 @@ globle int EnvGetcRouter(
    currentPtr = RouterData(theEnv)->ListOfRouters;
    while (currentPtr != NULL)
      {
-      if ((currentPtr->charget != NULL) ? QueryRouter(theEnv,logicalName,currentPtr) : FALSE)
+      if ((currentPtr->charget != NULL) ? QueryRouter(theEnv,execStatus,logicalName,currentPtr) : FALSE)
         {
-         SetEnvironmentRouterContext(theEnv,currentPtr->context);
+         SetEnvironmentRouterContext(theEnv,execStatus,currentPtr->context);
          if (currentPtr->environmentAware)
-           { inchar = (*currentPtr->charget)(theEnv,logicalName); }
+           { inchar = (*currentPtr->charget)(theEnv,execStatus,logicalName); }
          else            
            { inchar = ((int (*)(char *)) (*currentPtr->charget))(logicalName); }
 
@@ -237,7 +237,7 @@ globle int EnvGetcRouter(
    /* The logical name was not recognized by any routers. */
    /*=====================================================*/
 
-   UnrecognizedRouterMessage(theEnv,logicalName);
+   UnrecognizedRouterMessage(theEnv,execStatus,logicalName);
    return(-1);
   }
 
@@ -297,7 +297,7 @@ globle int EnvUngetcRouter(
    currentPtr = RouterData(theEnv)->ListOfRouters;
    while (currentPtr != NULL)
      {
-      if ((currentPtr->charunget != NULL) ? QueryRouter(theEnv,logicalName,currentPtr) : FALSE)
+      if ((currentPtr->charunget != NULL) ? QueryRouter(theEnv,execStatus,logicalName,currentPtr) : FALSE)
         {
          if ((ch == '\r') || (ch == '\n'))
            {
@@ -306,9 +306,9 @@ globle int EnvUngetcRouter(
               { DecrementLineCount(theEnv); }
            }
            
-         SetEnvironmentRouterContext(theEnv,currentPtr->context);
+         SetEnvironmentRouterContext(theEnv,execStatus,currentPtr->context);
          if (currentPtr->environmentAware)
-           { return((*currentPtr->charunget)(theEnv,ch,logicalName)); }
+           { return((*currentPtr->charunget)(theEnv,execStatus,ch,logicalName)); }
          else            
            { return(((int (*)(int,char *)) (*currentPtr->charunget))(ch,logicalName)); }
         }
@@ -320,7 +320,7 @@ globle int EnvUngetcRouter(
    /* The logical name was not recognized by any routers. */
    /*=====================================================*/
 
-   UnrecognizedRouterMessage(theEnv,logicalName);
+   UnrecognizedRouterMessage(theEnv,execStatus,logicalName);
    return(-1);
   }
 
@@ -336,12 +336,12 @@ globle void ExitCommand(
 
    if ((argCnt = EnvArgCountCheck(theEnv,execStatus,"exit",NO_MORE_THAN,1)) == -1) return;
    if (argCnt == 0)
-     { EnvExitRouter(theEnv,EXIT_SUCCESS); }
+     { EnvExitRouter(theEnv,execStatus,EXIT_SUCCESS); }
    else
     {
-     status = (int) EnvRtnLong(theEnv,1);
+     status = (int) EnvRtnLong(theEnv,execStatus,1);
      if (GetEvaluationError(theEnv)) return;
-     EnvExitRouter(theEnv,status);
+     EnvExitRouter(theEnv,execStatus,status);
     }
 
    return;
@@ -367,9 +367,9 @@ globle void EnvExitRouter(
         { 
          if (currentPtr->exiter != NULL) 
            {
-            SetEnvironmentRouterContext(theEnv,currentPtr->context);
+            SetEnvironmentRouterContext(theEnv,execStatus,currentPtr->context);
             if (currentPtr->environmentAware)
-              { (*currentPtr->exiter)(theEnv,num); }
+              { (*currentPtr->exiter)(theEnv,execStatus,num); }
             else            
               { ((int (*)(int))(*currentPtr->exiter))(num); }
            }
@@ -378,7 +378,7 @@ globle void EnvExitRouter(
      }
 
    if (RouterData(theEnv)->Abort) return;
-   genexit(theEnv,num);
+   genexit(theEnv,execStatus,num);
   }
 
 /********************************************/
@@ -412,9 +412,9 @@ globle intBool AddRouter(
       
    theEnv = GetCurrentEnvironment();
 
-   newPtr = get_struct(theEnv,router);
+   newPtr = get_struct(theEnv,execStatus,router);
 
-   nameCopy = (char *) genalloc(theEnv,strlen(routerName) + 1);
+   nameCopy = (char *) genalloc(theEnv,execStatus,strlen(routerName) + 1);
    genstrcpy(nameCopy,routerName);     
    newPtr->name = nameCopy;   
    
@@ -472,7 +472,7 @@ globle intBool EnvAddRouter(
   int (*ungetcFunction)(void *,int,char *),
   int (*exitFunction)(void *,int))
   {
-   return EnvAddRouterWithContext(theEnv,routerName,priority,
+   return EnvAddRouterWithContext(theEnv,execStatus,routerName,priority,
                                   queryFunction,printFunction,getcFunction,
                                   ungetcFunction,exitFunction,NULL);
   }
@@ -495,9 +495,9 @@ globle intBool EnvAddRouterWithContext(
    struct router *newPtr, *lastPtr, *currentPtr;
    char  *nameCopy;
 
-   newPtr = get_struct(theEnv,router);
+   newPtr = get_struct(theEnv,execStatus,router);
 
-   nameCopy = (char *) genalloc(theEnv,strlen(routerName) + 1);
+   nameCopy = (char *) genalloc(theEnv,execStatus,strlen(routerName) + 1);
    genstrcpy(nameCopy,routerName);     
    newPtr->name = nameCopy;
 
@@ -557,15 +557,15 @@ globle int EnvDeleteRouter(
      {
       if (strcmp(currentPtr->name,routerName) == 0)
         {
-         genfree(theEnv,currentPtr->name,strlen(currentPtr->name) + 1);
+         genfree(theEnv,execStatus,currentPtr->name,strlen(currentPtr->name) + 1);
          if (lastPtr == NULL)
            {
             RouterData(theEnv)->ListOfRouters = currentPtr->next;
-            rm(theEnv,currentPtr,(int) sizeof(struct router));
+            rm(theEnv,execStatus,currentPtr,(int) sizeof(struct router));
             return(1);
            }
          lastPtr->next = currentPtr->next;
-         rm(theEnv,currentPtr,(int) sizeof(struct router));
+         rm(theEnv,execStatus,currentPtr,(int) sizeof(struct router));
          return(1);
         }
       lastPtr = currentPtr;
@@ -588,7 +588,7 @@ globle int QueryRouters(
    currentPtr = RouterData(theEnv)->ListOfRouters;
    while (currentPtr != NULL)
      {
-      if (QueryRouter(theEnv,logicalName,currentPtr) == TRUE) return(TRUE);
+      if (QueryRouter(theEnv,execStatus,logicalName,currentPtr) == TRUE) return(TRUE);
       currentPtr = currentPtr->next;
      }
 
@@ -623,10 +623,10 @@ static int QueryRouter(
    /* if it recognizes the logical name.      */
    /*=========================================*/
    
-   SetEnvironmentRouterContext(theEnv,currentPtr->context);
+   SetEnvironmentRouterContext(theEnv,execStatus,currentPtr->context);
    if (currentPtr->environmentAware)
      { 
-      if ((*currentPtr->query)(theEnv,logicalName) == TRUE)
+      if ((*currentPtr->query)(theEnv,execStatus,logicalName) == TRUE)
         { return(TRUE); }
      }
    else            
@@ -739,10 +739,10 @@ globle void UnrecognizedRouterMessage(
   EXEC_STATUS,
   char *logicalName)
   {
-   PrintErrorID(theEnv,"ROUTER",1,FALSE);
-   EnvPrintRouter(theEnv,WERROR,"Logical name ");
-   EnvPrintRouter(theEnv,WERROR,logicalName);
-   EnvPrintRouter(theEnv,WERROR," was not recognized by any routers\n");
+   PrintErrorID(theEnv,execStatus,"ROUTER",1,FALSE);
+   EnvPrintRouter(theEnv,execStatus,WERROR,"Logical name ");
+   EnvPrintRouter(theEnv,execStatus,WERROR,logicalName);
+   EnvPrintRouter(theEnv,execStatus,WERROR," was not recognized by any routers\n");
   }
 
 /*****************************************/
@@ -758,10 +758,10 @@ globle int PrintNRouter(
    char *tempStr;
    int rv;
 
-   tempStr = (char *) genalloc(theEnv,length+1);
+   tempStr = (char *) genalloc(theEnv,execStatus,length+1);
    genstrncpy(tempStr,str,length);
    tempStr[length] = 0;
-   rv = EnvPrintRouter(theEnv,logicalName,tempStr);
-   genfree(theEnv,tempStr,length+1);
+   rv = EnvPrintRouter(theEnv,execStatus,logicalName,tempStr);
+   genfree(theEnv,execStatus,tempStr,length+1);
    return(rv);
   }

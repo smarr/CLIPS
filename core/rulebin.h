@@ -110,7 +110,7 @@ struct defruleBinaryData
    struct joinLink *LinkArray;
   };
 
-#define DefruleBinaryData(theEnv) ((struct defruleBinaryData *) GetEnvironmentData(theEnv,RULEBIN_DATA))
+#define DefruleBinaryData(theEnv) ((struct defruleBinaryData *) GetEnvironmentData(theEnv,execStatus,RULEBIN_DATA))
 
 #define BloadDefrulePointer(x,i) ((struct defrule *) ((i == -1L) ? NULL : &x[i]))
 #define BsaveJoinIndex(joinPtr) ((joinPtr == NULL) ? -1L :  ((struct joinNode *) joinPtr)->bsaveID)

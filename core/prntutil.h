@@ -48,7 +48,7 @@ struct printUtilityData
    intBool InstanceAddressesToNames;
   };
 
-#define PrintUtilityData(theEnv) ((struct printUtilityData *) GetEnvironmentData(theEnv,PRINT_UTILITY_DATA))
+#define PrintUtilityData(theEnv) ((struct printUtilityData *) GetEnvironmentData(theEnv,execStatus,PRINT_UTILITY_DATA))
 
 #ifdef LOCALE
 #undef LOCALE

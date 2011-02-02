@@ -67,7 +67,7 @@ struct utilityData
    struct trackedMemory *trackList;
   };
 
-#define UtilityData(theEnv) ((struct utilityData *) GetEnvironmentData(theEnv,UTILITY_DATA))
+#define UtilityData(theEnv) ((struct utilityData *) GetEnvironmentData(theEnv,execStatus,UTILITY_DATA))
 
   /* Is c the start of a utf8 sequence? */
 #define IsUTF8Start(ch) (((ch) & 0xC0) != 0x80)

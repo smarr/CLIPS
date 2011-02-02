@@ -62,12 +62,12 @@ typedef struct field * FIELD_PTR;
 #define GetMFType(target,index)  (((struct field *) ((struct multifield *) (target))->theFields)[index-1].type)
 #define GetMFValue(target,index)  (((struct field *) ((struct multifield *) (target))->theFields)[index-1].value)
 
-#define EnvGetMFLength(theEnv,target)     (((struct multifield *) (target))->multifieldLength)
-#define EnvGetMFPtr(theEnv,target,index)  (&(((struct field *) ((struct multifield *) (target))->theFields)[index-1]))
-#define EnvSetMFType(theEnv,target,index,value)  (((struct field *) ((struct multifield *) (target))->theFields)[index-1].type = (unsigned short) (value))
-#define EnvSetMFValue(theEnv,target,index,val)  (((struct field *) ((struct multifield *) (target))->theFields)[index-1].value = (void *) (val))
-#define EnvGetMFType(theEnv,target,index)  (((struct field *) ((struct multifield *) (target))->theFields)[index-1].type)
-#define EnvGetMFValue(theEnv,target,index)  (((struct field *) ((struct multifield *) (target))->theFields)[index-1].value)
+#define EnvGetMFLength(theEnv,execStatus,target)     (((struct multifield *) (target))->multifieldLength)
+#define EnvGetMFPtr(theEnv,execStatus,target,index)  (&(((struct field *) ((struct multifield *) (target))->theFields)[index-1]))
+#define EnvSetMFType(theEnv,execStatus,target,index,value)  (((struct field *) ((struct multifield *) (target))->theFields)[index-1].type = (unsigned short) (value))
+#define EnvSetMFValue(theEnv,execStatus,target,index,val)  (((struct field *) ((struct multifield *) (target))->theFields)[index-1].value = (void *) (val))
+#define EnvGetMFType(theEnv,execStatus,target,index)  (((struct field *) ((struct multifield *) (target))->theFields)[index-1].type)
+#define EnvGetMFValue(theEnv,execStatus,target,index)  (((struct field *) ((struct multifield *) (target))->theFields)[index-1].value)
 
 /*==================*/
 /* ENVIRONMENT DATA */
@@ -80,7 +80,7 @@ struct multifieldData
    struct multifield *ListOfMultifields;
   };
 
-#define MultifieldData(theEnv) ((struct multifieldData *) GetEnvironmentData(theEnv,MULTIFIELD_DATA))
+#define MultifieldData(theEnv) ((struct multifieldData *) GetEnvironmentData(theEnv,execStatus,MULTIFIELD_DATA))
 
 #ifdef LOCALE
 #undef LOCALE

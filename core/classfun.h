@@ -136,7 +136,7 @@ struct defclassData
    unsigned short ClassDefaultsMode;
   };
 
-#define DefclassData(theEnv) ((struct defclassData *) GetEnvironmentData(theEnv,DEFCLASS_DATA))
+#define DefclassData(theEnv) ((struct defclassData *) GetEnvironmentData(theEnv,execStatus,DEFCLASS_DATA))
 
 #endif
 

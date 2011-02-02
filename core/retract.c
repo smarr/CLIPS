@@ -92,20 +92,20 @@ globle void NetworkRetract(
       nextMatch = tempMatch->next;
 
       if (tempMatch->theMatch->children != NULL)
-        { PosEntryRetractAlpha(theEnv,tempMatch->theMatch); }
+        { PosEntryRetractAlpha(theEnv,execStatus,tempMatch->theMatch); }
 
       if (tempMatch->theMatch->blockList != NULL)
-        { NegEntryRetractAlpha(theEnv,tempMatch->theMatch); }
+        { NegEntryRetractAlpha(theEnv,execStatus,tempMatch->theMatch); }
       
       /*===================================================*/
       /* Remove from the alpha memory of the pattern node. */
       /*===================================================*/
 
-      RemoveAlphaMemoryMatches(theEnv,tempMatch->matchingPattern,
+      RemoveAlphaMemoryMatches(theEnv,execStatus,tempMatch->matchingPattern,
                                tempMatch->theMatch,
                                tempMatch->theMatch->binds[0].gm.theMatch);
       
-      rtn_struct(theEnv,patternMatch,tempMatch);
+      rtn_struct(theEnv,execStatus,patternMatch,tempMatch);
 
       tempMatch = nextMatch;
      }
@@ -128,25 +128,25 @@ globle void PosEntryRetractAlpha(
       joinPtr = (struct joinNode *) betaMatch->owner;
       
       if (betaMatch->children != NULL)
-        { PosEntryRetractBeta(theEnv,betaMatch,betaMatch->children); }
+        { PosEntryRetractBeta(theEnv,execStatus,betaMatch,betaMatch->children); }
 
       if (betaMatch->rhsMemory)
-        { NegEntryRetractAlpha(theEnv,betaMatch); }
+        { NegEntryRetractAlpha(theEnv,execStatus,betaMatch); }
       
       /* Remove the beta match. */
       
 	  if ((joinPtr->ruleToActivate != NULL) ?
 		  (betaMatch->marker != NULL) : FALSE)
-		{ RemoveActivation(theEnv,(struct activation *) betaMatch->marker,TRUE,TRUE); }
+		{ RemoveActivation(theEnv,execStatus,(struct activation *) betaMatch->marker,TRUE,TRUE); }
 
 	  tempMatch = betaMatch->nextRightChild;
 
 	  if (betaMatch->rhsMemory)
-		{ UnlinkBetaPMFromNodeAndLineage(theEnv,joinPtr,betaMatch,RHS); }
+		{ UnlinkBetaPMFromNodeAndLineage(theEnv,execStatus,joinPtr,betaMatch,RHS); }
 	  else
-		{ UnlinkBetaPMFromNodeAndLineage(theEnv,joinPtr,betaMatch,LHS); }
+		{ UnlinkBetaPMFromNodeAndLineage(theEnv,execStatus,joinPtr,betaMatch,LHS); }
 
-      DeletePartialMatches(theEnv,betaMatch);
+      DeletePartialMatches(theEnv,execStatus,betaMatch);
       
       betaMatch = tempMatch;     
      }
@@ -172,12 +172,12 @@ static void NegEntryRetractAlpha(
           (! joinPtr->patternIsExists) &&
           (! joinPtr->joinFromTheRight))
         {               
-         SystemError(theEnv,"RETRACT",117);
+         SystemError(theEnv,execStatus,"RETRACT",117);
          betaMatch = betaMatch->nextBlocked;
          continue;
         }
 
-      NegEntryRetractBeta(theEnv,joinPtr,alphaMatch,betaMatch);
+      NegEntryRetractBeta(theEnv,execStatus,joinPtr,alphaMatch,betaMatch);
       betaMatch = alphaMatch->blockList;
      }
   }
@@ -199,30 +199,30 @@ static void NegEntryRetractBeta(
 
    RemoveBlockedLink(betaMatch);
 
-   if (FindNextConflictingMatch(theEnv,betaMatch,alphaMatch->nextInMemory,joinPtr,alphaMatch))
+   if (FindNextConflictingMatch(theEnv,execStatus,betaMatch,alphaMatch->nextInMemory,joinPtr,alphaMatch))
      { return; }
    else if (joinPtr->patternIsExists)
      { 
       if (betaMatch->children != NULL)
-        { PosEntryRetractBeta(theEnv,betaMatch,betaMatch->children); }
+        { PosEntryRetractBeta(theEnv,execStatus,betaMatch,betaMatch->children); }
       return; 
      }
    else if (joinPtr->firstJoin && (joinPtr->patternIsNegated || joinPtr->joinFromTheRight) && (! joinPtr->patternIsExists)) 
      {
       if (joinPtr->secondaryNetworkTest != NULL)
         {
-         if (EvaluateSecondaryNetworkTest(theEnv,betaMatch,joinPtr) == FALSE)
+         if (EvaluateSecondaryNetworkTest(theEnv,execStatus,betaMatch,joinPtr) == FALSE)
            { return; }
         }     
      
-      EPMDrive(theEnv,betaMatch,joinPtr);
+      EPMDrive(theEnv,execStatus,betaMatch,joinPtr);
 
       return;
      }
 
    if (joinPtr->secondaryNetworkTest != NULL)
      {
-      if (EvaluateSecondaryNetworkTest(theEnv,betaMatch,joinPtr) == FALSE)
+      if (EvaluateSecondaryNetworkTest(theEnv,execStatus,betaMatch,joinPtr) == FALSE)
         { return; }
      }     
       
@@ -237,7 +237,7 @@ static void NegEntryRetractBeta(
    /* Create the new partial match. */
    /*===============================*/
 
-   PPDrive(theEnv,betaMatch,NULL,joinPtr);
+   PPDrive(theEnv,execStatus,betaMatch,NULL,joinPtr);
   }
 
 /***************************************************************/
@@ -268,18 +268,18 @@ globle void PosEntryRetractBeta(
         }
 
       if (betaMatch->blockList != NULL)
-        { NegEntryRetractAlpha(theEnv,betaMatch); }
+        { NegEntryRetractAlpha(theEnv,execStatus,betaMatch); }
       else if ((((struct joinNode *) betaMatch->owner)->ruleToActivate != NULL) ?
                (betaMatch->marker != NULL) : FALSE)
-        { RemoveActivation(theEnv,(struct activation *) betaMatch->marker,TRUE,TRUE); }
+        { RemoveActivation(theEnv,execStatus,(struct activation *) betaMatch->marker,TRUE,TRUE); }
       
       if (betaMatch->rhsMemory)
-        { UnlinkNonLeftLineage(theEnv,(struct joinNode *) betaMatch->owner,betaMatch,RHS); }
+        { UnlinkNonLeftLineage(theEnv,execStatus,(struct joinNode *) betaMatch->owner,betaMatch,RHS); }
       else
-        { UnlinkNonLeftLineage(theEnv,(struct joinNode *) betaMatch->owner,betaMatch,LHS); } 
+        { UnlinkNonLeftLineage(theEnv,execStatus,(struct joinNode *) betaMatch->owner,betaMatch,LHS); } 
 
-      if (betaMatch->dependents != NULL) RemoveLogicalSupport(theEnv,betaMatch);
-      ReturnPartialMatch(theEnv,betaMatch);
+      if (betaMatch->dependents != NULL) RemoveLogicalSupport(theEnv,execStatus,betaMatch);
+      ReturnPartialMatch(theEnv,execStatus,betaMatch);
     
       if (tempMatch == parentMatch) return;
       betaMatch = tempMatch;      
@@ -353,7 +353,7 @@ static intBool FindNextConflictingMatch(
        /* If so, the partial match must be ignored here.       */
        /*======================================================*/
 
-      else if (PartialMatchDefunct(theEnv,possibleConflicts))
+      else if (PartialMatchDefunct(theEnv,execStatus,possibleConflicts))
         { /* Do Nothing */ }
 
       /*================================================*/
@@ -380,7 +380,7 @@ static intBool FindNextConflictingMatch(
 #endif
          EngineData(theEnv)->GlobalRHSBinds = possibleConflicts;
 
-         result = EvaluateJoinExpression(theEnv,theJoin->networkTest,theJoin);
+         result = EvaluateJoinExpression(theEnv,execStatus,theJoin->networkTest,theJoin);
          if (execStatus->EvaluationError)
            {
             result = TRUE;
@@ -444,7 +444,7 @@ static intBool PartialMatchDefunct(
       if (thePM->binds[i].gm.theMatch == NULL) continue;
       thePE = thePM->binds[i].gm.theMatch->matchingItem;
       if (thePE && thePE->theInfo->synchronized &&
-          !(*thePE->theInfo->synchronized)(theEnv,thePE))
+          !(*thePE->theInfo->synchronized)(theEnv,execStatus,thePE))
         return(TRUE);
      }
    return(FALSE);
@@ -475,7 +475,7 @@ void DeletePartialMatches(
       /* result of a logical CE.                        */
       /*================================================*/
 
-      if (listOfPMs->dependents != NULL) RemoveLogicalSupport(theEnv,listOfPMs);
+      if (listOfPMs->dependents != NULL) RemoveLogicalSupport(theEnv,execStatus,listOfPMs);
 
       /*==========================================================*/
       /* If the partial match is being deleted from a beta memory */
@@ -490,7 +490,7 @@ void DeletePartialMatches(
       /* immediately).                                            */
       /*==========================================================*/
 
-      ReturnPartialMatch(theEnv,listOfPMs);
+      ReturnPartialMatch(theEnv,execStatus,listOfPMs);
 
       /*====================================*/
       /* Move on to the next partial match. */
@@ -532,8 +532,8 @@ globle void ReturnPartialMatch(
    if (waste->betaMemory == FALSE)
      {
       if (waste->binds[0].gm.theMatch->markers != NULL)
-        { ReturnMarkers(theEnv,waste->binds[0].gm.theMatch->markers); }
-      rm(theEnv,waste->binds[0].gm.theMatch,(int) sizeof(struct alphaMatch));
+        { ReturnMarkers(theEnv,execStatus,waste->binds[0].gm.theMatch->markers); }
+      rm(theEnv,execStatus,waste->binds[0].gm.theMatch,(int) sizeof(struct alphaMatch));
      }
 
    /*=================================================*/
@@ -542,13 +542,13 @@ globle void ReturnPartialMatch(
    /* the logical CE.                                 */
    /*=================================================*/
 
-   if (waste->dependents != NULL) RemovePMDependencies(theEnv,waste);
+   if (waste->dependents != NULL) RemovePMDependencies(theEnv,execStatus,waste);
 
    /*======================================================*/
    /* Return the partial match to the pool of free memory. */
    /*======================================================*/
 
-   rtn_var_struct(theEnv,partialMatch,(int) sizeof(struct genericMatch *) *
+   rtn_var_struct(theEnv,execStatus,partialMatch,(int) sizeof(struct genericMatch *) *
                   (waste->bcount - 1),
                   waste);
   }
@@ -572,8 +572,8 @@ globle void DestroyPartialMatch(
    if (waste->betaMemory == FALSE)
      {
       if (waste->binds[0].gm.theMatch->markers != NULL)
-        { ReturnMarkers(theEnv,waste->binds[0].gm.theMatch->markers); }
-      rm(theEnv,waste->binds[0].gm.theMatch,(int) sizeof(struct alphaMatch));
+        { ReturnMarkers(theEnv,execStatus,waste->binds[0].gm.theMatch->markers); }
+      rm(theEnv,execStatus,waste->binds[0].gm.theMatch,(int) sizeof(struct alphaMatch));
      }
      
    /*=================================================*/
@@ -582,13 +582,13 @@ globle void DestroyPartialMatch(
    /* the logical CE.                                 */
    /*=================================================*/
 
-   if (waste->dependents != NULL) DestroyPMDependencies(theEnv,waste);
+   if (waste->dependents != NULL) DestroyPMDependencies(theEnv,execStatus,waste);
 
    /*======================================================*/
    /* Return the partial match to the pool of free memory. */
    /*======================================================*/
 
-   rtn_var_struct(theEnv,partialMatch,(int) sizeof(struct genericMatch *) *
+   rtn_var_struct(theEnv,execStatus,partialMatch,(int) sizeof(struct genericMatch *) *
                   (waste->bcount - 1),
                   waste);
   }
@@ -608,7 +608,7 @@ static void ReturnMarkers(
    while (waste != NULL)
      {
       temp = waste->next;
-      rtn_struct(theEnv,multifieldMarker,waste);
+      rtn_struct(theEnv,execStatus,multifieldMarker,waste);
       waste = temp;
      }
   }
@@ -636,7 +636,7 @@ globle void FlushGarbagePartialMatches(
    while (EngineData(theEnv)->GarbageAlphaMatches != NULL)
      {
       amPtr = EngineData(theEnv)->GarbageAlphaMatches->next;
-      rtn_struct(theEnv,alphaMatch,EngineData(theEnv)->GarbageAlphaMatches);
+      rtn_struct(theEnv,execStatus,alphaMatch,EngineData(theEnv)->GarbageAlphaMatches);
       EngineData(theEnv)->GarbageAlphaMatches = amPtr;
      }
 
@@ -659,7 +659,7 @@ globle void FlushGarbagePartialMatches(
       /*============================================*/
 
       EngineData(theEnv)->GarbagePartialMatches->busy = FALSE;
-      ReturnPartialMatch(theEnv,EngineData(theEnv)->GarbagePartialMatches);
+      ReturnPartialMatch(theEnv,execStatus,EngineData(theEnv)->GarbagePartialMatches);
       EngineData(theEnv)->GarbagePartialMatches = pmPtr;
      }
   }

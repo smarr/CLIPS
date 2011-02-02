@@ -94,7 +94,7 @@ struct constraintData
 #endif
   };
 
-#define ConstraintData(theEnv) ((struct constraintData *) GetEnvironmentData(theEnv,CONSTRAINT_DATA))
+#define ConstraintData(theEnv) ((struct constraintData *) GetEnvironmentData(theEnv,execStatus,CONSTRAINT_DATA))
 
 #define GetDynamicConstraintChecking() EnvGetDynamicConstraintChecking(GetCurrentEnvironment())
 #define GetStaticConstraintChecking() EnvGetStaticConstraintChecking(GetCurrentEnvironment())

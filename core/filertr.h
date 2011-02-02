@@ -41,7 +41,7 @@ struct fileRouterData
    struct fileRouter *ListOfFileRouters;
   };
 
-#define FileRouterData(theEnv) ((struct fileRouterData *) GetEnvironmentData(theEnv,FILE_ROUTER_DATA))
+#define FileRouterData(theEnv) ((struct fileRouterData *) GetEnvironmentData(theEnv,execStatus,FILE_ROUTER_DATA))
 
 #ifdef LOCALE
 #undef LOCALE

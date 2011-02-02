@@ -61,19 +61,19 @@ globle void DefmoduleBinarySetup(
   void *theEnv,
   EXEC_STATUS)
   {
-   AddBeforeBloadFunction(theEnv,"defmodule",RemoveAllDefmodules,2000);
+   AddBeforeBloadFunction(theEnv,execStatus,"defmodule",RemoveAllDefmodules,2000);
 
 #if BLOAD_AND_BSAVE
-   AddBinaryItem(theEnv,"defmodule",0,BsaveFind,NULL,
+   AddBinaryItem(theEnv,execStatus,"defmodule",0,BsaveFind,NULL,
                              BsaveStorage,BsaveBinaryItem,
                              BloadStorage,BloadBinaryItem,
                              ClearBload);
 #endif
 
-   AddAbortBloadFunction(theEnv,"defmodule",CreateMainModule,0);
+   AddAbortBloadFunction(theEnv,execStatus,"defmodule",CreateMainModule,0);
 
 #if (BLOAD || BLOAD_ONLY)
-   AddBinaryItem(theEnv,"defmodule",0,NULL,NULL,NULL,NULL,
+   AddBinaryItem(theEnv,execStatus,"defmodule",0,NULL,NULL,NULL,NULL,
                              BloadStorage,BloadBinaryItem,
                              ClearBload);
 #endif
@@ -151,8 +151,8 @@ static void BsaveFind(
    /* in the process of saving the binary image.            */
    /*=======================================================*/
 
-   SaveBloadCount(theEnv,DefmoduleData(theEnv)->BNumberOfDefmodules);
-   SaveBloadCount(theEnv,DefmoduleData(theEnv)->NumberOfPortItems);
+   SaveBloadCount(theEnv,execStatus,DefmoduleData(theEnv)->BNumberOfDefmodules);
+   SaveBloadCount(theEnv,execStatus,DefmoduleData(theEnv)->NumberOfPortItems);
 
    /*==========================================*/
    /* Set the count of defmodule and defmodule */
@@ -166,9 +166,9 @@ static void BsaveFind(
    /* Loop through each module. */
    /*===========================*/
 
-   for (defmodulePtr = (struct defmodule *) EnvGetNextDefmodule(theEnv,NULL);
+   for (defmodulePtr = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,NULL);
         defmodulePtr != NULL;
-        defmodulePtr = (struct defmodule *) EnvGetNextDefmodule(theEnv,defmodulePtr))
+        defmodulePtr = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,defmodulePtr))
      {
       /*==============================================*/
       /* Increment the number of modules encountered. */
@@ -272,9 +272,9 @@ static void BsaveBinaryItem(
 
    DefmoduleData(theEnv)->BNumberOfDefmodules = 0;
    DefmoduleData(theEnv)->NumberOfPortItems = 0;
-   for (defmodulePtr = (struct defmodule *) EnvGetNextDefmodule(theEnv,NULL);
+   for (defmodulePtr = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,NULL);
         defmodulePtr != NULL;
-        defmodulePtr = (struct defmodule *) EnvGetNextDefmodule(theEnv,defmodulePtr))
+        defmodulePtr = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,defmodulePtr))
      {
       newDefmodule.name = defmodulePtr->name->bucket;
 
@@ -315,7 +315,7 @@ static void BsaveBinaryItem(
    /*==========================================*/
 
    DefmoduleData(theEnv)->NumberOfPortItems = 0;
-   defmodulePtr = (struct defmodule *) EnvGetNextDefmodule(theEnv,NULL);
+   defmodulePtr = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,NULL);
    while (defmodulePtr != NULL)
      {
       for (theList = defmodulePtr->importList;
@@ -358,7 +358,7 @@ static void BsaveBinaryItem(
          GenWrite(&newPortItem,sizeof(struct bsavePortItem),fp);
         }
 
-      defmodulePtr = (struct defmodule *) EnvGetNextDefmodule(theEnv,defmodulePtr);
+      defmodulePtr = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,defmodulePtr);
      }
 
    /*=============================================================*/
@@ -368,8 +368,8 @@ static void BsaveBinaryItem(
    /* overwritten by the binary save).                            */
    /*=============================================================*/
 
-   RestoreBloadCount(theEnv,&DefmoduleData(theEnv)->BNumberOfDefmodules);
-   RestoreBloadCount(theEnv,&DefmoduleData(theEnv)->NumberOfPortItems);
+   RestoreBloadCount(theEnv,execStatus,&DefmoduleData(theEnv)->BNumberOfDefmodules);
+   RestoreBloadCount(theEnv,execStatus,&DefmoduleData(theEnv)->NumberOfPortItems);
   }
 
 #endif /* BLOAD_AND_BSAVE */
@@ -389,9 +389,9 @@ static void BloadStorage(
    /* port item data structures to be read. */
    /*=======================================*/
 
-   GenReadBinary(theEnv,&space,sizeof(size_t));
-   GenReadBinary(theEnv,&DefmoduleData(theEnv)->BNumberOfDefmodules,sizeof(long int));
-   GenReadBinary(theEnv,&DefmoduleData(theEnv)->NumberOfPortItems,sizeof(long int));
+   GenReadBinary(theEnv,execStatus,&space,sizeof(size_t));
+   GenReadBinary(theEnv,execStatus,&DefmoduleData(theEnv)->BNumberOfDefmodules,sizeof(long int));
+   GenReadBinary(theEnv,execStatus,&DefmoduleData(theEnv)->NumberOfPortItems,sizeof(long int));
 
    /*================================*/
    /* Allocate the space needed for  */
@@ -405,7 +405,7 @@ static void BloadStorage(
      }
 
    space = (DefmoduleData(theEnv)->BNumberOfDefmodules * sizeof(struct defmodule));
-   DefmoduleData(theEnv)->DefmoduleArray = (struct defmodule *) genalloc(theEnv,space);
+   DefmoduleData(theEnv)->DefmoduleArray = (struct defmodule *) genalloc(theEnv,execStatus,space);
 
    /*================================*/
    /* Allocate the space needed for  */
@@ -419,7 +419,7 @@ static void BloadStorage(
      }
 
    space = (DefmoduleData(theEnv)->NumberOfPortItems * sizeof(struct portItem));
-   DefmoduleData(theEnv)->PortItemArray = (struct portItem *) genalloc(theEnv,space);
+   DefmoduleData(theEnv)->PortItemArray = (struct portItem *) genalloc(theEnv,execStatus,space);
   }
 
 /********************************************/
@@ -432,14 +432,14 @@ static void BloadBinaryItem(
   {
    size_t space;
 
-   GenReadBinary(theEnv,&space,sizeof(size_t));
+   GenReadBinary(theEnv,execStatus,&space,sizeof(size_t));
    if (DefmoduleData(theEnv)->BNumberOfDefmodules == 0) return;
 
-   BloadandRefresh(theEnv,DefmoduleData(theEnv)->BNumberOfDefmodules,sizeof(struct bsaveDefmodule),UpdateDefmodule);
-   BloadandRefresh(theEnv,DefmoduleData(theEnv)->NumberOfPortItems,sizeof(struct bsavePortItem),UpdatePortItem);
+   BloadandRefresh(theEnv,execStatus,DefmoduleData(theEnv)->BNumberOfDefmodules,sizeof(struct bsaveDefmodule),UpdateDefmodule);
+   BloadandRefresh(theEnv,execStatus,DefmoduleData(theEnv)->NumberOfPortItems,sizeof(struct bsavePortItem),UpdatePortItem);
 
-   SetListOfDefmodules(theEnv,(void *) DefmoduleData(theEnv)->DefmoduleArray);
-   EnvSetCurrentModule(theEnv,(void *) EnvGetNextDefmodule(theEnv,NULL));
+   SetListOfDefmodules(theEnv,execStatus,(void *) DefmoduleData(theEnv)->DefmoduleArray);
+   EnvSetCurrentModule(theEnv,execStatus,(void *) EnvGetNextDefmodule(theEnv,execStatus,NULL));
   }
 
 /******************************************/
@@ -469,7 +469,7 @@ static void UpdateDefmodule(
    else
      {
       DefmoduleData(theEnv)->DefmoduleArray[obji].itemsArray = 
-         (struct defmoduleItemHeader **) gm2(theEnv,sizeof(void *) * GetNumberOfModuleItems(theEnv));
+         (struct defmoduleItemHeader **) gm2(theEnv,execStatus,sizeof(void *) * GetNumberOfModuleItems(theEnv));
      }
 
    for (i = 0, theItem = GetListOfModuleItems(theEnv);
@@ -482,7 +482,7 @@ static void UpdateDefmodule(
         {
          DefmoduleData(theEnv)->DefmoduleArray[obji].itemsArray[i] =
              (struct defmoduleItemHeader *)
-             (*theItem->bloadModuleReference)(theEnv,obji);
+             (*theItem->bloadModuleReference)(theEnv,execStatus,obji);
         }
      }
 
@@ -563,26 +563,26 @@ static void ClearBload(
 
    for (i = 0; i < DefmoduleData(theEnv)->BNumberOfDefmodules; i++)
      {
-      DecrementSymbolCount(theEnv,DefmoduleData(theEnv)->DefmoduleArray[i].name);
+      DecrementSymbolCount(theEnv,execStatus,DefmoduleData(theEnv)->DefmoduleArray[i].name);
       for (theList = DefmoduleData(theEnv)->DefmoduleArray[i].importList;
            theList != NULL;
            theList = theList->next)
         {
-         if (theList->moduleName != NULL) DecrementSymbolCount(theEnv,theList->moduleName);
-         if (theList->constructType != NULL) DecrementSymbolCount(theEnv,theList->constructType);
-         if (theList->constructName != NULL) DecrementSymbolCount(theEnv,theList->constructName);
+         if (theList->moduleName != NULL) DecrementSymbolCount(theEnv,execStatus,theList->moduleName);
+         if (theList->constructType != NULL) DecrementSymbolCount(theEnv,execStatus,theList->constructType);
+         if (theList->constructName != NULL) DecrementSymbolCount(theEnv,execStatus,theList->constructName);
         }
 
       for (theList = DefmoduleData(theEnv)->DefmoduleArray[i].exportList;
            theList != NULL;
            theList = theList->next)
         {
-         if (theList->moduleName != NULL) DecrementSymbolCount(theEnv,theList->moduleName);
-         if (theList->constructType != NULL) DecrementSymbolCount(theEnv,theList->constructType);
-         if (theList->constructName != NULL) DecrementSymbolCount(theEnv,theList->constructName);
+         if (theList->moduleName != NULL) DecrementSymbolCount(theEnv,execStatus,theList->moduleName);
+         if (theList->constructType != NULL) DecrementSymbolCount(theEnv,execStatus,theList->constructType);
+         if (theList->constructName != NULL) DecrementSymbolCount(theEnv,execStatus,theList->constructName);
         }
 
-      rm(theEnv,DefmoduleData(theEnv)->DefmoduleArray[i].itemsArray,sizeof(void *) * GetNumberOfModuleItems(theEnv));
+      rm(theEnv,execStatus,DefmoduleData(theEnv)->DefmoduleArray[i].itemsArray,sizeof(void *) * GetNumberOfModuleItems(theEnv));
      }
 
    /*================================*/
@@ -591,7 +591,7 @@ static void ClearBload(
    /*================================*/
 
    space = DefmoduleData(theEnv)->BNumberOfDefmodules * sizeof(struct defmodule);
-   if (space != 0) genfree(theEnv,(void *) DefmoduleData(theEnv)->DefmoduleArray,space);
+   if (space != 0) genfree(theEnv,execStatus,(void *) DefmoduleData(theEnv)->DefmoduleArray,space);
    DefmoduleData(theEnv)->BNumberOfDefmodules = 0;
    
    /*================================*/
@@ -600,14 +600,14 @@ static void ClearBload(
    /*================================*/
 
    space = DefmoduleData(theEnv)->NumberOfPortItems * sizeof(struct portItem);
-   if (space != 0) genfree(theEnv,(void *) DefmoduleData(theEnv)->PortItemArray,space);
+   if (space != 0) genfree(theEnv,execStatus,(void *) DefmoduleData(theEnv)->PortItemArray,space);
    DefmoduleData(theEnv)->NumberOfPortItems = 0;
    
    /*===========================*/
    /* Reset module information. */
    /*===========================*/
 
-   SetListOfDefmodules(theEnv,NULL);
+   SetListOfDefmodules(theEnv,execStatus,NULL);
    CreateMainModule(theEnv);
    DefmoduleData(theEnv)->MainModuleRedefinable = TRUE;
   }

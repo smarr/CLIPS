@@ -206,11 +206,11 @@ static void PerformEditCommand(
    /* Get the file name. */
    /*====================*/
 
-   if ((num_a = EnvArgCountCheck(theEnv,"edit",NO_MORE_THAN,1)) == -1) return;
+   if ((num_a = EnvArgCountCheck(theEnv,execStatus,"edit",NO_MORE_THAN,1)) == -1) return;
 
    if (num_a == 1)
      {
-      if (EnvArgTypeCheck(theEnv,"edit",1,SYMBOL_OR_STRING,&arg_ptr) == FALSE) return;
+      if (EnvArgTypeCheck(theEnv,execStatus,"edit",1,SYMBOL_OR_STRING,&arg_ptr) == FALSE) return;
       fileName = DOToString(arg_ptr);
      }
 
@@ -223,15 +223,15 @@ static void PerformEditCommand(
         genstrcpy(bname, "main");                  /* Work out the name of */
         if (num_a > 0)                     /* the default buffer.  */
                 makename(bname,fileName);
-        edinit(theEnv,bname);                          /* Buffers, windows.    */
+        edinit(theEnv,execStatus,bname);                          /* Buffers, windows.    */
         vtinit(theEnv);                               /* Displays.            */
         if (num_a > 0) {
                 update();                       /* You have to update   */
-                readin(theEnv,fileName);             /* in case "[New file]" */
+                readin(theEnv,execStatus,fileName);             /* in case "[New file]" */
                 }
 
 	init_cmp_router(theEnv);			/* Prepare the compile  */
-        EnvDeactivateRouter(theEnv,"cmp_router");		/* router.              */
+        EnvDeactivateRouter(theEnv,execStatus,"cmp_router");		/* router.              */
         }
    else {
 
@@ -242,7 +242,7 @@ static void PerformEditCommand(
 	(*term.t_open)();
 
         if (num_a > 0) {
-           filevisit_guts(theEnv,fileName);
+           filevisit_guts(theEnv,execStatus,fileName);
            }
         }
 
@@ -308,7 +308,7 @@ loop:
                 c = CTLX | getctl();
         if (kbdmip != NULL) {                   /* Save macro strokes.  */
                 if (c!=(CTLX|')') && kbdmip>&kbdm[NKBDM-6]) {
-                        ctrlg(theEnv,FALSE, 0);
+                        ctrlg(theEnv,execStatus,FALSE, 0);
                         goto loop;
                 }
                 if (f != FALSE) {
@@ -317,7 +317,7 @@ loop:
                 }
                 *kbdmip++ = c;
         }
-        rtn_flag = execute(theEnv,c, f, n);                /* Do it.               */
+        rtn_flag = execute(theEnv,execStatus,c, f, n);                /* Do it.               */
         if(rtn_flag == EXIT)
            return;
 	else
@@ -337,9 +337,9 @@ globle void edinit(
         register BUFFER *bp;
         register WINDOW *wp;
 
-        bp     = bfind(theEnv,bname, TRUE, 0);              /* First buffer        */
-        blistp = bfind(theEnv,"[List]", TRUE, BFTEMP);      /* Buffer list buffer  */
-        wp     = (WINDOW *) genalloc(theEnv,(unsigned) sizeof(WINDOW));  /* First window        */
+        bp     = bfind(theEnv,execStatus,bname, TRUE, 0);              /* First buffer        */
+        blistp = bfind(theEnv,execStatus,"[List]", TRUE, BFTEMP);      /* Buffer list buffer  */
+        wp     = (WINDOW *) genalloc(theEnv,execStatus,(unsigned) sizeof(WINDOW));  /* First window        */
         curbp  = bp;                            /* Make this current    */
         wheadp = wp;
         curwp  = wp;
@@ -358,7 +358,7 @@ globle void edinit(
 
         /* Secret Buffer for CLIPS Compile output */
 
-        CompileBufferp = bfind(theEnv,"[Compilations]",TRUE,BFTEMP);
+        CompileBufferp = bfind(theEnv,execStatus,"[Compilations]",TRUE,BFTEMP);
 }
 
 /*
@@ -381,7 +381,7 @@ globle int execute(
         while (ktp < &keytab[NKEYTAB]) {
                 if (ktp->k_code == c) {
                         thisflag = 0;
-                        status   = (*ktp->k_fp)(theEnv,f, n);
+                        status   = (*ktp->k_fp)(theEnv,execStatus,f, n);
                         lastflag = thisflag;
                         return (status);
                 }
@@ -402,7 +402,7 @@ globle int execute(
                         return (n<0 ? FALSE : TRUE);
                 }
                 thisflag = 0;                   /* For the future.      */
-                status   = linsert(theEnv,n, c);
+                status   = linsert(theEnv,execStatus,n, c);
                 lastflag = thisflag;
                 return (status);
         }
@@ -490,8 +490,8 @@ globle int quickexit(
   {
    if ((curbp->b_flag&BFCHG) != 0          /* Changed.             */
         && (curbp->b_flag&BFTEMP) == 0)         /* Real.                */
-     filesave(theEnv,f, n);
-   return(edquit(theEnv,f, n));                     /* conditionally quit   */
+     filesave(theEnv,execStatus,f, n);
+   return(edquit(theEnv,execStatus,f, n));                     /* conditionally quit   */
   }
 
 /*
@@ -512,7 +512,7 @@ globle int edquit(
         if (f != FALSE                          /* Argument forces it.  */
         || anycb() == FALSE                     /* All buffers clean.   */
                                                 /* User says it's OK.   */
-        || (s=mlyesno(theEnv,"Modified Buffers! Quit")) == TRUE) {
+        || (s=mlyesno(theEnv,execStatus,"Modified Buffers! Quit")) == TRUE) {
                 vttidy();
                 full_cleanup(theEnv);
                 return(EXIT);
@@ -622,7 +622,7 @@ globle int ctlxe(
                                 c  = *kbdmop++;
                         }
                         s = TRUE;
-                } while (c!=(CTLX|')') && (s=execute(theEnv,c, af, an))==TRUE);
+                } while (c!=(CTLX|')') && (s=execute(theEnv,execStatus,c, af, an))==TRUE);
                 kbdmop = NULL;
         } while (s==TRUE && --n);
         return (s);
@@ -658,7 +658,7 @@ globle void full_cleanup(
 
 /*   Clear all data structures */
 
-   kill_all_buffers(theEnv,&bheadp);     /* Clear all existing buffers   */
+   kill_all_buffers(theEnv,execStatus,&bheadp);     /* Clear all existing buffers   */
 
    kill_all_windows(theEnv);           /* Clear all windows            */
 
@@ -695,13 +695,13 @@ globle int kill_all_buffers(
 
    bp = *top_buf;
    while(bp != NULL) {
-        spec_clear(theEnv,bp);                         /* Blow text away.      */
+        spec_clear(theEnv,execStatus,bp);                         /* Blow text away.      */
 
-        genfree(theEnv,(void *) bp->b_linep,           /* And free pointer     */
+        genfree(theEnv,execStatus,(void *) bp->b_linep,           /* And free pointer     */
 	        (unsigned)  sizeof(LINE)+ bp->b_linep->l_size);
 
         *top_buf = bp->b_bufp;                       /* Find next buffer     */
-        genfree(theEnv,(void *) bp, (unsigned) sizeof(BUFFER));   /* Release buffer block */
+        genfree(theEnv,execStatus,(void *) bp, (unsigned) sizeof(BUFFER));   /* Release buffer block */
 	bp = *top_buf;
         }
 
@@ -718,7 +718,7 @@ globle int kill_all_windows(
    wp = wheadp;
    while(wp != NULL) {
         wp1 = wp->w_wndp;
-        genfree(theEnv,(void *) wp, (unsigned) sizeof(WINDOW));
+        genfree(theEnv,execStatus,(void *) wp, (unsigned) sizeof(WINDOW));
 	wp  = wp1;
         }
 
@@ -739,7 +739,7 @@ globle int spec_clear(
 
         bp->b_flag  &= ~BFCHG;                  /* Not changed          */
         while ((lp=lforw(bp->b_linep)) != bp->b_linep)
-                lfree(theEnv,lp);
+                lfree(theEnv,execStatus,lp);
         bp->b_dotp  = bp->b_linep;              /* Fix "."              */
         bp->b_doto  = 0;
         bp->b_markp = NULL;                     /* Invalidate "mark"    */
@@ -761,7 +761,7 @@ globle void EditCommand(
    
    if (pauseEnvFunction != NULL) (*pauseEnvFunction)(theEnv) ;
    PerformEditCommand(theEnv);
-   if (continueEnvFunction != NULL) (*continueEnvFunction)(theEnv,0) ;
+   if (continueEnvFunction != NULL) (*continueEnvFunction)(theEnv,execStatus,0) ;
    if (redrawScreenFunction != NULL) (*redrawScreenFunction)(theEnv) ;
   }
 
@@ -772,7 +772,7 @@ globle void EditorFunctionDefinition(
   void *theEnv,
   EXEC_STATUS)
   {
-   EnvDefineFunction2(theEnv,"edit",'v', PTIEF EditCommand,"EditCommand", "*1k");
+   EnvDefineFunction2(theEnv,execStatus,"edit",'v', PTIEF EditCommand,"EditCommand", "*1k");
   }
 
 #else

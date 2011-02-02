@@ -99,7 +99,7 @@ globle int backchar(
    register LINE   *lp;
 
    if (n < 0)
-     return (forwchar(theEnv,f, -n));
+     return (forwchar(theEnv,execStatus,f, -n));
    while (n--)
      {
       if (curwp->w_doto == 0) 
@@ -145,7 +145,7 @@ globle int forwchar(
   int n)
   {
         if (n < 0)
-                return (backchar(theEnv,f, -n));
+                return (backchar(theEnv,execStatus,f, -n));
         while (n--) {
                 if (curwp->w_doto == llength(curwp->w_dotp)) {
                         if (curwp->w_dotp == curbp->b_linep)
@@ -214,7 +214,7 @@ globle int forwline(
         register LINE   *dlp;
 
         if (n < 0)
-                return (backline(theEnv,f, -n));
+                return (backline(theEnv,execStatus,f, -n));
         if ((lastflag&CFCPCN) == 0)             /* Reset goal if last   */
                 curgoal = curcol;               /* not C-P or C-N       */
         thisflag |= CFCPCN;
@@ -242,7 +242,7 @@ globle int backline(
         register LINE   *dlp;
 
         if (n < 0)
-                return (forwline(theEnv,f, -n));
+                return (forwline(theEnv,execStatus,f, -n));
         if ((lastflag&CFCPCN) == 0)             /* Reset goal if the    */
                 curgoal = curcol;               /* last isn't C-P, C-N  */
         thisflag |= CFCPCN;
@@ -305,7 +305,7 @@ globle int forwpage(
                 if (n <= 0)                     /* Forget the overlap   */
                         n = 1;                  /* if tiny window.      */
         } else if (n < 0)
-                return (backpage(theEnv,f, -n));
+                return (backpage(theEnv,execStatus,f, -n));
 #if     CVMVAS
         else                                    /* Convert from pages   */
                 n *= curwp->w_ntrows;           /* to lines.            */
@@ -339,7 +339,7 @@ globle int backpage(
                 if (n <= 0)                     /* Don't blow up if the */
                         n = 1;                  /* window is tiny.      */
         } else if (n < 0)
-                return (forwpage(theEnv,f, -n));
+                return (forwpage(theEnv,execStatus,f, -n));
 #if     CVMVAS
         else                                    /* Convert from pages   */
                 n *= curwp->w_ntrows;           /* to lines.            */
@@ -437,19 +437,19 @@ globle int wrapword(
         cnt = -1;
         do {
                 cnt++;
-                if (! backchar(theEnv,0, 1))
+                if (! backchar(theEnv,execStatus,0, 1))
                         return(FALSE);
         }
         while (! inword());
-        if (! backword(theEnv,0, 1))
+        if (! backword(theEnv,execStatus,0, 1))
                 return(FALSE);
         if (oldp == (int) (curwp->w_dotp && curwp->w_doto)) {
-                if (! backdel(theEnv,0, 1))
+                if (! backdel(theEnv,execStatus,0, 1))
                         return(FALSE);
-                if (! newline(theEnv,0, 1))
+                if (! newline(theEnv,execStatus,0, 1))
                         return(FALSE);
         }
-        return(forwword(theEnv,0, 1) && forwchar(theEnv,0, cnt));
+        return(forwword(theEnv,execStatus,0, 1) && forwchar(theEnv,execStatus,0, cnt));
   }
 
 /*
@@ -467,20 +467,20 @@ globle int backword(
   int n)
   {
         if (n < 0)
-                return (forwword(theEnv,f, -n));
-        if (backchar(theEnv,FALSE, 1) == FALSE)
+                return (forwword(theEnv,execStatus,f, -n));
+        if (backchar(theEnv,execStatus,FALSE, 1) == FALSE)
                 return (FALSE);
         while (n--) {
                 while (inword() == FALSE) {
-                        if (backchar(theEnv,FALSE, 1) == FALSE)
+                        if (backchar(theEnv,execStatus,FALSE, 1) == FALSE)
                                 return (FALSE);
                 }
                 while (inword() != FALSE) {
-                        if (backchar(theEnv,FALSE, 1) == FALSE)
+                        if (backchar(theEnv,execStatus,FALSE, 1) == FALSE)
                                 return (FALSE);
                 }
         }
-        return (forwchar(theEnv,FALSE, 1));
+        return (forwchar(theEnv,execStatus,FALSE, 1));
   }
 
 /*
@@ -497,14 +497,14 @@ globle int forwword(
   int n)
   {
         if (n < 0)
-                return (backword(theEnv,f, -n));
+                return (backword(theEnv,execStatus,f, -n));
         while (n--) {
                 while (inword() == FALSE) {
-                        if (forwchar(theEnv,FALSE, 1) == FALSE)
+                        if (forwchar(theEnv,execStatus,FALSE, 1) == FALSE)
                                 return (FALSE);
                 }
                 while (inword() != FALSE) {
-                        if (forwchar(theEnv,FALSE, 1) == FALSE)
+                        if (forwchar(theEnv,execStatus,FALSE, 1) == FALSE)
                                 return (FALSE);
                 }
         }
@@ -531,7 +531,7 @@ globle int upperword(
                 return (FALSE);
         while (n--) {
                 while (inword() == FALSE) {
-                        if (forwchar(theEnv,FALSE, 1) == FALSE)
+                        if (forwchar(theEnv,execStatus,FALSE, 1) == FALSE)
                                 return (FALSE);
                 }
                 while (inword() != FALSE) {
@@ -541,7 +541,7 @@ globle int upperword(
                                 lputc(curwp->w_dotp, curwp->w_doto, c);
                                 lchange(WFHARD);
                         }
-                        if (forwchar(theEnv,FALSE, 1) == FALSE)
+                        if (forwchar(theEnv,execStatus,FALSE, 1) == FALSE)
                                 return (FALSE);
                 }
         }
@@ -568,7 +568,7 @@ globle int lowerword(
                 return (FALSE);
         while (n--) {
                 while (inword() == FALSE) {
-                        if (forwchar(theEnv,FALSE, 1) == FALSE)
+                        if (forwchar(theEnv,execStatus,FALSE, 1) == FALSE)
                                 return (FALSE);
                 }
                 while (inword() != FALSE) {
@@ -578,7 +578,7 @@ globle int lowerword(
                                 lputc(curwp->w_dotp, curwp->w_doto, c);
                                 lchange(WFHARD);
                         }
-                        if (forwchar(theEnv,FALSE, 1) == FALSE)
+                        if (forwchar(theEnv,execStatus,FALSE, 1) == FALSE)
                                 return (FALSE);
                 }
         }
@@ -606,7 +606,7 @@ globle int capword(
                 return (FALSE);
         while (n--) {
                 while (inword() == FALSE) {
-                        if (forwchar(theEnv,FALSE, 1) == FALSE)
+                        if (forwchar(theEnv,execStatus,FALSE, 1) == FALSE)
                                 return (FALSE);
                 }
                 if (inword() != FALSE) {
@@ -616,7 +616,7 @@ globle int capword(
                                 lputc(curwp->w_dotp, curwp->w_doto, c);
                                 lchange(WFHARD);
                         }
-                        if (forwchar(theEnv,FALSE, 1) == FALSE)
+                        if (forwchar(theEnv,execStatus,FALSE, 1) == FALSE)
                                 return (FALSE);
                         while (inword() != FALSE) {
                                 c = lgetc(curwp->w_dotp, curwp->w_doto);
@@ -625,7 +625,7 @@ globle int capword(
                                         lputc(curwp->w_dotp, curwp->w_doto, c);
                                         lchange(WFHARD);
                                 }
-                                if (forwchar(theEnv,FALSE, 1) == FALSE)
+                                if (forwchar(theEnv,execStatus,FALSE, 1) == FALSE)
                                         return (FALSE);
                         }
                 }
@@ -663,19 +663,19 @@ globle int delfword(
         size = 0;
         while (n--) {
                 while (inword() == FALSE) {
-                        if (forwchar(theEnv,FALSE, 1) == FALSE)
+                        if (forwchar(theEnv,execStatus,FALSE, 1) == FALSE)
                                 return (FALSE);
                         ++size;
                 }
                 while (inword() != FALSE) {
-                        if (forwchar(theEnv,FALSE, 1) == FALSE)
+                        if (forwchar(theEnv,execStatus,FALSE, 1) == FALSE)
                                 return (FALSE);
                         ++size;
                 }
         }
         curwp->w_dotp = dotp;
         curwp->w_doto = doto;
-        return (ldelete(theEnv,(long) size, TRUE));
+        return (ldelete(theEnv,execStatus,(long) size, TRUE));
   }
 
 /*
@@ -696,7 +696,7 @@ globle int delbword(
 
         if (n < 0)
                 return (FALSE);
-        if (backchar(theEnv,FALSE, 1) == FALSE)
+        if (backchar(theEnv,execStatus,FALSE, 1) == FALSE)
                 return (FALSE);
 
         if ((lastflag&CFKILL) == 0)             /* Clear kill buffer if */
@@ -706,19 +706,19 @@ globle int delbword(
         size = 0;
         while (n--) {
                 while (inword() == FALSE) {
-                        if (backchar(theEnv,FALSE, 1) == FALSE)
+                        if (backchar(theEnv,execStatus,FALSE, 1) == FALSE)
                                 return (FALSE);
                         ++size;
                 }
                 while (inword() != FALSE) {
-                        if (backchar(theEnv,FALSE, 1) == FALSE)
+                        if (backchar(theEnv,execStatus,FALSE, 1) == FALSE)
                                 return (FALSE);
                         ++size;
                 }
         }
-        if (forwchar(theEnv,FALSE, 1) == FALSE)
+        if (forwchar(theEnv,execStatus,FALSE, 1) == FALSE)
                 return (FALSE);
-        return (ldelete(theEnv,(long) size, TRUE));
+        return (ldelete(theEnv,execStatus,(long) size, TRUE));
   }
 
 /*
@@ -780,7 +780,7 @@ globle int killregion(
    thisflag |= CFKILL;                     /* kill buffer stuff.   */
    curwp->w_dotp = region.r_linep;
    curwp->w_doto = region.r_offset;
-   return (ldelete(theEnv,region.r_size, TRUE));
+   return (ldelete(theEnv,execStatus,region.r_size, TRUE));
   }
 
 /*
@@ -812,12 +812,12 @@ globle int copyregion(
         loffs = region.r_offset;                /* Current offset.      */
         while (region.r_size--) {
                 if (loffs == llength(linep)) {  /* End of line.         */
-                        if ((s=kinsert(theEnv,'\n')) != TRUE)
+                        if ((s=kinsert(theEnv,execStatus,'\n')) != TRUE)
                                 return (s);
                         linep = lforw(linep);
                         loffs = 0;
                 } else {                        /* Middle of line.      */
-                        if ((s=kinsert(theEnv,lgetc(linep, loffs))) != TRUE)
+                        if ((s=kinsert(theEnv,execStatus,lgetc(linep, loffs))) != TRUE)
                                 return (s);
                         ++loffs;
                 }
@@ -1001,9 +1001,9 @@ globle int fileread(
    register int    s;
    char            fname[NFILEN];
 
-   if ((s=mlreply(theEnv,"Visit file: ", fname, NFILEN)) != TRUE)
+   if ((s=mlreply(theEnv,execStatus,"Visit file: ", fname, NFILEN)) != TRUE)
      { return (s); }
-   return (readin(theEnv,fname));
+   return (readin(theEnv,execStatus,fname));
   }
 
 /*
@@ -1030,9 +1030,9 @@ globle int filevisit(
         register int    s;
         char            fname[NFILEN];
 
-        if ((s=mlreply(theEnv,"Find file: ", fname, NFILEN)) != TRUE)
+        if ((s=mlreply(theEnv,execStatus,"Find file: ", fname, NFILEN)) != TRUE)
                 return (s);
-	filevisit_guts(theEnv,fname);
+	filevisit_guts(theEnv,execStatus,fname);
 	return(TRUE);
   }
 
@@ -1087,8 +1087,8 @@ globle int filevisit_guts(
                 }
         }
         makename(bname, fname);                 /* New buffer name.     */
-        while ((bp=bfind(theEnv,bname, FALSE, 0)) != NULL) {
-                s = mlreply(theEnv,"Buffer name: ", bname, NBUFN);
+        while ((bp=bfind(theEnv,execStatus,bname, FALSE, 0)) != NULL) {
+                s = mlreply(theEnv,execStatus,"Buffer name: ", bname, NBUFN);
                 if (s == ABORT)                 /* ^G to just quit      */
                         return (s);
                 if (s == FALSE) {               /* CR to clobber it     */
@@ -1096,7 +1096,7 @@ globle int filevisit_guts(
                         break;
                 }
         }
-        if (bp==NULL && (bp=bfind(theEnv,bname, TRUE, 0))==NULL) {
+        if (bp==NULL && (bp=bfind(theEnv,execStatus,bname, TRUE, 0))==NULL) {
                 mlwrite("Cannot create buffer");
                 return (FALSE);
         }
@@ -1111,7 +1111,7 @@ globle int filevisit_guts(
         curbp = bp;                             /* Switch to it.        */
         curwp->w_bufp = bp;
         curbp->b_nwnd++;
-        return (readin(theEnv,fname));                 /* Read it in.          */
+        return (readin(theEnv,execStatus,fname));                 /* Read it in.          */
 }
 
 /*
@@ -1138,7 +1138,7 @@ globle int readin(
         char            line[NLINE];
 
         bp = curbp;                             /* Cheap.               */
-        if ((s=bclear(theEnv,bp)) != TRUE)             /* Might be old.        */
+        if ((s=bclear(theEnv,execStatus,bp)) != TRUE)             /* Might be old.        */
                 return (s);
         bp->b_flag &= ~(BFTEMP|BFCHG);
         genstrcpy(bp->b_fname, fname);
@@ -1152,7 +1152,7 @@ globle int readin(
         nline = 0;
         while ((s=ffgetline(line, NLINE)) == FIOSUC) {
                 nbytes = strlen(line);
-                if ((lp1=lalloc(theEnv,nbytes)) == NULL) {
+                if ((lp1=lalloc(theEnv,execStatus,nbytes)) == NULL) {
                         s = FIOERR;             /* Keep message on the  */
                         break;                  /* display.             */
                 }
@@ -1252,7 +1252,7 @@ globle int filewrite(
         char            prompt[NFILEN + 15];
 
         gensprintf(prompt,"Write file [%s]: ",curbp->b_fname);
-        if ((s=mlreply(theEnv,prompt, fname, NFILEN)) != TRUE) {
+        if ((s=mlreply(theEnv,execStatus,prompt, fname, NFILEN)) != TRUE) {
                 if (s == FALSE)
                    genstrcpy(fname, curbp->b_fname);
                 else
@@ -1374,7 +1374,7 @@ globle int filename(
         register int    s;
         char            fname[NFILEN];
 
-        if ((s=mlreply(theEnv,"Name: ", fname, NFILEN)) == ABORT)
+        if ((s=mlreply(theEnv,execStatus,"Name: ", fname, NFILEN)) == ABORT)
                 return (s);
         if (s == FALSE)
                 genstrcpy(curbp->b_fname, "");

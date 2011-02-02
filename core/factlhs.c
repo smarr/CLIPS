@@ -83,12 +83,12 @@ globle struct lhsParseNode *SequenceRestrictionParse(
    /* with the first field of a pattern.                   */
    /*======================================================*/
 
-   SavePPBuffer(theEnv," ");
-   GetToken(theEnv,readSource,theToken);
+   SavePPBuffer(theEnv,execStatus," ");
+   GetToken(theEnv,execStatus,readSource,theToken);
    if ((theToken->type == OR_CONSTRAINT) || (theToken->type == AND_CONSTRAINT))
      {
-      ReturnLHSParseNodes(theEnv,topNode);
-      SyntaxErrorMessage(theEnv,"the first field of a pattern");
+      ReturnLHSParseNodes(theEnv,execStatus,topNode);
+      SyntaxErrorMessage(theEnv,execStatus,"the first field of a pattern");
       return(NULL);
      }
 
@@ -97,10 +97,10 @@ globle struct lhsParseNode *SequenceRestrictionParse(
    /* as if they were contained in a multifield slot.            */
    /*============================================================*/
 
-   nextField = RestrictionParse(theEnv,readSource,theToken,TRUE,NULL,1,NULL,1);
+   nextField = RestrictionParse(theEnv,execStatus,readSource,theToken,TRUE,NULL,1,NULL,1);
    if (nextField == NULL)
      {
-      ReturnLHSParseNodes(theEnv,topNode);
+      ReturnLHSParseNodes(theEnv,execStatus,topNode);
       return(NULL);
      }
    topNode->right = nextField;
@@ -112,10 +112,10 @@ globle struct lhsParseNode *SequenceRestrictionParse(
    if (theToken->type != RPAREN)
      {
       PPBackup(theEnv);
-      SavePPBuffer(theEnv," ");
-      SavePPBuffer(theEnv,theToken->printForm);
-      SyntaxErrorMessage(theEnv,"fact patterns");
-      ReturnLHSParseNodes(theEnv,topNode);
+      SavePPBuffer(theEnv,execStatus," ");
+      SavePPBuffer(theEnv,execStatus,theToken->printForm);
+      SyntaxErrorMessage(theEnv,execStatus,"fact patterns");
+      ReturnLHSParseNodes(theEnv,execStatus,topNode);
       return(NULL);
      }
 
@@ -128,7 +128,7 @@ globle struct lhsParseNode *SequenceRestrictionParse(
      {
       PPBackup(theEnv);
       PPBackup(theEnv);
-      SavePPBuffer(theEnv,")");
+      SavePPBuffer(theEnv,execStatus,")");
      }
 
    /*===================================*/
@@ -156,16 +156,16 @@ globle struct lhsParseNode *CreateInitialFactPattern(
    /*==================================*/
 
    theDeftemplate = (struct deftemplate *)
-                    FindImportedConstruct(theEnv,"deftemplate",NULL,"initial-fact",
+                    FindImportedConstruct(theEnv,execStatus,"deftemplate",NULL,"initial-fact",
                                           &count,TRUE,NULL);
    if (theDeftemplate == NULL)
      {
-      PrintWarningID(theEnv,"FACTLHS",1,FALSE);
-      EnvPrintRouter(theEnv,WWARNING,"Creating implied initial-fact deftemplate in module ");
-      EnvPrintRouter(theEnv,WWARNING,EnvGetDefmoduleName(theEnv,EnvGetCurrentModule(theEnv)));
-      EnvPrintRouter(theEnv,WWARNING,".\n");
-      EnvPrintRouter(theEnv,WWARNING,"  You probably want to import this deftemplate from the MAIN module.\n");
-      CreateImpliedDeftemplate(theEnv,(SYMBOL_HN *) EnvAddSymbol(theEnv,"initial-fact"),FALSE);
+      PrintWarningID(theEnv,execStatus,"FACTLHS",1,FALSE);
+      EnvPrintRouter(theEnv,execStatus,WWARNING,"Creating implied initial-fact deftemplate in module ");
+      EnvPrintRouter(theEnv,execStatus,WWARNING,EnvGetDefmoduleName(theEnv,execStatus,EnvGetCurrentModule(theEnv)));
+      EnvPrintRouter(theEnv,execStatus,WWARNING,".\n");
+      EnvPrintRouter(theEnv,execStatus,WWARNING,"  You probably want to import this deftemplate from the MAIN module.\n");
+      CreateImpliedDeftemplate(theEnv,execStatus,(SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,"initial-fact"),FALSE);
      }
 
    /*====================================*/
@@ -179,7 +179,7 @@ globle struct lhsParseNode *CreateInitialFactPattern(
 
    topNode->bottom = GetLHSParseNode(theEnv);
    topNode->bottom->type = SYMBOL;
-   topNode->bottom->value = (void *) EnvAddSymbol(theEnv,"initial-fact");
+   topNode->bottom->value = (void *) EnvAddSymbol(theEnv,execStatus,"initial-fact");
 
    /*=====================*/
    /* Return the pattern. */
@@ -237,12 +237,12 @@ globle struct lhsParseNode *FactPatternParse(
    /*=========================================================*/
 
    theDeftemplate = (struct deftemplate *)
-                    FindImportedConstruct(theEnv,"deftemplate",NULL,ValueToString(theToken->value),
+                    FindImportedConstruct(theEnv,execStatus,"deftemplate",NULL,ValueToString(theToken->value),
                                           &count,TRUE,NULL);
 
    if (count > 1)
      {
-      AmbiguousReferenceErrorMessage(theEnv,"deftemplate",ValueToString(theToken->value));
+      AmbiguousReferenceErrorMessage(theEnv,execStatus,"deftemplate",ValueToString(theToken->value));
       return(NULL);
      }
 
@@ -254,15 +254,15 @@ globle struct lhsParseNode *FactPatternParse(
    if (theDeftemplate == NULL)
      {
 #if DEFMODULE_CONSTRUCT
-      if (FindImportExportConflict(theEnv,"deftemplate",((struct defmodule *) EnvGetCurrentModule(theEnv)),ValueToString(theToken->value)))
+      if (FindImportExportConflict(theEnv,execStatus,"deftemplate",((struct defmodule *) EnvGetCurrentModule(theEnv)),ValueToString(theToken->value)))
         {
-         ImportExportConflictMessage(theEnv,"implied deftemplate",ValueToString(theToken->value),NULL,NULL);
+         ImportExportConflictMessage(theEnv,execStatus,"implied deftemplate",ValueToString(theToken->value),NULL,NULL);
          return(NULL);
         }
 #endif /* DEFMODULE_CONSTRUCT */
 
       if (! ConstructData(theEnv)->CheckSyntaxMode)
-        { theDeftemplate = CreateImpliedDeftemplate(theEnv,(SYMBOL_HN *) theToken->value,TRUE); }
+        { theDeftemplate = CreateImpliedDeftemplate(theEnv,execStatus,(SYMBOL_HN *) theToken->value,TRUE); }
       else
         { theDeftemplate = NULL; }
      }
@@ -273,13 +273,13 @@ globle struct lhsParseNode *FactPatternParse(
    /*===============================================*/
 
    if ((theDeftemplate != NULL) && (theDeftemplate->implied == FALSE))
-     { return(DeftemplateLHSParse(theEnv,readSource,theDeftemplate)); }
+     { return(DeftemplateLHSParse(theEnv,execStatus,readSource,theDeftemplate)); }
 
    /*================================*/
    /* Parse an ordered fact pattern. */
    /*================================*/
 
-   return(SequenceRestrictionParse(theEnv,readSource,theToken));
+   return(SequenceRestrictionParse(theEnv,execStatus,readSource,theToken));
   }
 
 #endif /* DEFTEMPLATE_CONSTRUCT && DEFRULE_CONSTRUCT && (! RUN_TIME) && (! BLOAD_ONLY) */

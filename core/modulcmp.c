@@ -65,7 +65,7 @@ globle void DefmoduleCompilerSetup(
   EXEC_STATUS)
   {
    DefmoduleData(theEnv)->DefmoduleCodeItem = 
-      AddCodeGeneratorItem(theEnv,"defmodule",200,BeforeDefmodulesToCode,
+      AddCodeGeneratorItem(theEnv,execStatus,"defmodule",200,BeforeDefmodulesToCode,
                            InitDefmoduleCode,ConstructToCode,3);
   }
 
@@ -81,9 +81,9 @@ static void BeforeDefmodulesToCode(
    int value = 0;
    struct defmodule *theModule;
 
-   for (theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,NULL);
+   for (theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,NULL);
         theModule != NULL;
-        theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,theModule))
+        theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,theModule))
      { theModule->bsaveID = value++; }
   }
 
@@ -121,11 +121,11 @@ static void InitDefmoduleCode(
 #pragma unused(maxIndices)
 #endif
 
-   if (EnvGetNextDefmodule(theEnv,NULL) != NULL)
-     { fprintf(initFP,"   SetListOfDefmodules(theEnv,(void *) %s%d_1);\n",DefmodulePrefix(),imageID); }
+   if (EnvGetNextDefmodule(theEnv,execStatus,NULL) != NULL)
+     { fprintf(initFP,"   SetListOfDefmodules(theEnv,execStatus,(void *) %s%d_1);\n",DefmodulePrefix(),imageID); }
    else
-     { fprintf(initFP,"   SetListOfDefmodules(theEnv,NULL);\n"); }
-   fprintf(initFP,"   EnvSetCurrentModule(theEnv,(void *) EnvGetNextDefmodule(theEnv,NULL));\n");
+     { fprintf(initFP,"   SetListOfDefmodules(theEnv,execStatus,NULL);\n"); }
+   fprintf(initFP,"   EnvSetCurrentModule(theEnv,execStatus,(void *) EnvGetNextDefmodule(theEnv,execStatus,NULL));\n");
   }
 
 /***********************************************************/
@@ -165,7 +165,7 @@ static int ConstructToCode(
    /* the maximum number of indices is ignored.  */
    /*============================================*/
 
-   if ((itemsFile = NewCFile(theEnv,fileName,pathName,fileNameBuffer,fileID,1,FALSE)) == NULL)
+   if ((itemsFile = NewCFile(theEnv,execStatus,fileName,pathName,fileNameBuffer,fileID,1,FALSE)) == NULL)
      { return(FALSE); }
    fprintf(itemsFile,"struct defmoduleItemHeader *%s%d_%d[] = {\n",ItemPrefix(),imageID,1);
    fprintf(headerFP,"extern struct defmoduleItemHeader *%s%d_%d[];\n",ItemPrefix(),imageID,1);
@@ -175,15 +175,15 @@ static int ConstructToCode(
    /* representation to the file as they are traversed.    */
    /*======================================================*/
 
-   for (theConstruct = (struct defmodule *) EnvGetNextDefmodule(theEnv,NULL);
+   for (theConstruct = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,NULL);
         theConstruct != NULL;
-        theConstruct = (struct defmodule *) EnvGetNextDefmodule(theEnv,theConstruct))
+        theConstruct = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,theConstruct))
      {
       /*===========================================*/
       /* Open a new file to write to if necessary. */
       /*===========================================*/
 
-      moduleFile = OpenFileIfNeeded(theEnv,moduleFile,fileName,pathName,fileNameBuffer,fileID,imageID,
+      moduleFile = OpenFileIfNeeded(theEnv,execStatus,moduleFile,fileName,pathName,fileNameBuffer,fileID,imageID,
                                     &fileCount,moduleArrayVersion,headerFP,
                                     "struct defmodule",DefmodulePrefix(),
                                     FALSE,NULL);
@@ -191,9 +191,9 @@ static int ConstructToCode(
       if (moduleFile == NULL)
         {
          moduleCount = maxIndices;
-         CloseFileIfNeeded(theEnv,moduleFile,&moduleCount,
+         CloseFileIfNeeded(theEnv,execStatus,moduleFile,&moduleCount,
                            &moduleArrayVersion,maxIndices,NULL,NULL);
-         GenClose(theEnv,itemsFile);
+         GenClose(theEnv,execStatus,itemsFile);
          return(FALSE);
         }
 
@@ -202,7 +202,7 @@ static int ConstructToCode(
       /*======================================*/
 
       fprintf(moduleFile,"{");
-      PrintSymbolReference(theEnv,moduleFile,theConstruct->name);
+      PrintSymbolReference(theEnv,execStatus,moduleFile,theConstruct->name);
       fprintf(moduleFile,",NULL,");
 
       /*=====================================================*/
@@ -219,7 +219,7 @@ static int ConstructToCode(
          if (theItem->constructsToCModuleReference == NULL)
            { fprintf(itemsFile,"NULL"); }
          else
-           { (*theItem->constructsToCModuleReference)(theEnv,itemsFile,(int) theConstruct->bsaveID,imageID,maxIndices); }
+           { (*theItem->constructsToCModuleReference)(theEnv,execStatus,itemsFile,(int) theConstruct->bsaveID,imageID,maxIndices); }
 
          if ((j + 1) < GetNumberOfModuleItems(theEnv)) fprintf(itemsFile,",");
          else if (theConstruct->next != NULL) fprintf(itemsFile,",\n");
@@ -290,7 +290,7 @@ static int ConstructToCode(
       /*===================================================*/
 
       moduleCount++;
-      moduleFile = CloseFileIfNeeded(theEnv,moduleFile,&moduleCount,&moduleArrayVersion,
+      moduleFile = CloseFileIfNeeded(theEnv,execStatus,moduleFile,&moduleCount,&moduleArrayVersion,
                                         maxIndices,NULL,NULL);
 
      }
@@ -300,17 +300,17 @@ static int ConstructToCode(
    /*=========================*/
 
    moduleCount = maxIndices;
-   CloseFileIfNeeded(theEnv,moduleFile,&moduleCount,
+   CloseFileIfNeeded(theEnv,execStatus,moduleFile,&moduleCount,
                      &moduleArrayVersion,maxIndices,NULL,NULL);
    fprintf(itemsFile,"};\n");
-   GenClose(theEnv,itemsFile);
+   GenClose(theEnv,execStatus,itemsFile);
 
    /*=========================================*/
    /* Write out the portItem data structures. */
    /*=========================================*/
 
    if (portItemCount == 0) return(TRUE);
-   return(PortItemsToCode(theEnv,fileName,pathName,fileNameBuffer,fileID,headerFP,imageID,maxIndices,&fileCount));
+   return(PortItemsToCode(theEnv,execStatus,fileName,pathName,fileNameBuffer,fileID,headerFP,imageID,maxIndices,&fileCount));
   }
 
 /************************************************************/
@@ -342,15 +342,15 @@ static int PortItemsToCode(
    /* C code representation to the file as they are traversed.        */
    /*=================================================================*/
 
-   for (thePortItem = GetNextPortItem(theEnv,&theDefmodule,&thePortItem,&importChecked,&exportChecked);
+   for (thePortItem = GetNextPortItem(theEnv,execStatus,&theDefmodule,&thePortItem,&importChecked,&exportChecked);
         thePortItem != NULL;
-        thePortItem = GetNextPortItem(theEnv,&theDefmodule,&thePortItem,&importChecked,&exportChecked))
+        thePortItem = GetNextPortItem(theEnv,execStatus,&theDefmodule,&thePortItem,&importChecked,&exportChecked))
      {
       /*===========================================*/
       /* Open a new file to write to if necessary. */
       /*===========================================*/
 
-      portItemsFile = OpenFileIfNeeded(theEnv,portItemsFile,fileName,pathName,fileNameBuffer,fileID,imageID,
+      portItemsFile = OpenFileIfNeeded(theEnv,execStatus,portItemsFile,fileName,pathName,fileNameBuffer,fileID,imageID,
                                        fileCount,portItemArrayVersion,headerFP,
                                        "struct portItem",PortPrefix(),
                                        FALSE,NULL);
@@ -358,7 +358,7 @@ static int PortItemsToCode(
       if (portItemsFile == NULL)
         {
          portItemCount = maxIndices;
-         CloseFileIfNeeded(theEnv,portItemsFile,&portItemCount,
+         CloseFileIfNeeded(theEnv,execStatus,portItemsFile,&portItemCount,
                            &portItemArrayVersion,maxIndices,NULL,NULL);
          return(FALSE);
         }
@@ -368,11 +368,11 @@ static int PortItemsToCode(
       /*================================================*/
 
       fprintf(portItemsFile,"{");
-      PrintSymbolReference(theEnv,portItemsFile,thePortItem->moduleName);
+      PrintSymbolReference(theEnv,execStatus,portItemsFile,thePortItem->moduleName);
       fprintf(portItemsFile,",");
-      PrintSymbolReference(theEnv,portItemsFile,thePortItem->constructType);
+      PrintSymbolReference(theEnv,execStatus,portItemsFile,thePortItem->constructType);
       fprintf(portItemsFile,",");
-      PrintSymbolReference(theEnv,portItemsFile,thePortItem->constructName);
+      PrintSymbolReference(theEnv,execStatus,portItemsFile,thePortItem->constructName);
       fprintf(portItemsFile,",");
 
       if (thePortItem->next == NULL)
@@ -390,7 +390,7 @@ static int PortItemsToCode(
       /*==================================================*/
 
       portItemCount++;
-      CloseFileIfNeeded(theEnv,portItemsFile,&portItemCount,&portItemArrayVersion,
+      CloseFileIfNeeded(theEnv,execStatus,portItemsFile,&portItemCount,&portItemArrayVersion,
                         maxIndices,NULL,NULL);
      }
 
@@ -400,7 +400,7 @@ static int PortItemsToCode(
    /*===================================================*/
 
    portItemCount = maxIndices;
-   CloseFileIfNeeded(theEnv,portItemsFile,&portItemCount,
+   CloseFileIfNeeded(theEnv,execStatus,portItemsFile,&portItemCount,
                      &portItemArrayVersion,maxIndices,NULL,NULL);
 
    return(TRUE);
@@ -428,7 +428,7 @@ static struct portItem *GetNextPortItem(
 
    if (*theDefmodule == NULL)
      {
-      *theDefmodule = (struct defmodule *) EnvGetNextDefmodule(theEnv,NULL);
+      *theDefmodule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,NULL);
       *thePortItem = NULL;
       *importChecked = FALSE;
       *exportChecked = FALSE;
@@ -490,7 +490,7 @@ static struct portItem *GetNextPortItem(
       /* for a portItem data structure.   */
       /*==================================*/
 
-      *theDefmodule = (struct defmodule *) EnvGetNextDefmodule(theEnv,*theDefmodule);
+      *theDefmodule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,*theDefmodule);
       *importChecked = FALSE;
       *exportChecked = FALSE;
      }

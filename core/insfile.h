@@ -47,7 +47,7 @@ struct instanceFileData
 #endif
   };
 
-#define InstanceFileData(theEnv) ((struct instanceFileData *) GetEnvironmentData(theEnv,INSTANCE_FILE_DATA))
+#define InstanceFileData(theEnv) ((struct instanceFileData *) GetEnvironmentData(theEnv,execStatus,INSTANCE_FILE_DATA))
 
 #endif
 

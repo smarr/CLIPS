@@ -135,8 +135,8 @@ globle void FactPatternMatch(
       /* node during an incremental reset. */
       /*===================================*/
 
-      if (SkipFactPatternNode(theEnv,patternPtr))
-        { patternPtr = GetNextFactPatternNode(theEnv,TRUE,patternPtr); }
+      if (SkipFactPatternNode(theEnv,execStatus,patternPtr))
+        { patternPtr = GetNextFactPatternNode(theEnv,execStatus,TRUE,patternPtr); }
 
       /*=========================================================*/
       /* If this is a single field pattern node, then determine  */
@@ -168,16 +168,16 @@ globle void FactPatternMatch(
            }
 
          if (skipit)
-           { patternPtr = GetNextFactPatternNode(theEnv,TRUE,patternPtr); }
+           { patternPtr = GetNextFactPatternNode(theEnv,execStatus,TRUE,patternPtr); }
          else
 
          if (patternPtr->header.selector)
            {
-            if (EvaluatePatternExpression(theEnv,patternPtr,patternPtr->networkTest->nextArg))
+            if (EvaluatePatternExpression(theEnv,execStatus,patternPtr,patternPtr->networkTest->nextArg))
               {
-               EvaluateExpression(theEnv,patternPtr->networkTest,&theResult);
+               EvaluateExpression(theEnv,execStatus,patternPtr->networkTest,&theResult);
             
-               tempPtr = (struct factPatternNode *) FindHashedPatternNode(theEnv,patternPtr,theResult.type,theResult.value);
+               tempPtr = (struct factPatternNode *) FindHashedPatternNode(theEnv,execStatus,patternPtr,theResult.type,theResult.value);
               }
             else
               { tempPtr = NULL; }
@@ -185,19 +185,19 @@ globle void FactPatternMatch(
             if (tempPtr != NULL)
               {
                if (tempPtr->header.stopNode)
-                 { ProcessFactAlphaMatch(theEnv,theFact,markers,tempPtr); }
+                 { ProcessFactAlphaMatch(theEnv,execStatus,theFact,markers,tempPtr); }
                
-               patternPtr = GetNextFactPatternNode(theEnv,FALSE,tempPtr);
+               patternPtr = GetNextFactPatternNode(theEnv,execStatus,FALSE,tempPtr);
               }
             else
-              { patternPtr = GetNextFactPatternNode(theEnv,TRUE,patternPtr); }
+              { patternPtr = GetNextFactPatternNode(theEnv,execStatus,TRUE,patternPtr); }
            }
          
          /*=============================================*/
          /* If the constraints are satisified, then ... */
          /*=============================================*/
 
-         else if (EvaluatePatternExpression(theEnv,patternPtr,patternPtr->networkTest))
+         else if (EvaluatePatternExpression(theEnv,execStatus,patternPtr,patternPtr->networkTest))
            {
             /*=======================================================*/
             /* If a leaf pattern node has been successfully reached, */
@@ -206,13 +206,13 @@ globle void FactPatternMatch(
             /*=======================================================*/
 
             if (patternPtr->header.stopNode)
-              { ProcessFactAlphaMatch(theEnv,theFact,markers,patternPtr); }
+              { ProcessFactAlphaMatch(theEnv,execStatus,theFact,markers,patternPtr); }
 
             /*===================================*/
             /* Move on to the next pattern node. */
             /*===================================*/
 
-            patternPtr = GetNextFactPatternNode(theEnv,FALSE,patternPtr);
+            patternPtr = GetNextFactPatternNode(theEnv,execStatus,FALSE,patternPtr);
            }
 
          /*==============================================*/
@@ -220,7 +220,7 @@ globle void FactPatternMatch(
          /*==============================================*/
 
          else
-           { patternPtr = GetNextFactPatternNode(theEnv,TRUE,patternPtr); }
+           { patternPtr = GetNextFactPatternNode(theEnv,execStatus,TRUE,patternPtr); }
         }
 
       /*======================================================*/
@@ -239,9 +239,9 @@ globle void FactPatternMatch(
          /*========================================================*/
 
          if (offsetSlot == patternPtr->whichSlot)
-           { ProcessMultifieldNode(theEnv,patternPtr,markers,endMark,offset); }
+           { ProcessMultifieldNode(theEnv,execStatus,patternPtr,markers,endMark,offset); }
          else
-           { ProcessMultifieldNode(theEnv,patternPtr,markers,endMark,0); }
+           { ProcessMultifieldNode(theEnv,execStatus,patternPtr,markers,endMark,0); }
 
          /*===================================================*/
          /* Move on to the next pattern node. Since the lower */
@@ -252,7 +252,7 @@ globle void FactPatternMatch(
          /* field pattern node that failed its constraint.    */
          /*===================================================*/
 
-         patternPtr = GetNextFactPatternNode(theEnv,TRUE,patternPtr);
+         patternPtr = GetNextFactPatternNode(theEnv,execStatus,TRUE,patternPtr);
         }
      }
   }
@@ -298,7 +298,7 @@ static void ProcessMultifieldNode(
    /* it to the end of the current list.        */
    /*===========================================*/
 
-   newMark = get_struct(theEnv,multifieldMarker);
+   newMark = get_struct(theEnv,execStatus,multifieldMarker);
    newMark->whichField = thePattern->whichField - 1;
    newMark->where.whichSlotNumber = (short) thePattern->whichSlot;
    newMark->startPosition = (thePattern->whichField - 1) + offset;
@@ -337,11 +337,11 @@ static void ProcessMultifieldNode(
 
       if (thePattern->header.selector)
         {
-         if (EvaluatePatternExpression(theEnv,thePattern,thePattern->networkTest->nextArg))
+         if (EvaluatePatternExpression(theEnv,execStatus,thePattern,thePattern->networkTest->nextArg))
            {
-            EvaluateExpression(theEnv,thePattern->networkTest,&theResult);
+            EvaluateExpression(theEnv,execStatus,thePattern->networkTest,&theResult);
          
-            thePattern = (struct factPatternNode *) FindHashedPatternNode(theEnv,thePattern,theResult.type,theResult.value);
+            thePattern = (struct factPatternNode *) FindHashedPatternNode(theEnv,execStatus,thePattern,theResult.type,theResult.value);
             if (thePattern != NULL)
               { success = TRUE; }
             else
@@ -352,7 +352,7 @@ static void ProcessMultifieldNode(
         }
       else if ((thePattern->networkTest == NULL) ?
           TRUE :
-          (EvaluatePatternExpression(theEnv,thePattern,thePattern->networkTest)))
+          (EvaluatePatternExpression(theEnv,execStatus,thePattern,thePattern->networkTest)))
         { success = TRUE; }
       else
         { success = FALSE; }
@@ -366,14 +366,14 @@ static void ProcessMultifieldNode(
          /*=======================================================*/
 
          if (thePattern->header.stopNode)
-           { ProcessFactAlphaMatch(theEnv,FactData(theEnv)->CurrentPatternFact,FactData(theEnv)->CurrentPatternMarks,thePattern); }
+           { ProcessFactAlphaMatch(theEnv,execStatus,FactData(theEnv)->CurrentPatternFact,FactData(theEnv)->CurrentPatternMarks,thePattern); }
 
          /*=============================================*/
          /* Recursively continue pattern matching based */
          /* on the multifield binding just generated.   */
          /*=============================================*/
 
-         FactPatternMatch(theEnv,FactData(theEnv)->CurrentPatternFact,
+         FactPatternMatch(theEnv,execStatus,FactData(theEnv)->CurrentPatternFact,
                           thePattern->nextLevel,0,FactData(theEnv)->CurrentPatternMarks,newMark);
         }
 
@@ -383,7 +383,7 @@ static void ProcessMultifieldNode(
       /* the multifield slot constraint.                */
       /*================================================*/
 
-      rtn_struct(theEnv,multifieldMarker,newMark);
+      rtn_struct(theEnv,execStatus,multifieldMarker,newMark);
       if (endMark != NULL) endMark->next = NULL;
       FactData(theEnv)->CurrentPatternMarks = oldMark;
       return;
@@ -402,14 +402,14 @@ static void ProcessMultifieldNode(
 
       if (thePattern->header.selector)
         {
-         if (EvaluatePatternExpression(theEnv,thePattern,thePattern->networkTest->nextArg))
+         if (EvaluatePatternExpression(theEnv,execStatus,thePattern,thePattern->networkTest->nextArg))
            {
-            EvaluateExpression(theEnv,thePattern->networkTest,&theResult);
+            EvaluateExpression(theEnv,execStatus,thePattern->networkTest,&theResult);
          
-            tempPtr = (struct factPatternNode *) FindHashedPatternNode(theEnv,thePattern,theResult.type,theResult.value);
+            tempPtr = (struct factPatternNode *) FindHashedPatternNode(theEnv,execStatus,thePattern,theResult.type,theResult.value);
             if (tempPtr != NULL)
               {
-               FactPatternMatch(theEnv,FactData(theEnv)->CurrentPatternFact,
+               FactPatternMatch(theEnv,execStatus,FactData(theEnv)->CurrentPatternFact,
                                 tempPtr->nextLevel,offset + repeatCount - 1,
                                 FactData(theEnv)->CurrentPatternMarks,newMark);
               }
@@ -417,9 +417,9 @@ static void ProcessMultifieldNode(
         }
       else if ((thePattern->networkTest == NULL) ?
                TRUE :
-               (EvaluatePatternExpression(theEnv,thePattern,thePattern->networkTest)))
+               (EvaluatePatternExpression(theEnv,execStatus,thePattern,thePattern->networkTest)))
         {
-         FactPatternMatch(theEnv,FactData(theEnv)->CurrentPatternFact,
+         FactPatternMatch(theEnv,execStatus,FactData(theEnv)->CurrentPatternFact,
                           thePattern->nextLevel,offset + repeatCount - 1,
                           FactData(theEnv)->CurrentPatternMarks,newMark);
         }
@@ -429,7 +429,7 @@ static void ProcessMultifieldNode(
     /* Get rid of the marker created for a multifield node. */
     /*======================================================*/
 
-    rtn_struct(theEnv,multifieldMarker,newMark);
+    rtn_struct(theEnv,execStatus,multifieldMarker,newMark);
     if (endMark != NULL) endMark->next = NULL;
     FactData(theEnv)->CurrentPatternMarks = oldMark;
    }
@@ -527,13 +527,13 @@ static void ProcessFactAlphaMatch(
   /* Create the hash value for the alpha match. */
   /*============================================*/
 
-  hashValue = ComputeRightHashValue(theEnv,&thePattern->header);
+  hashValue = ComputeRightHashValue(theEnv,execStatus,&thePattern->header);
 
   /*===========================================*/
   /* Create the partial match for the pattern. */
   /*===========================================*/
 
-  theMatch = CreateAlphaMatch(theEnv,theFact,theMarks,(struct patternNodeHeader *) &thePattern->header,hashValue);
+  theMatch = CreateAlphaMatch(theEnv,execStatus,theFact,theMarks,(struct patternNodeHeader *) &thePattern->header,hashValue);
   theMatch->owner = &thePattern->header;
 
   /*=======================================================*/
@@ -541,7 +541,7 @@ static void ProcessFactAlphaMatch(
   /*=======================================================*/
 
   listOfMatches = (struct patternMatch *) theFact->list;
-  theFact->list = (void *) get_struct(theEnv,patternMatch);
+  theFact->list = (void *) get_struct(theEnv,execStatus,patternMatch);
   ((struct patternMatch *) theFact->list)->next = listOfMatches;
   ((struct patternMatch *) theFact->list)->matchingPattern = (struct patternNodeHeader *) thePattern;
   ((struct patternMatch *) theFact->list)->theMatch = theMatch;
@@ -553,7 +553,7 @@ static void ProcessFactAlphaMatch(
   for (listOfJoins = thePattern->header.entryJoin;
        listOfJoins != NULL;
        listOfJoins = listOfJoins->rightMatchNode)
-     { NetworkAssert(theEnv,theMatch,listOfJoins); }
+     { NetworkAssert(theEnv,execStatus,theMatch,listOfJoins); }
   }
 
 /*****************************************************************/
@@ -593,7 +593,7 @@ static int EvaluatePatternExpression(
       case FACT_PN_CONSTANT1:
         oldArgument = execStatus->CurrentExpression;
         execStatus->CurrentExpression = theTest;
-        rv = FactPNConstant1(theEnv,theTest->value,&theResult);
+        rv = FactPNConstant1(theEnv,execStatus,theTest->value,&theResult);
         execStatus->CurrentExpression = oldArgument;
         return(rv);
 
@@ -606,7 +606,7 @@ static int EvaluatePatternExpression(
       case FACT_PN_CONSTANT2:
         oldArgument = execStatus->CurrentExpression;
         execStatus->CurrentExpression = theTest;
-        rv = FactPNConstant2(theEnv,theTest->value,&theResult);
+        rv = FactPNConstant2(theEnv,execStatus,theTest->value,&theResult);
         execStatus->CurrentExpression = oldArgument;
         return(rv);
 
@@ -618,7 +618,7 @@ static int EvaluatePatternExpression(
       case FACT_SLOT_LENGTH:
         oldArgument = execStatus->CurrentExpression;
         execStatus->CurrentExpression = theTest;
-        rv = FactSlotLength(theEnv,theTest->value,&theResult);
+        rv = FactSlotLength(theEnv,execStatus,theTest->value,&theResult);
         execStatus->CurrentExpression = oldArgument;
         return(rv);
      }
@@ -635,7 +635,7 @@ static int EvaluatePatternExpression(
            theTest != NULL;
            theTest = theTest->nextArg)
         {
-         if (EvaluatePatternExpression(theEnv,patternPtr,theTest) == TRUE)
+         if (EvaluatePatternExpression(theEnv,execStatus,patternPtr,theTest) == TRUE)
            {
             if (execStatus->EvaluationError) return(FALSE);
             return(TRUE);
@@ -658,7 +658,7 @@ static int EvaluatePatternExpression(
            theTest != NULL;
            theTest = theTest->nextArg)
         {
-         if (EvaluatePatternExpression(theEnv,patternPtr,theTest) == FALSE)
+         if (EvaluatePatternExpression(theEnv,execStatus,patternPtr,theTest) == FALSE)
            { return(FALSE); }
          if (execStatus->EvaluationError) return(FALSE);
         }
@@ -670,9 +670,9 @@ static int EvaluatePatternExpression(
    /* Evaluate all other expressions using EvaluateExpression. */
    /*==========================================================*/
 
-   if (EvaluateExpression(theEnv,theTest,&theResult))
+   if (EvaluateExpression(theEnv,execStatus,theTest,&theResult))
      {
-      PatternNetErrorMessage(theEnv,patternPtr);
+      PatternNetErrorMessage(theEnv,execStatus,patternPtr);
       return(FALSE);
      }
 
@@ -705,11 +705,11 @@ static void PatternNetErrorMessage(
    /* Print the fact being pattern matched. */
    /*=======================================*/
 
-   PrintErrorID(theEnv,"FACTMCH",1,TRUE);
-   EnvPrintRouter(theEnv,WERROR,"This error occurred in the fact pattern network\n");
-   EnvPrintRouter(theEnv,WERROR,"   Currently active fact: ");
-   PrintFact(theEnv,WERROR,FactData(theEnv)->CurrentPatternFact,FALSE,FALSE);
-   EnvPrintRouter(theEnv,WERROR,"\n");
+   PrintErrorID(theEnv,execStatus,"FACTMCH",1,TRUE);
+   EnvPrintRouter(theEnv,execStatus,WERROR,"This error occurred in the fact pattern network\n");
+   EnvPrintRouter(theEnv,execStatus,WERROR,"   Currently active fact: ");
+   PrintFact(theEnv,execStatus,WERROR,FactData(theEnv)->CurrentPatternFact,FALSE,FALSE);
+   EnvPrintRouter(theEnv,execStatus,WERROR,"\n");
 
    /*==============================================*/
    /* Print the field position or slot name of the */
@@ -725,7 +725,7 @@ static void PatternNetErrorMessage(
       gensprintf(buffer,"   Problem resides in slot %s\n",ValueToString(theSlots->slotName));
      }
 
-   EnvPrintRouter(theEnv,WERROR,buffer);
+   EnvPrintRouter(theEnv,execStatus,WERROR,buffer);
 
    /*==========================================================*/
    /* Trace the pattern to its entry point to the join network */
@@ -734,8 +734,8 @@ static void PatternNetErrorMessage(
    /* printed).                                                */
    /*==========================================================*/
 
-   TraceErrorToJoin(theEnv,patternPtr,FALSE);
-   EnvPrintRouter(theEnv,WERROR,"\n");
+   TraceErrorToJoin(theEnv,execStatus,patternPtr,FALSE);
+   EnvPrintRouter(theEnv,execStatus,WERROR,"\n");
   }
 
 /***************************************************************************/
@@ -760,10 +760,10 @@ static void TraceErrorToJoin(
          for (joinPtr = patternPtr->header.entryJoin;
               joinPtr != NULL;
               joinPtr = joinPtr->rightMatchNode)
-           { TraceErrorToRule(theEnv,joinPtr,"      "); }
+           { TraceErrorToRule(theEnv,execStatus,joinPtr,"      "); }
         }
       else
-        { TraceErrorToJoin(theEnv,patternPtr->nextLevel,TRUE); }
+        { TraceErrorToJoin(theEnv,execStatus,patternPtr->nextLevel,TRUE); }
 
       if (traceRight) patternPtr = patternPtr->rightNode;
       else patternPtr = NULL;
@@ -783,7 +783,7 @@ static int SkipFactPatternNode(
   struct factPatternNode *thePattern)
   {
 #if (MAC_MCW || WIN_MCW) && (RUN_TIME || BLOAD_ONLY)
-#pragma unused(theEnv,thePattern)
+#pragma unused(theEnv,execStatus,thePattern)
 #endif
 
 #if (! RUN_TIME) && (! BLOAD_ONLY)
@@ -869,12 +869,12 @@ globle void FactsIncrementalReset(
   {
    struct fact *factPtr;
 
-   for (factPtr = (struct fact *) EnvGetNextFact(theEnv,NULL);
+   for (factPtr = (struct fact *) EnvGetNextFact(theEnv,execStatus,NULL);
         factPtr != NULL;
-        factPtr = (struct fact *) EnvGetNextFact(theEnv,factPtr))
+        factPtr = (struct fact *) EnvGetNextFact(theEnv,execStatus,factPtr))
      {
       EngineData(theEnv)->JoinOperationInProgress = TRUE;
-      FactPatternMatch(theEnv,factPtr,
+      FactPatternMatch(theEnv,execStatus,factPtr,
                        factPtr->whichDeftemplate->patternNetwork,
                        0,NULL,NULL);
       EngineData(theEnv)->JoinOperationInProgress = FALSE;

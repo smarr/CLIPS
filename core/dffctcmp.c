@@ -55,7 +55,7 @@ globle void DeffactsCompilerSetup(
   EXEC_STATUS)
   {
    DeffactsData(theEnv)->DeffactsCodeItem = 
-      AddCodeGeneratorItem(theEnv,"deffacts",0,BeforeDeffactsToCode,
+      AddCodeGeneratorItem(theEnv,execStatus,"deffacts",0,BeforeDeffactsToCode,
                            NULL,ConstructToCode,2);
   }
 
@@ -68,7 +68,7 @@ static void BeforeDeffactsToCode(
   void *theEnv,
   EXEC_STATUS)
   {
-   MarkConstructBsaveIDs(theEnv,DeffactsData(theEnv)->DeffactsModuleIndex);
+   MarkConstructBsaveIDs(theEnv,execStatus,DeffactsData(theEnv)->DeffactsModuleIndex);
   }
 
 /**********************************************************/
@@ -104,48 +104,48 @@ static int ConstructToCode(
    /* C code representation to the file as they are traversed.        */
    /*=================================================================*/
 
-   for (theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,NULL);
+   for (theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,NULL);
         theModule != NULL;
-        theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,theModule))
+        theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,theModule))
      {
-      EnvSetCurrentModule(theEnv,(void *) theModule);
+      EnvSetCurrentModule(theEnv,execStatus,(void *) theModule);
 
-      moduleFile = OpenFileIfNeeded(theEnv,moduleFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
+      moduleFile = OpenFileIfNeeded(theEnv,execStatus,moduleFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
                                     moduleArrayVersion,headerFP,
                                     "struct deffactsModule",ModulePrefix(DeffactsData(theEnv)->DeffactsCodeItem),
                                     FALSE,NULL);
 
       if (moduleFile == NULL)
         {
-         CloseDeffactsFiles(theEnv,moduleFile,deffactsFile,maxIndices);
+         CloseDeffactsFiles(theEnv,execStatus,moduleFile,deffactsFile,maxIndices);
          return(0);
         }
 
-      DeffactsModuleToCode(theEnv,moduleFile,theModule,imageID,maxIndices,moduleCount);
-      moduleFile = CloseFileIfNeeded(theEnv,moduleFile,&moduleArrayCount,&moduleArrayVersion,
+      DeffactsModuleToCode(theEnv,execStatus,moduleFile,theModule,imageID,maxIndices,moduleCount);
+      moduleFile = CloseFileIfNeeded(theEnv,execStatus,moduleFile,&moduleArrayCount,&moduleArrayVersion,
                                      maxIndices,NULL,NULL);
 
       /*===================================================*/
       /* Loop through each of the deffacts in this module. */
       /*===================================================*/
 
-      for (theDeffacts = (struct deffacts *) EnvGetNextDeffacts(theEnv,NULL);
+      for (theDeffacts = (struct deffacts *) EnvGetNextDeffacts(theEnv,execStatus,NULL);
            theDeffacts != NULL;
-           theDeffacts = (struct deffacts *) EnvGetNextDeffacts(theEnv,theDeffacts))
+           theDeffacts = (struct deffacts *) EnvGetNextDeffacts(theEnv,execStatus,theDeffacts))
         {
-         deffactsFile = OpenFileIfNeeded(theEnv,deffactsFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
+         deffactsFile = OpenFileIfNeeded(theEnv,execStatus,deffactsFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
                                          deffactsArrayVersion,headerFP,
                                          "struct deffacts",ConstructPrefix(DeffactsData(theEnv)->DeffactsCodeItem),
                                          FALSE,NULL);
          if (deffactsFile == NULL)
            {
-            CloseDeffactsFiles(theEnv,moduleFile,deffactsFile,maxIndices);
+            CloseDeffactsFiles(theEnv,execStatus,moduleFile,deffactsFile,maxIndices);
             return(0);
            }
 
-         DeffactsToCode(theEnv,deffactsFile,theDeffacts,imageID,maxIndices,moduleCount);
+         DeffactsToCode(theEnv,execStatus,deffactsFile,theDeffacts,imageID,maxIndices,moduleCount);
          deffactsArrayCount++;
-         deffactsFile = CloseFileIfNeeded(theEnv,deffactsFile,&deffactsArrayCount,
+         deffactsFile = CloseFileIfNeeded(theEnv,execStatus,deffactsFile,&deffactsArrayCount,
                                           &deffactsArrayVersion,maxIndices,NULL,NULL);
         }
 
@@ -153,7 +153,7 @@ static int ConstructToCode(
       moduleArrayCount++;
      }
 
-   CloseDeffactsFiles(theEnv,moduleFile,deffactsFile,maxIndices);
+   CloseDeffactsFiles(theEnv,execStatus,moduleFile,deffactsFile,maxIndices);
 
    return(1);
   }
@@ -176,13 +176,13 @@ static void CloseDeffactsFiles(
    if (deffactsFile != NULL)
      {
       count = maxIndices;
-      CloseFileIfNeeded(theEnv,deffactsFile,&count,&arrayVersion,maxIndices,NULL,NULL);
+      CloseFileIfNeeded(theEnv,execStatus,deffactsFile,&count,&arrayVersion,maxIndices,NULL,NULL);
      }
 
    if (moduleFile != NULL)
      {
       count = maxIndices;
-      CloseFileIfNeeded(theEnv,moduleFile,&count,&arrayVersion,maxIndices,NULL,NULL);
+      CloseFileIfNeeded(theEnv,execStatus,moduleFile,&count,&arrayVersion,maxIndices,NULL,NULL);
      }
   }
 
@@ -208,7 +208,7 @@ static void DeffactsModuleToCode(
    
    fprintf(theFile,"{");
 
-   ConstructModuleToCode(theEnv,theFile,theModule,imageID,maxIndices,
+   ConstructModuleToCode(theEnv,execStatus,theFile,theModule,imageID,maxIndices,
                                   DeffactsData(theEnv)->DeffactsModuleIndex,
                                   ConstructPrefix(DeffactsData(theEnv)->DeffactsCodeItem));
 
@@ -234,7 +234,7 @@ static void DeffactsToCode(
 
    fprintf(theFile,"{");
 
-   ConstructHeaderToCode(theEnv,theFile,&theDeffacts->header,imageID,maxIndices,
+   ConstructHeaderToCode(theEnv,execStatus,theFile,&theDeffacts->header,imageID,maxIndices,
                          moduleCount,ModulePrefix(DeffactsData(theEnv)->DeffactsCodeItem),
                          ConstructPrefix(DeffactsData(theEnv)->DeffactsCodeItem));
 
@@ -244,7 +244,7 @@ static void DeffactsToCode(
    /* Assert List */
    /*=============*/
 
-   ExpressionToCode(theEnv,theFile,theDeffacts->assertList);
+   ExpressionToCode(theEnv,execStatus,theFile,theDeffacts->assertList);
    fprintf(theFile,"}");
   }
 

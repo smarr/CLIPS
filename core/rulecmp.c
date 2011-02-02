@@ -66,7 +66,7 @@ globle void DefruleCompilerSetup(
   void *theEnv,
   EXEC_STATUS)
   {
-   DefruleData(theEnv)->DefruleCodeItem = AddCodeGeneratorItem(theEnv,"defrules",0,BeforeDefrulesCode,
+   DefruleData(theEnv)->DefruleCodeItem = AddCodeGeneratorItem(theEnv,execStatus,"defrules",0,BeforeDefrulesCode,
                                           InitDefruleCode,ConstructToCode,4);
   }
 
@@ -81,7 +81,7 @@ static void BeforeDefrulesCode(
   {
    long int moduleCount, ruleCount, joinCount, linkCount;
 
-   TagRuleNetwork(theEnv,&moduleCount,&ruleCount,&joinCount, &linkCount);
+   TagRuleNetwork(theEnv,execStatus,&moduleCount,&ruleCount,&joinCount, &linkCount);
   }
 
 /*********************************************************/
@@ -118,17 +118,17 @@ static int ConstructToCode(
    /* Save the left and right prime links. */
    /*======================================*/
    
-   if (! TraverseJoinLinks(theEnv,DefruleData(theEnv)->LeftPrimeJoins,fileName,pathName,fileNameBuffer,fileID,headerFP,imageID,
+   if (! TraverseJoinLinks(theEnv,execStatus,DefruleData(theEnv)->LeftPrimeJoins,fileName,pathName,fileNameBuffer,fileID,headerFP,imageID,
                            maxIndices,&linkFile,&fileCount,&linkArrayVersion,&linkArrayCount))
      {
-      CloseDefruleFiles(theEnv,moduleFile,defruleFile,joinFile,linkFile,maxIndices);
+      CloseDefruleFiles(theEnv,execStatus,moduleFile,defruleFile,joinFile,linkFile,maxIndices);
       return(0);
      }
 
-   if (! TraverseJoinLinks(theEnv,DefruleData(theEnv)->RightPrimeJoins,fileName,pathName,fileNameBuffer,fileID,headerFP,imageID,
+   if (! TraverseJoinLinks(theEnv,execStatus,DefruleData(theEnv)->RightPrimeJoins,fileName,pathName,fileNameBuffer,fileID,headerFP,imageID,
                            maxIndices,&linkFile,&fileCount,&linkArrayVersion,&linkArrayCount))
      {
-      CloseDefruleFiles(theEnv,moduleFile,defruleFile,joinFile,linkFile,maxIndices);
+      CloseDefruleFiles(theEnv,execStatus,moduleFile,defruleFile,joinFile,linkFile,maxIndices);
       return(0);
      }
      
@@ -138,33 +138,33 @@ static int ConstructToCode(
    /* the file as they are traversed.                         */
    /*=========================================================*/
 
-   for (theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,NULL);
+   for (theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,NULL);
         theModule != NULL;
-        theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,theModule))
+        theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,theModule))
      {
       /*=========================*/
       /* Set the current module. */
       /*=========================*/
 
-      EnvSetCurrentModule(theEnv,(void *) theModule);
+      EnvSetCurrentModule(theEnv,execStatus,(void *) theModule);
 
       /*==========================*/
       /* Save the defrule module. */
       /*==========================*/
 
-      moduleFile = OpenFileIfNeeded(theEnv,moduleFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
+      moduleFile = OpenFileIfNeeded(theEnv,execStatus,moduleFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
                                     moduleArrayVersion,headerFP,
                                     "struct defruleModule",ModulePrefix(DefruleData(theEnv)->DefruleCodeItem),
                                     FALSE,NULL);
 
       if (moduleFile == NULL)
         {
-         CloseDefruleFiles(theEnv,moduleFile,defruleFile,joinFile,linkFile,maxIndices);
+         CloseDefruleFiles(theEnv,execStatus,moduleFile,defruleFile,joinFile,linkFile,maxIndices);
          return(0);
         }
 
-      DefruleModuleToCode(theEnv,moduleFile,theModule,imageID,maxIndices,moduleCount);
-      moduleFile = CloseFileIfNeeded(theEnv,moduleFile,&moduleArrayCount,&moduleArrayVersion,
+      DefruleModuleToCode(theEnv,execStatus,moduleFile,theModule,imageID,maxIndices,moduleCount);
+      moduleFile = CloseFileIfNeeded(theEnv,execStatus,moduleFile,&moduleArrayCount,&moduleArrayVersion,
                                      maxIndices,NULL,NULL);
 
       /*=========================================*/
@@ -172,7 +172,7 @@ static int ConstructToCode(
       /* their disjuncts) in the current module. */
       /*=========================================*/
 
-      theDefrule = (struct defrule *) EnvGetNextDefrule(theEnv,NULL);
+      theDefrule = (struct defrule *) EnvGetNextDefrule(theEnv,execStatus,NULL);
 
       while (theDefrule != NULL)
         {
@@ -180,31 +180,31 @@ static int ConstructToCode(
          /* Save the defrule data structures. */
          /*===================================*/
 
-         defruleFile = OpenFileIfNeeded(theEnv,defruleFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
+         defruleFile = OpenFileIfNeeded(theEnv,execStatus,defruleFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
                                         defruleArrayVersion,headerFP,
                                         "struct defrule",ConstructPrefix(DefruleData(theEnv)->DefruleCodeItem),
                                         FALSE,NULL);
          if (defruleFile == NULL)
            {
-            CloseDefruleFiles(theEnv,moduleFile,defruleFile,joinFile,linkFile,maxIndices);
+            CloseDefruleFiles(theEnv,execStatus,moduleFile,defruleFile,joinFile,linkFile,maxIndices);
             return(0);
            }
 
-         DefruleToCode(theEnv,defruleFile,theDefrule,imageID,maxIndices,
+         DefruleToCode(theEnv,execStatus,defruleFile,theDefrule,imageID,maxIndices,
                         moduleCount);
          defruleArrayCount++;
-         defruleFile = CloseFileIfNeeded(theEnv,defruleFile,&defruleArrayCount,&defruleArrayVersion,
+         defruleFile = CloseFileIfNeeded(theEnv,execStatus,defruleFile,&defruleArrayCount,&defruleArrayVersion,
                                          maxIndices,NULL,NULL);
 
          /*================================*/
          /* Save the join data structures. */
          /*================================*/
 
-         if (! RuleCompilerTraverseJoins(theEnv,theDefrule->lastJoin,fileName,pathName,fileNameBuffer,fileID,headerFP,imageID,
+         if (! RuleCompilerTraverseJoins(theEnv,execStatus,theDefrule->lastJoin,fileName,pathName,fileNameBuffer,fileID,headerFP,imageID,
                                          maxIndices,&joinFile,&linkFile,&fileCount,&joinArrayVersion,&joinArrayCount,
                                          &linkArrayVersion,&linkArrayCount))
            {
-            CloseDefruleFiles(theEnv,moduleFile,defruleFile,joinFile,linkFile,maxIndices);
+            CloseDefruleFiles(theEnv,execStatus,moduleFile,defruleFile,joinFile,linkFile,maxIndices);
             return(0);
            }
 
@@ -213,14 +213,14 @@ static int ConstructToCode(
          /*==========================================*/
 
          if (theDefrule->disjunct != NULL) theDefrule = theDefrule->disjunct;
-         else theDefrule = (struct defrule *) EnvGetNextDefrule(theEnv,theDefrule);
+         else theDefrule = (struct defrule *) EnvGetNextDefrule(theEnv,execStatus,theDefrule);
         }
 
       moduleCount++;
       moduleArrayCount++;
      }
 
-   CloseDefruleFiles(theEnv,moduleFile,defruleFile,joinFile,linkFile,maxIndices);
+   CloseDefruleFiles(theEnv,execStatus,moduleFile,defruleFile,joinFile,linkFile,maxIndices);
 
    return(1);
   }
@@ -253,26 +253,26 @@ static int RuleCompilerTraverseJoins(
      { 
       if (joinPtr->marked)
         {
-         *joinFile = OpenFileIfNeeded(theEnv,*joinFile,fileName,pathName,fileNameBuffer,fileID,imageID,fileCount,
+         *joinFile = OpenFileIfNeeded(theEnv,execStatus,*joinFile,fileName,pathName,fileNameBuffer,fileID,imageID,fileCount,
                                       *joinArrayVersion,headerFP,
                                       "struct joinNode",JoinPrefix(),FALSE,NULL);
          if (*joinFile == NULL)
            { return(FALSE); }
 
-         JoinToCode(theEnv,*joinFile,joinPtr,imageID,maxIndices);
+         JoinToCode(theEnv,execStatus,*joinFile,joinPtr,imageID,maxIndices);
          (*joinArrayCount)++;
-         *joinFile = CloseFileIfNeeded(theEnv,*joinFile,joinArrayCount,joinArrayVersion,
+         *joinFile = CloseFileIfNeeded(theEnv,execStatus,*joinFile,joinArrayCount,joinArrayVersion,
                                        maxIndices,NULL,NULL);
                       
                                        
-         if (! TraverseJoinLinks(theEnv,joinPtr->nextLinks,fileName,pathName,fileNameBuffer,fileID,headerFP,imageID,
+         if (! TraverseJoinLinks(theEnv,execStatus,joinPtr->nextLinks,fileName,pathName,fileNameBuffer,fileID,headerFP,imageID,
                                  maxIndices,linkFile,fileCount,linkArrayVersion,linkArrayCount))
            { return(FALSE); } 
         }
       
       if (joinPtr->joinFromTheRight)
         { 
-         if (RuleCompilerTraverseJoins(theEnv,(struct joinNode *) joinPtr->rightSideEntryStructure,fileName,pathName,
+         if (RuleCompilerTraverseJoins(theEnv,execStatus,(struct joinNode *) joinPtr->rightSideEntryStructure,fileName,pathName,
                                        fileNameBuffer,fileID,headerFP,imageID,maxIndices,joinFile,linkFile,fileCount,
                                        joinArrayVersion,joinArrayCount,
                                        linkArrayVersion,linkArrayCount) == FALSE)
@@ -306,16 +306,16 @@ static int TraverseJoinLinks(
         linkPtr != NULL;
         linkPtr = linkPtr->next)
      {
-      *linkFile = OpenFileIfNeeded(theEnv,*linkFile,fileName,pathName,fileNameBuffer,fileID,imageID,fileCount,
+      *linkFile = OpenFileIfNeeded(theEnv,execStatus,*linkFile,fileName,pathName,fileNameBuffer,fileID,imageID,fileCount,
                                    *linkArrayVersion,headerFP,
                                    "struct joinLink",LinkPrefix(),FALSE,NULL);
            
       if (*linkFile == NULL)
         { return(FALSE); }
            
-      LinkToCode(theEnv,*linkFile,linkPtr,imageID,maxIndices);
+      LinkToCode(theEnv,execStatus,*linkFile,linkPtr,imageID,maxIndices);
       (*linkArrayCount)++;
-      *linkFile = CloseFileIfNeeded(theEnv,*linkFile,linkArrayCount,linkArrayVersion,
+      *linkFile = CloseFileIfNeeded(theEnv,execStatus,*linkFile,linkArrayCount,linkArrayVersion,
                                     maxIndices,NULL,NULL);
      }
 
@@ -342,25 +342,25 @@ static void CloseDefruleFiles(
    if (linkFile != NULL)
      {
       count = maxIndices;
-      CloseFileIfNeeded(theEnv,linkFile,&count,&arrayVersion,maxIndices,NULL,NULL);
+      CloseFileIfNeeded(theEnv,execStatus,linkFile,&count,&arrayVersion,maxIndices,NULL,NULL);
      }
 
    if (joinFile != NULL)
      {
       count = maxIndices;
-      CloseFileIfNeeded(theEnv,joinFile,&count,&arrayVersion,maxIndices,NULL,NULL);
+      CloseFileIfNeeded(theEnv,execStatus,joinFile,&count,&arrayVersion,maxIndices,NULL,NULL);
      }
 
    if (defruleFile != NULL)
      {
       count = maxIndices;
-      CloseFileIfNeeded(theEnv,defruleFile,&count,&arrayVersion,maxIndices,NULL,NULL);
+      CloseFileIfNeeded(theEnv,execStatus,defruleFile,&count,&arrayVersion,maxIndices,NULL,NULL);
      }
 
    if (moduleFile != NULL)
      {
       count = maxIndices;
-      CloseFileIfNeeded(theEnv,moduleFile,&count,&arrayVersion,maxIndices,NULL,NULL);
+      CloseFileIfNeeded(theEnv,execStatus,moduleFile,&count,&arrayVersion,maxIndices,NULL,NULL);
      }
   }
 
@@ -386,7 +386,7 @@ static void DefruleModuleToCode(
 
    fprintf(theFile,"{");
 
-   ConstructModuleToCode(theEnv,theFile,theModule,imageID,maxIndices,
+   ConstructModuleToCode(theEnv,execStatus,theFile,theModule,imageID,maxIndices,
                                   DefruleData(theEnv)->DefruleModuleIndex,ConstructPrefix(DefruleData(theEnv)->DefruleCodeItem));
 
    fprintf(theFile,",NULL}");
@@ -411,7 +411,7 @@ static void DefruleToCode(
 
    fprintf(theFile,"{");
 
-   ConstructHeaderToCode(theEnv,theFile,&theDefrule->header,imageID,maxIndices,
+   ConstructHeaderToCode(theEnv,execStatus,theFile,&theDefrule->header,imageID,maxIndices,
                                   moduleCount,ModulePrefix(DefruleData(theEnv)->DefruleCodeItem),
                                   ConstructPrefix(DefruleData(theEnv)->DefruleCodeItem));
 
@@ -429,14 +429,14 @@ static void DefruleToCode(
    /* Dynamic Salience */
    /*==================*/
 
-   ExpressionToCode(theEnv,theFile,theDefrule->dynamicSalience);
+   ExpressionToCode(theEnv,execStatus,theFile,theDefrule->dynamicSalience);
    fprintf(theFile,",");
 
    /*=============*/
    /* RHS Actions */
    /*=============*/
 
-   ExpressionToCode(theEnv,theFile,theDefrule->actions);
+   ExpressionToCode(theEnv,execStatus,theFile,theDefrule->actions);
    fprintf(theFile,",");
 
    /*=========================*/
@@ -519,16 +519,16 @@ static void JoinToCode(
    /* Network Expression */
    /*====================*/
 
-   PrintHashedExpressionReference(theEnv,joinFile,theJoin->networkTest,imageID,maxIndices);
+   PrintHashedExpressionReference(theEnv,execStatus,joinFile,theJoin->networkTest,imageID,maxIndices);
    fprintf(joinFile,",");
 
-   PrintHashedExpressionReference(theEnv,joinFile,theJoin->secondaryNetworkTest,imageID,maxIndices);
+   PrintHashedExpressionReference(theEnv,execStatus,joinFile,theJoin->secondaryNetworkTest,imageID,maxIndices);
    fprintf(joinFile,",");
 
-   PrintHashedExpressionReference(theEnv,joinFile,theJoin->leftHash,imageID,maxIndices);
+   PrintHashedExpressionReference(theEnv,execStatus,joinFile,theJoin->leftHash,imageID,maxIndices);
    fprintf(joinFile,",");
 
-   PrintHashedExpressionReference(theEnv,joinFile,theJoin->rightHash,imageID,maxIndices);
+   PrintHashedExpressionReference(theEnv,execStatus,joinFile,theJoin->rightHash,imageID,maxIndices);
    fprintf(joinFile,",");
    
    /*============================*/
@@ -539,12 +539,12 @@ static void JoinToCode(
      { fprintf(joinFile,"NULL,"); }
    else if (theJoin->joinFromTheRight == FALSE)
      {
-      theParser = GetPatternParser(theEnv,(int) theJoin->rhsType);
+      theParser = GetPatternParser(theEnv,execStatus,(int) theJoin->rhsType);
       if (theParser->codeReferenceFunction == NULL) fprintf(joinFile,"NULL,");
       else
         {
          fprintf(joinFile,"VS ");
-         (*theParser->codeReferenceFunction)(theEnv,theJoin->rightSideEntryStructure,
+         (*theParser->codeReferenceFunction)(theEnv,execStatus,theJoin->rightSideEntryStructure,
                                              joinFile,imageID,maxIndices);
          fprintf(joinFile,",");
         }
@@ -698,7 +698,7 @@ static void InitDefruleCode(
 #pragma unused(imageID)
 #endif
 
-   fprintf(initFP,"   DefruleRunTimeInitialize(theEnv,");
+   fprintf(initFP,"   DefruleRunTimeInitialize(theEnv,execStatus,");
 
    if (DefruleData(theEnv)->RightPrimeJoins == NULL)
      { fprintf(initFP,"NULL,"); }

@@ -109,10 +109,10 @@ struct deftemplateData
 #endif
   };
 
-#define EnvGetDeftemplateName(theEnv,x) GetConstructNameString((struct constructHeader *) x)
-#define EnvGetDeftemplatePPForm(theEnv,x) GetConstructPPForm(theEnv,(struct constructHeader *) x)
-#define EnvDeftemplateModule(theEnv,x) GetConstructModuleName((struct constructHeader *) x)
-#define DeftemplateData(theEnv) ((struct deftemplateData *) GetEnvironmentData(theEnv,DEFTEMPLATE_DATA))
+#define EnvGetDeftemplateName(theEnv,execStatus,x) GetConstructNameString((struct constructHeader *) x)
+#define EnvGetDeftemplatePPForm(theEnv,execStatus,x) GetConstructPPForm(theEnv,execStatus,(struct constructHeader *) x)
+#define EnvDeftemplateModule(theEnv,execStatus,x) GetConstructModuleName((struct constructHeader *) x)
+#define DeftemplateData(theEnv) ((struct deftemplateData *) GetEnvironmentData(theEnv,execStatus,DEFTEMPLATE_DATA))
 
 #ifdef LOCALE
 #undef LOCALE

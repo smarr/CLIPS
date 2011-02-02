@@ -50,7 +50,7 @@ globle int ParseDeffacts(
   char *readSource)
   {
 #if (MAC_MCW || WIN_MCW) && (RUN_TIME || BLOAD_ONLY)
-#pragma unused(theEnv,readSource)
+#pragma unused(theEnv,execStatus,readSource)
 #endif
 
 #if (! RUN_TIME) && (! BLOAD_ONLY)
@@ -65,11 +65,11 @@ globle int ParseDeffacts(
    /*=========================*/
 
    deffactsError = FALSE;
-   SetPPBufferStatus(theEnv,ON);
+   SetPPBufferStatus(theEnv,execStatus,ON);
 
    FlushPPBuffer(theEnv);
-   SetIndentDepth(theEnv,3);
-   SavePPBuffer(theEnv,"(deffacts ");
+   SetIndentDepth(theEnv,execStatus,3);
+   SavePPBuffer(theEnv,execStatus,"(deffacts ");
 
    /*==========================================================*/
    /* Deffacts can not be added when a binary image is loaded. */
@@ -78,7 +78,7 @@ globle int ParseDeffacts(
 #if BLOAD || BLOAD_AND_BSAVE
    if ((Bloaded(theEnv) == TRUE) && (! ConstructData(theEnv)->CheckSyntaxMode))
      {
-      CannotLoadWithBloadMessage(theEnv,"deffacts");
+      CannotLoadWithBloadMessage(theEnv,execStatus,"deffacts");
       return(TRUE);
      }
 #endif
@@ -87,7 +87,7 @@ globle int ParseDeffacts(
    /* Parse the deffacts header. */
    /*============================*/
 
-   deffactsName = GetConstructNameAndComment(theEnv,readSource,&inputToken,"deffacts",
+   deffactsName = GetConstructNameAndComment(theEnv,execStatus,readSource,&inputToken,"deffacts",
                                              EnvFindDeffacts,EnvUndeffacts,"$",TRUE,
                                              TRUE,TRUE);
    if (deffactsName == NULL) { return(TRUE); }
@@ -96,18 +96,18 @@ globle int ParseDeffacts(
    /* Parse the list of facts in the deffacts body. */
    /*===============================================*/
 
-   temp = BuildRHSAssert(theEnv,readSource,&inputToken,&deffactsError,FALSE,FALSE,"deffacts","assert");
+   temp = BuildRHSAssert(theEnv,execStatus,readSource,&inputToken,&deffactsError,FALSE,FALSE,"deffacts","assert");
 
    if (deffactsError == TRUE) { return(TRUE); }
 
    if (ExpressionContainsVariables(temp,FALSE))
      {
-      LocalVariableErrorMessage(theEnv,"a deffacts construct");
-      ReturnExpression(theEnv,temp);
+      LocalVariableErrorMessage(theEnv,execStatus,"a deffacts construct");
+      ReturnExpression(theEnv,execStatus,temp);
       return(TRUE);
      }
 
-   SavePPBuffer(theEnv,"\n");
+   SavePPBuffer(theEnv,execStatus,"\n");
 
    /*==============================================*/
    /* If we're only checking syntax, don't add the */
@@ -116,7 +116,7 @@ globle int ParseDeffacts(
 
    if (ConstructData(theEnv)->CheckSyntaxMode)
      {
-      ReturnExpression(theEnv,temp);
+      ReturnExpression(theEnv,execStatus,temp);
       return(FALSE);
      }
 
@@ -124,17 +124,17 @@ globle int ParseDeffacts(
    /* Create the new deffacts. */
    /*==========================*/
 
-   ExpressionInstall(theEnv,temp);
-   newDeffacts = get_struct(theEnv,deffacts);
+   ExpressionInstall(theEnv,execStatus,temp);
+   newDeffacts = get_struct(theEnv,execStatus,deffacts);
    newDeffacts->header.name = deffactsName;
    IncrementSymbolCount(deffactsName);
-   newDeffacts->assertList = PackExpression(theEnv,temp);
+   newDeffacts->assertList = PackExpression(theEnv,execStatus,temp);
    newDeffacts->header.whichModule = (struct defmoduleItemHeader *)
-                              GetModuleItem(theEnv,NULL,FindModuleItem(theEnv,"deffacts")->moduleIndex);
+                              GetModuleItem(theEnv,execStatus,NULL,FindModuleItem(theEnv,execStatus,"deffacts")->moduleIndex);
 
    newDeffacts->header.next = NULL;
    newDeffacts->header.usrData = NULL;
-   ReturnExpression(theEnv,temp);
+   ReturnExpression(theEnv,execStatus,temp);
 
    /*=======================================================*/
    /* Save the pretty print representation of the deffacts. */

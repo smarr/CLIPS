@@ -63,7 +63,7 @@ globle void InitializeWatchData(
   void *theEnv,
   EXEC_STATUS)
   {
-   AllocateEnvironmentData(theEnv,WATCH_DATA,sizeof(struct watchData),DeallocateWatchData);
+   AllocateEnvironmentData(theEnv,execStatus,WATCH_DATA,sizeof(struct watchData),DeallocateWatchData);
   }
   
 /************************************************/
@@ -80,7 +80,7 @@ static void DeallocateWatchData(
    while (tmpPtr != NULL)
      {
       nextPtr = tmpPtr->next;
-      rtn_struct(theEnv,watchItem,tmpPtr);
+      rtn_struct(theEnv,execStatus,watchItem,tmpPtr);
       tmpPtr = nextPtr;
      }
   }
@@ -120,7 +120,7 @@ globle intBool AddWatchItem(
    /* Create the new watch item. */
    /*============================*/
 
-   newPtr = get_struct(theEnv,watchItem);
+   newPtr = get_struct(theEnv,execStatus,watchItem);
    newPtr->name = name;
    newPtr->flag = flag;
    newPtr->code = code;
@@ -158,7 +158,7 @@ globle intBool EnvWatch(
   EXEC_STATUS,
   char *itemName)
   {
-   return(EnvSetWatchItem(theEnv,itemName,ON,NULL));
+   return(EnvSetWatchItem(theEnv,execStatus,itemName,ON,NULL));
   }
 
 /**************************************************/
@@ -180,7 +180,7 @@ globle intBool EnvUnwatch(
   EXEC_STATUS,
   char *itemName)
   {
-   return(EnvSetWatchItem(theEnv,itemName,OFF,NULL));
+   return(EnvSetWatchItem(theEnv,execStatus,itemName,OFF,NULL));
   }
 
 /******************************************************/
@@ -235,9 +235,9 @@ globle int EnvSetWatchItem(
          /*=======================================*/
 
          if ((wPtr->accessFunc == NULL) ? FALSE :
-             ((*wPtr->accessFunc)(theEnv,wPtr->code,newState,argExprs) == FALSE))
+             ((*wPtr->accessFunc)(theEnv,execStatus,wPtr->code,newState,argExprs) == FALSE))
            {
-            SetEvaluationError(theEnv,TRUE);
+            SetEvaluationError(theEnv,execStatus,TRUE);
             return(FALSE);
            }
         }
@@ -266,9 +266,9 @@ globle int EnvSetWatchItem(
          /*=======================================*/
 
          if ((wPtr->accessFunc == NULL) ? FALSE :
-             ((*wPtr->accessFunc)(theEnv,wPtr->code,newState,argExprs) == FALSE))
+             ((*wPtr->accessFunc)(theEnv,execStatus,wPtr->code,newState,argExprs) == FALSE))
            {
-            SetEvaluationError(theEnv,TRUE);
+            SetEvaluationError(theEnv,execStatus,TRUE);
             return(FALSE);
            }
 
@@ -390,11 +390,11 @@ globle void WatchCommand(
 
    if (EnvArgTypeCheck(theEnv,execStatus,"watch",1,SYMBOL,&theValue) == FALSE) return;
    argument = DOToString(theValue);
-   wPtr = ValidWatchItem(theEnv,argument,&recognized);
+   wPtr = ValidWatchItem(theEnv,execStatus,argument,&recognized);
    if (recognized == FALSE)
      {
-      SetEvaluationError(theEnv,TRUE);
-      ExpectedTypeError1(theEnv,"watch",1,"watchable symbol");
+      SetEvaluationError(theEnv,execStatus,TRUE);
+      ExpectedTypeError1(theEnv,execStatus,"watch",1,"watchable symbol");
       return;
      }
 
@@ -406,8 +406,8 @@ globle void WatchCommand(
      {
       if ((wPtr == NULL) ? TRUE : (wPtr->accessFunc == NULL))
         {
-         SetEvaluationError(theEnv,TRUE);
-         ExpectedCountError(theEnv,"watch",EXACTLY,1);
+         SetEvaluationError(theEnv,execStatus,TRUE);
+         ExpectedCountError(theEnv,execStatus,"watch",EXACTLY,1);
          return;
         }
      }
@@ -416,7 +416,7 @@ globle void WatchCommand(
    /* Set the watch item. */
    /*=====================*/
 
-   EnvSetWatchItem(theEnv,argument,ON,GetNextArgument(GetFirstArgument()));
+   EnvSetWatchItem(theEnv,execStatus,argument,ON,GetNextArgument(GetFirstArgument()));
   }
 
 /****************************************/
@@ -438,11 +438,11 @@ globle void UnwatchCommand(
 
    if (EnvArgTypeCheck(theEnv,execStatus,"unwatch",1,SYMBOL,&theValue) == FALSE) return;
    argument = DOToString(theValue);
-   wPtr = ValidWatchItem(theEnv,argument,&recognized);
+   wPtr = ValidWatchItem(theEnv,execStatus,argument,&recognized);
    if (recognized == FALSE)
      {
-      SetEvaluationError(theEnv,TRUE);
-      ExpectedTypeError1(theEnv,"unwatch",1,"watchable symbol");
+      SetEvaluationError(theEnv,execStatus,TRUE);
+      ExpectedTypeError1(theEnv,execStatus,"unwatch",1,"watchable symbol");
       return;
      }
 
@@ -454,8 +454,8 @@ globle void UnwatchCommand(
      {
       if ((wPtr == NULL) ? TRUE : (wPtr->accessFunc == NULL))
         {
-         SetEvaluationError(theEnv,TRUE);
-         ExpectedCountError(theEnv,"unwatch",EXACTLY,1);
+         SetEvaluationError(theEnv,execStatus,TRUE);
+         ExpectedCountError(theEnv,execStatus,"unwatch",EXACTLY,1);
          return;
         }
      }
@@ -464,7 +464,7 @@ globle void UnwatchCommand(
    /* Set the watch item. */
    /*=====================*/
 
-   EnvSetWatchItem(theEnv,argument,OFF,GetNextArgument(GetFirstArgument()));
+   EnvSetWatchItem(theEnv,execStatus,argument,OFF,GetNextArgument(GetFirstArgument()));
   }
 
 /************************************************/
@@ -487,9 +487,9 @@ globle void ListWatchItemsCommand(
      {
       for (wPtr = WatchData(theEnv)->ListOfWatchItems; wPtr != NULL; wPtr = wPtr->next)
         {
-         EnvPrintRouter(theEnv,WDISPLAY,wPtr->name);
-         if (*(wPtr->flag)) EnvPrintRouter(theEnv,WDISPLAY," = on\n");
-         else EnvPrintRouter(theEnv,WDISPLAY," = off\n");
+         EnvPrintRouter(theEnv,execStatus,WDISPLAY,wPtr->name);
+         if (*(wPtr->flag)) EnvPrintRouter(theEnv,execStatus,WDISPLAY," = on\n");
+         else EnvPrintRouter(theEnv,execStatus,WDISPLAY," = off\n");
         }
       return;
      }
@@ -499,11 +499,11 @@ globle void ListWatchItemsCommand(
    /*=======================================*/
 
    if (EnvArgTypeCheck(theEnv,execStatus,"list-watch-items",1,SYMBOL,&theValue) == FALSE) return;
-   wPtr = ValidWatchItem(theEnv,DOToString(theValue),&recognized);
+   wPtr = ValidWatchItem(theEnv,execStatus,DOToString(theValue),&recognized);
    if ((recognized == FALSE) || (wPtr == NULL))
      {
-      SetEvaluationError(theEnv,TRUE);
-      ExpectedTypeError1(theEnv,"list-watch-items",1,"watchable symbol");
+      SetEvaluationError(theEnv,execStatus,TRUE);
+      ExpectedTypeError1(theEnv,execStatus,"list-watch-items",1,"watchable symbol");
       return;
      }
 
@@ -514,8 +514,8 @@ globle void ListWatchItemsCommand(
    if ((wPtr->printFunc == NULL) &&
        (GetNextArgument(GetFirstArgument()) != NULL))
      {
-      SetEvaluationError(theEnv,TRUE);
-      ExpectedCountError(theEnv,"list-watch-items",EXACTLY,1);
+      SetEvaluationError(theEnv,execStatus,TRUE);
+      ExpectedCountError(theEnv,execStatus,"list-watch-items",EXACTLY,1);
       return;
      }
 
@@ -523,9 +523,9 @@ globle void ListWatchItemsCommand(
    /* List the status of the watch item. */
    /*====================================*/
 
-   EnvPrintRouter(theEnv,WDISPLAY,wPtr->name);
-   if (*(wPtr->flag)) EnvPrintRouter(theEnv,WDISPLAY," = on\n");
-   else EnvPrintRouter(theEnv,WDISPLAY," = off\n");
+   EnvPrintRouter(theEnv,execStatus,WDISPLAY,wPtr->name);
+   if (*(wPtr->flag)) EnvPrintRouter(theEnv,execStatus,WDISPLAY," = on\n");
+   else EnvPrintRouter(theEnv,execStatus,WDISPLAY," = off\n");
 
    /*============================================*/
    /* List the status of individual watch items. */
@@ -533,9 +533,9 @@ globle void ListWatchItemsCommand(
 
    if (wPtr->printFunc != NULL)
      {
-      if ((*wPtr->printFunc)(theEnv,WDISPLAY,wPtr->code,
+      if ((*wPtr->printFunc)(theEnv,execStatus,WDISPLAY,wPtr->code,
                              GetNextArgument(GetFirstArgument())) == FALSE)
-        { SetEvaluationError(theEnv,TRUE); }
+        { SetEvaluationError(theEnv,execStatus,TRUE); }
      }
   }
 
@@ -566,11 +566,11 @@ globle int GetWatchItemCommand(
      { return(FALSE); }
 
    argument = DOToString(theValue);
-   ValidWatchItem(theEnv,argument,&recognized);
+   ValidWatchItem(theEnv,execStatus,argument,&recognized);
    if (recognized == FALSE)
      {
-      SetEvaluationError(theEnv,TRUE);
-      ExpectedTypeError1(theEnv,"get-watch-item",1,"watchable symbol");
+      SetEvaluationError(theEnv,execStatus,TRUE);
+      ExpectedTypeError1(theEnv,execStatus,"get-watch-item",1,"watchable symbol");
       return(FALSE);
      }
 
@@ -578,7 +578,7 @@ globle int GetWatchItemCommand(
    /* Get the watch item value. */
    /*===========================*/
 
-   if (EnvGetWatchItem(theEnv,argument) == 1)
+   if (EnvGetWatchItem(theEnv,execStatus,argument) == 1)
      { return(TRUE); }
 
    return(FALSE);
@@ -592,15 +592,15 @@ globle void WatchFunctionDefinitions(
   EXEC_STATUS)
   {
 #if ! RUN_TIME
-   EnvDefineFunction2(theEnv,"watch",   'v', PTIEF WatchCommand,   "WatchCommand", "1**w");
-   EnvDefineFunction2(theEnv,"unwatch", 'v', PTIEF UnwatchCommand, "UnwatchCommand", "1**w");
-   EnvDefineFunction2(theEnv,"get-watch-item", 'b', PTIEF GetWatchItemCommand,   "GetWatchItemCommand", "11w");
-   EnvDefineFunction2(theEnv,"list-watch-items", 'v', PTIEF ListWatchItemsCommand,
+   EnvDefineFunction2(theEnv,execStatus,"watch",   'v', PTIEF WatchCommand,   "WatchCommand", "1**w");
+   EnvDefineFunction2(theEnv,execStatus,"unwatch", 'v', PTIEF UnwatchCommand, "UnwatchCommand", "1**w");
+   EnvDefineFunction2(theEnv,execStatus,"get-watch-item", 'b', PTIEF GetWatchItemCommand,   "GetWatchItemCommand", "11w");
+   EnvDefineFunction2(theEnv,execStatus,"list-watch-items", 'v', PTIEF ListWatchItemsCommand,
                    "ListWatchItemsCommand", "0**w");
 #endif
 
-   EnvAddRouter(theEnv,WTRACE,1000,RecognizeWatchRouters,CaptureWatchPrints,NULL,NULL,NULL);
-   EnvDeactivateRouter(theEnv,WTRACE);
+   EnvAddRouter(theEnv,execStatus,WTRACE,1000,RecognizeWatchRouters,CaptureWatchPrints,NULL,NULL,NULL);
+   EnvDeactivateRouter(theEnv,execStatus,WTRACE);
   }
 
 /**************************************************/

@@ -73,7 +73,7 @@ globle void ReplaceGetJNObjectValue(
   struct lhsParseNode *theNode,
   int side)
   {
-   GenObjectGetVar(theEnv,TRUE,theItem,theNode,side);
+   GenObjectGetVar(theEnv,execStatus,TRUE,theItem,theNode,side);
   }
 
 globle EXPRESSION *GenGetJNObjectValue(
@@ -84,8 +84,8 @@ globle EXPRESSION *GenGetJNObjectValue(
   {
    EXPRESSION *theItem;
 
-   theItem = GenConstant(theEnv,0,NULL);
-   GenObjectGetVar(theEnv,TRUE,theItem,theNode,side);
+   theItem = GenConstant(theEnv,execStatus,0,NULL);
+   GenObjectGetVar(theEnv,execStatus,TRUE,theItem,theNode,side);
    return(theItem);
   }
 
@@ -96,7 +96,7 @@ globle EXPRESSION *ObjectJNVariableComparison(
   struct lhsParseNode *referringNode,
   int isNand)
   { 
-   return(GenerateSlotComparisonTest(theEnv,TRUE,isNand,selfNode,referringNode));
+   return(GenerateSlotComparisonTest(theEnv,execStatus,TRUE,isNand,selfNode,referringNode));
   }
 
 /**********************************************
@@ -144,21 +144,21 @@ globle EXPRESSION *GenObjectPNConstantCompare(
         }
       else
         hack.offset = theNode->singleFieldsAfter;
-      theExp = GenConstant(theEnv,OBJ_PN_CONSTANT,EnvAddBitMap(theEnv,(void *) &hack,
+      theExp = GenConstant(theEnv,execStatus,OBJ_PN_CONSTANT,EnvAddBitMap(theEnv,execStatus,(void *) &hack,
                                         (int) sizeof(struct ObjectCmpPNConstant)));
-      theExp->argList = GenConstant(theEnv,theNode->type,theNode->value);
+      theExp->argList = GenConstant(theEnv,execStatus,theNode->type,theNode->value);
      }
    else
      {
       hack.general = 1;
-      theExp = GenConstant(theEnv,OBJ_PN_CONSTANT,EnvAddBitMap(theEnv,(void *) &hack,
+      theExp = GenConstant(theEnv,execStatus,OBJ_PN_CONSTANT,EnvAddBitMap(theEnv,execStatus,(void *) &hack,
                                         (int) sizeof(struct ObjectCmpPNConstant)));
-      theExp->argList = GenConstant(theEnv,0,NULL);
+      theExp->argList = GenConstant(theEnv,execStatus,0,NULL);
       tmpType = theNode->type;
       theNode->type = SF_VARIABLE;
-      GenObjectGetVar(theEnv,FALSE,theExp->argList,theNode,-1);
+      GenObjectGetVar(theEnv,execStatus,FALSE,theExp->argList,theNode,-1);
       theNode->type = tmpType;
-      theExp->argList->nextArg = GenConstant(theEnv,theNode->type,theNode->value);
+      theExp->argList->nextArg = GenConstant(theEnv,execStatus,theNode->type,theNode->value);
      }
    return(theExp);
   }
@@ -169,7 +169,7 @@ globle void ReplaceGetPNObjectValue(
   EXPRESSION *theItem,
   struct lhsParseNode *theNode)
   {
-   GenObjectGetVar(theEnv,FALSE,theItem,theNode,-1);
+   GenObjectGetVar(theEnv,execStatus,FALSE,theItem,theNode,-1);
   }
 
 globle EXPRESSION *GenGetPNObjectValue(
@@ -179,8 +179,8 @@ globle EXPRESSION *GenGetPNObjectValue(
   {
    EXPRESSION *theItem;
 
-   theItem = GenConstant(theEnv,0,NULL);
-   GenObjectGetVar(theEnv,FALSE,theItem,theNode,-1);
+   theItem = GenConstant(theEnv,execStatus,0,NULL);
+   GenObjectGetVar(theEnv,execStatus,FALSE,theItem,theNode,-1);
    return(theItem);
   }
 
@@ -190,7 +190,7 @@ globle EXPRESSION *ObjectPNVariableComparison(
   struct lhsParseNode *selfNode,
   struct lhsParseNode *referringNode)
   {
-   return(GenerateSlotComparisonTest(theEnv,FALSE,FALSE,selfNode,referringNode));
+   return(GenerateSlotComparisonTest(theEnv,execStatus,FALSE,FALSE,selfNode,referringNode));
   }
 
 /****************************************************
@@ -231,13 +231,13 @@ globle void GenObjectLengthTest(
    else
      hack.minLength = theNode->singleFieldsAfter;
 
-   theTest = GenConstant(theEnv,OBJ_SLOT_LENGTH,EnvAddBitMap(theEnv,(void *) &hack,
+   theTest = GenConstant(theEnv,execStatus,OBJ_SLOT_LENGTH,EnvAddBitMap(theEnv,execStatus,(void *) &hack,
                                          (int) sizeof(struct ObjectMatchLength)));
                                          
    if (theNode->constantSelector != NULL)
-     { theNode->constantSelector->nextArg = CopyExpression(theEnv,theTest); }
+     { theNode->constantSelector->nextArg = CopyExpression(theEnv,execStatus,theTest); }
 
-   theNode->networkTest = CombineExpressions(theEnv,theTest,theNode->networkTest);
+   theNode->networkTest = CombineExpressions(theEnv,execStatus,theTest,theNode->networkTest);
   }
 
 /****************************************************
@@ -262,9 +262,9 @@ globle void GenObjectZeroLengthTest(
    ClearBitString((void *) &hack,(int) sizeof(struct ObjectMatchLength));
    hack.exactly = 1;
    hack.minLength = 0;
-   theTest = GenConstant(theEnv,OBJ_SLOT_LENGTH,EnvAddBitMap(theEnv,(void *) &hack,
+   theTest = GenConstant(theEnv,execStatus,OBJ_SLOT_LENGTH,EnvAddBitMap(theEnv,execStatus,(void *) &hack,
                                          (int) sizeof(struct ObjectMatchLength)));
-   theNode->networkTest = CombineExpressions(theEnv,theTest,theNode->networkTest);
+   theNode->networkTest = CombineExpressions(theEnv,execStatus,theTest,theNode->networkTest);
   }
 
 /* =========================================
@@ -343,7 +343,7 @@ static void GenObjectGetVar(
      {
       hack1.objectAddress = 1;
       SetpType(theItem,(joinReference ? OBJ_GET_SLOT_JNVAR1 : OBJ_GET_SLOT_PNVAR1));
-      theItem->value = EnvAddBitMap(theEnv,(void *) &hack1,(int) sizeof(struct ObjectMatchVar1));
+      theItem->value = EnvAddBitMap(theEnv,execStatus,(void *) &hack1,(int) sizeof(struct ObjectMatchVar1));
       return;
      }
 
@@ -361,7 +361,7 @@ static void GenObjectGetVar(
       hack1.allFields = 1;
       hack1.whichSlot = (unsigned short) theNode->slotNumber;
       theItem->type = (unsigned short) (joinReference ? OBJ_GET_SLOT_JNVAR1 : OBJ_GET_SLOT_PNVAR1);
-      theItem->value = EnvAddBitMap(theEnv,(void *) &hack1,(int) sizeof(struct ObjectMatchVar1));
+      theItem->value = EnvAddBitMap(theEnv,execStatus,(void *) &hack1,(int) sizeof(struct ObjectMatchVar1));
       return;
      }
 
@@ -385,7 +385,7 @@ static void GenObjectGetVar(
          hack2.endOffset = theNode->singleFieldsAfter;
         }
       theItem->type = (unsigned short) (joinReference ? OBJ_GET_SLOT_JNVAR2 : OBJ_GET_SLOT_PNVAR2);
-      theItem->value = EnvAddBitMap(theEnv,(void *) &hack2,sizeof(struct ObjectMatchVar2));
+      theItem->value = EnvAddBitMap(theEnv,execStatus,(void *) &hack2,sizeof(struct ObjectMatchVar2));
       return;
      }
 
@@ -399,7 +399,7 @@ static void GenObjectGetVar(
       hack2.beginningOffset = theNode->singleFieldsBefore;
       hack2.endOffset = theNode->singleFieldsAfter;
       theItem->type = (unsigned short) (joinReference ? OBJ_GET_SLOT_JNVAR2 : OBJ_GET_SLOT_PNVAR2);
-      theItem->value = EnvAddBitMap(theEnv,(void *) &hack2,sizeof(struct ObjectMatchVar2));
+      theItem->value = EnvAddBitMap(theEnv,execStatus,(void *) &hack2,sizeof(struct ObjectMatchVar2));
       return;
      }
 
@@ -409,7 +409,7 @@ static void GenObjectGetVar(
    hack1.whichSlot = (unsigned short) theNode->slotNumber;
    hack1.whichField = (unsigned short) theNode->index;
    theItem->type = (unsigned short) (joinReference ? OBJ_GET_SLOT_JNVAR1 : OBJ_GET_SLOT_PNVAR1);
-   theItem->value = EnvAddBitMap(theEnv,(void *) &hack1,sizeof(struct ObjectMatchVar1));
+   theItem->value = EnvAddBitMap(theEnv,execStatus,(void *) &hack1,sizeof(struct ObjectMatchVar1));
   }
 
 /****************************************************************
@@ -526,11 +526,11 @@ static EXPRESSION *GenerateSlotComparisonTest(
               { jhack1.secondPatternLHS = TRUE; }
             jhack1.secondPattern = (unsigned short) referringNode->joinDepth; 
             
-            theExp = GenConstant(theEnv,OBJ_JN_CMP1,EnvAddBitMap(theEnv,(void *) &jhack1,
+            theExp = GenConstant(theEnv,execStatus,OBJ_JN_CMP1,EnvAddBitMap(theEnv,execStatus,(void *) &jhack1,
                                            (int) sizeof(struct ObjectCmpJoinSingleSlotVars1)));
            }
          else
-           theExp = GenConstant(theEnv,OBJ_PN_CMP1,EnvAddBitMap(theEnv,(void *) &phack1,
+           theExp = GenConstant(theEnv,execStatus,OBJ_PN_CMP1,EnvAddBitMap(theEnv,execStatus,(void *) &phack1,
                                            (int) sizeof(struct ObjectCmpPNSingleSlotVars1)));
         }
       /* ============================================
@@ -600,10 +600,10 @@ static EXPRESSION *GenerateSlotComparisonTest(
               phack2.offset = jhack2.offset = referringNode->singleFieldsAfter;
            }
          if (joinTest)
-           theExp = GenConstant(theEnv,OBJ_JN_CMP2,EnvAddBitMap(theEnv,(void *) &jhack2,
+           theExp = GenConstant(theEnv,execStatus,OBJ_JN_CMP2,EnvAddBitMap(theEnv,execStatus,(void *) &jhack2,
                                            (int) sizeof(struct ObjectCmpJoinSingleSlotVars2)));
          else
-           theExp = GenConstant(theEnv,OBJ_PN_CMP2,EnvAddBitMap(theEnv,(void *) &phack2,
+           theExp = GenConstant(theEnv,execStatus,OBJ_PN_CMP2,EnvAddBitMap(theEnv,execStatus,(void *) &phack2,
                                            (int) sizeof(struct ObjectCmpPNSingleSlotVars2)));
         }
 
@@ -649,11 +649,11 @@ static EXPRESSION *GenerateSlotComparisonTest(
               { jhack3.secondPatternLHS = TRUE; }
             jhack3.secondPattern = (unsigned short) referringNode->joinDepth; 
 
-            theExp = GenConstant(theEnv,OBJ_JN_CMP3,EnvAddBitMap(theEnv,(void *) &jhack3,
+            theExp = GenConstant(theEnv,execStatus,OBJ_JN_CMP3,EnvAddBitMap(theEnv,execStatus,(void *) &jhack3,
                                          (int) sizeof(struct ObjectCmpJoinSingleSlotVars3)));
            }
          else
-           theExp = GenConstant(theEnv,OBJ_PN_CMP3,EnvAddBitMap(theEnv,(void *) &phack3,
+           theExp = GenConstant(theEnv,execStatus,OBJ_PN_CMP3,EnvAddBitMap(theEnv,execStatus,(void *) &phack3,
                                            (int) sizeof(struct ObjectCmpPNSingleSlotVars3)));
         }
      }
@@ -665,20 +665,20 @@ static EXPRESSION *GenerateSlotComparisonTest(
       ================================================== */
    else
      {
-      theExp = GenConstant(theEnv,FCALL,selfNode->negated ? ExpressionData(theEnv)->PTR_NEQ : ExpressionData(theEnv)->PTR_EQ);
-      theExp->argList = GenConstant(theEnv,0,NULL);
+      theExp = GenConstant(theEnv,execStatus,FCALL,selfNode->negated ? ExpressionData(theEnv)->PTR_NEQ : ExpressionData(theEnv)->PTR_EQ);
+      theExp->argList = GenConstant(theEnv,execStatus,0,NULL);
       
       if (isNand)
-        { GenObjectGetVar(theEnv,joinTest,theExp->argList,selfNode,NESTED_RHS); }
+        { GenObjectGetVar(theEnv,execStatus,joinTest,theExp->argList,selfNode,NESTED_RHS); }
       else
-        { GenObjectGetVar(theEnv,joinTest,theExp->argList,selfNode,RHS); }
+        { GenObjectGetVar(theEnv,execStatus,joinTest,theExp->argList,selfNode,RHS); }
       
-      theExp->argList->nextArg = GenConstant(theEnv,0,NULL);
+      theExp->argList->nextArg = GenConstant(theEnv,execStatus,0,NULL);
       
       if (isNand && (selfNode->beginNandDepth == referringNode->beginNandDepth))
-        { GenObjectGetVar(theEnv,joinTest,theExp->argList->nextArg,referringNode,NESTED_RHS); }
+        { GenObjectGetVar(theEnv,execStatus,joinTest,theExp->argList->nextArg,referringNode,NESTED_RHS); }
       else
-        { GenObjectGetVar(theEnv,joinTest,theExp->argList->nextArg,referringNode,LHS); }
+        { GenObjectGetVar(theEnv,execStatus,joinTest,theExp->argList->nextArg,referringNode,LHS); }
      }
    return(theExp);
   }

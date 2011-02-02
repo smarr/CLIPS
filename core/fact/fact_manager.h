@@ -92,7 +92,7 @@ struct factsData
    long LastModuleIndex;
   };
   
-#define FactData(theEnv) ((struct factsData *) GetEnvironmentData(theEnv,FACTS_DATA))
+#define FactData(theEnv) ((struct factsData *) GetEnvironmentData(theEnv,execStatus,FACTS_DATA))
 
 #ifdef LOCALE
 #undef LOCALE

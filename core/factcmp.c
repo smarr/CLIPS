@@ -55,7 +55,7 @@ globle void FactPatternsCompilerSetup(
   void *theEnv,
   EXEC_STATUS)
   {
-   FactData(theEnv)->FactCodeItem = AddCodeGeneratorItem(theEnv,"facts",0,BeforePatternNetworkToCode,
+   FactData(theEnv)->FactCodeItem = AddCodeGeneratorItem(theEnv,execStatus,"facts",0,BeforePatternNetworkToCode,
                                        NULL,PatternNetworkToCode,1);
   }
 
@@ -78,23 +78,23 @@ static void BeforePatternNetworkToCode(
    /* Loop through each module. */
    /*===========================*/
 
-   for (theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,NULL);
+   for (theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,NULL);
         theModule != NULL;
-        theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,theModule))
+        theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,theModule))
      {
       /*=========================*/
       /* Set the current module. */
       /*=========================*/
 
-      EnvSetCurrentModule(theEnv,(void *) theModule);
+      EnvSetCurrentModule(theEnv,execStatus,(void *) theModule);
 
       /*======================================================*/
       /* Loop through each deftemplate in the current module. */
       /*======================================================*/
 
-      for (theDeftemplate = (struct deftemplate *) EnvGetNextDeftemplate(theEnv,NULL);
+      for (theDeftemplate = (struct deftemplate *) EnvGetNextDeftemplate(theEnv,execStatus,NULL);
            theDeftemplate != NULL;
-           theDeftemplate = (struct deftemplate *) EnvGetNextDeftemplate(theEnv,theDeftemplate))
+           theDeftemplate = (struct deftemplate *) EnvGetNextDeftemplate(theEnv,execStatus,theDeftemplate))
         {
          /*=================================================*/
          /* Assign each pattern node in the pattern network */
@@ -184,24 +184,24 @@ static int PatternNetworkToCode(
    /* Loop through all the modules. */
    /*===============================*/
 
-   for (theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,NULL);
+   for (theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,NULL);
         theModule != NULL;
-        theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,theModule))
+        theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,theModule))
      {
       /*=========================*/
       /* Set the current module. */
       /*=========================*/
 
-      EnvSetCurrentModule(theEnv,(void *) theModule);
+      EnvSetCurrentModule(theEnv,execStatus,(void *) theModule);
 
       /*======================================*/
       /* Loop through all of the deftemplates */
       /* in the current module.               */
       /*======================================*/
 
-      for (theTemplate = (struct deftemplate *) EnvGetNextDeftemplate(theEnv,NULL);
+      for (theTemplate = (struct deftemplate *) EnvGetNextDeftemplate(theEnv,execStatus,NULL);
            theTemplate != NULL;
-           theTemplate = (struct deftemplate *) EnvGetNextDeftemplate(theEnv,theTemplate))
+           theTemplate = (struct deftemplate *) EnvGetNextDeftemplate(theEnv,execStatus,theTemplate))
         {
          /*======================================================*/
          /* Loop through each pattern node in the deftemplate's  */
@@ -213,18 +213,18 @@ static int PatternNetworkToCode(
               thePatternNode != NULL;
               thePatternNode = GetNextPatternNode(thePatternNode))
            {
-            networkFile = OpenFileIfNeeded(theEnv,networkFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
+            networkFile = OpenFileIfNeeded(theEnv,execStatus,networkFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
                                          networkArrayVersion,headerFP,
                                          "struct factPatternNode",FactPrefix(),FALSE,NULL);
             if (networkFile == NULL)
               {
-               CloseNetworkFiles(theEnv,networkFile,maxIndices);
+               CloseNetworkFiles(theEnv,execStatus,networkFile,maxIndices);
                return(0);
               }
 
-            PatternNodeToCode(theEnv,networkFile,thePatternNode,imageID,maxIndices);
+            PatternNodeToCode(theEnv,execStatus,networkFile,thePatternNode,imageID,maxIndices);
             networkArrayCount++;
-            networkFile = CloseFileIfNeeded(theEnv,networkFile,&networkArrayCount,
+            networkFile = CloseFileIfNeeded(theEnv,execStatus,networkFile,&networkArrayCount,
                                             &networkArrayVersion,maxIndices,NULL,NULL);
            }
         }
@@ -234,7 +234,7 @@ static int PatternNetworkToCode(
    /* Close any C files left open. */
    /*==============================*/
 
-   CloseNetworkFiles(theEnv,networkFile,maxIndices);
+   CloseNetworkFiles(theEnv,execStatus,networkFile,maxIndices);
 
    /*===============================*/
    /* Return TRUE to indicate the C */
@@ -261,7 +261,7 @@ static void CloseNetworkFiles(
 
    if (networkFile != NULL)
      {
-      CloseFileIfNeeded(theEnv,networkFile,&count,&arrayVersion,maxIndices,NULL,NULL);
+      CloseFileIfNeeded(theEnv,execStatus,networkFile,&count,&arrayVersion,maxIndices,NULL,NULL);
      }
   }
 
@@ -283,7 +283,7 @@ static void PatternNodeToCode(
    /* Pattern Node Header */
    /*=====================*/
 
-   PatternNodeHeaderToCode(theEnv,theFile,&thePatternNode->header,imageID,maxIndices);
+   PatternNodeHeaderToCode(theEnv,execStatus,theFile,&thePatternNode->header,imageID,maxIndices);
 
    /*========================*/
    /* Field and Slot Indices */
@@ -297,7 +297,7 @@ static void PatternNodeToCode(
    /* Network Tests */
    /*===============*/
 
-   PrintHashedExpressionReference(theEnv,theFile,thePatternNode->networkTest,imageID,maxIndices);
+   PrintHashedExpressionReference(theEnv,execStatus,theFile,thePatternNode->networkTest,imageID,maxIndices);
 
    /*============*/
    /* Next Level */

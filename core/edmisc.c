@@ -126,12 +126,12 @@ globle int compile_region(
 
    /* Create IO router for the region (CLIPS.C) */
 
-   EnvAddRouter(theEnv,"emacs_region",90,region_fnd,
+   EnvAddRouter(theEnv,execStatus,"emacs_region",90,region_fnd,
 		NULL,region_getc,region_ungetc,NULL);
 
    /* COMPILE */
 
-   if (get_compile(theEnv,"emacs_region","Emacs_region") == 0)
+   if (get_compile(theEnv,execStatus,"emacs_region","Emacs_region") == 0)
      mlwrite("Error while forming compilation buffer!");
    else
      mlwrite("Compilation done.");
@@ -165,12 +165,12 @@ globle int compile_file(
 
    /*  Create a IO router for the file   (CLIPS.C)  */
 
-   EnvAddRouter(theEnv,"emacs_file",90,buffer_fnd,
+   EnvAddRouter(theEnv,execStatus,"emacs_file",90,buffer_fnd,
 		NULL,buffer_getc,buffer_ungetc,NULL);
 
    /*   COMPILE   */
 
-   if (get_compile(theEnv,"emacs_file","Emacs_buffer") == 0)
+   if (get_compile(theEnv,execStatus,"emacs_file","Emacs_buffer") == 0)
      mlwrite("Error while forming compilation buffer!");
    else
      mlwrite("Compilation done.");
@@ -193,23 +193,23 @@ globle int get_compile(
 
    CompileSuccess = 1;
    CompileBufferp->b_flag &= ~BFCHG;           /* Don't complain!      */
-   if (bclear(theEnv,CompileBufferp) != TRUE)         /* Blow old text away   */
+   if (bclear(theEnv,execStatus,CompileBufferp) != TRUE)         /* Blow old text away   */
      return (0);
    CompileLineIndex = 0;
    CompileLine[0] = '\0';
 
-   EnvActivateRouter(theEnv,str1);	
-   EnvActivateRouter(theEnv,"cmp_router");
-   SetPrintWhileLoading(theEnv,TRUE);
-   LoadConstructsFromLogicalName(theEnv,str2);
+   EnvActivateRouter(theEnv,execStatus,str1);	
+   EnvActivateRouter(theEnv,execStatus,"cmp_router");
+   SetPrintWhileLoading(theEnv,execStatus,TRUE);
+   LoadConstructsFromLogicalName(theEnv,execStatus,str2);
    DestroyPPBuffer(theEnv);
    /* Flush last diagnostic line (if any) to buffer */
    if (CompileLineIndex != 0)
-     addline(theEnv,CompileBufferp,CompileLine);
-   EnvDeactivateRouter(theEnv,str1);	
-   EnvDeactivateRouter(theEnv,"cmp_router");
-   SetPrintWhileLoading(theEnv,FALSE);
-   EnvDeleteRouter(theEnv,str1);
+     addline(theEnv,execStatus,CompileBufferp,CompileLine);
+   EnvDeactivateRouter(theEnv,execStatus,str1);	
+   EnvDeactivateRouter(theEnv,execStatus,"cmp_router");
+   SetPrintWhileLoading(theEnv,execStatus,FALSE);
+   EnvDeleteRouter(theEnv,execStatus,str1);
 
    genstrcpy(CompileBufferp->b_fname, "");
    if (CompileBufferp->b_nwnd == 0) {          /* Not on screen yet.   */
@@ -416,7 +416,7 @@ globle int print_cmp(
      {
       if ((str[i] == '\n') || (str[i] == '\r'))
         {
-         addline(theEnv,CompileBufferp,CompileLine);
+         addline(theEnv,execStatus,CompileBufferp,CompileLine);
          CompileLineIndex = 0;
          CompileLine[0] = '\0';
         }
@@ -427,7 +427,7 @@ globle int print_cmp(
         }
       else
         {
-         addline(theEnv,CompileBufferp,CompileLine);
+         addline(theEnv,execStatus,CompileBufferp,CompileLine);
          CompileLineIndex = 1;
          CompileLine[0] = str[i];
          CompileLine[1] = '\0';
@@ -440,7 +440,7 @@ globle void init_cmp_router(
   void *theEnv,
   EXEC_STATUS)
   {
-   EnvAddRouter(theEnv,"cmp_router",
+   EnvAddRouter(theEnv,execStatus,"cmp_router",
 	      20,
 	      query_cmp,
 	      print_cmp,
@@ -454,7 +454,7 @@ globle void kill_cmp_router(
   void *theEnv,
   EXEC_STATUS)
   {
-   EnvDeleteRouter(theEnv,"cmp_router");
+   EnvDeleteRouter(theEnv,execStatus,"cmp_router");
   }
 
 /* =========================================================================
@@ -580,7 +580,7 @@ globle int gotoline(
    register int s;
    struct LINE *clp;
 
-   if ((s=mlreply(theEnv,"Goto line: ", buf, 5)) != TRUE)
+   if ((s=mlreply(theEnv,execStatus,"Goto line: ", buf, 5)) != TRUE)
         return (s);
 
    if((line = atoi(buf)) <= 0) {
@@ -670,7 +670,7 @@ globle int quote(
                 } while (s==TRUE && --n);
                 return (s);
         }
-        return (linsert(theEnv,n, c));
+        return (linsert(theEnv,execStatus,n, c));
   }
 
 /*
@@ -696,8 +696,8 @@ globle int tab(
                 return(TRUE);
         }
         if (! tabsize)
-                return(linsert(theEnv,1, '\t'));
-        return(linsert(theEnv,tabsize - (getccol(FALSE) % tabsize), ' '));
+                return(linsert(theEnv,execStatus,1, '\t'));
+        return(linsert(theEnv,execStatus,tabsize - (getccol(FALSE) % tabsize), ' '));
   }
 
 /*
@@ -726,7 +726,7 @@ globle int openline(
                 s = lnewline(theEnv);
         } while (s==TRUE && --i);
         if (s == TRUE)                          /* Then back up overtop */
-                s = backchar(theEnv,f, n);             /* of them all.         */
+                s = backchar(theEnv,execStatus,f, n);             /* of them all.         */
         return (s);
   }
 
@@ -756,7 +756,7 @@ globle int newline(
                 if (llength(lp) == curwp->w_doto
                 && lp != curbp->b_linep
                 && llength(lforw(lp)) == 0) {
-                        if ((s=forwchar(theEnv,FALSE, 1)) != TRUE)
+                        if ((s=forwchar(theEnv,execStatus,FALSE, 1)) != TRUE)
                                 return (s);
                 } else if ((s=lnewline(theEnv)) != TRUE)
                         return (s);
@@ -796,7 +796,7 @@ globle int deblank(
                 return (TRUE);
         curwp->w_dotp = lforw(lp1);
         curwp->w_doto = 0;
-        return (ldelete(theEnv,nld,FALSE));
+        return (ldelete(theEnv,execStatus,nld,FALSE));
   }
 
 /*
@@ -833,8 +833,8 @@ globle int indent(
                         ++nicol;
                 }
                 if (lnewline(theEnv) == FALSE
-                || ((i=nicol/8)!=0 && linsert(theEnv,i, '\t')==FALSE)
-                || ((i=nicol%8)!=0 && linsert(theEnv,i,  ' ')==FALSE))
+                || ((i=nicol/8)!=0 && linsert(theEnv,execStatus,i, '\t')==FALSE)
+                || ((i=nicol%8)!=0 && linsert(theEnv,execStatus,i,  ' ')==FALSE))
                         return (FALSE);
         }
         return (TRUE);
@@ -856,13 +856,13 @@ globle int forwdel(
   int n)
   {
         if (n < 0)
-                return (backdel(theEnv,f, -n));
+                return (backdel(theEnv,execStatus,f, -n));
         if (f != FALSE) {                       /* Really a kill.       */
                 if ((lastflag&CFKILL) == 0)
                         kdelete(theEnv);
                 thisflag |= CFKILL;
         }
-        return (ldelete(theEnv,(long) n, f));
+        return (ldelete(theEnv,execStatus,(long) n, f));
   }
 
 /*
@@ -883,14 +883,14 @@ globle int backdel(
         register int    s;
 
         if (n < 0)
-                return (forwdel(theEnv,f, -n));
+                return (forwdel(theEnv,execStatus,f, -n));
         if (f != FALSE) {                       /* Really a kill.       */
                 if ((lastflag&CFKILL) == 0)
                         kdelete(theEnv);
                 thisflag |= CFKILL;
         }
-        if ((s=backchar(theEnv,f, n)) == TRUE)
-                s = ldelete(theEnv,(long) n, f);
+        if ((s=backchar(theEnv,execStatus,f, n)) == TRUE)
+                s = ldelete(theEnv,execStatus,(long) n, f);
         return (s);
   }
 
@@ -937,7 +937,7 @@ globle int kill_fwd(
                 mlwrite("neg kill");
                 return (FALSE);
         }
-        return (ldelete(theEnv,(long) chunk, TRUE));
+        return (ldelete(theEnv,execStatus,(long) chunk, TRUE));
   }
 
 /*
@@ -966,10 +966,10 @@ globle int yank(
                 i = 0;
                 while ((c=kremove(i)) >= 0) {
                         if (c == '\n') {
-                                if (newline(theEnv,FALSE, 1) == FALSE)
+                                if (newline(theEnv,execStatus,FALSE, 1) == FALSE)
                                         return (FALSE);
                         } else {
-                                if (linsert(theEnv,1, c) == FALSE)
+                                if (linsert(theEnv,execStatus,1, c) == FALSE)
                                         return (FALSE);
                         }
                         ++i;
@@ -1037,7 +1037,7 @@ globle int forwsearch(
     register char *pp;
     register int s;
 
-    if ((s = readpattern(theEnv,"Search")) != TRUE)
+    if ((s = readpattern(theEnv,execStatus,"Search")) != TRUE)
         return (s);
 
     clp = curwp->w_dotp;
@@ -1114,7 +1114,7 @@ globle int backsearch(
     register char *pp;
     register int s;
 
-    if ((s = readpattern(theEnv,"Reverse search")) != TRUE)
+    if ((s = readpattern(theEnv,execStatus,"Reverse search")) != TRUE)
         return (s);
 
     for (epp = &pat[0]; epp[1] != 0; ++epp)
@@ -1202,12 +1202,12 @@ globle int bkwrdrpl(
     char *pat2;
     int s;
 
-    if ((s = readpattern(theEnv,"Rev. replace all occrs of")) != TRUE)
+    if ((s = readpattern(theEnv,execStatus,"Rev. replace all occrs of")) != TRUE)
         return (s);
-    pat2 = (char *) genalloc(theEnv,(unsigned) strlen (pat) + 1);          /* Pat2 is first pattern */
+    pat2 = (char *) genalloc(theEnv,execStatus,(unsigned) strlen (pat) + 1);          /* Pat2 is first pattern */
     genstrcpy(pat2,pat);
-    if((s = mlreply(theEnv,"Replace with: ",pat,NPAT)) == ABORT) {
-        genfree(theEnv,(void *) pat2, (unsigned) strlen(pat) + 1);
+    if((s = mlreply(theEnv,execStatus,"Replace with: ",pat,NPAT)) == ABORT) {
+        genfree(theEnv,execStatus,(void *) pat2, (unsigned) strlen(pat) + 1);
         return(s);
         }
     for (epp = &pat2[0];epp[1] != 0 ; ++epp);
@@ -1259,7 +1259,7 @@ globle int bkwrdrpl(
 			curwp->w_dotp = clp;
 			curwp->w_doto = tbo;
 			count++;
-			lreplace(theEnv,pat2);
+			lreplace(theEnv,execStatus,pat2);
 			clp = curwp->w_dotp;
 			cbo = curwp->w_doto - strlen(pat);
  		  }
@@ -1296,12 +1296,12 @@ globle int bkwrdcr(
     char *pat2;
     int s;
 
-    if ((s = readpattern(theEnv,"Rev. replace some occrs. of")) != TRUE)
+    if ((s = readpattern(theEnv,execStatus,"Rev. replace some occrs. of")) != TRUE)
         return (s);
-    pat2 = (char *) genalloc(theEnv,(unsigned) strlen (pat) + 1);
+    pat2 = (char *) genalloc(theEnv,execStatus,(unsigned) strlen (pat) + 1);
     genstrcpy(pat2,pat);
-    if((s = mlreply(theEnv,"Replace with: ",pat,NPAT)) == ABORT) {
-        genfree(theEnv,(void *) pat2,(unsigned) strlen(pat) + 1);
+    if((s = mlreply(theEnv,execStatus,"Replace with: ",pat,NPAT)) == ABORT) {
+        genfree(theEnv,execStatus,(void *) pat2,(unsigned) strlen(pat) + 1);
         return(s);
         }
     for (epp = &pat2[0]; epp[1] != 0; ++epp)
@@ -1374,7 +1374,7 @@ globle int bkwrdcr(
 	    	c = (*term.t_getchar)();
             	if((c ==' ')||(c == 'y')||(c == 'Y'))
                	   {
-                 	lreplace(theEnv,pat2);
+                 	lreplace(theEnv,execStatus,pat2);
                  	clp = curwp->w_dotp;
                  	cbo = curwp->w_doto - strlen(pat);
 	       	    }
@@ -1389,7 +1389,7 @@ globle int bkwrdcr(
      curwp->w_doto -= strlen(pat);
      update();
      mlwrite("No more occurrences of [%s] in buffer",pat2);
-     genfree(theEnv,(void *) pat2,(unsigned) strlen(pat) + 1);
+     genfree(theEnv,execStatus,(void *) pat2,(unsigned) strlen(pat) + 1);
      return(TRUE);
    }
 
@@ -1416,15 +1416,15 @@ globle int frwsr(
 
  /* Read the string to be replaced */
 
-  if((s = readpattern (theEnv,"Replace the occurences of?")) != TRUE)
+  if((s = readpattern (theEnv,execStatus,"Replace the occurences of?")) != TRUE)
     return (s);
-  pat2 = (char *) genalloc (theEnv,(unsigned) strlen(pat) + 1);
+  pat2 = (char *) genalloc (theEnv,execStatus,(unsigned) strlen(pat) + 1);
   genstrcpy (pat2,pat);
 
  /* Read the string to replace with */
 
-  if((s = mlreply(theEnv,"Replace with: ",pat,NPAT)) == ABORT) {
-    genfree(theEnv,(void *) pat2,(unsigned) strlen(pat) + 1);
+  if((s = mlreply(theEnv,execStatus,"Replace with: ",pat,NPAT)) == ABORT) {
+    genfree(theEnv,execStatus,(void *) pat2,(unsigned) strlen(pat) + 1);
     return(s);
     }
 
@@ -1466,7 +1466,7 @@ globle int frwsr(
             curwp->w_dotp = clp;
             curwp->w_doto = cbo - 1;
             count++;
-            lreplace(theEnv,pat2);
+            lreplace(theEnv,execStatus,pat2);
             clp = curwp->w_dotp;
             cbo = curwp->w_doto;
            }
@@ -1503,15 +1503,15 @@ globle int querysr(
 
  /* Read the string to be replaced */
 
-  if((s = readpattern (theEnv,"Query_replace ?")) != TRUE)
+  if((s = readpattern (theEnv,execStatus,"Query_replace ?")) != TRUE)
     return (s);
-  pat2 = (char *) genalloc(theEnv,(unsigned) strlen(pat) + 1);
+  pat2 = (char *) genalloc(theEnv,execStatus,(unsigned) strlen(pat) + 1);
   genstrcpy (pat2,pat);
 
  /* Read the string to replace with */
 
-  if((s = mlreply(theEnv,"Replace with: ",pat,NPAT)) == ABORT) {
-    genfree(theEnv,(void *) pat2,(unsigned) strlen(pat) + 1);
+  if((s = mlreply(theEnv,execStatus,"Replace with: ",pat,NPAT)) == ABORT) {
+    genfree(theEnv,execStatus,(void *) pat2,(unsigned) strlen(pat) + 1);
     return(s);
     }
 
@@ -1568,7 +1568,7 @@ globle int querysr(
 	    c = (*term.t_getchar)();
             if((c ==' ')||(c == 'y')||(c == 'Y'))
                {
-                 lreplace(theEnv,pat2);
+                 lreplace(theEnv,execStatus,pat2);
                  clp = curwp->w_dotp;
                  cbo = curwp->w_doto;
 	       }
@@ -1584,7 +1584,7 @@ globle int querysr(
      curwp->w_doto -= strlen(pat);
      update();
      mlwrite("No more occurrences of [%s] in buffer",pat2);
-     genfree(theEnv,(void *) pat2,(unsigned) strlen(pat) + 1);
+     genfree(theEnv,execStatus,(void *) pat2,(unsigned) strlen(pat) + 1);
      return(TRUE);
 
   }
@@ -1609,7 +1609,7 @@ globle int lreplace(
      lp1 = curwp->w_dotp;
      doto = curwp->w_doto;
 
-     if((lp2 =lalloc(theEnv,(int) (lp1->l_used - strlen(pat2) + strlen(pat) ))) == NULL)
+     if((lp2 =lalloc(theEnv,execStatus,(int) (lp1->l_used - strlen(pat2) + strlen(pat) ))) == NULL)
           return(FALSE);
 
      cp1 = &lp1->l_text[0];
@@ -1663,7 +1663,7 @@ globle int lreplace(
              }
         wp = wp->w_wndp;
      }
-     genfree(theEnv,(void *) lp1,(unsigned) sizeof(LINE) + lp1->l_size);
+     genfree(theEnv,execStatus,(void *) lp1,(unsigned) sizeof(LINE) + lp1->l_size);
      return(TRUE);
 }
 /********************************************************
@@ -1888,7 +1888,7 @@ globle int readpattern(
     *cp1++ = ':';                       /* Finish prompt */
     *cp1++ = ' ';
     *cp1++ = '\0';
-    s = mlreply(theEnv,tpat, tpat, NPAT);      /* Read pattern */
+    s = mlreply(theEnv,execStatus,tpat, tpat, NPAT);      /* Read pattern */
 
     if (s == TRUE)                      /* Specified */
         genstrcpy(pat, tpat);
@@ -1979,7 +1979,7 @@ globle int spawn(
         char            line[NLINE];
 
 #if     VAX_VMS
-        if ((s=mlreply(theEnv,"DCL command: ", line, NLINE)) != TRUE)
+        if ((s=mlreply(theEnv,execStatus,"DCL command: ", line, NLINE)) != TRUE)
                 return (s);
         (*term.t_putchar)('\n');                /* Already have '\r'    */
         (*term.t_flush)();
@@ -1993,7 +1993,7 @@ globle int spawn(
 #endif
 
 #if     WIN_MVC || WIN_BTC || WIN_GCC
-        if ((s=mlreply(theEnv,"MS-DOS command: ", line, NLINE)) != TRUE)
+        if ((s=mlreply(theEnv,execStatus,"MS-DOS command: ", line, NLINE)) != TRUE)
                 return (s);
         system(line);
         mlwrite("Hit any key to continue");
@@ -2003,7 +2003,7 @@ globle int spawn(
 #endif
 
 #if     UNIX_7 || UNIX_V || LINUX || DARWIN
-        if ((s=mlreply(theEnv,"! ", line, NLINE)) != TRUE)
+        if ((s=mlreply(theEnv,execStatus,"! ", line, NLINE)) != TRUE)
                 return (s);
         (*term.t_putchar)('\n');                /* Already have '\r'    */
         (*term.t_flush)();

@@ -55,7 +55,7 @@ struct procedureFunctionData
    struct dataObject *BindList;
   };
 
-#define ProcedureFunctionData(theEnv) ((struct procedureFunctionData *) GetEnvironmentData(theEnv,PRCDRFUN_DATA))
+#define ProcedureFunctionData(theEnv) ((struct procedureFunctionData *) GetEnvironmentData(theEnv,execStatus,PRCDRFUN_DATA))
 
    LOCALE void                           ProceduralFunctionDefinitions(void *);
    LOCALE void                           WhileFunction(void *,DATA_OBJECT_PTR);
