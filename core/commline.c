@@ -482,7 +482,7 @@ static int DoWhiteSpace(
 /*   if there is an active batch file.                              */
 /********************************************************************/
 globle void CommandLoop(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    int inchar;
 
@@ -535,7 +535,7 @@ globle void CommandLoop(
       /* buffer, then execute it.                */
       /*=========================================*/
 
-      ExecuteIfCommandComplete(theEnv);
+      ExecuteIfCommandComplete(theEnv,execStatus);
      }
   }
   
@@ -545,7 +545,7 @@ globle void CommandLoop(
 /*   are no longer any active batch files.                 */
 /***********************************************************/
 globle void CommandLoopBatch(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    SetHaltExecution(theEnv,FALSE);
    SetEvaluationError(theEnv,FALSE);
@@ -554,7 +554,7 @@ globle void CommandLoopBatch(
    RouterData(theEnv)->CommandBufferInputCount = 0;
    RouterData(theEnv)->AwaitingInput = TRUE;
 
-   CommandLoopBatchDriver(theEnv);
+   CommandLoopBatchDriver(theEnv,execStatus);
   }
 
 /************************************************************/
@@ -563,11 +563,11 @@ globle void CommandLoopBatch(
 /*   there are no longer any active batch files.            */
 /************************************************************/
 globle void CommandLoopOnceThenBatch(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
-   if (! ExecuteIfCommandComplete(theEnv)) return;
+   if (! ExecuteIfCommandComplete(theEnv,execStatus)) return;
 
-   CommandLoopBatchDriver(theEnv);
+   CommandLoopBatchDriver(theEnv,execStatus);
   }
   
 /*********************************************************/
@@ -576,7 +576,7 @@ globle void CommandLoopOnceThenBatch(
 /*   when there are no longer any active batch files.    */
 /*********************************************************/
 globle void CommandLoopBatchDriver(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    int inchar;
 
@@ -627,7 +627,7 @@ globle void CommandLoopBatchDriver(
       /* buffer, then execute it.                */
       /*=========================================*/
 
-      ExecuteIfCommandComplete(theEnv);
+      ExecuteIfCommandComplete(theEnv,execStatus);
      }
   }
 
@@ -636,7 +636,7 @@ globle void CommandLoopBatchDriver(
 /*   is a completed command and if so executes it.        */
 /**********************************************************/
 globle intBool ExecuteIfCommandComplete(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    if ((CompleteCommand(CommandLineData(theEnv)->CommandString) == 0) || 
        (RouterData(theEnv)->CommandBufferInputCount == 0) ||
