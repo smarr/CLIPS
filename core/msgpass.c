@@ -137,7 +137,7 @@ globle void EnvSend(
    EXPRESSION *iexp;
    SYMBOL_HN *msym;
 
-   if ((EvaluationData(theEnv)->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
+   if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
        (EvaluationData(theEnv)->CurrentExpression == NULL))
      { PeriodicCleanup(theEnv,TRUE,FALSE); }
 
@@ -958,7 +958,7 @@ static void PerformMessage(
    SetExecutingConstruct(theEnv,TRUE);
    oldName = MessageHandlerData(theEnv)->CurrentMessageName;
    MessageHandlerData(theEnv)->CurrentMessageName = mname;
-   EvaluationData(theEnv)->CurrentEvaluationDepth++;
+   execStatus->CurrentEvaluationDepth++;
 
    PushProcParameters(theEnv,args,CountArguments(args),
                         ValueToString(MessageHandlerData(theEnv)->CurrentMessageName),"message",
@@ -967,7 +967,7 @@ static void PerformMessage(
 
    if (EvaluationData(theEnv)->EvaluationError)
      {
-      EvaluationData(theEnv)->CurrentEvaluationDepth--;
+      execStatus->CurrentEvaluationDepth--;
       MessageHandlerData(theEnv)->CurrentMessageName = oldName;
       PeriodicCleanup(theEnv,FALSE,TRUE);
       SetExecutingConstruct(theEnv,oldce);
@@ -1017,7 +1017,7 @@ static void PerformMessage(
    if (EvaluationData(theEnv)->EvaluationError)
      {
       PopProcParameters(theEnv);
-      EvaluationData(theEnv)->CurrentEvaluationDepth--;
+      execStatus->CurrentEvaluationDepth--;
       MessageHandlerData(theEnv)->CurrentMessageName = oldName;
       PeriodicCleanup(theEnv,FALSE,TRUE);
       SetExecutingConstruct(theEnv,oldce);
@@ -1110,7 +1110,7 @@ static void PerformMessage(
       Restore the original calling frame
       ================================== */
    PopProcParameters(theEnv);
-   EvaluationData(theEnv)->CurrentEvaluationDepth--;
+   execStatus->CurrentEvaluationDepth--;
    MessageHandlerData(theEnv)->CurrentMessageName = oldName;
    PropagateReturnValue(theEnv,result);
    PeriodicCleanup(theEnv,FALSE,TRUE);

@@ -128,7 +128,7 @@ globle void WhileFunction(
    /* while condition evaluates to a non-FALSE value.    */
    /*====================================================*/
 
-   EvaluationData(theEnv)->CurrentEvaluationDepth++;
+   execStatus->CurrentEvaluationDepth++;
    EnvRtnUnknown(theEnv,1,&theResult);
    while (((theResult.value != EnvFalseSymbol(theEnv)) ||
            (theResult.type != SYMBOL)) &&
@@ -137,16 +137,16 @@ globle void WhileFunction(
       if ((ProcedureFunctionData(theEnv)->BreakFlag == TRUE) || (ProcedureFunctionData(theEnv)->ReturnFlag == TRUE))
         break;
       EnvRtnUnknown(theEnv,2,&theResult);
-      EvaluationData(theEnv)->CurrentEvaluationDepth--;
+      execStatus->CurrentEvaluationDepth--;
       if (ProcedureFunctionData(theEnv)->ReturnFlag == TRUE)
         { PropagateReturnValue(theEnv,&theResult); }
       PeriodicCleanup(theEnv,FALSE,TRUE);
-      EvaluationData(theEnv)->CurrentEvaluationDepth++;
+      execStatus->CurrentEvaluationDepth++;
       if ((ProcedureFunctionData(theEnv)->BreakFlag == TRUE) || (ProcedureFunctionData(theEnv)->ReturnFlag == TRUE))
         break;
       EnvRtnUnknown(theEnv,1,&theResult);
      }
-   EvaluationData(theEnv)->CurrentEvaluationDepth--;
+   execStatus->CurrentEvaluationDepth--;
 
    /*=====================================================*/
    /* Reset the break flag. The return flag is not reset  */
@@ -215,9 +215,9 @@ globle void LoopForCountFunction(
      {
       if ((ProcedureFunctionData(theEnv)->BreakFlag == TRUE) || (ProcedureFunctionData(theEnv)->ReturnFlag == TRUE))
         break;
-      EvaluationData(theEnv)->CurrentEvaluationDepth++;
+      execStatus->CurrentEvaluationDepth++;
       EnvRtnUnknown(theEnv,3,&arg_ptr);
-      EvaluationData(theEnv)->CurrentEvaluationDepth--;
+      execStatus->CurrentEvaluationDepth--;
       if (ProcedureFunctionData(theEnv)->ReturnFlag == TRUE)
         { PropagateReturnValue(theEnv,&arg_ptr); }
       PeriodicCleanup(theEnv,FALSE,TRUE);

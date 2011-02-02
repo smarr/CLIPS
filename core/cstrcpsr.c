@@ -131,14 +131,14 @@ globle int LoadConstructsFromLogicalName(
    /* error flags in preparation for parsing. */
    /*=========================================*/
 
-   if (EvaluationData(theEnv)->CurrentEvaluationDepth == 0) SetHaltExecution(theEnv,FALSE);
+   if (execStatus->CurrentEvaluationDepth == 0) SetHaltExecution(theEnv,FALSE);
    SetEvaluationError(theEnv,FALSE);
 
    /*========================================================*/
    /* Find the beginning of the first construct in the file. */
    /*========================================================*/
 
-   EvaluationData(theEnv)->CurrentEvaluationDepth++;
+   execStatus->CurrentEvaluationDepth++;
    GetToken(theEnv,readSource,&theToken);
    foundConstruct = FindConstructBeginning(theEnv,readSource,&theToken,FALSE,&noErrors);
 
@@ -193,15 +193,15 @@ globle int LoadConstructsFromLogicalName(
 
        if (foundConstruct)
          { IncrementSymbolCount(theToken.value); }
-       EvaluationData(theEnv)->CurrentEvaluationDepth--;
+       execStatus->CurrentEvaluationDepth--;
        PeriodicCleanup(theEnv,FALSE,TRUE);
        YieldTime(theEnv);
-       EvaluationData(theEnv)->CurrentEvaluationDepth++;
+       execStatus->CurrentEvaluationDepth++;
        if (foundConstruct)
          { DecrementSymbolCount(theEnv,(SYMBOL_HN *) theToken.value); }
      }
 
-   EvaluationData(theEnv)->CurrentEvaluationDepth--;
+   execStatus->CurrentEvaluationDepth--;
 
    /*========================================================*/
    /* Print a carriage return if a single character is being */
@@ -371,7 +371,7 @@ globle int ParseConstruct(
    PushRtnBrkContexts(theEnv);
    ExpressionData(theEnv)->ReturnContext = FALSE;
    ExpressionData(theEnv)->BreakContext = FALSE;
-   EvaluationData(theEnv)->CurrentEvaluationDepth++;
+   execStatus->CurrentEvaluationDepth++;
 
    /*=======================================*/
    /* Call the construct's parsing routine. */
@@ -385,7 +385,7 @@ globle int ParseConstruct(
    /* Restore environment settings. */
    /*===============================*/
 
-   EvaluationData(theEnv)->CurrentEvaluationDepth--;
+   execStatus->CurrentEvaluationDepth--;
    PopRtnBrkContexts(theEnv);
 
    ClearParsedBindNames(theEnv);

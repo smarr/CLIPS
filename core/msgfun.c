@@ -899,7 +899,7 @@ globle void WatchMessage(
    EnvPrintRouter(theEnv,logName," ");
    EnvPrintRouter(theEnv,logName,ValueToString(MessageHandlerData(theEnv)->CurrentMessageName));
    EnvPrintRouter(theEnv,logName," ED:");
-   PrintLongInteger(theEnv,logName,(long long) EvaluationData(theEnv)->CurrentEvaluationDepth);
+   PrintLongInteger(theEnv,logName,(long long) execStatus->CurrentEvaluationDepth);
    PrintProcParamArray(theEnv,logName);
   }
 
@@ -929,7 +929,7 @@ globle void WatchHandler(
    hnd = hndl->hnd;
    PrintHandler(theEnv,WTRACE,hnd,TRUE);
    EnvPrintRouter(theEnv,logName,"       ED:");
-   PrintLongInteger(theEnv,logName,(long long) EvaluationData(theEnv)->CurrentEvaluationDepth);
+   PrintLongInteger(theEnv,logName,(long long) execStatus->CurrentEvaluationDepth);
    PrintProcParamArray(theEnv,logName);
   }
 

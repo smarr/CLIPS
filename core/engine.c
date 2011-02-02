@@ -191,7 +191,7 @@ globle long long EnvRun(
    /* Set up execution variables. */
    /*=============================*/
 
-   if (EvaluationData(theEnv)->CurrentEvaluationDepth == 0) SetHaltExecution(theEnv,FALSE);
+   if (execStatus->CurrentEvaluationDepth == 0) SetHaltExecution(theEnv,FALSE);
    EngineData(theEnv)->HaltRules = FALSE;
 
 #if DEVELOPER
@@ -302,7 +302,7 @@ globle long long EnvRun(
       else
         { EngineData(theEnv)->TheLogicalBind = NULL; }
 
-      EvaluationData(theEnv)->CurrentEvaluationDepth++;
+      execStatus->CurrentEvaluationDepth++;
       SetEvaluationError(theEnv,FALSE);
       EngineData(theEnv)->ExecutingRule->executing = TRUE;
 
@@ -322,7 +322,7 @@ globle long long EnvRun(
 
       EngineData(theEnv)->ExecutingRule->executing = FALSE;
       SetEvaluationError(theEnv,FALSE);
-      EvaluationData(theEnv)->CurrentEvaluationDepth--;
+      execStatus->CurrentEvaluationDepth--;
       EngineData(theEnv)->TheLogicalJoin = NULL;
       
       if (EngineData(theEnv)->TheLogicalBind != NULL)

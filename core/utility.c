@@ -125,6 +125,7 @@ static void DeallocateUtilityData(
 /*************************************************************/
 globle void PeriodicCleanup(
   void *theEnv,
+  EXEC_STATUS,
   intBool cleanupAllDepths,
   intBool useHeuristics)
   {
@@ -166,9 +167,9 @@ globle void PeriodicCleanup(
    /* them when we go back to a lower evaluation depth. */
    /*===================================================*/
 
-   if (UtilityData(theEnv)->LastEvaluationDepth > EvaluationData(theEnv)->CurrentEvaluationDepth)
+   if (UtilityData(theEnv)->LastEvaluationDepth > execStatus->CurrentEvaluationDepth)
      {
-      UtilityData(theEnv)->LastEvaluationDepth = EvaluationData(theEnv)->CurrentEvaluationDepth;
+      UtilityData(theEnv)->LastEvaluationDepth = execStatus->CurrentEvaluationDepth;
       UtilityData(theEnv)->CurrentEphemeralCountMax = MAX_EPHEMERAL_COUNT;
       UtilityData(theEnv)->CurrentEphemeralSizeMax = MAX_EPHEMERAL_SIZE;
      }
@@ -195,8 +196,8 @@ globle void PeriodicCleanup(
 
    if (cleanupAllDepths)
      {
-      oldDepth = EvaluationData(theEnv)->CurrentEvaluationDepth;
-      EvaluationData(theEnv)->CurrentEvaluationDepth = -1;
+      oldDepth = execStatus->CurrentEvaluationDepth;
+      execStatus->CurrentEvaluationDepth = -1;
      }
 
    /*=============================================*/
@@ -230,7 +231,7 @@ globle void PeriodicCleanup(
    /* was performed on all depths.            */
    /*=========================================*/
 
-   if (cleanupAllDepths) EvaluationData(theEnv)->CurrentEvaluationDepth = oldDepth;
+   if (cleanupAllDepths) execStatus->CurrentEvaluationDepth = oldDepth;
 
    /*============================================================*/
    /* If very little memory was freed up, then increment the     */
@@ -250,7 +251,7 @@ globle void PeriodicCleanup(
    /* ephemeral count and size numbers used by the heuristics.      */
    /*===============================================================*/
 
-   UtilityData(theEnv)->LastEvaluationDepth = EvaluationData(theEnv)->CurrentEvaluationDepth;
+   UtilityData(theEnv)->LastEvaluationDepth = execStatus->CurrentEvaluationDepth;
   }
 
 /***************************************************/

@@ -406,7 +406,7 @@ globle void *EnvAddSymbol(
 
     AddEphemeralHashNode(theEnv,(GENERIC_HN *) peek,&SymbolData(theEnv)->EphemeralSymbolList,
                          sizeof(SYMBOL_HN),AVERAGE_STRING_SIZE);
-    peek->depth = EvaluationData(theEnv)->CurrentEvaluationDepth;
+    peek->depth = execStatus->CurrentEvaluationDepth;
 
     /*===================================*/
     /* Return the address of the symbol. */
@@ -495,7 +495,7 @@ globle void *EnvAddDouble(
 
     AddEphemeralHashNode(theEnv,(GENERIC_HN *) peek,&SymbolData(theEnv)->EphemeralFloatList,
                          sizeof(FLOAT_HN),0);
-    peek->depth = EvaluationData(theEnv)->CurrentEvaluationDepth;
+    peek->depth = execStatus->CurrentEvaluationDepth;
 
     /*==================================*/
     /* Return the address of the float. */
@@ -559,7 +559,7 @@ globle void *EnvAddLong(
 
     AddEphemeralHashNode(theEnv,(GENERIC_HN *) peek,&SymbolData(theEnv)->EphemeralIntegerList,
                          sizeof(INTEGER_HN),0);
-    peek->depth = EvaluationData(theEnv)->CurrentEvaluationDepth;
+    peek->depth = execStatus->CurrentEvaluationDepth;
 
     /*====================================*/
     /* Return the address of the integer. */
@@ -662,7 +662,7 @@ globle void *EnvAddBitMap(
 
     AddEphemeralHashNode(theEnv,(GENERIC_HN *) peek,&SymbolData(theEnv)->EphemeralBitMapList,
                          sizeof(BITMAP_HN),sizeof(long));
-    peek->depth = EvaluationData(theEnv)->CurrentEvaluationDepth;
+    peek->depth = execStatus->CurrentEvaluationDepth;
 
     /*===================================*/
     /* Return the address of the bitmap. */
@@ -732,7 +732,7 @@ globle void *EnvAddExternalAddress(
 
     AddEphemeralHashNode(theEnv,(GENERIC_HN *) peek,&SymbolData(theEnv)->EphemeralExternalAddressList,
                          sizeof(EXTERNAL_ADDRESS_HN),sizeof(long));
-    peek->depth = EvaluationData(theEnv)->CurrentEvaluationDepth;
+    peek->depth = execStatus->CurrentEvaluationDepth;
 
     /*=============================================*/
     /* Return the address of the external address. */
@@ -1224,7 +1224,7 @@ static void RemoveEphemeralHashNodes(
       /*==================================================*/
 
       if ((edPtr->associatedValue->count == 0) &&
-          (edPtr->associatedValue->depth > EvaluationData(theEnv)->CurrentEvaluationDepth))
+          (edPtr->associatedValue->depth > execStatus->CurrentEvaluationDepth))
         {
          RemoveHashNode(theEnv,edPtr->associatedValue,theTable,hashNodeSize,hashNodeType);
          rtn_struct(theEnv,ephemeron,edPtr);

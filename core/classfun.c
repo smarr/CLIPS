@@ -147,11 +147,11 @@ globle intBool InstancesPurge(
    int svdepth;
 
    DestroyAllInstances(theEnv);
-   svdepth = EvaluationData(theEnv)->CurrentEvaluationDepth;
-   if (EvaluationData(theEnv)->CurrentEvaluationDepth == 0)
-     EvaluationData(theEnv)->CurrentEvaluationDepth = -1;
+   svdepth = execStatus->CurrentEvaluationDepth;
+   if (execStatus->CurrentEvaluationDepth == 0)
+     execStatus->CurrentEvaluationDepth = -1;
    CleanupInstances(theEnv);
-   EvaluationData(theEnv)->CurrentEvaluationDepth = svdepth;
+   execStatus->CurrentEvaluationDepth = svdepth;
    return((InstanceData(theEnv)->InstanceList != NULL) ? FALSE : TRUE);
   }
 

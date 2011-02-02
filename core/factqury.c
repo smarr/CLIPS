@@ -538,9 +538,9 @@ globle void DelayedQueryDoForAllFacts(
       for (i = 0 ; i < rcnt ; i++)
         FactQueryData(theEnv)->QueryCore->solns[i] = FactQueryData(theEnv)->QueryCore->soln_set->soln[i];
       PopQuerySoln(theEnv);
-      EvaluationData(theEnv)->CurrentEvaluationDepth++;
+      execStatus->CurrentEvaluationDepth++;
       EvaluateExpression(theEnv,FactQueryData(theEnv)->QueryCore->action,result);
-      EvaluationData(theEnv)->CurrentEvaluationDepth--;
+      execStatus->CurrentEvaluationDepth--;
       if (ProcedureFunctionData(theEnv)->ReturnFlag == TRUE)
         { PropagateReturnValue(theEnv,result); }
       PeriodicCleanup(theEnv,FALSE,TRUE);
@@ -907,9 +907,9 @@ static int TestForFirstFactInTemplate(
       else
         {
          theFact->factHeader.busyCount++;
-         EvaluationData(theEnv)->CurrentEvaluationDepth++;
+         execStatus->CurrentEvaluationDepth++;
          EvaluateExpression(theEnv,FactQueryData(theEnv)->QueryCore->query,&temp);
-         EvaluationData(theEnv)->CurrentEvaluationDepth--;
+         execStatus->CurrentEvaluationDepth--;
          PeriodicCleanup(theEnv,FALSE,TRUE);
          theFact->factHeader.busyCount--;
          if (EvaluationData(theEnv)->HaltExecution == TRUE)
@@ -999,9 +999,9 @@ static void TestEntireTemplate(
       else
         { 
          theFact->factHeader.busyCount++;
-         EvaluationData(theEnv)->CurrentEvaluationDepth++;
+         execStatus->CurrentEvaluationDepth++;
          EvaluateExpression(theEnv,FactQueryData(theEnv)->QueryCore->query,&temp);
-         EvaluationData(theEnv)->CurrentEvaluationDepth--;
+         execStatus->CurrentEvaluationDepth--;
          PeriodicCleanup(theEnv,FALSE,TRUE);
          theFact->factHeader.busyCount--;
          if (EvaluationData(theEnv)->HaltExecution == TRUE)
@@ -1012,11 +1012,11 @@ static void TestEntireTemplate(
             if (FactQueryData(theEnv)->QueryCore->action != NULL)
               {
                theFact->factHeader.busyCount++;
-               EvaluationData(theEnv)->CurrentEvaluationDepth++;
+               execStatus->CurrentEvaluationDepth++;
                ValueDeinstall(theEnv,FactQueryData(theEnv)->QueryCore->result);
                EvaluateExpression(theEnv,FactQueryData(theEnv)->QueryCore->action,FactQueryData(theEnv)->QueryCore->result);
                ValueInstall(theEnv,FactQueryData(theEnv)->QueryCore->result);
-               EvaluationData(theEnv)->CurrentEvaluationDepth--;
+               execStatus->CurrentEvaluationDepth--;
                PeriodicCleanup(theEnv,FALSE,TRUE);
                theFact->factHeader.busyCount--;
                if (ProcedureFunctionData(theEnv)->BreakFlag || ProcedureFunctionData(theEnv)->ReturnFlag)

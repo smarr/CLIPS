@@ -542,7 +542,7 @@ globle intBool QuashInstance(
      )
      RemoveInstanceData(theEnv,ins);
 
-   if ((ins->busy == 0) && (ins->depth > EvaluationData(theEnv)->CurrentEvaluationDepth) &&
+   if ((ins->busy == 0) && (ins->depth > execStatus->CurrentEvaluationDepth) &&
        (InstanceData(theEnv)->MaintainGarbageInstances == FALSE)
 #if DEFRULE_CONSTRUCT
         && (ins->header.busyCount == 0)
@@ -655,7 +655,7 @@ static INSTANCE_TYPE *NewInstance(
    instance->garbage = 0;
    instance->initSlotsCalled = 0;
    instance->initializeInProgress = 0;
-   instance->depth = EvaluationData(theEnv)->CurrentEvaluationDepth;
+   instance->depth = execStatus->CurrentEvaluationDepth;
    instance->name = NULL;
    instance->hashTableIndex = 0;
    instance->cls = NULL;
@@ -744,7 +744,7 @@ static void InstallInstance(
         PrintInstanceWatch(theEnv,MAKE_TRACE,ins);
 #endif
       ins->installed = 1;
-      ins->depth = EvaluationData(theEnv)->CurrentEvaluationDepth;
+      ins->depth = execStatus->CurrentEvaluationDepth;
       IncrementSymbolCount(ins->name);
       IncrementDefclassBusyCount(theEnv,(void *) ins->cls);
       InstanceData(theEnv)->GlobalNumberOfInstances++;

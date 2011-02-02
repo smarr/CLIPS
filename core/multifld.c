@@ -95,7 +95,7 @@ globle void *CreateMultifield2(
    theSegment = get_var_struct(theEnv,multifield,(long) sizeof(struct field) * (newSize - 1L));
 
    theSegment->multifieldLength = size;
-   theSegment->depth = (short) EvaluationData(theEnv)->CurrentEvaluationDepth;
+   theSegment->depth = (short) execStatus->CurrentEvaluationDepth;
    theSegment->busyCount = 0;
    theSegment->next = NULL;
 
@@ -252,7 +252,7 @@ globle void *EnvCreateMultifield(
    theSegment = get_var_struct(theEnv,multifield,(long) sizeof(struct field) * (newSize - 1L));
 
    theSegment->multifieldLength = size;
-   theSegment->depth = (short) EvaluationData(theEnv)->CurrentEvaluationDepth;
+   theSegment->depth = (short) execStatus->CurrentEvaluationDepth;
    theSegment->busyCount = 0;
    theSegment->next = NULL;
 
@@ -292,7 +292,7 @@ globle void AddToMultifieldList(
   void *theEnv,
   struct multifield *theSegment)
   {
-   theSegment->depth = (short) EvaluationData(theEnv)->CurrentEvaluationDepth;
+   theSegment->depth = (short) execStatus->CurrentEvaluationDepth;
    theSegment->next = MultifieldData(theEnv)->ListOfMultifields;
    MultifieldData(theEnv)->ListOfMultifields = theSegment;
 
@@ -313,7 +313,7 @@ globle void FlushMultifields(
    while (theSegment != NULL)
      {
       nextPtr = theSegment->next;
-      if ((theSegment->depth > EvaluationData(theEnv)->CurrentEvaluationDepth) && (theSegment->busyCount == 0))
+      if ((theSegment->depth > execStatus->CurrentEvaluationDepth) && (theSegment->busyCount == 0))
         {
          UtilityData(theEnv)->EphemeralItemCount--;
          UtilityData(theEnv)->EphemeralItemSize -= sizeof(struct multifield) +

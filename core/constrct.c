@@ -367,7 +367,7 @@ globle void EnvReset(
    /* command prompt, reset the halt execution flag. */
    /*================================================*/
 
-   if (EvaluationData(theEnv)->CurrentEvaluationDepth == 0) SetHaltExecution(theEnv,FALSE);
+   if (execStatus->CurrentEvaluationDepth == 0) SetHaltExecution(theEnv,FALSE);
 
    /*=======================================================*/
    /* Call the before reset function to determine if the    */
@@ -411,7 +411,7 @@ globle void EnvReset(
    /* issued from an embedded controller.       */
    /*===========================================*/
 
-   if ((EvaluationData(theEnv)->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
+   if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
        (EvaluationData(theEnv)->CurrentExpression == NULL))
      { PeriodicCleanup(theEnv,TRUE,FALSE); }
 
@@ -567,7 +567,7 @@ globle void EnvClear(
    /* issued from an embedded controller.       */
    /*===========================================*/
 
-   if ((EvaluationData(theEnv)->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
+   if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
        (EvaluationData(theEnv)->CurrentExpression == NULL))
      { PeriodicCleanup(theEnv,TRUE,FALSE); }
 

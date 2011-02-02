@@ -440,7 +440,7 @@ globle void QSetDefglobalValue(
 
    DefglobalData(theEnv)->ChangeToGlobals = TRUE;
 
-   if ((EvaluationData(theEnv)->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
+   if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
        (EvaluationData(theEnv)->CurrentExpression == NULL))
      { PeriodicCleanup(theEnv,TRUE,FALSE); }
   }

@@ -517,7 +517,7 @@ globle intBool Undefconstruct(
       /* Perform periodic cleanup if embedded. */
       /*=======================================*/
 
-      if ((EvaluationData(theEnv)->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
+      if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
           (EvaluationData(theEnv)->CurrentExpression == NULL))
         { PeriodicCleanup(theEnv,TRUE,FALSE); }
 
@@ -553,7 +553,7 @@ globle intBool Undefconstruct(
    /* Perform periodic cleanup if embedded. */
    /*=======================================*/
 
-   if ((EvaluationData(theEnv)->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
+   if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
        (EvaluationData(theEnv)->CurrentExpression == NULL))
      { PeriodicCleanup(theEnv,TRUE,FALSE); }
 

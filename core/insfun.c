@@ -189,7 +189,7 @@ globle void CleanupInstances(
    gtmp = InstanceData(theEnv)->InstanceGarbageList;
    while (gtmp != NULL)
      {
-      if ((gtmp->ins->busy == 0) && (gtmp->ins->depth > EvaluationData(theEnv)->CurrentEvaluationDepth)
+      if ((gtmp->ins->busy == 0) && (gtmp->ins->depth > execStatus->CurrentEvaluationDepth)
 #if DEFRULE_CONSTRUCT
           && (gtmp->ins->header.busyCount == 0)
 #endif

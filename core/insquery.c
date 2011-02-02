@@ -519,9 +519,9 @@ globle void DelayedQueryDoForAllInstances(
       for (i = 0 ; i < rcnt ; i++)
         InstanceQueryData(theEnv)->QueryCore->solns[i] = InstanceQueryData(theEnv)->QueryCore->soln_set->soln[i];
       PopQuerySoln(theEnv);
-      EvaluationData(theEnv)->CurrentEvaluationDepth++;
+      execStatus->CurrentEvaluationDepth++;
       EvaluateExpression(theEnv,InstanceQueryData(theEnv)->QueryCore->action,result);
-      EvaluationData(theEnv)->CurrentEvaluationDepth--;
+      execStatus->CurrentEvaluationDepth--;
       if (ProcedureFunctionData(theEnv)->ReturnFlag == TRUE)
         { PropagateReturnValue(theEnv,result); }
       PeriodicCleanup(theEnv,FALSE,TRUE);
@@ -907,9 +907,9 @@ static int TestForFirstInstanceInClass(
       else
         {
          ins->busy++;
-         EvaluationData(theEnv)->CurrentEvaluationDepth++;
+         execStatus->CurrentEvaluationDepth++;
          EvaluateExpression(theEnv,InstanceQueryData(theEnv)->QueryCore->query,&temp);
-         EvaluationData(theEnv)->CurrentEvaluationDepth--;
+         execStatus->CurrentEvaluationDepth--;
          PeriodicCleanup(theEnv,FALSE,TRUE);
          ins->busy--;
          if (EvaluationData(theEnv)->HaltExecution == TRUE)
@@ -1017,9 +1017,9 @@ static void TestEntireClass(
       else
         {
          ins->busy++;
-         EvaluationData(theEnv)->CurrentEvaluationDepth++;
+         execStatus->CurrentEvaluationDepth++;
          EvaluateExpression(theEnv,InstanceQueryData(theEnv)->QueryCore->query,&temp);
-         EvaluationData(theEnv)->CurrentEvaluationDepth--;
+         execStatus->CurrentEvaluationDepth--;
          PeriodicCleanup(theEnv,FALSE,TRUE);
          ins->busy--;
          if (EvaluationData(theEnv)->HaltExecution == TRUE)
@@ -1030,11 +1030,11 @@ static void TestEntireClass(
             if (InstanceQueryData(theEnv)->QueryCore->action != NULL)
               {
                ins->busy++;
-               EvaluationData(theEnv)->CurrentEvaluationDepth++;
+               execStatus->CurrentEvaluationDepth++;
                ValueDeinstall(theEnv,InstanceQueryData(theEnv)->QueryCore->result);
                EvaluateExpression(theEnv,InstanceQueryData(theEnv)->QueryCore->action,InstanceQueryData(theEnv)->QueryCore->result);
                ValueInstall(theEnv,InstanceQueryData(theEnv)->QueryCore->result);
-               EvaluationData(theEnv)->CurrentEvaluationDepth--;
+               execStatus->CurrentEvaluationDepth--;
                PeriodicCleanup(theEnv,FALSE,TRUE);
                ins->busy--;
                if (ProcedureFunctionData(theEnv)->BreakFlag || ProcedureFunctionData(theEnv)->ReturnFlag)

@@ -85,7 +85,7 @@ struct utilityData
 #define RemovePeriodicFunction(a) EnvRemovePeriodicFunction(GetCurrentEnvironment(),a)
 
    LOCALE void                           InitializeUtilityData(void *);
-   LOCALE void                           PeriodicCleanup(void *,intBool,intBool);
+   LOCALE void                           PeriodicCleanup(void *, EXEC_STATUS, intBool,intBool);
    LOCALE intBool                        AddCleanupFunction(void *,char *,void (*)(void *),int);
    LOCALE intBool                        EnvAddPeriodicFunction(void *,char *,void (*)(void *),int);
    LOCALE intBool                        AddPeriodicFunction(char *,void (*)(void),int);

@@ -525,7 +525,7 @@ globle void PreviewGeneric(
    SetExecutingConstruct(theEnv,TRUE);
    previousGeneric = DefgenericData(theEnv)->CurrentGeneric;
    DefgenericData(theEnv)->CurrentGeneric = gfunc;
-   EvaluationData(theEnv)->CurrentEvaluationDepth++;
+   execStatus->CurrentEvaluationDepth++;
    PushProcParameters(theEnv,GetFirstArgument()->nextArg,
                           CountArguments(GetFirstArgument()->nextArg),
                           EnvGetDefgenericName(theEnv,(void *) gfunc),"generic function",
@@ -534,7 +534,7 @@ globle void PreviewGeneric(
      {
       PopProcParameters(theEnv);
       DefgenericData(theEnv)->CurrentGeneric = previousGeneric;
-      EvaluationData(theEnv)->CurrentEvaluationDepth--;
+      execStatus->CurrentEvaluationDepth--;
       SetExecutingConstruct(theEnv,oldce);
       return;
      }
@@ -543,7 +543,7 @@ globle void PreviewGeneric(
    gfunc->busy--;
    PopProcParameters(theEnv);
    DefgenericData(theEnv)->CurrentGeneric = previousGeneric;
-   EvaluationData(theEnv)->CurrentEvaluationDepth--;
+   execStatus->CurrentEvaluationDepth--;
    SetExecutingConstruct(theEnv,oldce);
   }
 

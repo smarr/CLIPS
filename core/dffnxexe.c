@@ -103,7 +103,7 @@ globle void CallDeffunction(
    SetExecutingConstruct(theEnv,TRUE);
    previouslyExecutingDeffunction = DeffunctionData(theEnv)->ExecutingDeffunction;
    DeffunctionData(theEnv)->ExecutingDeffunction = dptr;
-   EvaluationData(theEnv)->CurrentEvaluationDepth++;
+   execStatus->CurrentEvaluationDepth++;
    dptr->executing++;
    PushProcParameters(theEnv,args,CountArguments(args),EnvGetDeffunctionName(theEnv,(void *) dptr),
                       "deffunction",UnboundDeffunctionErr);
@@ -111,7 +111,7 @@ globle void CallDeffunction(
      {
       dptr->executing--;
       DeffunctionData(theEnv)->ExecutingDeffunction = previouslyExecutingDeffunction;
-      EvaluationData(theEnv)->CurrentEvaluationDepth--;
+      execStatus->CurrentEvaluationDepth--;
       PeriodicCleanup(theEnv,FALSE,TRUE);
       SetExecutingConstruct(theEnv,oldce);
       return;
@@ -145,7 +145,7 @@ globle void CallDeffunction(
    dptr->executing--;
    PopProcParameters(theEnv);
    DeffunctionData(theEnv)->ExecutingDeffunction = previouslyExecutingDeffunction;
-   EvaluationData(theEnv)->CurrentEvaluationDepth--;
+   execStatus->CurrentEvaluationDepth--;
    PropagateReturnValue(theEnv,result);
    PeriodicCleanup(theEnv,FALSE,TRUE);
    SetExecutingConstruct(theEnv,oldce);
@@ -203,7 +203,7 @@ static void WatchDeffunction(
      }
    EnvPrintRouter(theEnv,WTRACE,ValueToString(DeffunctionData(theEnv)->ExecutingDeffunction->header.name));
    EnvPrintRouter(theEnv,WTRACE," ED:");
-   PrintLongInteger(theEnv,WTRACE,(long long) EvaluationData(theEnv)->CurrentEvaluationDepth);
+   PrintLongInteger(theEnv,WTRACE,(long long) execStatus->CurrentEvaluationDepth);
    PrintProcParamArray(theEnv,WTRACE);
   }
 

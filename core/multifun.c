@@ -1322,9 +1322,9 @@ static void MultifieldPrognDriver(
       tmpField->index = (i - GetDOBegin(argval)) + 1; 
       for (theExp = GetFirstArgument()->nextArg ; theExp != NULL ; theExp = theExp->nextArg)
         {
-         EvaluationData(theEnv)->CurrentEvaluationDepth++;
+         execStatus->CurrentEvaluationDepth++;
          EvaluateExpression(theEnv,theExp,result);
-         EvaluationData(theEnv)->CurrentEvaluationDepth--;
+         execStatus->CurrentEvaluationDepth--;
          if (ProcedureFunctionData(theEnv)->ReturnFlag == TRUE)
            { PropagateReturnValue(theEnv,result); }
          PeriodicCleanup(theEnv,FALSE,TRUE);

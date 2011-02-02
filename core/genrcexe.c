@@ -135,7 +135,7 @@ globle void GenericDispatch(
    previousGeneric = DefgenericData(theEnv)->CurrentGeneric;
    previousMethod = DefgenericData(theEnv)->CurrentMethod;
    DefgenericData(theEnv)->CurrentGeneric = gfunc;
-   EvaluationData(theEnv)->CurrentEvaluationDepth++;
+   execStatus->CurrentEvaluationDepth++;
    gfunc->busy++;
    PushProcParameters(theEnv,params,CountArguments(params),
                       EnvGetDefgenericName(theEnv,(void *) gfunc),
@@ -145,7 +145,7 @@ globle void GenericDispatch(
       gfunc->busy--;
       DefgenericData(theEnv)->CurrentGeneric = previousGeneric;
       DefgenericData(theEnv)->CurrentMethod = previousMethod;
-      EvaluationData(theEnv)->CurrentEvaluationDepth--;
+      execStatus->CurrentEvaluationDepth--;
       PeriodicCleanup(theEnv,FALSE,TRUE);
       SetExecutingConstruct(theEnv,oldce);
       return;
@@ -226,7 +226,7 @@ globle void GenericDispatch(
    PopProcParameters(theEnv);
    DefgenericData(theEnv)->CurrentGeneric = previousGeneric;
    DefgenericData(theEnv)->CurrentMethod = previousMethod;
-   EvaluationData(theEnv)->CurrentEvaluationDepth--;
+   execStatus->CurrentEvaluationDepth--;
    PropagateReturnValue(theEnv,result);
    PeriodicCleanup(theEnv,FALSE,TRUE);
    SetExecutingConstruct(theEnv,oldce);
@@ -594,7 +594,7 @@ static void WatchGeneric(
    EnvPrintRouter(theEnv,WTRACE,ValueToString((void *) DefgenericData(theEnv)->CurrentGeneric->header.name));
    EnvPrintRouter(theEnv,WTRACE," ");
    EnvPrintRouter(theEnv,WTRACE," ED:");
-   PrintLongInteger(theEnv,WTRACE,(long long) EvaluationData(theEnv)->CurrentEvaluationDepth);
+   PrintLongInteger(theEnv,WTRACE,(long long) execStatus->CurrentEvaluationDepth);
    PrintProcParamArray(theEnv,WTRACE);
   }
 
@@ -630,7 +630,7 @@ static void WatchMethod(
    PrintLongInteger(theEnv,WTRACE,(long long) DefgenericData(theEnv)->CurrentMethod->index);
    EnvPrintRouter(theEnv,WTRACE," ");
    EnvPrintRouter(theEnv,WTRACE," ED:");
-   PrintLongInteger(theEnv,WTRACE,(long long) EvaluationData(theEnv)->CurrentEvaluationDepth);
+   PrintLongInteger(theEnv,WTRACE,(long long) execStatus->CurrentEvaluationDepth);
    PrintProcParamArray(theEnv,WTRACE);
   }
 

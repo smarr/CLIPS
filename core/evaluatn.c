@@ -752,8 +752,8 @@ globle void PropagateReturnValue(
      {
       theSegment = (struct multifield *) vPtr->value;
 
-      if (theSegment->depth > EvaluationData(theEnv)->CurrentEvaluationDepth)
-        theSegment->depth = (short) EvaluationData(theEnv)->CurrentEvaluationDepth;
+      if (theSegment->depth > execStatus->CurrentEvaluationDepth)
+        theSegment->depth = (short) execStatus->CurrentEvaluationDepth;
 
       theMultifield = theSegment->theFields;
 
@@ -781,19 +781,19 @@ static void PropagateReturnAtom(
 #if OBJECT_SYSTEM
       case INSTANCE_NAME   :
 #endif
-        if (((SYMBOL_HN *) value)->depth > EvaluationData(theEnv)->CurrentEvaluationDepth)
-          { ((SYMBOL_HN *) value)->depth = EvaluationData(theEnv)->CurrentEvaluationDepth; }
+        if (((SYMBOL_HN *) value)->depth > execStatus->CurrentEvaluationDepth)
+          { ((SYMBOL_HN *) value)->depth = execStatus->CurrentEvaluationDepth; }
         break;
 
 #if OBJECT_SYSTEM
       case INSTANCE_ADDRESS :
-        if (((INSTANCE_TYPE *) value)->depth > EvaluationData(theEnv)->CurrentEvaluationDepth)
-          { ((INSTANCE_TYPE *) value)->depth = EvaluationData(theEnv)->CurrentEvaluationDepth; }
+        if (((INSTANCE_TYPE *) value)->depth > execStatus->CurrentEvaluationDepth)
+          { ((INSTANCE_TYPE *) value)->depth = execStatus->CurrentEvaluationDepth; }
         break;
 #endif
       case FACT_ADDRESS :
-        if (((int) ((struct fact *) value)->depth) > EvaluationData(theEnv)->CurrentEvaluationDepth)
-          { ((struct fact *) value)->depth = (unsigned) EvaluationData(theEnv)->CurrentEvaluationDepth; }
+        if (((int) ((struct fact *) value)->depth) > execStatus->CurrentEvaluationDepth)
+          { ((struct fact *) value)->depth = (unsigned) execStatus->CurrentEvaluationDepth; }
         break;
      }
   }
@@ -852,7 +852,7 @@ globle int FunctionCall2(
    /* was executed from an embedded application.  */
    /*=============================================*/
 
-   if ((EvaluationData(theEnv)->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
+   if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
        (EvaluationData(theEnv)->CurrentExpression == NULL))
      { PeriodicCleanup(theEnv,TRUE,FALSE); }
 
@@ -860,7 +860,7 @@ globle int FunctionCall2(
    /* Reset the error state. */
    /*========================*/
 
-   if (EvaluationData(theEnv)->CurrentEvaluationDepth == 0) SetHaltExecution(theEnv,FALSE);
+   if (execStatus->CurrentEvaluationDepth == 0) SetHaltExecution(theEnv,FALSE);
    EvaluationData(theEnv)->EvaluationError = FALSE;
 
    /*======================================*/

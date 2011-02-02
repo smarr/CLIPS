@@ -579,7 +579,7 @@ globle intBool EnvRetract(
    /* executed from an embedded application.    */
    /*===========================================*/
 
-   if ((EvaluationData(theEnv)->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
+   if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
        (EvaluationData(theEnv)->CurrentExpression == NULL))
      { PeriodicCleanup(theEnv,TRUE,FALSE); }
 
@@ -609,7 +609,7 @@ static void RemoveGarbageFacts(
      {
       nextPtr = factPtr->nextFact;
       if ((factPtr->factHeader.busyCount == 0) &&
-          (((int) factPtr->depth) > EvaluationData(theEnv)->CurrentEvaluationDepth))
+          (((int) factPtr->depth) > execStatus->CurrentEvaluationDepth))
         {
          UtilityData(theEnv)->EphemeralItemCount--;
          UtilityData(theEnv)->EphemeralItemSize -= sizeof(struct fact) + (sizeof(struct field) * factPtr->theProposition.multifieldLength);
@@ -894,7 +894,7 @@ globle void *EnvAssert(
    /* executed from an embedded application.   */
    /*==========================================*/
 
-   if ((EvaluationData(theEnv)->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
+   if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
        (EvaluationData(theEnv)->CurrentExpression == NULL))
      { PeriodicCleanup(theEnv,TRUE,FALSE); }
 
@@ -1331,7 +1331,7 @@ globle struct fact *CreateFactBySize(
 
    theFact = get_var_struct(theEnv,fact,sizeof(struct field) * (newSize - 1));
 
-   theFact->depth = (unsigned) EvaluationData(theEnv)->CurrentEvaluationDepth;
+   theFact->depth = (unsigned) execStatus->CurrentEvaluationDepth;
    theFact->garbage = FALSE;
    theFact->factIndex = 0LL;
    theFact->factHeader.busyCount = 0;
@@ -1345,7 +1345,7 @@ globle struct fact *CreateFactBySize(
    theFact->list = NULL;
 
    theFact->theProposition.multifieldLength = size;
-   theFact->theProposition.depth = (short) EvaluationData(theEnv)->CurrentEvaluationDepth;
+   theFact->theProposition.depth = (short) execStatus->CurrentEvaluationDepth;
    theFact->theProposition.busyCount = 0;
 
    return(theFact);
