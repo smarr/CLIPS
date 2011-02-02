@@ -67,6 +67,9 @@
 #define INVALID     -2L
 #define UNSPECIFIED -1L
 
+# include <assert.h>
+# include <unistd.h>
+
 /***************************************/
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
@@ -256,13 +259,62 @@ globle void AssertCommand(
      AssertOrProcessEvent(theEnv, rv, TRUE);
    }    
 
-globle void ProcessEventCommand(
-                                void *theEnv,
-                                DATA_OBJECT_PTR rv)
+
+/*
+ * Used to transfer the parameters from EnvAssert to
+ * the pattern matching and retracting process.
+ */
+struct paramsForProcessEvent
 {
-  AssertOrProcessEvent(theEnv, rv, FALSE);
+  void *theEnv;
+  DATA_OBJECT_PTR rv;
+};
+
+
+static void * APR_THREAD_FUNC ProcessEventOnFactThread(apr_thread_t *thread, void *parameters)
+{
+  struct paramsForProcessEvent* const params = (struct paramsForProcessEvent*)parameters;
+  
+  AssertOrProcessEvent(params->theEnv, params->rv, FALSE);
+  
+  free(params);
+  
+  return NULL;
 }
 
+
+globle void ProcessEventCommand(
+   void *theEnv,
+   DATA_OBJECT_PTR rv)
+   {
+     // STEFAN: hand over to the FactThread
+     
+     struct paramsForProcessEvent * parameters = (struct paramsForProcessEvent *)malloc(sizeof(struct paramsForProcessEvent));
+     
+     if (!parameters) {
+       SystemError(theEnv,"malloc failed",1);
+     }
+     else {
+       parameters->theEnv = theEnv;
+       parameters->rv     = rv;
+       
+       apr_status_t apr_rv;
+       apr_rv = apr_thread_pool_push(Env(theEnv)->factThreadPool,
+                                 ProcessEventOnFactThread,
+                                 parameters,
+                                 0, NULL);
+       if (apr_rv) {
+         SystemError(theEnv,"Putting task on thread pool failed",1);
+       }
+     }
+     
+     while ((apr_thread_pool_tasks_count(Env(theEnv)->factThreadPool) > 0)
+            || ((apr_thread_pool_busy_count(Env(theEnv)->factThreadPool)) > 0)) {
+       usleep(100);
+     }
+     
+     assert(apr_thread_pool_idle_count(Env(theEnv)->factThreadPool) == 1);
+   }
 
 /****************************************/
 /* RetractCommand: H/L access routine   */

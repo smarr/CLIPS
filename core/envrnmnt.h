@@ -74,7 +74,8 @@ struct environmentData
     
     // STEFAN: Adding thread pool properties
     apr_pool_t        *memoryPool;
-    apr_thread_pool_t *threadPool;    
+    apr_thread_pool_t *matcherThreadPool;
+    apr_thread_pool_t *factThreadPool;
   };
 
 typedef struct environmentData ENVIRONMENT_DATA;

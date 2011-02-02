@@ -121,7 +121,7 @@ struct factsData
    LOCALE long long                      FactIndex(void *);
 #endif
 
-   LOCALE void                          *EnvAssert(void *,void *, bool);
+   LOCALE void                          *EnvAssert(void *,void *, int);
    LOCALE void                          *EnvAssertString(void *,char *);
    LOCALE struct fact                   *EnvCreateFact(void *,void *);
    LOCALE void                           EnvDecrementFactCount(void *,void *);

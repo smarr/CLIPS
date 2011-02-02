@@ -354,7 +354,8 @@ globle void *CreateEnvironmentDriver(
    theEnvironment->callbackContext = NULL;
     
     theEnvironment->memoryPool = NULL;
-    theEnvironment->threadPool = NULL;
+    theEnvironment->matcherThreadPool = NULL;
+    theEnvironment->factThreadPool = NULL;
     
     // STEFAN: initalize the thread-pool related data structures
     apr_status_t rv;
@@ -367,7 +368,15 @@ globle void *CreateEnvironmentDriver(
       return(NULL);
     }
     
-    rv = apr_thread_pool_create(&theEnvironment->threadPool, 1, 1, theEnvironment->memoryPool);
+    rv = apr_thread_pool_create(&theEnvironment->matcherThreadPool, 
+                                1, 1, theEnvironment->memoryPool);
+    if (rv) {
+      printf("\n[ENVRNMNT_THREAD] Unable to create thread pool.\n");
+      return(NULL);
+    }
+    
+    rv = apr_thread_pool_create(&theEnvironment->factThreadPool,
+                                1, 1, theEnvironment->memoryPool);
     if (rv) {
       printf("\n[ENVRNMNT_THREAD] Unable to create thread pool.\n");
       return(NULL);
