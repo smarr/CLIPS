@@ -132,7 +132,7 @@ globle int LoadConstructsFromLogicalName(
    /*=========================================*/
 
    if (execStatus->CurrentEvaluationDepth == 0) SetHaltExecution(theEnv,FALSE);
-   SetEvaluationError(theEnv,FALSE);
+   SetEvaluationError(theEnv,execStatus,FALSE);
 
    /*========================================================*/
    /* Find the beginning of the first construct in the file. */
@@ -365,7 +365,7 @@ globle int ParseConstruct(
    /*==================================*/
 
    ov = GetHaltExecution(theEnv);
-   SetEvaluationError(theEnv,FALSE);
+   SetEvaluationError(theEnv,execStatus,FALSE);
    SetHaltExecution(theEnv,FALSE);
    ClearParsedBindNames(theEnv);
    PushRtnBrkContexts(theEnv);

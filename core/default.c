@@ -258,7 +258,7 @@ static void *FindDefaultValue(
 /* ParseDefault: Parses a default value list. */
 /**********************************************/
 globle struct expr *ParseDefault(
-  void *theEnv,
+  void *theEnv,EXEC_STATUS,
   char *readSource,
   int multifield,
   int dynamic,
@@ -436,8 +436,8 @@ globle struct expr *ParseDefault(
 
    while (newItem != NULL)
      {
-      SetEvaluationError(theEnv,FALSE);
-      if (EvaluateExpression(theEnv,newItem,&theValue)) *error = TRUE;
+      SetEvaluationError(theEnv,execStatus,FALSE);
+      if (EvaluateExpression(theEnv,execStatus,newItem,&theValue)) *error = TRUE;
 
       if ((theValue.type == MULTIFIELD) &&
           (multifield == FALSE) &&

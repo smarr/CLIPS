@@ -71,7 +71,7 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static void                    PropagateReturnAtom(void *,int,void *);
+   static void                    PropagateReturnAtom(void *,EXEC_STATUS,int,void *);
    static void                    DeallocateEvaluationData(void *);
    static void                    PrintCAddress(void *,char *,void *);
    static void                    NewCAddress(void *,DATA_OBJECT *);
@@ -111,7 +111,7 @@ static void DeallocateEvaluationData(
 /*   if no errors occurred during evaluation, otherwise TRUE. */
 /**************************************************************/
 globle int EvaluateExpression(
-  void *theEnv,
+  void *theEnv,EXEC_STATUS,
   struct expr *problem,
   DATA_OBJECT_PTR returnValue)
   {
@@ -480,7 +480,7 @@ globle int InstallExternalAddressType(
 /* SetEvaluationError: Sets the EvaluationError flag. */
 /******************************************************/
 globle void SetEvaluationError(
-  void *theEnv,
+  void *theEnv,EXEC_STATUS,
   int value)
   {
    execStatus->EvaluationError = value;
@@ -492,7 +492,7 @@ globle void SetEvaluationError(
 /* GetEvaluationError: Returns the EvaluationError flag. */
 /*********************************************************/
 globle int GetEvaluationError(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    return(execStatus->EvaluationError);
   }
@@ -739,7 +739,7 @@ globle void AtomDeinstall(
 /*   the evaluation that generated the return value.                 */
 /*********************************************************************/
 globle void PropagateReturnValue(
-  void *theEnv,
+  void *theEnv,EXEC_STATUS,
   DATA_OBJECT *vPtr)
   {
    long i;
@@ -767,7 +767,7 @@ globle void PropagateReturnValue(
 /*   for PropagateReturnValue.           */
 /*****************************************/
 static void PropagateReturnAtom(
-  void *theEnv,
+  void *theEnv,EXEC_STATUS,
   int type,
   void *value)
   {

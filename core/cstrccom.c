@@ -73,7 +73,7 @@
 #if DEBUGGING_FUNCTIONS
    static void                    ConstructPrintWatch(void *,char *,struct construct *,void *,
                                                       unsigned (*)(void *,void *));
-   static unsigned                ConstructWatchSupport(void *,struct construct *,char *,
+   static unsigned                ConstructWatchSupport(void *,EXEC_STATUS,struct construct *,char *,
                                                         char *,EXPRESSION *,intBool,
                                                         unsigned,unsigned (*)(void *,void *),
                                                         void (*)(void *,unsigned,void *));
@@ -1413,7 +1413,7 @@ globle unsigned ConstructSetWatchAccess(
 /*   into watch and list-watch-items.                 */
 /******************************************************/
 static unsigned ConstructWatchSupport(
-  void *theEnv,
+  void *theEnv,EXEC_STATUS,
   struct construct *constructClass,
   char *funcName,
   char *logName,
@@ -1517,7 +1517,7 @@ static unsigned ConstructWatchSupport(
       /* occurs when evaluating the argument.     */
       /*==========================================*/
 
-      if (EvaluateExpression(theEnv,argExprs,&constructName))
+      if (EvaluateExpression(theEnv,execStatus,argExprs,&constructName))
         { return(FALSE); }
 
       /*================================================*/

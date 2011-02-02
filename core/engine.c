@@ -124,7 +124,7 @@ static void DeallocateEngineData(
 globle long long Run(
   long long runLimit)
   {
-   return EnvRun(GetCurrentEnvironment(),runLimit);
+   return EnvRun(GetCurrentEnvironment(),GetCurrentExecutionStatus(),runLimit);
   }
 #endif
   
@@ -132,7 +132,7 @@ globle long long Run(
 /* EnvRun: C access routine for the run command. */
 /*************************************************/
 globle long long EnvRun(
-  void *theEnv,
+  void *theEnv,EXEC_STATUS,
   long long runLimit)
   {
    long long rulesFired = 0;
@@ -303,7 +303,7 @@ globle long long EnvRun(
         { EngineData(theEnv)->TheLogicalBind = NULL; }
 
       execStatus->CurrentEvaluationDepth++;
-      SetEvaluationError(theEnv,FALSE);
+      SetEvaluationError(theEnv,execStatus,FALSE);
       EngineData(theEnv)->ExecutingRule->executing = TRUE;
 
 #if PROFILING_FUNCTIONS
@@ -321,7 +321,7 @@ globle long long EnvRun(
 #endif
 
       EngineData(theEnv)->ExecutingRule->executing = FALSE;
-      SetEvaluationError(theEnv,FALSE);
+      SetEvaluationError(theEnv,execStatus,FALSE);
       execStatus->CurrentEvaluationDepth--;
       EngineData(theEnv)->TheLogicalJoin = NULL;
       
@@ -830,7 +830,7 @@ globle void EnvFocus(
 /*   for the clear-focus-stack command.         */
 /************************************************/
 globle void ClearFocusStackCommand(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    if (EnvArgCountCheck(theEnv,execStatus,"list-focus-stack",EXACTLY,0) == -1) return;
 
@@ -926,7 +926,7 @@ globle intBool EnvRemoveRunFunction(
 /* RunCommand: H/L access routine for the run command.   */
 /*********************************************************/
 globle void RunCommand(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    int numArgs;
    long long runLimit = -1LL;
@@ -942,7 +942,7 @@ globle void RunCommand(
       runLimit = DOToLong(argPtr);
      }
 
-   EnvRun(theEnv,runLimit);
+   EnvRun(theEnv,execStatus,runLimit);
 
    return;
   }
@@ -951,7 +951,7 @@ globle void RunCommand(
 /* HaltCommand: Causes rule execution to halt. */
 /***********************************************/
 globle void HaltCommand(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    EnvArgCountCheck(theEnv,execStatus,"halt",EXACTLY,0);
    EnvHalt(theEnv);
@@ -1077,7 +1077,7 @@ globle intBool EnvDefruleHasBreakpoint(
 /*   for the set-break command.          */
 /*****************************************/
 globle void SetBreakCommand(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    DATA_OBJECT argPtr;
    char *argument;
@@ -1103,7 +1103,7 @@ globle void SetBreakCommand(
 /*   for the remove-break command.          */
 /********************************************/
 globle void RemoveBreakCommand(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    DATA_OBJECT argPtr;
    char *argument;
@@ -1142,7 +1142,7 @@ globle void RemoveBreakCommand(
 /*   for the show-breaks command.          */
 /*******************************************/
 globle void ShowBreaksCommand(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    int numArgs, error;
    struct defmodule *theModule;
@@ -1165,7 +1165,7 @@ globle void ShowBreaksCommand(
 /*   for the list-focus-stack command.         */
 /***********************************************/
 globle void ListFocusStackCommand(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    if (EnvArgCountCheck(theEnv,execStatus,"list-focus-stack",EXACTLY,0) == -1) return;
 
@@ -1198,7 +1198,7 @@ globle void EnvListFocusStack(
 /*   for the get-focus-stack function.         */
 /***********************************************/
 globle void GetFocusStackFunction(
-  void *theEnv,
+  void *theEnv,EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
    if (EnvArgCountCheck(theEnv,execStatus,"get-focus-stack",EXACTLY,0) == -1) return;
@@ -1268,7 +1268,7 @@ globle void EnvGetFocusStack(
 /*   for the pop-focus function.          */
 /******************************************/
 globle void *PopFocusFunction(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    struct defmodule *theModule;
 
@@ -1284,11 +1284,11 @@ globle void *PopFocusFunction(
 /*   for the get-focus function.          */
 /******************************************/
 globle void *GetFocusFunction(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    struct defmodule *rv;
 
-   EnvArgCountCheck(theEnv,"get-focus",EXACTLY,0);
+   EnvArgCountCheck(theEnv,execStatus,"get-focus",EXACTLY,0);
    rv = (struct defmodule *) EnvGetFocus(theEnv);
    if (rv == NULL) return((SYMBOL_HN *) EnvFalseSymbol(theEnv));
    return(rv->name);
@@ -1311,7 +1311,7 @@ globle void *EnvGetFocus(
 /*   for the focus function.          */
 /**************************************/
 globle int FocusCommand(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    DATA_OBJECT argPtr;
    char *argument;
@@ -1322,7 +1322,7 @@ globle int FocusCommand(
    /* Check for the correct number and type of arguments. */
    /*=====================================================*/
 
-   if ((argCount = EnvArgCountCheck(theEnv,"focus",AT_LEAST,1)) == -1)
+   if ((argCount = EnvArgCountCheck(theEnv,execStatus,"focus",AT_LEAST,1)) == -1)
      { return(FALSE); }
 
    /*===========================================*/
@@ -1331,7 +1331,7 @@ globle int FocusCommand(
 
    for (i = argCount; i > 0; i--)
      {
-      if (EnvArgTypeCheck(theEnv,"focus",i,SYMBOL,&argPtr) == FALSE)
+      if (EnvArgTypeCheck(theEnv,execStatus,"focus",i,SYMBOL,&argPtr) == FALSE)
         { return(FALSE); }
 
       argument = DOToString(argPtr);
