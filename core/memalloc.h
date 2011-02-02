@@ -65,10 +65,12 @@ struct memoryPtr
    struct memoryPtr *next;
   };
 
+// STEFAN: TODO: make those thread-safe
+
 #define get_struct(theEnv,type) \
-  ((MemoryData(theEnv)->MemoryTable[sizeof(struct type)] == NULL) ? \
-   ((struct type *) genalloc(theEnv,sizeof(struct type))) :\
-   ((MemoryData(theEnv)->TempMemoryPtr = MemoryData(theEnv)->MemoryTable[sizeof(struct type)]),\
+  ((MemoryData(theEnv)->MemoryTable[sizeof(struct type)] == NULL) \
+    ? ((struct type *) genalloc(theEnv,sizeof(struct type))) \
+    : ((MemoryData(theEnv)->TempMemoryPtr = MemoryData(theEnv)->MemoryTable[sizeof(struct type)]),\
     MemoryData(theEnv)->MemoryTable[sizeof(struct type)] = MemoryData(theEnv)->TempMemoryPtr->next,\
     ((struct type *) MemoryData(theEnv)->TempMemoryPtr)))
 
