@@ -35,8 +35,8 @@
 #define LOCALE extern
 #endif
 
-LOCALE void SetupDeffunctionsBload(void *);
-LOCALE void *BloadDeffunctionModuleReference(void *,int);
+LOCALE void SetupDeffunctionsBload(void *,EXEC_STATUS);
+LOCALE void *BloadDeffunctionModuleReference(void *,EXEC_STATUS,int);
 
 #define DFFNXBIN_DATA 24
 

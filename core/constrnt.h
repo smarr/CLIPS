@@ -101,21 +101,21 @@ struct constraintData
 #define SetDynamicConstraintChecking(a) EnvSetDynamicConstraintChecking(GetCurrentEnvironment(),a)
 #define SetStaticConstraintChecking(a) EnvSetStaticConstraintChecking(GetCurrentEnvironment(),a)
 
-   LOCALE void                           InitializeConstraints(void *);
+   LOCALE void                           InitializeConstraints(void *,EXEC_STATUS);
    LOCALE int                            GDCCommand(void *,EXEC_STATUS);
    LOCALE int                            SDCCommand(void *d,EXEC_STATUS);
    LOCALE int                            GSCCommand(void *,EXEC_STATUS);
    LOCALE int                            SSCCommand(void *,EXEC_STATUS);
-   LOCALE intBool                        EnvSetDynamicConstraintChecking(void *,int);
-   LOCALE intBool                        EnvGetDynamicConstraintChecking(void *);
-   LOCALE intBool                        EnvSetStaticConstraintChecking(void *,int);
-   LOCALE intBool                        EnvGetStaticConstraintChecking(void *);
+   LOCALE intBool                        EnvSetDynamicConstraintChecking(void *,EXEC_STATUS,int);
+   LOCALE intBool                        EnvGetDynamicConstraintChecking(void *,EXEC_STATUS);
+   LOCALE intBool                        EnvSetStaticConstraintChecking(void *,EXEC_STATUS,int);
+   LOCALE intBool                        EnvGetStaticConstraintChecking(void *,EXEC_STATUS);
 #if (! BLOAD_ONLY) && (! RUN_TIME)
    LOCALE unsigned long                  HashConstraint(struct constraintRecord *);
-   LOCALE struct constraintRecord       *AddConstraint(void *,struct constraintRecord *);
+   LOCALE struct constraintRecord       *AddConstraint(void *,EXEC_STATUS,struct constraintRecord *);
 #endif
 #if (! RUN_TIME)
-   LOCALE void                           RemoveConstraint(void *,struct constraintRecord *);
+   LOCALE void                           RemoveConstraint(void *,EXEC_STATUS,struct constraintRecord *);
 #endif
 
 #endif

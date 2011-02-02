@@ -34,20 +34,20 @@
 #define LOCALE extern
 #endif
 
-   LOCALE void                           DeveloperCommands(void *);
-   LOCALE void                           PrimitiveTablesInfo(void *);
-   LOCALE void                           PrimitiveTablesUsage(void *);
-   LOCALE void                           EnableGCHeuristics(void *);
-   LOCALE void                           DisableGCHeuristics(void *);
+   LOCALE void                           DeveloperCommands(void *,EXEC_STATUS);
+   LOCALE void                           PrimitiveTablesInfo(void *,EXEC_STATUS);
+   LOCALE void                           PrimitiveTablesUsage(void *,EXEC_STATUS);
+   LOCALE void                           EnableGCHeuristics(void *,EXEC_STATUS);
+   LOCALE void                           DisableGCHeuristics(void *,EXEC_STATUS);
 
 #if DEFRULE_CONSTRUCT && DEFTEMPLATE_CONSTRUCT
-   LOCALE void                           ShowFactPatternNetwork(void *);
+   LOCALE void                           ShowFactPatternNetwork(void *,EXEC_STATUS);
 #endif
 #if DEFRULE_CONSTRUCT && OBJECT_SYSTEM
-   LOCALE void                           PrintObjectPatternNetwork(void *);
+   LOCALE void                           PrintObjectPatternNetwork(void *,EXEC_STATUS);
 #endif
 #if OBJECT_SYSTEM
-   LOCALE void                           InstanceTableUsage(void *);
+   LOCALE void                           InstanceTableUsage(void *,EXEC_STATUS);
 #endif
 
 #endif

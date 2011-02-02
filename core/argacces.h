@@ -66,19 +66,19 @@
    LOCALE long long                      EnvRtnLong(void *, EXEC_STATUS,int);
    LOCALE struct dataObject             *EnvRtnUnknown(void *, EXEC_STATUS,int,struct dataObject *);
    LOCALE int                            EnvArgTypeCheck(void *, EXEC_STATUS,char *,int,int,struct dataObject *);
-   LOCALE intBool                        GetNumericArgument(void *,struct expr *,char *,struct dataObject *,int,int);
+   LOCALE intBool                        GetNumericArgument(void *,EXEC_STATUS,struct expr *,char *,struct dataObject *,int,int);
    LOCALE char                          *GetLogicalName(void *,EXEC_STATUS, int,char *);
    LOCALE char                          *GetFileName(void *, EXEC_STATUS, char *,int);
    LOCALE char                          *GetConstructName(void *, EXEC_STATUS, char *,char *);
-   LOCALE void                           ExpectedCountError(void *,char *,int,int);
-   LOCALE void                           OpenErrorMessage(void *,char *,char *);
-   LOCALE intBool                        CheckFunctionArgCount(void *,char *,char *,int);
+   LOCALE void                           ExpectedCountError(void *,EXEC_STATUS,char *,int,int);
+   LOCALE void                           OpenErrorMessage(void *,EXEC_STATUS,char *,char *);
+   LOCALE intBool                        CheckFunctionArgCount(void *,EXEC_STATUS,char *,char *,int);
    LOCALE void                           ExpectedReturnTypeError(char *,char *);
-   LOCALE void                           ExpectedTypeError1(void *,char *,int,char *);
-   LOCALE void                           ExpectedTypeError2(void *,char *,int);
+   LOCALE void                           ExpectedTypeError1(void *,EXEC_STATUS,char *,int,char *);
+   LOCALE void                           ExpectedTypeError2(void *,EXEC_STATUS,char *,int);
    LOCALE struct defmodule              *GetModuleName(void *, EXEC_STATUS, char *,int,int *);
    LOCALE void                          *GetFactOrInstanceArgument(void *, EXEC_STATUS, int,DATA_OBJECT *,char *);
-   LOCALE void                           IllegalLogicalNameMessage(void *,char *);
+   LOCALE void                           IllegalLogicalNameMessage(void *,EXEC_STATUS,char *);
 
 #endif
 

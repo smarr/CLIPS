@@ -69,13 +69,13 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static void                    PrintActivation(void *,char *,void *);
-   static void                    AgendaClearFunction(void *);
+   static void                    PrintActivation(void *,EXEC_STATUS,char *,void *);
+   static void                    AgendaClearFunction(void *,EXEC_STATUS);
    static char                   *SalienceEvaluationName(int);
    static int                     EvaluateSalience(void *,EXEC_STATUS,void *);
-   static struct salienceGroup   *ReuseOrCreateSalienceGroup(void *,struct defruleModule *,int);
+   static struct salienceGroup   *ReuseOrCreateSalienceGroup(void *,EXEC_STATUS,struct defruleModule *,int);
    static struct salienceGroup   *FindSalienceGroup(struct defruleModule *,int);
-   static void                    RemoveActivationFromGroup(void *,struct activation *,struct defruleModule *);
+   static void                    RemoveActivationFromGroup(void *,EXEC_STATUS,struct activation *,struct defruleModule *);
    
 /*************************************************/
 /* InitializeAgenda: Initializes the activations */

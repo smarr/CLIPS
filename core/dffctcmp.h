@@ -32,7 +32,7 @@
 #define LOCALE extern
 #endif
 
-   LOCALE void                           DeffactsCompilerSetup(void *);
-   LOCALE void                           DeffactsCModuleReference(void *,FILE *,int,int,int);
+   LOCALE void                           DeffactsCompilerSetup(void *,EXEC_STATUS);
+   LOCALE void                           DeffactsCModuleReference(void *,EXEC_STATUS,FILE *,int,int,int);
 
 #endif

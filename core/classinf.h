@@ -68,22 +68,22 @@ LOCALE void SlotAllowedValuesCommand(void *,EXEC_STATUS,DATA_OBJECT *);
 LOCALE void SlotAllowedClassesCommand(void *,EXEC_STATUS,DATA_OBJECT *);
 LOCALE void SlotRangeCommand(void *,EXEC_STATUS,DATA_OBJECT *);
 LOCALE void SlotCardinalityCommand(void *,EXEC_STATUS,DATA_OBJECT *);
-LOCALE intBool EnvClassAbstractP(void *,void *);
+LOCALE intBool EnvClassAbstractP(void *,EXEC_STATUS,void *);
 #if DEFRULE_CONSTRUCT
-LOCALE intBool EnvClassReactiveP(void *,void *);
+LOCALE intBool EnvClassReactiveP(void *,EXEC_STATUS,void *);
 #endif
-LOCALE void EnvClassSlots(void *,void *,DATA_OBJECT *,int);
-LOCALE void EnvGetDefmessageHandlerList(void *,void *,DATA_OBJECT *,int);
-LOCALE void EnvClassSuperclasses(void *,void *,DATA_OBJECT *,int);
-LOCALE void EnvClassSubclasses(void *,void *,DATA_OBJECT *,int);
-LOCALE void ClassSubclassAddresses(void *,void *,DATA_OBJECT *,int);
-LOCALE void EnvSlotFacets(void *,void *,char *,DATA_OBJECT *);
-LOCALE void EnvSlotSources(void *,void *,char *,DATA_OBJECT *);
-LOCALE void EnvSlotTypes(void *,void *,char *,DATA_OBJECT *);
-LOCALE void EnvSlotAllowedValues(void *,void *,char *,DATA_OBJECT *);
-LOCALE void EnvSlotAllowedClasses(void *,void *,char *,DATA_OBJECT *);
-LOCALE void EnvSlotRange(void *,void *,char *,DATA_OBJECT *);
-LOCALE void EnvSlotCardinality(void *,void *,char *,DATA_OBJECT *);
+LOCALE void EnvClassSlots(void *,EXEC_STATUS,void *,DATA_OBJECT *,int);
+LOCALE void EnvGetDefmessageHandlerList(void *,EXEC_STATUS,void *,DATA_OBJECT *,int);
+LOCALE void EnvClassSuperclasses(void *,EXEC_STATUS,void *,DATA_OBJECT *,int);
+LOCALE void EnvClassSubclasses(void *,EXEC_STATUS,void *,DATA_OBJECT *,int);
+LOCALE void ClassSubclassAddresses(void *,EXEC_STATUS,void *,DATA_OBJECT *,int);
+LOCALE void EnvSlotFacets(void *,EXEC_STATUS,void *,char *,DATA_OBJECT *);
+LOCALE void EnvSlotSources(void *,EXEC_STATUS,void *,char *,DATA_OBJECT *);
+LOCALE void EnvSlotTypes(void *,EXEC_STATUS,void *,char *,DATA_OBJECT *);
+LOCALE void EnvSlotAllowedValues(void *,EXEC_STATUS,void *,char *,DATA_OBJECT *);
+LOCALE void EnvSlotAllowedClasses(void *,EXEC_STATUS,void *,char *,DATA_OBJECT *);
+LOCALE void EnvSlotRange(void *,EXEC_STATUS,void *,char *,DATA_OBJECT *);
+LOCALE void EnvSlotCardinality(void *,EXEC_STATUS,void *,char *,DATA_OBJECT *);
 
 #endif
 

@@ -40,11 +40,11 @@
 #define LOCALE extern
 #endif
 
-LOCALE void SetupObjectSystem(void *);
+LOCALE void SetupObjectSystem(void *,EXEC_STATUS);
 #if RUN_TIME
-LOCALE void ObjectsRunTimeInitialize(void *,DEFCLASS *[],SLOT_NAME *[],DEFCLASS *[],unsigned);
+LOCALE void ObjectsRunTimeInitialize(void *,EXEC_STATUS,DEFCLASS *[],SLOT_NAME *[],DEFCLASS *[],unsigned);
 #else
-LOCALE void CreateSystemClasses(void *);
+LOCALE void CreateSystemClasses(void *,EXEC_STATUS);
 #endif
 
 #endif

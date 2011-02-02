@@ -44,12 +44,12 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static struct FunctionDefinition **ReadNeededFunctions(void *,long *,int *);
-   static struct FunctionDefinition  *FastFindFunction(void *,char *,struct FunctionDefinition *);
-   static int                         ClearBload(void *);
-   static void                        AbortBload(void *);
-   static int                         BloadOutOfMemoryFunction(void *,size_t);
-   static void                        DeallocateBloadData(void *);
+   static struct FunctionDefinition **ReadNeededFunctions(void *,EXEC_STATUS,long *,int *);
+   static struct FunctionDefinition  *FastFindFunction(void *,EXEC_STATUS,char *,struct FunctionDefinition *);
+   static int                         ClearBload(void *,EXEC_STATUS);
+   static void                        AbortBload(void *,EXEC_STATUS);
+   static int                         BloadOutOfMemoryFunction(void *,EXEC_STATUS,size_t);
+   static void                        DeallocateBloadData(void *,EXEC_STATUS);
 
 /**********************************************/
 /* InitializeBloadData: Allocates environment */
@@ -380,13 +380,13 @@ globle void BloadandRefresh(
   EXEC_STATUS,
   long objcnt,
   size_t objsz,
-  void (*objupdate)(void *,void *,long))
+  void (*objupdate)(void *,EXEC_STATUS,void *,long))
   {
    register long i,bi;
    char *buf;
    long objsmaxread,objsread;
    size_t space;
-   int (*oldOutOfMemoryFunction)(void *,size_t);
+   int (*oldOutOfMemoryFunction)(void *,EXEC_STATUS,size_t);
 
    if (objcnt == 0L) return;
 
@@ -698,7 +698,7 @@ globle void AddBeforeBloadFunction(
   void *theEnv,
   EXEC_STATUS,
   char *name,
-  void (*func)(void *),
+  void (*func)(void *,EXEC_STATUS),
   int priority)
   {
    BloadData(theEnv)->BeforeBloadFunctions =
@@ -714,7 +714,7 @@ globle void AddAfterBloadFunction(
   void *theEnv,
   EXEC_STATUS,
   char *name,
-  void (*func)(void *),
+  void (*func)(void *,EXEC_STATUS),
   int priority)
   {
    BloadData(theEnv)->AfterBloadFunctions =
@@ -730,12 +730,12 @@ globle void AddClearBloadReadyFunction(
   void *theEnv,
   EXEC_STATUS,
   char *name,
-  int (*func)(void *),
+  int (*func)(void *,EXEC_STATUS),
   int priority)
   {
    BloadData(theEnv)->ClearBloadReadyFunctions =
       AddFunctionToCallList(theEnv,execStatus,name,priority,
-                            (void (*)(void *)) func,
+                            (void (*)(void *,EXEC_STATUS)) func,
                             BloadData(theEnv)->ClearBloadReadyFunctions,TRUE);
   }
 
@@ -748,7 +748,7 @@ globle void AddAbortBloadFunction(
   void *theEnv,
   EXEC_STATUS,
   char *name,
-  void (*func)(void *),
+  void (*func)(void *,EXEC_STATUS),
   int priority)
   {
    BloadData(theEnv)->AbortBloadFunctions = AddFunctionToCallList(theEnv,execStatus,name,priority,func,BloadData(theEnv)->AbortBloadFunctions,TRUE);

@@ -89,22 +89,22 @@ struct bsaveData
 
 #define Bsave(a) EnvBsave(GetCurrentEnvironment(),a)
 
-   LOCALE void                    InitializeBsaveData(void *);
+   LOCALE void                    InitializeBsaveData(void *,EXEC_STATUS);
    LOCALE int                     BsaveCommand(void *, EXEC_STATUS);
 #if BLOAD_AND_BSAVE
-   LOCALE intBool                 EnvBsave(void *,char *);
-   LOCALE void                    MarkNeededItems(void *,struct expr *);
-   LOCALE void                    SaveBloadCount(void *,long);
-   LOCALE void                    RestoreBloadCount(void *,long *);
+   LOCALE intBool                 EnvBsave(void *,EXEC_STATUS,char *);
+   LOCALE void                    MarkNeededItems(void *,EXEC_STATUS,struct expr *);
+   LOCALE void                    SaveBloadCount(void *,EXEC_STATUS,long);
+   LOCALE void                    RestoreBloadCount(void *,EXEC_STATUS,long *);
 #endif
-   LOCALE intBool                 AddBinaryItem(void *,char *,int,
-                                                void (*)(void *),
-                                                void (*)(void *,FILE *),
-                                                void (*)(void *,FILE *),
-                                                void (*)(void *,FILE *),
-                                                void (*)(void *),
-                                                void (*)(void *),
-                                                void (*)(void *));
+   LOCALE intBool                 AddBinaryItem(void *,EXEC_STATUS,char *,int,
+                                                void (*)(void *,EXEC_STATUS),
+                                                void (*)(void *,EXEC_STATUS,FILE *),
+                                                void (*)(void *,EXEC_STATUS,FILE *),
+                                                void (*)(void *,EXEC_STATUS,FILE *),
+                                                void (*)(void *,EXEC_STATUS),
+                                                void (*)(void *,EXEC_STATUS),
+                                                void (*)(void *,EXEC_STATUS));
 
 #ifndef _BSAVE_SOURCE_
    extern struct BinaryItem      *ListOfBinaryItems;

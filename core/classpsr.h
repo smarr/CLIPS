@@ -36,10 +36,10 @@
 #define LOCALE extern
 #endif
 
-LOCALE int ParseDefclass(void *,char *);
+LOCALE int ParseDefclass(void *,EXEC_STATUS,char *);
 
 #if DEFMODULE_CONSTRUCT
-LOCALE void *CreateClassScopeMap(void *,DEFCLASS *);
+LOCALE void *CreateClassScopeMap(void *,EXEC_STATUS,DEFCLASS *);
 #endif
 
 #endif

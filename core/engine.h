@@ -147,19 +147,19 @@ struct engineData
 #endif
 
    LOCALE long long               EnvRun(void *,EXEC_STATUS,long long);
-   LOCALE intBool                 EnvAddRunFunction(void *,char *,
-                                                    void (*)(void *),int);
-   LOCALE intBool                 EnvAddRunFunctionWithContext(void *,char *,
-                                                               void (*)(void *),int,void *);
+   LOCALE intBool                 EnvAddRunFunction(void *,EXEC_STATUS,char *,
+                                                    void (*)(void *,EXEC_STATUS),int);
+   LOCALE intBool                 EnvAddRunFunctionWithContext(void *,EXEC_STATUS,char *,
+                                                               void (*)(void *,EXEC_STATUS),int,void *);
    LOCALE intBool                 AddRunFunction(char *,void (*)(void),int);
-   LOCALE intBool                 EnvRemoveRunFunction(void *,char *);
-   LOCALE void                    InitializeEngine(void *);
-   LOCALE void                    EnvSetBreak(void *,void *);
-   LOCALE void                    EnvHalt(void *);
-   LOCALE intBool                 EnvRemoveBreak(void *,void *);
-   LOCALE void                    RemoveAllBreakpoints(void *);
-   LOCALE void                    EnvShowBreaks(void *,char *,void *);
-   LOCALE intBool                 EnvDefruleHasBreakpoint(void *,void *);
+   LOCALE intBool                 EnvRemoveRunFunction(void *,EXEC_STATUS,char *);
+   LOCALE void                    InitializeEngine(void *,EXEC_STATUS);
+   LOCALE void                    EnvSetBreak(void *,EXEC_STATUS,void *);
+   LOCALE void                    EnvHalt(void *,EXEC_STATUS);
+   LOCALE intBool                 EnvRemoveBreak(void *,EXEC_STATUS,void *);
+   LOCALE void                    RemoveAllBreakpoints(void *,EXEC_STATUS);
+   LOCALE void                    EnvShowBreaks(void *,EXEC_STATUS,char *,void *);
+   LOCALE intBool                 EnvDefruleHasBreakpoint(void *,EXEC_STATUS,void *);
    LOCALE void                    RunCommand        (void *,EXEC_STATUS);
    LOCALE void                    SetBreakCommand   (void *,EXEC_STATUS);
    LOCALE void                    RemoveBreakCommand(void *,EXEC_STATUS);
@@ -167,21 +167,21 @@ struct engineData
    LOCALE void                    HaltCommand       (void *,EXEC_STATUS);
    LOCALE int                     FocusCommand      (void *,EXEC_STATUS);
    LOCALE void                    ClearFocusStackCommand(void *,EXEC_STATUS);
-   LOCALE void                    EnvClearFocusStack(void *);
-   LOCALE void                   *EnvGetNextFocus(void *,void *);
-   LOCALE void                    EnvFocus(void *,void *);
-   LOCALE int                     EnvGetFocusChanged(void *);
-   LOCALE void                    EnvSetFocusChanged(void *,int);
+   LOCALE void                    EnvClearFocusStack(void *,EXEC_STATUS);
+   LOCALE void                   *EnvGetNextFocus(void *,EXEC_STATUS,void *);
+   LOCALE void                    EnvFocus(void *,EXEC_STATUS,void *);
+   LOCALE int                     EnvGetFocusChanged(void *,EXEC_STATUS);
+   LOCALE void                    EnvSetFocusChanged(void *,EXEC_STATUS,int);
    LOCALE void                    ListFocusStackCommand(void *,EXEC_STATUS);
    LOCALE void                    EnvListFocusStack(void *,char *);
    LOCALE void                    GetFocusStackFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
    LOCALE void                    EnvGetFocusStack(void *,DATA_OBJECT_PTR);
    LOCALE void                   *PopFocusFunction(void *,EXEC_STATUS);
    LOCALE void                   *GetFocusFunction(void *,EXEC_STATUS);
-   LOCALE void                   *EnvPopFocus(void *);
-   LOCALE void                   *EnvGetFocus(void *);
-   LOCALE intBool                 EnvGetHaltRules(void *);
-   LOCALE void                    EnvSetHaltRules(void *,intBool);
+   LOCALE void                   *EnvPopFocus(void *,EXEC_STATUS);
+   LOCALE void                   *EnvGetFocus(void *,EXEC_STATUS);
+   LOCALE intBool                 EnvGetHaltRules(void *,EXEC_STATUS);
+   LOCALE void                    EnvSetHaltRules(void *,EXEC_STATUS,intBool);
 
 #endif
 

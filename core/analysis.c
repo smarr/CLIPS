@@ -56,21 +56,21 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static int                     GetVariables(void *,struct lhsParseNode *);
-   static intBool                 UnboundVariablesInPattern(void *,struct lhsParseNode *,int);
-   static int                     PropagateVariableToNodes(void *,
+   static int                     GetVariables(void *,EXEC_STATUS,struct lhsParseNode *);
+   static intBool                 UnboundVariablesInPattern(void *,EXEC_STATUS,struct lhsParseNode *,int);
+   static int                     PropagateVariableToNodes(void *,EXEC_STATUS,
                                                            struct lhsParseNode *,
                                                            int,
                                                            struct symbolHashNode *,
                                                            struct lhsParseNode *,
                                                            int,int,int);
-   static struct lhsParseNode    *CheckExpression(void *,
+   static struct lhsParseNode    *CheckExpression(void *,EXEC_STATUS,
                                                   struct lhsParseNode *,
                                                   struct lhsParseNode *,
                                                   int,
                                                   struct symbolHashNode *,
                                                   int);
-   static void                    VariableReferenceErrorMessage(void *,
+   static void                    VariableReferenceErrorMessage(void *,EXEC_STATUS,
                                                                 struct symbolHashNode *,
                                                                 struct lhsParseNode *,
                                                                 int,
@@ -81,19 +81,19 @@
                                                struct lhsParseNode *,
                                                struct lhsParseNode *,
                                                struct lhsParseNode *);
-   static int                     ProcessVariable(void *,
+   static int                     ProcessVariable(void *,EXEC_STATUS,
                                                struct lhsParseNode *,
                                                struct lhsParseNode *,
                                                struct lhsParseNode *);
-   static void                    VariableMixingErrorMessage(void *,struct symbolHashNode *);
-   static int                     PropagateVariableDriver(void *,
+   static void                    VariableMixingErrorMessage(void *,EXEC_STATUS,struct symbolHashNode *);
+   static int                     PropagateVariableDriver(void *,EXEC_STATUS,
                                                           struct lhsParseNode *,
                                                           struct lhsParseNode *,
                                                           struct lhsParseNode *,
                                                           int,struct symbolHashNode *,
                                                           struct lhsParseNode *,
                                                           int);
-   static void                    CombineNandExpressions(void *,struct lhsParseNode *);
+   static void                    CombineNandExpressions(void *,EXEC_STATUS,struct lhsParseNode *);
 
 /******************************************************************/
 /* VariableAnalysis: Propagates variables references to other     */

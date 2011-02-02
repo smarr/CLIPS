@@ -43,7 +43,7 @@
 #define LOCALE extern
 #endif
 
-   LOCALE void                           DeriveDefaultFromConstraints(void *,CONSTRAINT_RECORD *,DATA_OBJECT *,int,int);
+   LOCALE void                           DeriveDefaultFromConstraints(void *,EXEC_STATUS,CONSTRAINT_RECORD *,DATA_OBJECT *,int,int);
    LOCALE struct expr                   *ParseDefault(void *,EXEC_STATUS,char *,int,int,int,int *,int *,int *);
 
 #endif

@@ -46,16 +46,16 @@
 #define ListDeffacts(a,b) EnvListDeffacts(GetCurrentEnvironment(),a,b)
 #define Undeffacts(a) EnvUndeffacts(GetCurrentEnvironment(),a)
 
-   LOCALE void                           DeffactsBasicCommands(void *);
-   LOCALE void                           UndeffactsCommand(void *);
-   LOCALE intBool                        EnvUndeffacts(void *,void *);
-   LOCALE void                           GetDeffactsListFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                           EnvGetDeffactsList(void *,DATA_OBJECT_PTR,void *);
-   LOCALE void                          *DeffactsModuleFunction(void *);
-   LOCALE void                           PPDeffactsCommand(void *);
-   LOCALE int                            PPDeffacts(void *,char *,char *);
-   LOCALE void                           ListDeffactsCommand(void *);
-   LOCALE void                           EnvListDeffacts(void *,char *,void *);
+   LOCALE void                           DeffactsBasicCommands(void *,EXEC_STATUS);
+   LOCALE void                           UndeffactsCommand(void *,EXEC_STATUS);
+   LOCALE intBool                        EnvUndeffacts(void *,EXEC_STATUS,void *);
+   LOCALE void                           GetDeffactsListFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
+   LOCALE void                           EnvGetDeffactsList(void *,EXEC_STATUS,DATA_OBJECT_PTR,void *);
+   LOCALE void                          *DeffactsModuleFunction(void *,EXEC_STATUS);
+   LOCALE void                           PPDeffactsCommand(void *,EXEC_STATUS);
+   LOCALE int                            PPDeffacts(void *,EXEC_STATUS,char *,char *);
+   LOCALE void                           ListDeffactsCommand(void *,EXEC_STATUS);
+   LOCALE void                           EnvListDeffacts(void *,EXEC_STATUS,char *,void *);
 
 #endif
 

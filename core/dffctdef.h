@@ -90,12 +90,12 @@ struct deffactsModule
 #define GetNextDeffacts(a) EnvGetNextDeffacts(GetCurrentEnvironment(),a)
 #define IsDeffactsDeletable(a) EnvIsDeffactsDeletable(GetCurrentEnvironment(),a)
 
-   LOCALE void                           InitializeDeffacts(void *);
-   LOCALE void                          *EnvFindDeffacts(void *,char *);
-   LOCALE void                          *EnvGetNextDeffacts(void *,void *);
+   LOCALE void                           InitializeDeffacts(void *,EXEC_STATUS);
+   LOCALE void                          *EnvFindDeffacts(void *,EXEC_STATUS,char *);
+   LOCALE void                          *EnvGetNextDeffacts(void *,EXEC_STATUS,void *);
    LOCALE void                           CreateInitialFactDeffacts(void);
-   LOCALE intBool                        EnvIsDeffactsDeletable(void *,void *);
-   LOCALE struct deffactsModule         *GetDeffactsModuleItem(void *,struct defmodule *);
+   LOCALE intBool                        EnvIsDeffactsDeletable(void *,EXEC_STATUS,void *);
+   LOCALE struct deffactsModule         *GetDeffactsModuleItem(void *,EXEC_STATUS,struct defmodule *);
 
 #endif
 

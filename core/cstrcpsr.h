@@ -50,13 +50,13 @@
    LOCALE int                            EnvLoad(void *,EXEC_STATUS,char *);
    LOCALE int                            LoadConstructsFromLogicalName(void *,EXEC_STATUS,char *);
    LOCALE int                            ParseConstruct(void *,EXEC_STATUS,char *,char *);
-   LOCALE void                           RemoveConstructFromModule(void *,struct constructHeader *);
-   LOCALE struct symbolHashNode         *GetConstructNameAndComment(void *,char *,
+   LOCALE void                           RemoveConstructFromModule(void *,EXEC_STATUS,struct constructHeader *);
+   LOCALE struct symbolHashNode         *GetConstructNameAndComment(void *,EXEC_STATUS,char *,
                                          struct token *,char *,
-                                         void *(*)(void *,char *),
-                                         int (*)(void *,void *),
+                                         void *(*)(void *,EXEC_STATUS,char *),
+                                         int (*)(void *,EXEC_STATUS,void *),
                                          char *,int,int,int);
-   LOCALE void                           ImportExportConflictMessage(void *,char *,char *,char *,char *);
+   LOCALE void                           ImportExportConflictMessage(void *,EXEC_STATUS,char *,char *,char *,char *);
 
 #endif
 

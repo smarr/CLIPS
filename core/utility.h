@@ -30,6 +30,8 @@
 #undef LOCALE
 #endif
 
+# include "evaluatn.h"
+
 struct callFunctionItem
   {
    char *name;

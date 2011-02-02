@@ -42,10 +42,10 @@
 #define LOCALE extern
 #endif
 
-   LOCALE struct constraintRecord       *IntersectConstraints(void *,struct constraintRecord *,struct constraintRecord *);
+   LOCALE struct constraintRecord       *IntersectConstraints(void *,EXEC_STATUS,struct constraintRecord *,struct constraintRecord *);
 #if (! BLOAD_ONLY)
-   LOCALE struct constraintRecord       *UnionConstraints(void *,struct constraintRecord *,struct constraintRecord *);
-   LOCALE void                           RemoveConstantFromConstraint(void *,int,void *,CONSTRAINT_RECORD *);
+   LOCALE struct constraintRecord       *UnionConstraints(void *,EXEC_STATUS,struct constraintRecord *,struct constraintRecord *);
+   LOCALE void                           RemoveConstantFromConstraint(void *,EXEC_STATUS,int,void *,CONSTRAINT_RECORD *);
 #endif
 
 #endif

@@ -41,7 +41,7 @@
 #define LOCALE extern
 #endif
 
-LOCALE void CallDeffunction(void *,DEFFUNCTION *,EXPRESSION *,DATA_OBJECT *);
+LOCALE void CallDeffunction(void *,EXEC_STATUS,DEFFUNCTION *,EXPRESSION *,DATA_OBJECT *);
 
 #endif
 

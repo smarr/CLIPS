@@ -50,10 +50,10 @@ LOCALE void AssignBsaveConstructHeaderVals(struct bsaveConstructHeader *,
                                              struct constructHeader *);
 #endif
 
-LOCALE void UpdateConstructHeader(void *,
+LOCALE void UpdateConstructHeader(void *,EXEC_STATUS,
                                   struct bsaveConstructHeader *,
                                   struct constructHeader *,int,void *,int,void *);
-LOCALE void UnmarkConstructHeader(void *,struct constructHeader *);
+LOCALE void UnmarkConstructHeader(void *,EXEC_STATUS,struct constructHeader *);
 
 #ifndef _CSTRCBIN_SOURCE_
 #endif

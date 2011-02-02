@@ -42,15 +42,15 @@
 #include <stdio.h>
 #endif
 
-   LOCALE struct constraintRecord       *GetConstraintRecord(void *);
-   LOCALE int                            CompareNumbers(void *,int,void *,int,void *);
-   LOCALE struct constraintRecord       *CopyConstraintRecord(void *,CONSTRAINT_RECORD *);
+   LOCALE struct constraintRecord       *GetConstraintRecord(void *,EXEC_STATUS);
+   LOCALE int                            CompareNumbers(void *,EXEC_STATUS,int,void *,int,void *);
+   LOCALE struct constraintRecord       *CopyConstraintRecord(void *,EXEC_STATUS,CONSTRAINT_RECORD *);
    LOCALE int                            SetConstraintType(int,CONSTRAINT_RECORD *);
    LOCALE void                           SetAnyAllowedFlags(CONSTRAINT_RECORD *,int);
    LOCALE void                           SetAnyRestrictionFlags(CONSTRAINT_RECORD *,int);
-   LOCALE CONSTRAINT_RECORD             *ArgumentTypeToConstraintRecord(void *,int);
-   LOCALE CONSTRAINT_RECORD             *FunctionCallToConstraintRecord(void *,void *);
-   LOCALE CONSTRAINT_RECORD             *ExpressionToConstraintRecord(void *,struct expr *);
+   LOCALE CONSTRAINT_RECORD             *ArgumentTypeToConstraintRecord(void *,EXEC_STATUS,int);
+   LOCALE CONSTRAINT_RECORD             *FunctionCallToConstraintRecord(void *,EXEC_STATUS,void *);
+   LOCALE CONSTRAINT_RECORD             *ExpressionToConstraintRecord(void *,EXEC_STATUS,struct expr *);
 
 #endif
 

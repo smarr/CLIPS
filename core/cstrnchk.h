@@ -51,19 +51,19 @@
 #define CARDINALITY_VIOLATION           5
 #define ALLOWED_CLASSES_VIOLATION       6
 
-   LOCALE intBool                        CheckCardinalityConstraint(void *,long,CONSTRAINT_RECORD *);
+   LOCALE intBool                        CheckCardinalityConstraint(void *,EXEC_STATUS,long,CONSTRAINT_RECORD *);
    LOCALE intBool                        CheckAllowedValuesConstraint(int,void *,CONSTRAINT_RECORD *);
-   LOCALE intBool                        CheckAllowedClassesConstraint(void *,int,void *,CONSTRAINT_RECORD *);
-   LOCALE int                            ConstraintCheckExpressionChain(void *,struct expr *,
+   LOCALE intBool                        CheckAllowedClassesConstraint(void *,EXEC_STATUS,int,void *,CONSTRAINT_RECORD *);
+   LOCALE int                            ConstraintCheckExpressionChain(void *,EXEC_STATUS,struct expr *,
                                                                      CONSTRAINT_RECORD *);
-   LOCALE void                           ConstraintViolationErrorMessage(void *,char *,char *,int,int,
+   LOCALE void                           ConstraintViolationErrorMessage(void *,EXEC_STATUS,char *,char *,int,int,
                                                                       struct symbolHashNode *,
                                                                       int,int,CONSTRAINT_RECORD *,
                                                                       int);
-   LOCALE int                            ConstraintCheckValue(void *,int,void *,CONSTRAINT_RECORD *);
-   LOCALE int                            ConstraintCheckDataObject(void *,DATA_OBJECT *,CONSTRAINT_RECORD *);
+   LOCALE int                            ConstraintCheckValue(void *,EXEC_STATUS,int,void *,CONSTRAINT_RECORD *);
+   LOCALE int                            ConstraintCheckDataObject(void *,EXEC_STATUS,DATA_OBJECT *,CONSTRAINT_RECORD *);
 #if (! BLOAD_ONLY) && (! RUN_TIME)
-   LOCALE int                            ConstraintCheckExpression(void *,struct expr *,
+   LOCALE int                            ConstraintCheckExpression(void *,EXEC_STATUS,struct expr *,
                                                                 CONSTRAINT_RECORD *);
 #endif
 #if (! RUN_TIME)
