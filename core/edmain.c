@@ -189,7 +189,8 @@ globle KEYTAB keytab[] = {
 static void PerformEditCommand(void *);
 
 static void PerformEditCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
 {
         register int    c;
         register int    f;
@@ -330,6 +331,7 @@ loop:
  */
 globle void edinit(
   void *theEnv,
+  EXEC_STATUS,
   char bname[])
 {
         register BUFFER *bp;
@@ -367,6 +369,7 @@ globle void edinit(
  */
 globle int execute(
   void *theEnv,
+  EXEC_STATUS,
   int c,
   int f,
   int n)
@@ -481,6 +484,7 @@ globle int getctl()
  */
 globle int quickexit(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -499,6 +503,7 @@ globle int quickexit(
 #endif
 globle int edquit(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -526,6 +531,7 @@ globle int edquit(
 #endif
 globle int temp_quit(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -543,6 +549,7 @@ globle int temp_quit(
 #endif
 globle int ctlxlp(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -565,6 +572,7 @@ globle int ctlxlp(
 #endif
 globle int ctlxrp(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -588,6 +596,7 @@ globle int ctlxrp(
 #endif
 globle int ctlxe(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
 {
@@ -629,6 +638,7 @@ globle int ctlxe(
 #endif
 globle int ctrlg(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -642,7 +652,8 @@ globle int ctrlg(
   }
 
 globle void full_cleanup(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
 {
 
 /*   Clear all data structures */
@@ -677,6 +688,7 @@ globle void full_cleanup(
 
 globle int kill_all_buffers(
   void *theEnv,
+  EXEC_STATUS,
   BUFFER **top_buf)
   {
    register BUFFER *bp;
@@ -697,7 +709,8 @@ globle int kill_all_buffers(
 }
 
 globle int kill_all_windows(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
 {
    register WINDOW *wp;
    register WINDOW *wp1;
@@ -719,6 +732,7 @@ globle int kill_all_windows(
 
 globle int spec_clear(
   void *theEnv,
+  EXEC_STATUS,
   BUFFER *bp)
 {
         register LINE   *lp;
@@ -734,7 +748,8 @@ globle int spec_clear(
 }
 
 globle void EditCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    void (*redrawScreenFunction)(void *);
    void (*pauseEnvFunction)(void *);
@@ -754,7 +769,8 @@ globle void EditCommand(
 /* EditorFunctionDefinition:               */
 /*******************************************/
 globle void EditorFunctionDefinition(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    EnvDefineFunction2(theEnv,"edit",'v', PTIEF EditCommand,"EditCommand", "*1k");
   }
@@ -765,13 +781,15 @@ globle void EditCommand(void *);
 globle void EditorFunctionDefinition(void *);
 
 globle void EditCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    /* Empty Stub */
   }
 
 globle void EditorFunctionDefinition(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {       
   }
 

@@ -108,6 +108,7 @@ globle void AssignBsaveConstructHeaderVals(
  ***************************************************/
 LOCALE void UpdateConstructHeader(
   void *theEnv,
+  EXEC_STATUS,
   struct bsaveConstructHeader *theBsaveConstruct,
   struct constructHeader *theConstruct,
   int itemModuleSize,
@@ -145,6 +146,7 @@ LOCALE void UpdateConstructHeader(
  *******************************************************/
 globle void UnmarkConstructHeader(
   void *theEnv,
+  EXEC_STATUS,
   struct constructHeader *theConstruct)
   {
    DecrementSymbolCount(theEnv,theConstruct->name);

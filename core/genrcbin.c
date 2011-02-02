@@ -134,7 +134,8 @@ static void DeallocateDefgenericBinaryData(void *);
   NOTES        : None
  ***********************************************************/
 globle void SetupGenericsBload(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    AllocateEnvironmentData(theEnv,GENRCBIN_DATA,sizeof(struct defgenericBinaryData),DeallocateDefgenericBinaryData);
 #if BLOAD_AND_BSAVE
@@ -155,7 +156,8 @@ globle void SetupGenericsBload(
 /*    data for the defgeneric binary functionality.        */
 /***********************************************************/
 static void DeallocateDefgenericBinaryData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
 #if (BLOAD || BLOAD_ONLY || BLOAD_AND_BSAVE) && (! RUN_TIME)
    size_t space;
@@ -188,6 +190,7 @@ static void DeallocateDefgenericBinaryData(
  ***************************************************/
 globle void *BloadDefgenericModuleReference(
   void *theEnv,
+  EXEC_STATUS,
   int theIndex)
   {
    return ((void *) &DefgenericBinaryData(theEnv)->ModuleArray[theIndex]);
@@ -219,7 +222,8 @@ globle void *BloadDefgenericModuleReference(
                    generic functions will be bsaved in order of binary list)
  ***************************************************************************/
 static void BsaveGenericsFind(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    SaveBloadCount(theEnv,DefgenericBinaryData(theEnv)->ModuleCount);
    SaveBloadCount(theEnv,DefgenericBinaryData(theEnv)->GenericCount);
@@ -252,6 +256,7 @@ static void BsaveGenericsFind(
 #endif
 static void MarkDefgenericItems(
   void *theEnv,
+  EXEC_STATUS,
   struct constructHeader *theDefgeneric,
   void *userBuffer)
   {
@@ -292,6 +297,7 @@ static void MarkDefgenericItems(
  ***************************************************/
 static void BsaveGenericsExpressions(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp)
   {
    /* ================================================================
@@ -317,6 +323,7 @@ static void BsaveGenericsExpressions(
  ***************************************************/
 static void BsaveMethodExpressions(
   void *theEnv,
+  EXEC_STATUS,
   struct constructHeader *theDefgeneric,
   void *userBuffer)
   {
@@ -341,6 +348,7 @@ static void BsaveMethodExpressions(
  ***************************************************/
 static void BsaveRestrictionExpressions(
   void *theEnv,
+  EXEC_STATUS,
   struct constructHeader *theDefgeneric,
   void *userBuffer)
   {
@@ -368,6 +376,7 @@ static void BsaveRestrictionExpressions(
  ***********************************************************/
 static void BsaveStorageGenerics(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp)
   {
    size_t space;
@@ -397,6 +406,7 @@ static void BsaveStorageGenerics(
  ****************************************************************************************/
 static void BsaveGenerics(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp)
   {
    struct defmodule *theModule;
@@ -481,6 +491,7 @@ static void BsaveGenerics(
  ***************************************************/
 static void BsaveDefgenericHeader(
   void *theEnv,
+  EXEC_STATUS,
   struct constructHeader *theDefgeneric,
   void *userBuffer)
   {
@@ -510,6 +521,7 @@ static void BsaveDefgenericHeader(
  ***************************************************/
 static void BsaveMethods(
   void *theEnv,
+  EXEC_STATUS,
   struct constructHeader *theDefgeneric,
   void *userBuffer)
   {
@@ -556,6 +568,7 @@ static void BsaveMethods(
  ******************************************************/
 static void BsaveMethodRestrictions(
   void *theEnv,
+  EXEC_STATUS,
   struct constructHeader *theDefgeneric,
   void *userBuffer)
   {
@@ -604,6 +617,7 @@ static void BsaveMethodRestrictions(
 #endif
 static void BsaveRestrictionTypes(
   void *theEnv,
+  EXEC_STATUS,
   struct constructHeader *theDefgeneric,
   void *userBuffer)
   {
@@ -646,7 +660,8 @@ static void BsaveRestrictionTypes(
                    within the structures
  ***********************************************************************/
 static void BloadStorageGenerics(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    size_t space;
    long counts[5];
@@ -712,7 +727,8 @@ static void BloadStorageGenerics(
   NOTES        : Assumes all loading is finished
  ********************************************************************/
 static void BloadGenerics(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    size_t space;
 
@@ -733,6 +749,7 @@ static void BloadGenerics(
  *********************************************/
 static void UpdateGenericModule(
   void *theEnv,
+  EXEC_STATUS,
   void *buf,
   long obji)
   {
@@ -745,6 +762,7 @@ static void UpdateGenericModule(
 
 static void UpdateGeneric(
   void *theEnv,
+  EXEC_STATUS,
   void *buf,
   long obji)
   {
@@ -768,6 +786,7 @@ static void UpdateGeneric(
 
 static void UpdateMethod(
   void *theEnv,
+  EXEC_STATUS,
   void *buf,
   long obji)
   {
@@ -792,6 +811,7 @@ static void UpdateMethod(
 
 static void UpdateRestriction(
   void *theEnv,
+  EXEC_STATUS,
   void *buf,
   long obji)
   {
@@ -805,6 +825,7 @@ static void UpdateRestriction(
 
 static void UpdateType(
   void *theEnv,
+  EXEC_STATUS,
   void *buf,
   long obji)
   {
@@ -835,7 +856,8 @@ static void UpdateType(
   NOTES        : Generic function name symbol counts decremented
  ***************************************************************/
 static void ClearBloadGenerics(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    register long i;
    size_t space;

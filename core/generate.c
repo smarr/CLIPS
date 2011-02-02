@@ -81,6 +81,7 @@
 /*******************************************************/
 globle void FieldConversion(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *theField,
   struct lhsParseNode *thePattern)
   {
@@ -354,6 +355,7 @@ globle void FieldConversion(
 /****************************************************************************/
 static void ExtractAnds(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *andField,
   int testInPatternNetwork,
   struct expr **patternNetTest,
@@ -423,6 +425,7 @@ static void ExtractAnds(
 /************************************************************************/
 static void ExtractFieldTest(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *theField,
   int testInPatternNetwork,
   struct expr **patternNetTest,
@@ -542,6 +545,7 @@ static void ExtractFieldTest(
 /*********************************************************/
 static struct expr *GenPNConstant(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *theField)
   {
    struct expr *top;
@@ -581,6 +585,7 @@ static struct expr *GenPNConstant(
 /************************************************************/
 static struct expr *GenJNConstant(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *theField,
   int isNand)
   {
@@ -629,6 +634,7 @@ static struct expr *GenJNConstant(
 /******************************************************/
 static struct expr *GenJNColon(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *theField,
   int isNand)
   {
@@ -669,6 +675,7 @@ static struct expr *GenJNColon(
 /******************************************************/
 static struct expr *GenPNColon(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *theField)
   {
    struct expr *top, *conversion;
@@ -705,6 +712,7 @@ static struct expr *GenPNColon(
 /******************************************************/
 static struct expr *GenJNEq(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *theField,
   int isNand)
   {
@@ -749,6 +757,7 @@ static struct expr *GenJNEq(
 /*******************************************************/
 static struct expr *GenPNEq(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *theField)
   {
    struct expr *top, *conversion;
@@ -786,6 +795,7 @@ static struct expr *GenPNEq(
 /*******************************************************************/
 globle struct expr *GetvarReplace(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *nodeList,
   int isNand)
   {
@@ -894,6 +904,7 @@ globle intBool IsNandTest(
 /**********************************************************************/
 static struct expr *GetfieldReplace(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *nodeList)
   {
    struct expr *newList;
@@ -946,6 +957,7 @@ static struct expr *GetfieldReplace(
 /**************************************************************/
 static struct expr *GenJNVariableComparison(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *selfNode,
   struct lhsParseNode *referringNode,
   int isNand)
@@ -996,6 +1008,7 @@ static struct expr *GenJNVariableComparison(
 /*************************************************************/
 static struct expr *GenPNVariableComparison(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *selfNode,
   struct lhsParseNode *referringNode)
   {

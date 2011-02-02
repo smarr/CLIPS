@@ -79,7 +79,8 @@ static void PopQuerySoln(void *);
   NOTES        : None
  ****************************************************/
 globle void SetupFactQuery(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    AllocateEnvironmentData(theEnv,FACT_QUERY_DATA,sizeof(struct factQueryData),NULL);
 
@@ -134,6 +135,7 @@ globle void SetupFactQuery(
  *************************************************************/
 globle void GetQueryFact(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    register QUERY_CORE *core;
@@ -155,6 +157,7 @@ globle void GetQueryFact(
  **************************************************************************/
 globle void GetQueryFactSlot(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    struct fact *theFact;
@@ -266,7 +269,8 @@ globle void GetQueryFactSlot(
   NOTES        : H/L Syntax : See FactParseQueryNoAction()
  ******************************************************************************/
 globle intBool AnyFacts(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    QUERY_TEMPLATE *qtemplates;
    unsigned rcnt;
@@ -303,6 +307,7 @@ globle intBool AnyFacts(
  ******************************************************************************/
 globle void QueryFindFact(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    QUERY_TEMPLATE *qtemplates;
@@ -362,6 +367,7 @@ globle void QueryFindFact(
  ******************************************************************************/
 globle void QueryFindAllFacts(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    QUERY_TEMPLATE *qtemplates;
@@ -421,6 +427,7 @@ globle void QueryFindAllFacts(
  ******************************************************************************/
 globle void QueryDoForFact(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    QUERY_TEMPLATE *qtemplates;
@@ -462,6 +469,7 @@ globle void QueryDoForFact(
  ******************************************************************************/
 globle void QueryDoForAllFacts(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    QUERY_TEMPLATE *qtemplates;
@@ -510,6 +518,7 @@ globle void QueryDoForAllFacts(
  ******************************************************************************/
 globle void DelayedQueryDoForAllFacts(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    QUERY_TEMPLATE *qtemplates;
@@ -574,7 +583,8 @@ globle void DelayedQueryDoForAllFacts(
   NOTES        : None
  *******************************************************/
 static void PushQueryCore(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    QUERY_STACK *qptr;
 
@@ -595,7 +605,8 @@ static void PushQueryCore(
   NOTES        : Assumes stack is not empty
  ******************************************************/
 static void PopQueryCore(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    QUERY_STACK *qptr;
 
@@ -617,6 +628,7 @@ static void PopQueryCore(
  ***************************************************/
 static QUERY_CORE *FindQueryCore(
   void *theEnv,
+  EXEC_STATUS,
   int depth)
   {
    QUERY_STACK *qptr;
@@ -654,6 +666,7 @@ static QUERY_CORE *FindQueryCore(
  **********************************************************/
 static QUERY_TEMPLATE *DetermineQueryTemplates(
   void *theEnv,
+  EXEC_STATUS,
   EXPRESSION *templateExp,
   char *func,
   unsigned *rcnt)
@@ -717,6 +730,7 @@ static QUERY_TEMPLATE *DetermineQueryTemplates(
  *************************************************************/
 static QUERY_TEMPLATE *FormChain(
   void *theEnv,
+  EXEC_STATUS,
   char *func,
   DATA_OBJECT *val)
   {
@@ -815,6 +829,7 @@ static QUERY_TEMPLATE *FormChain(
  ******************************************************/
 static void DeleteQueryTemplates(
   void *theEnv,
+  EXEC_STATUS,
   QUERY_TEMPLATE *qlist)
   {
    QUERY_TEMPLATE *tmp;
@@ -849,6 +864,7 @@ static void DeleteQueryTemplates(
  ************************************************************/
 static int TestForFirstInChain(
   void *theEnv,
+  EXEC_STATUS,
   QUERY_TEMPLATE *qchain,
   int indx)
   {
@@ -881,6 +897,7 @@ static int TestForFirstInChain(
  *****************************************************************/
 static int TestForFirstFactInTemplate(
   void *theEnv,
+  EXEC_STATUS,
   struct deftemplate *templatePtr,
   QUERY_TEMPLATE *qchain,
   int indx)
@@ -945,6 +962,7 @@ static int TestForFirstFactInTemplate(
  ************************************************************/
 static void TestEntireChain(
   void *theEnv,
+  EXEC_STATUS,
   QUERY_TEMPLATE *qchain,
   int indx)
   {
@@ -977,6 +995,7 @@ static void TestEntireChain(
  *****************************************************************/
 static void TestEntireTemplate(
   void *theEnv,
+  EXEC_STATUS,
   struct deftemplate *templatePtr,
   QUERY_TEMPLATE *qchain,
   int indx)
@@ -1048,7 +1067,8 @@ static void TestEntireTemplate(
   NOTES        : Solutions are stored as sequential arrays of struct fact *
  ***************************************************************************/
 static void AddSolution(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    QUERY_SOLN *new_soln;
    register unsigned i;
@@ -1077,7 +1097,8 @@ static void AddSolution(
   NOTES        : Assumes QueryCore->soln_set != 0
  ***************************************************/
 static void PopQuerySoln(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    FactQueryData(theEnv)->QueryCore->soln_bottom = FactQueryData(theEnv)->QueryCore->soln_set;
    FactQueryData(theEnv)->QueryCore->soln_set = FactQueryData(theEnv)->QueryCore->soln_set->nxt;

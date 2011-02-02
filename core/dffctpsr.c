@@ -46,6 +46,7 @@
 /************************************************************/
 globle int ParseDeffacts(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource)
   {
 #if (MAC_MCW || WIN_MCW) && (RUN_TIME || BLOAD_ONLY)

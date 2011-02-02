@@ -92,6 +92,7 @@ static int CompileLineIndex = 0;
 #endif
 globle int compile_region(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -147,6 +148,7 @@ globle int compile_region(
 #endif
 globle int compile_file(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -181,6 +183,7 @@ globle int compile_file(
  **********************************************************/
 globle int get_compile(
   void *theEnv,
+  EXEC_STATUS,
   char *str1,
   char *str2)
   {
@@ -247,6 +250,7 @@ globle int get_compile(
 
 globle int region_fnd(
   void *theEnv,
+  EXEC_STATUS,
   char *log_name)
   {
    if (strcmp("Emacs_region",log_name)== 0)
@@ -264,6 +268,7 @@ globle int region_fnd(
 #endif
 globle int region_getc(
   void *theEnv,
+  EXEC_STATUS,
 char *log_name)
 {
   int c;
@@ -292,6 +297,7 @@ char *log_name)
 #endif
 globle int region_ungetc(
   void *theEnv,
+  EXEC_STATUS,
 int c,
 char *log_name)
 
@@ -317,6 +323,7 @@ char *log_name)
 
 globle int buffer_fnd(
   void *theEnv,
+  EXEC_STATUS,
   char *log_name)
 {
     if(strcmp("Emacs_buffer",log_name)== 0)
@@ -335,6 +342,7 @@ globle int buffer_fnd(
 #endif
 globle int buffer_getc(
   void *theEnv,
+  EXEC_STATUS,
   char *log_name)
 {
   int c;
@@ -364,6 +372,7 @@ globle int buffer_getc(
 #endif
 globle int buffer_ungetc(
   void *theEnv,
+  EXEC_STATUS,
   int    c,
   char  *logical_name)
 {
@@ -381,6 +390,7 @@ globle int buffer_ungetc(
 
 globle int query_cmp(
   void *theEnv,
+  EXEC_STATUS,
   char *logName)
 {
    if((strcmp(logName,"wdialog") == 0) ||
@@ -394,6 +404,7 @@ globle int query_cmp(
 
 globle int print_cmp(
   void *theEnv,
+  EXEC_STATUS,
   char *logName, 
   char *str)
   {
@@ -426,7 +437,8 @@ globle int print_cmp(
   }
 
 globle void init_cmp_router(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    EnvAddRouter(theEnv,"cmp_router",
 	      20,
@@ -439,7 +451,8 @@ globle void init_cmp_router(
   }
 
 globle void kill_cmp_router(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    EnvDeleteRouter(theEnv,"cmp_router");
   }
@@ -457,6 +470,7 @@ globle void kill_cmp_router(
 #endif
 globle int setfillcol(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -474,6 +488,7 @@ globle int setfillcol(
 #endif
 globle int showcpos(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -555,6 +570,7 @@ globle int cntlines()
 #endif
 globle int gotoline(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -601,6 +617,7 @@ globle int gotoline(
 #endif
 globle int twiddle(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -635,6 +652,7 @@ globle int twiddle(
 #endif
 globle int quote(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -667,6 +685,7 @@ globle int quote(
 #endif
 globle int tab(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -691,6 +710,7 @@ globle int tab(
 #endif
 globle int openline(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -722,6 +742,7 @@ globle int openline(
 #endif
 globle int newline(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -756,6 +777,7 @@ globle int newline(
 #endif
 globle int deblank(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -790,6 +812,7 @@ globle int deblank(
 #endif
 globle int indent(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
 {
@@ -828,6 +851,7 @@ globle int indent(
 #endif
 globle int forwdel(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -852,6 +876,7 @@ globle int forwdel(
 #endif
 globle int backdel(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -882,6 +907,7 @@ globle int backdel(
 #endif
 globle int kill_fwd(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -927,6 +953,7 @@ globle int kill_fwd(
 #endif
 globle int yank(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -998,6 +1025,7 @@ globle int yank(
 #endif
 globle int forwsearch(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
     {
@@ -1073,6 +1101,7 @@ fail:;
 #endif
 globle int backsearch(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
     {
@@ -1159,6 +1188,7 @@ globle int backsearch(
 #endif
 globle int bkwrdrpl(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
     {
@@ -1253,6 +1283,7 @@ globle int bkwrdrpl(
 #endif
 globle int bkwrdcr(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
     {
@@ -1374,6 +1405,7 @@ globle int bkwrdcr(
 #endif
 globle int frwsr(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
 {
@@ -1460,6 +1492,7 @@ globle int frwsr(
 #endif
 globle int querysr(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -1563,6 +1596,7 @@ globle int querysr(
 
 globle int lreplace(
   void *theEnv,
+  EXEC_STATUS,
   char *pat2)
 {
       int doto;
@@ -1643,6 +1677,7 @@ globle int lreplace(
 #endif
 globle int smatchb(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -1811,6 +1846,7 @@ int tempch)
  */
 globle int readpattern(
     void *theEnv,
+  EXEC_STATUS,
     char *prompt)
     {
     register char *cp1;
@@ -1883,6 +1919,7 @@ globle int readpattern(
 #endif
 globle int spawncli(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
 {
@@ -1934,6 +1971,7 @@ globle int spawncli(
 #endif
 globle int spawn(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
 {

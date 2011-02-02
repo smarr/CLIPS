@@ -135,7 +135,8 @@ static void UpdateDefclassesScope(void *);
   NOTES        : Order of setup calls is important
  **********************************************************/
 globle void SetupObjectSystem(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {   
    ENTITY_RECORD defclassEntityRecord = { "DEFCLASS_PTR", DEFCLASS_PTR,1,0,0,
                                               NULL,NULL,NULL,NULL,NULL,
@@ -190,7 +191,8 @@ globle void SetupObjectSystem(
 /*    data for the defclass construct.             */
 /***************************************************/
 static void DeallocateDefclassData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
 #if ! RUN_TIME   
    SLOT_NAME *tmpSNPPtr, *nextSNPPtr;
@@ -297,6 +299,7 @@ static void DeallocateDefclassData(
 #endif
 static void DestroyDefclassAction(
   void *theEnv,
+  EXEC_STATUS,
   struct constructHeader *theConstruct,
   void *buffer)
   {
@@ -331,6 +334,7 @@ static void DestroyDefclassAction(
  ***************************************************/
 globle void ObjectsRunTimeInitialize(
   void *theEnv,
+  EXEC_STATUS,
   DEFCLASS *ctable[],
   SLOT_NAME *sntable[],
   DEFCLASS **cidmap,
@@ -421,6 +425,7 @@ globle void ObjectsRunTimeInitialize(
 /*******************************************************************/
 static void SearchForHashedPatternNodes(
    void *theEnv,
+  EXEC_STATUS,
    OBJECT_PATTERN_NODE *theNode)
    {
     while (theNode != NULL)
@@ -454,7 +459,8 @@ static void SearchForHashedPatternNodes(
                 WARNING!!: Assumes no classes exist yet!
  ***************************************************************/
 globle void CreateSystemClasses(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DEFCLASS *user,*any,*primitive,*number,*lexeme,*address,*instance;
 #if DEFRULE_CONSTRUCT
@@ -556,7 +562,8 @@ globle void CreateSystemClasses(
   NOTES        : None
  *********************************************************/
 static void SetupDefclasses(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    InstallPrimitive(theEnv,&DefclassData(theEnv)->DefclassEntityRecord,DEFCLASS_PTR);
 
@@ -686,6 +693,7 @@ static void SetupDefclasses(
  *********************************************************/
 static DEFCLASS *AddSystemClass(
   void *theEnv,
+  EXEC_STATUS,
   char *name,
   DEFCLASS *parent)
   {
@@ -739,7 +747,8 @@ static DEFCLASS *AddSystemClass(
   NOTES        : None
  *****************************************************/
 static void *AllocateModule(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return((void *) get_struct(theEnv,defclassModule));
   }
@@ -755,6 +764,7 @@ static void *AllocateModule(
  ***************************************************/
 static void ReturnModule(
   void *theEnv,
+  EXEC_STATUS,
   void *theItem)
   {
    FreeConstructHeaderModule(theEnv,(struct defmoduleItemHeader *) theItem,DefclassData(theEnv)->DefclassConstruct);
@@ -778,7 +788,8 @@ static void ReturnModule(
   NOTES        : None
  ***************************************************/
 static void UpdateDefclassesScope(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    register unsigned i;
    DEFCLASS *theDefclass;

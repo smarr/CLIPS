@@ -51,7 +51,8 @@
 /*    for use with the constructs-to-c command.              */
 /*************************************************************/
 globle void DeffactsCompilerSetup(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DeffactsData(theEnv)->DeffactsCodeItem = 
       AddCodeGeneratorItem(theEnv,"deffacts",0,BeforeDeffactsToCode,
@@ -64,7 +65,8 @@ globle void DeffactsCompilerSetup(
 /*   structures are written to a file as C code              */
 /*************************************************************/
 static void BeforeDeffactsToCode(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    MarkConstructBsaveIDs(theEnv,DeffactsData(theEnv)->DeffactsModuleIndex);
   }
@@ -75,6 +77,7 @@ static void BeforeDeffactsToCode(
 /**********************************************************/
 static int ConstructToCode(
   void *theEnv,
+  EXEC_STATUS,
   char *fileName,
   char *pathName,
   char *fileNameBuffer,
@@ -162,6 +165,7 @@ static int ConstructToCode(
 /*********************************************************/
 static void CloseDeffactsFiles(
   void *theEnv,
+  EXEC_STATUS,
   FILE *moduleFile,
   FILE *deffactsFile,
   int maxIndices)
@@ -191,6 +195,7 @@ static void CloseDeffactsFiles(
 #endif
 static void DeffactsModuleToCode(
   void *theEnv,
+  EXEC_STATUS,
   FILE *theFile,
   struct defmodule *theModule,
   int imageID,
@@ -216,6 +221,7 @@ static void DeffactsModuleToCode(
 /*********************************************************/
 static void DeffactsToCode(
   void *theEnv,
+  EXEC_STATUS,
   FILE *theFile,
   struct deffacts *theDeffacts,
   int imageID,
@@ -248,6 +254,7 @@ static void DeffactsToCode(
 /**************************************************************/
 globle void DeffactsCModuleReference(
   void *theEnv,
+  EXEC_STATUS,
   FILE *theFile,
   int count,
   int imageID,

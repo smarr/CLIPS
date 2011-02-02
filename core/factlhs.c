@@ -55,6 +55,7 @@
 /***********************************************/
 globle struct lhsParseNode *SequenceRestrictionParse(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   struct token *theToken)
   {
@@ -142,7 +143,8 @@ globle struct lhsParseNode *SequenceRestrictionParse(
 /*   for use in rules which have no LHS patterns.               */
 /****************************************************************/
 globle struct lhsParseNode *CreateInitialFactPattern(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct lhsParseNode *topNode;
    struct deftemplate *theDeftemplate;
@@ -212,6 +214,7 @@ globle int FactPatternParserFind(
 /******************************************************/
 globle struct lhsParseNode *FactPatternParse(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   struct token *theToken)
   {

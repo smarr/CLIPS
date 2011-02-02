@@ -94,6 +94,7 @@ static DEFFUNCTION *AddDeffunction(void *,SYMBOL_HN *,EXPRESSION *,int,int,int,i
  ***************************************************************************/
 globle intBool ParseDeffunction(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource)
   {
    SYMBOL_HN *deffunctionName;
@@ -282,6 +283,7 @@ globle intBool ParseDeffunction(
  ************************************************************/
 static intBool ValidDeffunctionName(
   void *theEnv,
+  EXEC_STATUS,
   char *theDeffunctionName)
   {
    struct constructHeader *theDeffunction;
@@ -386,6 +388,7 @@ static intBool ValidDeffunctionName(
 #endif
 static DEFFUNCTION *AddDeffunction(
   void *theEnv,
+  EXEC_STATUS,
   SYMBOL_HN *name,
   EXPRESSION *actions,
   int min,

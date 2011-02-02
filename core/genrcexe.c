@@ -112,6 +112,7 @@ static DEFCLASS *DetermineRestrictionClass(void *,DATA_OBJECT *);
  ***********************************************************************************/
 globle void GenericDispatch(
   void *theEnv,
+  EXEC_STATUS,
   DEFGENERIC *gfunc,
   DEFMETHOD *prevmeth,
   DEFMETHOD *meth,
@@ -243,7 +244,8 @@ globle void GenericDispatch(
   NOTES        : None
  *******************************************************/
 globle void UnboundMethodErr(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    EnvPrintRouter(theEnv,WERROR,"generic function ");
    EnvPrintRouter(theEnv,WERROR,EnvGetDefgenericName(theEnv,(void *) DefgenericData(theEnv)->CurrentGeneric));
@@ -265,6 +267,7 @@ globle void UnboundMethodErr(
  ***********************************************************************/
 globle intBool IsMethodApplicable(
   void *theEnv,
+  EXEC_STATUS,
   DEFMETHOD *meth)
   {
    DATA_OBJECT temp;
@@ -351,7 +354,8 @@ globle intBool IsMethodApplicable(
   NOTES        : H/L Syntax: (next-methodp)
  ***************************************************/
 globle int NextMethodP(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    register DEFMETHOD *meth;
 
@@ -379,6 +383,7 @@ globle int NextMethodP(
  ****************************************************/
 globle void CallNextMethod(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    DEFMETHOD *oldMethod;
@@ -456,6 +461,7 @@ globle void CallNextMethod(
  **************************************************************************/
 globle void CallSpecificMethod(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    DATA_OBJECT temp;
@@ -491,6 +497,7 @@ globle void CallSpecificMethod(
  ***********************************************************************/
 globle void OverrideNextMethod(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    result->type = SYMBOL;
@@ -520,6 +527,7 @@ globle void OverrideNextMethod(
  ***********************************************************/
 globle void GetGenericCurrentArgument(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    result->type = DefgenericData(theEnv)->GenericCurrentArgument->type;
@@ -549,6 +557,7 @@ globle void GetGenericCurrentArgument(
  ************************************************************/
 static DEFMETHOD *FindApplicableMethod(
   void *theEnv,
+  EXEC_STATUS,
   DEFGENERIC *gfunc,
   DEFMETHOD *meth)
   {
@@ -580,6 +589,7 @@ static DEFMETHOD *FindApplicableMethod(
  **********************************************************************/
 static void WatchGeneric(
   void *theEnv,
+  EXEC_STATUS,
   char *tstring)
   {
    EnvPrintRouter(theEnv,WTRACE,"GNC ");
@@ -612,6 +622,7 @@ static void WatchGeneric(
  **********************************************************************/
 static void WatchMethod(
   void *theEnv,
+  EXEC_STATUS,
   char *tstring)
   {
    EnvPrintRouter(theEnv,WTRACE,"MTH ");
@@ -649,6 +660,7 @@ static void WatchMethod(
  ***************************************************/
 static DEFCLASS *DetermineRestrictionClass(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *dobj)
   {
    INSTANCE_TYPE *ins;

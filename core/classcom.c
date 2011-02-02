@@ -83,6 +83,7 @@ static char *GetClassDefaultsModeName(unsigned short);
  ******************************************************************/
 globle void *EnvFindDefclass(
   void *theEnv,
+  EXEC_STATUS,
   char *classAndModuleName)
   {
    SYMBOL_HN *classSymbol = NULL;
@@ -128,6 +129,7 @@ globle void *EnvFindDefclass(
  ***************************************************/
 globle DEFCLASS *LookupDefclassByMdlOrScope(
   void *theEnv,
+  EXEC_STATUS,
   char *classAndModuleName)
   {
    DEFCLASS *cls;
@@ -171,6 +173,7 @@ globle DEFCLASS *LookupDefclassByMdlOrScope(
  ****************************************************/
 globle DEFCLASS *LookupDefclassInScope(
   void *theEnv,
+  EXEC_STATUS,
   char *className)
   {
    DEFCLASS *cls;
@@ -203,6 +206,7 @@ globle DEFCLASS *LookupDefclassInScope(
  ******************************************************/
 globle DEFCLASS *LookupDefclassAnywhere(
   void *theEnv,
+  EXEC_STATUS,
   struct defmodule *theModule,
   char *className)
   {
@@ -240,6 +244,7 @@ globle DEFCLASS *LookupDefclassAnywhere(
 #endif
 globle intBool DefclassInScope(
   void *theEnv,
+  EXEC_STATUS,
   DEFCLASS *theDefclass,
   struct defmodule *theModule)
   {
@@ -272,6 +277,7 @@ globle intBool DefclassInScope(
  ***********************************************************/
 globle void *EnvGetNextDefclass(
   void *theEnv,
+  EXEC_STATUS,
   void *ptr)
   {
    return((void *) GetNextConstructItem(theEnv,(struct constructHeader *) ptr,DefclassData(theEnv)->DefclassModuleIndex));
@@ -289,6 +295,7 @@ globle void *EnvGetNextDefclass(
  ***************************************************/
 globle intBool EnvIsDefclassDeletable(
   void *theEnv,
+  EXEC_STATUS,
   void *ptr)
   {
    DEFCLASS *cls;
@@ -317,7 +324,8 @@ globle intBool EnvIsDefclassDeletable(
   NOTES        : Syntax : (undefclass <class-name> | *)
  *************************************************************/
 globle void UndefclassCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    UndefconstructCommand(theEnv,"undefclass",DefclassData(theEnv)->DefclassConstruct);
   }
@@ -332,6 +340,7 @@ globle void UndefclassCommand(
  ********************************************************/
 globle intBool EnvUndefclass(
   void *theEnv,
+  EXEC_STATUS,
   void *theDefclass)
   {
 #if (MAC_MCW || WIN_MCW) && (RUN_TIME || BLOAD_ONLY)
@@ -367,7 +376,8 @@ globle intBool EnvUndefclass(
   NOTES        : Syntax : (ppdefclass <class-name>)
  *********************************************************/
 globle void PPDefclassCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {   
    PPConstructCommand(theEnv,"ppdefclass",DefclassData(theEnv)->DefclassConstruct);
   }
@@ -381,7 +391,8 @@ globle void PPDefclassCommand(
   NOTES        : H/L Interface
  ***************************************************/
 globle void ListDefclassesCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    ListConstructCommand(theEnv,"list-defclasses",DefclassData(theEnv)->DefclassConstruct);
   }
@@ -397,6 +408,7 @@ globle void ListDefclassesCommand(
  ***************************************************/
 globle void EnvListDefclasses(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   struct defmodule *theModule)
   {
@@ -419,6 +431,7 @@ globle void EnvListDefclasses(
 #endif
 globle unsigned EnvGetDefclassWatchInstances(
   void *theEnv,
+  EXEC_STATUS,
   void *theClass)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
@@ -445,6 +458,7 @@ globle unsigned EnvGetDefclassWatchInstances(
 #endif
 globle void EnvSetDefclassWatchInstances(
   void *theEnv,
+  EXEC_STATUS,
   unsigned newState,
   void *theClass)
   {
@@ -473,6 +487,7 @@ globle void EnvSetDefclassWatchInstances(
 #endif
 globle unsigned EnvGetDefclassWatchSlots(
   void *theEnv,
+  EXEC_STATUS,
   void *theClass)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
@@ -498,6 +513,7 @@ globle unsigned EnvGetDefclassWatchSlots(
 #endif
 globle void EnvSetDefclassWatchSlots(
   void *theEnv,
+  EXEC_STATUS,
   unsigned newState,
   void *theClass)
   {
@@ -524,6 +540,7 @@ globle void EnvSetDefclassWatchSlots(
  ******************************************************************/
 globle unsigned DefclassWatchAccess(
   void *theEnv,
+  EXEC_STATUS,
   int code,
   unsigned newState,
   EXPRESSION *argExprs)
@@ -552,6 +569,7 @@ globle unsigned DefclassWatchAccess(
  ***********************************************************************/
 globle unsigned DefclassWatchPrint(
   void *theEnv,
+  EXEC_STATUS,
   char *logName,
   int code,
   EXPRESSION *argExprs)
@@ -577,6 +595,7 @@ globle unsigned DefclassWatchPrint(
  *********************************************************/
 globle void GetDefclassListFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
    GetConstructListFunction(theEnv,"get-defclass-list",returnValue,DefclassData(theEnv)->DefclassConstruct);
@@ -595,6 +614,7 @@ globle void GetDefclassListFunction(
  ***************************************************************/
 globle void EnvGetDefclassList(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *returnValue,
   struct defmodule *theModule)
   {
@@ -670,6 +690,7 @@ globle SYMBOL_HN *CheckClassAndSlot(
 #endif
 globle void SaveDefclasses(
   void *theEnv,
+  EXEC_STATUS,
   void *theModule,
   char *logName)
   {
@@ -704,6 +725,7 @@ globle void SaveDefclasses(
  ***************************************************/
 static void SaveDefclass(
   void *theEnv,
+  EXEC_STATUS,
   struct constructHeader *theDefclass,
   void *userBuffer)
   {
@@ -738,6 +760,7 @@ static void SaveDefclass(
 /***********************************************/
 globle unsigned short EnvSetClassDefaultsMode(
   void *theEnv,
+  EXEC_STATUS,
   unsigned short value)
   {
    unsigned short ov;
@@ -752,7 +775,8 @@ globle unsigned short EnvSetClassDefaultsMode(
 /*    value of the class defaults mode. */
 /****************************************/
 globle unsigned short EnvGetClassDefaultsMode(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return(DefclassData(theEnv)->ClassDefaultsMode);
   }
@@ -762,7 +786,8 @@ globle unsigned short EnvGetClassDefaultsMode(
 /*   for the get-class-defaults-mode command.      */
 /***************************************************/
 globle void *GetClassDefaultsModeCommand(
-  void *theEnv,EXEC_STATUS)
+  void *theEnv,
+	EXEC_STATUS)
   {
    EnvArgCountCheck(theEnv,execStatus,"get-class-defaults-mode",EXACTLY,0);
 
@@ -774,7 +799,8 @@ globle void *GetClassDefaultsModeCommand(
 /*   for the set-class-defaults-mode command.      */
 /***************************************************/
 globle void *SetClassDefaultsModeCommand(
-  void *theEnv,EXEC_STATUS)
+  void *theEnv,
+	EXEC_STATUS)
   {
    DATA_OBJECT argPtr;
    char *argument;

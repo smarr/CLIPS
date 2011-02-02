@@ -78,7 +78,8 @@
 /*   and allocates that amount of space.                   */
 /***********************************************************/
 globle void AllocateExpressions(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    size_t space;
 
@@ -97,7 +98,8 @@ globle void AllocateExpressions(
 /*   used by the expression binary image.     */
 /**********************************************/
 globle void RefreshExpressions(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    if (ExpressionData(theEnv)->ExpressionArray == NULL) return;
 
@@ -118,6 +120,7 @@ globle void RefreshExpressions(
  *********************************************************/
 static void UpdateExpression(
   void *theEnv,
+  EXEC_STATUS,
   void *buf,
   long obji)
   {
@@ -244,7 +247,8 @@ static void UpdateExpression(
 /*   utilized by an expression binary image. */
 /*********************************************/
 globle void ClearBloadedExpressions(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    unsigned long int i;
    size_t space;
@@ -317,7 +321,8 @@ globle void ClearBloadedExpressions(
   NOTES        : None
  ***************************************************/
 globle void FindHashedExpressions(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    register unsigned i;
    EXPRESSION_HN *exphash;
@@ -341,6 +346,7 @@ globle void FindHashedExpressions(
  ***************************************************/
 globle void BsaveHashedExpressions(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp)
   {
    register unsigned i;
@@ -357,6 +363,7 @@ globle void BsaveHashedExpressions(
 /***************************************************************/
 globle void BsaveConstructExpressions(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp)
   {
    struct BinaryItem *biPtr;
@@ -376,6 +383,7 @@ globle void BsaveConstructExpressions(
 /***************************************/
 globle void BsaveExpression(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *testPtr,
   FILE *fp)
   {

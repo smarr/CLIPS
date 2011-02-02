@@ -104,6 +104,7 @@ static void DeassignClassID(void *,unsigned);
 #endif
 globle void IncrementDefclassBusyCount(
   void *theEnv,
+  EXEC_STATUS,
   void *theDefclass)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
@@ -126,6 +127,7 @@ globle void IncrementDefclassBusyCount(
  ***************************************************/
 globle void DecrementDefclassBusyCount(
   void *theEnv,
+  EXEC_STATUS,
   void *theDefclass)
   {   
    if (! ConstructData(theEnv)->ClearInProgress)
@@ -170,7 +172,8 @@ globle intBool InstancesPurge(
   NOTES        : None
  ***************************************************/
 globle void InitializeClasses(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    register int i;
 
@@ -221,6 +224,7 @@ globle SLOT_DESC *FindClassSlot(
  ***************************************************************/
 globle void ClassExistError(
   void *theEnv,
+  EXEC_STATUS,
   char *func,
   char *cname)
   {
@@ -243,6 +247,7 @@ globle void ClassExistError(
  *********************************************/
 globle void DeleteClassLinks(
   void *theEnv,
+  EXEC_STATUS,
   CLASS_LINK *clink)
   {
    CLASS_LINK *ctmp;
@@ -268,6 +273,7 @@ globle void DeleteClassLinks(
  ******************************************************/
 globle void PrintClassName(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   DEFCLASS *theDefclass,
   intBool linefeedFlag)
@@ -299,6 +305,7 @@ globle void PrintClassName(
  ***************************************************/
 globle void PrintPackedClassLinks(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   char *title,
   PACKED_CLASS_LINKS *plinks)
@@ -328,6 +335,7 @@ globle void PrintPackedClassLinks(
  *******************************************************/
 globle void PutClassInTable(
   void *theEnv,
+  EXEC_STATUS,
   DEFCLASS *cls)
   {
    cls->hashTableIndex = HashClass(GetDefclassNamePointer((void *) cls));
@@ -345,6 +353,7 @@ globle void PutClassInTable(
  *********************************************************/
 globle void RemoveClassFromTable(
   void *theEnv,
+  EXEC_STATUS,
   DEFCLASS *cls)
   {
    DEFCLASS *prvhsh,*hshptr;
@@ -379,6 +388,7 @@ globle void RemoveClassFromTable(
  ***************************************************/
 globle void AddClassLink(
   void *theEnv,
+  EXEC_STATUS,
   PACKED_CLASS_LINKS *src,
   DEFCLASS *cls,
   int posn)
@@ -419,6 +429,7 @@ globle void AddClassLink(
  ***************************************************/
 globle void DeleteSubclassLink(
   void *theEnv,
+  EXEC_STATUS,
   DEFCLASS *sclass,
   DEFCLASS *cls)
   {
@@ -457,6 +468,7 @@ globle void DeleteSubclassLink(
  **************************************************************/
 globle DEFCLASS *NewClass(
   void *theEnv,
+  EXEC_STATUS,
   SYMBOL_HN *className)
   {
    register DEFCLASS *cls;
@@ -512,6 +524,7 @@ globle DEFCLASS *NewClass(
  ***************************************************/
 globle void DeletePackedClassLinks(
   void *theEnv,
+  EXEC_STATUS,
   PACKED_CLASS_LINKS *plp,
   int deleteTop)
   {
@@ -537,6 +550,7 @@ globle void DeletePackedClassLinks(
  ***************************************************/
 globle void AssignClassID(
   void *theEnv,
+  EXEC_STATUS,
   DEFCLASS *cls)
   {
    register unsigned i;
@@ -570,6 +584,7 @@ globle void AssignClassID(
  *********************************************************/
 globle SLOT_NAME *AddSlotName(
   void *theEnv,
+  EXEC_STATUS,
   SYMBOL_HN *slotName,
   int newid,
   int usenewid)
@@ -628,6 +643,7 @@ globle SLOT_NAME *AddSlotName(
  ***************************************************/
 globle void DeleteSlotName(
   void *theEnv,
+  EXEC_STATUS,
   SLOT_NAME *slotName)
   {
    SLOT_NAME *snp,*prv;
@@ -669,6 +685,7 @@ globle void DeleteSlotName(
  *******************************************************************/
 LOCALE void RemoveDefclass(
   void *theEnv,
+  EXEC_STATUS,
   void *vcls)
   {
    DEFCLASS *cls = (DEFCLASS *) vcls;
@@ -746,6 +763,7 @@ LOCALE void RemoveDefclass(
  *******************************************************************/
 LOCALE void DestroyDefclass(
   void *theEnv,
+  EXEC_STATUS,
   void *vcls)
   {
    DEFCLASS *cls = (DEFCLASS *) vcls;
@@ -829,6 +847,7 @@ LOCALE void DestroyDefclass(
  ***************************************************/
 globle void InstallClass(
   void *theEnv,
+  EXEC_STATUS,
   DEFCLASS *cls,
   int set)
   {
@@ -922,7 +941,8 @@ globle int IsClassBeingUsed(
   NOTES        : None
  ***************************************************/
 globle int RemoveAllUserClasses(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    void *userClasses,*ctmp;
    int success = TRUE;
@@ -971,6 +991,7 @@ globle int RemoveAllUserClasses(
  ****************************************************/
 globle int DeleteClassUAG(
   void *theEnv,
+  EXEC_STATUS,
   DEFCLASS *cls)
   {
    long subCount;
@@ -1041,6 +1062,7 @@ globle void MarkBitMapSubclasses(
  ***************************************************/
 globle short FindSlotNameID(
   void *theEnv,
+  EXEC_STATUS,
   SYMBOL_HN *slotName)
   {
    SLOT_NAME *snp;
@@ -1061,6 +1083,7 @@ globle short FindSlotNameID(
  ***************************************************/
 globle SYMBOL_HN *FindIDSlotName(
   void *theEnv,
+  EXEC_STATUS,
   int id)
   {
    SLOT_NAME *snp;
@@ -1079,6 +1102,7 @@ globle SYMBOL_HN *FindIDSlotName(
  ***************************************************/
 globle SLOT_NAME *FindIDSlotNameHash(
   void *theEnv,
+  EXEC_STATUS,
   int id)
   {
    register int i;
@@ -1110,7 +1134,8 @@ globle SLOT_NAME *FindIDSlotNameHash(
                   class is only visited once
  ***************************************************/
 globle int GetTraversalID(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    register unsigned i;
    register DEFCLASS *cls;
@@ -1142,7 +1167,8 @@ globle int GetTraversalID(
                    call to GetTraversalID()
  ***************************************************/
 globle void ReleaseTraversalID(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DefclassData(theEnv)->CTID--;
   }
@@ -1207,7 +1233,8 @@ static unsigned HashSlotName(
   NOTES        : None
  ***********************************************/
 static int NewSlotNameID(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    int newid = 0;
    register unsigned i;
@@ -1244,6 +1271,7 @@ static int NewSlotNameID(
  ***************************************************/
 static void DeassignClassID(
   void *theEnv,
+  EXEC_STATUS,
   unsigned id)
   {
    int i;

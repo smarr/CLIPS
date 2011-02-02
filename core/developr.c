@@ -60,14 +60,15 @@
 #if DEVELOPER
 
 #if DEFRULE_CONSTRUCT && OBJECT_SYSTEM
-static void PrintOPNLevel(void *theEnv,OBJECT_PATTERN_NODE *,char *,int);
+static void PrintOPNLevel(void *theEnv,EXEC_STATUS, OBJECT_PATTERN_NODE *,char *,int);
 #endif
 
 /**************************************************/
 /* DeveloperCommands: Sets up developer commands. */
 /**************************************************/
 globle void DeveloperCommands(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
 #if ! RUN_TIME
    EnvDefineFunction2(theEnv,"primitives-info",'v', PTIEF PrimitiveTablesInfo,"PrimitiveTablesInfo","00");
@@ -96,7 +97,8 @@ globle void DeveloperCommands(
 /* EnableGCHeuristics:      */
 /******************************************************/
 globle void EnableGCHeuristics(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    EnvArgCountCheck(theEnv,"enable-gc-heuristics",EXACTLY,0);
    SetGarbageCollectionHeuristics(theEnv,TRUE);
@@ -106,7 +108,8 @@ globle void EnableGCHeuristics(
 /* DisableGCHeuristics:      */
 /******************************************************/
 globle void DisableGCHeuristics(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    EnvArgCountCheck(theEnv,"disable-gc-heuristics",EXACTLY,0);
    SetGarbageCollectionHeuristics(theEnv,FALSE);
@@ -117,7 +120,8 @@ globle void DisableGCHeuristics(
 /*   symbol, float, integer, and bitmap tables.       */
 /******************************************************/
 globle void PrimitiveTablesInfo(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    unsigned long i;
    SYMBOL_HN **symbolArray, *symbolPtr;
@@ -203,7 +207,8 @@ globle void PrimitiveTablesInfo(
 /*   symbol, float, integer, and bitmap tables.       */
 /******************************************************/
 globle void PrimitiveTablesUsage(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    unsigned long i;
    int symbolCounts[COUNT_SIZE], floatCounts[COUNT_SIZE];
@@ -296,7 +301,8 @@ globle void PrimitiveTablesUsage(
 /*   fact pattern network for a specified deftemplate. */
 /*******************************************************/
 globle void ShowFactPatternNetwork(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct factPatternNode *patternPtr;
    struct deftemplate *theDeftemplate;
@@ -368,7 +374,8 @@ globle void ShowFactPatternNetwork(
   NOTES        : None
  ***************************************************/
 globle void PrintObjectPatternNetwork(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    char indentbuf[80];
 
@@ -389,6 +396,7 @@ globle void PrintObjectPatternNetwork(
  **********************************************************/
 static void PrintOPNLevel(
   void *theEnv,
+  EXEC_STATUS,
   OBJECT_PATTERN_NODE *pptr,
   char *indentbuf,
   int ilen)
@@ -473,7 +481,8 @@ static void PrintOPNLevel(
 /*   instances in the instance hash table.       */
 /******************************************************/
 globle void InstanceTableUsage(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    unsigned long i;
    int instanceCounts[COUNT_SIZE];

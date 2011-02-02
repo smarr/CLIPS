@@ -85,7 +85,8 @@ struct bsaveFactPatternNode
 /*   feature for the fact pattern network.           */
 /*****************************************************/
 globle void FactBinarySetup(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    AllocateEnvironmentData(theEnv,FACTBIN_DATA,sizeof(struct factBinaryData),DeallocateFactBloadData);
    
@@ -107,7 +108,8 @@ globle void FactBinarySetup(
 /*    data for the fact bsave functionality.        */
 /****************************************************/
 static void DeallocateFactBloadData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    size_t space;
    int i;
@@ -127,7 +129,8 @@ static void DeallocateFactBloadData(
 /*   pattern network in the current environment.         */
 /*********************************************************/
 static void BsaveFind(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct deftemplate *theDeftemplate;
    struct defmodule *theModule;
@@ -182,6 +185,7 @@ static void BsaveFind(
 /**********************************************************/
 static void BsaveDriver(
   void *theEnv,
+  EXEC_STATUS,
   int action,
   FILE *fp,
   struct factPatternNode *thePattern)
@@ -222,6 +226,7 @@ static void BsaveDriver(
 /*********************************************************/
 static void BsaveStorage(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp)
   {
    size_t space;
@@ -237,6 +242,7 @@ static void BsaveStorage(
 /*****************************************************/
 static void BsaveFactPatterns(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp)
   {
    size_t space;
@@ -288,6 +294,7 @@ static void BsaveFactPatterns(
 /******************************************************/
 static void BsavePatternNode(
   void *theEnv,
+  EXEC_STATUS,
   struct factPatternNode *thePattern,
   FILE *fp)
   {
@@ -314,7 +321,8 @@ static void BsavePatternNode(
 /*   the factPatternNodes used by this binary image. */
 /*****************************************************/
 static void BloadStorage(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    size_t space;
 
@@ -346,7 +354,8 @@ static void BloadStorage(
 /*   data structures used by this binary image.             */
 /************************************************************/
 static void BloadBinaryItem(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    size_t space;
    long i;
@@ -386,6 +395,7 @@ static void BloadBinaryItem(
 /*************************************************/
 static void UpdateFactPatterns(
   void *theEnv,
+  EXEC_STATUS,
   void *buf,
   long obji)
   {
@@ -412,7 +422,8 @@ static void UpdateFactPatterns(
 /*   when a binary load is in effect.              */
 /***************************************************/
 static void ClearBload(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    size_t space;
    long i;

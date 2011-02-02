@@ -61,7 +61,8 @@
 /*   save/load feature for the defglobals.   */
 /*********************************************/
 globle void DefglobalBinarySetup(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    AllocateEnvironmentData(theEnv,GLOBLBIN_DATA,sizeof(struct defglobalBinaryData),DeallocateDefglobalBloadData);
 #if (BLOAD_AND_BSAVE || BLOAD)
@@ -87,7 +88,8 @@ globle void DefglobalBinarySetup(
 /*    data for the defglobal bsave functionality.        */
 /*********************************************************/
 static void DeallocateDefglobalBloadData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
 #if (BLOAD || BLOAD_ONLY || BLOAD_AND_BSAVE) && (! RUN_TIME)
    size_t space;
@@ -117,7 +119,8 @@ static void DeallocateDefglobalBloadData(
 /*   the defglobals in the current environment.     */
 /****************************************************/
 static void BsaveFind(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct defglobal *defglobalPtr;
    struct defmodule *theModule;
@@ -175,6 +178,7 @@ static void BsaveFind(
 /*****************************************************/
 static void BsaveStorage(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp)
   {
    size_t space;
@@ -197,6 +201,7 @@ static void BsaveStorage(
 /*********************************************/
 static void BsaveBinaryItem(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp)
   {
    size_t space;
@@ -274,7 +279,8 @@ static void BsaveBinaryItem(
 /*   the defglobals used by this binary image. */
 /***********************************************/
 static void BloadStorageDefglobals(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    size_t space;
 
@@ -321,7 +327,8 @@ static void BloadStorageDefglobals(
 /*   constructs used by this binary image.            */
 /******************************************************/
 static void BloadBinaryItem(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    size_t space;
 
@@ -358,6 +365,7 @@ static void BloadBinaryItem(
 /************************************************/
 static void UpdateDefglobalModule(
   void *theEnv,
+  EXEC_STATUS,
   void *buf,
   long obji)
   {
@@ -376,6 +384,7 @@ static void UpdateDefglobalModule(
 /******************************************/
 static void UpdateDefglobal(
   void *theEnv,
+  EXEC_STATUS,
   void *buf,
   long obji)
   {
@@ -399,7 +408,8 @@ static void UpdateDefglobal(
 /*   when a binary load is in effect.  */
 /***************************************/
 static void ClearBload(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    long i;
    size_t space;
@@ -442,6 +452,7 @@ static void ClearBload(
 /********************************************************/
 globle void *BloadDefglobalModuleReference(
   void *theEnv,
+  EXEC_STATUS,
   int theIndex)
   {
    return ((void *) &DefglobalBinaryData(theEnv)->ModuleArray[theIndex]);

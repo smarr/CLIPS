@@ -99,7 +99,8 @@ static void TypeToCode(void *,FILE *,int,void *,int);
   NOTES        : None
  ***************************************************/
 globle void SetupGenericsCompiler(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DefgenericData(theEnv)->DefgenericCodeItem = AddCodeGeneratorItem(theEnv,"generics",0,ReadyDefgenericsForCode,
                                              NULL,DefgenericsToCode,5);
@@ -121,6 +122,7 @@ globle void SetupGenericsCompiler(
  ***************************************************/
 globle void PrintGenericFunctionReference(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp,
   DEFGENERIC *gfunc,
   int imageID,
@@ -149,6 +151,7 @@ globle void PrintGenericFunctionReference(
  ****************************************************/
 globle void DefgenericCModuleReference(
   void *theEnv,
+  EXEC_STATUS,
   FILE *theFile,
   int count,
   int imageID,
@@ -177,7 +180,8 @@ globle void DefgenericCModuleReference(
   NOTES        : None
  ***************************************************/
 static void ReadyDefgenericsForCode(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    MarkConstructBsaveIDs(theEnv,DefgenericData(theEnv)->DefgenericModuleIndex);
   }
@@ -199,6 +203,7 @@ static void ReadyDefgenericsForCode(
  *******************************************************/
 static int DefgenericsToCode(
   void *theEnv,
+  EXEC_STATUS,
   char *fileName,
   char *pathName,
   char *fileNameBuffer,
@@ -398,6 +403,7 @@ GenericCodeError:
  *****************************************************/
 static void CloseDefgenericFiles(
   void *theEnv,
+  EXEC_STATUS,
   FILE *itemFiles[SAVE_ITEMS],
   int itemReopenFlags[SAVE_ITEMS],
   struct CodeGeneratorFile itemCodeFiles[SAVE_ITEMS],
@@ -431,6 +437,7 @@ static void CloseDefgenericFiles(
  ***************************************************/
 static void DefgenericModuleToCode(
   void *theEnv,
+  EXEC_STATUS,
   FILE *theFile,
   struct defmodule *theModule,
   int imageID,
@@ -462,6 +469,7 @@ static void DefgenericModuleToCode(
  ***************************************************************/
 static void SingleDefgenericToCode(
   void *theEnv,
+  EXEC_STATUS,
   FILE *theFile,
   int imageID,
   int maxIndices,
@@ -509,6 +517,7 @@ static void SingleDefgenericToCode(
  ***************************************************************/
 static void MethodToCode(
   void *theEnv,
+  EXEC_STATUS,
   FILE *theFile,
   int imageID,
   DEFMETHOD *theMethod,
@@ -545,6 +554,7 @@ static void MethodToCode(
  ***************************************************************/
 static void RestrictionToCode(
   void *theEnv,
+  EXEC_STATUS,
   FILE *theFile,
   int imageID,
   RESTRICTION *theRestriction,
@@ -574,6 +584,7 @@ static void RestrictionToCode(
  ***************************************************************/
 static void TypeToCode(
   void *theEnv,
+  EXEC_STATUS,
   FILE *theFile,
   int imageID,
   void *theType,

@@ -77,6 +77,7 @@
                                                                 struct symbolHashNode *,
                                                                 int);
    static int                     ProcessField(void *theEnv,
+  																						 EXEC_STATUS,
                                                struct lhsParseNode *,
                                                struct lhsParseNode *,
                                                struct lhsParseNode *);
@@ -104,6 +105,7 @@
 /******************************************************************/
 globle int VariableAnalysis(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *patternPtr)
   {
    struct lhsParseNode *rv, *theList, *tempList;
@@ -249,6 +251,7 @@ globle int VariableAnalysis(
 /****************************************************************/
 static int GetVariables(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *thePattern)
   {
    struct lhsParseNode *patternHead = thePattern;
@@ -325,6 +328,7 @@ static int GetVariables(
 /******************************************************/
 static int ProcessVariable(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *thePattern,
   struct lhsParseNode *multifieldHeader,
   struct lhsParseNode *patternHead)
@@ -393,6 +397,7 @@ static int ProcessVariable(
 /*******************************************/
 static int PropagateVariableDriver(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *patternHead,
   struct lhsParseNode *theNode,
   struct lhsParseNode *multifieldHeader,
@@ -479,6 +484,7 @@ static int PropagateVariableDriver(
 /********************************************************/
 static int ProcessField(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *thePattern,
   struct lhsParseNode *multifieldHeader,
   struct lhsParseNode *patternHead)
@@ -554,6 +560,7 @@ static int ProcessField(
 /*************************************************************/
 static int PropagateVariableToNodes(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *theNode,
   int theType,
   struct symbolHashNode *variableName,
@@ -693,6 +700,7 @@ static int PropagateVariableToNodes(
 /*************************************************************/
 static intBool UnboundVariablesInPattern(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *theSlot,
   int pattern)
   {
@@ -815,6 +823,7 @@ static intBool UnboundVariablesInPattern(
 /******************************************************************/
 static struct lhsParseNode *CheckExpression(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *exprPtr,
   struct lhsParseNode *lastOne,
   int whichCE,
@@ -921,6 +930,7 @@ static struct lhsParseNode *CheckExpression(
 /********************************************************/
 static void VariableReferenceErrorMessage(
   void *theEnv,
+  EXEC_STATUS,
   struct symbolHashNode *theVariable,
   struct lhsParseNode *theExpression,
   int whichCE,
@@ -995,6 +1005,7 @@ static void VariableReferenceErrorMessage(
 /************************************************************/
 static void VariableMixingErrorMessage(
   void *theEnv,
+  EXEC_STATUS,
   struct symbolHashNode *theVariable)
   {
    PrintErrorID(theEnv,"ANALYSIS",3,TRUE);
@@ -1008,6 +1019,7 @@ static void VariableMixingErrorMessage(
 /*************************************************************/
 static void CombineNandExpressions(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *theLHS)
   {
    int scanDepth;

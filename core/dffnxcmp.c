@@ -61,7 +61,8 @@ static void SingleDeffunctionToCode(void *,FILE *,DEFFUNCTION *,int,int,int);
   NOTES        : None
  ***************************************************/
 globle void SetupDeffunctionCompiler(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DeffunctionData(theEnv)->DeffunctionCodeItem = AddCodeGeneratorItem(theEnv,"deffunctions",0,ReadyDeffunctionsForCode,
                                               NULL,DeffunctionsToCode,2);
@@ -84,6 +85,7 @@ globle void SetupDeffunctionCompiler(
  ***************************************************/
 globle void PrintDeffunctionReference(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp,
   DEFFUNCTION *dfPtr,
   int imageID,
@@ -112,6 +114,7 @@ globle void PrintDeffunctionReference(
  ****************************************************/
 globle void DeffunctionCModuleReference(
   void *theEnv,
+  EXEC_STATUS,
   FILE *theFile,
   int count,
   int imageID,
@@ -140,7 +143,8 @@ globle void DeffunctionCModuleReference(
   NOTES        : None
  ***************************************************/
 static void ReadyDeffunctionsForCode(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    MarkConstructBsaveIDs(theEnv,DeffunctionData(theEnv)->DeffunctionModuleIndex);
   }
@@ -162,6 +166,7 @@ static void ReadyDeffunctionsForCode(
  *******************************************************/
 static int DeffunctionsToCode(
   void *theEnv,
+  EXEC_STATUS,
   char *fileName,
   char *pathName,
   char *fileNameBuffer,
@@ -254,6 +259,7 @@ static int DeffunctionsToCode(
  ***************************************************/
 static void CloseDeffunctionFiles(
   void *theEnv,
+  EXEC_STATUS,
   FILE *moduleFile,
   FILE *deffunctionFile,
   int maxIndices)
@@ -289,6 +295,7 @@ static void CloseDeffunctionFiles(
  ***************************************************/
 static void DeffunctionModuleToCode(
   void *theEnv,
+  EXEC_STATUS,
   FILE *theFile,
   struct defmodule *theModule,
   int imageID,
@@ -316,6 +323,7 @@ static void DeffunctionModuleToCode(
  ***************************************************/
 static void SingleDeffunctionToCode(
   void *theEnv,
+  EXEC_STATUS,
   FILE *theFile,
   DEFFUNCTION *theDeffunction,
   int imageID,

@@ -51,6 +51,7 @@
 /***************************************************************/
 globle intBool FactPNGetVar1(
   void *theEnv,
+  EXEC_STATUS,
   void *theValue,
   DATA_OBJECT_PTR returnValue)
   {
@@ -162,6 +163,7 @@ globle intBool FactPNGetVar1(
 /**************************************************/
 globle intBool FactPNGetVar2(
   void *theEnv,
+  EXEC_STATUS,
   void *theValue,
   DATA_OBJECT_PTR returnValue)
   {
@@ -200,6 +202,7 @@ globle intBool FactPNGetVar2(
 /*****************************************************************/
 globle intBool FactPNGetVar3(
   void *theEnv,
+  EXEC_STATUS,
   void *theValue,
   DATA_OBJECT_PTR returnValue)
   {
@@ -265,6 +268,7 @@ globle intBool FactPNGetVar3(
 #endif
 globle intBool FactPNConstant1(
   void *theEnv,
+  EXEC_STATUS,
   void *theValue,
   DATA_OBJECT_PTR returnValue)
   {
@@ -309,6 +313,7 @@ globle intBool FactPNConstant1(
 #endif
 globle intBool FactPNConstant2(
   void *theEnv,
+  EXEC_STATUS,
   void *theValue,
   DATA_OBJECT_PTR returnValue)
   {
@@ -364,6 +369,7 @@ globle intBool FactPNConstant2(
 /**************************************************************/
 globle intBool FactJNGetVar1(
   void *theEnv,
+  EXEC_STATUS,
   void *theValue,
   DATA_OBJECT_PTR returnValue)
   {
@@ -505,6 +511,7 @@ globle intBool FactJNGetVar1(
 /*************************************************/
 globle intBool FactJNGetVar2(
   void *theEnv,
+  EXEC_STATUS,
   void *theValue,
   DATA_OBJECT_PTR returnValue)
   {
@@ -552,6 +559,7 @@ globle intBool FactJNGetVar2(
 /****************************************************************/
 globle intBool FactJNGetVar3(
   void *theEnv,
+  EXEC_STATUS,
   void *theValue,
   DATA_OBJECT_PTR returnValue)
   {
@@ -622,6 +630,7 @@ globle intBool FactJNGetVar3(
 /****************************************************/
 globle intBool FactSlotLength(
   void *theEnv,
+  EXEC_STATUS,
   void *theValue,
   DATA_OBJECT_PTR returnValue)
   {
@@ -664,6 +673,7 @@ globle intBool FactSlotLength(
 #endif
 globle int FactJNCompVars1(
   void *theEnv,
+  EXEC_STATUS,
   void *theValue,
   DATA_OBJECT *theResult)
   {
@@ -724,6 +734,7 @@ globle int FactJNCompVars1(
 #endif
 globle int FactJNCompVars2(
   void *theEnv,
+  EXEC_STATUS,
   void *theValue,
   DATA_OBJECT *theResult)
   {
@@ -805,6 +816,7 @@ globle int FactJNCompVars2(
 /*****************************************************/
 globle int FactPNCompVars1(
   void *theEnv,
+  EXEC_STATUS,
   void *theValue,
   DATA_OBJECT *theResult)
   {
@@ -856,6 +868,7 @@ globle int FactPNCompVars1(
 #endif
 globle unsigned short AdjustFieldPosition(
   void *theEnv,
+  EXEC_STATUS,
   struct multifieldMarker *markList,
   unsigned short whichField,
   unsigned short whichSlot,
@@ -924,6 +937,7 @@ globle unsigned short AdjustFieldPosition(
 #endif
 globle int FactStoreMultifield(
   void *theEnv,
+  EXEC_STATUS,
   void *theValue,
   DATA_OBJECT *theResult)
   {

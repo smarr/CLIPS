@@ -75,6 +75,7 @@
 /**********************************************************************/
 globle struct expr *BuildRHSAssert(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   struct token *theToken,
   int *error,
@@ -197,6 +198,7 @@ globle struct expr *BuildRHSAssert(
 /***************************************************************/
 globle struct expr *GetRHSPattern(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   struct token *tempToken,
   int *error,
@@ -419,6 +421,7 @@ globle struct expr *GetRHSPattern(
 /********************************************************************/
 globle struct expr *GetAssertArgument(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   struct token *theToken,
   int *error,
@@ -530,6 +533,7 @@ globle struct expr *GetAssertArgument(
 /****************************************************/
 globle struct fact *StringToFact(
   void *theEnv,
+  EXEC_STATUS,
   char *str)
   {
    struct token theToken;
@@ -623,6 +627,7 @@ globle struct fact *StringToFact(
 /*********************************************************/
 static void NoSuchTemplateError(
   void *theEnv,
+  EXEC_STATUS,
   char *templateName)
   {
    PrintErrorID(theEnv,"FACTRHS",1,FALSE);

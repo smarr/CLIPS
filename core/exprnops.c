@@ -76,6 +76,7 @@
 /**************************************************************/
 globle int CheckArgumentAgainstRestriction(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *theExpression,
   int theRestriction)
   {
@@ -246,6 +247,7 @@ globle int CountArguments(
 /******************************************/
 globle struct expr *CopyExpression(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *original)
   {
    struct expr *topLevel, *next, *last;
@@ -326,6 +328,7 @@ globle long ExpressionSize(
 /************************************************/
 globle struct expr *GenConstant(
   void *theEnv,
+  EXEC_STATUS,
   unsigned short type,
   void *value)
   {
@@ -345,6 +348,7 @@ globle struct expr *GenConstant(
 /*************************************************/
 globle void PrintExpression(
   void *theEnv,
+  EXEC_STATUS,
   char *fileid,
   struct expr *theExpression)
   {
@@ -403,6 +407,7 @@ globle void PrintExpression(
 /*************************************************************************/
 globle struct expr *CombineExpressions(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *expr1,
   struct expr *expr2)
   {

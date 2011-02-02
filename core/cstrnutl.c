@@ -45,7 +45,8 @@
 /*   the values of a constraint record.         */
 /************************************************/
 globle struct constraintRecord *GetConstraintRecord(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    CONSTRAINT_RECORD *constraints;
    unsigned i;
@@ -122,6 +123,7 @@ globle void SetAnyAllowedFlags(
 /*****************************************************/
 globle struct constraintRecord *CopyConstraintRecord(
   void *theEnv,
+  EXEC_STATUS,
   CONSTRAINT_RECORD *sourceConstraint)
   {
    CONSTRAINT_RECORD *theConstraint;
@@ -299,6 +301,7 @@ globle int SetConstraintType(
 /*************************************************************/
 globle int CompareNumbers(
   void *theEnv,
+  EXEC_STATUS,
   int type1,
   void *vptr1,
   int type2,
@@ -396,6 +399,7 @@ globle int CompareNumbers(
 /****************************************************************/
 globle CONSTRAINT_RECORD *ExpressionToConstraintRecord(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *theExpression)
   {
    CONSTRAINT_RECORD *rv;
@@ -484,6 +488,7 @@ globle CONSTRAINT_RECORD *ExpressionToConstraintRecord(
 /*******************************************************/
 globle CONSTRAINT_RECORD *FunctionCallToConstraintRecord(
   void *theEnv,
+  EXEC_STATUS,
   void *theFunction)
   {
    CONSTRAINT_RECORD *rv;
@@ -567,6 +572,7 @@ globle CONSTRAINT_RECORD *FunctionCallToConstraintRecord(
 /*******************************************************/
 globle CONSTRAINT_RECORD *ArgumentTypeToConstraintRecord(
   void *theEnv,
+  EXEC_STATUS,
   int theRestriction)
   {
    CONSTRAINT_RECORD *rv;

@@ -123,7 +123,7 @@
    void                               ConstructsToCCommand(void *);
    static int                         ConstructsToC(void *,char *,char *,char *,long long,long long);
    static void                        WriteFunctionExternDeclarations(void *,FILE *);
-   static int                         FunctionsToCode(void *theEnv,char *,char *,char *);
+   static int                         FunctionsToCode(void *theEnv,EXEC_STATUS,char *,char *,char *);
    static int                         WriteInitializationFunction(void *,char *,char *,char *);
    static void                        DumpExpression(void *,struct expr *);
    static void                        MarkConstruct(void *,struct constructHeader *,void *);
@@ -135,7 +135,8 @@
 /*    data for the constructs-to-c command.               */
 /**********************************************************/
 globle void InitializeConstructCompilerData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    AllocateEnvironmentData(theEnv,CONSTRUCT_COMPILER_DATA,sizeof(struct constructCompilerData),DeallocateConstructCompilerData);
    
@@ -148,7 +149,8 @@ globle void InitializeConstructCompilerData(
 /*    data for the constructs-to-c command.                 */
 /************************************************************/
 static void DeallocateConstructCompilerData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct CodeGeneratorItem *tmpPtr, *nextPtr;
    int i;
@@ -174,7 +176,8 @@ static void DeallocateConstructCompilerData(
 /*   for the constructs-to-c command.         */
 /**********************************************/
 globle void ConstructsToCCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    char *fileName, *pathName, *fileNameBuffer;
    DATA_OBJECT theArg;
@@ -323,6 +326,7 @@ globle void ConstructsToCCommand(
 /***************************************/
 static int ConstructsToC(
   void *theEnv,
+  EXEC_STATUS,
   char *fileName,
   char *pathName,
   char *fileNameBuffer,
@@ -424,7 +428,7 @@ static int ConstructsToC(
    fprintf(ConstructCompilerData(theEnv)->FixupFP,"/**********************************/\n");
 
    fprintf(ConstructCompilerData(theEnv)->FixupFP,"\nvoid FixupCImage_%d(\n",ConstructCompilerData(theEnv)->ImageID);
-   fprintf(ConstructCompilerData(theEnv)->FixupFP,"  void *theEnv)\n");
+   fprintf(ConstructCompilerData(theEnv)->FixupFP,"  void *theEnv, EXEC_STATUS)\n");
    fprintf(ConstructCompilerData(theEnv)->FixupFP,"  {\n");
 
    /*==================================*/
@@ -515,6 +519,7 @@ static int ConstructsToC(
 /*******************************************************/
 static void WriteFunctionExternDeclarations(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp)
   {
    struct FunctionDefinition *theFunction;
@@ -626,6 +631,7 @@ static void WriteFunctionExternDeclarations(
 /****************************************************/
 static int FunctionsToCode(
   void *theEnv,
+  EXEC_STATUS,
   char *fileName,
   char *pathName,
   char *fileNameBuffer)
@@ -713,6 +719,7 @@ static int FunctionsToCode(
 /************************************************************/
 globle void PrintFunctionReference(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp,
   struct FunctionDefinition *funcPtr)
   {
@@ -730,6 +737,7 @@ globle void PrintFunctionReference(
 /******************************************/
 static int WriteInitializationFunction(
   void *theEnv,
+  EXEC_STATUS,
   char *fileName,
   char *pathName,
   char *fileNameBuffer)
@@ -769,6 +777,7 @@ static int WriteInitializationFunction(
    /* Begin writing the initialization function. */
    /*============================================*/
 
+	 // Lode: TODO add EXEC_STATUS contents
    fprintf(fp,"\n");
    fprintf(fp,"/*******************************************/\n");
    fprintf(fp,"/* CONSTRUCT IMAGE INITIALIZATION FUNCTION */\n");
@@ -828,6 +837,7 @@ static int WriteInitializationFunction(
 /**************************************************/
 globle FILE *NewCFile(
   void *theEnv,
+  EXEC_STATUS,
   char *fileName,
   char *pathName,
   char *fileNameBuffer,
@@ -866,7 +876,8 @@ globle FILE *NewCFile(
 /*   the table.                                           */
 /**********************************************************/
 static void HashedExpressionsToCode(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    unsigned i;
    EXPRESSION_HN *exphash;
@@ -890,6 +901,7 @@ static void HashedExpressionsToCode(
 /*****************************************************/
 globle void PrintHashedExpressionReference(
   void *theEnv,
+  EXEC_STATUS,
   FILE *theFile,
   struct expr *theExpression,
   int imageID,
@@ -917,6 +929,7 @@ globle void PrintHashedExpressionReference(
 /**************************************************************/
 globle int ExpressionToCode(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp,
   struct expr *exprPtr)
   {
@@ -986,6 +999,7 @@ globle int ExpressionToCode(
 /**********************************************************/
 static void DumpExpression(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *exprPtr)
   {
    while (exprPtr != NULL)
@@ -1131,7 +1145,8 @@ static void DumpExpression(
 /*   the constructs-to-c command.              */
 /***********************************************/
 globle void ConstructsToCCommandDefinition(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    EnvDefineFunction2(theEnv,"constructs-to-c",'v',
                    PTIEF ConstructsToCCommand,
@@ -1146,6 +1161,7 @@ globle void ConstructsToCCommandDefinition(
 /*********************************************************/
 globle struct CodeGeneratorItem *AddCodeGeneratorItem(
   void *theEnv,
+  EXEC_STATUS,
   char *name,
   int priority,
   void (*beforeFunction)(void *),
@@ -1250,6 +1266,7 @@ globle struct CodeGeneratorItem *AddCodeGeneratorItem(
 /************************************************************/
 globle FILE *CloseFileIfNeeded(
   void *theEnv,
+  EXEC_STATUS,
   FILE *theFile,
   int *theCount,
   int *arrayVersion,
@@ -1345,6 +1362,7 @@ globle FILE *CloseFileIfNeeded(
 /******************************************************************/
 globle FILE *OpenFileIfNeeded(
   void *theEnv,
+  EXEC_STATUS,
   FILE *theFile,
   char *fileName,
   char *pathName,
@@ -1447,6 +1465,7 @@ globle FILE *OpenFileIfNeeded(
 /*************************************************/
 globle void MarkConstructBsaveIDs(
   void *theEnv,
+  EXEC_STATUS,
   int constructModuleIndex)
   {
    long theCount = 0;
@@ -1464,6 +1483,7 @@ globle void MarkConstructBsaveIDs(
 #endif
 static void MarkConstruct(
   void *theEnv,
+  EXEC_STATUS,
   struct constructHeader *theConstruct,
   void *vTheBuffer)
   {
@@ -1481,6 +1501,7 @@ static void MarkConstruct(
 /***********************************************************/
 globle void ConstructHeaderToCode(
   void *theEnv,
+  EXEC_STATUS,
   FILE *theFile,
   struct constructHeader *theConstruct,
   int imageID,
@@ -1541,6 +1562,7 @@ globle void ConstructHeaderToCode(
 /***********************************************************/
 globle void ConstructModuleToCode(
   void *theEnv,
+  EXEC_STATUS,
   FILE *theFile,
   struct defmodule *theModule,
   int imageID,
@@ -1597,7 +1619,8 @@ globle void ConstructModuleToCode(
 /*   for rule compiler stub.        */
 /************************************/
 void ConstructsToCCommand(
-  void *theEnv) 
+  void *theEnv,
+  EXEC_STATUS) 
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
 #pragma unused(theEnv)

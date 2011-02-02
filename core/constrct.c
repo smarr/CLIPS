@@ -64,7 +64,8 @@
 /*    data for constructs.                        */
 /**************************************************/
 globle void InitializeConstructData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    AllocateEnvironmentData(theEnv,CONSTRUCT_DATA,sizeof(struct constructData),DeallocateConstructData);
 
@@ -78,7 +79,8 @@ globle void InitializeConstructData(
 /*    data for constructs.                          */
 /****************************************************/
 static void DeallocateConstructData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct construct *tmpPtr, *nextPtr;
 
@@ -106,6 +108,7 @@ static void DeallocateConstructData(
 /*************************************************/
 globle struct construct *FindConstruct(
   void *theEnv,
+  EXEC_STATUS,
   char *name)
   {
    struct construct *currentPtr;
@@ -129,6 +132,7 @@ globle struct construct *FindConstruct(
 /***********************************************************/
 globle int RemoveConstruct(
   void *theEnv,
+  EXEC_STATUS,
   char *name)
   {
    struct construct *currentPtr, *lastPtr = NULL;
@@ -170,6 +174,7 @@ globle int Save(
 /************************************************/
 globle int EnvSave(
   void *theEnv,
+  EXEC_STATUS,
   char *fileName)
   {
    struct callFunctionItem *saveFunction;
@@ -232,6 +237,7 @@ globle int EnvSave(
 /*******************************************************/
 globle intBool RemoveSaveFunction(
   void *theEnv,
+  EXEC_STATUS,
   char *name)
   {
    int found;
@@ -250,6 +256,7 @@ globle intBool RemoveSaveFunction(
 /**********************************/
 globle void SetCompilationsWatch(
   void *theEnv,
+  EXEC_STATUS,
   unsigned value)
   {
    ConstructData(theEnv)->WatchCompilations = value;
@@ -260,7 +267,8 @@ globle void SetCompilationsWatch(
 /*   value of WatchCompilations.     */
 /*************************************/
 globle unsigned GetCompilationsWatch(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {   
    return(ConstructData(theEnv)->WatchCompilations); 
   }
@@ -271,6 +279,7 @@ globle unsigned GetCompilationsWatch(
 /**********************************/
 globle void SetPrintWhileLoading(
   void *theEnv,
+  EXEC_STATUS,
   intBool value)
   {
    ConstructData(theEnv)->PrintWhileLoading = value;
@@ -281,7 +290,8 @@ globle void SetPrintWhileLoading(
 /*   value of PrintWhileLoading.     */
 /*************************************/
 globle intBool GetPrintWhileLoading(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return(ConstructData(theEnv)->PrintWhileLoading);
   }
@@ -292,7 +302,8 @@ globle intBool GetPrintWhileLoading(
 /*   the Construct Manager.          */
 /*************************************/
 globle void InitializeConstructs(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
 #if (! RUN_TIME)
    EnvDefineFunction2(theEnv,"clear",   'v', PTIEF ClearCommand,   "ClearCommand", "00");
@@ -313,7 +324,8 @@ globle void InitializeConstructs(
 /*   for the clear command.           */
 /**************************************/
 globle void ClearCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    if (EnvArgCountCheck(theEnv,execStatus,"clear",EXACTLY,0) == -1) return;
    EnvClear(theEnv);
@@ -325,7 +337,8 @@ globle void ClearCommand(
 /*   for the reset command.           */
 /**************************************/
 globle void ResetCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    if (EnvArgCountCheck(theEnv,execStatus,"reset",EXACTLY,0) == -1) return;
    EnvReset(theEnv);
@@ -348,7 +361,8 @@ globle void Reset()
 /*   for the reset command.   */
 /******************************/
 globle void EnvReset(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct callFunctionItem *resetPtr;
 
@@ -426,8 +440,10 @@ globle void EnvReset(
 /* SetBeforeResetFunction: Sets the */
 /*  value of BeforeResetFunction.   */
 /************************************/
-globle int (*SetBeforeResetFunction(void *theEnv,
-                                    int (*theFunction)(void *)))(void *)
+globle int (*SetBeforeResetFunction(
+	void *theEnv,
+  EXEC_STATUS,
+  int (*theFunction)(void *)))(void *)
   {
    int (*tempFunction)(void *);
 
@@ -447,7 +463,8 @@ globle intBool AddResetFunction(
   int priority)
   {
    void *theEnv;
-   
+   // Lode: TODO EXEC_STATUS?
+
    theEnv = GetCurrentEnvironment();
    
    ConstructData(theEnv)->ListOfResetFunctions = 
@@ -463,6 +480,7 @@ globle intBool AddResetFunction(
 /****************************************/
 globle intBool EnvAddResetFunction(
   void *theEnv,
+  EXEC_STATUS,
   char *name,
   void (*functionPtr)(void *),
   int priority)
@@ -479,6 +497,7 @@ globle intBool EnvAddResetFunction(
 /**********************************************/
 globle intBool EnvRemoveResetFunction(
   void *theEnv,
+  EXEC_STATUS,
   char *name)
   {
    int found;
@@ -506,7 +525,8 @@ globle void Clear()
 /* EnvClear: C access routine for the clear command. */
 /*****************************************************/
 globle void EnvClear(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct callFunctionItem *theFunction;
    
@@ -595,7 +615,8 @@ globle void EnvClear(
 /*   the determination).                                 */
 /*********************************************************/
 globle intBool ClearReady(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct callFunctionItem *theFunction;
    int (*tempFunction)(void *);
@@ -618,6 +639,7 @@ globle intBool ClearReady(
 /******************************************/
 globle intBool AddClearReadyFunction(
   void *theEnv,
+  EXEC_STATUS,
   char *name,
   int (*functionPtr)(void *),
   int priority)
@@ -635,6 +657,7 @@ globle intBool AddClearReadyFunction(
 /************************************************/
 globle intBool RemoveClearReadyFunction(
   void *theEnv,
+  EXEC_STATUS,
   char *name)
   {
    int found;
@@ -658,7 +681,8 @@ globle intBool AddClearFunction(
   int priority)
   {
    void *theEnv;
-   
+   // Lode: TODO EXEC_STATUS
+
    theEnv = GetCurrentEnvironment();
    
    ConstructData(theEnv)->ListOfClearFunctions =
@@ -675,6 +699,7 @@ globle intBool AddClearFunction(
 /****************************************/
 globle intBool EnvAddClearFunction(
   void *theEnv,
+  EXEC_STATUS,
   char *name,
   void (*functionPtr)(void *),
   int priority)
@@ -692,6 +717,7 @@ globle intBool EnvAddClearFunction(
 /**********************************************/
 globle intBool EnvRemoveClearFunction(
   void *theEnv,
+  EXEC_STATUS,
   char *name)
   {
    int found;
@@ -710,7 +736,8 @@ globle intBool EnvRemoveClearFunction(
 /*   otherwise FALSE.                    */
 /***********************************************/
 globle int ExecutingConstruct(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return(ConstructData(theEnv)->Executing); 
   }
@@ -723,6 +750,7 @@ globle int ExecutingConstruct(
 /********************************************/
 globle void SetExecutingConstruct(
   void *theEnv,
+  EXEC_STATUS,
   int value)
   {
    ConstructData(theEnv)->Executing = value;
@@ -736,6 +764,7 @@ globle void SetExecutingConstruct(
 /************************************************************/
 globle void OldGetConstructList(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue,
   void *(*nextFunction)(void *,void *),
   char *(*nameFunction)(void *,void *))
@@ -791,6 +820,7 @@ globle void OldGetConstructList(
 /*******************************************************/
 globle void DeinstallConstructHeader(
   void *theEnv,
+  EXEC_STATUS,
   struct constructHeader *theHeader)
   {
    DecrementSymbolCount(theEnv,theHeader->name);
@@ -816,6 +846,7 @@ globle void DeinstallConstructHeader(
 /**************************************************/
 globle void DestroyConstructHeader(
   void *theEnv,
+  EXEC_STATUS,
   struct constructHeader *theHeader)
   {
    if (theHeader->ppForm != NULL)
@@ -838,6 +869,7 @@ globle void DestroyConstructHeader(
 /*****************************************************/
 globle struct construct *AddConstruct(
   void *theEnv,
+  EXEC_STATUS,
   char *name,
   char *pluralName,
   int (*parseFunction)(void *,char *),
@@ -889,6 +921,7 @@ globle struct construct *AddConstruct(
 /************************************/
 globle intBool AddSaveFunction(
   void *theEnv,
+  EXEC_STATUS,
   char *name,
   void (*functionPtr)(void *,void *,char *),
   int priority)

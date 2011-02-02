@@ -73,7 +73,8 @@
 /* FactFunctionDefinitions: Defines fact functions. */
 /****************************************************/
 globle void FactFunctionDefinitions(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
 #if ! RUN_TIME
    EnvDefineFunction2(theEnv,"fact-existp",  'b', PTIEF FactExistpFunction,  "FactExistpFunction", "11z");
@@ -94,7 +95,8 @@ globle void FactFunctionDefinitions(
 /*   for the fact-relation function.          */
 /**********************************************/
 globle void *FactRelationFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct fact *theFact;
 
@@ -128,6 +130,7 @@ globle void *FactRelation(
 #endif
 globle void *EnvFactDeftemplate(
   void *theEnv,
+  EXEC_STATUS,
   void *vTheFact)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
@@ -144,7 +147,8 @@ globle void *EnvFactDeftemplate(
 /*   for the fact-existp function.          */
 /********************************************/
 globle int FactExistpFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct fact *theFact;
 
@@ -164,6 +168,7 @@ globle int FactExistpFunction(
 #endif
 globle int EnvFactExistp(
   void *theEnv,
+  EXEC_STATUS,
   void *vTheFact)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
@@ -184,6 +189,7 @@ globle int EnvFactExistp(
 /***********************************************/
 globle void FactSlotValueFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *returnValue)
   {
    struct fact *theFact;
@@ -229,6 +235,7 @@ globle void FactSlotValueFunction(
 /***************************************/
 globle void FactSlotValue(
   void *theEnv,
+  EXEC_STATUS,
   void *vTheFact,
   char *theSlotName,
   DATA_OBJECT *returnValue)
@@ -276,6 +283,7 @@ globle void FactSlotValue(
 /***********************************************/
 globle void FactSlotNamesFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *returnValue)
   {
    struct fact *theFact;
@@ -313,6 +321,7 @@ globle void FactSlotNamesFunction(
 /***************************************/
 globle void EnvFactSlotNames(
   void *theEnv,
+  EXEC_STATUS,
   void *vTheFact,
   DATA_OBJECT *returnValue)
   {
@@ -376,6 +385,7 @@ globle void EnvFactSlotNames(
 /*********************************************/
 globle void GetFactListFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
    struct defmodule *theModule;
@@ -431,6 +441,7 @@ globle void GetFactListFunction(
 /*************************************/
 globle void EnvGetFactList(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue,
   void *vTheModule)
   {
@@ -514,7 +525,8 @@ globle void EnvGetFactList(
 /*   for the ppfact function.         */
 /**************************************/
 globle void PPFactFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct fact *theFact;
    int numberOfArguments;
@@ -588,6 +600,7 @@ globle void PPFactFunction(
 #endif
 globle void EnvPPFact(
   void *theEnv,
+  EXEC_STATUS,
   void *vTheFact,
   char *logicalName,
   int ignoreDefaults)
@@ -612,6 +625,7 @@ globle void EnvPPFact(
 /**************************************************************/
 globle struct fact *GetFactAddressOrIndexArgument(
   void *theEnv,
+  EXEC_STATUS,
   char *theFunction,
   int position,
   int noFactError)

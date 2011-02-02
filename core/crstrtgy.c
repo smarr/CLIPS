@@ -77,6 +77,7 @@
 /******************************************************************/
 globle void PlaceActivation(
   void *theEnv,
+  EXEC_STATUS,
   ACTIVATION **whichAgenda,
   ACTIVATION *newActivation,
   struct salienceGroup *theGroup)
@@ -309,6 +310,7 @@ static ACTIVATION *PlaceBreadthActivation(
 /*******************************************************************/
 static ACTIVATION *PlaceLEXActivation(
   void *theEnv,
+  EXEC_STATUS,
   ACTIVATION *newActivation,
   struct salienceGroup *theGroup)
   {
@@ -410,6 +412,7 @@ static ACTIVATION *PlaceLEXActivation(
 /*******************************************************************/
 static ACTIVATION *PlaceMEAActivation(
   void *theEnv,
+  EXEC_STATUS,
   ACTIVATION *newActivation,
   struct salienceGroup *theGroup)
   {
@@ -787,6 +790,7 @@ static ACTIVATION *PlaceRandomActivation(
 /*********************************************************/
 static unsigned long long *SortPartialMatch(
   void *theEnv,
+  EXEC_STATUS,
   struct partialMatch *binds)
   {
    unsigned long long *nbinds;
@@ -847,6 +851,7 @@ static unsigned long long *SortPartialMatch(
 /**************************************************************************/
 static int ComparePartialMatches(
   void *theEnv,
+  EXEC_STATUS,
   ACTIVATION *actPtr,
   ACTIVATION *newActivation)
   {
@@ -938,6 +943,7 @@ static int ComparePartialMatches(
 /************************************/
 globle int EnvSetStrategy(
   void *theEnv,
+  EXEC_STATUS,
   int value)
   {
    int oldStrategy;
@@ -955,7 +961,8 @@ globle int EnvSetStrategy(
 /*   for the get-strategy command.  */
 /************************************/
 globle int EnvGetStrategy(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return(AgendaData(theEnv)->Strategy);
   }
@@ -965,7 +972,8 @@ globle int EnvGetStrategy(
 /*   for the get-strategy command.          */
 /********************************************/
 globle void *GetStrategyCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    EnvArgCountCheck(theEnv,execStatus,"get-strategy",EXACTLY,0);
 
@@ -977,7 +985,8 @@ globle void *GetStrategyCommand(
 /*   for the set-strategy command.          */
 /********************************************/
 globle void *SetStrategyCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DATA_OBJECT argPtr;
    char *argument;

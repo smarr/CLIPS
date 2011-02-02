@@ -97,6 +97,7 @@ unsigned long HashFact(
 /**********************************************/
 static struct fact *FactExists(
   void *theEnv,
+  EXEC_STATUS,
   struct fact *theFact,
   unsigned long hashValue)
   {
@@ -126,6 +127,7 @@ static struct fact *FactExists(
 /************************************************************/
 globle void AddHashedFact(
   void *theEnv,
+  EXEC_STATUS,
   struct fact *theFact,
   unsigned long hashValue)
   {
@@ -159,6 +161,7 @@ globle void AddHashedFact(
 /******************************************/
 globle intBool RemoveHashedFact(
   void *theEnv,
+  EXEC_STATUS,
   struct fact *theFact)
   {
    unsigned long hashValue;
@@ -213,6 +216,7 @@ globle intBool RemoveHashedFact(
 /*****************************************************/
 globle unsigned long HandleFactDuplication(
   void *theEnv,
+  EXEC_STATUS,
   void *theFact,
   intBool *duplicate)
   {
@@ -252,7 +256,8 @@ globle unsigned long HandleFactDuplication(
 /*   for the get-fact-duplication command. */
 /*******************************************/
 globle intBool EnvGetFactDuplication(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {   
    return(FactData(theEnv)->FactDuplication); 
   }
@@ -263,6 +268,7 @@ globle intBool EnvGetFactDuplication(
 /*******************************************/
 globle intBool EnvSetFactDuplication(
   void *theEnv,
+  EXEC_STATUS,
   int value)
   {
    int ov;
@@ -277,7 +283,8 @@ globle intBool EnvSetFactDuplication(
 /*   entries in the fact hash table to NULL.      */
 /**************************************************/
 globle void InitializeFactHashTable(
-   void *theEnv)
+   void *theEnv,
+  EXEC_STATUS)
    {
     FactData(theEnv)->FactHashTable = CreateFactHashTable(theEnv,SIZE_FACT_HASH);
     FactData(theEnv)->FactHashTableSize = SIZE_FACT_HASH;
@@ -288,6 +295,7 @@ globle void InitializeFactHashTable(
 /*******************************************************************/
 static struct factHashEntry **CreateFactHashTable(
    void *theEnv,
+  EXEC_STATUS,
    unsigned long tableSize)
    {
     unsigned long i;
@@ -307,7 +315,8 @@ static struct factHashEntry **CreateFactHashTable(
 /* ResizeFactHashTable: */
 /*******************************************************************/
 static void ResizeFactHashTable(
-   void *theEnv)
+   void *theEnv,
+  EXEC_STATUS)
    {
     unsigned long i, newSize, newLocation;
     struct factHashEntry **theTable, **newTable;
@@ -351,7 +360,8 @@ static void ResizeFactHashTable(
 /* ResetFactHashTable: */
 /*******************************************************************/
 static void ResetFactHashTable(
-   void *theEnv)
+   void *theEnv,
+  EXEC_STATUS)
    {
     struct factHashEntry **newTable;
 
@@ -385,7 +395,8 @@ static void ResetFactHashTable(
 /*   in each slot of the fact hash table.            */
 /*****************************************************/
 globle void ShowFactHashTable(
-   void *theEnv)
+   void *theEnv,
+  EXEC_STATUS)
    {
     int i, count;
     struct factHashEntry *theEntry;

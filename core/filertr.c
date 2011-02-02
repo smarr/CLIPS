@@ -55,7 +55,8 @@
 /* InitializeFileRouter: Initializes file input/output router. */
 /***************************************************************/
 globle void InitializeFileRouter(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    AllocateEnvironmentData(theEnv,FILE_ROUTER_DATA,sizeof(struct fileRouterData),DeallocateFileRouterData);
 
@@ -69,7 +70,8 @@ globle void InitializeFileRouter(
 /*    environment data for file routers. */
 /*****************************************/
 static void DeallocateFileRouterData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct fileRouter *tmpPtr, *nextPtr;
 
@@ -90,6 +92,7 @@ static void DeallocateFileRouterData(
 /*****************************************/
 globle FILE *FindFptr(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName)
   {
    struct fileRouter *fptr;
@@ -137,6 +140,7 @@ globle FILE *FindFptr(
 /*****************************************************/
 globle int FindFile(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName)
   {
    if (FindFptr(theEnv,logicalName) != NULL) return(TRUE);
@@ -152,6 +156,7 @@ globle int FindFile(
 #endif
 static int ExitFile(
   void *theEnv,
+  EXEC_STATUS,
   int num)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
@@ -172,6 +177,7 @@ static int ExitFile(
 /*********************************************/
 static int PrintFile(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   char *str)
   {
@@ -189,6 +195,7 @@ static int PrintFile(
 /*******************************************/
 static int GetcFile(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName)
   {
    FILE *fptr;
@@ -216,6 +223,7 @@ static int GetcFile(
 /***********************************************/
 static int UngetcFile(
   void *theEnv,
+  EXEC_STATUS,
   int ch,
   char *logicalName)
   {
@@ -237,6 +245,7 @@ static int UngetcFile(
 /*********************************************************/
 globle int OpenAFile(
   void *theEnv,
+  EXEC_STATUS,
   char *fileName,
   char *accessMode,
   char *logicalName)
@@ -284,6 +293,7 @@ globle int OpenAFile(
 /*************************************************************/
 globle int CloseFile(
   void *theEnv,
+  EXEC_STATUS,
   char *fid)
   {
    struct fileRouter *fptr, *prev;
@@ -317,7 +327,8 @@ globle int CloseFile(
 /*   any file was closed, otherwise FALSE.    */
 /**********************************************/
 globle int CloseAllFiles(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct fileRouter *fptr, *prev;
 

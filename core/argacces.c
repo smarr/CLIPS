@@ -497,6 +497,7 @@ globle int EnvArgTypeCheck(
 /******************************************************************/
 globle intBool GetNumericArgument(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *theArgument,
   char *functionName,
   DATA_OBJECT *result,
@@ -631,6 +632,7 @@ globle char *GetFileName(
 /******************************************************************/
 globle void OpenErrorMessage(
   void *theEnv,
+  EXEC_STATUS,
   char *functionName,
   char *fileName)
   {
@@ -738,6 +740,7 @@ globle char *GetConstructName(
 /**************************************************************************/
 static void NonexistantError(
   void *theEnv,
+  EXEC_STATUS,
   char *accessFunction,
   char *functionName,
   int argumentPosition)
@@ -758,6 +761,7 @@ static void NonexistantError(
 /*********************************************************/
 globle void ExpectedCountError(
   void *theEnv,
+  EXEC_STATUS,
   char *functionName,
   int countRelation,
   int expectedNumber)
@@ -795,6 +799,7 @@ globle void ExpectedCountError(
 /*************************************************************/
 globle intBool CheckFunctionArgCount(
   void *theEnv,
+  EXEC_STATUS,
   char *functionName,
   char *restrictions,
   int argumentCount)
@@ -893,6 +898,7 @@ globle intBool CheckFunctionArgCount(
 /*******************************************************************/
 globle void ExpectedTypeError1(
   void *theEnv,
+  EXEC_STATUS,
   char *functionName,
   int whichArg,
   char *expectedType)
@@ -915,6 +921,7 @@ globle void ExpectedTypeError1(
 /**************************************************************/
 globle void ExpectedTypeError2(
   void *theEnv,
+  EXEC_STATUS,
   char *functionName,
   int whichArg)
   {
@@ -938,6 +945,7 @@ globle void ExpectedTypeError2(
 /*******************************************************************/
 static void ExpectedTypeError3(
   void *theEnv,
+  EXEC_STATUS,
   char *accessFunction,
   char *functionName,
   int argumentPosition,
@@ -1032,6 +1040,7 @@ void *GetFactOrInstanceArgument(
 /****************************************************/
 void IllegalLogicalNameMessage(
   void *theEnv,
+  EXEC_STATUS,
   char *theFunction)
   {
    PrintErrorID(theEnv,"IOFUN",1,FALSE);

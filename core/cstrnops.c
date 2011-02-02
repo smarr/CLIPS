@@ -93,6 +93,7 @@
 /**************************************************************/
 globle struct constraintRecord *IntersectConstraints(
   void *theEnv,
+  EXEC_STATUS,
   CONSTRAINT_RECORD *c1,
   CONSTRAINT_RECORD *c2)
   {
@@ -238,6 +239,7 @@ globle struct constraintRecord *IntersectConstraints(
 /*************************************************/
 static void IntersectAllowedValueExpressions(
   void *theEnv,
+  EXEC_STATUS,
   CONSTRAINT_RECORD *constraint1,
   CONSTRAINT_RECORD *constraint2,
   CONSTRAINT_RECORD *newConstraint)
@@ -302,6 +304,7 @@ static void IntersectAllowedValueExpressions(
 /*************************************************/
 static void IntersectAllowedClassExpressions(
   void *theEnv,
+  EXEC_STATUS,
   CONSTRAINT_RECORD *constraint1,
   CONSTRAINT_RECORD *constraint2,
   CONSTRAINT_RECORD *newConstraint)
@@ -366,6 +369,7 @@ static void IntersectAllowedClassExpressions(
 /*********************************************************/
 static void IntersectNumericExpressions(
   void *theEnv,
+  EXEC_STATUS,
   CONSTRAINT_RECORD *constraint1,
   CONSTRAINT_RECORD *constraint2,
   CONSTRAINT_RECORD *newConstraint,
@@ -641,6 +645,7 @@ static int RestrictionOnType(
 /**********************************************************/
 globle struct constraintRecord *UnionConstraints(
   void *theEnv,
+  EXEC_STATUS,
   CONSTRAINT_RECORD *c1,
   CONSTRAINT_RECORD *c2)
   {
@@ -760,6 +765,7 @@ globle struct constraintRecord *UnionConstraints(
 /**************************************************/
 static void UnionNumericExpressions(
   void *theEnv,
+  EXEC_STATUS,
   CONSTRAINT_RECORD *constraint1,
   CONSTRAINT_RECORD *constraint2,
   CONSTRAINT_RECORD *newConstraint,
@@ -881,6 +887,7 @@ static void UnionNumericExpressions(
 /*********************************************************/
 static void UnionRangeMinMaxValueWithList(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *addmin,
   struct expr *addmax,
   struct expr **theMinList,
@@ -1036,6 +1043,7 @@ static void UnionRangeMinMaxValueWithList(
 /***************************************************/
 static void UnionAllowedClassExpressions(
   void *theEnv,
+  EXEC_STATUS,
   CONSTRAINT_RECORD *constraint1,
   CONSTRAINT_RECORD *constraint2,
   CONSTRAINT_RECORD *newConstraint)
@@ -1054,6 +1062,7 @@ static void UnionAllowedClassExpressions(
 /***************************************************/
 static void UnionAllowedValueExpressions(
   void *theEnv,
+  EXEC_STATUS,
   CONSTRAINT_RECORD *constraint1,
   CONSTRAINT_RECORD *constraint2,
   CONSTRAINT_RECORD *newConstraint)
@@ -1073,6 +1082,7 @@ static void UnionAllowedValueExpressions(
 /************************************************************/
 static struct expr *AddToUnionList(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *theList1,
   struct expr *theHead,
   CONSTRAINT_RECORD *theConstraint)
@@ -1136,6 +1146,7 @@ static struct expr *AddToUnionList(
 /****************************************************/
 globle void RemoveConstantFromConstraint(
   void *theEnv,
+  EXEC_STATUS,
   int theType,
   void *theValue,
   CONSTRAINT_RECORD *theConstraint)

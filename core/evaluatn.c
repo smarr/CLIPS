@@ -84,7 +84,8 @@
 /*    data for expression evaluation.             */
 /**************************************************/
 globle void InitializeEvaluationData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct externalAddressType cPointer = { "C", PrintCAddress, PrintCAddress, NULL, NewCAddress, NULL };
    
@@ -98,7 +99,8 @@ globle void InitializeEvaluationData(
 /*    data for evaluation data.                      */
 /*****************************************************/
 static void DeallocateEvaluationData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    int i;
    
@@ -112,6 +114,7 @@ static void DeallocateEvaluationData(
 /**************************************************************/
 globle int EvaluateExpression(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *problem,
   DATA_OBJECT_PTR returnValue)
   {
@@ -439,6 +442,7 @@ globle int EvaluateExpression(
 /******************************************/
 globle void InstallPrimitive(
   void *theEnv,
+  EXEC_STATUS,
   struct entityRecord *thePrimitive,
   int whichPosition)
   {
@@ -457,6 +461,7 @@ globle void InstallPrimitive(
 /******************************************************/
 globle int InstallExternalAddressType(
   void *theEnv,
+  EXEC_STATUS,
   struct externalAddressType *theAddressType)
   {
    struct externalAddressType *copyEAT;
@@ -481,6 +486,7 @@ globle int InstallExternalAddressType(
 /******************************************************/
 globle void SetEvaluationError(
   void *theEnv,
+  EXEC_STATUS,
   int value)
   {
    execStatus->EvaluationError = value;
@@ -492,7 +498,8 @@ globle void SetEvaluationError(
 /* GetEvaluationError: Returns the EvaluationError flag. */
 /*********************************************************/
 globle int GetEvaluationError(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return(execStatus->EvaluationError);
   }
@@ -502,6 +509,7 @@ globle int GetEvaluationError(
 /**************************************************/
 globle void SetHaltExecution(
   void *theEnv,
+  EXEC_STATUS,
   int value)
   { 
    execStatus->HaltExecution = value; 
@@ -511,7 +519,8 @@ globle void SetHaltExecution(
 /* GetHaltExecution: Returns the HaltExecution flag. */
 /*****************************************************/
 globle int GetHaltExecution(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return(execStatus->HaltExecution);
   }
@@ -522,6 +531,7 @@ globle int GetHaltExecution(
 /******************************************************/
 globle void ReturnValues(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR garbagePtr,
   intBool decrementSupplementalInfo)
   {
@@ -544,6 +554,7 @@ globle void ReturnValues(
 /***************************************************/
 globle void PrintDataObject(
   void *theEnv,
+  EXEC_STATUS,
   char *fileid,
   DATA_OBJECT_PTR argPtr)
   {
@@ -598,6 +609,7 @@ globle void PrintDataObject(
 /****************************************************/
 globle void EnvSetMultifieldErrorValue(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
    returnValue->type = MULTIFIELD;
@@ -612,6 +624,7 @@ globle void EnvSetMultifieldErrorValue(
 /**************************************************/
 globle void ValueInstall(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *vPtr)
   {
    if (vPtr->type == MULTIFIELD) MultifieldInstall(theEnv,(struct multifield *) vPtr->value);
@@ -624,6 +637,7 @@ globle void ValueInstall(
 /****************************************************/
 globle void ValueDeinstall(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *vPtr)
   {
    if (vPtr->type == MULTIFIELD) MultifieldDeinstall(theEnv,(struct multifield *) vPtr->value);
@@ -636,6 +650,7 @@ globle void ValueDeinstall(
 /*****************************************/
 globle void AtomInstall(
   void *theEnv,
+  EXEC_STATUS,
   int type,
   void *vPtr)
   {
@@ -686,6 +701,7 @@ globle void AtomInstall(
 /*******************************************/
 globle void AtomDeinstall(
   void *theEnv,
+  EXEC_STATUS,
   int type,
   void *vPtr)
   {
@@ -740,6 +756,7 @@ globle void AtomDeinstall(
 /*********************************************************************/
 globle void PropagateReturnValue(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *vPtr)
   {
    long i;
@@ -768,6 +785,7 @@ globle void PropagateReturnValue(
 /*****************************************/
 static void PropagateReturnAtom(
   void *theEnv,
+  EXEC_STATUS,
   int type,
   void *value)
   {
@@ -807,6 +825,7 @@ static void PropagateReturnAtom(
 /********************************************/
 globle int EnvFunctionCall(
   void *theEnv,
+  EXEC_STATUS,
   char *name,
   char *args,
   DATA_OBJECT *result)
@@ -840,6 +859,7 @@ globle int EnvFunctionCall(
 /********************************************/
 globle int FunctionCall2(
   void *theEnv,
+  EXEC_STATUS,
   FUNCTION_REFERENCE *theReference,
   char *args,
   DATA_OBJECT *result)
@@ -906,6 +926,7 @@ globle int FunctionCall2(
 /***************************************************/
 globle void CopyDataObject(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *dst,
   DATA_OBJECT *src,
   int garbageMultifield)
@@ -948,6 +969,7 @@ globle void TransferDataObjectValues(
 /************************************************************************/
 globle struct expr *ConvertValueToExpression(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *theValue)
   {
    long i;
@@ -1040,6 +1062,7 @@ unsigned long GetAtomicHashValue(
 /***********************************************************/
 globle struct expr *FunctionReferenceExpression(
   void *theEnv,
+  EXEC_STATUS,
   char *name)
   {
 #if DEFGENERIC_CONSTRUCT
@@ -1092,6 +1115,7 @@ globle struct expr *FunctionReferenceExpression(
 /******************************************************************/
 globle intBool GetFunctionReference(
   void *theEnv,
+  EXEC_STATUS,
   char *name,
   FUNCTION_REFERENCE *theReference)
   {
@@ -1192,6 +1216,7 @@ globle intBool DOsEqual(
  ***********************************************************/
 globle int EvaluateAndStoreInDataObject(
   void *theEnv,
+  EXEC_STATUS,
   int mfp,
   EXPRESSION *theExp,
   DATA_OBJECT *val,
@@ -1222,6 +1247,7 @@ globle int EvaluateAndStoreInDataObject(
 /*******************************************************/
 static void PrintCAddress(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   void *theValue)
   {
@@ -1239,6 +1265,7 @@ static void PrintCAddress(
 /*******************************************************/
 static void NewCAddress(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *rv)
   {
    int numberOfArguments;
@@ -1263,6 +1290,7 @@ static void NewCAddress(
 /*
 static intBool DiscardCAddress(
   void *theEnv,
+  EXEC_STATUS,
   void *theValue)
   {
    EnvPrintRouter(theEnv,WDISPLAY,"Discarding C Address\n");

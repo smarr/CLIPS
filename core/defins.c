@@ -127,7 +127,8 @@ static void DeallocateDefinstancesData(void *);
   NOTES        : None
  ***************************************************/
 globle void SetupDefinstances(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    AllocateEnvironmentData(theEnv,DEFINSTANCES_DATA,sizeof(struct definstancesData),DeallocateDefinstancesData);
 
@@ -208,7 +209,8 @@ globle void SetupDefinstances(
 /*    data for the definstances construct.             */
 /*******************************************************/
 static void DeallocateDefinstancesData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
 #if ! RUN_TIME
    struct definstancesModule *theModuleItem;
@@ -246,6 +248,7 @@ static void DeallocateDefinstancesData(
 #endif
 static void DestroyDefinstancesAction(
   void *theEnv,
+  EXEC_STATUS,
   struct constructHeader *theConstruct,
   void *buffer)
   {
@@ -282,6 +285,7 @@ static void DestroyDefinstancesAction(
  ***********************************************************/
 globle void *EnvGetNextDefinstances(
   void *theEnv,
+  EXEC_STATUS,
   void *ptr)
   {
    return((void *) GetNextConstructItem(theEnv,(struct constructHeader *) ptr,
@@ -300,6 +304,7 @@ globle void *EnvGetNextDefinstances(
  ***************************************************/
 globle void *EnvFindDefinstances(
   void *theEnv,
+  EXEC_STATUS,
   char *name)
   {
    return(FindNamedConstruct(theEnv,name,DefinstancesData(theEnv)->DefinstancesConstruct));
@@ -316,6 +321,7 @@ globle void *EnvFindDefinstances(
  ***************************************************/
 globle int EnvIsDefinstancesDeletable(
   void *theEnv,
+  EXEC_STATUS,
   void *ptr)
   {
    if (! ConstructsDeletable(theEnv))
@@ -333,7 +339,8 @@ globle int EnvIsDefinstancesDeletable(
   NOTES        : H/L Syntax : (undefinstances <name> | *)
  ***********************************************************/
 globle void UndefinstancesCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    UndefconstructCommand(theEnv,"undefinstances",DefinstancesData(theEnv)->DefinstancesConstruct);
   }
@@ -347,7 +354,8 @@ globle void UndefinstancesCommand(
   NOTES        : H/L Syntax: (definstances-module <defins-name>)
  *****************************************************************/
 globle void *GetDefinstancesModuleCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return(GetConstructModuleCommand(theEnv,"definstances-module",DefinstancesData(theEnv)->DefinstancesConstruct));
   }
@@ -363,6 +371,7 @@ globle void *GetDefinstancesModuleCommand(
  ***********************************************************/
 globle intBool EnvUndefinstances(
   void *theEnv,
+  EXEC_STATUS,
   void *vptr)
   {
 #if RUN_TIME || BLOAD_ONLY
@@ -400,7 +409,8 @@ globle intBool EnvUndefinstances(
   NOTES        : H/L Syntax : (ppdefinstances <name>)
  ***************************************************************/
 globle void PPDefinstancesCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    PPConstructCommand(theEnv,"ppdefinstances",DefinstancesData(theEnv)->DefinstancesConstruct);
   }
@@ -414,7 +424,8 @@ globle void PPDefinstancesCommand(
   NOTES        : H/L Interface
  ***************************************************/
 globle void ListDefinstancesCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    ListConstructCommand(theEnv,"list-definstances",DefinstancesData(theEnv)->DefinstancesConstruct);
   }
@@ -430,6 +441,7 @@ globle void ListDefinstancesCommand(
  ***************************************************/
 globle void EnvListDefinstances(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   struct defmodule *theModule)
   {
@@ -450,6 +462,7 @@ globle void EnvListDefinstances(
  ****************************************************************/
 globle void GetDefinstancesListFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT*returnValue)
   {
    GetConstructListFunction(theEnv,"get-definstances-list",returnValue,DefinstancesData(theEnv)->DefinstancesConstruct);
@@ -468,6 +481,7 @@ globle void GetDefinstancesListFunction(
  ***************************************************************/
 globle void EnvGetDefinstancesList(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *returnValue,
   struct defmodule *theModule)
   {
@@ -500,6 +514,7 @@ globle void EnvGetDefinstancesList(
  *********************************************************************/
 static int ParseDefinstances(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource)
   {
    SYMBOL_HN *dname;
@@ -617,6 +632,7 @@ static int ParseDefinstances(
  *************************************************************/
 static SYMBOL_HN *ParseDefinstancesName(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   int *active)
   {
@@ -664,6 +680,7 @@ static SYMBOL_HN *ParseDefinstancesName(
  **************************************************************/
 static void RemoveDefinstances(
   void *theEnv,
+  EXEC_STATUS,
   void *vdptr)
   {
    DEFINSTANCES *dptr = (DEFINSTANCES *) vdptr;
@@ -687,6 +704,7 @@ static void RemoveDefinstances(
  ***************************************************/
 static void SaveDefinstances(
   void *theEnv,
+  EXEC_STATUS,
   void *theModule,
   char *logName)
   {
@@ -703,7 +721,8 @@ static void SaveDefinstances(
   NOTES        : None
  ***************************************************/
 static intBool RemoveAllDefinstances(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DEFINSTANCES *dptr,*dhead;
    int success = TRUE;
@@ -744,6 +763,7 @@ static intBool RemoveAllDefinstances(
  ***************************************************/
 static void DefinstancesDeleteError(
   void *theEnv,
+  EXEC_STATUS,
   char *dname)
   {
    CantDeleteItemErrorMessage(theEnv,"definstances",dname);
@@ -763,7 +783,8 @@ static void DefinstancesDeleteError(
   NOTES        : None
  ********************************************************/
 static void CreateInitialDefinstances(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    EXPRESSION *tmp;
    DEFINSTANCES *theDefinstances;
@@ -799,7 +820,8 @@ static void CreateInitialDefinstances(
   NOTES        : None
  *****************************************************/
 static void *AllocateModule(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return((void *) get_struct(theEnv,definstancesModule));
   }
@@ -815,6 +837,7 @@ static void *AllocateModule(
  ***************************************************/
 static void ReturnModule(
   void *theEnv,
+  EXEC_STATUS,
   void *theItem)
   {
 #if (! BLOAD_ONLY)
@@ -836,7 +859,8 @@ static void ReturnModule(
   NOTES        : Used by (clear) and (bload)
  ***************************************************/
 static intBool ClearDefinstancesReady(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    int flagBuffer = TRUE;
 
@@ -864,6 +888,7 @@ static intBool ClearDefinstancesReady(
 #endif
 static void CheckDefinstancesBusy(
   void *theEnv,
+  EXEC_STATUS,
   struct constructHeader *theDefinstances,
   void *userBuffer)
   {
@@ -892,7 +917,8 @@ static void CheckDefinstancesBusy(
   NOTES        : None
  ***************************************************/
 static void ResetDefinstances(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DoForAllConstructs(theEnv,ResetDefinstancesAction,DefinstancesData(theEnv)->DefinstancesModuleIndex,TRUE,NULL);
   }
@@ -912,6 +938,7 @@ static void ResetDefinstances(
 #endif
 static void ResetDefinstancesAction(
   void *theEnv,
+  EXEC_STATUS,
   struct constructHeader *vDefinstances,
   void *userBuffer)
   {

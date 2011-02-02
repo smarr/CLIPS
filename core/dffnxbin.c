@@ -103,7 +103,8 @@ static void DeallocateDeffunctionBloadData(void *);
   NOTES        : None
  ***********************************************************/
 globle void SetupDeffunctionsBload(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    AllocateEnvironmentData(theEnv,DFFNXBIN_DATA,sizeof(struct deffunctionBinaryData),DeallocateDeffunctionBloadData);
 #if BLOAD_AND_BSAVE
@@ -123,7 +124,8 @@ globle void SetupDeffunctionsBload(
 /*    data for the deffunction bsave functionality.        */
 /***********************************************************/
 static void DeallocateDeffunctionBloadData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    size_t space;
 
@@ -147,6 +149,7 @@ static void DeallocateDeffunctionBloadData(
  ***************************************************/
 globle void *BloadDeffunctionModuleReference(
   void *theEnv,
+  EXEC_STATUS,
   int theIndex)
   {
    return ((void *) &DeffunctionBinaryData(theEnv)->ModuleArray[theIndex]);
@@ -176,7 +179,8 @@ globle void *BloadDeffunctionModuleReference(
                    deffunctions will be bsaved in order of binary list)
  ***************************************************************************/
 static void BsaveDeffunctionFind(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    SaveBloadCount(theEnv,DeffunctionBinaryData(theEnv)->ModuleCount);
    SaveBloadCount(theEnv,DeffunctionBinaryData(theEnv)->DeffunctionCount);
@@ -202,6 +206,7 @@ static void BsaveDeffunctionFind(
 #endif
 static void MarkDeffunctionItems(
   void *theEnv,
+  EXEC_STATUS,
   struct constructHeader *theDeffunction,
   void *userBuffer)
   {
@@ -225,6 +230,7 @@ static void MarkDeffunctionItems(
  ***************************************************/
 static void BsaveDeffunctionExpressions(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp)
   {
    DoForAllConstructs(theEnv,BsaveDeffunctionExpression,DeffunctionData(theEnv)->DeffunctionModuleIndex,
@@ -243,6 +249,7 @@ static void BsaveDeffunctionExpressions(
  ***************************************************/
 static void BsaveDeffunctionExpression(
   void *theEnv,
+  EXEC_STATUS,
   struct constructHeader *theDeffunction,
   void *userBuffer)
   {
@@ -261,6 +268,7 @@ static void BsaveDeffunctionExpression(
  ***********************************************************/
 static void BsaveStorageDeffunctions(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp)
   {
    size_t space;
@@ -283,6 +291,7 @@ static void BsaveStorageDeffunctions(
  *************************************************************************************/
 static void BsaveDeffunctions(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp)
   {
    size_t space;
@@ -329,6 +338,7 @@ static void BsaveDeffunctions(
  ***************************************************/
 static void BsaveDeffunction(
   void *theEnv,
+  EXEC_STATUS,
   struct constructHeader *theDeffunction,
   void *userBuffer)
   {
@@ -362,7 +372,8 @@ static void BsaveDeffunction(
                    within the structures
  ***********************************************************************/
 static void BloadStorageDeffunctions(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    size_t space;
 
@@ -403,7 +414,8 @@ static void BloadStorageDeffunctions(
   NOTES        : Assumes all loading is finished
  ********************************************************************/
 static void BloadDeffunctions(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    size_t space;
 
@@ -426,6 +438,7 @@ static void BloadDeffunctions(
  *******************************************************/
 static void UpdateDeffunctionModule(
   void *theEnv,
+  EXEC_STATUS,
   void *buf,
   long obji)
   {
@@ -450,6 +463,7 @@ static void UpdateDeffunctionModule(
  ***************************************************/
 static void UpdateDeffunction(
   void *theEnv,
+  EXEC_STATUS,
   void *buf,
   long obji)
   {
@@ -485,7 +499,8 @@ static void UpdateDeffunction(
   NOTES        : Deffunction name symbol counts decremented
  ***************************************************************/
 static void ClearDeffunctionBload(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    register long i;
    size_t space;

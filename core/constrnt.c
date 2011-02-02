@@ -66,7 +66,8 @@
 /*   dynamic constraint access functions.            */
 /*****************************************************/
 globle void InitializeConstraints(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
 #if (! RUN_TIME) && (! BLOAD_ONLY)
    int i;
@@ -101,7 +102,8 @@ globle void InitializeConstraints(
 /*    data for constraints.                          */
 /*****************************************************/
 static void DeallocateConstraintData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
 #if ! RUN_TIME   
    struct constraintRecord *tmpPtr, *nextPtr;
@@ -144,6 +146,7 @@ static void DeallocateConstraintData(
 /*************************************************************/
 static void ReturnConstraintRecord(
   void *theEnv,
+  EXEC_STATUS,
   CONSTRAINT_RECORD *constraints)
   {
    if (constraints == NULL) return;
@@ -170,6 +173,7 @@ static void ReturnConstraintRecord(
 /***************************************************/
 static void DeinstallConstraintRecord(
   void *theEnv,
+  EXEC_STATUS,
   CONSTRAINT_RECORD *constraints)
   {
    if (constraints->bucket >= 0)
@@ -201,6 +205,7 @@ static void DeinstallConstraintRecord(
 /******************************************/
 globle void RemoveConstraint(
   void *theEnv,
+  EXEC_STATUS,
   struct constraintRecord *theConstraint)
   {
    struct constraintRecord *tmpPtr, *prevPtr = NULL;
@@ -416,6 +421,7 @@ static int ConstraintCompare(
 /************************************/
 globle struct constraintRecord *AddConstraint(
   void *theEnv,
+  EXEC_STATUS,
   struct constraintRecord *theConstraint)
   {
    struct constraintRecord *tmpPtr;
@@ -452,6 +458,7 @@ globle struct constraintRecord *AddConstraint(
 /*************************************************/
 static void InstallConstraintRecord(
   void *theEnv,
+  EXEC_STATUS,
   CONSTRAINT_RECORD *constraints)
   {
    struct expr *tempExpr;
@@ -491,7 +498,8 @@ static void InstallConstraintRecord(
 /*   set-dynamic-constraint-checking command. */
 /**********************************************/
 globle int SDCCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    int oldValue;
    DATA_OBJECT arg_ptr;
@@ -516,7 +524,8 @@ globle int SDCCommand(
 /*   get-dynamic-constraint-checking command. */
 /**********************************************/
 globle int GDCCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    int oldValue;
 
@@ -533,7 +542,8 @@ globle int GDCCommand(
 /*   set-static-constraint-checking command. */
 /*********************************************/
 globle int SSCCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    int oldValue;
    DATA_OBJECT arg_ptr;
@@ -558,7 +568,8 @@ globle int SSCCommand(
 /*   get-static-constraint-checking command. */
 /*********************************************/
 globle int GSCCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    int oldValue;
 
@@ -576,6 +587,7 @@ globle int GSCCommand(
 /******************************************************/
 globle intBool EnvSetDynamicConstraintChecking(
   void *theEnv,
+  EXEC_STATUS,
   int value)
   {
    int ov;
@@ -589,7 +601,8 @@ globle intBool EnvSetDynamicConstraintChecking(
 /*   for the get-dynamic-constraint-checking command. */
 /******************************************************/
 globle intBool EnvGetDynamicConstraintChecking(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   { 
    return(ConstraintData(theEnv)->DynamicConstraintChecking); 
   }
@@ -600,6 +613,7 @@ globle intBool EnvGetDynamicConstraintChecking(
 /*****************************************************/
 globle intBool EnvSetStaticConstraintChecking(
   void *theEnv,
+  EXEC_STATUS,
   int value)
   {
    int ov;
@@ -614,7 +628,8 @@ globle intBool EnvSetStaticConstraintChecking(
 /*   for the get-static-constraint-checking command. */
 /*****************************************************/
 globle intBool EnvGetStaticConstraintChecking(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {    
    return(ConstraintData(theEnv)->StaticConstraintChecking); 
   }

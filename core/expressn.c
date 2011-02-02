@@ -70,7 +70,8 @@
 /*   and the expression hash table.               */
 /**************************************************/
 globle void InitExpressionData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
 #if ! RUN_TIME
    register unsigned i;
@@ -93,7 +94,8 @@ globle void InitExpressionData(
 /*    environment data for expressions.  */
 /*****************************************/
 static void DeallocateExpressionData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
 #if ! RUN_TIME
    int i;
@@ -138,7 +140,8 @@ static void DeallocateExpressionData(
 /*   pointers used in generating some expressions.  */
 /****************************************************/
 globle void InitExpressionPointers(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    ExpressionData(theEnv)->PTR_AND = (void *) FindFunction(theEnv,"and");
    ExpressionData(theEnv)->PTR_OR = (void *) FindFunction(theEnv,"or");
@@ -160,6 +163,7 @@ globle void InitExpressionPointers(
 /***************************************************/
 globle void ExpressionInstall(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *expression)
   {
    if (expression == NULL) return;
@@ -178,6 +182,7 @@ globle void ExpressionInstall(
 /*****************************************************/
 globle void ExpressionDeinstall(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *expression)
   {
    if (expression == NULL) return;
@@ -201,6 +206,7 @@ globle void ExpressionDeinstall(
 /***********************************************************************/
 globle struct expr *PackExpression(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *original)
   {
    struct expr *packPtr;
@@ -262,6 +268,7 @@ static long ListToPacked(
 /***************************************************************/
 globle void ReturnPackedExpression(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *packPtr)
   {
    if (packPtr != NULL)
@@ -279,6 +286,7 @@ globle void ReturnPackedExpression(
 /***********************************************/
 globle void ReturnExpression(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *waste)
   {
    register struct expr *tmp;
@@ -310,6 +318,7 @@ globle void ReturnExpression(
  ***************************************************/
 static EXPRESSION_HN *FindHashedExpression(
   void *theEnv,
+  EXEC_STATUS,
   EXPRESSION *theExp,
   unsigned *hashval,
   EXPRESSION_HN **prv)
@@ -379,6 +388,7 @@ static unsigned HashExpression(
  ***************************************************/
 globle void RemoveHashedExpression(
   void *theEnv,
+  EXEC_STATUS,
   EXPRESSION *theExp)
   {
    EXPRESSION_HN *exphash,*prv;
@@ -418,6 +428,7 @@ globle void RemoveHashedExpression(
  *****************************************************/
 globle EXPRESSION *AddHashedExpression(
   void *theEnv,
+  EXEC_STATUS,
   EXPRESSION *theExp)
   {
    EXPRESSION_HN *prv,*exphash;
@@ -456,6 +467,7 @@ globle EXPRESSION *AddHashedExpression(
  ***************************************************/
 globle long HashedExpressionIndex(
   void *theEnv,
+  EXEC_STATUS,
   EXPRESSION *theExp)
   {
    EXPRESSION_HN *exphash,*prv;

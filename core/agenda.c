@@ -83,7 +83,8 @@
 /*   manipulating the agenda.                    */
 /*************************************************/
 globle void InitializeAgenda(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {   
    AllocateEnvironmentData(theEnv,AGENDA_DATA,sizeof(struct agendaData),NULL);
    
@@ -123,6 +124,7 @@ globle void InitializeAgenda(
 /*****************************************************************/
 globle void AddActivation(
   void *theEnv,
+  EXEC_STATUS,
   void *vTheRule,
   void *vBinds)
   {
@@ -196,6 +198,7 @@ globle void AddActivation(
 /***************************************************************/
 static struct salienceGroup *ReuseOrCreateSalienceGroup(
   void *theEnv,
+  EXEC_STATUS,
   struct defruleModule *theRuleModule,
   int salience)
   {
@@ -259,6 +262,7 @@ static struct salienceGroup *FindSalienceGroup(
 /***************************************************************/
 globle void ClearRuleFromAgenda(
   void *theEnv,
+  EXEC_STATUS,
   void *vTheRule)
   {
    struct defrule *theRule = (struct defrule *) vTheRule;
@@ -309,6 +313,7 @@ globle void ClearRuleFromAgenda(
 /****************************************************************/
 globle void *EnvGetNextActivation(
   void *theEnv,
+  EXEC_STATUS,
   void *actPtr)
   {
    struct defruleModule *theModuleItem;
@@ -332,6 +337,7 @@ globle void *EnvGetNextActivation(
 #endif
 globle char *EnvGetActivationName(
   void *theEnv,
+  EXEC_STATUS,
   void *actPtr)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
@@ -350,6 +356,7 @@ globle char *EnvGetActivationName(
 #endif
 globle int EnvSetActivationSalience(
   void *theEnv,
+  EXEC_STATUS,
   void *actPtr,
   int value)
   {
@@ -369,6 +376,7 @@ globle int EnvSetActivationSalience(
 /**********************************************/
 globle void EnvGetActivationPPForm(
   void *theEnv,
+  EXEC_STATUS,
   char *buffer,
   unsigned bufferLength,
   void *theActivation)
@@ -384,6 +392,7 @@ globle void EnvGetActivationPPForm(
 /****************************************************/
 globle void EnvGetActivationBasisPPForm(
   void *theEnv,
+  EXEC_STATUS,
   char *buffer,
   unsigned bufferLength,
   void *vTheActivation)
@@ -401,6 +410,7 @@ globle void EnvGetActivationBasisPPForm(
 /********************************************/
 globle intBool MoveActivationToTop(
   void *theEnv,
+  EXEC_STATUS,
   void *vtheActivation)
   {
    struct activation *prevPtr;
@@ -456,6 +466,7 @@ globle intBool MoveActivationToTop(
 /**********************************************/
 globle intBool EnvDeleteActivation(
   void *theEnv,
+  EXEC_STATUS,
   void *theActivation)
   {
    if (theActivation == NULL) RemoveAllActivations(theEnv);
@@ -470,6 +481,7 @@ globle intBool EnvDeleteActivation(
 /*******************************************************/
 globle intBool DetachActivation(
   void *theEnv,
+  EXEC_STATUS,
   void *vTheActivation)
   {
    struct defruleModule *theModuleItem;
@@ -534,6 +546,7 @@ globle intBool DetachActivation(
 /****************************************************************************/
 static void PrintActivation(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   void *vTheActivation)
   {
@@ -553,6 +566,7 @@ static void PrintActivation(
 /*******************************/
 globle void EnvAgenda(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   void *vTheModule)
   {
@@ -569,6 +583,7 @@ globle void EnvAgenda(
 /*******************************************************************/
 globle void RemoveActivation(
   void *theEnv,
+  EXEC_STATUS,
   void *vTheActivation,
   int updateAgenda,
   int updateLinks)
@@ -649,6 +664,7 @@ globle void RemoveActivation(
 /**************************************************************/
 static void RemoveActivationFromGroup(
   void *theEnv,
+  EXEC_STATUS,
   struct activation *theActivation,
   struct defruleModule *theRuleModule)
   {
@@ -710,7 +726,8 @@ static void RemoveActivationFromGroup(
 /*   clear command. Resets the current time tag to zero.      */
 /**************************************************************/
 static void AgendaClearFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    AgendaData(theEnv)->CurrentTimetag = 0;
   }
@@ -720,7 +737,8 @@ static void AgendaClearFunction(
 /*   from the agenda of the current module.      */
 /*************************************************/
 globle void RemoveAllActivations(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct activation *tempPtr, *theActivation;
    struct salienceGroup *theGroup, *tempGroup;
@@ -748,7 +766,8 @@ globle void RemoveAllActivations(
 /*   made to the agenda.                                 */
 /*********************************************************/
 globle int EnvGetAgendaChanged(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return(AgendaData(theEnv)->AgendaChanged);
   }
@@ -759,6 +778,7 @@ globle int EnvGetAgendaChanged(
 /*****************************************************************/
 globle void EnvSetAgendaChanged(
   void *theEnv,
+  EXEC_STATUS,
   int value)
   {
    AgendaData(theEnv)->AgendaChanged = value;
@@ -770,6 +790,7 @@ globle void EnvSetAgendaChanged(
 /**********************************************************/
 globle void EnvReorderAgenda(
   void *theEnv,
+  EXEC_STATUS,
   void *vTheModule)
   {
    struct activation *theActivation, *tempPtr;
@@ -844,7 +865,8 @@ globle void EnvReorderAgenda(
 /*   total number of activations on all agendas.    */
 /****************************************************/
 globle unsigned long GetNumberOfActivations(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {  
    return(AgendaData(theEnv)->NumberOfActivations); 
   }
@@ -854,7 +876,8 @@ globle unsigned long GetNumberOfActivations(
 /*   Syntax: (refresh <defrule-name>)                 */
 /******************************************************/
 globle void RefreshCommand(
-  void *theEnv, EXEC_STATUS)
+  void *theEnv,
+  EXEC_STATUS)
   {
    char *ruleName;
    void *rulePtr;
@@ -890,6 +913,7 @@ globle void RefreshCommand(
 /************************************************************/
 globle intBool EnvRefresh(
   void *theEnv,
+  EXEC_STATUS,
   void *theRule)
   {
    struct defrule *rulePtr;
@@ -939,7 +963,8 @@ globle intBool EnvRefresh(
 /*   for the refresh-agenda command.          */
 /**********************************************/
 globle void RefreshAgendaCommand(
-  void *theEnv, EXEC_STATUS)
+  void *theEnv,
+	EXEC_STATUS)
   {
    int numArgs, error;
    struct defmodule *theModule;
@@ -977,6 +1002,7 @@ globle void RefreshAgendaCommand(
 /**************************************/
 globle void EnvRefreshAgenda(
   void *theEnv,
+  EXEC_STATUS,
   void *vTheModule)
   {
    struct activation *theActivation;
@@ -1071,7 +1097,8 @@ globle void EnvRefreshAgenda(
 /*   Syntax: (set-salience-evaluation-behavior <symbol>) */
 /*********************************************************/
 globle void *SetSalienceEvaluationCommand(
-  void *theEnv,EXEC_STATUS)
+  void *theEnv,
+	EXEC_STATUS)
   {
    DATA_OBJECT argPtr;
    char *argument, *oldValue;
@@ -1126,7 +1153,8 @@ globle void *SetSalienceEvaluationCommand(
 /*   Syntax: (get-salience-evaluation-behavior)          */
 /*********************************************************/
 globle void *GetSalienceEvaluationCommand(
-  void *theEnv, EXEC_STATUS)
+  void *theEnv,
+  EXEC_STATUS)
   {
    EnvArgCountCheck(theEnv,execStatus,"get-salience-evaluation",EXACTLY,0);
 
@@ -1168,7 +1196,8 @@ static char *SalienceEvaluationName(
 /*  or every cycle).                                            */
 /****************************************************************/
 globle intBool EnvGetSalienceEvaluation(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {   
    return(AgendaData(theEnv)->SalienceEvaluation); 
   }
@@ -1179,6 +1208,7 @@ globle intBool EnvGetSalienceEvaluation(
 /***********************************************/
 globle intBool EnvSetSalienceEvaluation(
   void *theEnv,
+  EXEC_STATUS,
   int value)
   {
    int ov;
@@ -1198,6 +1228,7 @@ globle intBool EnvSetSalienceEvaluation(
 /*****************************************************************/
 static int EvaluateSalience(
   void *theEnv,
+  EXEC_STATUS,
   void *vPtr)
   {
    struct defrule *rPtr = (struct defrule *) vPtr;
@@ -1278,7 +1309,8 @@ static int EvaluateSalience(
 /*   Syntax: (agenda)                          */
 /***********************************************/
 globle void AgendaCommand(
-  void *theEnv, EXEC_STATUS)
+  void *theEnv,
+	EXEC_STATUS)
   {
    int numArgs, error;
    struct defmodule *theModule;

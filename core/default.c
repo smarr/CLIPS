@@ -59,6 +59,7 @@
 /********************************************************/
 globle void DeriveDefaultFromConstraints(
   void *theEnv,
+  EXEC_STATUS,
   CONSTRAINT_RECORD *constraints,
   DATA_OBJECT *theDefault,
   int multifield,
@@ -196,6 +197,7 @@ globle void DeriveDefaultFromConstraints(
 /************************************************************************/
 static void *FindDefaultValue(
   void *theEnv,
+  EXEC_STATUS,
   int theType,
   CONSTRAINT_RECORD *theConstraints,
   void *standardDefault)
@@ -259,6 +261,7 @@ static void *FindDefaultValue(
 /**********************************************/
 globle struct expr *ParseDefault(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   int multifield,
   int dynamic,

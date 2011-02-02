@@ -189,6 +189,7 @@ static intBool CheckTypeConstraint(
 /********************************************************/
 globle intBool CheckCardinalityConstraint(
   void *theEnv,
+  EXEC_STATUS,
   long number,
   CONSTRAINT_RECORD *constraints)
   {
@@ -243,6 +244,7 @@ globle intBool CheckCardinalityConstraint(
 /*****************************************************************/
 static intBool CheckRangeAgainstCardinalityConstraint(
   void *theEnv,
+  EXEC_STATUS,
   int min,
   int max,
   CONSTRAINT_RECORD *constraints)
@@ -386,6 +388,7 @@ globle intBool CheckAllowedValuesConstraint(
 /**********************************************************************/
 globle intBool CheckAllowedClassesConstraint(
   void *theEnv,
+  EXEC_STATUS,
   int type,
   void *vPtr,
   CONSTRAINT_RECORD *constraints)
@@ -472,6 +475,7 @@ globle intBool CheckAllowedClassesConstraint(
 /*************************************************************/
 static intBool CheckRangeConstraint(
   void *theEnv,
+  EXEC_STATUS,
   int type,
   void *vPtr,
   CONSTRAINT_RECORD *constraints)
@@ -532,6 +536,7 @@ static intBool CheckRangeConstraint(
 /************************************************/
 globle void ConstraintViolationErrorMessage(
   void *theEnv,
+  EXEC_STATUS,
   char *theWhat,
   char *thePlace,
   int command,
@@ -635,6 +640,7 @@ globle void ConstraintViolationErrorMessage(
 /********************************************************************/
 static void PrintRange(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   CONSTRAINT_RECORD *theConstraint)
   {
@@ -654,6 +660,7 @@ static void PrintRange(
 /*************************************************************/
 globle int ConstraintCheckDataObject(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *theData,
   CONSTRAINT_RECORD *theConstraints)
   {
@@ -693,6 +700,7 @@ globle int ConstraintCheckDataObject(
 /****************************************************************/
 globle int ConstraintCheckValue(
   void *theEnv,
+  EXEC_STATUS,
   int theType,
   void *theValue,
   CONSTRAINT_RECORD *theConstraints)
@@ -724,6 +732,7 @@ globle int ConstraintCheckValue(
 /********************************************************************/
 globle int ConstraintCheckExpressionChain(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *theExpression,
   CONSTRAINT_RECORD *theConstraints)
   {
@@ -779,6 +788,7 @@ globle int ConstraintCheckExpressionChain(
 /***************************************************/
 globle int ConstraintCheckExpression(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *theExpression,
   CONSTRAINT_RECORD *theConstraints)
   {

@@ -76,6 +76,7 @@
 /********************************************************************/
 globle intBool CheckConstraintParseConflicts(
   void *theEnv,
+  EXEC_STATUS,
   CONSTRAINT_RECORD *constraints)
   {
    /*===================================================*/
@@ -195,6 +196,7 @@ globle intBool CheckConstraintParseConflicts(
 /********************************************************/
 globle void AttributeConflictErrorMessage(
   void *theEnv,
+  EXEC_STATUS,
   char *attribute1,
   char *attribute2)
   {
@@ -261,6 +263,7 @@ globle intBool StandardConstraint(
 /***********************************************************************/
 globle intBool ParseStandardConstraint(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   char *constraintName,
   CONSTRAINT_RECORD *constraints,
@@ -342,6 +345,7 @@ globle intBool ParseStandardConstraint(
 /***********************************************************/
 globle void OverlayConstraint(
   void *theEnv,
+  EXEC_STATUS,
   CONSTRAINT_PARSE_RECORD *pc,
   CONSTRAINT_RECORD *cdst,
   CONSTRAINT_RECORD *csrc)
@@ -475,6 +479,7 @@ globle void OverlayConstraintParseRecord(
 /************************************************************/
 static void AddToRestrictionList(
   void *theEnv,
+  EXEC_STATUS,
   int type,
   CONSTRAINT_RECORD *cdst,
   CONSTRAINT_RECORD *csrc)
@@ -497,6 +502,7 @@ static void AddToRestrictionList(
 /*******************************************************************/
 static intBool ParseAllowedValuesAttribute(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   char *constraintName,
   CONSTRAINT_RECORD *constraints,
@@ -851,6 +857,7 @@ static intBool ParseAllowedValuesAttribute(
 /***********************************************************/
 static void NoConjunctiveUseError(
   void *theEnv,
+  EXEC_STATUS,
   char *attribute1,
   char *attribute2)
   {
@@ -868,6 +875,7 @@ static void NoConjunctiveUseError(
 /**************************************************/
 static intBool ParseTypeAttribute(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   CONSTRAINT_RECORD *constraints)
   {
@@ -1014,6 +1022,7 @@ static intBool ParseTypeAttribute(
 /***************************************************************************/
 static intBool ParseRangeCardinalityAttribute(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   CONSTRAINT_RECORD *constraints,
   CONSTRAINT_PARSE_RECORD *parsedConstraints,

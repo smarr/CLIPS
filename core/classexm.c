@@ -103,7 +103,8 @@ static char *ConstraintCode(CONSTRAINT_RECORD *,unsigned,unsigned);
   NOTES        : Syntax : (browse-classes [<class>])
  ****************************************************************/
 globle void BrowseClassesCommand(
-  void *theEnv, EXEC_STATUS)
+  void *theEnv,
+	EXEC_STATUS)
   {
    register DEFCLASS *cls;
    
@@ -139,6 +140,7 @@ globle void BrowseClassesCommand(
  ****************************************************************/
 globle void EnvBrowseClasses(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   void *clsptr)
   {
@@ -156,7 +158,8 @@ globle void EnvBrowseClasses(
   NOTES        : Syntax : (describe-class <class-name>)
  ****************************************************************/
 globle void DescribeClassCommand(
-  void *theEnv, EXEC_STATUS)
+  void *theEnv,
+	EXEC_STATUS)
   {
    char *cname;
    DEFCLASS *cls;
@@ -183,6 +186,7 @@ globle void DescribeClassCommand(
  ******************************************************/
 globle void EnvDescribeClass(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   void *clsptr)
   {
@@ -314,7 +318,8 @@ globle char *GetCreateAccessorString(
   NOTES        : H/L Syntax: (defclass-module <class-name>)
  ************************************************************/
 globle void *GetDefclassModuleCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return(GetConstructModuleCommand(theEnv,"defclass-module",DefclassData(theEnv)->DefclassConstruct));
   }
@@ -328,7 +333,8 @@ globle void *GetDefclassModuleCommand(
   NOTES        : H/L Syntax : (superclassp <class-1> <class-2>)
  *********************************************************************/
 globle intBool SuperclassPCommand(
-  void *theEnv,EXEC_STATUS)
+  void *theEnv,
+	EXEC_STATUS)
   {
    DEFCLASS *c1,*c2;
    
@@ -354,6 +360,7 @@ globle intBool SuperclassPCommand(
 #endif
 globle intBool EnvSuperclassP(
   void *theEnv,
+  EXEC_STATUS,
   void *firstClass,
   void *secondClass)
   {
@@ -373,7 +380,8 @@ globle intBool EnvSuperclassP(
   NOTES        : H/L Syntax : (subclassp <class-1> <class-2>)
  *********************************************************************/
 globle intBool SubclassPCommand(
-  void *theEnv,EXEC_STATUS)
+  void *theEnv,
+	EXEC_STATUS)
   {
    DEFCLASS *c1,*c2;
    
@@ -399,6 +407,7 @@ globle intBool SubclassPCommand(
 #endif
 globle intBool EnvSubclassP(
   void *theEnv,
+  EXEC_STATUS,
   void *firstClass,
   void *secondClass)
   {
@@ -418,7 +427,8 @@ globle intBool EnvSubclassP(
   NOTES        : H/L Syntax : (slot-existp <class> <slot> [inherit])
  *********************************************************************/
 globle int SlotExistPCommand(
-  void *theEnv, EXEC_STATUS)
+  void *theEnv,
+	EXEC_STATUS)
   {
    DEFCLASS *cls;
    SLOT_DESC *sd;
@@ -457,6 +467,7 @@ globle int SlotExistPCommand(
  ***************************************************/
 globle intBool EnvSlotExistP(
   void *theEnv,
+  EXEC_STATUS,
   void *theDefclass,
   char *slotName,
   intBool inheritFlag)
@@ -474,7 +485,8 @@ globle intBool EnvSlotExistP(
   NOTES        : H/L Syntax : (message-handler-existp <class> <hnd> [<type>])
  ************************************************************************************/
 globle int MessageHandlerExistPCommand(
-  void *theEnv, EXEC_STATUS)
+  void *theEnv,
+ 	EXEC_STATUS)
   {
    DEFCLASS *cls;
    SYMBOL_HN *mname;
@@ -517,7 +529,8 @@ globle int MessageHandlerExistPCommand(
   NOTES        : H/L Syntax : (slot-writablep <class> <slot>)
  **********************************************************************/
 globle intBool SlotWritablePCommand(
-  void *theEnv,EXEC_STATUS)
+  void *theEnv,
+	EXEC_STATUS)
   {
    DEFCLASS *theDefclass;
    SLOT_DESC *sd;
@@ -540,6 +553,7 @@ globle intBool SlotWritablePCommand(
  ***************************************************/
 globle intBool EnvSlotWritableP(
   void *theEnv,
+  EXEC_STATUS,
   void *theDefclass,
   char *slotName)
   {
@@ -560,7 +574,8 @@ globle intBool EnvSlotWritableP(
   NOTES        : H/L Syntax : (slot-initablep <class> <slot>)
  **********************************************************************/
 globle intBool SlotInitablePCommand(
-  void *theEnv,EXEC_STATUS)
+  void *theEnv,
+	EXEC_STATUS)
   {
    DEFCLASS *theDefclass;
    SLOT_DESC *sd;
@@ -583,6 +598,7 @@ globle intBool SlotInitablePCommand(
  ***************************************************/
 globle intBool EnvSlotInitableP(
   void *theEnv,
+  EXEC_STATUS,
   void *theDefclass,
   char *slotName)
   {
@@ -603,7 +619,8 @@ globle intBool EnvSlotInitableP(
   NOTES        : H/L Syntax : (slot-publicp <class> <slot>)
  **********************************************************************/
 globle intBool SlotPublicPCommand(
-  void *theEnv, EXEC_STATUS)
+  void *theEnv,
+ 	EXEC_STATUS)
   {
    DEFCLASS *theDefclass;
    SLOT_DESC *sd;
@@ -626,6 +643,7 @@ globle intBool SlotPublicPCommand(
  ***************************************************/
 globle intBool EnvSlotPublicP(
   void *theEnv,
+  EXEC_STATUS,
   void *theDefclass,
   char *slotName)
   {
@@ -648,6 +666,7 @@ globle intBool EnvSlotPublicP(
  ***************************************************/
 globle int EnvSlotDefaultP(
   void *theEnv,
+  EXEC_STATUS,
   void *theDefclass,
   char *slotName)
   {
@@ -677,7 +696,8 @@ globle int EnvSlotDefaultP(
   NOTES        : H/L Syntax : (slot-direct-accessp <class> <slot>)
  **********************************************************************/
 globle intBool SlotDirectAccessPCommand(
-  void *theEnv,EXEC_STATUS)
+  void *theEnv,
+	EXEC_STATUS)
   {
    DEFCLASS *theDefclass;
    SLOT_DESC *sd;
@@ -702,6 +722,7 @@ globle intBool SlotDirectAccessPCommand(
  ***************************************************/
 globle intBool EnvSlotDirectAccessP(
   void *theEnv,
+  EXEC_STATUS,
   void *theDefclass,
   char *slotName)
   {
@@ -723,7 +744,8 @@ globle intBool EnvSlotDirectAccessP(
   NOTES        : H/L Syntax : (slot-default-value <class> <slot>)
  **********************************************************************/
 globle void SlotDefaultValueCommand(
-  void *theEnv,EXEC_STATUS,
+  void *theEnv,
+	EXEC_STATUS,
   DATA_OBJECT_PTR theValue)
   {
    DEFCLASS *theDefclass;
@@ -764,6 +786,7 @@ globle void SlotDefaultValueCommand(
  *********************************************************/
 globle intBool EnvSlotDefaultValue(
   void *theEnv,
+  EXEC_STATUS,
   void *theDefclass,
   char *slotName,
   DATA_OBJECT_PTR theValue)
@@ -799,7 +822,8 @@ globle intBool EnvSlotDefaultValue(
   NOTES        : H/L Syntax : (class-existp <arg>)
  ********************************************************/
 globle intBool ClassExistPCommand(
-  void *theEnv, EXEC_STATUS)
+  void *theEnv,
+ 	EXEC_STATUS)
   {
    DATA_OBJECT temp;
    
@@ -925,6 +949,7 @@ static SLOT_DESC *CheckSlotExists(
  ***************************************************/
 static SLOT_DESC *LookupSlot(
   void *theEnv,
+  EXEC_STATUS,
   DEFCLASS *theDefclass,
   char *slotName,
   intBool inheritFlag)
@@ -961,6 +986,7 @@ static SLOT_DESC *LookupSlot(
  ******************************************************/
 static DEFCLASS *CheckClass(
   void *theEnv,
+  EXEC_STATUS,
   char *func,
   char *cname)
   {
@@ -1004,6 +1030,7 @@ static char *GetClassNameArgument(
  ****************************************************************/
 static void PrintClassBrowse(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   DEFCLASS *cls,
   long depth)
@@ -1033,6 +1060,7 @@ static void PrintClassBrowse(
  *********************************************************/
 static void DisplaySeparator(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   char *buf,
   int maxlen,
@@ -1078,6 +1106,7 @@ static void DisplaySeparator(
  *************************************************************/
 static void DisplaySlotBasicInfo(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   char *slotNamePrintFormat,
   char *overrideMessagePrintFormat,
@@ -1158,6 +1187,7 @@ static void DisplaySlotBasicInfo(
  ***************************************************/
 static intBool PrintSlotSources(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   SYMBOL_HN *sname,
   PACKED_CLASS_LINKS *sprec,
@@ -1210,6 +1240,7 @@ static intBool PrintSlotSources(
  *********************************************************/
 static void DisplaySlotConstraintInfo(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   char *slotNamePrintFormat,
   char *buf,

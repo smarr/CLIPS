@@ -356,6 +356,7 @@ globle void SlotCardinalityCommand(
 #endif
 globle intBool EnvClassAbstractP(
   void *theEnv,
+  EXEC_STATUS,
   void *clsptr)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
@@ -380,6 +381,7 @@ globle intBool EnvClassAbstractP(
 #endif
 globle intBool EnvClassReactiveP(
   void *theEnv,
+  EXEC_STATUS,
   void *clsptr)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
@@ -405,6 +407,7 @@ globle intBool EnvClassReactiveP(
  ********************************************************************/
 globle void EnvClassSlots(
   void *theEnv,
+  EXEC_STATUS,
   void *clsptr,
   DATA_OBJECT *result,
   int inhp)
@@ -454,6 +457,7 @@ globle void EnvClassSlots(
  ************************************************************************/
 globle void EnvGetDefmessageHandlerList(
   void *theEnv,
+  EXEC_STATUS,
   void *clsptr,
   DATA_OBJECT *result,
   int inhp)
@@ -530,6 +534,7 @@ globle void EnvGetDefmessageHandlerList(
  ***************************************************************************/
 globle void EnvClassSuperclasses(
   void *theEnv,
+  EXEC_STATUS,
   void *clsptr,
   DATA_OBJECT *result,
   int inhp)
@@ -575,6 +580,7 @@ globle void EnvClassSuperclasses(
  **************************************************************************/
 globle void EnvClassSubclasses(
   void *theEnv,
+  EXEC_STATUS,
   void *clsptr,
   DATA_OBJECT *result,
   int inhp)
@@ -612,6 +618,7 @@ globle void EnvClassSubclasses(
  **************************************************************************/
 globle void ClassSubclassAddresses(
   void *theEnv,
+  EXEC_STATUS,
   void *clsptr,
   DATA_OBJECT *result,
   int inhp)
@@ -650,6 +657,7 @@ globle void ClassSubclassAddresses(
 
 globle void EnvSlotFacets(
   void *theEnv,
+  EXEC_STATUS,
   void *clsptr,
   char *sname,
   DATA_OBJECT *result)
@@ -738,6 +746,7 @@ globle void EnvSlotFacets(
 
 globle void EnvSlotSources(
   void *theEnv,
+  EXEC_STATUS,
   void *clsptr,
   char *sname,
   DATA_OBJECT *result)
@@ -784,6 +793,7 @@ globle void EnvSlotSources(
 
 globle void EnvSlotTypes(
   void *theEnv,
+  EXEC_STATUS,
   void *clsptr,
   char *sname,
   DATA_OBJECT *result)
@@ -866,6 +876,7 @@ DefclassData(theEnv)->PrimitiveClassMap[j]));
 
 globle void EnvSlotAllowedValues(
   void *theEnv,
+  EXEC_STATUS,
   void *clsptr,
   char *sname,
   DATA_OBJECT *result)
@@ -897,6 +908,7 @@ globle void EnvSlotAllowedValues(
 
 globle void EnvSlotAllowedClasses(
   void *theEnv,
+  EXEC_STATUS,
   void *clsptr,
   char *sname,
   DATA_OBJECT *result)
@@ -928,6 +940,7 @@ globle void EnvSlotAllowedClasses(
 
 globle void EnvSlotRange(
   void *theEnv,
+  EXEC_STATUS,
   void *clsptr,
   char *sname,
   DATA_OBJECT *result)
@@ -957,6 +970,7 @@ globle void EnvSlotRange(
 
 globle void EnvSlotCardinality(
   void *theEnv,
+  EXEC_STATUS,
   void *clsptr,
   char *sname,
   DATA_OBJECT *result)
@@ -1121,6 +1135,7 @@ static unsigned StoreSubclasses(
  *********************************************************/
 static SLOT_DESC *SlotInfoSlot(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result,
   DEFCLASS *cls,
   char *sname,

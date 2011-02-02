@@ -90,7 +90,8 @@ static void DisplayGenericCore(void *,DEFGENERIC *);
   NOTES        : Used by (clear) and (bload)
  ***************************************************/
 globle intBool ClearDefgenericsReady(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return((DefgenericData(theEnv)->CurrentGeneric != NULL) ? FALSE : TRUE);
   }
@@ -105,7 +106,8 @@ globle intBool ClearDefgenericsReady(
   NOTES        : None
  *****************************************************/
 globle void *AllocateDefgenericModule(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return((void *) get_struct(theEnv,defgenericModule));
   }
@@ -121,6 +123,7 @@ globle void *AllocateDefgenericModule(
  ***************************************************/
 globle void FreeDefgenericModule(
   void *theEnv,
+  EXEC_STATUS,
   void *theItem)
   {
 #if (! BLOAD_ONLY)
@@ -152,7 +155,8 @@ globle void FreeDefgenericModule(
                    to be cleared
  ************************************************************/
 globle int ClearDefmethods(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    register DEFGENERIC *gfunc;
    int success = TRUE;
@@ -183,6 +187,7 @@ globle int ClearDefmethods(
  *****************************************************************/
 globle int RemoveAllExplicitMethods(
   void *theEnv,
+  EXEC_STATUS,
   DEFGENERIC *gfunc)
   {
    long i,j;
@@ -238,6 +243,7 @@ globle int RemoveAllExplicitMethods(
  **************************************************/
 globle void RemoveDefgeneric(
   void *theEnv,
+  EXEC_STATUS,
   void *vgfunc)
   {
    DEFGENERIC *gfunc = (DEFGENERIC *) vgfunc;
@@ -264,7 +270,8 @@ globle void RemoveDefgeneric(
   NOTES        : None
  ****************************************************************/
 globle int ClearDefgenerics(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    register DEFGENERIC *gfunc,*gtmp;
    int success = TRUE;
@@ -305,6 +312,7 @@ globle int ClearDefgenerics(
  ********************************************************/
 globle void MethodAlterError(
   void *theEnv,
+  EXEC_STATUS,
   DEFGENERIC *gfunc)
   {
    PrintErrorID(theEnv,"GENRCFUN",1,FALSE);
@@ -326,6 +334,7 @@ globle void MethodAlterError(
  ***************************************************/
 globle void DeleteMethodInfo(
   void *theEnv,
+  EXEC_STATUS,
   DEFGENERIC *gfunc,
   DEFMETHOD *meth)
   {
@@ -376,6 +385,7 @@ globle void DeleteMethodInfo(
 #endif
 globle void DestroyMethodInfo(
   void *theEnv,
+  EXEC_STATUS,
   DEFGENERIC *gfunc,
   DEFMETHOD *meth)
   {
@@ -502,7 +512,8 @@ globle long FindMethodByIndex(
   NOTES        : H/L Syntax: (preview-generic <func> <args>)
  *************************************************************/
 globle void PreviewGeneric(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DEFGENERIC *gfunc;
    DEFGENERIC *previousGeneric;
@@ -562,6 +573,7 @@ globle void PreviewGeneric(
 #endif
 globle void PrintMethod(
   void *theEnv,
+  EXEC_STATUS,
   char *buf,
   int buflen,
   DEFMETHOD *meth)
@@ -630,6 +642,7 @@ globle void PrintMethod(
  ***************************************************/
 globle DEFGENERIC *CheckGenericExists(
   void *theEnv,
+  EXEC_STATUS,
   char *fname,
   char *gname)
   {
@@ -663,6 +676,7 @@ globle DEFGENERIC *CheckGenericExists(
  ***************************************************/
 globle long CheckMethodExists(
   void *theEnv,
+  EXEC_STATUS,
   char *fname,
   DEFGENERIC *gfunc,
   long mi)
@@ -702,6 +716,7 @@ globle long CheckMethodExists(
  *******************************************************/
 globle char *TypeName(
   void *theEnv,
+  EXEC_STATUS,
   int tcode)
   {
    switch (tcode)
@@ -743,6 +758,7 @@ globle char *TypeName(
  ******************************************************/
 globle void PrintGenericName(
   void *theEnv,
+  EXEC_STATUS,
   char *logName,
   DEFGENERIC *gfunc)
   {
@@ -775,6 +791,7 @@ globle void PrintGenericName(
  *********************************************************/
 static void DisplayGenericCore(
   void *theEnv,
+  EXEC_STATUS,
   DEFGENERIC *gfunc)
   {
    long i;

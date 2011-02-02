@@ -74,7 +74,8 @@
 /*    data for command line functionality.          */
 /****************************************************/
 globle void InitializeCommandLineData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    AllocateEnvironmentData(theEnv,COMMANDLINE_DATA,sizeof(struct commandLineData),DeallocateCommandLineData);
 
@@ -89,7 +90,8 @@ globle void InitializeCommandLineData(
 /*    data for the command line functionality.        */
 /******************************************************/
 static void DeallocateCommandLineData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
 #if ! RUN_TIME
    if (CommandLineData(theEnv)->CommandString != NULL) 
@@ -116,6 +118,7 @@ static void DeallocateCommandLineData(
 /***************************************************/
 globle int ExpandCommandString(
   void *theEnv,
+  EXEC_STATUS,
   int inchar)
   {
    size_t k;
@@ -130,7 +133,8 @@ globle int ExpandCommandString(
 /* FlushCommandString: Empties the contents of the CommandString. */
 /******************************************************************/
 globle void FlushCommandString(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    if (CommandLineData(theEnv)->CommandString != NULL) rm(theEnv,CommandLineData(theEnv)->CommandString,CommandLineData(theEnv)->MaximumCharacters);
    CommandLineData(theEnv)->CommandString = NULL;
@@ -144,6 +148,7 @@ globle void FlushCommandString(
 /*********************************************************************************/
 globle void SetCommandString(
   void *theEnv,
+  EXEC_STATUS,
   char *str)
   {
    size_t length;
@@ -165,6 +170,7 @@ globle void SetCommandString(
 /*************************************************************/
 globle void SetNCommandString(
   void *theEnv,
+  EXEC_STATUS,
   char *str,
   unsigned length)
   {
@@ -184,6 +190,7 @@ globle void SetNCommandString(
 /******************************************************************************/
 globle void AppendCommandString(
   void *theEnv,
+  EXEC_STATUS,
   char *str)
   {
    CommandLineData(theEnv)->CommandString = AppendToString(theEnv,str,CommandLineData(theEnv)->CommandString,&RouterData(theEnv)->CommandBufferInputCount,&CommandLineData(theEnv)->MaximumCharacters);
@@ -194,6 +201,7 @@ globle void AppendCommandString(
 /******************************************************************************/
 globle void InsertCommandString(
   void *theEnv,
+  EXEC_STATUS,
   char *str,
   unsigned int position)
   {
@@ -208,6 +216,7 @@ globle void InsertCommandString(
 /************************************************************/
 globle void AppendNCommandString(
   void *theEnv,
+  EXEC_STATUS,
   char *str,
   unsigned length)
   {
@@ -218,7 +227,8 @@ globle void AppendNCommandString(
 /* GetCommandString: Returns a pointer to the contents of the CommandString. */
 /*****************************************************************************/
 globle char *GetCommandString(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return(CommandLineData(theEnv)->CommandString);
   }
@@ -482,7 +492,8 @@ static int DoWhiteSpace(
 /*   if there is an active batch file.                              */
 /********************************************************************/
 globle void CommandLoop(
-  void *theEnv,EXEC_STATUS)
+  void *theEnv,
+  EXEC_STATUS)
   {
    int inchar;
 
@@ -545,7 +556,8 @@ globle void CommandLoop(
 /*   are no longer any active batch files.                 */
 /***********************************************************/
 globle void CommandLoopBatch(
-  void *theEnv,EXEC_STATUS)
+  void *theEnv,
+	EXEC_STATUS)
   {
    SetHaltExecution(theEnv,FALSE);
    SetEvaluationError(theEnv,FALSE);
@@ -563,7 +575,8 @@ globle void CommandLoopBatch(
 /*   there are no longer any active batch files.            */
 /************************************************************/
 globle void CommandLoopOnceThenBatch(
-  void *theEnv,EXEC_STATUS)
+  void *theEnv,
+	EXEC_STATUS)
   {
    if (! ExecuteIfCommandComplete(theEnv,execStatus)) return;
 
@@ -576,7 +589,8 @@ globle void CommandLoopOnceThenBatch(
 /*   when there are no longer any active batch files.    */
 /*********************************************************/
 globle void CommandLoopBatchDriver(
-  void *theEnv,EXEC_STATUS)
+  void *theEnv,
+	EXEC_STATUS)
   {
    int inchar;
 
@@ -636,7 +650,8 @@ globle void CommandLoopBatchDriver(
 /*   is a completed command and if so executes it.        */
 /**********************************************************/
 globle intBool ExecuteIfCommandComplete(
-  void *theEnv,EXEC_STATUS)
+  void *theEnv,
+	EXEC_STATUS)
   {
    if ((CompleteCommand(CommandLineData(theEnv)->CommandString) == 0) || 
        (RouterData(theEnv)->CommandBufferInputCount == 0) ||
@@ -668,7 +683,8 @@ globle intBool ExecuteIfCommandComplete(
 /* CommandCompleteAndNotEmpty: */
 /*******************************************/
 globle intBool CommandCompleteAndNotEmpty(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    if ((CompleteCommand(CommandLineData(theEnv)->CommandString) == 0) || 
        (RouterData(theEnv)->CommandBufferInputCount == 0) ||
@@ -682,7 +698,8 @@ globle intBool CommandCompleteAndNotEmpty(
 /* PrintPrompt: Prints the command prompt. */
 /*******************************************/
 globle void PrintPrompt(
-   void *theEnv)
+   void *theEnv,
+  EXEC_STATUS)
    {
     EnvPrintRouter(theEnv,WPROMPT,COMMAND_PROMPT);
 
@@ -694,7 +711,8 @@ globle void PrintPrompt(
 /* PrintBanner: Prints the CLIPS banner. */
 /*****************************************/
 globle void PrintBanner(
-   void *theEnv)
+   void *theEnv,
+  EXEC_STATUS)
    {
     EnvPrintRouter(theEnv,WPROMPT,CommandLineData(theEnv)->BannerString);
    }
@@ -705,6 +723,7 @@ globle void PrintBanner(
 /************************************************/
 globle void SetAfterPromptFunction(
   void *theEnv,
+  EXEC_STATUS,
   int (*funptr)(void *))
   {
    CommandLineData(theEnv)->AfterPromptFunction = funptr;
@@ -716,6 +735,7 @@ globle void SetAfterPromptFunction(
 /***********************************************************/
 globle void SetBeforeCommandExecutionFunction(
   void *theEnv,
+  EXEC_STATUS,
   int (*funptr)(void *))
   {
    CommandLineData(theEnv)->BeforeCommandExecutionFunction = funptr;
@@ -726,6 +746,7 @@ globle void SetBeforeCommandExecutionFunction(
 /************************************************/
 globle intBool RouteCommand(
   void *theEnv,
+  EXEC_STATUS,
   char *command,
   int printResult)
   {
@@ -884,7 +905,8 @@ globle intBool RouteCommand(
 /*   character to the CommandString.                             */
 /*****************************************************************/
 static int DefaultGetNextEvent(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    int inchar;
 
@@ -901,7 +923,10 @@ static int DefaultGetNextEvent(
 /* SetEventFunction: Replaces the    */
 /*   current value of EventFunction. */
 /*************************************/
-globle int (*SetEventFunction(void *theEnv,int (*theFunction)(void *)))(void *)
+globle int (*SetEventFunction(
+	void *theEnv,
+  EXEC_STATUS,
+	int (*theFunction)(void *)))(void *)
   {
    int (*tmp_ptr)(void *);
 
@@ -915,7 +940,8 @@ globle int (*SetEventFunction(void *theEnv,int (*theFunction)(void *)))(void *)
 /*   top-level command is being parsed. */
 /****************************************/
 globle intBool TopLevelCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return(CommandLineData(theEnv)->ParsingTopLevelCommand);
   }
@@ -926,6 +952,7 @@ globle intBool TopLevelCommand(
 /***********************************************************/
 globle char *GetCommandCompletionString(
   void *theEnv,
+  EXEC_STATUS,
   char *theString,
   size_t maxPosition)
   {
@@ -1001,6 +1028,7 @@ globle char *GetCommandCompletionString(
 /****************************************************************/
 globle void SetHaltCommandLoopBatch(
   void *theEnv,
+  EXEC_STATUS,
   int value)
   { 
    CommandLineData(theEnv)->HaltCommandLoopBatch = value; 
@@ -1010,7 +1038,8 @@ globle void SetHaltCommandLoopBatch(
 /* GetHaltCommandLoopBatch: Returns the HaltCommandLoopBatch flag. */
 /*******************************************************************/
 globle int GetHaltCommandLoopBatch(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return(CommandLineData(theEnv)->HaltCommandLoopBatch);
   }

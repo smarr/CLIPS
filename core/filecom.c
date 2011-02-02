@@ -124,7 +124,8 @@ struct fileCommandData
 /*   file commands.                    */
 /***************************************/
 globle void FileCommandDefinitions(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    AllocateEnvironmentData(theEnv,FILECOM_DATA,sizeof(struct fileCommandData),DeallocateFileCommandData);
 
@@ -154,7 +155,8 @@ globle void FileCommandDefinitions(
 /*    data for file commands.                         */
 /******************************************************/
 static void DeallocateFileCommandData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct batchEntry *theEntry, *nextEntry;
    
@@ -194,6 +196,7 @@ static void DeallocateFileCommandData(
 #endif
 static int FindDribble(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
@@ -218,6 +221,7 @@ static int FindDribble(
 /*******************************************************/
 static int PrintDribble(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   char *str)
   {
@@ -246,6 +250,7 @@ static int PrintDribble(
 /*****************************************************/
 static int GetcDribble(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName)
   {
    int rv;
@@ -278,6 +283,7 @@ static int GetcDribble(
 /***********************************************************/
 static void PutcDribbleBuffer(
   void *theEnv,
+  EXEC_STATUS,
   int rv)
   {
    /*===================================================*/
@@ -335,6 +341,7 @@ static void PutcDribbleBuffer(
 /*********************************************************/
 static int UngetcDribble(
   void *theEnv,
+  EXEC_STATUS,
   int ch,
   char *logicalName)
   {
@@ -371,6 +378,7 @@ static int UngetcDribble(
 #endif
 static int ExitDribble(
   void *theEnv,
+  EXEC_STATUS,
   int num)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
@@ -389,7 +397,8 @@ static int ExitDribble(
 /*   for the dribble-on command.          */
 /******************************************/
 globle int DribbleOnCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    char *fileName;
 
@@ -405,6 +414,7 @@ globle int DribbleOnCommand(
 /**********************************/
 globle intBool EnvDribbleOn(
   void *theEnv,
+  EXEC_STATUS,
   char *fileName)
   {
    /*==============================*/
@@ -461,7 +471,8 @@ globle intBool EnvDribbleOn(
 /*   router is active, otherwise FALSE>          */
 /*************************************************/
 globle intBool EnvDribbleActive(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    if (FileCommandData(theEnv)->DribbleFP != NULL) return(TRUE);
 
@@ -473,7 +484,8 @@ globle intBool EnvDribbleActive(
 /*   for the dribble-off command.          */
 /*******************************************/
 globle int DribbleOffCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    if (EnvArgCountCheck(theEnv,execStatus,"dribble-off",EXACTLY,0) == -1) return(FALSE);
    return(EnvDribbleOff(theEnv));
@@ -484,7 +496,8 @@ globle int DribbleOffCommand(
 /*   for the dribble-off command.  */
 /***********************************/
 globle intBool EnvDribbleOff(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    int rv = 0;
 
@@ -544,6 +557,7 @@ globle intBool EnvDribbleOff(
 /*****************************************************/
 globle void SetDribbleStatusFunction(
   void *theEnv,
+  EXEC_STATUS,
   int (*fnptr)(void *,int))
   {
    FileCommandData(theEnv)->DribbleStatusFunction = fnptr;
@@ -558,6 +572,7 @@ globle void SetDribbleStatusFunction(
 #endif
 static int FindBatch(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
@@ -575,6 +590,7 @@ static int FindBatch(
 /*************************************************/
 static int GetcBatch(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName)
   {
    return(LLGetcBatch(theEnv,logicalName,FALSE));
@@ -586,6 +602,7 @@ static int GetcBatch(
 /***************************************************/
 globle int LLGetcBatch(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   int returnOnEOF)
   {
@@ -666,6 +683,7 @@ globle int LLGetcBatch(
 #endif
 static int UngetcBatch(
   void *theEnv,
+  EXEC_STATUS,
   int ch,
   char *logicalName)
   {
@@ -689,6 +707,7 @@ static int UngetcBatch(
 #endif
 static int ExitBatch(
   void *theEnv,
+  EXEC_STATUS,
   int num)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
@@ -703,7 +722,8 @@ static int ExitBatch(
 /*   for the batch command.           */
 /**************************************/
 globle int BatchCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    char *fileName;
 
@@ -718,6 +738,7 @@ globle int BatchCommand(
 /**************************************************/
 globle int Batch(
   void *theEnv,
+  EXEC_STATUS,
   char *fileName)
   { return(OpenBatch(theEnv,fileName,FALSE)); }
 
@@ -727,6 +748,7 @@ globle int Batch(
 /***********************************************/
 globle int OpenBatch(
   void *theEnv,
+  EXEC_STATUS,
   char *fileName,
   int placeAtEnd)
   {
@@ -781,6 +803,7 @@ globle int OpenBatch(
 /*****************************************************************/
 globle int OpenStringBatch(
   void *theEnv,
+  EXEC_STATUS,
   char *stringName,
   char *theString,
   int placeAtEnd)
@@ -807,6 +830,7 @@ globle int OpenStringBatch(
 /*******************************************************/
 static void AddBatch(
   void *theEnv,
+  EXEC_STATUS,
   int placeAtEnd,
   void *theSource,
   int type,
@@ -855,7 +879,8 @@ static void AddBatch(
 /* RemoveBatch: Removes the top entry on the list of batch files. */
 /******************************************************************/
 globle int RemoveBatch(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct batchEntry *bptr;
    int rv;
@@ -927,7 +952,8 @@ globle int RemoveBatch(
 /*   file is open, otherwise FALSE.     */
 /****************************************/
 globle intBool BatchActive(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    if (FileCommandData(theEnv)->TopOfBatchList != NULL) return(TRUE);
 
@@ -938,7 +964,8 @@ globle intBool BatchActive(
 /* CloseAllBatchSources: Closes all open batch files. */
 /******************************************************/
 globle void CloseAllBatchSources(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {   
    /*================================================*/
    /* Free the batch buffer if it contains anything. */
@@ -972,7 +999,8 @@ globle void CloseAllBatchSources(
 /*   for the batch* command.              */
 /******************************************/
 globle int BatchStarCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    char *fileName;
 
@@ -989,6 +1017,7 @@ globle int BatchStarCommand(
 /**********************************************************/
 globle int EnvBatchStar(
   void *theEnv,
+  EXEC_STATUS,
   char *fileName)
   {
    int inchar;
@@ -1060,6 +1089,7 @@ globle int EnvBatchStar(
 /**************************************************/
 globle int EnvBatchStar(
   void *theEnv,
+  EXEC_STATUS,
   char *fileName)
   {
 #if (MAC_MCW || WIN_MCW) && RUN_TIME
@@ -1077,7 +1107,8 @@ globle int EnvBatchStar(
 /* LoadCommand: H/L access routine for the load command.   */
 /***********************************************************/
 globle int LoadCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
 #if (! BLOAD_ONLY) && (! RUN_TIME)
    char *theFileName;
@@ -1108,7 +1139,8 @@ globle int LoadCommand(
 /* LoadStarCommand: H/L access routine for the load* command.   */
 /****************************************************************/
 globle int LoadStarCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
 #if (! BLOAD_ONLY) && (! RUN_TIME)
    char *theFileName;
@@ -1136,7 +1168,8 @@ globle int LoadStarCommand(
 /* SaveCommand: H/L access routine for the save command.   */
 /***********************************************************/
 globle int SaveCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
 #if (! BLOAD_ONLY) && (! RUN_TIME)
    char *theFileName;

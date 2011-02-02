@@ -140,7 +140,8 @@ static void PrintMethodWatchFlag(void *,char *,void *,long);
   NOTES        : None
  ***********************************************************/
 globle void SetupGenericFunctions(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    ENTITY_RECORD genericEntityRecord =
                      { "GCALL", GCALL,0,0,1,
@@ -274,7 +275,8 @@ globle void SetupGenericFunctions(
 /*    data for the defgeneric construct.             */
 /*****************************************************/
 static void DeallocateDefgenericData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
 #if ! RUN_TIME
    struct defgenericModule *theModuleItem;
@@ -313,6 +315,7 @@ static void DeallocateDefgenericData(
 #endif
 static void DestroyDefgenericAction(
   void *theEnv,
+  EXEC_STATUS,
   struct constructHeader *theConstruct,
   void *buffer)
   {
@@ -354,6 +357,7 @@ static void DestroyDefgenericAction(
  ***************************************************/
 globle void *EnvFindDefgeneric(
   void *theEnv,
+  EXEC_STATUS,
   char *genericModuleAndName)
   {
    return(FindNamedConstruct(theEnv,genericModuleAndName,DefgenericData(theEnv)->DefgenericConstruct));
@@ -372,6 +376,7 @@ globle void *EnvFindDefgeneric(
  ***************************************************/
 globle DEFGENERIC *LookupDefgenericByMdlOrScope(
   void *theEnv,
+  EXEC_STATUS,
   char *defgenericName)
   {
    return((DEFGENERIC *) LookupConstruct(theEnv,DefgenericData(theEnv)->DefgenericConstruct,defgenericName,TRUE));
@@ -390,6 +395,7 @@ globle DEFGENERIC *LookupDefgenericByMdlOrScope(
  ***************************************************/
 globle DEFGENERIC *LookupDefgenericInScope(
   void *theEnv,
+  EXEC_STATUS,
   char *defgenericName)
   {
    return((DEFGENERIC *) LookupConstruct(theEnv,DefgenericData(theEnv)->DefgenericConstruct,defgenericName,FALSE));
@@ -407,6 +413,7 @@ globle DEFGENERIC *LookupDefgenericInScope(
  ***********************************************************/
 globle void *EnvGetNextDefgeneric(
   void *theEnv,
+  EXEC_STATUS,
   void *ptr)
   {
    return((void *) GetNextConstructItem(theEnv,(struct constructHeader *) ptr,DefgenericData(theEnv)->DefgenericModuleIndex));
@@ -428,6 +435,7 @@ globle void *EnvGetNextDefgeneric(
 #endif
 globle long EnvGetNextDefmethod(
   void *theEnv,
+  EXEC_STATUS,
   void *ptr,
   long theIndex)
   {
@@ -478,6 +486,7 @@ globle DEFMETHOD *GetDefmethodPointer(
  ***************************************************/
 globle int EnvIsDefgenericDeletable(
   void *theEnv,
+  EXEC_STATUS,
   void *ptr)
   {
    if (! ConstructsDeletable(theEnv))
@@ -498,6 +507,7 @@ globle int EnvIsDefgenericDeletable(
  ***************************************************/
 globle int EnvIsDefmethodDeletable(
   void *theEnv,
+  EXEC_STATUS,
   void *ptr,
   long theIndex)
   {
@@ -523,7 +533,8 @@ globle int EnvIsDefmethodDeletable(
   NOTES        : H/L Syntax: (undefgeneric <name> | *)
  **********************************************************/
 globle void UndefgenericCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    UndefconstructCommand(theEnv,"undefgeneric",DefgenericData(theEnv)->DefgenericConstruct);
   }
@@ -537,7 +548,8 @@ globle void UndefgenericCommand(
   NOTES        : H/L Syntax: (defgeneric-module <generic-name>)
  ****************************************************************/
 globle void *GetDefgenericModuleCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return(GetConstructModuleCommand(theEnv,"defgeneric-module",DefgenericData(theEnv)->DefgenericConstruct));
   }
@@ -551,7 +563,8 @@ globle void *GetDefgenericModuleCommand(
   NOTES        : H/L Syntax: (undefmethod <name> <index> | *)
  **************************************************************/
 globle void UndefmethodCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DATA_OBJECT temp;
    DEFGENERIC *gfunc;
@@ -609,6 +622,7 @@ globle void UndefmethodCommand(
  **************************************************************/
 globle intBool EnvUndefgeneric(
   void *theEnv,
+  EXEC_STATUS,
   void *vptr)
   {
 #if (MAC_MCW || WIN_MCW) && (RUN_TIME || BLOAD_ONLY)
@@ -650,6 +664,7 @@ globle intBool EnvUndefgeneric(
  **************************************************************/
 globle intBool EnvUndefmethod(
   void *theEnv,
+  EXEC_STATUS,
   void *vptr,
   long mi)
   {
@@ -735,6 +750,7 @@ globle intBool EnvUndefmethod(
  *****************************************************/
 globle void EnvGetDefmethodDescription(
   void *theEnv,
+  EXEC_STATUS,
   char *buf,
   int buflen,
   void *ptr,
@@ -766,6 +782,7 @@ globle void EnvGetDefmethodDescription(
 #endif
 globle unsigned EnvGetDefgenericWatch(
   void *theEnv,
+  EXEC_STATUS,
   void *theGeneric)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
@@ -791,6 +808,7 @@ globle unsigned EnvGetDefgenericWatch(
 #endif
 globle void EnvSetDefgenericWatch(
   void *theEnv,
+  EXEC_STATUS,
   unsigned newState,
   void *theGeneric)
   {
@@ -817,6 +835,7 @@ globle void EnvSetDefgenericWatch(
 #endif
 globle unsigned EnvGetDefmethodWatch(
   void *theEnv,
+  EXEC_STATUS,
   void *theGeneric,
   long theIndex)
   {
@@ -848,6 +867,7 @@ globle unsigned EnvGetDefmethodWatch(
 #endif
 globle void EnvSetDefmethodWatch(
   void *theEnv,
+  EXEC_STATUS,
   unsigned newState,
   void *theGeneric,
   long theIndex)
@@ -874,7 +894,8 @@ globle void EnvSetDefmethodWatch(
   NOTES        : H/L Syntax: (ppdefgeneric <name>)
  ********************************************************/
 globle void PPDefgenericCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    PPConstructCommand(theEnv,"ppdefgeneric",DefgenericData(theEnv)->DefgenericConstruct);
   }
@@ -889,7 +910,8 @@ globle void PPDefgenericCommand(
   NOTES        : H/L Syntax: (ppdefmethod <name> <index>)
  **********************************************************/
 globle void PPDefmethodCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DATA_OBJECT temp;
    char *gname;
@@ -921,7 +943,8 @@ globle void PPDefmethodCommand(
   NOTES        : H/L Syntax: (list-defmethods <name>)
  ******************************************************/
 globle void ListDefmethodsCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DATA_OBJECT temp;
    DEFGENERIC *gfunc;
@@ -952,6 +975,7 @@ globle void ListDefmethodsCommand(
 #endif
 globle char *EnvGetDefmethodPPForm(
   void *theEnv,
+  EXEC_STATUS,
   void *ptr,
   long theIndex)
   {
@@ -975,7 +999,8 @@ globle char *EnvGetDefmethodPPForm(
   NOTES        : H/L Interface
  ***************************************************/
 globle void ListDefgenericsCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    ListConstructCommand(theEnv,"list-defgenerics",DefgenericData(theEnv)->DefgenericConstruct);
   }
@@ -991,6 +1016,7 @@ globle void ListDefgenericsCommand(
  ***************************************************/
 globle void EnvListDefgenerics(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   struct defmodule *theModule)
   {
@@ -1010,6 +1036,7 @@ globle void EnvListDefgenerics(
  ******************************************************/
 globle void EnvListDefmethods(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   void *vptr)
   {
@@ -1046,6 +1073,7 @@ globle void EnvListDefmethods(
  ***************************************************************/
 globle void GetDefgenericListFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT*returnValue)
   {
    GetConstructListFunction(theEnv,"get-defgeneric-list",returnValue,DefgenericData(theEnv)->DefgenericConstruct);
@@ -1064,6 +1092,7 @@ globle void GetDefgenericListFunction(
  ***************************************************************/
 globle void EnvGetDefgenericList(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *returnValue,
   struct defmodule *theModule)
   {
@@ -1082,6 +1111,7 @@ globle void EnvGetDefgenericList(
  ***********************************************************/
 globle void GetDefmethodListCommand(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
    DATA_OBJECT temp;
@@ -1117,6 +1147,7 @@ globle void GetDefmethodListCommand(
  ***********************************************************/
 globle void EnvGetDefmethodList(
   void *theEnv,
+  EXEC_STATUS,
   void *vgfunc,
   DATA_OBJECT_PTR returnValue)
   {
@@ -1173,6 +1204,7 @@ globle void EnvGetDefmethodList(
  ***********************************************************************************/
 globle void GetMethodRestrictionsCommand(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    DATA_OBJECT temp;
@@ -1240,6 +1272,7 @@ globle void GetMethodRestrictionsCommand(
  ***********************************************************************/
 globle void EnvGetMethodRestrictions(
   void *theEnv,
+  EXEC_STATUS,
   void *vgfunc,
   long mi,
   DATA_OBJECT *result)
@@ -1310,6 +1343,7 @@ globle void EnvGetMethodRestrictions(
 #endif
 static void PrintGenericCall(
   void *theEnv,
+  EXEC_STATUS,
   char *logName,
   void *value)
   {
@@ -1348,6 +1382,7 @@ static void PrintGenericCall(
  *******************************************************/
 static intBool EvaluateGenericCall(
   void *theEnv,
+  EXEC_STATUS,
   void *value,
   DATA_OBJECT *result)
   {
@@ -1370,6 +1405,7 @@ static intBool EvaluateGenericCall(
  ***************************************************/
 static void DecrementGenericBusyCount(
   void *theEnv,
+  EXEC_STATUS,
   void *value)
   {
    /* ==============================================
@@ -1396,6 +1432,7 @@ static void DecrementGenericBusyCount(
 #endif
 static void IncrementGenericBusyCount(
   void *theEnv,
+  EXEC_STATUS,
   void *value)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
@@ -1416,6 +1453,7 @@ static void IncrementGenericBusyCount(
  **********************************************************************/
 static void SaveDefgenerics(
   void *theEnv,
+  EXEC_STATUS,
   void *theModule,
   char *logName)
   {
@@ -1432,6 +1470,7 @@ static void SaveDefgenerics(
  **********************************************************************/
 static void SaveDefmethods(
   void *theEnv,
+  EXEC_STATUS,
   void *theModule,
   char *logName)
   {
@@ -1453,6 +1492,7 @@ static void SaveDefmethods(
  ***************************************************/
 static void SaveDefmethodsForDefgeneric(
   void *theEnv,
+  EXEC_STATUS,
   struct constructHeader *theDefgeneric,
   void *userBuffer)
   {
@@ -1484,6 +1524,7 @@ static void SaveDefmethodsForDefgeneric(
  ****************************************************/
 static void RemoveDefgenericMethod(
   void *theEnv,
+  EXEC_STATUS,
   DEFGENERIC *gfunc,
   long gi)
   {
@@ -1537,6 +1578,7 @@ static void RemoveDefgenericMethod(
  ******************************************************/
 static long ListMethodsForGeneric(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   DEFGENERIC *gfunc)
   {
@@ -1572,6 +1614,7 @@ static long ListMethodsForGeneric(
 #endif
 static unsigned DefgenericWatchAccess(
   void *theEnv,
+  EXEC_STATUS,
   int code,
   unsigned newState,
   EXPRESSION *argExprs)
@@ -1602,6 +1645,7 @@ static unsigned DefgenericWatchAccess(
 #endif
 static unsigned DefgenericWatchPrint(
   void *theEnv,
+  EXEC_STATUS,
   char *logName,
   int code,
   EXPRESSION *argExprs)
@@ -1632,6 +1676,7 @@ static unsigned DefgenericWatchPrint(
 #endif
 static unsigned DefmethodWatchAccess(
   void *theEnv,
+  EXEC_STATUS,
   int code,
   unsigned newState,
   EXPRESSION *argExprs)
@@ -1663,6 +1708,7 @@ static unsigned DefmethodWatchAccess(
 #endif
 static unsigned DefmethodWatchPrint(
   void *theEnv,
+  EXEC_STATUS,
   char *logName,
   int code,
   EXPRESSION *argExprs)
@@ -1691,6 +1737,7 @@ static unsigned DefmethodWatchPrint(
  *******************************************************/
 static unsigned DefmethodWatchSupport(
   void *theEnv,
+  EXEC_STATUS,
   char *funcName,
   char *logName,
   unsigned newState,
@@ -1813,6 +1860,7 @@ static unsigned DefmethodWatchSupport(
  ***************************************************/
 static void PrintMethodWatchFlag(
   void *theEnv,
+  EXEC_STATUS,
   char *logName,
   void *theGeneric,
   long theMethod)
@@ -1843,6 +1891,7 @@ static void PrintMethodWatchFlag(
  ***************************************************/
 globle void TypeCommand(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    EvaluateExpression(theEnv,GetFirstArgument(),result);

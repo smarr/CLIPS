@@ -146,6 +146,7 @@ static intBool EvaluateSlotDefaultValue(void *,SLOT_DESC *,char *);
  ************************************************************/
 globle TEMP_SLOT_LINK *ParseSlot(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   TEMP_SLOT_LINK *slist,
   PACKED_CLASS_LINKS *preclist,
@@ -365,6 +366,7 @@ ParseSlotError:
  ***************************************************/
 globle void DeleteSlots(
   void *theEnv,
+  EXEC_STATUS,
   TEMP_SLOT_LINK *slots)
   {
    TEMP_SLOT_LINK *stmp;
@@ -408,6 +410,7 @@ globle void DeleteSlots(
  **************************************************************/
 static SLOT_DESC *NewSlot(
   void *theEnv,
+  EXEC_STATUS,
   SYMBOL_HN *name)
   {
    SLOT_DESC *slot;
@@ -452,6 +455,7 @@ static SLOT_DESC *NewSlot(
  **********************************************************/
 static TEMP_SLOT_LINK *InsertSlot(
   void *theEnv,
+  EXEC_STATUS,
   TEMP_SLOT_LINK *slist,
   SLOT_DESC *slot)
   {
@@ -519,6 +523,7 @@ static TEMP_SLOT_LINK *InsertSlot(
  *****************************************************************/
 static int ParseSimpleFacet(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   char *specbits,
   char *facetName,
@@ -604,6 +609,7 @@ ParseSimpleFacetError:
  *************************************************************/
 static intBool ParseDefaultFacet(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   char *specbits,
   SLOT_DESC *slot)
@@ -671,6 +677,7 @@ static intBool ParseDefaultFacet(
  *************************************************************************/
 static void BuildCompositeFacets(
   void *theEnv,
+  EXEC_STATUS,
   SLOT_DESC *sd,
   PACKED_CLASS_LINKS *preclist,
   char *specbits,
@@ -755,6 +762,7 @@ static void BuildCompositeFacets(
  ***************************************************/
 static intBool CheckForFacetConflicts(
   void *theEnv,
+  EXEC_STATUS,
   SLOT_DESC *sd,
   CONSTRAINT_PARSE_RECORD *parsedConstraint)
   {
@@ -810,6 +818,7 @@ static intBool CheckForFacetConflicts(
  ********************************************************************/
 static intBool EvaluateSlotDefaultValue(
   void *theEnv,
+  EXEC_STATUS,
   SLOT_DESC *sd,
   char *specbits)
   {

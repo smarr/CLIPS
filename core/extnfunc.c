@@ -57,7 +57,8 @@
 /*    data for external functions.                       */
 /*********************************************************/
 globle void InitializeExternalFunctionData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    AllocateEnvironmentData(theEnv,EXTERNAL_FUNCTION_DATA,sizeof(struct externalFunctionData),DeallocateExternalFunctionData);
   }
@@ -67,7 +68,8 @@ globle void InitializeExternalFunctionData(
 /*    data for external functions.                         */
 /***********************************************************/
 static void DeallocateExternalFunctionData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct FunctionHash *fhPtr, *nextFHPtr;
    int i;
@@ -115,7 +117,8 @@ globle int DefineFunction(
   int (*pointer)(void),
   char *actualName)
   {
-   void *theEnv;
+   void *theEnv,
+  EXEC_STATUS;
    
    theEnv = GetCurrentEnvironment();
 
@@ -131,6 +134,7 @@ globle int DefineFunction(
 /***************************************************************/
 globle int EnvDefineFunction(
   void *theEnv,
+  EXEC_STATUS,
   char *name,
   int returnType,
   int (*pointer)(void *),
@@ -145,6 +149,7 @@ globle int EnvDefineFunction(
 /************************************************************/
 globle int EnvDefineFunctionWithContext(
   void *theEnv,
+  EXEC_STATUS,
   char *name,
   int returnType,
   int (*pointer)(void *),
@@ -168,6 +173,7 @@ globle int DefineFunction2(
   {
    void *theEnv;
    
+	 // Lode: TODO add EXEC_STATUS??
    theEnv = GetCurrentEnvironment();
 
    return(DefineFunction3(theEnv,name,returnType,
@@ -182,6 +188,7 @@ globle int DefineFunction2(
 /*************************************************************/
 globle int EnvDefineFunction2(
   void *theEnv,
+  EXEC_STATUS,
   char *name,
   int returnType,
   int (*pointer)(void *),
@@ -197,6 +204,7 @@ globle int EnvDefineFunction2(
 /*************************************************************/
 globle int EnvDefineFunction2WithContext(
   void *theEnv,
+  EXEC_STATUS,
   char *name,
   int returnType,
   int (*pointer)(void *),
@@ -234,6 +242,7 @@ globle int EnvDefineFunction2WithContext(
 /*************************************************************/
 globle int DefineFunction3(
   void *theEnv,
+  EXEC_STATUS,
   char *name,
   int returnType,
   int (*pointer)(void *),
@@ -306,6 +315,7 @@ globle int DefineFunction3(
 /***********************************************/
 globle int UndefineFunction(
   void *theEnv,
+  EXEC_STATUS,
   char *functionName)
   {
    SYMBOL_HN *findValue;
@@ -344,6 +354,7 @@ globle int UndefineFunction(
 /******************************************/
 static int RemoveHashFunction(
   void *theEnv,
+  EXEC_STATUS,
   struct FunctionDefinition *fdPtr)
   {
    struct FunctionHash *fhPtr, *lastPtr = NULL;
@@ -383,6 +394,7 @@ static int RemoveHashFunction(
 /***************************************************************************/
 globle int AddFunctionParser(
   void *theEnv,
+  EXEC_STATUS,
   char *functionName,
   struct expr *(*fpPtr)(void *,struct expr *,char *))
   {
@@ -407,6 +419,7 @@ globle int AddFunctionParser(
 /*********************************************************************/
 globle int RemoveFunctionParser(
   void *theEnv,
+  EXEC_STATUS,
   char *functionName)
   {
    struct FunctionDefinition *fdPtr;
@@ -429,6 +442,7 @@ globle int RemoveFunctionParser(
 /*****************************************************************/
 globle int FuncSeqOvlFlags(
   void *theEnv,
+  EXEC_STATUS,
   char *functionName,
   int seqp,
   int ovlp)
@@ -578,7 +592,8 @@ globle int GetNthRestriction(
 /* GetFunctionList: Returns the ListOfFunctions. */
 /*************************************************/
 globle struct FunctionDefinition *GetFunctionList(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return(ExternalFunctionData(theEnv)->ListOfFunctions);
   }
@@ -589,6 +604,7 @@ globle struct FunctionDefinition *GetFunctionList(
 /**************************************************************/
 globle void InstallFunctionList(
   void *theEnv,
+  EXEC_STATUS,
   struct FunctionDefinition *value)
   {
    int i;
@@ -625,6 +641,7 @@ globle void InstallFunctionList(
 /********************************************************/
 globle struct FunctionDefinition *FindFunction(
   void *theEnv,
+  EXEC_STATUS,
   char *functionName)
   {
    struct FunctionHash *fhPtr;
@@ -653,7 +670,8 @@ globle struct FunctionDefinition *FindFunction(
 /*   the function hash table to NULL.                    */
 /*********************************************************/
 static void InitializeFunctionHashTable(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    int i;
 
@@ -669,6 +687,7 @@ static void InitializeFunctionHashTable(
 /****************************************************************/
 static void AddHashFunction(
   void *theEnv,
+  EXEC_STATUS,
   struct FunctionDefinition *fdPtr)
   {
    struct FunctionHash *newhash, *temp;

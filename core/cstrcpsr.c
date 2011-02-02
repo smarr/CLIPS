@@ -76,6 +76,7 @@ globle int Load(
 /************************************************************/
 globle int EnvLoad(
   void *theEnv,
+  EXEC_STATUS,
   char *fileName)
   {
    FILE *theFile;
@@ -119,6 +120,7 @@ globle int EnvLoad(
 /*****************************************************************/
 globle int LoadConstructsFromLogicalName(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource)
   {
    int constructFlag;
@@ -241,6 +243,7 @@ globle int LoadConstructsFromLogicalName(
 /********************************************************************/
 static int FindConstructBeginning(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   struct token *theToken,
   int errorCorrection,
@@ -346,6 +349,7 @@ static int FindConstructBeginning(
 /***********************************************************/
 globle int ParseConstruct(
   void *theEnv,
+  EXEC_STATUS,
   char *name,
   char *logicalName)
   {
@@ -410,6 +414,7 @@ globle int ParseConstruct(
 #endif
 globle SYMBOL_HN *GetConstructNameAndComment(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   struct token *inputToken,
   char *constructName,
@@ -606,6 +611,7 @@ globle SYMBOL_HN *GetConstructNameAndComment(
 /****************************************/
 globle void RemoveConstructFromModule(
   void *theEnv,
+  EXEC_STATUS,
   struct constructHeader *theConstruct)
   {
    struct constructHeader *lastConstruct,*currentConstruct;
@@ -658,6 +664,7 @@ globle void RemoveConstructFromModule(
 /******************************************************/
 globle void ImportExportConflictMessage(
   void *theEnv,
+  EXEC_STATUS,
   char *constructName,
   char *itemName,
   char *causedByConstruct,

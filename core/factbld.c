@@ -72,7 +72,8 @@
 /*   and pattern/join network integration routines.      */
 /*********************************************************/
 globle void InitializeFactPatterns(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
 #if DEFRULE_CONSTRUCT
    struct patternParser *newPtr;
@@ -145,6 +146,7 @@ globle void InitializeFactPatterns(
 /******************************************************************************/
 static struct patternNodeHeader *PlaceFactPattern(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *thePattern)
   {
    struct lhsParseNode *tempPattern;
@@ -418,6 +420,7 @@ static struct factPatternNode *FindPatternNode(
 /*************************************************************/
 static struct lhsParseNode *RemoveUnneededSlots(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *thePattern)
   {
    struct lhsParseNode *tempPattern = thePattern;
@@ -587,6 +590,7 @@ static struct lhsParseNode *RemoveUnneededSlots(
 /****************************************************/
 static struct factPatternNode *CreateNewPatternNode(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *thePattern,
   struct factPatternNode *nodeBeforeMatch,
   struct factPatternNode *upperLevel,
@@ -726,6 +730,7 @@ static struct factPatternNode *CreateNewPatternNode(
 /*************************************************************/
 static void DetachFactPattern(
   void *theEnv,
+  EXEC_STATUS,
   struct patternNodeHeader *thePattern)
   {
    struct factPatternNode *patternPtr;
@@ -843,6 +848,7 @@ static void DetachFactPattern(
 /**************************************************************/
 globle void DestroyFactPatternNetwork(
   void *theEnv,
+  EXEC_STATUS,
   struct factPatternNode *thePattern)
   {
    struct factPatternNode *patternPtr;
@@ -883,6 +889,7 @@ globle void DestroyFactPatternNetwork(
 /***********************************************************/
 static void FindAndSetDeftemplatePatternNetwork(
   void *theEnv,
+  EXEC_STATUS,
   struct factPatternNode *rootNode,
   struct factPatternNode *newRootNode)
   {
@@ -954,6 +961,7 @@ static void FindAndSetDeftemplatePatternNetwork(
 /***************************************************************/
 static void ClearPatternMatches(
   void *theEnv,
+  EXEC_STATUS,
   struct factPatternNode *patternPtr)
   {
    struct fact *theFact;

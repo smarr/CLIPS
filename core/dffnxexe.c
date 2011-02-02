@@ -84,6 +84,7 @@ static void WatchDeffunction(void *,char *);
  ****************************************************/
 globle void CallDeffunction(
   void *theEnv,
+  EXEC_STATUS,
   DEFFUNCTION *dptr,
   EXPRESSION *args,
   DATA_OBJECT *result)
@@ -168,7 +169,8 @@ globle void CallDeffunction(
   NOTES        : None
  *******************************************************/
 static void UnboundDeffunctionErr(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    EnvPrintRouter(theEnv,WERROR,"deffunction ");
    EnvPrintRouter(theEnv,WERROR,EnvGetDeffunctionName(theEnv,(void *) DeffunctionData(theEnv)->ExecutingDeffunction));
@@ -191,6 +193,7 @@ static void UnboundDeffunctionErr(
  ***************************************************/
 static void WatchDeffunction(
   void *theEnv,
+  EXEC_STATUS,
   char *tstring)
   {
    EnvPrintRouter(theEnv,WTRACE,"DFN ");

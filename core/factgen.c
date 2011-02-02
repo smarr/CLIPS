@@ -91,7 +91,8 @@ struct factgenData
 /*   and value access routines as primitive operations.            */
 /*******************************************************************/
 globle void InitializeFactReteFunctions(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
 #if DEFRULE_CONSTRUCT
    struct entityRecord   factJNGV1Info = { "FACT_JN_VAR1", FACT_JN_VAR1,0,1,0,
@@ -217,6 +218,7 @@ globle void InitializeFactReteFunctions(
 /******************************************************************/
 globle struct expr *FactGenPNConstant(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *theField)
   {
    struct expr *top;
@@ -316,6 +318,7 @@ globle struct expr *FactGenPNConstant(
 /*******************************************************/
 globle struct expr *FactGenGetfield(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *theNode)
   {
    /*===================================================*/
@@ -357,6 +360,7 @@ globle struct expr *FactGenGetfield(
 /**************************************************/
 globle struct expr *FactGenGetvar(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *theNode,
   int side)
   {
@@ -402,6 +406,7 @@ globle struct expr *FactGenGetvar(
 /**************************************************************/
 globle struct expr *FactGenCheckLength(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *theNode)
   {
    struct factCheckLengthPNCall hack;
@@ -459,6 +464,7 @@ globle struct expr *FactGenCheckLength(
 /**************************************************************/
 globle struct expr *FactGenCheckZeroLength(
   void *theEnv,
+  EXEC_STATUS,
   unsigned theSlot)
   {
    struct factCheckLengthPNCall hack;
@@ -479,6 +485,7 @@ globle struct expr *FactGenCheckZeroLength(
 /*********************************************************************/
 globle void FactReplaceGetvar(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *theItem,
   struct lhsParseNode *theNode,
   int side)
@@ -535,6 +542,7 @@ globle void FactReplaceGetvar(
 /***********************************************************************/
 globle void FactReplaceGetfield(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *theItem,
   struct lhsParseNode *theNode)
   {
@@ -593,6 +601,7 @@ globle void FactReplaceGetfield(
 /*************************************************************/
 static void *FactGetVarJN1(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *theNode,
   int side)
   {
@@ -686,6 +695,7 @@ static void *FactGetVarJN1(
 /**************************************************************/
 static void *FactGetVarJN2(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *theNode,
   int side)
   {
@@ -744,6 +754,7 @@ static void *FactGetVarJN2(
 /*************************************************************/
 static void *FactGetVarJN3(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *theNode,
   int side)
   {
@@ -856,6 +867,7 @@ static void *FactGetVarJN3(
 /**************************************************************/
 static void *FactGetVarPN1(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *theNode)
   {
    struct factGetVarPN1Call hack;
@@ -924,6 +936,7 @@ static void *FactGetVarPN1(
 /***************************************************************/
 static void *FactGetVarPN2(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *theNode)
   {
    struct factGetVarPN2Call hack;
@@ -961,6 +974,7 @@ static void *FactGetVarPN2(
 /*************************************************************/
 static void *FactGetVarPN3(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *theNode)
   {
    struct factGetVarPN3Call hack;
@@ -1046,6 +1060,7 @@ static void *FactGetVarPN3(
 /*************************************************************/
 globle struct expr *FactPNVariableComparison(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *selfNode,
   struct lhsParseNode *referringNode)
   {
@@ -1108,6 +1123,7 @@ globle struct expr *FactPNVariableComparison(
 /*********************************************************/
 globle struct expr *FactJNVariableComparison(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *selfNode,
   struct lhsParseNode *referringNode,
   int nandJoin)

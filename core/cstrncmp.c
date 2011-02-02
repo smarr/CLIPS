@@ -47,6 +47,7 @@
 /***********************************************/
 globle int ConstraintsToCode(
   void *theEnv,
+  EXEC_STATUS,
   char *fileName,
   char *pathName,
   char *fileNameBuffer,
@@ -206,6 +207,7 @@ globle int ConstraintsToCode(
 /**********************************************************/
 globle void PrintConstraintReference(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp,
   CONSTRAINT_RECORD *cPtr,
   int imageID,

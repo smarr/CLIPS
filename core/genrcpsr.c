@@ -116,6 +116,7 @@ static DEFGENERIC *NewGeneric(void *,SYMBOL_HN *);
  ***************************************************************************/
 globle intBool ParseDefgeneric(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource)
   {
    SYMBOL_HN *gname;
@@ -185,6 +186,7 @@ globle intBool ParseDefgeneric(
  ***************************************************************************/
 globle intBool ParseDefmethod(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource)
   {
    SYMBOL_HN *gname;
@@ -390,6 +392,7 @@ DefmethodParseError:
  ************************************************************************/
 globle DEFMETHOD *AddMethod(
   void *theEnv,
+  EXEC_STATUS,
   DEFGENERIC *gfunc,
   DEFMETHOD *meth,
   int mposn,
@@ -517,6 +520,7 @@ globle DEFMETHOD *AddMethod(
  *****************************************************/
 globle void PackRestrictionTypes(
   void *theEnv,
+  EXEC_STATUS,
   RESTRICTION *rptr,
   EXPRESSION *types)
   {
@@ -546,6 +550,7 @@ globle void PackRestrictionTypes(
  ***************************************************/
 globle void DeleteTempRestricts(
   void *theEnv,
+  EXEC_STATUS,
   EXPRESSION *phead)
   {
    EXPRESSION *ptmp;
@@ -637,6 +642,7 @@ globle DEFMETHOD *FindMethodByRestrictions(
  ***********************************************************/
 static intBool ValidGenericName(
   void *theEnv,
+  EXEC_STATUS,
   char *theDefgenericName)
   {
    struct constructHeader *theDefgeneric;
@@ -739,6 +745,7 @@ static intBool ValidGenericName(
  ***************************************************/
 static void CreateDefaultGenericPPForm(
   void *theEnv,
+  EXEC_STATUS,
   DEFGENERIC *gfunc)
   {
    char *moduleName,*genericName,*buf;
@@ -765,6 +772,7 @@ static void CreateDefaultGenericPPForm(
  *******************************************************/
 static SYMBOL_HN *ParseMethodNameAndIndex(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   int *theIndex)
   {
@@ -824,6 +832,7 @@ static SYMBOL_HN *ParseMethodNameAndIndex(
  ************************************************************************/
 static int ParseMethodParameters(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   EXPRESSION **params,
   SYMBOL_HN **wildcard)
@@ -937,6 +946,7 @@ static int ParseMethodParameters(
  ************************************************************/
 static RESTRICTION *ParseRestriction(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource)
   {
    EXPRESSION *types = NULL,*new_types,
@@ -1065,6 +1075,7 @@ static RESTRICTION *ParseRestriction(
  *****************************************************************/
 static void ReplaceCurrentArgRefs(
   void *theEnv,
+  EXEC_STATUS,
   EXPRESSION *query)
   {
    while (query != NULL)
@@ -1096,6 +1107,7 @@ static void ReplaceCurrentArgRefs(
  **********************************************************/
 static int DuplicateParameters(
   void *theEnv,
+  EXEC_STATUS,
   EXPRESSION *head,
   EXPRESSION **prv,
   SYMBOL_HN *name)
@@ -1133,6 +1145,7 @@ static int DuplicateParameters(
  *****************************************************************/
 static EXPRESSION *AddParameter(
   void *theEnv,
+  EXEC_STATUS,
   EXPRESSION *phead,
   EXPRESSION *pprv,
   SYMBOL_HN *pname,
@@ -1164,6 +1177,7 @@ static EXPRESSION *AddParameter(
  *************************************************************/
 static EXPRESSION *ValidType(
   void *theEnv,
+  EXEC_STATUS,
   SYMBOL_HN *tname)
   {
 #if OBJECT_SYSTEM
@@ -1233,6 +1247,7 @@ static EXPRESSION *ValidType(
  *************************************************************/
 static intBool RedundantClasses(
   void *theEnv,
+  EXEC_STATUS,
   void *c1,
   void *c2)
   {
@@ -1274,6 +1289,7 @@ static intBool RedundantClasses(
  *********************************************************/
 static DEFGENERIC *AddGeneric(
   void *theEnv,
+  EXEC_STATUS,
   SYMBOL_HN *name,
   int *newGeneric)
   {
@@ -1319,6 +1335,7 @@ static DEFGENERIC *AddGeneric(
  **********************************************************************/
 static DEFMETHOD *AddGenericMethod(
   void *theEnv,
+  EXEC_STATUS,
   DEFGENERIC *gfunc,
   int mposn,
   short mi)
@@ -1516,6 +1533,7 @@ static int TypeListCompare(
  ***************************************************/
 static DEFGENERIC *NewGeneric(
   void *theEnv,
+  EXEC_STATUS,
   SYMBOL_HN *gname)
   {
    DEFGENERIC *ngen;

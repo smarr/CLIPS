@@ -85,7 +85,8 @@
 /* InitializeEngine: Initializes the activations and statistics watch items. */
 /*****************************************************************************/
 globle void InitializeEngine(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {   
    AllocateEnvironmentData(theEnv,ENGINE_DATA,sizeof(struct engineData),DeallocateEngineData);
 
@@ -102,7 +103,8 @@ globle void InitializeEngine(
 /*    data for engine functionality.             */
 /*************************************************/
 static void DeallocateEngineData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct focus *tmpPtr, *nextPtr;
    
@@ -133,6 +135,7 @@ globle long long Run(
 /*************************************************/
 globle long long EnvRun(
   void *theEnv,
+  EXEC_STATUS,
   long long runLimit)
   {
    long long rulesFired = 0;
@@ -608,7 +611,8 @@ globle long long EnvRun(
 /*   should be executed based on the current focus.        */
 /***********************************************************/
 static struct activation *NextActivationToFire(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct activation *theActivation;
    struct defmodule *theModule;
@@ -651,6 +655,7 @@ static struct activation *NextActivationToFire(
 /***************************************************/
 static struct defmodule *RemoveFocus(
   void *theEnv,
+  EXEC_STATUS,
   struct defmodule *theModule)
   {
    struct focus *tempFocus,*prevFocus, *nextFocus;
@@ -746,7 +751,8 @@ static struct defmodule *RemoveFocus(
 /* EnvPopFocus: C access routine for the pop-focus function. */
 /*************************************************************/
 globle void *EnvPopFocus(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    if (EngineData(theEnv)->CurrentFocus == NULL) return(NULL);
    return((void *) RemoveFocus(theEnv,EngineData(theEnv)->CurrentFocus->theModule));
@@ -757,6 +763,7 @@ globle void *EnvPopFocus(
 /***************************************************************/
 globle void *EnvGetNextFocus(
   void *theEnv,
+  EXEC_STATUS,
   void *theFocus)
   {
    /*==================================================*/
@@ -779,6 +786,7 @@ globle void *EnvGetNextFocus(
 /******************************************************/
 globle void EnvFocus(
   void *theEnv,
+  EXEC_STATUS,
   void *vTheModule)
   {
    struct defmodule *theModule = (struct defmodule *) vTheModule;
@@ -830,7 +838,8 @@ globle void EnvFocus(
 /*   for the clear-focus-stack command.         */
 /************************************************/
 globle void ClearFocusStackCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    if (EnvArgCountCheck(theEnv,execStatus,"list-focus-stack",EXACTLY,0) == -1) return;
 
@@ -842,7 +851,8 @@ globle void ClearFocusStackCommand(
 /*   for the clear-focus-stack command. */
 /****************************************/
 globle void EnvClearFocusStack(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    while (EngineData(theEnv)->CurrentFocus != NULL) EnvPopFocus(theEnv);
 
@@ -859,7 +869,8 @@ globle intBool AddRunFunction(
   void (*functionPtr)(void),
   int priority)
   {
-   void *theEnv;
+   void *theEnv,
+  EXEC_STATUS;
    
    theEnv = GetCurrentEnvironment();
 
@@ -876,6 +887,7 @@ globle intBool AddRunFunction(
 /**************************************/
 globle intBool EnvAddRunFunction(
   void *theEnv,
+  EXEC_STATUS,
   char *name,
   void (*functionPtr)(void *),
   int priority)
@@ -892,6 +904,7 @@ globle intBool EnvAddRunFunction(
 /*****************************************/
 globle intBool EnvAddRunFunctionWithContext(
   void *theEnv,
+  EXEC_STATUS,
   char *name,
   void (*functionPtr)(void *),
   int priority,
@@ -910,6 +923,7 @@ globle intBool EnvAddRunFunctionWithContext(
 /********************************************/
 globle intBool EnvRemoveRunFunction(
   void *theEnv,
+  EXEC_STATUS,
   char *name)
   {
    int found;
@@ -926,7 +940,8 @@ globle intBool EnvRemoveRunFunction(
 /* RunCommand: H/L access routine for the run command.   */
 /*********************************************************/
 globle void RunCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    int numArgs;
    long long runLimit = -1LL;
@@ -951,7 +966,8 @@ globle void RunCommand(
 /* HaltCommand: Causes rule execution to halt. */
 /***********************************************/
 globle void HaltCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    EnvArgCountCheck(theEnv,execStatus,"halt",EXACTLY,0);
    EnvHalt(theEnv);
@@ -962,7 +978,8 @@ globle void HaltCommand(
 /*   for the halt command.   */
 /*****************************/
 globle void EnvHalt(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    EngineData(theEnv)->HaltRules = TRUE;
   }
@@ -978,6 +995,7 @@ globle void EnvHalt(
 #endif
 globle void EnvSetBreak(
   void *theEnv,
+  EXEC_STATUS,
   void *theRule)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
@@ -1000,6 +1018,7 @@ globle void EnvSetBreak(
 #endif
 globle intBool EnvRemoveBreak(
   void *theEnv,
+  EXEC_STATUS,
   void *theRule)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
@@ -1026,7 +1045,8 @@ globle intBool EnvRemoveBreak(
 /* RemoveAllBreakpoints: Removes all breakpoints. */
 /**************************************************/
 globle void RemoveAllBreakpoints(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    void *theRule;
    void *theDefmodule = NULL;
@@ -1045,6 +1065,7 @@ globle void RemoveAllBreakpoints(
 /***********************************/
 globle void EnvShowBreaks(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   void *vTheModule)
   {
@@ -1063,6 +1084,7 @@ globle void EnvShowBreaks(
 #endif
 globle intBool EnvDefruleHasBreakpoint(
   void *theEnv,
+  EXEC_STATUS,
   void *theRule)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
@@ -1077,7 +1099,8 @@ globle intBool EnvDefruleHasBreakpoint(
 /*   for the set-break command.          */
 /*****************************************/
 globle void SetBreakCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DATA_OBJECT argPtr;
    char *argument;
@@ -1103,7 +1126,8 @@ globle void SetBreakCommand(
 /*   for the remove-break command.          */
 /********************************************/
 globle void RemoveBreakCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DATA_OBJECT argPtr;
    char *argument;
@@ -1142,7 +1166,8 @@ globle void RemoveBreakCommand(
 /*   for the show-breaks command.          */
 /*******************************************/
 globle void ShowBreaksCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    int numArgs, error;
    struct defmodule *theModule;
@@ -1165,7 +1190,8 @@ globle void ShowBreaksCommand(
 /*   for the list-focus-stack command.         */
 /***********************************************/
 globle void ListFocusStackCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    if (EnvArgCountCheck(theEnv,execStatus,"list-focus-stack",EXACTLY,0) == -1) return;
 
@@ -1178,6 +1204,7 @@ globle void ListFocusStackCommand(
 /***************************************/
 globle void EnvListFocusStack(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName)
   {
    struct focus *theFocus;
@@ -1199,6 +1226,7 @@ globle void EnvListFocusStack(
 /***********************************************/
 globle void GetFocusStackFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
    if (EnvArgCountCheck(theEnv,execStatus,"get-focus-stack",EXACTLY,0) == -1) return;
@@ -1212,6 +1240,7 @@ globle void GetFocusStackFunction(
 /***************************************/
 globle void EnvGetFocusStack(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
    struct focus *theFocus;
@@ -1268,7 +1297,8 @@ globle void EnvGetFocusStack(
 /*   for the pop-focus function.          */
 /******************************************/
 globle void *PopFocusFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct defmodule *theModule;
 
@@ -1284,7 +1314,8 @@ globle void *PopFocusFunction(
 /*   for the get-focus function.          */
 /******************************************/
 globle void *GetFocusFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct defmodule *rv;
 
@@ -1299,7 +1330,8 @@ globle void *GetFocusFunction(
 /*   for the get-focus function. */
 /*********************************/
 globle void *EnvGetFocus(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    if (EngineData(theEnv)->CurrentFocus == NULL) return(NULL);
 
@@ -1311,7 +1343,8 @@ globle void *EnvGetFocus(
 /*   for the focus function.          */
 /**************************************/
 globle int FocusCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DATA_OBJECT argPtr;
    char *argument;
@@ -1357,7 +1390,8 @@ globle int FocusCommand(
 /* EnvGetFocusChanged: Returns the value of the variable FocusChanged. */
 /***********************************************************************/
 globle int EnvGetFocusChanged(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return(EngineData(theEnv)->FocusChanged);
   }
@@ -1367,6 +1401,7 @@ globle int EnvGetFocusChanged(
 /********************************************************************/
 globle void EnvSetFocusChanged(
   void *theEnv,
+  EXEC_STATUS,
   int value)
   {
    EngineData(theEnv)->FocusChanged = value;
@@ -1377,6 +1412,7 @@ globle void EnvSetFocusChanged(
 /*********************************************/
 globle void EnvSetHaltRules(
   void *theEnv,
+  EXEC_STATUS,
   intBool value)
   { 
    EngineData(theEnv)->HaltRules = value; 
@@ -1386,7 +1422,8 @@ globle void EnvSetHaltRules(
 /* EnvGetHaltRules: Returns the HaltExecution flag. */
 /****************************************************/
 globle intBool EnvGetHaltRules(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return(EngineData(theEnv)->HaltRules);
   }

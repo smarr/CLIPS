@@ -76,6 +76,7 @@ static struct  sgttyb  nstate;		        /* values for editor mode */
 #endif
 globle int gotobol(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -91,6 +92,7 @@ globle int gotobol(
  */
 globle int backchar(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -122,6 +124,7 @@ globle int backchar(
 #endif
 globle int gotoeol(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -137,6 +140,7 @@ globle int gotoeol(
  */
 globle int forwchar(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -165,6 +169,7 @@ globle int forwchar(
 #endif
 globle int gotobob(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -184,6 +189,7 @@ globle int gotobob(
 #endif
 globle int gotoeob(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -201,6 +207,7 @@ globle int gotoeob(
  */
 globle int forwline(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -228,6 +235,7 @@ globle int forwline(
  */
 globle int backline(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -286,6 +294,7 @@ LINE   *dlp)
  */
 globle int forwpage(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -319,6 +328,7 @@ globle int forwpage(
  */
 globle int backpage(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -353,6 +363,7 @@ globle int backpage(
 #endif
 globle int setmark(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -373,6 +384,7 @@ globle int setmark(
 #endif
 globle int swapmark(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -417,7 +429,8 @@ globle int swapmark(
 #pragma argsused
 #endif
 globle int wrapword(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
         register int cnt, oldp;
         oldp = (int) curwp->w_dotp;
@@ -449,6 +462,7 @@ globle int wrapword(
 #endif
 globle int backword(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -478,6 +492,7 @@ globle int backword(
 #endif
 globle int forwword(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -506,6 +521,7 @@ globle int forwword(
 #endif
 globle int upperword(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -542,6 +558,7 @@ globle int upperword(
 #endif
 globle int lowerword(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -579,6 +596,7 @@ globle int lowerword(
 #endif
 globle int capword(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -625,6 +643,7 @@ globle int capword(
 #endif
 globle int delfword(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -669,6 +688,7 @@ globle int delfword(
 #endif
 globle int delbword(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -746,6 +766,7 @@ globle int inword()
 #endif
 globle int killregion(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -773,6 +794,7 @@ globle int killregion(
 #endif
 globle int copyregion(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -817,6 +839,7 @@ globle int copyregion(
 #endif
 globle int lowerregion(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -858,6 +881,7 @@ globle int lowerregion(
 #endif
 globle int upperregion(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -970,6 +994,7 @@ REGION *rp)
 #endif
 globle int fileread(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -998,6 +1023,7 @@ globle int fileread(
 #endif
 globle int filevisit(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -1012,6 +1038,7 @@ globle int filevisit(
 
 globle int filevisit_guts(
   void *theEnv,
+  EXEC_STATUS,
   char fname[])
 {
         register BUFFER *bp;
@@ -1097,6 +1124,7 @@ globle int filevisit_guts(
  */
 globle int readin(
   void *theEnv,
+  EXEC_STATUS,
   char    fname[])
 {
         register LINE   *lp1;
@@ -1214,6 +1242,7 @@ char    fname[])
 #endif
 globle int filewrite(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -1255,6 +1284,7 @@ globle int filewrite(
 #endif
 globle int filesave(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {
@@ -1336,6 +1366,7 @@ char    *fn)
 #endif
 globle int filename(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
   {

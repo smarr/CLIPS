@@ -62,7 +62,8 @@ static void SingleDefinstancesToCode(void *,FILE *,DEFINSTANCES *,int,int,int);
   NOTES        : None
  ***************************************************/
 globle void SetupDefinstancesCompiler(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DefinstancesData(theEnv)->DefinstancesCodeItem = AddCodeGeneratorItem(theEnv,"definstances",0,ReadyDefinstancesForCode,
                                                NULL,DefinstancesToCode,2);
@@ -84,6 +85,7 @@ globle void SetupDefinstancesCompiler(
  ****************************************************/
 globle void DefinstancesCModuleReference(
   void *theEnv,
+  EXEC_STATUS,
   FILE *theFile,
   int count,
   int imageID,
@@ -112,7 +114,8 @@ globle void DefinstancesCModuleReference(
   NOTES        : None
  ***************************************************/
 static void ReadyDefinstancesForCode(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    MarkConstructBsaveIDs(theEnv,DefinstancesData(theEnv)->DefinstancesModuleIndex);
   }
@@ -134,6 +137,7 @@ static void ReadyDefinstancesForCode(
  *******************************************************/
 static int DefinstancesToCode(
   void *theEnv,
+  EXEC_STATUS,
   char *fileName,
   char *pathName,
   char *fileNameBuffer,
@@ -226,6 +230,7 @@ static int DefinstancesToCode(
  ***************************************************/
 static void CloseDefinstancesFiles(
   void *theEnv,
+  EXEC_STATUS,
   FILE *moduleFile,
   FILE *definstancesFile,
   int maxIndices)
@@ -262,6 +267,7 @@ static void CloseDefinstancesFiles(
  ***************************************************/
 static void DefinstancesModuleToCode(
   void *theEnv,
+  EXEC_STATUS,
   FILE *theFile,
   struct defmodule *theModule,
   int imageID,
@@ -289,6 +295,7 @@ static void DefinstancesModuleToCode(
  ***************************************************/
 static void SingleDefinstancesToCode(
   void *theEnv,
+  EXEC_STATUS,
   FILE *theFile,
   DEFINSTANCES *theDefinstances,
   int imageID,

@@ -60,7 +60,8 @@
 /*   save/load feature for deffacts.        */
 /********************************************/
 globle void DeffactsBinarySetup(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    AllocateEnvironmentData(theEnv,DFFCTBIN_DATA,sizeof(struct deffactsBinaryData),DeallocateDeffactsBloadData);
 #if BLOAD_AND_BSAVE
@@ -82,7 +83,8 @@ globle void DeffactsBinarySetup(
 /*    data for the deffacts bsave functionality.        */
 /********************************************************/
 static void DeallocateDeffactsBloadData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    size_t space;
 
@@ -101,7 +103,8 @@ static void DeallocateDeffactsBloadData(
 /*   in the current environment.                         */
 /*********************************************************/
 static void BsaveFind(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct deffacts *theDeffacts;
    struct defmodule *theModule;
@@ -172,6 +175,7 @@ static void BsaveFind(
 /************************************************/
 static void BsaveExpressions(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp)
   {
    struct deffacts *theDeffacts;
@@ -209,6 +213,7 @@ static void BsaveExpressions(
 /******************************************************/
 static void BsaveStorage(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp)
   {
    size_t space;
@@ -232,6 +237,7 @@ static void BsaveStorage(
 /********************************************/
 static void BsaveBinaryItem(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp)
   {
    size_t space;
@@ -311,7 +317,8 @@ static void BsaveBinaryItem(
 /*   the deffacts used by this binary image.        */
 /****************************************************/
 static void BloadStorage(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    size_t space;
 
@@ -359,7 +366,8 @@ static void BloadStorage(
 /*   constructs used by this binary image.           */
 /*****************************************************/
 static void BloadBinaryItem(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    size_t space;
 
@@ -394,6 +402,7 @@ static void BloadBinaryItem(
 /***************************************************/
 static void UpdateDeffactsModule(
   void *theEnv,
+  EXEC_STATUS,
   void *buf,
   long obji)
   {
@@ -410,6 +419,7 @@ static void UpdateDeffactsModule(
 /*********************************************/
 static void UpdateDeffacts(
   void *theEnv,
+  EXEC_STATUS,
   void *buf,
   long obji)
   {
@@ -427,7 +437,8 @@ static void UpdateDeffacts(
 /*   when a binary load is in effect. */
 /**************************************/
 static void ClearBload(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    long i;
    size_t space;
@@ -463,6 +474,7 @@ static void ClearBload(
 /******************************************************/
 globle void *BloadDeffactsModuleReference(
   void *theEnv,
+  EXEC_STATUS,
   int theIndex)
   {
    return ((void *) &DeffactsBinaryData(theEnv)->ModuleArray[theIndex]);

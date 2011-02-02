@@ -99,7 +99,8 @@ static void DeallocateDefinstancesBinaryData(void *);
   NOTES        : None
  ***********************************************************/
 globle void SetupDefinstancesBload(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    AllocateEnvironmentData(theEnv,DFINSBIN_DATA,sizeof(struct definstancesBinaryData),DeallocateDefinstancesBinaryData);
 #if BLOAD_AND_BSAVE
@@ -119,7 +120,8 @@ globle void SetupDefinstancesBload(
 /*    data for the definstances binary functionality.        */
 /*************************************************************/
 static void DeallocateDefinstancesBinaryData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    size_t space;
 
@@ -143,6 +145,7 @@ static void DeallocateDefinstancesBinaryData(
  ***************************************************/
 globle void *BloadDefinstancesModuleRef(
   void *theEnv,
+  EXEC_STATUS,
   int theIndex)
   {
    return ((void *) &DefinstancesBinaryData(theEnv)->ModuleArray[theIndex]);
@@ -172,7 +175,8 @@ globle void *BloadDefinstancesModuleRef(
                    definstances will be bsaved in order of binary list)
  ***************************************************************************/
 static void BsaveDefinstancesFind(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    SaveBloadCount(theEnv,DefinstancesBinaryData(theEnv)->ModuleCount);
    SaveBloadCount(theEnv,DefinstancesBinaryData(theEnv)->DefinstancesCount);
@@ -199,6 +203,7 @@ static void BsaveDefinstancesFind(
 #endif
 static void MarkDefinstancesItems(
   void *theEnv,
+  EXEC_STATUS,
   struct constructHeader *theDefinstances,
   void *userBuffer)
   {
@@ -222,6 +227,7 @@ static void MarkDefinstancesItems(
  ***************************************************/
 static void BsaveDefinstancesExpressions(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp)
   {
    DoForAllConstructs(theEnv,BsaveDefinstancesExpression,DefinstancesData(theEnv)->DefinstancesModuleIndex,
@@ -240,6 +246,7 @@ static void BsaveDefinstancesExpressions(
  ***************************************************/
 static void BsaveDefinstancesExpression(
   void *theEnv,
+  EXEC_STATUS,
   struct constructHeader *theDefinstances,
   void *userBuffer)
   {
@@ -258,6 +265,7 @@ static void BsaveDefinstancesExpression(
  ***********************************************************/
 static void BsaveStorageDefinstances(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp)
   {
    size_t space;
@@ -280,6 +288,7 @@ static void BsaveStorageDefinstances(
  *************************************************************************************/
 static void BsaveDefinstancesDriver(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp)
   {
    size_t space;
@@ -326,6 +335,7 @@ static void BsaveDefinstancesDriver(
  ***************************************************/
 static void BsaveDefinstances(
   void *theEnv,
+  EXEC_STATUS,
   struct constructHeader *theDefinstances,
   void *userBuffer)
   {
@@ -356,7 +366,8 @@ static void BsaveDefinstances(
                    within the structures
  ***********************************************************************/
 static void BloadStorageDefinstances(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    size_t space;
 
@@ -397,7 +408,8 @@ static void BloadStorageDefinstances(
   NOTES        : Assumes all loading is finished
  ********************************************************************/
 static void BloadDefinstances(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    size_t space;
 
@@ -420,6 +432,7 @@ static void BloadDefinstances(
  *******************************************************/
 static void UpdateDefinstancesModule(
   void *theEnv,
+  EXEC_STATUS,
   void *buf,
   long obji)
   {
@@ -444,6 +457,7 @@ static void UpdateDefinstancesModule(
  ***************************************************/
 static void UpdateDefinstances(
   void *theEnv,
+  EXEC_STATUS,
   void *buf,
   long obji)
   {
@@ -471,7 +485,8 @@ static void UpdateDefinstances(
   NOTES        : Definstances name symbol counts decremented
  ***************************************************************/
 static void ClearDefinstancesBload(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    register long i;
    size_t space;

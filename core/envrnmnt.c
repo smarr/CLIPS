@@ -91,6 +91,8 @@ globle intBool AllocateEnvironmentData(
   {      
    struct environmentData *theEnvironment = (struct environmentData *) vtheEnvironment;
 
+	 // Lode: TODO check arguments: need EXEC_STATUS
+
    /*===========================================*/
    /* Environment data can't be of length zero. */
    /*===========================================*/
@@ -156,6 +158,7 @@ globle intBool DeallocateEnvironmentData()
   {
 #if ALLOW_ENVIRONMENT_GLOBALS
    struct environmentData *theEnvironment, *nextEnvironment;
+	 // Lode: TODO add EXEC_STATUS?
    int i, rv = TRUE;
    
    for (i = 0; i < SIZE_ENVIRONMENT_HASH; i++)
@@ -212,6 +215,7 @@ static void InitializeEnvironmentHashTable()
 static void AddHashedEnvironment(
   struct environmentData *theEnvironment)
   {
+	 // Lode: TODO add EXEC_STATUS?
    struct environmentData *temp;
    unsigned long hashValue;
    
@@ -232,6 +236,7 @@ static void AddHashedEnvironment(
 static intBool RemoveHashedEnvironment(
   struct environmentData *theEnvironment)
   {
+	 // Lode: TODO add EXEC_STATUS?
    unsigned long hashValue;
    struct environmentData *hptr, *prev;
 
@@ -268,6 +273,7 @@ static struct environmentData *FindEnvironment(
   unsigned long environmentIndex)
   {
    struct environmentData *theEnvironment;
+	 // Lode: TODO add EXEC_STATUS?
    unsigned long hashValue;
    
    hashValue = environmentIndex % SIZE_ENVIRONMENT_HASH;
@@ -318,6 +324,7 @@ globle void *CreateEnvironmentDriver(
   struct externalAddressHashNode **externalAddressTable)
   {
    struct environmentData *theEnvironment;
+	 // Lode: TODO add EXEC_STATUS?
    void *theData;
    
    theEnvironment = (struct environmentData *) malloc(sizeof(struct environmentData));
@@ -425,6 +432,7 @@ globle void *CreateEnvironmentDriver(
 globle void SetCurrentEnvironment(
   void *theEnvironment)
   {
+	 // Lode: TODO add EXEC_STATUS?
    CurrentEnvironment = (struct environmentData *) theEnvironment;
   }
   
@@ -437,6 +445,7 @@ globle intBool SetCurrentEnvironmentByIndex(
   unsigned long environmentIndex)
   {
    struct environmentData *theEnvironment;
+	 // Lode: TODO add EXEC_STATUS?
 
    theEnvironment = FindEnvironment(environmentIndex);
    
@@ -456,6 +465,7 @@ globle void *GetEnvironmentByIndex(
   unsigned long environmentIndex)
   {
    struct environmentData *theEnvironment;
+	 // Lode: TODO add EXEC_STATUS?
 
    theEnvironment = FindEnvironment(environmentIndex);
       
@@ -478,6 +488,7 @@ globle void *GetCurrentEnvironment()
 globle unsigned long GetEnvironmentIndex(
   void *theEnvironment)
   {
+	 // Lode: TODO add EXEC_STATUS?
    return(((struct environmentData *) theEnvironment)->environmentIndex);
   } 
   
@@ -490,6 +501,7 @@ globle unsigned long GetEnvironmentIndex(
 globle void *GetEnvironmentContext(
   void *theEnvironment)
   {
+	 // Lode: TODO add EXEC_STATUS?
    return(((struct environmentData *) theEnvironment)->context);
   } 
 
@@ -501,6 +513,7 @@ globle void *SetEnvironmentContext(
   void *theEnvironment,
   void *theContext)
   {
+	 // Lode: TODO add EXEC_STATUS?
    void *oldContext;
    
    oldContext = ((struct environmentData *) theEnvironment)->context;
@@ -517,6 +530,7 @@ globle void *SetEnvironmentContext(
 globle void *GetEnvironmentRouterContext(
   void *theEnvironment)
   {
+	 // Lode: TODO add EXEC_STATUS?
    return(((struct environmentData *) theEnvironment)->routerContext);
   } 
 
@@ -528,6 +542,7 @@ globle void *SetEnvironmentRouterContext(
   void *theEnvironment,
   void *theRouterContext)
   {
+	 // Lode: TODO add EXEC_STATUS?
    void *oldRouterContext;
    
    oldRouterContext = ((struct environmentData *) theEnvironment)->routerContext;
@@ -544,6 +559,7 @@ globle void *SetEnvironmentRouterContext(
 globle void *GetEnvironmentFunctionContext(
   void *theEnvironment)
   {
+	 // Lode: TODO add EXEC_STATUS?
    return(((struct environmentData *) theEnvironment)->functionContext);
   } 
 
@@ -555,6 +571,7 @@ globle void *SetEnvironmentFunctionContext(
   void *theEnvironment,
   void *theFunctionContext)
   {
+	 // Lode: TODO add EXEC_STATUS?
    void *oldFunctionContext;
    
    oldFunctionContext = ((struct environmentData *) theEnvironment)->functionContext;
@@ -571,6 +588,7 @@ globle void *SetEnvironmentFunctionContext(
 globle void *GetEnvironmentCallbackContext(
   void *theEnvironment)
   {
+	 // Lode: TODO add EXEC_STATUS?
    return(((struct environmentData *) theEnvironment)->callbackContext);
   } 
 
@@ -582,6 +600,7 @@ globle void *SetEnvironmentCallbackContext(
   void *theEnvironment,
   void *theCallbackContext)
   {
+	 // Lode: TODO add EXEC_STATUS?
    void *oldCallbackContext;
    
    oldCallbackContext = ((struct environmentData *) theEnvironment)->callbackContext;
@@ -598,6 +617,7 @@ globle void *SetEnvironmentCallbackContext(
 globle intBool DestroyEnvironment(
   void *vtheEnvironment)
   {   
+	 // Lode: TODO add EXEC_STATUS?
    struct environmentCleanupFunction *cleanupPtr;
    int i;
    struct memoryData *theMemData;
@@ -682,6 +702,7 @@ globle intBool AddEnvironmentCleanupFunction(
   void (*functionPtr)(void *),
   int priority)
   {
+	 // Lode: TODO add EXEC_STATUS?
    struct environmentCleanupFunction *newPtr, *currentPtr, *lastPtr = NULL;
    struct environmentData *theEnv = (struct environmentData *) vtheEnv;
      
@@ -728,6 +749,7 @@ globle intBool AddEnvironmentCleanupFunction(
 static void RemoveEnvironmentCleanupFunctions(
   struct environmentData *theEnv)
   {   
+	 // Lode: TODO add EXEC_STATUS?
    struct environmentCleanupFunction *nextPtr;
       
    while (theEnv->listOfCleanupEnvironmentFunctions != NULL)

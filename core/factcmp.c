@@ -52,7 +52,8 @@
 /*   command for use with the fact pattern network.           */
 /**************************************************************/
 globle void FactPatternsCompilerSetup(  
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    FactData(theEnv)->FactCodeItem = AddCodeGeneratorItem(theEnv,"facts",0,BeforePatternNetworkToCode,
                                        NULL,PatternNetworkToCode,1);
@@ -64,7 +65,8 @@ globle void FactPatternsCompilerSetup(
 /*   the data structures are written to a file as C code        */
 /****************************************************************/
 static void BeforePatternNetworkToCode(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    int whichPattern = 0;
    int whichDeftemplate = 0;
@@ -156,6 +158,7 @@ static struct factPatternNode *GetNextPatternNode(
 /********************************************************************/
 static int PatternNetworkToCode(
   void *theEnv,
+  EXEC_STATUS,
   char *fileName,
   char *pathName,
   char *fileNameBuffer,
@@ -249,6 +252,7 @@ static int PatternNetworkToCode(
 /****************************************************************/
 static void CloseNetworkFiles(
   void *theEnv,
+  EXEC_STATUS,
   FILE *networkFile,
   int maxIndices)
   {
@@ -267,6 +271,7 @@ static void CloseNetworkFiles(
 /************************************************************/
 static void PatternNodeToCode(
   void *theEnv,
+  EXEC_STATUS,
   FILE *theFile,
   struct factPatternNode *thePatternNode,
   int imageID,
@@ -353,6 +358,7 @@ static void PatternNodeToCode(
 /**********************************************************/
 globle void FactPatternNodeReference(
   void *theEnv,
+  EXEC_STATUS,
   void *theVPattern,
   FILE *theFile,
   int imageID,

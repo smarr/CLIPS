@@ -51,7 +51,8 @@ struct basicMathFunctionData
 /* BasicMathFunctionDefinitions: Defines basic math functions. */
 /***************************************************************/
 globle void BasicMathFunctionDefinitions(
-  void *theEnv,EXEC_STATUS)
+  void *theEnv,
+	EXEC_STATUS)
   {   
    AllocateEnvironmentData(theEnv,BMATHFUN_DATA,sizeof(struct basicMathFunctionData),NULL);
    

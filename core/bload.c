@@ -56,7 +56,8 @@
 /*    data for the bload command.             */
 /**********************************************/
 globle void InitializeBloadData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    AllocateEnvironmentData(theEnv,BLOAD_DATA,sizeof(struct bloadData),NULL);
    AddEnvironmentCleanupFunction(theEnv,"bload",DeallocateBloadData,-1500);
@@ -70,7 +71,8 @@ globle void InitializeBloadData(
 /*    data for the bload command.               */
 /************************************************/
 static void DeallocateBloadData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {   
    DeallocateCallList(theEnv,BloadData(theEnv)->BeforeBloadFunctions);
    DeallocateCallList(theEnv,BloadData(theEnv)->AfterBloadFunctions);
@@ -84,6 +86,7 @@ static void DeallocateBloadData(
 /******************************/
 globle int EnvBload(
   void *theEnv,
+  EXEC_STATUS,
   char *fileName)
   {
    long numberOfFunctions;
@@ -374,6 +377,7 @@ globle int EnvBload(
  ************************************************************/
 globle void BloadandRefresh(
   void *theEnv,
+  EXEC_STATUS,
   long objcnt,
   size_t objsz,
   void (*objupdate)(void *,void *,long))
@@ -428,6 +432,7 @@ globle void BloadandRefresh(
 /**********************************************/
 static struct FunctionDefinition **ReadNeededFunctions(
   void *theEnv,
+  EXEC_STATUS,
   long int *numberOfFunctions,
   int *error)
   {
@@ -519,6 +524,7 @@ static struct FunctionDefinition **ReadNeededFunctions(
 /*****************************************/
 static struct FunctionDefinition *FastFindFunction(
   void *theEnv,
+  EXEC_STATUS,
   char *functionName,
   struct FunctionDefinition *lastFunction)
   {
@@ -567,7 +573,8 @@ static struct FunctionDefinition *FastFindFunction(
 /*   command, otherwise returns FALSE.    */
 /******************************************/
 globle intBool Bloaded(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return(BloadData(theEnv)->BloadActive);
   }
@@ -577,7 +584,8 @@ globle intBool Bloaded(
 /*   from the KB environment.        */
 /*************************************/
 static int ClearBload(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct BinaryItem *biPtr;
    struct callFunctionItem *bfPtr;
@@ -665,7 +673,8 @@ static int ClearBload(
 /*   functions in event of failure.              */
 /*************************************************/
 static void AbortBload(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct callFunctionItem *bfPtr;
 
@@ -687,6 +696,7 @@ static void AbortBload(
 /********************************************/
 globle void AddBeforeBloadFunction(
   void *theEnv,
+  EXEC_STATUS,
   char *name,
   void (*func)(void *),
   int priority)
@@ -702,6 +712,7 @@ globle void AddBeforeBloadFunction(
 /*******************************************/
 globle void AddAfterBloadFunction(
   void *theEnv,
+  EXEC_STATUS,
   char *name,
   void (*func)(void *),
   int priority)
@@ -717,6 +728,7 @@ globle void AddAfterBloadFunction(
 /**************************************************/
 globle void AddClearBloadReadyFunction(
   void *theEnv,
+  EXEC_STATUS,
   char *name,
   int (*func)(void *),
   int priority)
@@ -734,6 +746,7 @@ globle void AddClearBloadReadyFunction(
 /*********************************************/
 globle void AddAbortBloadFunction(
   void *theEnv,
+  EXEC_STATUS,
   char *name,
   void (*func)(void *),
   int priority)
@@ -758,6 +771,7 @@ globle void AddAbortBloadFunction(
 #endif
 static int BloadOutOfMemoryFunction(
   void *theEnv,
+  EXEC_STATUS,
   size_t size)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
@@ -773,6 +787,7 @@ static int BloadOutOfMemoryFunction(
 /*****************************************************/
 globle void CannotLoadWithBloadMessage(
   void *theEnv,
+  EXEC_STATUS,
   char *constructName)
   {
    PrintErrorID(theEnv,"BLOAD",1,TRUE);
@@ -788,7 +803,8 @@ globle void CannotLoadWithBloadMessage(
 /*   for the bload command.           */
 /**************************************/
 globle int BloadCommand(
-  void *theEnv, EXEC_STATUS)
+  void *theEnv,
+  EXEC_STATUS)
   {
 #if (! RUN_TIME) && (BLOAD || BLOAD_ONLY || BLOAD_AND_BSAVE)
    char *fileName;

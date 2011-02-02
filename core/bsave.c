@@ -60,7 +60,8 @@
 /*    data for the bsave command.             */
 /**********************************************/
 globle void InitializeBsaveData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    AllocateEnvironmentData(theEnv,BSAVE_DATA,sizeof(struct bsaveData),DeallocateBsaveData);
   }
@@ -70,7 +71,8 @@ globle void InitializeBsaveData(
 /*    data for the bsave command.               */
 /************************************************/
 static void DeallocateBsaveData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct BinaryItem *tmpPtr, *nextPtr;
    
@@ -88,7 +90,8 @@ static void DeallocateBsaveData(
 /*   for the bsave command.           */
 /**************************************/
 globle int BsaveCommand(
-  void *theEnv, EXEC_STATUS)
+  void *theEnv,
+	EXEC_STATUS)
   {
 #if (! RUN_TIME) && BLOAD_AND_BSAVE
    char *fileName;
@@ -113,6 +116,7 @@ globle int BsaveCommand(
 /******************************/
 globle intBool EnvBsave(
   void *theEnv,
+  EXEC_STATUS,
   char *fileName)
   {
    FILE *fp;
@@ -274,7 +278,8 @@ globle intBool EnvBsave(
 /*   being unneeded by this binary image.    */
 /*********************************************/
 static void InitializeFunctionNeededFlags(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct FunctionDefinition *functionList;
 
@@ -291,7 +296,8 @@ static void InitializeFunctionNeededFlags(
 /*   number of expressions in use (through a global).     */
 /**********************************************************/
 static void FindNeededItems(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct BinaryItem *biPtr;
 
@@ -307,6 +313,7 @@ static void FindNeededItems(
 /****************************************************/
 static void WriteNeededFunctions(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp)
   {
    unsigned long int count = 0;
@@ -368,7 +375,8 @@ static void WriteNeededFunctions(
 /*   function names in the binary save file. */
 /*********************************************/
 static size_t FunctionBinarySize(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    size_t size = 0;
    struct FunctionDefinition *functionList;
@@ -391,6 +399,7 @@ static size_t FunctionBinarySize(
 /***************************************************/
 globle void SaveBloadCount(
   void *theEnv,
+  EXEC_STATUS,
   long cnt)
   {
    BLOADCNTSV *tmp, *prv;
@@ -417,6 +426,7 @@ globle void SaveBloadCount(
 /**************************************************/
 globle void RestoreBloadCount(
   void *theEnv,
+  EXEC_STATUS,
   long *cnt)
   {
    BLOADCNTSV *tmp;
@@ -434,6 +444,7 @@ globle void RestoreBloadCount(
 /**********************************************/
 globle void MarkNeededItems(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *testPtr)
   {
    while (testPtr != NULL)
@@ -483,6 +494,7 @@ globle void MarkNeededItems(
 /******************************************************/
 static void WriteBinaryHeader(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp)
   {
    GenWrite(BloadData(theEnv)->BinaryPrefixID,(unsigned long) strlen(BloadData(theEnv)->BinaryPrefixID) + 1,fp);
@@ -495,6 +507,7 @@ static void WriteBinaryHeader(
 /******************************************************/
 static void WriteBinaryFooter(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp)
   {
    char footerBuffer[CONSTRUCT_HEADER_SIZE];
@@ -515,6 +528,7 @@ static void WriteBinaryFooter(
 /**********************************************************/
 globle intBool AddBinaryItem(
   void *theEnv,
+  EXEC_STATUS,
   char *name,
   int priority,
   void (*findFunction)(void *),

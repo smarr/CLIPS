@@ -43,6 +43,7 @@
 #endif
 globle void PrintFactJNCompVars1(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   void *theValue)
   {
@@ -94,6 +95,7 @@ globle void PrintFactJNCompVars1(
 #endif
 globle void PrintFactJNCompVars2(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   void *theValue)
   {
@@ -157,6 +159,7 @@ globle void PrintFactJNCompVars2(
 #endif
 globle void PrintFactPNCompVars1(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   void *theValue)
   {
@@ -189,6 +192,7 @@ globle void PrintFactPNCompVars1(
 #endif
 globle void PrintFactSlotLength(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   void *theValue)
   {
@@ -222,6 +226,7 @@ globle void PrintFactSlotLength(
 #endif
 globle void PrintFactJNGetVar1(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   void *theValue)
   {
@@ -265,6 +270,7 @@ globle void PrintFactJNGetVar1(
 #endif
 globle void PrintFactJNGetVar2(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   void *theValue)
   {
@@ -301,6 +307,7 @@ globle void PrintFactJNGetVar2(
 #endif
 globle void PrintFactJNGetVar3(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   void *theValue)
   {
@@ -347,6 +354,7 @@ globle void PrintFactJNGetVar3(
 #endif
 globle void PrintFactPNGetVar1(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   void *theValue)
   {
@@ -382,6 +390,7 @@ globle void PrintFactPNGetVar1(
 #endif
 globle void PrintFactPNGetVar2(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   void *theValue)
   {
@@ -410,6 +419,7 @@ globle void PrintFactPNGetVar2(
 #endif
 globle void PrintFactPNGetVar3(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   void *theValue)
   {
@@ -448,6 +458,7 @@ globle void PrintFactPNGetVar3(
 #endif
 globle void PrintFactPNConstant1(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   void *theValue)
   {
@@ -483,6 +494,7 @@ globle void PrintFactPNConstant1(
 #endif
 globle void PrintFactPNConstant2(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   void *theValue)
   {

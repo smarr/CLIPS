@@ -73,6 +73,7 @@
 /************************************************/
 globle void NetworkAssert(
   void *theEnv,
+  EXEC_STATUS,
   struct partialMatch *binds,
   struct joinNode *join)
   {
@@ -111,6 +112,7 @@ globle void NetworkAssert(
 /*****************************************************/
 globle void NetworkAssertRight(
   void *theEnv,
+  EXEC_STATUS,
   struct partialMatch *rhsBinds,
   struct joinNode *join)
   {
@@ -310,6 +312,7 @@ globle void NetworkAssertRight(
 /****************************************************/
 globle void NetworkAssertLeft(
   void *theEnv,
+  EXEC_STATUS,
   struct partialMatch *lhsBinds,
   struct joinNode *join)
   {
@@ -529,6 +532,7 @@ globle void NetworkAssertLeft(
 /*******************************************************/
 globle intBool EvaluateJoinExpression(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *joinExpr,
   struct joinNode *joinPtr)
   {
@@ -669,6 +673,7 @@ globle intBool EvaluateJoinExpression(
 /*******************************************************/
 globle intBool EvaluateSecondaryNetworkTest(
   void *theEnv,
+  EXEC_STATUS,
   struct partialMatch *leftMatch,
   struct joinNode *joinPtr)
   {
@@ -705,6 +710,7 @@ globle intBool EvaluateSecondaryNetworkTest(
 /*******************************************************/
 globle unsigned long BetaMemoryHashValue(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *hashExpr,
   struct partialMatch *lbinds,
   struct partialMatch *rbinds,
@@ -816,6 +822,7 @@ globle unsigned long BetaMemoryHashValue(
 /*******************************************************************/
 globle void PPDrive(
   void *theEnv,
+  EXEC_STATUS,
   struct partialMatch *lhsBinds,
   struct partialMatch *rhsBinds,
   struct joinNode *join)
@@ -887,6 +894,7 @@ globle void PPDrive(
 /***********************************************************************/
 globle void EPMDrive(
   void *theEnv,
+  EXEC_STATUS,
   struct partialMatch *parent,
   struct joinNode *join)
   {
@@ -918,6 +926,7 @@ globle void EPMDrive(
 /***************************************************************/
 static void EmptyDrive(
   void *theEnv,
+  EXEC_STATUS,
   struct joinNode *join,
   struct partialMatch *rhsBinds)
   {
@@ -1072,6 +1081,7 @@ static void EmptyDrive(
 /********************************************************************/
 static void JoinNetErrorMessage(
   void *theEnv,
+  EXEC_STATUS,
   struct joinNode *joinPtr)
   {
    PrintErrorID(theEnv,"DRIVE",1,TRUE);

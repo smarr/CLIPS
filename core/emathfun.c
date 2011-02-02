@@ -72,7 +72,8 @@
 /*   the extended math functions.               */
 /************************************************/
 globle void ExtendedMathFunctionDefinitions(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
 #if ! RUN_TIME
    EnvDefineFunction2(theEnv,"cos",      'd', PTIEF CosFunction,      "CosFunction", "11n");
@@ -126,6 +127,7 @@ globle void ExtendedMathFunctionDefinitions(
 /************************************************************/
 static int SingleNumberCheck(
   void *theEnv,
+  EXEC_STATUS,
   char *functionName,
   double *theNumber)
   {
@@ -157,6 +159,7 @@ static int TestProximity(
 /********************************************************/
 static void DomainErrorMessage(
   void *theEnv,
+  EXEC_STATUS,
   char *functionName)
   {
    PrintErrorID(theEnv,"EMATHFUN",1,FALSE);
@@ -174,6 +177,7 @@ static void DomainErrorMessage(
 /************************************************************/
 static void ArgumentOverflowErrorMessage(
   void *theEnv,
+  EXEC_STATUS,
   char *functionName)
   {
    PrintErrorID(theEnv,"EMATHFUN",2,FALSE);
@@ -191,6 +195,7 @@ static void ArgumentOverflowErrorMessage(
 /************************************************************/
 static void SingularityErrorMessage(
   void *theEnv,
+  EXEC_STATUS,
   char *functionName)
   {
    PrintErrorID(theEnv,"EMATHFUN",3,FALSE);
@@ -206,7 +211,8 @@ static void SingularityErrorMessage(
 /*   for the cos function.           */
 /*************************************/
 globle double CosFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    double num;
 
@@ -219,7 +225,8 @@ globle double CosFunction(
 /*   for the sin function.           */
 /*************************************/
 globle double SinFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    double num;
 
@@ -232,7 +239,8 @@ globle double SinFunction(
 /*   for the tan function.           */
 /*************************************/
 globle double TanFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    double num, tv;
 
@@ -252,7 +260,8 @@ globle double TanFunction(
 /*   for the sec function.           */
 /*************************************/
 globle double SecFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    double num, tv;
 
@@ -273,7 +282,8 @@ globle double SecFunction(
 /*   for the csc function.           */
 /*************************************/
 globle double CscFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    double num, tv;
 
@@ -293,7 +303,8 @@ globle double CscFunction(
 /*   for the cot function.           */
 /*************************************/
 globle double CotFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
     double num, tv;
 
@@ -314,7 +325,8 @@ globle double CotFunction(
 /*   for the acos function.           */
 /**************************************/
 globle double AcosFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    double num;
 
@@ -332,7 +344,8 @@ globle double AcosFunction(
 /*   for the asin function.           */
 /**************************************/
 globle double AsinFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    double num;
 
@@ -350,7 +363,8 @@ globle double AsinFunction(
 /*   for the atan function.           */
 /**************************************/
 globle double AtanFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    double num;
 
@@ -363,7 +377,8 @@ globle double AtanFunction(
 /*   for the asec function.           */
 /**************************************/
 globle double AsecFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    double num;
 
@@ -382,7 +397,8 @@ globle double AsecFunction(
 /*   for the acsc function.           */
 /**************************************/
 globle double AcscFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    double num;
 
@@ -401,7 +417,8 @@ globle double AcscFunction(
 /*   for the acot function.           */
 /**************************************/
 globle double AcotFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    double num;
 
@@ -416,7 +433,8 @@ globle double AcotFunction(
 /*   for the cosh function.           */
 /**************************************/
 globle double CoshFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    double num;
 
@@ -429,7 +447,8 @@ globle double CoshFunction(
 /*   for the sinh function.           */
 /**************************************/
 globle double SinhFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    double num;
 
@@ -442,7 +461,8 @@ globle double SinhFunction(
 /*   for the tanh function.           */
 /**************************************/
 globle double TanhFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    double num;
 
@@ -455,7 +475,8 @@ globle double TanhFunction(
 /*   for the sech function.           */
 /**************************************/
 globle double SechFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    double num;
 
@@ -468,7 +489,8 @@ globle double SechFunction(
 /*   for the csch function.           */
 /**************************************/
 globle double CschFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    double num;
 
@@ -491,7 +513,8 @@ globle double CschFunction(
 /*   for the coth function.           */
 /**************************************/
 globle double CothFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    double num;
 
@@ -514,7 +537,8 @@ globle double CothFunction(
 /*   for the acosh function.           */
 /***************************************/
 globle double AcoshFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    double num;
 
@@ -532,7 +556,8 @@ globle double AcoshFunction(
 /*   for the asinh function.           */
 /***************************************/
 globle double AsinhFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    double num;
 
@@ -545,7 +570,8 @@ globle double AsinhFunction(
 /*   for the atanh function.           */
 /***************************************/
 globle double AtanhFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    double num;
 
@@ -563,7 +589,8 @@ globle double AtanhFunction(
 /*   for the asech function.           */
 /***************************************/
 globle double AsechFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    double num;
 
@@ -581,7 +608,8 @@ globle double AsechFunction(
 /*   for the acsch function.           */
 /***************************************/
 globle double AcschFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    double num;
 
@@ -599,7 +627,8 @@ globle double AcschFunction(
 /*   for the acoth function.           */
 /***************************************/
 globle double AcothFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    double num;
 
@@ -617,7 +646,8 @@ globle double AcothFunction(
 /*   for the exp function.           */
 /*************************************/
 globle double ExpFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    double num;
 
@@ -630,7 +660,8 @@ globle double ExpFunction(
 /*   for the log function.           */
 /*************************************/
 globle double LogFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    double num;
 
@@ -654,7 +685,8 @@ globle double LogFunction(
 /*   for the log10 function.           */
 /***************************************/
 globle double Log10Function(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    double num;
 
@@ -678,7 +710,8 @@ globle double Log10Function(
 /*   for the sqrt function.           */
 /**************************************/
 globle double SqrtFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    double num;
 
@@ -696,7 +729,8 @@ globle double SqrtFunction(
 /*   for the pow function.           */
 /*************************************/
 globle double PowFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DATA_OBJECT value1, value2;
 
@@ -725,6 +759,7 @@ globle double PowFunction(
 /*************************************/
 globle void ModFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR result)
   {
    DATA_OBJECT item1, item2;
@@ -783,7 +818,8 @@ globle void ModFunction(
 /*   for the pi function.           */
 /************************************/
 globle double PiFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
 
    if (EnvArgCountCheck(theEnv,execStatus,"pi",EXACTLY,0) == -1) return(acos(-1.0));
@@ -795,7 +831,8 @@ globle double PiFunction(
 /*   for the deg-rad function.          */
 /****************************************/
 globle double DegRadFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    double num;
 
@@ -808,7 +845,8 @@ globle double DegRadFunction(
 /*   for the rad-deg function.          */
 /****************************************/
 globle double RadDegFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    double num;
 
@@ -821,7 +859,8 @@ globle double RadDegFunction(
 /*   for the deg-grad function.          */
 /*****************************************/
 globle double DegGradFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    double num;
 
@@ -834,7 +873,8 @@ globle double DegGradFunction(
 /*   for the grad-deg function.          */
 /*****************************************/
 globle double GradDegFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    double num;
 
@@ -847,7 +887,8 @@ globle double GradDegFunction(
 /*   for the round function.           */
 /***************************************/
 globle long long RoundFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DATA_OBJECT result;
 

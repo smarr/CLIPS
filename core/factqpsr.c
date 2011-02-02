@@ -114,6 +114,7 @@
  ***********************************************************************/
 globle EXPRESSION *FactParseQueryNoAction(
   void *theEnv,
+  EXEC_STATUS,
   EXPRESSION *top,
   char *readSource)
   {
@@ -182,6 +183,7 @@ globle EXPRESSION *FactParseQueryNoAction(
  ***********************************************************************/
 globle EXPRESSION *FactParseQueryAction(
   void *theEnv,
+  EXEC_STATUS,
   EXPRESSION *top,
   char *readSource)
   {
@@ -250,6 +252,7 @@ globle EXPRESSION *FactParseQueryAction(
  ***************************************************************/
 static EXPRESSION *ParseQueryRestrictions(
   void *theEnv,
+  EXEC_STATUS,
   EXPRESSION *top,
   char *readSource,
   struct token *queryInputToken)
@@ -379,6 +382,7 @@ ParseQueryRestrictionsError2:
  ***************************************************/
 static intBool ReplaceTemplateNameWithReference(
   void *theEnv,
+  EXEC_STATUS,
   EXPRESSION *theExp)
   {
    char *theTemplateName;
@@ -425,6 +429,7 @@ static intBool ReplaceTemplateNameWithReference(
  *************************************************************/
 static int ParseQueryTestExpression(
   void *theEnv,
+  EXEC_STATUS,
   EXPRESSION *top,
   char *readSource)
   {
@@ -489,6 +494,7 @@ static int ParseQueryTestExpression(
  *************************************************************/
 static int ParseQueryActionExpression(
   void *theEnv,
+  EXEC_STATUS,
   EXPRESSION *top,
   char *readSource,
   EXPRESSION *factQuerySetVars,
@@ -586,6 +592,7 @@ static int ParseQueryActionExpression(
  ***********************************************************************************/
 static void ReplaceFactVariables(
   void *theEnv,
+  EXEC_STATUS,
   EXPRESSION *vlist,
   EXPRESSION *bexp,
   int sdirect,
@@ -647,6 +654,7 @@ static void ReplaceFactVariables(
  *************************************************************************/
 static void ReplaceSlotReference(
   void *theEnv,
+  EXEC_STATUS,
   EXPRESSION *vlist,
   EXPRESSION *theExp,
   struct FunctionDefinition *func,

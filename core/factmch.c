@@ -72,6 +72,7 @@
 /*************************************************************************/
 globle void FactPatternMatch(
   void *theEnv,
+  EXEC_STATUS,
   struct fact *theFact,
   struct factPatternNode *patternPtr,
   int offset,
@@ -265,6 +266,7 @@ globle void FactPatternMatch(
 /**************************************************************/
 static void ProcessMultifieldNode(
   void *theEnv,
+  EXEC_STATUS,
   struct factPatternNode *thePattern,
   struct multifieldMarker *markers,
   struct multifieldMarker *endMark,
@@ -439,6 +441,7 @@ static void ProcessMultifieldNode(
 /******************************************************/
 static struct factPatternNode *GetNextFactPatternNode(
   void *theEnv,
+  EXEC_STATUS,
   int finishedMatching,
   struct factPatternNode *thePattern)
   {
@@ -510,6 +513,7 @@ static struct factPatternNode *GetNextFactPatternNode(
 /*******************************************************/
 static void ProcessFactAlphaMatch(
   void *theEnv,
+  EXEC_STATUS,
   struct fact *theFact,
   struct multifieldMarker *theMarks,
   struct factPatternNode *thePattern)
@@ -559,6 +563,7 @@ static void ProcessFactAlphaMatch(
 /*****************************************************************/
 static int EvaluatePatternExpression(
   void *theEnv,
+  EXEC_STATUS,
   struct factPatternNode *patternPtr,
   struct expr *theTest)
   {
@@ -689,6 +694,7 @@ static int EvaluatePatternExpression(
 /************************************************************************/
 static void PatternNetErrorMessage(
   void *theEnv,
+  EXEC_STATUS,
   struct factPatternNode *patternPtr)
   {
    char buffer[60];
@@ -741,6 +747,7 @@ static void PatternNetErrorMessage(
 /***************************************************************************/
 static void TraceErrorToJoin(
   void *theEnv,
+  EXEC_STATUS,
   struct factPatternNode *patternPtr,
   int traceRight)
   {
@@ -772,6 +779,7 @@ static void TraceErrorToJoin(
 /***********************************************************************/
 static int SkipFactPatternNode(
   void *theEnv,
+  EXEC_STATUS,
   struct factPatternNode *thePattern)
   {
 #if (MAC_MCW || WIN_MCW) && (RUN_TIME || BLOAD_ONLY)
@@ -801,6 +809,7 @@ static int SkipFactPatternNode(
 #endif
 globle void MarkFactPatternForIncrementalReset(
   void *theEnv,
+  EXEC_STATUS,
   struct patternNodeHeader *thePattern,
   int value)
   {
@@ -855,7 +864,8 @@ globle void MarkFactPatternForIncrementalReset(
 /*   only active patterns in the fact pattern network.        */
 /**************************************************************/
 globle void FactsIncrementalReset(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct fact *factPtr;
 

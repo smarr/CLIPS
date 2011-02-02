@@ -105,6 +105,7 @@ globle void AddConstructToModule(
 /****************************************************/
 globle intBool DeleteNamedConstruct(
   void *theEnv,
+  EXEC_STATUS,
   char *constructName,
   struct construct *constructClass)
   {
@@ -165,6 +166,7 @@ globle intBool DeleteNamedConstruct(
 /*******************************************/
 globle void *FindNamedConstruct(
   void *theEnv,
+  EXEC_STATUS,
   char *constructName,
   struct construct *constructClass)
   {
@@ -240,6 +242,7 @@ globle void *FindNamedConstruct(
 /*****************************************/
 globle void UndefconstructCommand(
   void *theEnv,
+  EXEC_STATUS,
   char *command,
   struct construct *constructClass)
   {
@@ -296,6 +299,7 @@ globle void UndefconstructCommand(
 /******************************************/
 globle void PPConstructCommand(
   void *theEnv,
+  EXEC_STATUS,
   char *command,
   struct construct *constructClass)
   {
@@ -327,6 +331,7 @@ globle void PPConstructCommand(
 /***********************************/
 globle int PPConstruct(
   void *theEnv,
+  EXEC_STATUS,
   char *constructName,
   char *logicalName,
   struct construct *constructClass)
@@ -372,6 +377,7 @@ globle int PPConstruct(
 /*********************************************/
 globle SYMBOL_HN *GetConstructModuleCommand(
   void *theEnv,
+  EXEC_STATUS,
   char *command,
   struct construct *constructClass)
   {
@@ -413,6 +419,7 @@ globle SYMBOL_HN *GetConstructModuleCommand(
 /******************************************/
 globle struct defmodule *GetConstructModule(
   void *theEnv,
+  EXEC_STATUS,
   char *constructName,
   struct construct *constructClass)
   {
@@ -454,6 +461,7 @@ globle struct defmodule *GetConstructModule(
 /*************************************/
 globle intBool Undefconstruct(
   void *theEnv,
+  EXEC_STATUS,
   void *theConstruct,
   struct construct *constructClass)
   {
@@ -572,6 +580,7 @@ globle intBool Undefconstruct(
 /***********************************/
 globle void SaveConstruct(
   void *theEnv,
+  EXEC_STATUS,
   void *theModule,
   char *logicalName,
   struct construct *constructClass)
@@ -647,6 +656,7 @@ globle char *GetConstructNameString(
 #endif
 globle char *EnvGetConstructNameString(
   void *theEnv,
+  EXEC_STATUS,
   struct constructHeader *theConstruct)
   { 
 #if MAC_MCW || WIN_MCW || MAC_XCD
@@ -670,6 +680,7 @@ globle SYMBOL_HN *GetConstructNamePointer(
 /************************************************/
 globle void GetConstructListFunction(
   void *theEnv,
+  EXEC_STATUS,
   char *functionName,
   DATA_OBJECT_PTR returnValue,
   struct construct *constructClass)
@@ -748,6 +759,7 @@ globle void GetConstructListFunction(
 /********************************************/
 globle void GetConstructList(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue,
   struct construct *constructClass,
   struct defmodule *theModule)
@@ -929,6 +941,7 @@ globle void GetConstructList(
 /*********************************************/
 globle void ListConstructCommand(
   void *theEnv,
+  EXEC_STATUS,
   char *functionName,
   struct construct *constructClass)
   {
@@ -1000,6 +1013,7 @@ globle void ListConstructCommand(
 /*****************************************/
 globle void ListConstruct(
   void *theEnv,
+  EXEC_STATUS,
   struct construct *constructClass,
   char *logicalName,
   struct defmodule *theModule)
@@ -1121,6 +1135,7 @@ globle struct defmoduleItemHeader *GetConstructModuleItem(
 #endif
 globle char *GetConstructPPForm(
   void *theEnv,
+  EXEC_STATUS,
   struct constructHeader *theConstruct)
   { 
 #if MAC_MCW || WIN_MCW || MAC_XCD
@@ -1136,6 +1151,7 @@ globle char *GetConstructPPForm(
 /****************************************************/
 globle struct constructHeader *GetNextConstructItem(
   void *theEnv,
+  EXEC_STATUS,
   struct constructHeader *theConstruct,
   int moduleIndex)
   {
@@ -1162,6 +1178,7 @@ globle struct constructHeader *GetNextConstructItem(
 /*******************************************************/
 globle struct defmoduleItemHeader *GetConstructModuleItemByIndex(
   void *theEnv,
+  EXEC_STATUS,
   struct defmodule *theModule,
   int moduleIndex)
   {
@@ -1182,6 +1199,7 @@ globle struct defmoduleItemHeader *GetConstructModuleItemByIndex(
 /******************************************/
 globle void FreeConstructHeaderModule(
   void *theEnv,
+  EXEC_STATUS,
   struct defmoduleItemHeader *theModuleItem,
   struct construct *constructClass)
   {
@@ -1203,6 +1221,7 @@ globle void FreeConstructHeaderModule(
 /**********************************************/
 globle long DoForAllConstructs(
   void *theEnv,
+  EXEC_STATUS,
   void (*actionFunction)(void *,struct constructHeader *,void *),
   int moduleItemIndex,
   int interruptable,
@@ -1277,6 +1296,7 @@ globle long DoForAllConstructs(
 /******************************************************/
 globle void DoForAllConstructsInModule(
   void *theEnv,
+  EXEC_STATUS,
   void *theModule,
   void (*actionFunction)(void *,struct constructHeader *,void *),
   int moduleItemIndex,
@@ -1336,6 +1356,7 @@ globle void DoForAllConstructsInModule(
 /*****************************************************/
 globle void InitializeConstructHeader(
   void *theEnv,
+  EXEC_STATUS,
   char *constructType,
   struct constructHeader *theConstruct,
   SYMBOL_HN *theConstructName)
@@ -1361,6 +1382,7 @@ globle void InitializeConstructHeader(
 /*************************************************/
 globle void SetConstructPPForm(
   void *theEnv,
+  EXEC_STATUS,
   struct constructHeader *theConstruct,
   char *ppForm)
   {
@@ -1380,6 +1402,7 @@ globle void SetConstructPPForm(
 /******************************************************/
 globle unsigned ConstructPrintWatchAccess(
   void *theEnv,
+  EXEC_STATUS,
   struct construct *constructClass,
   char *logName,
   EXPRESSION *argExprs,
@@ -1396,6 +1419,7 @@ globle unsigned ConstructPrintWatchAccess(
 /**************************************************/
 globle unsigned ConstructSetWatchAccess(
   void *theEnv,
+  EXEC_STATUS,
   struct construct *constructClass,
   unsigned newState,
   EXPRESSION *argExprs,
@@ -1412,6 +1436,7 @@ globle unsigned ConstructSetWatchAccess(
 /******************************************************/
 static unsigned ConstructWatchSupport(
   void *theEnv,
+  EXEC_STATUS,
   struct construct *constructClass,
   char *funcName,
   char *logName,
@@ -1562,6 +1587,7 @@ static unsigned ConstructWatchSupport(
 /*************************************************/
 static void ConstructPrintWatch(
   void *theEnv,
+  EXEC_STATUS,
   char *logName,
   struct construct *constructClass,
   void *theConstruct,
@@ -1583,6 +1609,7 @@ static void ConstructPrintWatch(
 /*****************************************************/
 globle void *LookupConstruct(
   void *theEnv,
+  EXEC_STATUS,
   struct construct *constructClass,
   char *constructName,
   intBool moduleNameAllowed)
@@ -1638,7 +1665,8 @@ globle void *LookupConstruct(
 #pragma argsused
 #endif
 globle intBool ConstructsDeletable(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
 #if BLOAD_ONLY || RUN_TIME || ((! BLOAD) && (! BLOAD_AND_BSAVE))
 #if MAC_MCW || WIN_MCW || MAC_XCD

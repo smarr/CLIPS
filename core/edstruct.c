@@ -74,6 +74,7 @@ static void int_to_ascii(char [],int,int);
 #endif
 globle int usebuffer(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
 {
@@ -137,6 +138,7 @@ globle int usebuffer(
 #endif
 globle int killbuffer(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
 {
@@ -188,6 +190,7 @@ globle int killbuffer(
 #endif
 globle int listbuffers(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
 {
@@ -234,7 +237,8 @@ globle int listbuffers(
  * is an error (if there is no memory).
  */
 globle int makelist(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
 {
         register char   *cp1;
         register char   *cp2;
@@ -305,6 +309,7 @@ globle int makelist(
  */
 globle int addline(
   void *theEnv,
+  EXEC_STATUS,
   BUFFER *bufferp,
   char    *text)
 {
@@ -359,6 +364,7 @@ globle int anycb()
  */
 globle BUFFER  *bfind(
   void *theEnv,
+  EXEC_STATUS,
 char   *bname,
 int cflag,
 int bflag)
@@ -413,6 +419,7 @@ int bflag)
  */
 globle int bclear(
   void *theEnv,
+  EXEC_STATUS,
   BUFFER *bp)
 {
         register LINE   *lp;
@@ -459,6 +466,7 @@ globle int bclear(
  */
 globle LINE    *lalloc(
   void *theEnv,
+  EXEC_STATUS,
   int    used)
 {
         register LINE   *lp;
@@ -481,6 +489,7 @@ globle LINE    *lalloc(
  */
 globle void lfree(
   void *theEnv,
+  EXEC_STATUS,
   LINE   *lp)
 {
         register BUFFER *bp;
@@ -556,6 +565,7 @@ int    flag)
  */
 globle int linsert(
   void *theEnv,
+  EXEC_STATUS,
   int n,
   int c)
 {
@@ -642,7 +652,8 @@ globle int linsert(
  * split forces more updating.
  */
 globle int lnewline(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
 {
         register char   *cp1;
         register char   *cp2;
@@ -697,6 +708,7 @@ globle int lnewline(
  */
 globle int ldelete(
   void *theEnv,
+  EXEC_STATUS,
   long n,
   int kflag)
 {
@@ -766,7 +778,8 @@ globle int ldelete(
  * "ldelete" only.
  */
 globle int ldelnewline(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
 {
         register char   *cp1;
         register char   *cp2;
@@ -849,7 +862,8 @@ globle int ldelnewline(
  * in case the buffer has grown to immense size. No errors.
  */
 globle void kdelete(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
 {
         if (kbufp != NULL) {
                 genfree(theEnv,(void *) kbufp, (unsigned) ksize);
@@ -867,6 +881,7 @@ globle void kdelete(
  */
 globle int kinsert(
   void *theEnv,
+  EXEC_STATUS,
   int c)
 {
 #if  WIN_MVC || WIN_BTC
@@ -927,6 +942,7 @@ int n)
 #endif
 globle int reposition(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
     {
@@ -944,6 +960,7 @@ globle int reposition(
 #endif
 globle int EditorRefresh(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
     {
@@ -968,6 +985,7 @@ globle int EditorRefresh(
 #endif
 globle int nextwind(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
     {
@@ -991,6 +1009,7 @@ globle int nextwind(
 #endif
 globle int prevwind(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
     {
@@ -1020,6 +1039,7 @@ globle int prevwind(
  */
 globle int mvdnwind(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
     {
@@ -1038,6 +1058,7 @@ globle int mvdnwind(
 #endif
 globle int mvupwind(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
     {
@@ -1092,6 +1113,7 @@ globle int mvupwind(
 #endif
 globle int onlywind(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
 {
@@ -1144,6 +1166,7 @@ globle int onlywind(
 #endif
 globle int splitwind(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
 {
@@ -1223,6 +1246,7 @@ globle int splitwind(
  */
 globle int enlargewind(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
 {
@@ -1272,6 +1296,7 @@ globle int enlargewind(
  */
 globle int shrinkwind(
   void *theEnv,
+  EXEC_STATUS,
   int f,
   int n)
 {
@@ -1320,7 +1345,8 @@ globle int shrinkwind(
  * might be better. Return a pointer, or NULL on error.
  */
 globle WINDOW  *wpopup(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
 {
         register WINDOW *wp;
 
@@ -1361,7 +1387,8 @@ globle WINDOW  *wpopup(
  * redrawn on the first call to "update".
  */
 globle void vtinit(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
 {
     register int i;
 
@@ -1873,6 +1900,7 @@ globle void mlerase()
  */
 globle int mlyesno(
     void *theEnv,
+  EXEC_STATUS,
     char *prompt)
     {
     register int s;
@@ -1907,6 +1935,7 @@ globle int mlyesno(
  */
 globle int mlreply(
    void *theEnv,
+  EXEC_STATUS,
     char *prompt,
     char *buf,
     int nbuf)
@@ -2157,7 +2186,8 @@ globle void mlputli(
 
 
 globle void kill_video_buffers(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
     int i;
 

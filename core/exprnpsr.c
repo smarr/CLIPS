@@ -73,6 +73,7 @@
 /***************************************************/
 globle struct expr *Function0Parse(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName)
   {
    struct token theToken;
@@ -103,6 +104,7 @@ globle struct expr *Function0Parse(
 /*******************************************************/
 globle struct expr *Function1Parse(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName)
   {
    struct token theToken;
@@ -135,6 +137,7 @@ globle struct expr *Function1Parse(
 /****************************************************/
 globle struct expr *Function2Parse(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   char *name)
   {
@@ -328,6 +331,7 @@ globle struct expr *Function2Parse(
  **********************************************************************/
 globle intBool ReplaceSequenceExpansionOps(
   void *theEnv,
+  EXEC_STATUS,
   EXPRESSION *actions,
   EXPRESSION *fcallexp,
   void *expcall,
@@ -392,7 +396,8 @@ globle intBool ReplaceSequenceExpansionOps(
 /*   for the break/return functions.             */
 /*************************************************/
 globle void PushRtnBrkContexts(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    SAVED_CONTEXTS *svtmp;
 
@@ -408,7 +413,8 @@ globle void PushRtnBrkContexts(
 /*   for the break/return functions.               */
 /***************************************************/
 globle void PopRtnBrkContexts(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    SAVED_CONTEXTS *svtmp;
 
@@ -427,6 +433,7 @@ globle void PopRtnBrkContexts(
 /*****************************************************************/
 globle int CheckExpressionAgainstRestrictions(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *theExpression,
   char *restrictions,
   char *functionName)
@@ -555,6 +562,7 @@ globle int CheckExpressionAgainstRestrictions(
 /*******************************************************/
 globle struct expr *CollectArguments(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *top,
   char *logicalName)
   {
@@ -603,6 +611,7 @@ globle struct expr *CollectArguments(
 /********************************************/
 globle struct expr *ArgumentParse(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   int *errorFlag)
   {
@@ -662,6 +671,7 @@ globle struct expr *ArgumentParse(
 /************************************************************/
 globle struct expr *ParseAtomOrExpression(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   struct token *useToken)
   {
@@ -708,6 +718,7 @@ globle struct expr *ParseAtomOrExpression(
 /*********************************************/
 globle struct expr *GroupActions(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   struct token *theToken,
   int readFirstToken,
@@ -835,6 +846,7 @@ globle struct expr *GroupActions(
 /********************************************************/
 globle intBool EnvSetSequenceOperatorRecognition(
   void *theEnv,
+  EXEC_STATUS,
   int value)
   {
    int ov;
@@ -849,7 +861,8 @@ globle intBool EnvSetSequenceOperatorRecognition(
 /*   for the Get-sequence-operator-recognition function */
 /********************************************************/
 globle intBool EnvGetSequenceOperatorRecognition(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return(ExpressionData(theEnv)->SequenceOpMode);
   }
@@ -860,6 +873,7 @@ globle intBool EnvGetSequenceOperatorRecognition(
 /*******************************************/
 globle EXPRESSION *ParseConstantArguments(
   void *theEnv,
+  EXEC_STATUS,
   char *argstr,
   int *error)
   {
@@ -928,6 +942,7 @@ globle EXPRESSION *ParseConstantArguments(
 /*********************************************/
 globle struct expr *RemoveUnneededProgn(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *theExpression)
   {
    struct FunctionDefinition *fptr;

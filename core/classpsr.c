@@ -145,6 +145,7 @@ static void CreatePublicSlotMessageHandlers(void *,DEFCLASS *);
   ***************************************************************************************/
 globle int ParseDefclass(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource)
   {
    SYMBOL_HN *cname;
@@ -386,6 +387,7 @@ globle int ParseDefclass(
  ***********************************************************/
 static intBool ValidClassName(
   void *theEnv,
+  EXEC_STATUS,
   char *theClassName,
   DEFCLASS **theDefclass)
   {
@@ -441,6 +443,7 @@ static intBool ValidClassName(
  ***************************************************************/
 static intBool ParseSimpleQualifier(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   char *classQualifier,
   char *clearRelation,
@@ -491,6 +494,7 @@ ParseSimpleQualifierError:
  ***************************************************/
 static intBool ReadUntilClosingParen(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   struct token *inputToken)
   {
@@ -549,6 +553,7 @@ static intBool ReadUntilClosingParen(
  *****************************************************************************/
 static void AddClass(
   void *theEnv,
+  EXEC_STATUS,
   DEFCLASS *cls)
   {
    DEFCLASS *ctmp;
@@ -633,6 +638,7 @@ static void AddClass(
  *******************************************************/
 static void BuildSubclassLinks(
   void *theEnv,
+  EXEC_STATUS,
   DEFCLASS *cls)
   {
    long i;
@@ -654,6 +660,7 @@ static void BuildSubclassLinks(
  **********************************************************/
 static void FormInstanceTemplate(
   void *theEnv,
+  EXEC_STATUS,
   DEFCLASS *cls)
   {
    TEMP_SLOT_LINK *islots = NULL,*stmp;
@@ -715,6 +722,7 @@ static void FormInstanceTemplate(
  **********************************************************/
 static void FormSlotNameMap(
   void *theEnv,
+  EXEC_STATUS,
   DEFCLASS *cls)
   {
    long i;
@@ -750,6 +758,7 @@ static void FormSlotNameMap(
  *******************************************************************/
 static TEMP_SLOT_LINK *MergeSlots(
   void *theEnv,
+  EXEC_STATUS,
   TEMP_SLOT_LINK *old,
   DEFCLASS *cls,
   short *scnt,
@@ -804,6 +813,7 @@ static TEMP_SLOT_LINK *MergeSlots(
  ***********************************************************************/
 static void PackSlots(
   void *theEnv,
+  EXEC_STATUS,
   DEFCLASS *cls,
   TEMP_SLOT_LINK *slots)
   {
@@ -846,6 +856,7 @@ static void PackSlots(
  ********************************************************/
 globle void *CreateClassScopeMap(
   void *theEnv,
+  EXEC_STATUS,
   DEFCLASS *theDefclass)
   {
    unsigned scopeMapSize;
@@ -911,6 +922,7 @@ globle void *CreateClassScopeMap(
  ******************************************************************************/
 static void CreatePublicSlotMessageHandlers(
   void *theEnv,
+  EXEC_STATUS,
   DEFCLASS *theDefclass)
   {
    long i;
