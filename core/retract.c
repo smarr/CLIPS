@@ -81,6 +81,7 @@
 /************************************************************/
 globle void NetworkRetract(
   void *theEnv,
+  EXEC_STATUS,
   struct patternMatch *listOfMatchedPatterns)
   {
    struct patternMatch *tempMatch, *nextMatch;
@@ -115,6 +116,7 @@ globle void NetworkRetract(
 /***************************************************************/
 globle void PosEntryRetractAlpha(
   void *theEnv,
+  EXEC_STATUS,
   struct partialMatch *alphaMatch)
   {
    struct partialMatch *betaMatch, *tempMatch;
@@ -155,6 +157,7 @@ globle void PosEntryRetractAlpha(
 /***************************************************************/
 static void NegEntryRetractAlpha(
   void *theEnv,
+  EXEC_STATUS,
   struct partialMatch *alphaMatch)
   {
    struct partialMatch *betaMatch;
@@ -184,6 +187,7 @@ static void NegEntryRetractAlpha(
 /***************************************************************/
 static void NegEntryRetractBeta(
   void *theEnv,
+  EXEC_STATUS,
   struct joinNode *joinPtr,
   struct partialMatch *alphaMatch,
   struct partialMatch *betaMatch)
@@ -241,6 +245,7 @@ static void NegEntryRetractBeta(
 /***************************************************************/
 globle void PosEntryRetractBeta(
   void *theEnv,
+  EXEC_STATUS,
   struct partialMatch *parentMatch,
   struct partialMatch *betaMatch)
   {
@@ -288,6 +293,7 @@ globle void PosEntryRetractBeta(
 /******************************************************************/
 static intBool FindNextConflictingMatch(
   void *theEnv,
+  EXEC_STATUS,
   struct partialMatch *theBind,
   struct partialMatch *possibleConflicts,
   struct joinNode *theJoin,
@@ -427,6 +433,7 @@ static intBool FindNextConflictingMatch(
 /***********************************************************/
 static intBool PartialMatchDefunct(
   void *theEnv,
+  EXEC_STATUS,
   struct partialMatch *thePM)
   {
    register unsigned short i;
@@ -449,6 +456,7 @@ static intBool PartialMatchDefunct(
 /***************************************************/
 void DeletePartialMatches(
   void *theEnv,
+  EXEC_STATUS,
   struct partialMatch *listOfPMs)
   {
    struct partialMatch *nextPM;
@@ -498,6 +506,7 @@ void DeletePartialMatches(
 /**************************************************************/
 globle void ReturnPartialMatch(
   void *theEnv,
+  EXEC_STATUS,
   struct partialMatch *waste)
   {
    /*==============================================*/
@@ -550,6 +559,7 @@ globle void ReturnPartialMatch(
 /***************************************************************/
 globle void DestroyPartialMatch(
   void *theEnv,
+  EXEC_STATUS,
   struct partialMatch *waste)
   {
    /*======================================================*/
@@ -590,6 +600,7 @@ globle void DestroyPartialMatch(
 /******************************************************/
 static void ReturnMarkers(
   void *theEnv,
+  EXEC_STATUS,
   struct multifieldMarker *waste)
   {
    struct multifieldMarker *temp;
@@ -611,7 +622,8 @@ static void ReturnMarkers(
 /*   data structures through the alpha memory bindings.      */
 /*************************************************************/
 globle void FlushGarbagePartialMatches(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct partialMatch *pmPtr;
    struct alphaMatch *amPtr;

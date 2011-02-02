@@ -62,7 +62,8 @@ struct sortFunctionData
 /*   the sorting functions.             */
 /****************************************/
 globle void SortFunctionDefinitions(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    AllocateEnvironmentData(theEnv,SORTFUN_DATA,sizeof(struct sortFunctionData),DeallocateSortFunctionData);
 #if ! RUN_TIME
@@ -75,7 +76,8 @@ globle void SortFunctionDefinitions(
 /*    data for the sort function.                      */
 /*******************************************************/
 static void DeallocateSortFunctionData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    ReturnExpression(theEnv,SortFunctionData(theEnv)->SortComparisonFunction);
   }
@@ -85,6 +87,7 @@ static void DeallocateSortFunctionData(
 /**************************************/
 static int DefaultCompareSwapFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *item1,
   DATA_OBJECT *item2)
   {
@@ -111,6 +114,7 @@ static int DefaultCompareSwapFunction(
 /**************************************/
 globle void SortFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
    long argumentCount, i, j, k = 0;
@@ -294,6 +298,7 @@ globle void SortFunction(
 /*******************************************/
 void MergeSort(
   void *theEnv,
+  EXEC_STATUS,
   unsigned long listSize,
   DATA_OBJECT *theList,
   int (*swapFunction)(void *,DATA_OBJECT *,DATA_OBJECT  *))
@@ -332,6 +337,7 @@ void MergeSort(
 /******************************************************/
 static void DoMergeSort(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *theList,
   DATA_OBJECT *tempList,
   unsigned long s1,

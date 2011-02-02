@@ -56,7 +56,8 @@
 /* InitializeStringRouter: Initializes string I/O router. */
 /**********************************************************/
 globle void InitializeStringRouter(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    AllocateEnvironmentData(theEnv,STRING_ROUTER_DATA,sizeof(struct stringRouterData),DeallocateStringRouterData);
 
@@ -68,7 +69,8 @@ globle void InitializeStringRouter(
 /*    environment data for string routers. */
 /*******************************************/
 static void DeallocateStringRouterData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct stringRouter *tmpPtr, *nextPtr;
    
@@ -87,6 +89,7 @@ static void DeallocateStringRouterData(
 /*************************************************************/
 static int FindString(
   void *theEnv,
+  EXEC_STATUS,
   char *fileid)
   {
    struct stringRouter *head;
@@ -107,6 +110,7 @@ static int FindString(
 /**************************************************/
 static int PrintString(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   char *str)
   {
@@ -138,6 +142,7 @@ static int PrintString(
 /************************************************/
 static int GetcString(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName)
   {
    struct stringRouter *head;
@@ -171,6 +176,7 @@ static int GetcString(
 #endif
 static int UngetcString(
   void *theEnv,
+  EXEC_STATUS,
   int ch,
   char *logicalName)
   {
@@ -199,6 +205,7 @@ static int UngetcString(
 /************************************************/
 globle int OpenStringSource(
   void *theEnv,
+  EXEC_STATUS,
   char *name,
   char *str,
   size_t currentPosition)
@@ -222,6 +229,7 @@ globle int OpenStringSource(
 /******************************************************/
 globle int OpenTextSource(
   void *theEnv,
+  EXEC_STATUS,
   char *name,
   char *str,
   size_t currentPosition,
@@ -241,6 +249,7 @@ globle int OpenTextSource(
 /******************************************************************/
 static int CreateReadStringSource(
   void *theEnv,
+  EXEC_STATUS,
   char *name,
   char *str,
   size_t currentPosition,
@@ -268,6 +277,7 @@ static int CreateReadStringSource(
 /**********************************************/
 globle int CloseStringSource(
   void *theEnv,
+  EXEC_STATUS,
   char *name)
   {
    struct stringRouter *head, *last;
@@ -305,6 +315,7 @@ globle int CloseStringSource(
 /******************************************************************/
 globle int OpenStringDestination(
   void *theEnv,
+  EXEC_STATUS,
   char *name,
   char *str,
   size_t maximumPosition)
@@ -331,6 +342,7 @@ globle int OpenStringDestination(
 /***************************************************/
 globle int CloseStringDestination(
   void *theEnv,
+  EXEC_STATUS,
   char *name)
   {
    return(CloseStringSource(theEnv,name));
@@ -341,6 +353,7 @@ globle int CloseStringDestination(
 /*******************************************************************/
 static struct stringRouter *FindStringRouter(
   void *theEnv,
+  EXEC_STATUS,
   char *name)
   {
    struct stringRouter *head;

@@ -189,6 +189,7 @@ static void DeallocateTextProcessingData(void *);
 /****************************************************************************/
 globle int TextLookupFetch(
   void *theEnv,
+  EXEC_STATUS,
   char *file)
   {
    FILE *fp;                     /*Pointer into stream of input file      */
@@ -315,6 +316,7 @@ globle int TextLookupFetch(
 /******************************************************************************/
 globle int TextLookupToss(
   void *theEnv,
+  EXEC_STATUS,
   char *file)
   {
    struct lists *plptr, *clptr;
@@ -369,6 +371,7 @@ globle int TextLookupToss(
 /******************************************************************************/
 static FILE *GetEntries(
   void *theEnv,
+  EXEC_STATUS,
   char *file,
   char **menu,
   char *name,
@@ -407,6 +410,7 @@ static FILE *GetEntries(
 /******************************************************************************/
 static FILE *GetCurrentMenu(
   void *theEnv,
+  EXEC_STATUS,
   char *file,
   int *status)
   {
@@ -483,6 +487,7 @@ static FILE *GetCurrentMenu(
 /******************************************************************************/
 static char *grab_string(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp,
   char *buf,
   int bufsize)
@@ -550,6 +555,7 @@ static void upper(
 /******************************************************************************/
 static struct lists *NewFetchFile(
   void *theEnv,
+  EXEC_STATUS,
   char *file)
   {
    struct lists *lptr = NULL, *lnode;
@@ -597,6 +603,7 @@ static struct lists *NewFetchFile(
 /******************************************************************************/
 static struct entries *AllocateEntryNode(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp,
   char *file,
   char *str,
@@ -691,6 +698,7 @@ static struct entries *AllocateEntryNode(
 /******************************************************************************/
 static int AttachLeaf(
   void *theEnv,
+  EXEC_STATUS,
   struct lists *lnode,
   struct entries *enode,
   FILE *fp,
@@ -815,6 +823,7 @@ static int AttachLeaf(
 /******************************************************************************/
 static long int LookupEntry(
   void *theEnv,
+  EXEC_STATUS,
   char *file,
   char **menu,
   char *name,
@@ -943,6 +952,7 @@ static long int LookupEntry(
 /******************************************************************************/
 static void TossFunction(
   void *theEnv,
+  EXEC_STATUS,
   struct entries *eptr)
   {
    struct entries *prev;
@@ -1029,7 +1039,8 @@ static FILE *FindTopicInEntries(void *,char *,struct topics *,char **,int *);
 #if HELP_FUNCTIONS
 
 globle void HelpFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    int status;                     /*Return code from the lookup routines */
    FILE *fp;                       /*Pointer in to the help file stream   */
@@ -1203,7 +1214,8 @@ globle void HelpFunction(
 /*          If no argument is given, it displays the current file name.    */
 /***************************************************************************/
 globle void HelpPathFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    char *help_name;
    DATA_OBJECT arg_ptr;
@@ -1255,6 +1267,7 @@ globle void HelpPathFunction(
 /***************************************************************************/
 globle void FetchCommand(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    int load_ct;          /*Number of entries loaded */
@@ -1297,7 +1310,8 @@ globle void FetchCommand(
 /* For usage, see the external documentation.                                 */
 /******************************************************************************/
 globle int PrintRegionCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct topics *params,    /*Lookup file and list of topic requests  */
                  *tptr;      /*Used in deallocating the parameter list */
@@ -1347,7 +1361,8 @@ globle int PrintRegionCommand(
 /*FUNCTION GetRegionCommand : (H/L functionget-region)                 */
 /******************************************************************************/
 globle void *GetRegionCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct topics *params,    /*Lookup file and list of topic requests  */
                  *tptr;      /*Used in deallocating the parameter list */
@@ -1417,7 +1432,8 @@ globle void *GetRegionCommand(
 /*          returns a (float) boolean flag indicating failure or success.  */
 /***************************************************************************/
 globle int TossCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    char *file;   /*Name of the file */
    DATA_OBJECT arg_ptr;
@@ -1456,6 +1472,7 @@ globle int TossCommand(
 #endif
 static int RecognizeHelpRouters(
   void *theEnv,
+  EXEC_STATUS,
   char *log_name)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
@@ -1472,6 +1489,7 @@ static int RecognizeHelpRouters(
 #endif
 static int HelpPrint(
   void *theEnv,
+  EXEC_STATUS,
   char *log_name,
   char *str)
   {
@@ -1488,6 +1506,7 @@ static int HelpPrint(
 #endif
 static int HelpGetc(
   void *theEnv,
+  EXEC_STATUS,
   char *log_name)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
@@ -1502,6 +1521,7 @@ static int HelpGetc(
 #endif
 static int HelpUngetc(
   void *theEnv,
+  EXEC_STATUS,
   int ch,
   char *log_name)
   {
@@ -1529,7 +1549,8 @@ static int HelpUngetc(
 /*          the list or NULL if there were no command line topics.            */
 /******************************************************************************/
 static struct topics *GetCommandLineTopics(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    int topic_num,         /*Number of topics specified by the user */
        theIndex;             /*Used to loop through the topic list    */
@@ -1582,6 +1603,7 @@ static struct topics *GetCommandLineTopics(
 
 static struct topics *AskForNewHelpTopic(
   void *theEnv,
+  EXEC_STATUS,
   struct topics *old_list,
   char **menu)
   {
@@ -1699,6 +1721,7 @@ static struct topics *AskForNewHelpTopic(
 /******************************************************************************/
 static FILE *FindTopicInEntries(
   void *theEnv,
+  EXEC_STATUS,
   char *file,
   struct topics *main_topic,
   char **menu,
@@ -1754,7 +1777,8 @@ static FILE *FindTopicInEntries(
 /* HelpFunctionDefinitions:                */
 /*******************************************/
 globle void HelpFunctionDefinitions(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    AllocateEnvironmentData(theEnv,TEXTPRO_DATA,sizeof(struct textProcessingData),DeallocateTextProcessingData);
 #if ! RUN_TIME
@@ -1777,7 +1801,8 @@ globle void HelpFunctionDefinitions(
 /*    data for text processing routines.                 */
 /*********************************************************/
 static void DeallocateTextProcessingData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct lists *nextptr, *clptr;
 

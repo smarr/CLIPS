@@ -70,6 +70,7 @@
 /**************************************************************/
 globle void AtomicValuesToCode(
   void *theEnv,
+  EXEC_STATUS,
   char *fileName,
   char *pathName,
   char *fileNameBuffer)
@@ -94,6 +95,7 @@ globle void AtomicValuesToCode(
 /*****************************************************/
 static int SymbolHashNodesToCode(
   void *theEnv,
+  EXEC_STATUS,
   char *fileName,
   char *pathName,
   char *fileNameBuffer,
@@ -196,6 +198,7 @@ static int SymbolHashNodesToCode(
 /******************************************************/
 static int BitMapHashNodesToCode(
   void *theEnv,
+  EXEC_STATUS,
   char *fileName,
   char *pathName,
   char *fileNameBuffer,
@@ -310,6 +313,7 @@ static int BitMapHashNodesToCode(
 /*****************************************************/
 static int BitMapValuesToCode(
   void *theEnv,
+  EXEC_STATUS,
   char *fileName,
   char *pathName,
   char *fileNameBuffer,
@@ -423,6 +427,7 @@ static int BitMapValuesToCode(
 /****************************************************/
 static int FloatHashNodesToCode(
   void *theEnv,
+  EXEC_STATUS,
   char *fileName,
   char *pathName,
   char *fileNameBuffer,
@@ -525,6 +530,7 @@ static int FloatHashNodesToCode(
 /******************************************************/
 static int IntegerHashNodesToCode(
   void *theEnv,
+  EXEC_STATUS,
   char *fileName,
   char *pathName,
   char *fileNameBuffer,
@@ -627,6 +633,7 @@ static int IntegerHashNodesToCode(
 /****************************************************************/
 static int HashTablesToCode(
   void *theEnv,
+  EXEC_STATUS,
   char *fileName,
   char *pathName,
   char *fileNameBuffer)
@@ -738,6 +745,7 @@ static int HashTablesToCode(
 /*****************************************************/
 globle void PrintSymbolReference(
   void *theEnv,
+  EXEC_STATUS,
   FILE *theFile,
   struct symbolHashNode *theSymbol)
   {
@@ -754,6 +762,7 @@ globle void PrintSymbolReference(
 /****************************************************/
 globle void PrintFloatReference(
   void *theEnv,
+  EXEC_STATUS,
   FILE *theFile,
   struct floatHashNode *theFloat)
   {
@@ -769,6 +778,7 @@ globle void PrintFloatReference(
 /******************************************************/
 globle void PrintIntegerReference(
   void *theEnv,
+  EXEC_STATUS,
   FILE *theFile,
   struct integerHashNode *theInteger)
   {
@@ -784,6 +794,7 @@ globle void PrintIntegerReference(
 /*****************************************************/
 globle void PrintBitMapReference(
   void *theEnv,
+  EXEC_STATUS,
   FILE *theFile,
   struct bitMapHashNode *theBitMap)
   {

@@ -84,7 +84,8 @@
 /* DefruleCommands: Initializes defrule commands and functions. */
 /****************************************************************/
 globle void DefruleCommands(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
 #if ! RUN_TIME
    EnvDefineFunction2(theEnv,"run",'v', PTIEF RunCommand,"RunCommand", "*1i");
@@ -152,7 +153,8 @@ globle void DefruleCommands(
 /*   for the get-beta-memory-resizing command. */
 /***********************************************/
 globle intBool EnvGetBetaMemoryResizing(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {   
    return(DefruleData(theEnv)->BetaMemoryResizingFlag);
   }
@@ -163,6 +165,7 @@ globle intBool EnvGetBetaMemoryResizing(
 /***********************************************/
 globle intBool EnvSetBetaMemoryResizing(
   void *theEnv,
+  EXEC_STATUS,
   int value)
   {
    int ov;
@@ -179,7 +182,8 @@ globle intBool EnvSetBetaMemoryResizing(
 /*   for the set-beta-memory-resizing command.      */
 /****************************************************/
 globle int SetBetaMemoryResizingCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    int oldValue;
    DATA_OBJECT argPtr;
@@ -217,7 +221,8 @@ globle int SetBetaMemoryResizingCommand(
 /*   for the get-beta-memory-resizing command.      */
 /****************************************************/
 globle int GetBetaMemoryResizingCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    int oldValue;
 
@@ -236,7 +241,8 @@ globle int GetBetaMemoryResizingCommand(
 /*   for the matches command.           */
 /****************************************/
 globle void MatchesCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    char *ruleName;
    void *rulePtr;
@@ -260,6 +266,7 @@ globle void MatchesCommand(
 /********************************/
 globle intBool EnvMatches(
   void *theEnv,
+  EXEC_STATUS,
   void *theRule)
   {
    struct defrule *rulePtr, *tmpPtr;
@@ -325,6 +332,7 @@ globle intBool EnvMatches(
 /*********************/
 static int ListAlphaMatches(
   void *theEnv,
+  EXEC_STATUS,
   struct joinNode *theJoin,
   int priorPatterns)
   {
@@ -396,6 +404,7 @@ static int ListAlphaMatches(
 /********************/
 static int ListBetaMatches(
   void *theEnv,
+  EXEC_STATUS,
   struct joinNode *theJoin,
   int blockStart)
   {
@@ -447,6 +456,7 @@ static int ListBetaMatches(
 #endif
 static void PrintMatchesMemory(
   void *theEnv,
+  EXEC_STATUS,
   struct joinNode *theJoin,
   struct betaMemory *theMemory,
   int startCE, 
@@ -496,7 +506,8 @@ static void PrintMatchesMemory(
 /*   for the join-activity command.        */
 /*******************************************/
 globle long long JoinActivityCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    char *ruleName;
    void *rulePtr;
@@ -520,6 +531,7 @@ globle long long JoinActivityCommand(
 /*************************************/
 globle long long EnvJoinActivity(
   void *theEnv,
+  EXEC_STATUS,
   void *theRule,
   int verbosity)
   {
@@ -556,6 +568,7 @@ globle long long EnvJoinActivity(
 /*************************/
 static int ListBetaJoinActivity(
   void *theEnv,
+  EXEC_STATUS,
   struct joinNode *theJoin,
   int blockStart,
   long long *activity,
@@ -624,7 +637,8 @@ static int ListBetaJoinActivity(
 /*   for the matches-count command.        */
 /*******************************************/
 globle void MatchesCountCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    char *ruleName;
    void *rulePtr;
@@ -648,6 +662,7 @@ globle void MatchesCountCommand(
 /*************************************/
 globle intBool EnvMatchesCount(
   void *theEnv,
+  EXEC_STATUS,
   void *theRule)
   {
    struct defrule *rulePtr, *tmpPtr;
@@ -830,7 +845,8 @@ globle intBool EnvMatchesCount(
 /*   for the timetag function.         */
 /***************************************/
 globle long long TimetagFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DATA_OBJECT item;
    void *ptr;
@@ -852,7 +868,8 @@ globle long long TimetagFunction(
 /*   for the rule-complexity function.         */
 /***********************************************/
 globle long RuleComplexityCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    char *ruleName;
    struct defrule *rulePtr;
@@ -875,7 +892,8 @@ globle long RuleComplexityCommand(
 /*   for the show-joins command.          */
 /******************************************/
 globle void ShowJoinsCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    char *ruleName;
    void *rulePtr;
@@ -901,6 +919,7 @@ globle void ShowJoinsCommand(
 /*********************************/
 static void ShowJoins(
   void *theEnv,
+  EXEC_STATUS,
   void *theRule)
   {
    struct defrule *rulePtr;
@@ -981,7 +1000,8 @@ static void ShowJoins(
 /*   in each slot of the alpha hash table.            */
 /******************************************************/
 globle void ShowAlphaHashTable(
-   void *theEnv)
+   void *theEnv,
+  EXEC_STATUS)
    {
     int i, count;
     long totalCount = 0;

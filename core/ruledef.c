@@ -87,7 +87,8 @@
 /* InitializeDefrules: Initializes the defrule construct. */
 /**********************************************************/
 globle void InitializeDefrules(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {   
    unsigned long i;
    AllocateEnvironmentData(theEnv,DEFRULE_DATA,sizeof(struct defruleData),DeallocateDefruleData);
@@ -132,7 +133,8 @@ globle void InitializeDefrules(
 /*    data for the defrule construct.             */
 /**************************************************/
 static void DeallocateDefruleData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct defruleModule *theModuleItem;
    void *theModule;
@@ -191,6 +193,7 @@ static void DeallocateDefruleData(
 #endif
 static void DestroyDefruleAction(
   void *theEnv,
+  EXEC_STATUS,
   struct constructHeader *theConstruct,
   void *buffer)
   {
@@ -207,7 +210,8 @@ static void DestroyDefruleAction(
 /*   construct for use with the defmodule construct. */
 /*****************************************************/
 static void InitializeDefruleModules(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DefruleData(theEnv)->DefruleModuleIndex = RegisterModuleItem(theEnv,"defrule",
                                     AllocateModule,
@@ -229,7 +233,8 @@ static void InitializeDefruleModules(
 /* AllocateModule: Allocates a defrule module. */
 /***********************************************/
 static void *AllocateModule(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct defruleModule *theItem;
 
@@ -244,6 +249,7 @@ static void *AllocateModule(
 /*********************************************/
 static void ReturnModule(
   void *theEnv,
+  EXEC_STATUS,
   void *theItem)
   {
    FreeConstructHeaderModule(theEnv,(struct defmoduleItemHeader *) theItem,DefruleData(theEnv)->DefruleConstruct);
@@ -256,6 +262,7 @@ static void ReturnModule(
 /************************************************************/
 globle struct defruleModule *GetDefruleModuleItem(
   void *theEnv,
+  EXEC_STATUS,
   struct defmodule *theModule)
   {   
    return((struct defruleModule *) GetConstructModuleItemByIndex(theEnv,theModule,DefruleData(theEnv)->DefruleModuleIndex)); 
@@ -267,6 +274,7 @@ globle struct defruleModule *GetDefruleModuleItem(
 /*******************************************************************/
 globle void *EnvFindDefrule(
   void *theEnv,
+  EXEC_STATUS,
   char *defruleName)
   {   
    return(FindNamedConstruct(theEnv,defruleName,DefruleData(theEnv)->DefruleConstruct)); 
@@ -280,6 +288,7 @@ globle void *EnvFindDefrule(
 /************************************************************/
 globle void *EnvGetNextDefrule(
   void *theEnv,
+  EXEC_STATUS,
   void *defrulePtr)
   {   
    return((void *) GetNextConstructItem(theEnv,(struct constructHeader *) defrulePtr,DefruleData(theEnv)->DefruleModuleIndex)); 
@@ -291,6 +300,7 @@ globle void *EnvGetNextDefrule(
 /*******************************************************/
 globle intBool EnvIsDefruleDeletable(
   void *theEnv,
+  EXEC_STATUS,
   void *vTheDefrule)
   {
    struct defrule *theDefrule;
@@ -316,6 +326,7 @@ globle intBool EnvIsDefruleDeletable(
 /******************************************/
 globle void DefruleRunTimeInitialize(
   void *theEnv,
+  EXEC_STATUS,
   struct joinLink *rightPrime,
   struct joinLink *leftPrime)
   {
@@ -352,6 +363,7 @@ globle void DefruleRunTimeInitialize(
 /******************************************/
 static void AddBetaMemoriesToRule(
   void *theEnv,
+  EXEC_STATUS,
   struct joinNode *theNode)
   {
    AddBetaMemoriesToJoin(theEnv,theNode);
@@ -372,6 +384,7 @@ static void AddBetaMemoriesToRule(
 /******************************************/
 globle void AddBetaMemoriesToJoin(
   void *theEnv,
+  EXEC_STATUS,
   struct joinNode *theNode)
   {   
    if ((theNode->leftMemory != NULL) || (theNode->rightMemory != NULL))

@@ -81,7 +81,8 @@
 /* DeftemplateFunctions: Initializes the deftemplate functions. */
 /****************************************************************/
 globle void DeftemplateFunctions(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
 #if ! RUN_TIME
    EnvDefineFunction(theEnv,"modify",'u', PTIEF ModifyCommand,"ModifyCommand");
@@ -134,6 +135,7 @@ globle void DeftemplateFunctions(
 /*********************************************************************/
 globle void ModifyCommand(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
    DuplicateModifyCommand(theEnv,TRUE,returnValue);
@@ -145,6 +147,7 @@ globle void ModifyCommand(
 /***************************************************************************/
 globle void DuplicateCommand(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
    DuplicateModifyCommand(theEnv,FALSE,returnValue);
@@ -160,6 +163,7 @@ globle void DuplicateCommand(
 /***************************************************************/
 static void DuplicateModifyCommand(
   void *theEnv,
+  EXEC_STATUS,
   int retractIt,
   DATA_OBJECT_PTR returnValue)
   {
@@ -430,6 +434,7 @@ static void DuplicateModifyCommand(
 /****************************************************/
 globle void DeftemplateSlotNamesFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *returnValue)
   {
    char *deftemplateName;
@@ -475,6 +480,7 @@ globle void DeftemplateSlotNamesFunction(
 /**********************************************/
 globle void EnvDeftemplateSlotNames(
   void *theEnv,
+  EXEC_STATUS,
   void *vTheDeftemplate,
   DATA_OBJECT *returnValue)
   {
@@ -537,7 +543,8 @@ globle void EnvDeftemplateSlotNames(
 /*   for the deftemplate-slot-defaultp function.       */
 /*******************************************************/
 globle void *DeftemplateSlotDefaultPFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct deftemplate *theDeftemplate;
    SYMBOL_HN *slotName;
@@ -571,6 +578,7 @@ globle void *DeftemplateSlotDefaultPFunction(
 /*************************************************/
 globle int EnvDeftemplateSlotDefaultP(
   void *theEnv,
+  EXEC_STATUS,
   void *vTheDeftemplate,
   char *slotName)
   {
@@ -629,6 +637,7 @@ globle int EnvDeftemplateSlotDefaultP(
 /*************************************************************/
 globle void DeftemplateSlotDefaultValueFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR theValue)
   {
    struct deftemplate *theDeftemplate;
@@ -659,6 +668,7 @@ globle void DeftemplateSlotDefaultValueFunction(
 /******************************************************/
 globle intBool EnvDeftemplateSlotDefaultValue(
   void *theEnv,
+  EXEC_STATUS,
   void *vTheDeftemplate,
   char *slotName,
   DATA_OBJECT_PTR theValue)
@@ -740,6 +750,7 @@ globle intBool EnvDeftemplateSlotDefaultValue(
 /**********************************************************/
 globle void DeftemplateSlotCardinalityFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR theValue)
   {
    struct deftemplate *theDeftemplate;
@@ -769,6 +780,7 @@ globle void DeftemplateSlotCardinalityFunction(
 /****************************************************/
 globle void EnvDeftemplateSlotCardinality(
   void *theEnv,
+  EXEC_STATUS,
   void *vTheDeftemplate,
   char *slotName,
   DATA_OBJECT *result)
@@ -857,6 +869,7 @@ globle void EnvDeftemplateSlotCardinality(
 /************************************************************/
 globle void DeftemplateSlotAllowedValuesFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR theValue)
   {
    struct deftemplate *theDeftemplate;
@@ -886,6 +899,7 @@ globle void DeftemplateSlotAllowedValuesFunction(
 /*******************************************************/
 globle void EnvDeftemplateSlotAllowedValues(
   void *theEnv,
+  EXEC_STATUS,
   void *vTheDeftemplate,
   char *slotName,
   DATA_OBJECT *result)
@@ -966,6 +980,7 @@ globle void EnvDeftemplateSlotAllowedValues(
 /****************************************************/
 globle void DeftemplateSlotRangeFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR theValue)
   {
    struct deftemplate *theDeftemplate;
@@ -995,6 +1010,7 @@ globle void DeftemplateSlotRangeFunction(
 /**********************************************/
 globle void EnvDeftemplateSlotRange(
   void *theEnv,
+  EXEC_STATUS,
   void *vTheDeftemplate,
   char *slotName,
   DATA_OBJECT *result)
@@ -1077,6 +1093,7 @@ globle void EnvDeftemplateSlotRange(
 /****************************************************/
 globle void DeftemplateSlotTypesFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR theValue)
   {
    struct deftemplate *theDeftemplate;
@@ -1106,6 +1123,7 @@ globle void DeftemplateSlotTypesFunction(
 /**********************************************/
 globle void EnvDeftemplateSlotTypes(
   void *theEnv,
+  EXEC_STATUS,
   void *vTheDeftemplate,
   char *slotName,
   DATA_OBJECT *result)
@@ -1246,7 +1264,8 @@ globle void EnvDeftemplateSlotTypes(
 /*   for the deftemplate-slot-multip function.       */
 /*****************************************************/
 globle int DeftemplateSlotMultiPFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct deftemplate *theDeftemplate;
    SYMBOL_HN *slotName;
@@ -1272,6 +1291,7 @@ globle int DeftemplateSlotMultiPFunction(
 /***********************************************/
 globle int EnvDeftemplateSlotMultiP(
   void *theEnv,
+  EXEC_STATUS,
   void *vTheDeftemplate,
   char *slotName)
   {
@@ -1322,7 +1342,8 @@ globle int EnvDeftemplateSlotMultiP(
 /*   for the deftemplate-slot-singlep function.       */
 /******************************************************/
 globle int DeftemplateSlotSinglePFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct deftemplate *theDeftemplate;
    SYMBOL_HN *slotName;
@@ -1348,6 +1369,7 @@ globle int DeftemplateSlotSinglePFunction(
 /************************************************/
 globle int EnvDeftemplateSlotSingleP(
   void *theEnv,
+  EXEC_STATUS,
   void *vTheDeftemplate,
   char *slotName)
   {
@@ -1398,7 +1420,8 @@ globle int EnvDeftemplateSlotSingleP(
 /*   for the deftemplate-slot-existp function.       */
 /*****************************************************/
 globle int DeftemplateSlotExistPFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct deftemplate *theDeftemplate;
    SYMBOL_HN *slotName;
@@ -1424,6 +1447,7 @@ globle int DeftemplateSlotExistPFunction(
 /************************************************/
 globle int EnvDeftemplateSlotExistP(
   void *theEnv,
+  EXEC_STATUS,
   void *vTheDeftemplate,
   char *slotName)
   {
@@ -1463,7 +1487,8 @@ globle int EnvDeftemplateSlotExistP(
 /*   for the deftemplate-slot-facet-existp function.      */
 /**********************************************************/
 globle int DeftemplateSlotFacetExistPFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct deftemplate *theDeftemplate;
    SYMBOL_HN *slotName;
@@ -1497,6 +1522,7 @@ globle int DeftemplateSlotFacetExistPFunction(
 /*****************************************************/
 globle int EnvDeftemplateSlotFacetExistP(
   void *theEnv,
+  EXEC_STATUS,
   void *vTheDeftemplate,
   char *slotName,
   char *facetName)
@@ -1548,6 +1574,7 @@ globle int EnvDeftemplateSlotFacetExistP(
 /*********************************************************/
 globle void DeftemplateSlotFacetValueFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *returnValue)
   {
    struct deftemplate *theDeftemplate;
@@ -1589,6 +1616,7 @@ globle void DeftemplateSlotFacetValueFunction(
 /****************************************************/
 globle int EnvDeftemplateSlotFacetValue(
   void *theEnv,
+  EXEC_STATUS,
   void *vTheDeftemplate,
   char *slotName,
   char *facetName,
@@ -1644,6 +1672,7 @@ globle int EnvDeftemplateSlotFacetValue(
 /************************************************************/
 static SYMBOL_HN *CheckDeftemplateAndSlotArguments(
   void *theEnv,
+  EXEC_STATUS,
   char *functionName,
   struct deftemplate **theDeftemplate,
   int expectedArgs)
@@ -1710,6 +1739,7 @@ static SYMBOL_HN *CheckDeftemplateAndSlotArguments(
 /***************************************************************/
 globle intBool UpdateModifyDuplicate(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *top,
   char *name,
   void *vTheLHS)
@@ -1870,6 +1900,7 @@ static SYMBOL_HN *FindTemplateForFactAddress(
 /*******************************************/
 globle struct expr *ModifyParse(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *top,
   char *logicalName)
   {
@@ -1881,6 +1912,7 @@ globle struct expr *ModifyParse(
 /*************************************************/
 globle struct expr *DuplicateParse(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *top,
   char *logicalName)
   {
@@ -1892,6 +1924,7 @@ globle struct expr *DuplicateParse(
 /*************************************************************/
 static struct expr *ModAndDupParse(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *top,
   char *logicalName,
   char *name)

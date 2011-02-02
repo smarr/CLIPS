@@ -71,6 +71,7 @@
 /**********************************************************************/
 globle void ReturnDefrule(
   void *theEnv,
+  EXEC_STATUS,
   void *vWaste)
   {
 #if (MAC_MCW || WIN_MCW) && (RUN_TIME || BLOAD_ONLY)
@@ -191,6 +192,7 @@ globle void ReturnDefrule(
 /********************************************************/
 globle void DestroyDefrule(
   void *theEnv,
+  EXEC_STATUS,
   void *vTheDefrule)
   {
    struct defrule *theDefrule = (struct defrule *) vTheDefrule;
@@ -249,6 +251,7 @@ globle void DestroyDefrule(
 /**********************************************************************/
 static void DetachJoinsDriver(
   void *theEnv,
+  EXEC_STATUS,
   struct defrule *theRule,
   intBool destroy)
   {
@@ -286,6 +289,7 @@ static void DetachJoinsDriver(
 /**********************************************************************/
 static void DetachJoins(
   void *theEnv,
+  EXEC_STATUS,
   struct joinNode *join,
   intBool destroy)
   {
@@ -537,6 +541,7 @@ static void DetachJoins(
 /***********************************************************************/
 static void RemoveIntranetworkLink(
   void *theEnv,
+  EXEC_STATUS,
   struct joinNode *join)
   {
    struct patternNodeHeader *patternPtr;

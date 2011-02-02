@@ -71,6 +71,7 @@
 /*******************************************************************/
 globle struct lhsParseNode *ParseRuleLHS(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   struct token *theToken,
   char *ruleName,
@@ -129,6 +130,7 @@ globle struct lhsParseNode *ParseRuleLHS(
 /*********************************************************/
 static struct lhsParseNode *RuleBodyParse(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   struct token *theToken,
   char *ruleName,
@@ -205,6 +207,7 @@ static struct lhsParseNode *RuleBodyParse(
 /********************************************************/
 static void DeclarationParse(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   char *ruleName,
   int *error)
@@ -362,6 +365,7 @@ static void DeclarationParse(
 /************************************************************/
 static void ParseSalience(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   char *ruleName,
   int *error)
@@ -434,6 +438,7 @@ static void ParseSalience(
 /**************************************************************/
 static void ParseAutoFocus(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   int *error)
   {
@@ -484,6 +489,7 @@ static void ParseAutoFocus(
 /*****************************************************************/
 static struct lhsParseNode *LHSPattern(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   int terminator,
   char *terminatorString,
@@ -633,6 +639,7 @@ static struct lhsParseNode *LHSPattern(
 /*********************************************************************/
 static struct lhsParseNode *ConnectedPatternParse(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   struct token *theToken,
   int *error)
@@ -878,6 +885,7 @@ static struct lhsParseNode *ConnectedPatternParse(
 /***********************************************/
 static struct lhsParseNode *GroupPatterns(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   int terminator,
   char *terminatorString,
@@ -955,6 +963,7 @@ static struct lhsParseNode *GroupPatterns(
 /**************************************************************/
 static struct lhsParseNode *TestPattern(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   int *error)
   {
@@ -1008,6 +1017,7 @@ static struct lhsParseNode *TestPattern(
 /****************************************************************/
 static struct lhsParseNode *AssignmentParse(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   SYMBOL_HN *factAddress,
   int *error)
@@ -1109,6 +1119,7 @@ static void TagLHSLogicalNodes(
 /***********************************************************/
 static struct lhsParseNode *SimplePatternParse(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   struct token *theToken,
   int *error)

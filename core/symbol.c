@@ -90,6 +90,7 @@
 #endif
 globle void InitializeAtomTables(
   void *theEnv,
+  EXEC_STATUS,
   struct symbolHashNode **symbolTable,
   struct floatHashNode **floatTable,
   struct integerHashNode **integerTable,
@@ -169,7 +170,8 @@ globle void InitializeAtomTables(
 /*    data for symbols.                          */
 /*************************************************/
 static void DeallocateSymbolData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    int i;
    SYMBOL_HN *shPtr, *nextSHPtr;
@@ -349,6 +351,7 @@ static void DeallocateSymbolData(
 /*********************************************************************/
 globle void *EnvAddSymbol(
   void *theEnv,
+  EXEC_STATUS,
   char *str)
   {
    unsigned long tally;
@@ -421,6 +424,7 @@ globle void *EnvAddSymbol(
 /*****************************************************************/
 globle SYMBOL_HN *FindSymbolHN(
   void *theEnv,
+  EXEC_STATUS,
   char *str)
   {
    unsigned long tally;
@@ -447,6 +451,7 @@ globle SYMBOL_HN *FindSymbolHN(
 /*******************************************************************/
 globle void *EnvAddDouble(
   void *theEnv,
+  EXEC_STATUS,
   double number)
   {
    unsigned long tally;
@@ -512,6 +517,7 @@ globle void *EnvAddDouble(
 /***************************************************************/
 globle void *EnvAddLong(
   void *theEnv,
+  EXEC_STATUS,
   long long number)
   {
    unsigned long tally;
@@ -574,6 +580,7 @@ globle void *EnvAddLong(
 /*****************************************************************/
 globle INTEGER_HN *FindLongHN(
   void *theEnv,
+  EXEC_STATUS,
   long long theLong)
   {
    unsigned long tally;
@@ -597,6 +604,7 @@ globle INTEGER_HN *FindLongHN(
 /*******************************************************************/
 globle void *EnvAddBitMap(
   void *theEnv,
+  EXEC_STATUS,
   void *vTheBitMap,
   unsigned size)
   {
@@ -680,6 +688,7 @@ globle void *EnvAddBitMap(
 /*******************************************************************/
 globle void *EnvAddExternalAddress(
   void *theEnv,
+  EXEC_STATUS,
   void *theExternalAddress,
   unsigned theType)
   {
@@ -883,6 +892,7 @@ globle unsigned long HashBitMap(
 /*****************************************************/
 globle void DecrementSymbolCount(
   void *theEnv,
+  EXEC_STATUS,
   SYMBOL_HN *theValue)
   {
    if (theValue->count < 0)
@@ -917,6 +927,7 @@ globle void DecrementSymbolCount(
 /***************************************************/
 globle void DecrementFloatCount(
   void *theEnv,
+  EXEC_STATUS,
   FLOAT_HN *theValue)
   {
    if (theValue->count <= 0)
@@ -945,6 +956,7 @@ globle void DecrementFloatCount(
 /*********************************************************/
 globle void DecrementIntegerCount(
   void *theEnv,
+  EXEC_STATUS,
   INTEGER_HN *theValue)
   {
    if (theValue->count <= 0)
@@ -973,6 +985,7 @@ globle void DecrementIntegerCount(
 /*****************************************************/
 globle void DecrementBitMapCount(
   void *theEnv,
+  EXEC_STATUS,
   BITMAP_HN *theValue)
   {
    if (theValue->count < 0)
@@ -1007,6 +1020,7 @@ globle void DecrementBitMapCount(
 /*************************************************************/
 globle void DecrementExternalAddressCount(
   void *theEnv,
+  EXEC_STATUS,
   EXTERNAL_ADDRESS_HN *theValue)
   {
    if (theValue->count < 0)
@@ -1041,6 +1055,7 @@ globle void DecrementExternalAddressCount(
 /************************************************/
 static void RemoveHashNode(
   void *theEnv,
+  EXEC_STATUS,
   GENERIC_HN *theValue,
   GENERIC_HN **theTable,
   int size,
@@ -1118,6 +1133,7 @@ static void RemoveHashNode(
 /***********************************************************/
 static void AddEphemeralHashNode(
   void *theEnv,
+  EXEC_STATUS,
   GENERIC_HN *theHashNode,
   struct ephemeron **theEphemeralList,
   int hashNodeSize,
@@ -1170,7 +1186,8 @@ static void AddEphemeralHashNode(
 /*   from their respective storage tables.         */
 /***************************************************/
 globle void RemoveEphemeralAtoms(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    RemoveEphemeralHashNodes(theEnv,&SymbolData(theEnv)->EphemeralSymbolList,(GENERIC_HN **) SymbolData(theEnv)->SymbolTable,
                             sizeof(SYMBOL_HN),SYMBOL,AVERAGE_STRING_SIZE);
@@ -1197,6 +1214,7 @@ globle void RemoveEphemeralAtoms(
 /****************************************************************/
 static void RemoveEphemeralHashNodes(
   void *theEnv,
+  EXEC_STATUS,
   struct ephemeron **theEphemeralList,
   GENERIC_HN **theTable,
   int hashNodeSize,
@@ -1268,7 +1286,8 @@ static void RemoveEphemeralHashNodes(
 /* GetSymbolTable: Returns a pointer to the SymbolTable. */
 /*********************************************************/
 globle SYMBOL_HN **GetSymbolTable(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return(SymbolData(theEnv)->SymbolTable);
   }
@@ -1278,6 +1297,7 @@ globle SYMBOL_HN **GetSymbolTable(
 /******************************************************/
 globle void SetSymbolTable(
   void *theEnv,
+  EXEC_STATUS,
   SYMBOL_HN **value)
   {
    SymbolData(theEnv)->SymbolTable = value;
@@ -1287,7 +1307,8 @@ globle void SetSymbolTable(
 /* GetFloatTable: Returns a pointer to the FloatTable. */
 /*******************************************************/
 globle FLOAT_HN **GetFloatTable(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return(SymbolData(theEnv)->FloatTable);
   }
@@ -1297,6 +1318,7 @@ globle FLOAT_HN **GetFloatTable(
 /****************************************************/
 globle void SetFloatTable(
   void *theEnv,
+  EXEC_STATUS,
   FLOAT_HN **value)
   {
    SymbolData(theEnv)->FloatTable = value;
@@ -1306,7 +1328,8 @@ globle void SetFloatTable(
 /* GetIntegerTable: Returns a pointer to the IntegerTable. */
 /***********************************************************/
 globle INTEGER_HN **GetIntegerTable(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return(SymbolData(theEnv)->IntegerTable);
   }
@@ -1316,6 +1339,7 @@ globle INTEGER_HN **GetIntegerTable(
 /********************************************************/
 globle void SetIntegerTable(
   void *theEnv,
+  EXEC_STATUS,
   INTEGER_HN **value)
   {
    SymbolData(theEnv)->IntegerTable = value;
@@ -1325,7 +1349,8 @@ globle void SetIntegerTable(
 /* GetBitMapTable: Returns a pointer to the BitMapTable. */
 /*********************************************************/
 globle BITMAP_HN **GetBitMapTable(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return(SymbolData(theEnv)->BitMapTable);
   }
@@ -1335,6 +1360,7 @@ globle BITMAP_HN **GetBitMapTable(
 /******************************************************/
 globle void SetBitMapTable(
   void *theEnv,
+  EXEC_STATUS,
   BITMAP_HN **value)
   {
    SymbolData(theEnv)->BitMapTable = value;
@@ -1344,7 +1370,8 @@ globle void SetBitMapTable(
 /* GetExternalAddressTable: Returns a pointer to the ExternalAddressTable. */
 /***************************************************************************/
 globle EXTERNAL_ADDRESS_HN **GetExternalAddressTable(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return(SymbolData(theEnv)->ExternalAddressTable);
   }
@@ -1354,6 +1381,7 @@ globle EXTERNAL_ADDRESS_HN **GetExternalAddressTable(
 /************************************************************************/
 globle void SetExternalAddressTable(
   void *theEnv,
+  EXEC_STATUS,
   EXTERNAL_ADDRESS_HN **value)
   {
    SymbolData(theEnv)->ExternalAddressTable = value;
@@ -1365,7 +1393,8 @@ globle void SetExternalAddressTable(
 /*   and NegativeInfinity symbols.                    */
 /******************************************************/
 globle void RefreshSpecialSymbols(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    SymbolData(theEnv)->TrueSymbolHN = (void *) FindSymbolHN(theEnv,TRUE_STRING);
    SymbolData(theEnv)->FalseSymbolHN = (void *) FindSymbolHN(theEnv,FALSE_STRING);
@@ -1382,6 +1411,7 @@ globle void RefreshSpecialSymbols(
 /***********************************************************/
 globle struct symbolMatch *FindSymbolMatches(
   void *theEnv,
+  EXEC_STATUS,
   char *searchString,
   unsigned *numberOfMatches,
   size_t *commonPrefixLength)
@@ -1411,6 +1441,7 @@ globle struct symbolMatch *FindSymbolMatches(
 /*********************************************************/
 globle void ReturnSymbolMatches(
   void *theEnv,
+  EXEC_STATUS,
   struct symbolMatch *listOfMatches)
   {
    struct symbolMatch *temp;
@@ -1444,6 +1475,7 @@ globle void ClearBitString(
 /*****************************************************************/
 globle SYMBOL_HN *GetNextSymbolMatch(
   void *theEnv,
+  EXEC_STATUS,
   char *searchString,
   size_t searchLength,
   SYMBOL_HN *prevSymbol,
@@ -1618,6 +1650,7 @@ static size_t CommonPrefixLength(
 /****************************************************************/
 globle void SetAtomicValueIndices(
   void *theEnv,
+  EXEC_STATUS,
   int setAll)
   {
    unsigned long count;
@@ -1722,7 +1755,8 @@ globle void SetAtomicValueIndices(
 /*   effects of a call to the SetAtomicValueIndices function.          */
 /***********************************************************************/
 globle void RestoreAtomicValueBuckets(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    unsigned long i;
    SYMBOL_HN *symbolPtr, **symbolArray;

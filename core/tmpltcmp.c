@@ -58,7 +58,8 @@
 /*   construct for use with the constructs-to-c command. */
 /*********************************************************/
 globle void DeftemplateCompilerSetup(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DeftemplateData(theEnv)->DeftemplateCodeItem = AddCodeGeneratorItem(theEnv,"deftemplate",0,NULL,InitDeftemplateCode,ConstructToCode,3);
   }
@@ -69,6 +70,7 @@ globle void DeftemplateCompilerSetup(
 /*************************************************************/
 static int ConstructToCode(
   void *theEnv,
+  EXEC_STATUS,
   char *fileName,
   char *pathName,
   char *fileNameBuffer,
@@ -188,6 +190,7 @@ static int ConstructToCode(
 /************************************************************/
 static void CloseDeftemplateFiles(
   void *theEnv,
+  EXEC_STATUS,
   FILE *moduleFile,
   FILE *templateFile,
   FILE *slotFile,
@@ -224,6 +227,7 @@ static void CloseDeftemplateFiles(
 #endif
 static void DeftemplateModuleToCode(
   void *theEnv,
+  EXEC_STATUS,
   FILE *theFile,
   struct defmodule *theModule,
   int imageID,
@@ -248,6 +252,7 @@ static void DeftemplateModuleToCode(
 /************************************************************/
 static void DeftemplateToCode(
   void *theEnv,
+  EXEC_STATUS,
   FILE *theFile,
   struct deftemplate *theTemplate,
   int imageID,
@@ -310,6 +315,7 @@ static void DeftemplateToCode(
 /*****************************************************/
 static void SlotToCode(
   void *theEnv,
+  EXEC_STATUS,
   FILE *theFile,
   struct templateSlot *theSlot,
   int imageID,
@@ -371,6 +377,7 @@ static void SlotToCode(
 /*****************************************************************/
 globle void DeftemplateCModuleReference(
   void *theEnv,
+  EXEC_STATUS,
   FILE *theFile,
   int count,
   int imageID,
@@ -388,6 +395,7 @@ globle void DeftemplateCModuleReference(
 /********************************************************************/
 globle void DeftemplateCConstructReference(
   void *theEnv,
+  EXEC_STATUS,
   FILE *theFile,
   void *vTheTemplate,
   int imageID,
@@ -416,6 +424,7 @@ globle void DeftemplateCConstructReference(
 #endif
 static void InitDeftemplateCode(
   void *theEnv,
+  EXEC_STATUS,
   FILE *initFP,
   int imageID,
   int maxIndices)

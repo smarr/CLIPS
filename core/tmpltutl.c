@@ -65,6 +65,7 @@
 /********************************************************/
 globle void InvalidDeftemplateSlotMessage(
   void *theEnv,
+  EXEC_STATUS,
   char *slotName,
   char *deftemplateName,
   int printCR)
@@ -84,6 +85,7 @@ globle void InvalidDeftemplateSlotMessage(
 /**********************************************************/
 globle void SingleFieldSlotCardinalityError(
   void *theEnv,
+  EXEC_STATUS,
   char *slotName)
   {
    PrintErrorID(theEnv,"TMPLTDEF",2,TRUE);
@@ -98,6 +100,7 @@ globle void SingleFieldSlotCardinalityError(
 /**********************************************************************/
 globle void MultiIntoSingleFieldSlotError(
   void *theEnv,
+  EXEC_STATUS,
   struct templateSlot *theSlot,
   struct deftemplate *theDeftemplate)
   {
@@ -120,6 +123,7 @@ globle void MultiIntoSingleFieldSlotError(
 /**************************************************************/
 globle void CheckTemplateFact(
   void *theEnv,
+  EXEC_STATUS,
   struct fact *theFact)
   {
    struct field *sublist;
@@ -204,6 +208,7 @@ globle void CheckTemplateFact(
 /***********************************************************************/
 globle intBool CheckRHSSlotTypes(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *rhsSlots,
   struct templateSlot *slotPtr,
   char *thePlace)
@@ -276,6 +281,7 @@ globle int FindSlotPosition(
 /*******************************************************************/
 globle void PrintTemplateFact(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   struct fact *theFact,
   int seperateLines,
@@ -401,7 +407,8 @@ globle void PrintTemplateFact(
 /* UpdateDeftemplateScope: Updates the scope flag of all the deftemplates. */
 /***************************************************************************/
 globle void UpdateDeftemplateScope(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct deftemplate *theDeftemplate;
    int moduleCount;
@@ -474,6 +481,7 @@ globle struct templateSlot *FindSlot(
 /************************************************************/
 globle struct deftemplate *CreateImpliedDeftemplate(
   void *theEnv,
+  EXEC_STATUS,
   SYMBOL_HN *deftemplateName,
   int setFlag)
   {

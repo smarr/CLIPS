@@ -71,6 +71,7 @@
 /*******************************************************/
 globle int ParseDeftemplate(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource)
   {
 #if (MAC_MCW || WIN_MCW) && (RUN_TIME || BLOAD_ONLY)
@@ -215,6 +216,7 @@ globle int ParseDeftemplate(
 /**************************************************************/
 globle void InstallDeftemplate(
   void *theEnv,
+  EXEC_STATUS,
   struct deftemplate *theDeftemplate)
   {
    struct templateSlot *slotPtr;
@@ -242,6 +244,7 @@ globle void InstallDeftemplate(
 /********************************************************************/
 static struct templateSlot *SlotDeclarations(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   struct token *inputToken)
   {
@@ -326,6 +329,7 @@ static struct templateSlot *SlotDeclarations(
 /*****************************************************/
 static struct templateSlot *ParseSlot(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   struct token *inputToken,
   struct templateSlot *slotList)
@@ -441,6 +445,7 @@ static struct templateSlot *ParseSlot(
 /**************************************************************/
 static struct templateSlot *DefinedSlots(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   SYMBOL_HN *slotName,
   int multifieldSlot,
@@ -641,6 +646,7 @@ static struct templateSlot *DefinedSlots(
 /***************************************************/
 static intBool ParseFacetAttribute(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   struct templateSlot *theSlot,
   intBool multifacet)

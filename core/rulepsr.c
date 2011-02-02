@@ -96,6 +96,7 @@
 /****************************************************/
 globle int ParseDefrule(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource)
   {
 #if (MAC_MCW || WIN_MCW) && (RUN_TIME || BLOAD_ONLY)
@@ -270,6 +271,7 @@ globle int ParseDefrule(
 /**************************************************************/
 static struct defrule *ProcessRuleLHS(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *theLHS,
   struct expr *actions,
   SYMBOL_HN *ruleName,
@@ -468,6 +470,7 @@ static struct defrule *ProcessRuleLHS(
 /************************************************************************/
 static struct defrule *CreateNewDisjunct(
   void *theEnv,
+  EXEC_STATUS,
   SYMBOL_HN *ruleName,
   int localVarCnt,
   struct expr *theActions,
@@ -548,6 +551,7 @@ static struct defrule *CreateNewDisjunct(
 /****************************************************************/
 static int ReplaceRHSVariable(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *list,
   void *VtheLHS)
   {
@@ -609,6 +613,7 @@ static int ReplaceRHSVariable(
 /*******************************************************/
 static struct expr *ParseRuleRHS(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource)
   {
    struct expr *actions;
@@ -657,6 +662,7 @@ static struct expr *ParseRuleRHS(
 /************************************************************/
 static int RuleComplexity(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *theLHS)
   {
    struct lhsParseNode *thePattern, *tempPattern;
@@ -693,6 +699,7 @@ static int RuleComplexity(
 /********************************************************************/
 static int ExpressionComplexity(
    void *theEnv,
+  EXEC_STATUS,
   struct expr *exprPtr)
   {
    int complexity = 0;
@@ -735,6 +742,7 @@ static int ExpressionComplexity(
 /********************************************/
 static int LogicalAnalysis(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *patternList)
   {
    int firstLogical, logicalsFound = FALSE, logicalJoin = 1;
@@ -956,6 +964,7 @@ static void AddToDefruleList(
 /**********************************************************/
 static void DumpRuleAnalysis(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *tempNode)
   {
    struct lhsParseNode *traceNode;

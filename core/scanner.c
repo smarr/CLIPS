@@ -59,7 +59,8 @@
 /*    data for scanner routines.                */
 /************************************************/
 globle void InitializeScannerData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    AllocateEnvironmentData(theEnv,SCANNER_DATA,sizeof(struct scannerData),DeallocateScannerData);
   }
@@ -69,7 +70,8 @@ globle void InitializeScannerData(
 /*    data for scanner routines.                  */
 /**************************************************/
 static void DeallocateScannerData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    if (ScannerData(theEnv)->GlobalMax !=  0)
      { genfree(theEnv,ScannerData(theEnv)->GlobalString,ScannerData(theEnv)->GlobalMax); }
@@ -85,6 +87,7 @@ static void DeallocateScannerData(
 /***********************************************************************/
 globle void GetToken(
  void *theEnv,
+  EXEC_STATUS,
  char *logicalName,
  struct token *theToken)
  {
@@ -375,6 +378,7 @@ globle void GetToken(
 /*************************************/
 static void *ScanSymbol(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   int count,
   unsigned short *type)
@@ -453,6 +457,7 @@ static void *ScanSymbol(
 /*************************************/
 static void *ScanString(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName)
   {
    int inchar;
@@ -503,6 +508,7 @@ static void *ScanString(
 /**************************************/
 static void ScanNumber(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   struct token *theToken)
   {
@@ -759,7 +765,8 @@ globle void CopyToken(
 /*   line count to zero.                */
 /****************************************/
 globle void ResetLineCount(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    ScannerData(theEnv)->LineCount = 0;
   }
@@ -768,7 +775,8 @@ globle void ResetLineCount(
 /* GettLineCount: Returns the scanner's line count. */
 /****************************************************/
 globle long GetLineCount(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return(ScannerData(theEnv)->LineCount);
   }
@@ -778,7 +786,8 @@ globle long GetLineCount(
 /*   the scanner's line count.    */
 /**********************************/
 globle void IncrementLineCount(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    ScannerData(theEnv)->LineCount++;
   }
@@ -788,7 +797,8 @@ globle void IncrementLineCount(
 /*   the scanner's line count.    */
 /**********************************/
 globle void DecrementLineCount(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    ScannerData(theEnv)->LineCount--;
   }

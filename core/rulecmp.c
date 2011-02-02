@@ -63,7 +63,8 @@
 /*   for use with the constructs-to-c command.             */
 /***********************************************************/
 globle void DefruleCompilerSetup(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DefruleData(theEnv)->DefruleCodeItem = AddCodeGeneratorItem(theEnv,"defrules",0,BeforeDefrulesCode,
                                           InitDefruleCode,ConstructToCode,4);
@@ -75,7 +76,8 @@ globle void DefruleCompilerSetup(
 /*   the data structures are written to a file as C code      */
 /**************************************************************/
 static void BeforeDefrulesCode(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    long int moduleCount, ruleCount, joinCount, linkCount;
 
@@ -88,6 +90,7 @@ static void BeforeDefrulesCode(
 /*********************************************************/
 static int ConstructToCode(
   void *theEnv,
+  EXEC_STATUS,
   char *fileName,
   char *pathName,
   char *fileNameBuffer,
@@ -227,6 +230,7 @@ static int ConstructToCode(
 /*********************************************************************/
 static int RuleCompilerTraverseJoins(
   void *theEnv,
+  EXEC_STATUS,
   struct joinNode *joinPtr,
   char *fileName,
   char *pathName,
@@ -284,6 +288,7 @@ static int RuleCompilerTraverseJoins(
 /*******************************************************/
 static int TraverseJoinLinks(
   void *theEnv,
+  EXEC_STATUS,
   struct joinLink *linkPtr,
   char *fileName,
   char *pathName,
@@ -324,6 +329,7 @@ static int TraverseJoinLinks(
 /********************************************************/
 static void CloseDefruleFiles(
   void *theEnv,
+  EXEC_STATUS,
   FILE *moduleFile,
   FILE *defruleFile,
   FILE *joinFile,
@@ -367,6 +373,7 @@ static void CloseDefruleFiles(
 #endif
 static void DefruleModuleToCode(
   void *theEnv,
+  EXEC_STATUS,
   FILE *theFile,
   struct defmodule *theModule,
   int imageID,
@@ -391,6 +398,7 @@ static void DefruleModuleToCode(
 /**********************************************************/
 static void DefruleToCode(
   void *theEnv,
+  EXEC_STATUS,
   FILE *theFile,
   struct defrule *theDefrule,
   int imageID,
@@ -477,6 +485,7 @@ static void DefruleToCode(
 /***************************************************/
 static void JoinToCode(
   void *theEnv,
+  EXEC_STATUS,
   FILE *joinFile,
   struct joinNode *theJoin,
   int imageID,
@@ -606,6 +615,7 @@ static void JoinToCode(
 /***************************************************/
 static void LinkToCode(
   void *theEnv,
+  EXEC_STATUS,
   FILE *theFile,
   struct joinLink *theLink,
   int imageID,
@@ -656,6 +666,7 @@ static void LinkToCode(
 /*************************************************************/
 globle void DefruleCModuleReference(
   void *theEnv,
+  EXEC_STATUS,
   FILE *theFile,
   int count,
   int imageID,
@@ -676,6 +687,7 @@ globle void DefruleCModuleReference(
 #endif
 static void InitDefruleCode(
   void *theEnv,
+  EXEC_STATUS,
   FILE *initFP,
   int imageID,
   int maxIndices)

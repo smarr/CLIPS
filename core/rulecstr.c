@@ -66,6 +66,7 @@
 /***********************************************************/
 static intBool CheckForUnmatchableConstraints(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *theNode,
   int whichCE)
   {
@@ -88,6 +89,7 @@ static intBool CheckForUnmatchableConstraints(
 /******************************************************/
 static void ConstraintConflictMessage(
   void *theEnv,
+  EXEC_STATUS,
   struct symbolHashNode *variableName,
   int thePattern,
   int theField,
@@ -146,6 +148,7 @@ static void ConstraintConflictMessage(
 /***************************************************************/
 static intBool MultifieldCardinalityViolation(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *theNode)
   {
    struct lhsParseNode *tmpNode;
@@ -266,6 +269,7 @@ static intBool MultifieldCardinalityViolation(
 /***************************************************/
 globle intBool ProcessConnectedConstraints(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *theNode,
   struct lhsParseNode *multifieldHeader,
   struct lhsParseNode *patternHead)
@@ -404,6 +408,7 @@ globle intBool ProcessConnectedConstraints(
 /**************************************************/
 globle void ConstraintReferenceErrorMessage(
   void *theEnv,
+  EXEC_STATUS,
   struct symbolHashNode *theVariable,
   struct lhsParseNode *theExpression,
   int whichArgument,
@@ -475,6 +480,7 @@ globle void ConstraintReferenceErrorMessage(
 /********************************************************/
 static struct lhsParseNode *AddToVariableConstraints(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *oldList,
   struct lhsParseNode *newItems)
   {
@@ -549,6 +555,7 @@ static struct lhsParseNode *AddToVariableConstraints(
 /***********************************************************/
 static struct lhsParseNode *UnionVariableConstraints(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *list1,
   struct lhsParseNode *list2)
   {
@@ -619,6 +626,7 @@ static struct lhsParseNode *UnionVariableConstraints(
 /*****************************************************************/
 globle struct lhsParseNode *GetExpressionVarConstraints(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *theExpression)
   {
    struct lhsParseNode *list1 = NULL, *list2;
@@ -655,6 +663,7 @@ globle struct lhsParseNode *GetExpressionVarConstraints(
 /***********************************************/
 globle struct lhsParseNode *DeriveVariableConstraints(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *theNode)
   {
    struct lhsParseNode *orNode, *andNode;
@@ -701,6 +710,7 @@ globle struct lhsParseNode *DeriveVariableConstraints(
 /*******************************************/
 globle intBool CheckRHSForConstraintErrors(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *expressionList,
   struct lhsParseNode *theLHS)
   {
@@ -749,6 +759,7 @@ globle intBool CheckRHSForConstraintErrors(
 /*************************************************************/
 static intBool CheckArgumentForConstraintError(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *expressionList,
   struct expr *lastOne,
   int i,

@@ -69,7 +69,8 @@
 /*   the string manipulation functions.   */
 /******************************************/
 globle void StringFunctionDefinitions(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
 #if ! RUN_TIME
    EnvDefineFunction2(theEnv,"str-cat", 'k', PTIEF StrCatFunction, "StrCatFunction", "1*");
@@ -96,6 +97,7 @@ globle void StringFunctionDefinitions(
 /****************************************/
 globle void StrCatFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {   
    StrOrSymCatFunction(theEnv,returnValue,STRING);
@@ -107,6 +109,7 @@ globle void StrCatFunction(
 /****************************************/
 globle void SymCatFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
    StrOrSymCatFunction(theEnv,returnValue,SYMBOL);
@@ -118,6 +121,7 @@ globle void SymCatFunction(
 /********************************************************/
 static void StrOrSymCatFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue,
   unsigned short returnType)
   {
@@ -249,7 +253,8 @@ static void StrOrSymCatFunction(
 /*   for the str-length function.          */
 /*******************************************/
 globle long long StrLengthFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DATA_OBJECT theArg;
 
@@ -280,6 +285,7 @@ globle long long StrLengthFunction(
 /****************************************/
 globle void UpcaseFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
    DATA_OBJECT theArg;
@@ -343,6 +349,7 @@ globle void UpcaseFunction(
 /*****************************************/
 globle void LowcaseFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
    DATA_OBJECT theArg;
@@ -405,7 +412,8 @@ globle void LowcaseFunction(
 /*   for the str-compare function.          */
 /********************************************/
 globle long long StrCompareFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    int numArgs, length;
    DATA_OBJECT arg1, arg2, arg3;
@@ -461,7 +469,8 @@ globle long long StrCompareFunction(
 /*   for the sub-string function.          */
 /*******************************************/
 globle void *SubStringFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DATA_OBJECT theArgument;
    char *tempString, *returnString;
@@ -545,6 +554,7 @@ globle void *SubStringFunction(
 /******************************************/
 globle void StrIndexFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR result)
   {
    DATA_OBJECT theArgument1, theArgument2;
@@ -602,6 +612,7 @@ globle void StrIndexFunction(
 /********************************************/
 globle void StringToFieldFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *returnValue)
   {
    DATA_OBJECT theArg;
@@ -640,6 +651,7 @@ globle void StringToFieldFunction(
 /*************************************************************/
 globle void StringToField(
   void *theEnv,
+  EXEC_STATUS,
   char *theString,
   DATA_OBJECT *returnValue)
   {
@@ -690,6 +702,7 @@ globle void StringToField(
 /**************************************/
 globle void EvalFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
    DATA_OBJECT theArg;
@@ -742,6 +755,7 @@ globle int Eval(
 /*****************************/
 globle int EnvEval(
   void *theEnv,
+  EXEC_STATUS,
   char *theString,
   DATA_OBJECT_PTR returnValue)
   {
@@ -878,6 +892,7 @@ globle int EnvEval(
 /*************************************************/
 globle void EvalFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
    PrintErrorID(theEnv,"STRNGFUN",1,FALSE);
@@ -892,6 +907,7 @@ globle void EvalFunction(
 /*****************************************************/
 globle int EnvEval(
   void *theEnv,
+  EXEC_STATUS,
   char *theString,
   DATA_OBJECT_PTR returnValue)
   {
@@ -914,7 +930,8 @@ globle int EnvEval(
 /*   for the build function.           */
 /***************************************/
 globle int BuildFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DATA_OBJECT theArg;
 
@@ -956,6 +973,7 @@ globle int Build(
 /******************************/
 globle int EnvBuild(
   void *theEnv,
+  EXEC_STATUS,
   char *theString)
   {
    char *constructType;
@@ -1054,7 +1072,8 @@ globle int EnvBuild(
 /*   provided for use with a run-time version.    */
 /**************************************************/
 globle int BuildFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    PrintErrorID(theEnv,"STRNGFUN",1,FALSE);
    EnvPrintRouter(theEnv,WERROR,"Function build does not work in run time modules.\n");
@@ -1067,6 +1086,7 @@ globle int BuildFunction(
 /******************************************************/
 globle int EnvBuild(
   void *theEnv,
+  EXEC_STATUS,
   char *theString)
   { 
 #if (MAC_MCW || WIN_MCW) && (RUN_TIME || BLOAD_ONLY)

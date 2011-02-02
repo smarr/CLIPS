@@ -60,7 +60,8 @@
 /*    data for watch items.                   */
 /**********************************************/
 globle void InitializeWatchData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    AllocateEnvironmentData(theEnv,WATCH_DATA,sizeof(struct watchData),DeallocateWatchData);
   }
@@ -70,7 +71,8 @@ globle void InitializeWatchData(
 /*    data for watch items.                     */
 /************************************************/
 static void DeallocateWatchData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct watchItem *tmpPtr, *nextPtr;
 
@@ -91,6 +93,7 @@ static void DeallocateWatchData(
 /*************************************************************/
 globle intBool AddWatchItem(
   void *theEnv,
+  EXEC_STATUS,
   char *name,
   int code,
   unsigned *flag,
@@ -152,6 +155,7 @@ globle intBool AddWatchItem(
 /*****************************************************/
 globle intBool EnvWatch(
   void *theEnv,
+  EXEC_STATUS,
   char *itemName)
   {
    return(EnvSetWatchItem(theEnv,itemName,ON,NULL));
@@ -173,6 +177,7 @@ globle intBool Watch(
 /*********************************************************/
 globle intBool EnvUnwatch(
   void *theEnv,
+  EXEC_STATUS,
   char *itemName)
   {
    return(EnvSetWatchItem(theEnv,itemName,OFF,NULL));
@@ -195,6 +200,7 @@ globle intBool Unwatch(
 /***********************************************************************/
 globle int EnvSetWatchItem(
   void *theEnv,
+  EXEC_STATUS,
   char *itemName,
   unsigned newState,
   struct expr *argExprs)
@@ -286,6 +292,7 @@ globle int EnvSetWatchItem(
 /******************************************************************/
 globle int EnvGetWatchItem(
   void *theEnv,
+  EXEC_STATUS,
   char *itemName)
   {
    struct watchItem *wPtr;
@@ -305,6 +312,7 @@ globle int EnvGetWatchItem(
 /****************************************************************/
 static struct watchItem *ValidWatchItem(
   void *theEnv,
+  EXEC_STATUS,
   char *itemName,
   int *recognized)
   {
@@ -328,6 +336,7 @@ static struct watchItem *ValidWatchItem(
 /*************************************************************/
 globle char *GetNthWatchName(
   void *theEnv,
+  EXEC_STATUS,
   int whichItem)
   {
    int i;
@@ -348,6 +357,7 @@ globle char *GetNthWatchName(
 /***************************************************************/
 globle int GetNthWatchValue(
   void *theEnv,
+  EXEC_STATUS,
   int whichItem)
   {
    int i;
@@ -366,7 +376,8 @@ globle int GetNthWatchValue(
 /*   for the watch command.           */
 /**************************************/
 globle void WatchCommand(
-  void *theEnv, EXEC_STATUS)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DATA_OBJECT theValue;
    char *argument;
@@ -413,7 +424,8 @@ globle void WatchCommand(
 /*   for the unwatch command.           */
 /****************************************/
 globle void UnwatchCommand(
-  void *theEnv, EXEC_STATUS)
+  void *theEnv,
+	EXEC_STATUS)
   {
    DATA_OBJECT theValue;
    char *argument;
@@ -460,7 +472,8 @@ globle void UnwatchCommand(
 /*   for the list-watch-items command.          */
 /************************************************/
 globle void ListWatchItemsCommand(
-  void *theEnv, EXEC_STATUS)
+  void *theEnv,
+	EXEC_STATUS)
   {
    struct watchItem *wPtr;
    DATA_OBJECT theValue;
@@ -531,7 +544,8 @@ globle void ListWatchItemsCommand(
 /*   for the get-watch-item command.       */
 /*******************************************/
 globle int GetWatchItemCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DATA_OBJECT theValue;
    char *argument;
@@ -574,7 +588,8 @@ globle int GetWatchItemCommand(
 /* WatchFunctionDefinitions: Initializes the watch commands. */
 /*************************************************************/
 globle void WatchFunctionDefinitions(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
 #if ! RUN_TIME
    EnvDefineFunction2(theEnv,"watch",   'v', PTIEF WatchCommand,   "WatchCommand", "1**w");
@@ -596,6 +611,7 @@ globle void WatchFunctionDefinitions(
 #endif
 static intBool RecognizeWatchRouters(
   void *theEnv,
+  EXEC_STATUS,
   char *logName)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
@@ -615,6 +631,7 @@ static intBool RecognizeWatchRouters(
 #endif
 static int CaptureWatchPrints(
   void *theEnv,
+  EXEC_STATUS,
   char *logName,
   char *str)
   {

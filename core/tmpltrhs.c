@@ -64,6 +64,7 @@
 /******************************************************************/
 globle struct expr *ParseAssertTemplate(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   struct token *theToken,
   int *error,
@@ -169,6 +170,7 @@ globle struct expr *ParseAssertTemplate(
 /****************************************************************/
 static struct templateSlot *ParseSlotLabel(
   void *theEnv,
+  EXEC_STATUS,
   char *inputSource,
   struct token *tempToken,
   struct deftemplate *theDeftemplate,
@@ -249,6 +251,7 @@ static struct templateSlot *ParseSlotLabel(
 /**************************************************************************/
 static struct expr *ParseAssertSlotValues(
   void *theEnv,
+  EXEC_STATUS,
   char *inputSource,
   struct token *tempToken,
   struct templateSlot *slotPtr,
@@ -398,6 +401,7 @@ static struct expr *ParseAssertSlotValues(
 /*************************************************************************/
 static struct expr *ReorderAssertSlotValues(
   void *theEnv,
+  EXEC_STATUS,
   struct templateSlot *slotPtr,
   struct expr *firstSlot,
   int *error)
@@ -459,6 +463,7 @@ static struct expr *ReorderAssertSlotValues(
 /***************************************************************/
 static struct expr *GetSlotAssertValues(
   void *theEnv,
+  EXEC_STATUS,
   struct templateSlot *slotPtr,
   struct expr *firstSlot,
   int *error)

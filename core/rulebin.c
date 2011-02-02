@@ -87,7 +87,8 @@
 /*   feature for the defrule construct.              */
 /*****************************************************/
 globle void DefruleBinarySetup(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    AllocateEnvironmentData(theEnv,RULEBIN_DATA,sizeof(struct defruleBinaryData),DeallocateDefruleBloadData);
 
@@ -109,7 +110,8 @@ globle void DefruleBinarySetup(
 /*    data for the defrule bsave functionality.        */
 /*******************************************************/
 static void DeallocateDefruleBloadData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
 #if (BLOAD || BLOAD_ONLY || BLOAD_AND_BSAVE) && (! RUN_TIME)
    size_t space;
@@ -176,7 +178,8 @@ static void DeallocateDefruleBloadData(
 /*   the memory needed for their associated expressions.     */
 /*************************************************************/
 static void BsaveFind(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct defrule *theDefrule, *theDisjunct;
    struct defmodule *theModule;
@@ -270,6 +273,7 @@ static void BsaveFind(
 /************************************************/
 static void BsaveExpressions(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp)
   {
    struct defrule *theDefrule, *theDisjunct;
@@ -329,6 +333,7 @@ static void BsaveExpressions(
 /*****************************************************/
 static void BsaveStorage(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp)
   {
    size_t space;
@@ -362,6 +367,7 @@ static void BsaveStorage(
 /*******************************************/
 static void BsaveBinaryItem(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp)
   {
    size_t space;
@@ -447,6 +453,7 @@ static void BsaveBinaryItem(
 /************************************************************/
 static void BsaveDisjuncts(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp,
   struct defrule *theDefrule)
   {
@@ -537,6 +544,7 @@ static void BsaveDisjuncts(
 /********************************************/
 static void BsaveJoins(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp)
   {
    struct defrule *rulePtr;
@@ -580,6 +588,7 @@ static void BsaveJoins(
 /**************************************************************/
 static void BsaveTraverseJoins(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp,
   struct joinNode *joinPtr)
   {
@@ -600,6 +609,7 @@ static void BsaveTraverseJoins(
 /********************************************/
 static void BsaveJoin(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp,
   struct joinNode *joinPtr)
   {
@@ -644,6 +654,7 @@ static void BsaveJoin(
 /********************************************/
 static void BsaveLinks(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp)
   {
    struct defrule *rulePtr;
@@ -699,6 +710,7 @@ static void BsaveLinks(
 /**************************************************/
 static void BsaveTraverseLinks(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp,
   struct joinNode *joinPtr)
   {
@@ -746,6 +758,7 @@ static void BsaveLink(
 /***********************************************************/
 globle void AssignBsavePatternHeaderValues(
   void *theEnv,
+  EXEC_STATUS,
   struct bsavePatternNodeHeader *theBsaveHeader,
   struct patternNodeHeader *theHeader)
   {
@@ -766,7 +779,8 @@ globle void AssignBsavePatternHeaderValues(
 /*   the defrules used by this binary image.    */
 /************************************************/
 static void BloadStorage(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    size_t space;
 
@@ -835,7 +849,8 @@ static void BloadStorage(
 /*   constructs used by this binary image.          */
 /****************************************************/
 static void BloadBinaryItem(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    size_t space;
 
@@ -889,6 +904,7 @@ static void BloadBinaryItem(
 /**********************************************/
 static void UpdateDefruleModule(
   void *theEnv,
+  EXEC_STATUS,
   void *buf,
   long obji)
   {
@@ -909,6 +925,7 @@ static void UpdateDefruleModule(
 /****************************************/
 static void UpdateDefrule(
   void *theEnv,
+  EXEC_STATUS,
   void *buf,
   long obji)
   {
@@ -943,6 +960,7 @@ static void UpdateDefrule(
 /*************************************/
 static void UpdateJoin(
   void *theEnv,
+  EXEC_STATUS,
   void *buf,
   long obji)
   {
@@ -985,6 +1003,7 @@ static void UpdateJoin(
 /*************************************/
 static void UpdateLink(
   void *theEnv,
+  EXEC_STATUS,
   void *buf,
   long obji)
   {
@@ -1002,6 +1021,7 @@ static void UpdateLink(
 /************************************************************/
 globle void UpdatePatternNodeHeader(
   void *theEnv,
+  EXEC_STATUS,
   struct patternNodeHeader *theHeader,
   struct bsavePatternNodeHeader *theBsaveHeader)
   {
@@ -1034,7 +1054,8 @@ globle void UpdatePatternNodeHeader(
 /*   when a binary load is in effect. */
 /**************************************/
 static void ClearBload(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    size_t space;
    long i;
@@ -1121,6 +1142,7 @@ static void ClearBload(
 /*******************************************************/
 globle void *BloadDefruleModuleReference(
   void *theEnv,
+  EXEC_STATUS,
   int theIndex)
   {
    return ((void *) &DefruleBinaryData(theEnv)->ModuleArray[theIndex]);

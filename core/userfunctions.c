@@ -63,6 +63,7 @@ void UserFunctions()
 
 static struct expr *ProcessEventParse(
                                 void *theEnv,
+  															EXEC_STATUS,
                                 struct expr *top,
                                 char *logicalName)
 {
@@ -91,7 +92,8 @@ static struct expr *ProcessEventParse(
 #pragma argsused
 #endif
 void EnvUserFunctions(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
     
     // STEFAN: try to add a new primitive which enters a event/fact into our

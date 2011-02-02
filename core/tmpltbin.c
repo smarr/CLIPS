@@ -66,7 +66,8 @@
 /*   save/load feature for deftemplates.       */
 /***********************************************/
 globle void DeftemplateBinarySetup(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    AllocateEnvironmentData(theEnv,TMPLTBIN_DATA,sizeof(struct deftemplateBinaryData),DeallocateDeftemplateBloadData);
 #if BLOAD_AND_BSAVE
@@ -87,7 +88,8 @@ globle void DeftemplateBinarySetup(
 /*    data for the deftemplate bsave functionality.        */
 /***********************************************************/
 static void DeallocateDeftemplateBloadData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    size_t space;
 
@@ -109,7 +111,8 @@ static void DeallocateDeftemplateBloadData(
 /*   current environment.                                     */
 /**************************************************************/
 static void BsaveFind(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct deftemplate *theDeftemplate;
    struct templateSlot *theSlot;
@@ -189,6 +192,7 @@ static void BsaveFind(
 /*********************************************************/
 static void BsaveStorage(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp)
   {
    size_t space;
@@ -214,6 +218,7 @@ static void BsaveStorage(
 /***********************************************/
 static void BsaveBinaryItem(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp)
   {
    size_t space;
@@ -340,7 +345,8 @@ static void BsaveBinaryItem(
 /*   the deftemplates used by this binary image.    */
 /****************************************************/
 static void BloadStorage(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    size_t space;
 
@@ -405,7 +411,8 @@ static void BloadStorage(
 /*   constructs used by this binary image.              */
 /********************************************************/
 static void BloadBinaryItem(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    size_t space;
 
@@ -448,6 +455,7 @@ static void BloadBinaryItem(
 /**************************************************/
 static void UpdateDeftemplateModule(
   void *theEnv,
+  EXEC_STATUS,
   void *buf,
   long obji)
   {
@@ -465,6 +473,7 @@ static void UpdateDeftemplateModule(
 /********************************************/
 static void UpdateDeftemplate(
   void *theEnv,
+  EXEC_STATUS,
   void *buf,
   long obji)
   {
@@ -504,6 +513,7 @@ static void UpdateDeftemplate(
 /************************************************/
 static void UpdateDeftemplateSlot(
   void *theEnv,
+  EXEC_STATUS,
   void *buf,
   long obji)
   {
@@ -535,7 +545,8 @@ static void UpdateDeftemplateSlot(
 /*   when a binary load is in effect.    */
 /*****************************************/
 static void ClearBload(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    size_t space;
    int i;
@@ -595,6 +606,7 @@ static void ClearBload(
 /************************************************************/
 globle void *BloadDeftemplateModuleReference(
   void *theEnv,
+  EXEC_STATUS,
   int theIndex)
   {
    return ((void *) &DeftemplateBinaryData(theEnv)->ModuleArray[theIndex]);

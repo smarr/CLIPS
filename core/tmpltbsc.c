@@ -79,7 +79,8 @@
 /* DeftemplateBasicCommands: Initializes basic deftemplate commands. */
 /*********************************************************************/
 globle void DeftemplateBasicCommands(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
 #if ! DEFFACTS_CONSTRUCT
    EnvAddResetFunction(theEnv,"deftemplate",ResetDeftemplates,0);
@@ -115,7 +116,8 @@ globle void DeftemplateBasicCommands(
 /*************************************************************/
 #if ! DEFFACTS_CONSTRUCT
 static void ResetDeftemplates(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct fact *factPtr;
 
@@ -132,7 +134,8 @@ static void ResetDeftemplates(
 /*   clear command. Creates the initial-facts deftemplate.       */
 /*****************************************************************/
 static void ClearDeftemplates(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
 #if (! RUN_TIME) && (! BLOAD_ONLY)
 
@@ -150,6 +153,7 @@ static void ClearDeftemplates(
 /**********************************************/
 static void SaveDeftemplates(
   void *theEnv,
+  EXEC_STATUS,
   void *theModule,
   char *logicalName)
   {   
@@ -161,7 +165,8 @@ static void SaveDeftemplates(
 /*   for the undeftemplate command.           */
 /**********************************************/
 globle void UndeftemplateCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {   
    UndefconstructCommand(theEnv,"undeftemplate",DeftemplateData(theEnv)->DeftemplateConstruct); 
   }
@@ -172,6 +177,7 @@ globle void UndeftemplateCommand(
 /**************************************/
 globle intBool EnvUndeftemplate(
   void *theEnv,
+  EXEC_STATUS,
   void *theDeftemplate)
   {   
    return(Undefconstruct(theEnv,theDeftemplate,DeftemplateData(theEnv)->DeftemplateConstruct)); 
@@ -183,6 +189,7 @@ globle intBool EnvUndeftemplate(
 /****************************************************/
 globle void GetDeftemplateListFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {   
    GetConstructListFunction(theEnv,"get-deftemplate-list",returnValue,DeftemplateData(theEnv)->DeftemplateConstruct); 
@@ -194,6 +201,7 @@ globle void GetDeftemplateListFunction(
 /***********************************************/
 globle void EnvGetDeftemplateList(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue,
   void *theModule)
   {   
@@ -205,7 +213,8 @@ globle void EnvGetDeftemplateList(
 /*   for the deftemplate-module function.          */
 /***************************************************/
 globle void *DeftemplateModuleFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {   
    return(GetConstructModuleCommand(theEnv,"deftemplate-module",DeftemplateData(theEnv)->DeftemplateConstruct)); 
   }
@@ -217,7 +226,8 @@ globle void *DeftemplateModuleFunction(
 /*   for the ppdeftemplate command.           */
 /**********************************************/
 globle void PPDeftemplateCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {   
    PPConstructCommand(theEnv,"ppdeftemplate",DeftemplateData(theEnv)->DeftemplateConstruct); 
   }
@@ -228,6 +238,7 @@ globle void PPDeftemplateCommand(
 /***************************************/
 globle int PPDeftemplate(
   void *theEnv,
+  EXEC_STATUS,
   char *deftemplateName,
   char *logicalName)
   {   
@@ -239,7 +250,8 @@ globle int PPDeftemplate(
 /*   for the list-deftemplates command.          */
 /*************************************************/
 globle void ListDeftemplatesCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {    
    ListConstructCommand(theEnv,"list-deftemplates",DeftemplateData(theEnv)->DeftemplateConstruct); 
   }
@@ -250,6 +262,7 @@ globle void ListDeftemplatesCommand(
 /*****************************************/
 globle void EnvListDeftemplates(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   void *theModule)
   {   
@@ -265,6 +278,7 @@ globle void EnvListDeftemplates(
 #endif
 globle unsigned EnvGetDeftemplateWatch(
   void *theEnv,
+  EXEC_STATUS,
   void *theTemplate)
   { 
 #if MAC_MCW || WIN_MCW || MAC_XCD
@@ -283,6 +297,7 @@ globle unsigned EnvGetDeftemplateWatch(
 #endif
 globle void EnvSetDeftemplateWatch(
   void *theEnv,
+  EXEC_STATUS,
   unsigned newState,
   void *theTemplate)
   {
@@ -302,6 +317,7 @@ globle void EnvSetDeftemplateWatch(
 #endif
 globle unsigned DeftemplateWatchAccess(
   void *theEnv,
+  EXEC_STATUS,
   int code,
   unsigned newState,
   EXPRESSION *argExprs)
@@ -323,6 +339,7 @@ globle unsigned DeftemplateWatchAccess(
 #endif
 globle unsigned DeftemplateWatchPrint(
   void *theEnv,
+  EXEC_STATUS,
   char *logName,
   int code,
   EXPRESSION *argExprs)

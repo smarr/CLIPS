@@ -60,7 +60,8 @@
 /* InitializeDefaultRouters: Initializes output streams. */
 /*********************************************************/
 globle void InitializeDefaultRouters(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    AllocateEnvironmentData(theEnv,ROUTER_DATA,sizeof(struct routerData),DeallocateRouterData);
 
@@ -79,7 +80,8 @@ globle void InitializeDefaultRouters(
 /*    data for I/O routers.                      */
 /*************************************************/
 static void DeallocateRouterData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct router *tmpPtr, *nextPtr;
    
@@ -98,6 +100,7 @@ static void DeallocateRouterData(
 /*******************************************/
 globle int EnvPrintRouter(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   char *str)
   {
@@ -150,6 +153,7 @@ globle int EnvPrintRouter(
 /**************************************************/
 globle int EnvGetcRouter(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName)
   {
    struct router *currentPtr;
@@ -242,6 +246,7 @@ globle int EnvGetcRouter(
 /******************************************************/
 globle int EnvUngetcRouter(
   void *theEnv,
+  EXEC_STATUS,
   int ch,
   char *logicalName)
   {
@@ -323,7 +328,8 @@ globle int EnvUngetcRouter(
 /* ExitCommand: H/L command for exiting the program. */
 /*****************************************************/
 globle void ExitCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    int argCnt;
    int status;
@@ -347,6 +353,7 @@ globle void ExitCommand(
 /***********************************************/
 globle void EnvExitRouter(
   void *theEnv,
+  EXEC_STATUS,
   int num)
   {
    struct router *currentPtr, *nextPtr;
@@ -379,7 +386,8 @@ globle void EnvExitRouter(
 /*   after calling all closing routers.     */
 /********************************************/
 globle void AbortExit(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    RouterData(theEnv)->Abort = TRUE;
   }
@@ -398,7 +406,8 @@ globle intBool AddRouter(
   int (*exitFunction)(int))
   {
    struct router *newPtr, *lastPtr, *currentPtr;
-   void *theEnv;
+   void *theEnv,
+  EXEC_STATUS;
    char *nameCopy;
       
    theEnv = GetCurrentEnvironment();
@@ -454,6 +463,7 @@ globle intBool AddRouter(
 /************************************************************/
 globle intBool EnvAddRouter(
   void *theEnv,
+  EXEC_STATUS,
   char *routerName,
   int priority,
   int (*queryFunction)(void *,char *),
@@ -472,6 +482,7 @@ globle intBool EnvAddRouter(
 /***********************************************************************/
 globle intBool EnvAddRouterWithContext(
   void *theEnv,
+  EXEC_STATUS,
   char *routerName,
   int priority,
   int (*queryFunction)(void *,char *),
@@ -534,6 +545,7 @@ globle intBool EnvAddRouterWithContext(
 /*****************************************************************/
 globle int EnvDeleteRouter(
   void *theEnv,
+  EXEC_STATUS,
   char *routerName)
   {
    struct router *currentPtr, *lastPtr;
@@ -568,6 +580,7 @@ globle int EnvDeleteRouter(
 /*********************************************************************/
 globle int QueryRouters(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName)
   {
    struct router *currentPtr;
@@ -588,6 +601,7 @@ globle int QueryRouters(
 /************************************************/
 static int QueryRouter(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   struct router *currentPtr)
   {
@@ -629,6 +643,7 @@ static int QueryRouter(
 /*******************************************************/
 globle int EnvDeactivateRouter(
   void *theEnv,
+  EXEC_STATUS,
   char *routerName)
   {
    struct router *currentPtr;
@@ -653,6 +668,7 @@ globle int EnvDeactivateRouter(
 /***************************************************/
 globle int EnvActivateRouter(
   void *theEnv,
+  EXEC_STATUS,
   char *routerName)
   {
    struct router *currentPtr;
@@ -677,6 +693,7 @@ globle int EnvActivateRouter(
 /********************************************************/
 globle void SetFastLoad(
   void *theEnv,
+  EXEC_STATUS,
   FILE *filePtr)
   { 
    RouterData(theEnv)->FastLoadFilePtr = filePtr; 
@@ -687,6 +704,7 @@ globle void SetFastLoad(
 /********************************************************/
 globle void SetFastSave(
   void *theEnv,
+  EXEC_STATUS,
   FILE *filePtr)
   { 
    RouterData(theEnv)->FastSaveFilePtr = filePtr; 
@@ -696,7 +714,8 @@ globle void SetFastSave(
 /* GetFastLoad: Returns the "fast load" file pointer. */
 /******************************************************/
 globle FILE *GetFastLoad(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return(RouterData(theEnv)->FastLoadFilePtr); 
   }
@@ -705,7 +724,8 @@ globle FILE *GetFastLoad(
 /* GetFastSave: Returns the "fast save" file pointer. */
 /******************************************************/
 globle FILE *GetFastSave(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return(RouterData(theEnv)->FastSaveFilePtr); 
   }
@@ -716,6 +736,7 @@ globle FILE *GetFastSave(
 /*****************************************************/
 globle void UnrecognizedRouterMessage(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName)
   {
    PrintErrorID(theEnv,"ROUTER",1,FALSE);
@@ -729,6 +750,7 @@ globle void UnrecognizedRouterMessage(
 /*****************************************/
 globle int PrintNRouter(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   char *str,
   unsigned long length)

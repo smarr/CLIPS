@@ -257,7 +257,8 @@ struct systemDependentData
 /*    data for system dependent routines.               */
 /********************************************************/
 static void InitializeSystemDependentData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    AllocateEnvironmentData(theEnv,SYSTEM_DEPENDENT_DATA,sizeof(struct systemDependentData),NULL);
   }
@@ -479,6 +480,7 @@ globle void EnvInitializeEnvironment(
 /******************************************************/
 globle void SetRedrawFunction(
   void *theEnv,
+  EXEC_STATUS,
   void (*theFunction)(void *))
   {
    SystemDependentData(theEnv)->RedrawScreenFunction = theFunction;
@@ -490,6 +492,7 @@ globle void SetRedrawFunction(
 /******************************************************/
 globle void SetPauseEnvFunction(
   void *theEnv,
+  EXEC_STATUS,
   void (*theFunction)(void *))
   {
    SystemDependentData(theEnv)->PauseEnvFunction = theFunction;
@@ -502,6 +505,7 @@ globle void SetPauseEnvFunction(
 /*********************************************************/
 globle void SetContinueEnvFunction(
   void *theEnv,
+  EXEC_STATUS,
   void (*theFunction)(void *,int))
   {
    SystemDependentData(theEnv)->ContinueEnvFunction = theFunction;
@@ -539,6 +543,7 @@ globle void (*GetContinueEnvFunction(void *theEnv))(void *,int)
 /*************************************************/
 globle void RerouteStdin(
   void *theEnv,
+  EXEC_STATUS,
   int argc,
   char *argv[])
   {
@@ -623,7 +628,8 @@ globle void RerouteStdin(
 /*   of system defined functions.                 */
 /**************************************************/
 static void SystemFunctionDefinitions(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    ProceduralFunctionDefinitions(theEnv);
    MiscFunctionDefinitions(theEnv);
@@ -751,7 +757,8 @@ globle double gentime()
 /*   representing a command to the operating system. */
 /*****************************************************/
 globle void gensystem(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    char *commandBuffer = NULL;
    size_t bufferPosition = 0;
@@ -850,7 +857,8 @@ globle void VMSSystem(
 /*    a character from stdin.              */
 /*******************************************/
 globle int gengetchar(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
 #if WIN_BTC || WIN_MVC
    if (SystemDependentData(theEnv)->getcLength ==
@@ -884,6 +892,7 @@ globle int gengetchar(
 /***********************************************/
 globle int genungetchar(
   void *theEnv,
+  EXEC_STATUS,
   int theChar)
   {
 #if WIN_BTC || WIN_MVC
@@ -905,6 +914,7 @@ globle int genungetchar(
 /****************************************************/
 globle void genprintfile(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fptr,
   char *str)
   {
@@ -1049,6 +1059,7 @@ static void RestoreInterruptVectors()
 /**************************************/
 globle void genexit(
   void *theEnv,
+  EXEC_STATUS,
   int num)
   {
    if (SystemDependentData(theEnv)->jmpBuffer != NULL)
@@ -1062,6 +1073,7 @@ globle void genexit(
 /**************************************/
 globle void SetJmpBuffer(
   void *theEnv,
+  EXEC_STATUS,
   jmp_buf *theJmpBuffer)
   {
    SystemDependentData(theEnv)->jmpBuffer = theJmpBuffer;
@@ -1222,6 +1234,7 @@ globle int (*EnvSetAfterOpenFunction(void *theEnv,
 /*********************************************/
 globle FILE *GenOpen(
   void *theEnv,
+  EXEC_STATUS,
   char *fileName,
   char *accessType)
   {
@@ -1251,6 +1264,7 @@ globle FILE *GenOpen(
 /**********************************************/
 globle int GenClose(
   void *theEnv,
+  EXEC_STATUS,
   FILE *theFile)
   {
    int rv;
@@ -1274,6 +1288,7 @@ globle int GenClose(
 /************************************************************/
 globle int GenOpenReadBinary(
   void *theEnv,
+  EXEC_STATUS,
   char *funcName,
   char *fileName)
   {
@@ -1319,6 +1334,7 @@ globle int GenOpenReadBinary(
 /***********************************************/
 globle void GenReadBinary(
   void *theEnv,
+  EXEC_STATUS,
   void *dataPtr,
   size_t size)
   {
@@ -1363,6 +1379,7 @@ globle void GenReadBinary(
 /***************************************************/
 globle void GetSeekCurBinary(
   void *theEnv,
+  EXEC_STATUS,
   long offset)
   {
 #if WIN_BTC
@@ -1384,6 +1401,7 @@ globle void GetSeekCurBinary(
 /***************************************************/
 globle void GetSeekSetBinary(
   void *theEnv,
+  EXEC_STATUS,
   long offset)
   {
 #if WIN_BTC
@@ -1405,6 +1423,7 @@ globle void GetSeekSetBinary(
 /************************************************/
 globle void GenTellBinary(
   void *theEnv,
+  EXEC_STATUS,
   long *offset)
   {
 #if WIN_BTC
@@ -1425,7 +1444,8 @@ globle void GenTellBinary(
 /*   specific code for closing a file.  */
 /****************************************/
 globle void GenCloseBinary(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    if (SystemDependentData(theEnv)->BeforeOpenFunction != NULL)
      { (*SystemDependentData(theEnv)->BeforeOpenFunction)(theEnv); }
@@ -1472,7 +1492,8 @@ globle void GenWrite(
 #pragma argsused
 #endif
 static void InitializeKeywords(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
 #if (! RUN_TIME) && WINDOW_INTERFACE
    void *ts;

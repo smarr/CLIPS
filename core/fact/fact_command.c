@@ -763,6 +763,7 @@ globle void EnvFacts(
 /****************************************************************/
 static long long GetFactsArgument(
   void *theEnv,
+  EXEC_STATUS,
   int whichOne,
   int argumentCount)
   {
@@ -794,6 +795,7 @@ static long long GetFactsArgument(
 /**********************************************/
 globle void AssertStringFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
    DATA_OBJECT argPtr;
@@ -835,7 +837,8 @@ globle void AssertStringFunction(
 /*   for the save-facts command.          */
 /******************************************/
 globle int SaveFactsCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    char *fileName;
    int numArgs, saveCode = LOCAL_SAVE;

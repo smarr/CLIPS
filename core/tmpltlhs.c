@@ -63,6 +63,7 @@
 /*********************************************/
 globle struct lhsParseNode *DeftemplateLHSParse(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   struct deftemplate *theDeftemplate)
   {
@@ -124,6 +125,7 @@ globle struct lhsParseNode *DeftemplateLHSParse(
 /******************************************/
 static struct lhsParseNode *GetLHSSlots(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   struct token *tempToken,
   struct deftemplate *theDeftemplate,
@@ -238,6 +240,7 @@ static struct lhsParseNode *GetLHSSlots(
 /*****************************************************/
 static struct lhsParseNode *GetSingleLHSSlot(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   struct token *tempToken,
   struct templateSlot *slotPtr,
@@ -345,6 +348,7 @@ static struct lhsParseNode *GetSingleLHSSlot(
 /******************************************************/
 static intBool MultiplyDefinedLHSSlots(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *theSlots,
   SYMBOL_HN *slotName)
   {

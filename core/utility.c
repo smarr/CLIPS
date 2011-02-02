@@ -65,7 +65,8 @@
 /*    data for utility routines.                */
 /************************************************/
 globle void InitializeUtilityData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    AllocateEnvironmentData(theEnv,UTILITY_DATA,sizeof(struct utilityData),DeallocateUtilityData);
    
@@ -84,7 +85,8 @@ globle void InitializeUtilityData(
 /*    data for utility routines.                  */
 /**************************************************/
 static void DeallocateUtilityData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct callFunctionItem *tmpPtr, *nextPtr;
    struct trackedMemory *tmpTM, *nextTM;
@@ -261,6 +263,7 @@ globle void PeriodicCleanup(
 /***************************************************/
 globle intBool AddCleanupFunction(
   void *theEnv,
+  EXEC_STATUS,
   char *name,
   void (*theFunction)(void *),
   int priority)
@@ -282,7 +285,7 @@ globle intBool AddPeriodicFunction(
   void (*theFunction)(void),
   int priority)
   {
-   void *theEnv;
+   void *theEnv,
    
    theEnv = GetCurrentEnvironment();
    
@@ -301,6 +304,7 @@ globle intBool AddPeriodicFunction(
 /*******************************************************/
 globle intBool EnvAddPeriodicFunction(
   void *theEnv,
+  EXEC_STATUS,
   char *name,
   void (*theFunction)(void *),
   int priority)
@@ -319,6 +323,7 @@ globle intBool EnvAddPeriodicFunction(
 /*******************************************************/
 globle intBool RemoveCleanupFunction(
   void *theEnv,
+  EXEC_STATUS,
   char *name)
   {
    intBool found;
@@ -335,6 +340,7 @@ globle intBool RemoveCleanupFunction(
 /**********************************************************/
 globle intBool EnvRemovePeriodicFunction(
   void *theEnv,
+  EXEC_STATUS,
   char *name)
   {
    intBool found;
@@ -351,6 +357,7 @@ globle intBool EnvRemovePeriodicFunction(
 /*****************************************************/
 globle char *StringPrintForm(
   void *theEnv,
+  EXEC_STATUS,
   char *str)
   {
    int i = 0;
@@ -386,6 +393,7 @@ globle char *StringPrintForm(
 /***********************************************************/
 globle char *AppendStrings(
   void *theEnv,
+  EXEC_STATUS,
   char *str1,
   char *str2)
   {
@@ -408,6 +416,7 @@ globle char *AppendStrings(
 /******************************************************/
 globle char *AppendToString(
   void *theEnv,
+  EXEC_STATUS,
   char *appendStr,
   char *oldStr,
   size_t *oldPos,
@@ -448,6 +457,7 @@ globle char *AppendToString(
 /**********************************************************/
 globle char *InsertInString(
   void *theEnv,
+  EXEC_STATUS,
   char *insertStr,
   size_t position,
   char *oldStr,
@@ -495,6 +505,7 @@ globle char *InsertInString(
 /*******************************************************************/
 globle char *EnlargeString(
   void *theEnv,
+  EXEC_STATUS,
   size_t length,
   char *oldStr,
   size_t *oldPos,
@@ -528,6 +539,7 @@ globle char *EnlargeString(
 /*******************************************************/
 globle char *AppendNToString(
   void *theEnv,
+  EXEC_STATUS,
   char *appendStr,
   char *oldStr,
   size_t length,
@@ -586,6 +598,7 @@ globle char *AppendNToString(
 /*******************************************************/
 globle char *ExpandStringWithChar(
   void *theEnv,
+  EXEC_STATUS,
   int inchar,
   char *str,
   size_t *pos,
@@ -631,6 +644,7 @@ globle char *ExpandStringWithChar(
 /*****************************************************************/
 globle struct callFunctionItem *AddFunctionToCallList(
   void *theEnv,
+  EXEC_STATUS,
   char *name,
   int priority,
   void (*func)(void *),
@@ -647,6 +661,7 @@ globle struct callFunctionItem *AddFunctionToCallList(
 /***********************************************************/
 globle struct callFunctionItem *AddFunctionToCallListWithContext(
   void *theEnv,
+  EXEC_STATUS,
   char *name,
   int priority,
   void (*func)(void *),
@@ -698,6 +713,7 @@ globle struct callFunctionItem *AddFunctionToCallListWithContext(
 /*****************************************************************/
 globle struct callFunctionItem *RemoveFunctionFromCallList(
   void *theEnv,
+  EXEC_STATUS,
   char *name,
   struct callFunctionItem *head,
   int *found)
@@ -736,6 +752,7 @@ globle struct callFunctionItem *RemoveFunctionFromCallList(
 /**************************************************************/
 globle void DeallocateCallList(
   void *theEnv,
+  EXEC_STATUS,
   struct callFunctionItem *theList)
   {
    struct callFunctionItem *tmpPtr, *nextPtr;
@@ -755,6 +772,7 @@ globle void DeallocateCallList(
 /*****************************************/
 globle unsigned long ItemHashValue(
   void *theEnv,
+  EXEC_STATUS,
   unsigned short theType,
   void *theValue,
   unsigned long theRange)
@@ -810,7 +828,8 @@ globle unsigned long ItemHashValue(
 /*   is running in the background.          */
 /********************************************/
 globle void YieldTime(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    if ((UtilityData(theEnv)->YieldTimeFunction != NULL) && UtilityData(theEnv)->YieldFunctionEnabled)
      { (*UtilityData(theEnv)->YieldTimeFunction)(); }
@@ -821,6 +840,7 @@ globle void YieldTime(
 /********************************************/
 globle short SetGarbageCollectionHeuristics(
   void *theEnv,
+  EXEC_STATUS,
   short newValue)
   {
    short oldValue;
@@ -837,7 +857,8 @@ globle short SetGarbageCollectionHeuristics(
 /*   of garbage collection locks.             */
 /**********************************************/
 globle void EnvIncrementGCLocks(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    UtilityData(theEnv)->GarbageCollectionLocks++;
   }
@@ -847,7 +868,8 @@ globle void EnvIncrementGCLocks(
 /*   of garbage collection locks.             */
 /**********************************************/
 globle void EnvDecrementGCLocks(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    if (UtilityData(theEnv)->GarbageCollectionLocks > 0)
      { UtilityData(theEnv)->GarbageCollectionLocks--; }
@@ -858,6 +880,7 @@ globle void EnvDecrementGCLocks(
 /********************************************/
 globle short EnablePeriodicFunctions(
   void *theEnv,
+  EXEC_STATUS,
   short value)
   {
    short oldValue;
@@ -874,6 +897,7 @@ globle short EnablePeriodicFunctions(
 /********************************************/
 globle short EnableYieldFunction(
   void *theEnv,
+  EXEC_STATUS,
   short value)
   {
    short oldValue;
@@ -890,6 +914,7 @@ globle short EnableYieldFunction(
 /********************************************/
 globle struct trackedMemory *AddTrackedMemory(
   void *theEnv,
+  EXEC_STATUS,
   void *theMemory,
   size_t theSize)
   {
@@ -911,6 +936,7 @@ globle struct trackedMemory *AddTrackedMemory(
 /********************************************/
 globle void RemoveTrackedMemory(
   void *theEnv,
+  EXEC_STATUS,
   struct trackedMemory *theTracker)
   {   
    if (theTracker->prev == NULL)

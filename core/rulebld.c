@@ -72,6 +72,7 @@
 /****************************************************************/
 globle struct joinNode *ConstructJoins(
   void *theEnv,
+  EXEC_STATUS,
   int logicalJoin,
   struct lhsParseNode *theLHS,
   int startDepth)
@@ -347,6 +348,7 @@ globle struct joinNode *ConstructJoins(
 /****************************************************************/
 static void AttachTestCEsToPatternCEs(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *theLHS)
   {
    struct lhsParseNode *lastNode, *tempNode;
@@ -555,6 +557,7 @@ static int TestJoinForReuse(
 /*************************************************************************/
 static struct joinNode *CreateNewJoin(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *joinTest,
   struct expr *secondaryJoinTest,
   struct joinNode *lhsEntryStruct,

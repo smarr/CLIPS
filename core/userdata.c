@@ -32,7 +32,8 @@
 /*    data for user data routines.               */
 /*************************************************/
 globle void InitializeUserDataData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    AllocateEnvironmentData(theEnv,USER_DATA_DATA,sizeof(struct userDataData),NULL);
   }
@@ -44,6 +45,7 @@ globle void InitializeUserDataData(
 /******************************************************/
 globle unsigned char InstallUserDataRecord(
   void *theEnv,
+  EXEC_STATUS,
   struct userDataRecord *theRecord)
   {
    theRecord->dataID = UserDataData(theEnv)->UserDataRecordCount;
@@ -58,6 +60,7 @@ globle unsigned char InstallUserDataRecord(
 /*****************************************************/
 globle struct userData *FetchUserData(
   void *theEnv,
+  EXEC_STATUS,
   unsigned char userDataID,
   struct userData **theList)
   {
@@ -107,6 +110,7 @@ globle struct userData *TestUserData(
 /***************************************************************/
 globle void ClearUserDataList(
   void *theEnv,
+  EXEC_STATUS,
   struct userData *theList)
   {
    struct userData *nextData;
@@ -125,6 +129,7 @@ globle void ClearUserDataList(
 /*************************************************/
 globle struct userData *DeleteUserData(
   void *theEnv,
+  EXEC_STATUS,
   unsigned char userDataID,
   struct userData *theList)
   {

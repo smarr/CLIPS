@@ -100,6 +100,7 @@ struct groupReference
 /********************************************/
 globle struct lhsParseNode *ReorderPatterns(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *theLHS,
   int *anyChange)
   {
@@ -229,6 +230,7 @@ globle struct lhsParseNode *ReorderPatterns(
 /******************************************/
 static struct lhsParseNode *ReorderDriver(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *theLHS,
   int *anyChange,
   int pass)
@@ -379,6 +381,7 @@ static void MarkExistsNands(
 /*************************************************************/
 static intBool AddNandPatterns(
   void *theEnv,
+  EXEC_STATUS,
   int depth,
   struct lhsParseNode *parent,
   struct lhsParseNode *firstPattern,
@@ -642,6 +645,7 @@ static intBool AddNandPatternsForSubconstraints(
 /*************************************************************/
 static void InsertNandPatterns(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *parent,
   struct lhsParseNode *firstPattern,
   struct lhsParseNode *endPattern,
@@ -746,6 +750,7 @@ static int VariableDepth(
 /****************************************************************/
 globle void AddInitialPatterns(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *theLHS)
   {
    struct lhsParseNode *thePattern;
@@ -779,6 +784,7 @@ globle void AddInitialPatterns(
 /***********************************************************/
 static struct lhsParseNode *PerformReorder1(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *theLHS,
   int *newChange)
   {
@@ -910,6 +916,7 @@ static struct lhsParseNode *PerformReorder1(
 /***********************************************************/
 static struct lhsParseNode *PerformReorder2(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *theLHS,
   int *newChange)
   {
@@ -1085,6 +1092,7 @@ static struct lhsParseNode *PerformReorder2(
 /**************************************************/
 static struct lhsParseNode *ReverseAndOr(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *listOfCEs,
   struct lhsParseNode *orCE,
   int orPosition)
@@ -1191,6 +1199,7 @@ static struct lhsParseNode *ReverseAndOr(
 /***********************************************************/
 static struct lhsParseNode *CompressCEs(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *theLHS,
   int *newChange)
   {
@@ -1338,6 +1347,7 @@ static struct lhsParseNode *CompressCEs(
 /*********************************************************************/
 globle struct lhsParseNode *CopyLHSParseNodes(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *listOfCEs)
   {
    struct lhsParseNode *newList;
@@ -1359,6 +1369,7 @@ globle struct lhsParseNode *CopyLHSParseNodes(
 /**********************************************************/
 globle void CopyLHSParseNode(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *dest,
   struct lhsParseNode *src,
   int duplicate)
@@ -1442,7 +1453,8 @@ globle void CopyLHSParseNode(
 /*   used for building conditional elements.        */
 /****************************************************/
 globle struct lhsParseNode *GetLHSParseNode(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct lhsParseNode *newNode;
 
@@ -1497,6 +1509,7 @@ globle struct lhsParseNode *GetLHSParseNode(
 /********************************************************/
 globle void ReturnLHSParseNodes(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *waste)
   {
    if (waste != NULL)
@@ -1529,6 +1542,7 @@ globle void ReturnLHSParseNodes(
 /********************************************************/
 globle struct lhsParseNode *ExpressionToLHSParseNodes(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *expressionList)
   {
    struct lhsParseNode *newList, *theList;
@@ -1586,6 +1600,7 @@ globle struct lhsParseNode *ExpressionToLHSParseNodes(
 /******************************************************************/
 globle struct expr *LHSParseNodesToExpression(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *nodeList)
   {
    struct expr *newList;
@@ -1622,6 +1637,7 @@ globle struct expr *LHSParseNodesToExpression(
 /************************************************************/
 static void IncrementNandDepth(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *theLHS,
   int lastCE)
   {
@@ -1681,7 +1697,8 @@ static void IncrementNandDepth(
 /*  CE or when no CEs are specified in the LHS of a rule.  */
 /***********************************************************/
 static struct lhsParseNode *CreateInitialPattern(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct lhsParseNode *topNode;
 
@@ -1705,6 +1722,7 @@ static struct lhsParseNode *CreateInitialPattern(
 /*****************************************************************/
 static struct lhsParseNode *AddRemainingInitialPatterns(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *theLHS)
   {
    struct lhsParseNode *lastNode = NULL, *thePattern, *rv = theLHS;
@@ -1744,6 +1762,7 @@ static struct lhsParseNode *AddRemainingInitialPatterns(
 /**********************************************/
 static void PrintNodes(
   void *theEnv,
+  EXEC_STATUS,
   char *fileid,
   struct lhsParseNode *theNode)
   {

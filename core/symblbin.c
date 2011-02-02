@@ -56,6 +56,7 @@
 /**********************************************/
 globle void WriteNeededAtomicValues(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp)
   {
    WriteNeededSymbols(theEnv,fp);
@@ -70,7 +71,8 @@ globle void WriteNeededAtomicValues(
 /*   the binary image being saved.                      */
 /********************************************************/
 globle void InitAtomicValueNeededFlags(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    unsigned long i;
    SYMBOL_HN *symbolPtr, **symbolArray;
@@ -149,6 +151,7 @@ globle void InitAtomicValueNeededFlags(
 /*****************************************************************/
 globle void WriteNeededSymbols(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp)
   {
    unsigned long i;
@@ -210,6 +213,7 @@ globle void WriteNeededSymbols(
 /*****************************************************************/
 globle void WriteNeededFloats(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp)
   {
    int i;
@@ -260,6 +264,7 @@ globle void WriteNeededFloats(
 /******************************************************************/
 globle void WriteNeededIntegers(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp)
   {
    int i;
@@ -314,6 +319,7 @@ globle void WriteNeededIntegers(
 /*****************************************************************/
 static void WriteNeededBitMaps(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp)
   {
    int i;
@@ -377,7 +383,8 @@ static void WriteNeededBitMaps(
 /*   this binary image from the binary file. */
 /*********************************************/
 globle void ReadNeededAtomicValues(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    ReadNeededSymbols(theEnv);
    ReadNeededFloats(theEnv);
@@ -390,7 +397,8 @@ globle void ReadNeededAtomicValues(
 /*   used by the binary image.             */
 /*******************************************/
 globle void ReadNeededSymbols(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    char *symbolNames, *namePtr;
    unsigned long space;
@@ -441,7 +449,8 @@ globle void ReadNeededSymbols(
 /*   used by the binary image.           */
 /*****************************************/
 globle void ReadNeededFloats(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    double *floatValues;
    long i;
@@ -485,7 +494,8 @@ globle void ReadNeededFloats(
 /*   used by the binary image.               */
 /*********************************************/
 globle void ReadNeededIntegers(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    long long *integerValues;
    long i;
@@ -529,7 +539,8 @@ globle void ReadNeededIntegers(
 /*   used by the binary image.             */
 /*******************************************/
 static void ReadNeededBitMaps(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    char *bitMapStorage, *bitMapPtr;
    unsigned long space;
@@ -583,7 +594,8 @@ static void ReadNeededBitMaps(
 /*   in refreshing expressions and other data structures. */
 /**********************************************************/
 globle void FreeAtomicValueStorage(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    if (SymbolData(theEnv)->SymbolArray != NULL)
      rm3(theEnv,(void *) SymbolData(theEnv)->SymbolArray,(long) sizeof(SYMBOL_HN *) * SymbolData(theEnv)->NumberOfSymbols);

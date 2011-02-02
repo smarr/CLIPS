@@ -75,6 +75,7 @@
 /***********************************************************/
 globle void PrintPartialMatch(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   struct partialMatch *list)
   {
@@ -101,6 +102,7 @@ globle void PrintPartialMatch(
 /**********************************************/
 globle struct partialMatch *CopyPartialMatch(
   void *theEnv,
+  EXEC_STATUS,
   struct partialMatch *list)
   {
    struct partialMatch *linker;
@@ -125,7 +127,8 @@ globle struct partialMatch *CopyPartialMatch(
 /* CreateEmptyPartialMatch:  */
 /**********************************************/
 globle struct partialMatch *CreateEmptyPartialMatch(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct partialMatch *linker;
 
@@ -169,6 +172,7 @@ static void InitializePMLinks(
 /***********************************************************/
 globle void UpdateBetaPMLinks(
   void *theEnv,
+  EXEC_STATUS,
   struct partialMatch *thePM,
   struct partialMatch *lhsBinds,
   struct partialMatch *rhsBinds,
@@ -308,6 +312,7 @@ globle void RemoveBlockedLink(
 /***********************************************************/
 globle void UnlinkBetaPMFromNodeAndLineage(
   void *theEnv,
+  EXEC_STATUS,
   struct joinNode *join,
   struct partialMatch *thePM,
   int side)
@@ -361,6 +366,7 @@ globle void UnlinkBetaPMFromNodeAndLineage(
 /***********************************************************/
 globle void UnlinkNonLeftLineage(
   void *theEnv,
+  EXEC_STATUS,
   struct joinNode *join,
   struct partialMatch *thePM,
   int side)
@@ -543,6 +549,7 @@ static void UnlinkBetaPartialMatchfromAlphaAndBetaLineage(
 /********************************************************/
 globle struct partialMatch *MergePartialMatches(
   void *theEnv,
+  EXEC_STATUS,
   struct partialMatch *lhsBind,
   struct partialMatch *rhsBind)
   {
@@ -587,6 +594,7 @@ globle struct partialMatch *MergePartialMatches(
 /*******************************************************************/
 globle void InitializePatternHeader(
   void *theEnv,
+  EXEC_STATUS,
   struct patternNodeHeader *theHeader)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
@@ -620,6 +628,7 @@ globle void InitializePatternHeader(
 /******************************************************************/
 globle struct partialMatch *CreateAlphaMatch(
   void *theEnv,
+  EXEC_STATUS,
   void *theEntity,
   struct multifieldMarker *markers,
   struct patternNodeHeader *theHeader,
@@ -724,6 +733,7 @@ globle struct partialMatch *CreateAlphaMatch(
 /*******************************************/
 struct multifieldMarker *CopyMultifieldMarkers(
   void *theEnv,
+  EXEC_STATUS,
   struct multifieldMarker *theMarkers)
   {
    struct multifieldMarker *head = NULL, *lastMark = NULL, *newMark;
@@ -758,6 +768,7 @@ struct multifieldMarker *CopyMultifieldMarkers(
 /***************************************************************/
 globle void FlushAlphaBetaMemory(
   void *theEnv,
+  EXEC_STATUS,
   struct partialMatch *pfl)
   {
    struct partialMatch *pfltemp;
@@ -779,6 +790,7 @@ globle void FlushAlphaBetaMemory(
 /*****************************************************************/
 globle void DestroyAlphaBetaMemory(
   void *theEnv,
+  EXEC_STATUS,
   struct partialMatch *pfl)
   {
    struct partialMatch *pfltemp;
@@ -842,6 +854,7 @@ globle int GetPatternNumberFromJoin(
 /************************************************************************/
 globle void TraceErrorToRule(
   void *theEnv,
+  EXEC_STATUS,
   struct joinNode *joinPtr,
   char *indentSpaces)
   {
@@ -862,6 +875,7 @@ globle void TraceErrorToRule(
 /**************************************************************/
 static void TraceErrorToRuleDriver(
   void *theEnv,
+  EXEC_STATUS,
   struct joinNode *joinPtr,
   char *indentSpaces,
   int priorRightJoinPatterns,
@@ -932,6 +946,7 @@ static int CountPriorPatterns(
 /********************************************************/
 globle void MarkRuleNetwork(
   void *theEnv,
+  EXEC_STATUS,
   int value)
   {
    struct defrule *rulePtr;
@@ -1001,6 +1016,7 @@ globle void MarkRuleJoins(
 /*****************************************/ 
 globle struct partialMatch *GetAlphaMemory(
   void *theEnv,
+  EXEC_STATUS,
   struct patternNodeHeader *theHeader,
   unsigned long hashOffset)
   {
@@ -1052,6 +1068,7 @@ globle struct partialMatch *GetRightBetaMemory(
 /***************************************/ 
 globle void ReturnLeftMemory(
   void *theEnv,
+  EXEC_STATUS,
   struct joinNode *theJoin)
   {
    if (theJoin->leftMemory == NULL) return;
@@ -1066,6 +1083,7 @@ globle void ReturnLeftMemory(
 /***************************************/ 
 globle void ReturnRightMemory(
   void *theEnv,
+  EXEC_STATUS,
   struct joinNode *theJoin)
   {
    if (theJoin->rightMemory == NULL) return;
@@ -1085,6 +1103,7 @@ globle void ReturnRightMemory(
 /****************************************************************/
 globle void DestroyBetaMemory(
   void *theEnv,
+  EXEC_STATUS,
   struct joinNode *theJoin,
   int side)
   {  
@@ -1115,6 +1134,7 @@ globle void DestroyBetaMemory(
 /*************************************************************/
 globle void FlushBetaMemory(
   void *theEnv,
+  EXEC_STATUS,
   struct joinNode *theJoin,
   int side)
   {
@@ -1163,6 +1183,7 @@ globle intBool BetaMemoryNotEmpty(
 /*********************************************/ 
 globle void RemoveAlphaMemoryMatches(
   void *theEnv,
+  EXEC_STATUS,
   struct patternNodeHeader *theHeader,
   struct partialMatch *theMatch,
   struct alphaMatch *theAlphaMatch)
@@ -1202,6 +1223,7 @@ globle void RemoveAlphaMemoryMatches(
 /*****************************************************************/
 globle void DestroyAlphaMemory(
   void *theEnv,
+  EXEC_STATUS,
   struct patternNodeHeader *theHeader,
   int unlink)
   {
@@ -1228,6 +1250,7 @@ globle void DestroyAlphaMemory(
 /*****************************************************************/
 globle void FlushAlphaMemory(
   void *theEnv,
+  EXEC_STATUS,
   struct patternNodeHeader *theHeader)
   {
    struct alphaMemoryHash *theAlphaMemory, *tempMemory;
@@ -1252,6 +1275,7 @@ globle void FlushAlphaMemory(
 /*****************************************************************/
 static struct alphaMemoryHash *FindAlphaMemory(
   void *theEnv,
+  EXEC_STATUS,
   struct patternNodeHeader *theHeader,
   unsigned long hashValue)
   {
@@ -1296,6 +1320,7 @@ static unsigned long AlphaMemoryHashValue(
 /*****************************************************************/
 static void UnlinkAlphaMemory(
   void *theEnv,
+  EXEC_STATUS,
   struct patternNodeHeader *theHeader,
   struct alphaMemoryHash *theAlphaMemory)
   {
@@ -1333,6 +1358,7 @@ static void UnlinkAlphaMemory(
 /*****************************************************************/
 static void UnlinkAlphaMemoryBucketSiblings(
   void *theEnv,
+  EXEC_STATUS,
   struct alphaMemoryHash *theAlphaMemory)
   {
    if (theAlphaMemory->prev == NULL)
@@ -1349,6 +1375,7 @@ static void UnlinkAlphaMemoryBucketSiblings(
 /********************************************/ 
 unsigned long ComputeRightHashValue(
   void *theEnv,
+  EXEC_STATUS,
   struct patternNodeHeader *theHeader)
   {
    struct expr *tempExpr;
@@ -1396,6 +1423,7 @@ unsigned long ComputeRightHashValue(
 /***********************************************************/
 globle void ResizeBetaMemory(
   void *theEnv,
+  EXEC_STATUS,
   struct betaMemory *theMemory)
   {
    struct partialMatch **oldArray, **lastAdd, *thePM, *nextPM;
@@ -1450,6 +1478,7 @@ globle void ResizeBetaMemory(
 /***********************************************************/
 static void ResetBetaMemory(
   void *theEnv,
+  EXEC_STATUS,
   struct betaMemory *theMemory)
   {
    struct partialMatch **oldArray, **lastAdd;
@@ -1486,6 +1515,7 @@ static void ResetBetaMemory(
 /*************************************************************/
 globle void TagRuleNetwork(
   void *theEnv,
+  EXEC_STATUS,
   long int *moduleCount,
   long int *ruleCount,
   long int *joinCount,
@@ -1557,6 +1587,7 @@ globle void TagRuleNetwork(
 /*******************************************************************/
 static void TagNetworkTraverseJoins(
   void *theEnv,
+  EXEC_STATUS,
   long int *joinCount,
   long int *linkCount,
   struct joinNode *joinPtr)
