@@ -480,7 +480,12 @@ globle void *GetCurrentEnvironment()
   {
    return(CurrentEnvironment);
   }  
-  
+
+global struct executionStatus *GetCurrentExectionStatus() 
+  {
+   return(CurrentExecutionStatus);
+  }
+
 /******************************************/
 /* GetEnvironmentIndex: Returns the index */
 /*   of the specified environment.        */

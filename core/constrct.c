@@ -328,7 +328,7 @@ globle void ClearCommand(
   EXEC_STATUS)
   {
    if (EnvArgCountCheck(theEnv,execStatus,"clear",EXACTLY,0) == -1) return;
-   EnvClear(theEnv);
+   EnvClear(theEnv,execStatus);
    return;
   }
 
@@ -341,7 +341,7 @@ globle void ResetCommand(
   EXEC_STATUS)
   {
    if (EnvArgCountCheck(theEnv,execStatus,"reset",EXACTLY,0) == -1) return;
-   EnvReset(theEnv);
+   EnvReset(theEnv,execStatus);
    return;
   }
 
@@ -350,9 +350,9 @@ globle void ResetCommand(
 /*   for the reset command. */
 /****************************/
 #if ALLOW_ENVIRONMENT_GLOBALS
-globle void Reset()
+globle void Reset(EXEC_STATUS)
   {
-   EnvReset(GetCurrentEnvironment());
+   EnvReset(GetCurrentEnvironment(),execStatus);
   }  
 #endif
 
@@ -515,9 +515,9 @@ globle intBool EnvRemoveResetFunction(
 /*   for the clear command. */
 /****************************/
 #if ALLOW_ENVIRONMENT_GLOBALS
-globle void Clear()
+globle void Clear(EXEC_STATUS)
   {
-   EnvClear(GetCurrentEnvironment());
+   EnvClear(GetCurrentEnvironment(),execStatus);
   }  
 #endif
     
@@ -605,7 +605,7 @@ globle void EnvClear(
    /* Perform reset after clear. */
    /*============================*/
    
-   EnvReset(theEnv);
+   EnvReset(theEnv,execStatus);
   }
 
 /*********************************************************/

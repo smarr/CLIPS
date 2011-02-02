@@ -79,8 +79,8 @@
    LOCALE struct expr                   *ModifyParse(void *,struct expr *,char *);
    LOCALE struct expr                   *DuplicateParse(void *,struct expr *,char *);
    LOCALE void                           DeftemplateFunctions( void *);
-   LOCALE void                           ModifyCommand(void *,DATA_OBJECT_PTR);
-   LOCALE void                           DuplicateCommand(void *,DATA_OBJECT_PTR);
+   LOCALE void                           ModifyCommand(void *, EXEC_STATUS, DATA_OBJECT_PTR);
+   LOCALE void                           DuplicateCommand(void *, EXEC_STATUS, DATA_OBJECT_PTR);
    LOCALE void                           DeftemplateSlotNamesFunction(void *,DATA_OBJECT *);
    LOCALE void                           EnvDeftemplateSlotNames(void *,void *,DATA_OBJECT *);
    LOCALE void                           DeftemplateSlotDefaultValueFunction(void *,DATA_OBJECT *);

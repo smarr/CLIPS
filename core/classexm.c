@@ -321,7 +321,7 @@ globle void *GetDefclassModuleCommand(
   void *theEnv,
   EXEC_STATUS)
   {
-   return(GetConstructModuleCommand(theEnv,"defclass-module",DefclassData(theEnv)->DefclassConstruct));
+   return(GetConstructModuleCommand(theEnv,execStatus,"defclass-module",DefclassData(theEnv)->DefclassConstruct));
   }
 
 /*********************************************************************

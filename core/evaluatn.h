@@ -204,9 +204,9 @@ struct evaluationData
 #define FunctionCall(a,b,c) EnvFunctionCall(GetCurrentEnvironment(),a,b,c)
 
    LOCALE void                           InitializeEvaluationData(void *);
-   LOCALE int                            EvaluateExpression(void *,struct expr *,struct dataObject *);
-   LOCALE void                           SetEvaluationError(void *,intBool);
-   LOCALE int                            GetEvaluationError(void *);
+   LOCALE int                            EvaluateExpression(void *,EXEC_STATUS,struct expr *,struct dataObject *);
+   LOCALE void                           SetEvaluationError(void *,EXEC_STATUS,intBool);
+   LOCALE int                            GetEvaluationError(void *,EXEC_STATUS);
    LOCALE void                           SetHaltExecution(void *,int);
    LOCALE int                            GetHaltExecution(void *);
    LOCALE void                           ReturnValues(void *,struct dataObject *,intBool);
@@ -214,7 +214,7 @@ struct evaluationData
    LOCALE void                           EnvSetMultifieldErrorValue(void *,struct dataObject *);
    LOCALE void                           ValueInstall(void *,struct dataObject *);
    LOCALE void                           ValueDeinstall(void *,struct dataObject *);
-   LOCALE void                           PropagateReturnValue(void *,struct dataObject *);
+   LOCALE void                           PropagateReturnValue(void *,EXEC_STATUS,struct dataObject *);
 #if DEFFUNCTION_CONSTRUCT || DEFGENERIC_CONSTRUCT
    LOCALE int                            EnvFunctionCall(void *,char *,char *,DATA_OBJECT *);
    LOCALE int                            FunctionCall2(void *,FUNCTION_REFERENCE *,char *,DATA_OBJECT *);

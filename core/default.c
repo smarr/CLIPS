@@ -439,8 +439,8 @@ globle struct expr *ParseDefault(
 
    while (newItem != NULL)
      {
-      SetEvaluationError(theEnv,FALSE);
-      if (EvaluateExpression(theEnv,newItem,&theValue)) *error = TRUE;
+      SetEvaluationError(theEnv,execStatus,FALSE);
+      if (EvaluateExpression(theEnv,execStatus,newItem,&theValue)) *error = TRUE;
 
       if ((theValue.type == MULTIFIELD) &&
           (multifield == FALSE) &&

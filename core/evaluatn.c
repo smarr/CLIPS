@@ -71,7 +71,7 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static void                    PropagateReturnAtom(void *,int,void *);
+   static void                    PropagateReturnAtom(void *,EXEC_STATUS,int,void *);
    static void                    DeallocateEvaluationData(void *);
    static void                    PrintCAddress(void *,char *,void *);
    static void                    NewCAddress(void *,DATA_OBJECT *);

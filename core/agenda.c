@@ -72,7 +72,7 @@
    static void                    PrintActivation(void *,char *,void *);
    static void                    AgendaClearFunction(void *);
    static char                   *SalienceEvaluationName(int);
-   static int                     EvaluateSalience(void *,void *);
+   static int                     EvaluateSalience(void *,EXEC_STATUS,void *);
    static struct salienceGroup   *ReuseOrCreateSalienceGroup(void *,struct defruleModule *,int);
    static struct salienceGroup   *FindSalienceGroup(struct defruleModule *,int);
    static void                    RemoveActivationFromGroup(void *,struct activation *,struct defruleModule *);
@@ -154,7 +154,7 @@ globle void AddActivation(
    newActivation->theRule = theRule;
    newActivation->basis = binds;
    newActivation->timetag = AgendaData(theEnv)->CurrentTimetag++;
-   newActivation->salience = EvaluateSalience(theEnv,theRule);
+   newActivation->salience = EvaluateSalience(theEnv,execStatus,theRule);
 
    newActivation->randomID = genrand();
    newActivation->prev = NULL;
@@ -904,7 +904,7 @@ globle void RefreshCommand(
    /* Refresh the rule. */
    /*===================*/
 
-   EnvRefresh(theEnv,rulePtr);
+   EnvRefresh(theEnv,execStatus,rulePtr);
   }
 
 /************************************************************/
@@ -949,7 +949,7 @@ globle intBool EnvRefresh(
             if (((struct joinNode *) listOfMatches->owner)->ruleToActivate != NULL)
               {
                if (listOfMatches->marker == NULL)
-                 { AddActivation(theEnv,rulePtr,listOfMatches); }
+                 { AddActivation(theEnv,execStatus,rulePtr,listOfMatches); }
               }
            }
         }
@@ -993,7 +993,7 @@ globle void RefreshAgendaCommand(
    /* Refresh the agenda of the appropriate module. */
    /*===============================================*/
 
-   EnvRefreshAgenda(theEnv,theModule);
+   EnvRefreshAgenda(theEnv,execStatus,theModule);
   }
 
 /**************************************/
@@ -1058,7 +1058,7 @@ globle void EnvRefreshAgenda(
       for (theActivation = (struct activation *) EnvGetNextActivation(theEnv,NULL);
            theActivation != NULL;
            theActivation = (struct activation *) EnvGetNextActivation(theEnv,theActivation))
-        { theActivation->salience = EvaluateSalience(theEnv,theActivation->theRule); }
+        { theActivation->salience = EvaluateSalience(theEnv,execStatus,theActivation->theRule); }
 
       /*======================================================*/
       /* Reorder the agenda based on the new salience values. */
@@ -1258,8 +1258,8 @@ static int EvaluateSalience(
   /* during evaluation, print an error message.         */
   /*====================================================*/
 
-  SetEvaluationError(theEnv,FALSE);
-  if (EvaluateExpression(theEnv,rPtr->dynamicSalience,&salienceValue))
+  SetEvaluationError(theEnv,execStatus,FALSE);
+  if (EvaluateExpression(theEnv,execStatus,rPtr->dynamicSalience,&salienceValue))
     {
      SalienceInformationError(theEnv,"defrule",ValueToString(rPtr->header.name));
      return(rPtr->salience);
@@ -1273,7 +1273,7 @@ static int EvaluateSalience(
     {
      SalienceNonIntegerError(theEnv);
      SalienceInformationError(theEnv,"defrule",ValueToString(rPtr->header.name));
-     SetEvaluationError(theEnv,TRUE);
+     SetEvaluationError(theEnv,execStatus,TRUE);
      return(rPtr->salience);
     }
 
@@ -1287,7 +1287,7 @@ static int EvaluateSalience(
   if ((salience > MAX_DEFRULE_SALIENCE) || (salience < MIN_DEFRULE_SALIENCE))
     {
      SalienceRangeError(theEnv,MIN_DEFRULE_SALIENCE,MAX_DEFRULE_SALIENCE);
-     SetEvaluationError(theEnv,TRUE);
+     SetEvaluationError(theEnv,execStatus,TRUE);
      SalienceInformationError(theEnv,"defrule",ValueToString(((struct defrule *) rPtr)->header.name));
      return(rPtr->salience);
     }

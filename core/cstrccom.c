@@ -73,7 +73,7 @@
 #if DEBUGGING_FUNCTIONS
    static void                    ConstructPrintWatch(void *,char *,struct construct *,void *,
                                                       unsigned (*)(void *,void *));
-   static unsigned                ConstructWatchSupport(void *,struct construct *,char *,
+   static unsigned                ConstructWatchSupport(void *,EXEC_STATUS,struct construct *,char *,
                                                         char *,EXPRESSION *,intBool,
                                                         unsigned,unsigned (*)(void *,void *),
                                                         void (*)(void *,unsigned,void *));
@@ -1004,7 +1004,7 @@ globle void ListConstructCommand(
    /* to list the constructs. */
    /*=========================*/
 
-   ListConstruct(theEnv,constructClass,WDISPLAY,theModule);
+   ListConstruct(theEnv,execStatus,constructClass,WDISPLAY,theModule);
   }
 
 /*****************************************/
@@ -1540,7 +1540,7 @@ static unsigned ConstructWatchSupport(
       /* occurs when evaluating the argument.     */
       /*==========================================*/
 
-      if (EvaluateExpression(theEnv,argExprs,&constructName))
+      if (EvaluateExpression(theEnv,execStatus,argExprs,&constructName))
         { return(FALSE); }
 
       /*================================================*/

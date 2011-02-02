@@ -55,7 +55,7 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static int                     SingleNumberCheck(void *,char *,double *);
+   static int                     SingleNumberCheck(void *,EXEC_STATUS,char *,double *);
    static int                     TestProximity(double,double);
    static void                    DomainErrorMessage(void *,char *);
    static void                    ArgumentOverflowErrorMessage(void *,char *);
@@ -216,7 +216,7 @@ globle double CosFunction(
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"cos",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"cos",&num) == FALSE) return(0.0);
    return(cos(num));
   }
 
@@ -230,7 +230,7 @@ globle double SinFunction(
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"sin",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"sin",&num) == FALSE) return(0.0);
    return(sin(num));
   }
 
@@ -244,7 +244,7 @@ globle double TanFunction(
   {
    double num, tv;
 
-   if (SingleNumberCheck(theEnv,"tan",&num) == FALSE) return (0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"tan",&num) == FALSE) return (0.0);
    tv = cos(num);
    if ((tv < SMALLEST_ALLOWED_NUMBER) && (tv > -SMALLEST_ALLOWED_NUMBER))
      {
@@ -265,7 +265,7 @@ globle double SecFunction(
   {
    double num, tv;
 
-   if (SingleNumberCheck(theEnv,"sec",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"sec",&num) == FALSE) return(0.0);
 
    tv = cos(num);
    if ((tv < SMALLEST_ALLOWED_NUMBER) && (tv > -SMALLEST_ALLOWED_NUMBER))
@@ -287,7 +287,7 @@ globle double CscFunction(
   {
    double num, tv;
 
-   if (SingleNumberCheck(theEnv,"csc",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"csc",&num) == FALSE) return(0.0);
    tv = sin(num);
    if ((tv < SMALLEST_ALLOWED_NUMBER) && (tv > -SMALLEST_ALLOWED_NUMBER))
      {
@@ -308,7 +308,7 @@ globle double CotFunction(
   {
     double num, tv;
 
-    if (SingleNumberCheck(theEnv,"cot",&num) == FALSE) return(0.0);
+    if (SingleNumberCheck(theEnv,execStatus,"cot",&num) == FALSE) return(0.0);
 
     tv = sin(num);
     if ((tv < SMALLEST_ALLOWED_NUMBER) && (tv > -SMALLEST_ALLOWED_NUMBER))
@@ -330,7 +330,7 @@ globle double AcosFunction(
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"acos",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"acos",&num) == FALSE) return(0.0);
    if ((num > 1.0) || (num < -1.0))
      {
       DomainErrorMessage(theEnv,"acos");
@@ -349,7 +349,7 @@ globle double AsinFunction(
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"asin",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"asin",&num) == FALSE) return(0.0);
    if ((num > 1.0) || (num < -1.0))
      {
       DomainErrorMessage(theEnv,"asin");
@@ -368,7 +368,7 @@ globle double AtanFunction(
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"atan",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"atan",&num) == FALSE) return(0.0);
    return(atan(num));
   }
 
@@ -382,7 +382,7 @@ globle double AsecFunction(
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"asec",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"asec",&num) == FALSE) return(0.0);
    if ((num < 1.0) && (num > -1.0))
      {
       DomainErrorMessage(theEnv,"asec");
@@ -402,7 +402,7 @@ globle double AcscFunction(
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"acsc",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"acsc",&num) == FALSE) return(0.0);
    if ((num < 1.0) && (num > -1.0))
      {
       DomainErrorMessage(theEnv,"acsc");
@@ -422,7 +422,7 @@ globle double AcotFunction(
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"acot",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"acot",&num) == FALSE) return(0.0);
    if (TestProximity(num,1e-25) == TRUE)  return(PID2);
    num = 1.0 / num;
    return(atan(num));
@@ -438,7 +438,7 @@ globle double CoshFunction(
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"cosh",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"cosh",&num) == FALSE) return(0.0);
    return(cosh(num));
   }
 
@@ -452,7 +452,7 @@ globle double SinhFunction(
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"sinh",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"sinh",&num) == FALSE) return(0.0);
    return(sinh(num));
   }
 
@@ -466,7 +466,7 @@ globle double TanhFunction(
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"tanh",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"tanh",&num) == FALSE) return(0.0);
    return(tanh(num));
   }
 
@@ -480,7 +480,7 @@ globle double SechFunction(
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"sech",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"sech",&num) == FALSE) return(0.0);
    return(1.0 / cosh(num));
   }
 
@@ -494,7 +494,7 @@ globle double CschFunction(
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"csch",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"csch",&num) == FALSE) return(0.0);
    if (num == 0.0)
      {
       SingularityErrorMessage(theEnv,"csch");
@@ -518,7 +518,7 @@ globle double CothFunction(
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"coth",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"coth",&num) == FALSE) return(0.0);
    if (num == 0.0)
      {
       SingularityErrorMessage(theEnv,"coth");
@@ -542,7 +542,7 @@ globle double AcoshFunction(
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"acosh",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"acosh",&num) == FALSE) return(0.0);
    if (num < 1.0)
      {
       DomainErrorMessage(theEnv,"acosh");
@@ -561,7 +561,7 @@ globle double AsinhFunction(
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"asinh",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"asinh",&num) == FALSE) return(0.0);
    return(genasinh(num));
   }
 
@@ -575,7 +575,7 @@ globle double AtanhFunction(
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"atanh",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"atanh",&num) == FALSE) return(0.0);
    if ((num >= 1.0) || (num <= -1.0))
      {
       DomainErrorMessage(theEnv,"atanh");
@@ -594,7 +594,7 @@ globle double AsechFunction(
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"asech",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"asech",&num) == FALSE) return(0.0);
    if ((num > 1.0) || (num <= 0.0))
      {
       DomainErrorMessage(theEnv,"asech");
@@ -613,7 +613,7 @@ globle double AcschFunction(
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"acsch",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"acsch",&num) == FALSE) return(0.0);
    if (num == 0.0)
      {
       DomainErrorMessage(theEnv,"acsch");
@@ -632,7 +632,7 @@ globle double AcothFunction(
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"acoth",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"acoth",&num) == FALSE) return(0.0);
    if ((num <= 1.0) && (num >= -1.0))
      {
       DomainErrorMessage(theEnv,"acoth");
@@ -651,7 +651,7 @@ globle double ExpFunction(
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"exp",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"exp",&num) == FALSE) return(0.0);
    return(exp(num));
   }
 
@@ -665,7 +665,7 @@ globle double LogFunction(
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"log",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"log",&num) == FALSE) return(0.0);
    if (num < 0.0)
      {
       DomainErrorMessage(theEnv,"log");
@@ -690,7 +690,7 @@ globle double Log10Function(
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"log10",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"log10",&num) == FALSE) return(0.0);
    if (num < 0.0)
      {
       DomainErrorMessage(theEnv,"log10");
@@ -715,7 +715,7 @@ globle double SqrtFunction(
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"sqrt",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"sqrt",&num) == FALSE) return(0.0);
    if (num < 0.00000)
      {
       DomainErrorMessage(theEnv,"sqrt");
@@ -850,7 +850,7 @@ globle double RadDegFunction(
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"rad-deg",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"rad-deg",&num) == FALSE) return(0.0);
    return(num * 180.0 / PI);
   }
 
@@ -864,7 +864,7 @@ globle double DegGradFunction(
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"deg-grad",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"deg-grad",&num) == FALSE) return(0.0);
    return(num / 0.9);
   }
 
@@ -878,7 +878,7 @@ globle double GradDegFunction(
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"grad-deg",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"grad-deg",&num) == FALSE) return(0.0);
    return(num * 0.9);
   }
 

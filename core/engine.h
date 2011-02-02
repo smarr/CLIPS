@@ -146,7 +146,7 @@ struct engineData
    LOCALE long long               Run(long long);
 #endif
 
-   LOCALE long long               EnvRun(void *,long long);
+   LOCALE long long               EnvRun(void *,EXEC_STATUS,long long);
    LOCALE intBool                 EnvAddRunFunction(void *,char *,
                                                     void (*)(void *),int);
    LOCALE intBool                 EnvAddRunFunctionWithContext(void *,char *,
@@ -160,24 +160,24 @@ struct engineData
    LOCALE void                    RemoveAllBreakpoints(void *);
    LOCALE void                    EnvShowBreaks(void *,char *,void *);
    LOCALE intBool                 EnvDefruleHasBreakpoint(void *,void *);
-   LOCALE void                    RunCommand(void *);
-   LOCALE void                    SetBreakCommand(void *);
-   LOCALE void                    RemoveBreakCommand(void *);
-   LOCALE void                    ShowBreaksCommand(void *);
-   LOCALE void                    HaltCommand(void *);
-   LOCALE int                     FocusCommand(void *);
-   LOCALE void                    ClearFocusStackCommand(void *);
+   LOCALE void                    RunCommand        (void *,EXEC_STATUS);
+   LOCALE void                    SetBreakCommand   (void *,EXEC_STATUS);
+   LOCALE void                    RemoveBreakCommand(void *,EXEC_STATUS);
+   LOCALE void                    ShowBreaksCommand (void *,EXEC_STATUS);
+   LOCALE void                    HaltCommand       (void *,EXEC_STATUS);
+   LOCALE int                     FocusCommand      (void *,EXEC_STATUS);
+   LOCALE void                    ClearFocusStackCommand(void *,EXEC_STATUS);
    LOCALE void                    EnvClearFocusStack(void *);
    LOCALE void                   *EnvGetNextFocus(void *,void *);
    LOCALE void                    EnvFocus(void *,void *);
    LOCALE int                     EnvGetFocusChanged(void *);
    LOCALE void                    EnvSetFocusChanged(void *,int);
-   LOCALE void                    ListFocusStackCommand(void *);
+   LOCALE void                    ListFocusStackCommand(void *,EXEC_STATUS);
    LOCALE void                    EnvListFocusStack(void *,char *);
-   LOCALE void                    GetFocusStackFunction(void *,DATA_OBJECT_PTR);
+   LOCALE void                    GetFocusStackFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
    LOCALE void                    EnvGetFocusStack(void *,DATA_OBJECT_PTR);
-   LOCALE void                   *PopFocusFunction(void *);
-   LOCALE void                   *GetFocusFunction(void *);
+   LOCALE void                   *PopFocusFunction(void *,EXEC_STATUS);
+   LOCALE void                   *GetFocusFunction(void *,EXEC_STATUS);
    LOCALE void                   *EnvPopFocus(void *);
    LOCALE void                   *EnvGetFocus(void *);
    LOCALE intBool                 EnvGetHaltRules(void *);

@@ -120,8 +120,8 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   void                               ConstructsToCCommand(void *);
-   static int                         ConstructsToC(void *,char *,char *,char *,long long,long long);
+   void                               ConstructsToCCommand(void *,EXEC_STATUS);
+   static int                         ConstructsToC(void *,EXEC_STATUS,char *,char *,char *,long long,long long);
    static void                        WriteFunctionExternDeclarations(void *,FILE *);
    static int                         FunctionsToCode(void *theEnv,EXEC_STATUS,char *,char *,char *);
    static int                         WriteInitializationFunction(void *,char *,char *,char *);
@@ -315,7 +315,7 @@ globle void ConstructsToCCommand(
  
    fileNameBuffer = (char *) genalloc(theEnv,nameLength + pathLength + EXTRA_FILE_NAME);
    
-   ConstructsToC(theEnv,fileName,pathName,fileNameBuffer,id,max);
+   ConstructsToC(theEnv,execStatus,fileName,pathName,fileNameBuffer,id,max);
    
    genfree(theEnv,fileNameBuffer,nameLength + pathLength + EXTRA_FILE_NAME);
   }

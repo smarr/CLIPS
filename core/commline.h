@@ -74,7 +74,7 @@ struct commandLineData
    LOCALE void                           PrintBanner(void *);
    LOCALE void                           SetAfterPromptFunction(void *,int (*)(void *));
    LOCALE void                           SetBeforeCommandExecutionFunction(void *,int (*)(void *));
-   LOCALE intBool                        RouteCommand(void *,char *,int);
+   LOCALE intBool                        RouteCommand(void *,EXEC_STATUS,char *,int);
    LOCALE int                          (*SetEventFunction(void *,int (*)(void *)))(void *);
    LOCALE intBool                        TopLevelCommand(void *);
    LOCALE void                           AppendNCommandString(void *,char *,unsigned);

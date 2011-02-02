@@ -69,7 +69,7 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static void                    DuplicateModifyCommand(void *,int,DATA_OBJECT_PTR);
+   static void                    DuplicateModifyCommand(void *, EXEC_STATUS, int,DATA_OBJECT_PTR);
    static SYMBOL_HN              *CheckDeftemplateAndSlotArguments(void *,char *,struct deftemplate **,int);
 
 #if (! RUN_TIME) && (! BLOAD_ONLY)
@@ -138,7 +138,7 @@ globle void ModifyCommand(
   EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
-   DuplicateModifyCommand(theEnv,TRUE,returnValue);
+   DuplicateModifyCommand(theEnv, execStatus, TRUE, returnValue);
   }
 
 /***************************************************************************/
@@ -150,7 +150,7 @@ globle void DuplicateCommand(
   EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
-   DuplicateModifyCommand(theEnv,FALSE,returnValue);
+   DuplicateModifyCommand(theEnv, execStatus, FALSE, returnValue);
   }
 
 /***************************************************************/

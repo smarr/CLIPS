@@ -327,7 +327,7 @@ globle void UndefclassCommand(
   void *theEnv,
   EXEC_STATUS)
   {
-   UndefconstructCommand(theEnv,"undefclass",DefclassData(theEnv)->DefclassConstruct);
+   UndefconstructCommand(theEnv,execStatus,"undefclass",DefclassData(theEnv)->DefclassConstruct);
   }
 
 /********************************************************
@@ -379,7 +379,7 @@ globle void PPDefclassCommand(
   void *theEnv,
   EXEC_STATUS)
   {   
-   PPConstructCommand(theEnv,"ppdefclass",DefclassData(theEnv)->DefclassConstruct);
+   PPConstructCommand(theEnv,execStatus,"ppdefclass",DefclassData(theEnv)->DefclassConstruct);
   }
 
 /***************************************************
@@ -394,7 +394,7 @@ globle void ListDefclassesCommand(
   void *theEnv,
   EXEC_STATUS)
   {
-   ListConstructCommand(theEnv,"list-defclasses",DefclassData(theEnv)->DefclassConstruct);
+   ListConstructCommand(theEnv,execStatus,"list-defclasses",DefclassData(theEnv)->DefclassConstruct);
   }
 
 /***************************************************
@@ -412,7 +412,7 @@ globle void EnvListDefclasses(
   char *logicalName,
   struct defmodule *theModule)
   {
-   ListConstruct(theEnv,DefclassData(theEnv)->DefclassConstruct,logicalName,theModule);
+   ListConstruct(theEnv,execStatus,DefclassData(theEnv)->DefclassConstruct,logicalName,theModule);
   }
 
 /*********************************************************
@@ -598,7 +598,7 @@ globle void GetDefclassListFunction(
   EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
-   GetConstructListFunction(theEnv,"get-defclass-list",returnValue,DefclassData(theEnv)->DefclassConstruct);
+   GetConstructListFunction(theEnv,execStatus,"get-defclass-list",returnValue,DefclassData(theEnv)->DefclassConstruct);
   }
 
 /***************************************************************

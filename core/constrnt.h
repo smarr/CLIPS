@@ -102,10 +102,10 @@ struct constraintData
 #define SetStaticConstraintChecking(a) EnvSetStaticConstraintChecking(GetCurrentEnvironment(),a)
 
    LOCALE void                           InitializeConstraints(void *);
-   LOCALE int                            GDCCommand(void *);
-   LOCALE int                            SDCCommand(void *d);
-   LOCALE int                            GSCCommand(void *);
-   LOCALE int                            SSCCommand(void *);
+   LOCALE int                            GDCCommand(void *,EXEC_STATUS);
+   LOCALE int                            SDCCommand(void *d,EXEC_STATUS);
+   LOCALE int                            GSCCommand(void *,EXEC_STATUS);
+   LOCALE int                            SSCCommand(void *,EXEC_STATUS);
    LOCALE intBool                        EnvSetDynamicConstraintChecking(void *,int);
    LOCALE intBool                        EnvGetDynamicConstraintChecking(void *);
    LOCALE intBool                        EnvSetStaticConstraintChecking(void *,int);

@@ -126,7 +126,7 @@ static void DeallocateEngineData(
 globle long long Run(
   long long runLimit)
   {
-   return EnvRun(GetCurrentEnvironment(),runLimit);
+   return EnvRun(GetCurrentEnvironment(),GetCurrentExecutionStatus(),runLimit);
   }
 #endif
   
@@ -306,7 +306,7 @@ globle long long EnvRun(
         { EngineData(theEnv)->TheLogicalBind = NULL; }
 
       execStatus->CurrentEvaluationDepth++;
-      SetEvaluationError(theEnv,FALSE);
+      SetEvaluationError(theEnv,execStatus,FALSE);
       EngineData(theEnv)->ExecutingRule->executing = TRUE;
 
 #if PROFILING_FUNCTIONS
@@ -324,7 +324,7 @@ globle long long EnvRun(
 #endif
 
       EngineData(theEnv)->ExecutingRule->executing = FALSE;
-      SetEvaluationError(theEnv,FALSE);
+      SetEvaluationError(theEnv,execStatus,FALSE);
       execStatus->CurrentEvaluationDepth--;
       EngineData(theEnv)->TheLogicalJoin = NULL;
       
@@ -957,7 +957,7 @@ globle void RunCommand(
       runLimit = DOToLong(argPtr);
      }
 
-   EnvRun(theEnv,runLimit);
+   EnvRun(theEnv,execStatus,runLimit);
 
    return;
   }
@@ -1319,7 +1319,7 @@ globle void *GetFocusFunction(
   {
    struct defmodule *rv;
 
-   EnvArgCountCheck(theEnv,"get-focus",EXACTLY,0);
+   EnvArgCountCheck(theEnv,execStatus,"get-focus",EXACTLY,0);
    rv = (struct defmodule *) EnvGetFocus(theEnv);
    if (rv == NULL) return((SYMBOL_HN *) EnvFalseSymbol(theEnv));
    return(rv->name);
@@ -1355,7 +1355,7 @@ globle int FocusCommand(
    /* Check for the correct number and type of arguments. */
    /*=====================================================*/
 
-   if ((argCount = EnvArgCountCheck(theEnv,"focus",AT_LEAST,1)) == -1)
+   if ((argCount = EnvArgCountCheck(theEnv,execStatus,"focus",AT_LEAST,1)) == -1)
      { return(FALSE); }
 
    /*===========================================*/
@@ -1364,7 +1364,7 @@ globle int FocusCommand(
 
    for (i = argCount; i > 0; i--)
      {
-      if (EnvArgTypeCheck(theEnv,"focus",i,SYMBOL,&argPtr) == FALSE)
+      if (EnvArgTypeCheck(theEnv,execStatus,"focus",i,SYMBOL,&argPtr) == FALSE)
         { return(FALSE); }
 
       argument = DOToString(argPtr);
