@@ -133,7 +133,7 @@ globle void AddHashedFact(
 	  
 	// Lode: Add a write lock to the FactHashTable
 	// XXX: could be removed?
-	apr_thread_rwlock_rdlock(Env(theEnv)->factHashLock);
+	apr_thread_rwlock_wrlock(Env(theEnv)->factHashLock);
 	  
    if (FactData(theEnv)->NumberOfFacts > FactData(theEnv)->FactHashTableSize)
      { ResizeFactHashTable(theEnv); }
@@ -183,6 +183,7 @@ globle intBool RemoveHashedFact(
             rtn_struct(theEnv,factHashEntry,hptr);
             if (FactData(theEnv)->NumberOfFacts == 1)
               { ResetFactHashTable(theEnv); }
+			apr_thread_rwlock_unlock(Env(theEnv)->factHashLock); // Lode: Unlock
             return(1);
            }
          else
@@ -191,6 +192,7 @@ globle intBool RemoveHashedFact(
             rtn_struct(theEnv,factHashEntry,hptr);
             if (FactData(theEnv)->NumberOfFacts == 1)
               { ResetFactHashTable(theEnv); }
+			apr_thread_rwlock_unlock(Env(theEnv)->factHashLock); // Lode: Unlock
             return(1);
            }
         }
@@ -227,11 +229,15 @@ globle unsigned long HandleFactDuplication(
    if (FactData(theEnv)->FactDuplication) return(hashValue);
 
    tempPtr = FactExists(theEnv,(struct fact *) theFact,hashValue);
-   if (tempPtr == NULL) return(hashValue);
+	  if (tempPtr == NULL) {
+		  apr_thread_rwlock_unlock(Env(theEnv)->factHashLock); // Lode: Unlock
+		  return(hashValue);
+	  }
 	  
 	// Lode: Unlock FactHashTable
 	apr_thread_rwlock_unlock(Env(theEnv)->factHashLock);
 	  
+   // Lode: TODO check thread-safety
    ReturnFact(theEnv,(struct fact *) theFact);
 #if DEFRULE_CONSTRUCT
    AddLogicalDependencies(theEnv,(struct patternEntity *) tempPtr,TRUE);
