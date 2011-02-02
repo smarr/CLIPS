@@ -100,7 +100,9 @@ static struct fact *FactExists(
   {
    struct factHashEntry *theFactHash;
 
-   hashValue = (hashValue % FactData(theEnv)->FactHashTableSize);
+    // STEFAN: TODO: make thread-safe
+    
+   hashValue = (hashValue % FactData(theEnv)->FactHashTableSize);  // not thread-safe, could be resized...
 
    for (theFactHash = FactData(theEnv)->FactHashTable[hashValue];
         theFactHash != NULL;
@@ -134,7 +136,9 @@ globle void AddHashedFact(
    newhash = get_struct(theEnv,factHashEntry);
    newhash->theFact = theFact;
 
-   hashValue = (hashValue % FactData(theEnv)->FactHashTableSize);
+     // STEFAN: TODO: make this thread-safe
+    
+   hashValue = (hashValue % FactData(theEnv)->FactHashTableSize);  // not thread-safe, could be resized...
    
    temp = FactData(theEnv)->FactHashTable[hashValue];
    FactData(theEnv)->FactHashTable[hashValue] = newhash;
@@ -153,6 +157,9 @@ globle intBool RemoveHashedFact(
    struct factHashEntry *hptr, *prev;
 
    hashValue = HashFact(theFact);
+    
+    // STEFAN: TODO: make this thread-safe
+    
    hashValue = (hashValue % FactData(theEnv)->FactHashTableSize);
 
    for (hptr = FactData(theEnv)->FactHashTable[hashValue], prev = NULL;
