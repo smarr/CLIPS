@@ -58,6 +58,30 @@ void EnvUserFunctions(void *);
 void UserFunctions()
   {   
   }
+
+globle void ProcessEventCommand(
+                          void *theEnv,
+                          DATA_OBJECT_PTR rv)
+{
+ printf("ProcessEventCommand: %p %p\n", theEnv, rv); 
+}
+
+static struct expr *AssertParse(
+                                void *theEnv,
+                                struct expr *top,
+                                char *logicalName)
+{
+  int error;
+  struct expr *rv;
+  struct token theToken;
+  
+  ReturnExpression(theEnv,top);
+  SavePPBuffer(theEnv," ");
+  IncrementIndentDepth(theEnv,8);
+  rv = BuildRHSAssert(theEnv,logicalName,&theToken,&error,TRUE,TRUE,"assert command");
+  DecrementIndentDepth(theEnv,8);
+  return(rv);
+}
   
 /***********************************************************/
 /* EnvUserFunctions: Informs the expert system environment */
@@ -74,6 +98,16 @@ void UserFunctions()
 void EnvUserFunctions(
   void *theEnv)
   {
+    
+    // STEFAN: try to add a new primitive which enters a event/fact into our
+    //         parallel processing system
+    EnvDefineFunction(theEnv, "proc-event", 'v', PTIEF ProcessEventCommand,
+                      "ProcessEventCommand"); 
+
+    AddFunctionParser(theEnv,"proc-event",AssertParse);
+    FuncSeqOvlFlags(theEnv,"proc-event",FALSE,FALSE);
+
+    
 #if MAC_MCW || WIN_MCW || MAC_XCD
 #pragma unused(theEnv)
 #endif
