@@ -267,7 +267,6 @@ globle void AssertCommand(
 struct paramsForProcessEvent
 {
   void *theEnv;
-  DATA_OBJECT_PTR rv;
 };
 
 
@@ -275,7 +274,8 @@ static void * APR_THREAD_FUNC ProcessEventOnFactThread(apr_thread_t *thread, voi
 {
   struct paramsForProcessEvent* const params = (struct paramsForProcessEvent*)parameters;
   
-  AssertOrProcessEvent(params->theEnv, params->rv, FALSE);
+  DATA_OBJECT result;
+  AssertOrProcessEvent(params->theEnv, &result, FALSE);
   
   free(params);
   
@@ -284,11 +284,10 @@ static void * APR_THREAD_FUNC ProcessEventOnFactThread(apr_thread_t *thread, voi
 
 
 globle void ProcessEventCommand(
-   void *theEnv,
-   DATA_OBJECT_PTR rv)
+   void *theEnv)
    {
      // STEFAN: hand over to the FactThread
-     
+       
      struct paramsForProcessEvent * parameters = (struct paramsForProcessEvent *)malloc(sizeof(struct paramsForProcessEvent));
      
      if (!parameters) {
@@ -296,7 +295,6 @@ globle void ProcessEventCommand(
      }
      else {
        parameters->theEnv = theEnv;
-       parameters->rv     = rv;
        
        apr_status_t apr_rv;
        apr_rv = apr_thread_pool_push(Env(theEnv)->factThreadPool,

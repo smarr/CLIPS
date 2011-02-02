@@ -43,7 +43,7 @@
    LOCALE void                           FactCommandDefinitions(void *);
    LOCALE void                           AssertCommand(void *,DATA_OBJECT_PTR);
    LOCALE void                           RetractCommand(void *);
-   LOCALE void                           ProcessEventCommand(void *,DATA_OBJECT_PTR);
+   LOCALE void                           ProcessEventCommand(void *);
    LOCALE void                           AssertStringFunction(void *,DATA_OBJECT_PTR);
    LOCALE void                           FactsCommand(void *);
    LOCALE void                           EnvFacts(void *,char *,void *,long long,long long,long long);
