@@ -678,7 +678,8 @@ static void * APR_THREAD_FUNC ParallelFactMatchAndLogicRetract(apr_thread_t *thr
 /********************************************************/
 globle void *EnvAssert(
   void *theEnv,
-  void *vTheFact)
+  void *vTheFact,
+  int  goParallel)
   {
    unsigned long hashValue;
    unsigned long length, i;
@@ -1581,7 +1582,7 @@ globle void *EnvAssertString(
 
    if ((theFact = StringToFact(theEnv,theString)) == NULL) return(NULL);
 
-   return((void *) EnvAssert(theEnv,(void *) theFact));
+   return((void *) EnvAssert(theEnv,(void *) theFact, FALSE));
   }
 
 /******************************************************/

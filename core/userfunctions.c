@@ -43,6 +43,8 @@
 
 #include "clips.h"
 
+#include "factrhs.h"
+
 void UserFunctions(void);
 void EnvUserFunctions(void *);
 
@@ -58,13 +60,6 @@ void EnvUserFunctions(void *);
 void UserFunctions()
   {   
   }
-
-globle void ProcessEventCommand(
-                          void *theEnv,
-                          DATA_OBJECT_PTR rv)
-{
- printf("ProcessEventCommand: %p %p\n", theEnv, rv); 
-}
 
 static struct expr *ProcessEventParse(
                                 void *theEnv,

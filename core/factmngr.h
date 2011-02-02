@@ -103,7 +103,7 @@ struct factsData
 #define LOCALE extern
 #endif
 
-#define Assert(a) EnvAssert(GetCurrentEnvironment(),a)
+#define Assert(a) EnvAssert(GetCurrentEnvironment(),a, FALSE)
 #define AssertString(a) EnvAssertString(GetCurrentEnvironment(),a)
 #define AssignFactSlotDefaults(a) EnvAssignFactSlotDefaults(GetCurrentEnvironment(),a)
 #define CreateFact(a) EnvCreateFact(GetCurrentEnvironment(),a)
@@ -121,7 +121,7 @@ struct factsData
    LOCALE long long                      FactIndex(void *);
 #endif
 
-   LOCALE void                          *EnvAssert(void *,void *);
+   LOCALE void                          *EnvAssert(void *,void *, bool);
    LOCALE void                          *EnvAssertString(void *,char *);
    LOCALE struct fact                   *EnvCreateFact(void *,void *);
    LOCALE void                           EnvDecrementFactCount(void *,void *);

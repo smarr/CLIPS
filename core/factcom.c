@@ -115,13 +115,10 @@ globle void FactCommandDefinitions(
 #endif
   }
 
-/***************************************/
-/* AssertCommand: H/L access routine   */
-/*   for the assert function.          */
-/***************************************/
-globle void AssertCommand(
-  void *theEnv,
-  DATA_OBJECT_PTR rv)
+static void AssertOrProcessEvent(
+   void *theEnv,
+   DATA_OBJECT_PTR rv,
+   int doAssert)
   {
    struct deftemplate *theDeftemplate;
    struct field *theField;
@@ -232,7 +229,7 @@ globle void AssertCommand(
    /* Add the fact to the fact-list. */
    /*================================*/
 
-   theFact = (struct fact *) EnvAssert(theEnv,(void *) newFact);
+   theFact = (struct fact *) EnvAssert(theEnv,(void *) newFact, !doAssert);
 
    /*========================================*/
    /* The asserted fact is the return value. */
@@ -246,6 +243,26 @@ globle void AssertCommand(
 
    return;
   }
+
+
+/***************************************/
+/* AssertCommand: H/L access routine   */
+/*   for the assert function.          */
+/***************************************/
+globle void AssertCommand(
+   void *theEnv,
+   DATA_OBJECT_PTR rv)
+   {
+     AssertOrProcessEvent(theEnv, rv, TRUE);
+   }    
+
+globle void ProcessEventCommand(
+                                void *theEnv,
+                                DATA_OBJECT_PTR rv)
+{
+  AssertOrProcessEvent(theEnv, rv, FALSE);
+}
+
 
 /****************************************/
 /* RetractCommand: H/L access routine   */

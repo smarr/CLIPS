@@ -123,7 +123,7 @@ static void ResetDeftemplates(
 
    if (factPtr == NULL) return;
 
-   EnvAssert(theEnv,(void *) factPtr);
+   EnvAssert(theEnv,(void *) factPtr, FALSE);
  }
 #endif
 

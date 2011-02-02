@@ -405,8 +405,9 @@ static void DuplicateModifyCommand(
    /* Perform the duplicate/modify action. */
    /*======================================*/
 
+# warning STEFAN: check back here, whether we need to use DuplicateModifyCommand and want to do EnvAssert with (..,.., TRUE)
    if (retractIt) EnvRetract(theEnv,oldFact);
-   theFact = (struct fact *) EnvAssert(theEnv,newFact);
+   theFact = (struct fact *) EnvAssert(theEnv,newFact, FALSE);
 
    /*========================================*/
    /* The asserted fact is the return value. */
