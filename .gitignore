@@ -1,7 +1,9 @@
-# OSX Specific
+# OSX and Xcode Specific
 .DS_Store
 
 *.pbxuser
 *.perspectivev3
 /mac_os_x/CLIPS.xcodeproj/xcuserdata/
 /mac_os_x/CLIPS.xcodeproj/project.xcworkspace/
+/mac_os_x/build/
+
