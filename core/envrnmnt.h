@@ -50,6 +50,7 @@
 
 # include <apr_pools.h>
 # include <apr_thread_pool.h>
+# include <apr_thread_rwlock.h>
 
 struct environmentCleanupFunction
   {
@@ -74,7 +75,11 @@ struct environmentData
     
     // STEFAN: Adding thread pool properties
     apr_pool_t        *memoryPool;
-    apr_thread_pool_t *threadPool;    
+    apr_thread_pool_t *threadPool;
+	
+	// Lode: Added Reader/Writer Lock for Hash
+	apr_thread_rwlock_t *factHashLock;
+
   };
 
 typedef struct environmentData ENVIRONMENT_DATA;

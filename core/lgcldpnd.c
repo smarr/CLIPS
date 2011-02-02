@@ -82,6 +82,7 @@ globle intBool AddLogicalDependencies(
    struct partialMatch *theBinds;
    struct dependency *newDependency;
 
+	  // Lode: TODO Thread-safe
    /*==============================================*/
    /* If the rule has no logical patterns, then no */
    /* dependencies have to be established.         */
