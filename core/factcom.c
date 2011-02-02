@@ -1288,7 +1288,7 @@ static struct expr *AssertParse(
    ReturnExpression(theEnv,top);
    SavePPBuffer(theEnv," ");
    IncrementIndentDepth(theEnv,8);
-   rv = BuildRHSAssert(theEnv,logicalName,&theToken,&error,TRUE,TRUE,"assert command");
+   rv = BuildRHSAssert(theEnv,logicalName,&theToken,&error,TRUE,TRUE,"assert command","assert");
    DecrementIndentDepth(theEnv,8);
    return(rv);
   }

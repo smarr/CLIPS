@@ -80,7 +80,8 @@ globle struct expr *BuildRHSAssert(
   int *error,
   int atLeastOne,
   int readFirstParen,
-  char *whereParsed)
+  char *whereParsed,
+  const char* assertLikeCommand)
   {
    struct expr *lastOne, *nextOne, *assertList, *stub;
 
@@ -117,7 +118,7 @@ globle struct expr *BuildRHSAssert(
      {
       PPCRAndIndent(theEnv);
 
-      stub = GenConstant(theEnv,FCALL,(void *) FindFunction(theEnv,"assert"));
+      stub = GenConstant(theEnv,FCALL,(void *) FindFunction(theEnv, assertLikeCommand));
       stub->argList = nextOne;
       nextOne = stub;
 

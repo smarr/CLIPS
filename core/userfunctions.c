@@ -66,7 +66,7 @@ globle void ProcessEventCommand(
  printf("ProcessEventCommand: %p %p\n", theEnv, rv); 
 }
 
-static struct expr *AssertParse(
+static struct expr *ProcessEventParse(
                                 void *theEnv,
                                 struct expr *top,
                                 char *logicalName)
@@ -78,7 +78,7 @@ static struct expr *AssertParse(
   ReturnExpression(theEnv,top);
   SavePPBuffer(theEnv," ");
   IncrementIndentDepth(theEnv,8);
-  rv = BuildRHSAssert(theEnv,logicalName,&theToken,&error,TRUE,TRUE,"assert command");
+  rv = BuildRHSAssert(theEnv,logicalName,&theToken,&error,TRUE,TRUE,"proc-event command", "proc-event");
   DecrementIndentDepth(theEnv,8);
   return(rv);
 }
@@ -104,7 +104,7 @@ void EnvUserFunctions(
     EnvDefineFunction(theEnv, "proc-event", 'v', PTIEF ProcessEventCommand,
                       "ProcessEventCommand"); 
 
-    AddFunctionParser(theEnv,"proc-event",AssertParse);
+    AddFunctionParser(theEnv,"proc-event",ProcessEventParse);
     FuncSeqOvlFlags(theEnv,"proc-event",FALSE,FALSE);
 
     

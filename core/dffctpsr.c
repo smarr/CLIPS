@@ -95,7 +95,7 @@ globle int ParseDeffacts(
    /* Parse the list of facts in the deffacts body. */
    /*===============================================*/
 
-   temp = BuildRHSAssert(theEnv,readSource,&inputToken,&deffactsError,FALSE,FALSE,"deffacts");
+   temp = BuildRHSAssert(theEnv,readSource,&inputToken,&deffactsError,FALSE,FALSE,"deffacts","assert");
 
    if (deffactsError == TRUE) { return(TRUE); }
 
