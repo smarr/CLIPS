@@ -41,21 +41,21 @@
 #define GetAutoFloatDividend() EnvGetAutoFloatDividend(GetCurrentEnvironment())
 #define SetAutoFloatDividend(a) EnvSetAutoFloatDividend(GetCurrentEnvironment(),a)
 
-   LOCALE void                    BasicMathFunctionDefinitions(void *);
-   LOCALE void                    AdditionFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                    MultiplicationFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                    SubtractionFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                    DivisionFunction(void *,DATA_OBJECT_PTR);
-   LOCALE long long               DivFunction(void *);
-   LOCALE intBool                 SetAutoFloatDividendCommand(void *);
-   LOCALE intBool                 GetAutoFloatDividendCommand(void *);
-   LOCALE intBool                 EnvGetAutoFloatDividend(void *);
-   LOCALE intBool                 EnvSetAutoFloatDividend(void *,int);
-   LOCALE long long               IntegerFunction(void *);
-   LOCALE double                  FloatFunction(void *);
-   LOCALE void                    AbsFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                    MinFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                    MaxFunction(void *,DATA_OBJECT_PTR);
+   LOCALE void                    BasicMathFunctionDefinitions(void *,EXEC_STATUS);
+   LOCALE void                    AdditionFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
+   LOCALE void                    MultiplicationFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
+   LOCALE void                    SubtractionFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
+   LOCALE void                    DivisionFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
+   LOCALE long long               DivFunction(void *,EXEC_STATUS);
+   LOCALE intBool                 SetAutoFloatDividendCommand(void *,EXEC_STATUS);
+   LOCALE intBool                 GetAutoFloatDividendCommand(void *,EXEC_STATUS);
+   LOCALE intBool                 EnvGetAutoFloatDividend(void *,EXEC_STATUS);
+   LOCALE intBool                 EnvSetAutoFloatDividend(void *,EXEC_STATUS,int);
+   LOCALE long long               IntegerFunction(void *,EXEC_STATUS);
+   LOCALE double                  FloatFunction(void *,EXEC_STATUS);
+   LOCALE void                    AbsFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
+   LOCALE void                    MinFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
+   LOCALE void                    MaxFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
 
 #endif
 

@@ -328,7 +328,7 @@ globle void ExitCommand(
    int argCnt;
    int status;
 
-   if ((argCnt = EnvArgCountCheck(theEnv,"exit",NO_MORE_THAN,1)) == -1) return;
+   if ((argCnt = EnvArgCountCheck(theEnv,execStatus,"exit",NO_MORE_THAN,1)) == -1) return;
    if (argCnt == 0)
      { EnvExitRouter(theEnv,EXIT_SUCCESS); }
    else

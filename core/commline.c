@@ -482,14 +482,14 @@ static int DoWhiteSpace(
 /*   if there is an active batch file.                              */
 /********************************************************************/
 globle void CommandLoop(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    int inchar;
 
    EnvPrintRouter(theEnv,WPROMPT,CommandLineData(theEnv)->BannerString);
    SetHaltExecution(theEnv,FALSE);
    SetEvaluationError(theEnv,FALSE);
-   PeriodicCleanup(theEnv,TRUE,FALSE);
+   PeriodicCleanup(theEnv,execStatus,TRUE,FALSE);
    PrintPrompt(theEnv);
    RouterData(theEnv)->CommandBufferInputCount = 0;
    RouterData(theEnv)->AwaitingInput = TRUE;
@@ -535,7 +535,7 @@ globle void CommandLoop(
       /* buffer, then execute it.                */
       /*=========================================*/
 
-      ExecuteIfCommandComplete(theEnv);
+      ExecuteIfCommandComplete(theEnv,execStatus);
      }
   }
   
@@ -545,16 +545,16 @@ globle void CommandLoop(
 /*   are no longer any active batch files.                 */
 /***********************************************************/
 globle void CommandLoopBatch(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    SetHaltExecution(theEnv,FALSE);
    SetEvaluationError(theEnv,FALSE);
-   PeriodicCleanup(theEnv,TRUE,FALSE);
+   PeriodicCleanup(theEnv,execStatus,TRUE,FALSE);
    PrintPrompt(theEnv);
    RouterData(theEnv)->CommandBufferInputCount = 0;
    RouterData(theEnv)->AwaitingInput = TRUE;
 
-   CommandLoopBatchDriver(theEnv);
+   CommandLoopBatchDriver(theEnv,execStatus);
   }
 
 /************************************************************/
@@ -563,11 +563,11 @@ globle void CommandLoopBatch(
 /*   there are no longer any active batch files.            */
 /************************************************************/
 globle void CommandLoopOnceThenBatch(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
-   if (! ExecuteIfCommandComplete(theEnv)) return;
+   if (! ExecuteIfCommandComplete(theEnv,execStatus)) return;
 
-   CommandLoopBatchDriver(theEnv);
+   CommandLoopBatchDriver(theEnv,execStatus);
   }
   
 /*********************************************************/
@@ -576,7 +576,7 @@ globle void CommandLoopOnceThenBatch(
 /*   when there are no longer any active batch files.    */
 /*********************************************************/
 globle void CommandLoopBatchDriver(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    int inchar;
 
@@ -627,7 +627,7 @@ globle void CommandLoopBatchDriver(
       /* buffer, then execute it.                */
       /*=========================================*/
 
-      ExecuteIfCommandComplete(theEnv);
+      ExecuteIfCommandComplete(theEnv,execStatus);
      }
   }
 
@@ -636,7 +636,7 @@ globle void CommandLoopBatchDriver(
 /*   is a completed command and if so executes it.        */
 /**********************************************************/
 globle intBool ExecuteIfCommandComplete(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    if ((CompleteCommand(CommandLineData(theEnv)->CommandString) == 0) || 
        (RouterData(theEnv)->CommandBufferInputCount == 0) ||
@@ -653,12 +653,12 @@ globle intBool ExecuteIfCommandComplete(
    SetPPBufferStatus(theEnv,OFF);
    RouterData(theEnv)->CommandBufferInputCount = 0;
    RouterData(theEnv)->AwaitingInput = FALSE;
-   RouteCommand(theEnv,CommandLineData(theEnv)->CommandString,TRUE);
+   RouteCommand(theEnv,execStatus,CommandLineData(theEnv)->CommandString,TRUE);
    FlushPPBuffer(theEnv);
    SetHaltExecution(theEnv,FALSE);
    SetEvaluationError(theEnv,FALSE);
    FlushCommandString(theEnv);
-   PeriodicCleanup(theEnv,TRUE,FALSE);
+   PeriodicCleanup(theEnv,execStatus,TRUE,FALSE);
    PrintPrompt(theEnv);
          
    return TRUE;
@@ -725,7 +725,7 @@ globle void SetBeforeCommandExecutionFunction(
 /* RouteCommand: Processes a completed command. */
 /************************************************/
 globle intBool RouteCommand(
-  void *theEnv,
+  void *theEnv,EXEC_STATUS,
   char *command,
   int printResult)
   {
@@ -820,7 +820,7 @@ globle intBool RouteCommand(
    {
     int errorFlag;
 
-    errorFlag = ParseConstruct(theEnv,commandName,"command");
+    errorFlag = ParseConstruct(theEnv,execStatus,commandName,"command");
     if (errorFlag != -1)
       {
        CloseStringSource(theEnv,"command");

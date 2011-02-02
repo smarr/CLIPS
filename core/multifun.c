@@ -1329,11 +1329,11 @@ static void MultifieldPrognDriver(
            { PropagateReturnValue(theEnv,result); }
          PeriodicCleanup(theEnv,FALSE,TRUE);
 
-         if (EvaluationData(theEnv)->HaltExecution || ProcedureFunctionData(theEnv)->BreakFlag || ProcedureFunctionData(theEnv)->ReturnFlag)
+         if (execStatus->HaltExecution || ProcedureFunctionData(theEnv)->BreakFlag || ProcedureFunctionData(theEnv)->ReturnFlag)
            {
             ValueDeinstall(theEnv,&argval);
             ProcedureFunctionData(theEnv)->BreakFlag = FALSE;
-            if (EvaluationData(theEnv)->HaltExecution)
+            if (execStatus->HaltExecution)
               {
                result->type = SYMBOL;
                result->value = EnvFalseSymbol(theEnv);

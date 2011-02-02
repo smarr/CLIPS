@@ -90,14 +90,14 @@ globle int SetResetGlobalsCommand(
    /* Check for the correct number of arguments. */
    /*============================================*/
 
-   if (EnvArgCountCheck(theEnv,"set-reset-globals",EXACTLY,1) == -1)
+   if (EnvArgCountCheck(theEnv,execStatus,"set-reset-globals",EXACTLY,1) == -1)
      { return(oldValue); }
 
    /*===========================================*/
    /* Determine the new value of the attribute. */
    /*===========================================*/
 
-   EnvRtnUnknown(theEnv,1,&arg_ptr);
+   EnvRtnUnknown(theEnv,execStatus,1,&arg_ptr);
 
    if ((arg_ptr.value == EnvFalseSymbol(theEnv)) && (arg_ptr.type == SYMBOL))
      { EnvSetResetGlobals(theEnv,FALSE); }
@@ -137,7 +137,7 @@ globle int GetResetGlobalsCommand(
 
    oldValue = EnvGetResetGlobals(theEnv);
 
-   if (EnvArgCountCheck(theEnv,"get-reset-globals",EXACTLY,0) == -1)
+   if (EnvArgCountCheck(theEnv,execStatus,"get-reset-globals",EXACTLY,0) == -1)
      { return(oldValue); }
 
    return(oldValue);
@@ -165,11 +165,11 @@ globle void ShowDefglobalsCommand(
    struct defmodule *theModule;
    int numArgs, error;
 
-   if ((numArgs = EnvArgCountCheck(theEnv,"show-defglobals",NO_MORE_THAN,1)) == -1) return;
+   if ((numArgs = EnvArgCountCheck(theEnv,execStatus,"show-defglobals",NO_MORE_THAN,1)) == -1) return;
 
    if (numArgs == 1)
      {
-      theModule = GetModuleName(theEnv,"show-defglobals",1,&error);
+      theModule = GetModuleName(theEnv,execStatus,"show-defglobals",1,&error);
       if (error) return;
      }
    else
@@ -234,7 +234,7 @@ globle void EnvShowDefglobals(
            constructPtr != NULL;
            constructPtr = constructPtr->next)
         {
-         if (EvaluationData(theEnv)->HaltExecution == TRUE) return;
+         if (execStatus->HaltExecution == TRUE) return;
 
          if (allModules) EnvPrintRouter(theEnv,logicalName,"   ");
          PrintDefglobalValueForm(theEnv,logicalName,(void *) constructPtr);

@@ -557,7 +557,7 @@ globle void UndefmethodCommand(
    DEFGENERIC *gfunc;
    long mi;
 
-   if (EnvArgTypeCheck(theEnv,"undefmethod",1,SYMBOL,&temp) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"undefmethod",1,SYMBOL,&temp) == FALSE)
      return;
    gfunc = LookupDefgenericByMdlOrScope(theEnv,DOToString(temp));
    if ((gfunc == NULL) ? (strcmp(DOToString(temp),"*") != 0) : FALSE)
@@ -568,7 +568,7 @@ globle void UndefmethodCommand(
       EnvPrintRouter(theEnv,WERROR," in function undefmethod.\n");
       return;
      }
-   EnvRtnUnknown(theEnv,2,&temp);
+   EnvRtnUnknown(theEnv,execStatus,2,&temp);
    if (temp.type == SYMBOL)
      {
       if (strcmp(DOToString(temp),"*") != 0)
@@ -896,10 +896,10 @@ globle void PPDefmethodCommand(
    DEFGENERIC *gfunc;
    int gi;
    
-   if (EnvArgTypeCheck(theEnv,"ppdefmethod",1,SYMBOL,&temp) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"ppdefmethod",1,SYMBOL,&temp) == FALSE)
      return;
    gname = DOToString(temp);
-   if (EnvArgTypeCheck(theEnv,"ppdefmethod",2,INTEGER,&temp) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"ppdefmethod",2,INTEGER,&temp) == FALSE)
      return;
    gfunc = CheckGenericExists(theEnv,"ppdefmethod",gname);
    if (gfunc == NULL)
@@ -926,11 +926,11 @@ globle void ListDefmethodsCommand(
    DATA_OBJECT temp;
    DEFGENERIC *gfunc;
    
-   if (EnvRtnArgCount(theEnv) == 0)
-     EnvListDefmethods(theEnv,WDISPLAY,NULL);
+   if (EnvRtnArgCount(theEnv,execStatus) == 0)
+     EnvListDefmethods(theEnv,execStatus,WDISPLAY,NULL);
    else
      {
-      if (EnvArgTypeCheck(theEnv,"list-defmethods",1,SYMBOL,&temp) == FALSE)
+      if (EnvArgTypeCheck(theEnv,execStatus,"list-defmethods",1,SYMBOL,&temp) == FALSE)
         return;
       gfunc = CheckGenericExists(theEnv,"list-defmethods",DOToString(temp));
       if (gfunc != NULL)
@@ -1087,11 +1087,11 @@ globle void GetDefmethodListCommand(
    DATA_OBJECT temp;
    DEFGENERIC *gfunc;
    
-   if (EnvRtnArgCount(theEnv) == 0)
+   if (EnvRtnArgCount(theEnv,execStatus) == 0)
      EnvGetDefmethodList(theEnv,NULL,returnValue);
    else
      {
-      if (EnvArgTypeCheck(theEnv,"get-defmethod-list",1,SYMBOL,&temp) == FALSE)
+      if (EnvArgTypeCheck(theEnv,execStatus,"get-defmethod-list",1,SYMBOL,&temp) == FALSE)
         {
          EnvSetMultifieldErrorValue(theEnv,returnValue);
          return;
@@ -1178,7 +1178,7 @@ globle void GetMethodRestrictionsCommand(
    DATA_OBJECT temp;
    DEFGENERIC *gfunc;
 
-   if (EnvArgTypeCheck(theEnv,"get-method-restrictions",1,SYMBOL,&temp) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"get-method-restrictions",1,SYMBOL,&temp) == FALSE)
      {
       EnvSetMultifieldErrorValue(theEnv,result);
       return;
@@ -1189,7 +1189,7 @@ globle void GetMethodRestrictionsCommand(
       EnvSetMultifieldErrorValue(theEnv,result);
       return;
      }
-   if (EnvArgTypeCheck(theEnv,"get-method-restrictions",2,INTEGER,&temp) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"get-method-restrictions",2,INTEGER,&temp) == FALSE)
      {
       EnvSetMultifieldErrorValue(theEnv,result);
       return;

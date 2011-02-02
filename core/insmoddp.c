@@ -171,7 +171,7 @@ globle void ModifyInstance(
       Find the instance and make sure it
       wasn't deleted by the overrides
       ================================== */
-   ins = CheckInstance(theEnv,ValueToString(ExpressionFunctionCallName(EvaluationData(theEnv)->CurrentExpression)));
+   ins = CheckInstance(theEnv,ValueToString(ExpressionFunctionCallName(execStatus->CurrentExpression)));
    if (ins == NULL)
      {
       SetpType(result,SYMBOL);
@@ -238,7 +238,7 @@ globle void MsgModifyInstance(
       Find the instance and make sure it
       wasn't deleted by the overrides
       ================================== */
-   ins = CheckInstance(theEnv,ValueToString(ExpressionFunctionCallName(EvaluationData(theEnv)->CurrentExpression)));
+   ins = CheckInstance(theEnv,ValueToString(ExpressionFunctionCallName(execStatus->CurrentExpression)));
    if (ins == NULL)
      {
       SetpType(result,SYMBOL);
@@ -306,7 +306,7 @@ globle void DuplicateInstance(
       Find the instance and make sure it
       wasn't deleted by the overrides
       ================================== */
-   ins = CheckInstance(theEnv,ValueToString(ExpressionFunctionCallName(EvaluationData(theEnv)->CurrentExpression)));
+   ins = CheckInstance(theEnv,ValueToString(ExpressionFunctionCallName(execStatus->CurrentExpression)));
    if (ins == NULL)
      {
       SetpType(result,SYMBOL);
@@ -314,7 +314,7 @@ globle void DuplicateInstance(
       DeleteSlotOverrideEvaluations(theEnv,overrides,overrideCount);
       return;
      }
-   if (EnvArgTypeCheck(theEnv,ValueToString(ExpressionFunctionCallName(EvaluationData(theEnv)->CurrentExpression)),
+   if (EnvArgTypeCheck(theEnv,ValueToString(ExpressionFunctionCallName(execStatus->CurrentExpression)),
                     2,INSTANCE_NAME,&newName) == FALSE)
      {
       SetpType(result,SYMBOL);
@@ -386,7 +386,7 @@ globle void MsgDuplicateInstance(
       Find the instance and make sure it
       wasn't deleted by the overrides
       ================================== */
-   ins = CheckInstance(theEnv,ValueToString(ExpressionFunctionCallName(EvaluationData(theEnv)->CurrentExpression)));
+   ins = CheckInstance(theEnv,ValueToString(ExpressionFunctionCallName(execStatus->CurrentExpression)));
    if (ins == NULL)
      {
       SetpType(result,SYMBOL);
@@ -394,7 +394,7 @@ globle void MsgDuplicateInstance(
       DeleteSlotOverrideEvaluations(theEnv,overrides,overrideCount);
       return;
      }
-   if (EnvArgTypeCheck(theEnv,ValueToString(ExpressionFunctionCallName(EvaluationData(theEnv)->CurrentExpression)),
+   if (EnvArgTypeCheck(theEnv,ValueToString(ExpressionFunctionCallName(execStatus->CurrentExpression)),
                     2,INSTANCE_NAME,&newName) == FALSE)
      {
       SetpType(result,SYMBOL);
@@ -666,7 +666,7 @@ static DATA_OBJECT *EvaluateSlotOverrides(
         goto EvaluateOverridesError;
       if (ovs[ovi].type != SYMBOL)
         {
-         ExpectedTypeError1(theEnv,ValueToString(ExpressionFunctionCallName(EvaluationData(theEnv)->CurrentExpression)),
+         ExpectedTypeError1(theEnv,ValueToString(ExpressionFunctionCallName(execStatus->CurrentExpression)),
                             ovi+1,"slot name");
          SetEvaluationError(theEnv,TRUE);
          goto EvaluateOverridesError;
@@ -791,7 +791,7 @@ static void ModifyMsgHandlerSupport(
          msgExp.argList = NULL;
          msgExp.nextArg = NULL;
          DirectMessage(theEnv,insSlot->desc->overrideMessage,ins,&temp,&msgExp);
-         if (EvaluationData(theEnv)->EvaluationError ||
+         if (execStatus->EvaluationError ||
              ((temp.type == SYMBOL) && (temp.value == EnvFalseSymbol(theEnv))))
            return;
         }
@@ -918,7 +918,7 @@ static void DuplicateMsgHandlerSupport(
          msgExp.argList = NULL;
          msgExp.nextArg = NULL;
          DirectMessage(theEnv,dstInsSlot->desc->overrideMessage,dstins,&temp,&msgExp);
-         if (EvaluationData(theEnv)->EvaluationError ||
+         if (execStatus->EvaluationError ||
              ((temp.type == SYMBOL) && (temp.value == EnvFalseSymbol(theEnv))))
            goto DuplicateError;
         }
@@ -964,7 +964,7 @@ static void DuplicateMsgHandlerSupport(
             DirectMessage(theEnv,dstins->slots[i].desc->overrideMessage,
                           dstins,&temp,valArg);
             ReturnExpression(theEnv,valArg);
-            if (EvaluationData(theEnv)->EvaluationError ||
+            if (execStatus->EvaluationError ||
                 ((temp.type == SYMBOL) && (temp.value == EnvFalseSymbol(theEnv))))
               goto DuplicateError;
            }

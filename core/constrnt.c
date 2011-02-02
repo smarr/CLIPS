@@ -491,17 +491,17 @@ static void InstallConstraintRecord(
 /*   set-dynamic-constraint-checking command. */
 /**********************************************/
 globle int SDCCommand(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    int oldValue;
    DATA_OBJECT arg_ptr;
 
    oldValue = EnvGetDynamicConstraintChecking(theEnv);
 
-   if (EnvArgCountCheck(theEnv,"set-dynamic-constraint-checking",EXACTLY,1) == -1)
+   if (EnvArgCountCheck(theEnv,execStatus,"set-dynamic-constraint-checking",EXACTLY,1) == -1)
      { return(oldValue); }
 
-   EnvRtnUnknown(theEnv,1,&arg_ptr);
+   EnvRtnUnknown(theEnv,execStatus,1,&arg_ptr);
 
    if ((arg_ptr.value == EnvFalseSymbol(theEnv)) && (arg_ptr.type == SYMBOL))
      { EnvSetDynamicConstraintChecking(theEnv,FALSE); }
@@ -516,13 +516,13 @@ globle int SDCCommand(
 /*   get-dynamic-constraint-checking command. */
 /**********************************************/
 globle int GDCCommand(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    int oldValue;
 
    oldValue = EnvGetDynamicConstraintChecking(theEnv);
 
-   if (EnvArgCountCheck(theEnv,"get-dynamic-constraint-checking",EXACTLY,0) == -1)
+   if (EnvArgCountCheck(theEnv,execStatus,"get-dynamic-constraint-checking",EXACTLY,0) == -1)
      { return(oldValue); }
 
    return(oldValue);
@@ -533,17 +533,17 @@ globle int GDCCommand(
 /*   set-static-constraint-checking command. */
 /*********************************************/
 globle int SSCCommand(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    int oldValue;
    DATA_OBJECT arg_ptr;
 
    oldValue = EnvGetStaticConstraintChecking(theEnv);
 
-   if (EnvArgCountCheck(theEnv,"set-static-constraint-checking",EXACTLY,1) == -1)
+   if (EnvArgCountCheck(theEnv,execStatus,"set-static-constraint-checking",EXACTLY,1) == -1)
      { return(oldValue); }
 
-   EnvRtnUnknown(theEnv,1,&arg_ptr);
+   EnvRtnUnknown(theEnv,execStatus,1,&arg_ptr);
 
    if ((arg_ptr.value == EnvFalseSymbol(theEnv)) && (arg_ptr.type == SYMBOL))
      { EnvSetStaticConstraintChecking(theEnv,FALSE); }
@@ -558,13 +558,13 @@ globle int SSCCommand(
 /*   get-static-constraint-checking command. */
 /*********************************************/
 globle int GSCCommand(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    int oldValue;
 
    oldValue = EnvGetStaticConstraintChecking(theEnv);
 
-   if (EnvArgCountCheck(theEnv,"get-static-constraint-checking",EXACTLY,0) == -1)
+   if (EnvArgCountCheck(theEnv,execStatus,"get-static-constraint-checking",EXACTLY,0) == -1)
      { return(oldValue); }
 
    return(oldValue);

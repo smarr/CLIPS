@@ -17,9 +17,9 @@
 /*   routine for the clear-window command.   */
 /*********************************************/
 void ClearEnvironmentWindowCommand(
-  void *theEnv)
+  void *theEnv, EXEC_STATUS)
   {
-   if (EnvArgCountCheck(theEnv,"clear-window",EXACTLY,0) == -1) return;
+   if (EnvArgCountCheck(theEnv,execStatus,"clear-window",EXACTLY,0) == -1) return;
    id theObject = GetEnvironmentContext(theEnv);
    
    [theObject clearScrollbackFunction];

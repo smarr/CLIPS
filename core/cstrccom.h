@@ -48,26 +48,26 @@
 #endif
    LOCALE intBool                        DeleteNamedConstruct(void *,char *,struct construct *);
    LOCALE void                          *FindNamedConstruct(void *,char *,struct construct *);
-   LOCALE void                           UndefconstructCommand(void *,char *,struct construct *);
+   LOCALE void                           UndefconstructCommand(void *,EXEC_STATUS,char *,struct construct *);
    LOCALE int                            PPConstruct(void *,char *,char *,struct construct *);
-   LOCALE SYMBOL_HN                     *GetConstructModuleCommand(void *,char *,struct construct *);
+   LOCALE SYMBOL_HN                     *GetConstructModuleCommand(void *,EXEC_STATUS,char *,struct construct *);
    LOCALE struct defmodule              *GetConstructModule(void *,char *,struct construct *);
-   LOCALE intBool                        Undefconstruct(void *,void *,struct construct *);
+   LOCALE intBool                        Undefconstruct(void *,EXEC_STATUS,void *,struct construct *);
    LOCALE void                           SaveConstruct(void *,void *,char *,struct construct *);
    LOCALE char                          *GetConstructNameString(struct constructHeader *);
    LOCALE char                          *EnvGetConstructNameString(void *,struct constructHeader *);
    LOCALE char                          *GetConstructModuleName(struct constructHeader *);
    LOCALE SYMBOL_HN                     *GetConstructNamePointer(struct constructHeader *);
-   LOCALE void                           GetConstructListFunction(void *,char *,DATA_OBJECT_PTR,
+   LOCALE void                           GetConstructListFunction(void *,EXEC_STATUS,char *,DATA_OBJECT_PTR,
                                                                   struct construct *);
    LOCALE void                           GetConstructList(void *,DATA_OBJECT_PTR,struct construct *,
                                                           struct defmodule *);
-   LOCALE void                           ListConstructCommand(void *,char *,struct construct *);
-   LOCALE void                           ListConstruct(void *,struct construct *,char *,struct defmodule *);
+   LOCALE void                           ListConstructCommand(void *,EXEC_STATUS,char *,struct construct *);
+   LOCALE void                           ListConstruct(void *,EXEC_STATUS,struct construct *,char *,struct defmodule *);
    LOCALE void                           SetNextConstruct(struct constructHeader *,struct constructHeader *);
    LOCALE struct defmoduleItemHeader    *GetConstructModuleItem(struct constructHeader *);
    LOCALE char                          *GetConstructPPForm(void *,struct constructHeader *);
-   LOCALE void                           PPConstructCommand(void *,char *,struct construct *);
+   LOCALE void                           PPConstructCommand(void *,EXEC_STATUS,char *,struct construct *);
    LOCALE struct constructHeader        *GetNextConstructItem(void *,struct constructHeader *,int);
    LOCALE struct defmoduleItemHeader    *GetConstructModuleItemByIndex(void *,struct defmodule *,int);
    LOCALE void                           FreeConstructHeaderModule(void *,struct defmoduleItemHeader *,

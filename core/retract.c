@@ -375,10 +375,10 @@ static intBool FindNextConflictingMatch(
          EngineData(theEnv)->GlobalRHSBinds = possibleConflicts;
 
          result = EvaluateJoinExpression(theEnv,theJoin->networkTest,theJoin);
-         if (EvaluationData(theEnv)->EvaluationError)
+         if (execStatus->EvaluationError)
            {
             result = TRUE;
-            EvaluationData(theEnv)->EvaluationError = FALSE;
+            execStatus->EvaluationError = FALSE;
            }
         
 #if DEVELOPER

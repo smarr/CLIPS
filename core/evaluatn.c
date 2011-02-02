@@ -71,7 +71,7 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static void                    PropagateReturnAtom(void *,int,void *);
+   static void                    PropagateReturnAtom(void *,EXEC_STATUS,int,void *);
    static void                    DeallocateEvaluationData(void *);
    static void                    PrintCAddress(void *,char *,void *);
    static void                    NewCAddress(void *,DATA_OBJECT *);
@@ -111,7 +111,7 @@ static void DeallocateEvaluationData(
 /*   if no errors occurred during evaluation, otherwise TRUE. */
 /**************************************************************/
 globle int EvaluateExpression(
-  void *theEnv,
+  void *theEnv,EXEC_STATUS,
   struct expr *problem,
   DATA_OBJECT_PTR returnValue)
   {
@@ -126,7 +126,7 @@ globle int EvaluateExpression(
      {
       returnValue->type = SYMBOL;
       returnValue->value = EnvFalseSymbol(theEnv);
-      return(EvaluationData(theEnv)->EvaluationError);
+      return(execStatus->EvaluationError);
      }
 
    switch (problem->type)
@@ -160,8 +160,8 @@ globle int EvaluateExpression(
                       ProfileFunctionData(theEnv)->ProfileUserFunctions);
 #endif
 
-         oldArgument = EvaluationData(theEnv)->CurrentExpression;
-         EvaluationData(theEnv)->CurrentExpression = problem;
+         oldArgument = execStatus->CurrentExpression;
+         execStatus->CurrentExpression = problem;
 
          switch(fptr->returnValueType)
            {
@@ -365,7 +365,7 @@ globle int EvaluateExpression(
 #endif
 
         SetEnvironmentFunctionContext(theEnv,oldContext);
-        EvaluationData(theEnv)->CurrentExpression = oldArgument;
+        execStatus->CurrentExpression = oldArgument;
         break;
         }
 
@@ -410,8 +410,8 @@ globle int EvaluateExpression(
            EnvExitRouter(theEnv,EXIT_FAILURE);
           }
 
-        oldArgument = EvaluationData(theEnv)->CurrentExpression;
-        EvaluationData(theEnv)->CurrentExpression = problem;
+        oldArgument = execStatus->CurrentExpression;
+        execStatus->CurrentExpression = problem;
 
 #if PROFILING_FUNCTIONS 
         StartProfile(theEnv,&profileFrame,
@@ -425,12 +425,12 @@ globle int EvaluateExpression(
         EndProfile(theEnv,&profileFrame);
 #endif
 
-        EvaluationData(theEnv)->CurrentExpression = oldArgument;
+        execStatus->CurrentExpression = oldArgument;
         break;
      }
 
    PropagateReturnValue(theEnv,returnValue);
-   return(EvaluationData(theEnv)->EvaluationError);
+   return(execStatus->EvaluationError);
   }
 
 /******************************************/
@@ -480,21 +480,21 @@ globle int InstallExternalAddressType(
 /* SetEvaluationError: Sets the EvaluationError flag. */
 /******************************************************/
 globle void SetEvaluationError(
-  void *theEnv,
+  void *theEnv,EXEC_STATUS,
   int value)
   {
-   EvaluationData(theEnv)->EvaluationError = value;
+   execStatus->EvaluationError = value;
    if (value == TRUE) 
-     { EvaluationData(theEnv)->HaltExecution = TRUE; }
+     { execStatus->HaltExecution = TRUE; }
   }
 
 /*********************************************************/
 /* GetEvaluationError: Returns the EvaluationError flag. */
 /*********************************************************/
 globle int GetEvaluationError(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
-   return(EvaluationData(theEnv)->EvaluationError);
+   return(execStatus->EvaluationError);
   }
 
 /**************************************************/
@@ -504,7 +504,7 @@ globle void SetHaltExecution(
   void *theEnv,
   int value)
   { 
-   EvaluationData(theEnv)->HaltExecution = value; 
+   execStatus->HaltExecution = value; 
   }
 
 /*****************************************************/
@@ -513,7 +513,7 @@ globle void SetHaltExecution(
 globle int GetHaltExecution(
   void *theEnv)
   {
-   return(EvaluationData(theEnv)->HaltExecution);
+   return(execStatus->HaltExecution);
   }
 
 /******************************************************/
@@ -739,7 +739,7 @@ globle void AtomDeinstall(
 /*   the evaluation that generated the return value.                 */
 /*********************************************************************/
 globle void PropagateReturnValue(
-  void *theEnv,
+  void *theEnv,EXEC_STATUS,
   DATA_OBJECT *vPtr)
   {
    long i;
@@ -767,7 +767,7 @@ globle void PropagateReturnValue(
 /*   for PropagateReturnValue.           */
 /*****************************************/
 static void PropagateReturnAtom(
-  void *theEnv,
+  void *theEnv,EXEC_STATUS,
   int type,
   void *value)
   {
@@ -853,7 +853,7 @@ globle int FunctionCall2(
    /*=============================================*/
 
    if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
-       (EvaluationData(theEnv)->CurrentExpression == NULL))
+       (execStatus->CurrentExpression == NULL))
      { PeriodicCleanup(theEnv,TRUE,FALSE); }
 
    /*========================*/
@@ -861,7 +861,7 @@ globle int FunctionCall2(
    /*========================*/
 
    if (execStatus->CurrentEvaluationDepth == 0) SetHaltExecution(theEnv,FALSE);
-   EvaluationData(theEnv)->EvaluationError = FALSE;
+   execStatus->EvaluationError = FALSE;
 
    /*======================================*/
    /* Initialize the default return value. */
@@ -1214,7 +1214,7 @@ globle int EvaluateAndStoreInDataObject(
    else
      StoreInMultifield(theEnv,val,theExp,garbageSegment);
    
-   return(EvaluationData(theEnv)->EvaluationError ? FALSE : TRUE);
+   return(execStatus->EvaluationError ? FALSE : TRUE);
   }
 
 /*******************************************************/

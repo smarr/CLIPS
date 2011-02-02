@@ -788,13 +788,13 @@ globle void CannotLoadWithBloadMessage(
 /*   for the bload command.           */
 /**************************************/
 globle int BloadCommand(
-  void *theEnv)
+  void *theEnv, EXEC_STATUS)
   {
 #if (! RUN_TIME) && (BLOAD || BLOAD_ONLY || BLOAD_AND_BSAVE)
    char *fileName;
 
-   if (EnvArgCountCheck(theEnv,"bload",EXACTLY,1) == -1) return(FALSE);
-   fileName = GetFileName(theEnv,"bload",1);
+   if (EnvArgCountCheck(theEnv,execStatus,"bload",EXACTLY,1) == -1) return(FALSE);
+   fileName = GetFileName(theEnv,execStatus,"bload",1);
    if (fileName != NULL) return(EnvBload(theEnv,fileName));
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD

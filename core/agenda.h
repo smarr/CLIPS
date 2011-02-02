@@ -128,7 +128,7 @@ struct agendaData
 #define SetAgendaChanged(a) EnvSetAgendaChanged(GetCurrentEnvironment(),a)
 #define SetSalienceEvaluation(a) EnvSetSalienceEvaluation(GetCurrentEnvironment(),a)
 
-   LOCALE void                    AddActivation(void *,void *,void *);
+   LOCALE void                    AddActivation(void *,EXEC_STATUS,void *,void *);
    LOCALE void                    ClearRuleFromAgenda(void *,void *);
    LOCALE void                   *EnvGetNextActivation(void *,void *);
    LOCALE char                   *EnvGetActivationName(void *,void *);
@@ -146,16 +146,16 @@ struct agendaData
    LOCALE unsigned long           GetNumberOfActivations(void *);
    LOCALE intBool                 EnvGetSalienceEvaluation(void *);
    LOCALE intBool                 EnvSetSalienceEvaluation(void *,intBool);
-   LOCALE void                    EnvRefreshAgenda(void *,void *);
+   LOCALE void                    EnvRefreshAgenda(void *,EXEC_STATUS,void *);
    LOCALE void                    EnvReorderAgenda(void *,void *);
    LOCALE void                    InitializeAgenda(void *);
-   LOCALE void                   *SetSalienceEvaluationCommand(void *);
-   LOCALE void                   *GetSalienceEvaluationCommand(void *);
-   LOCALE void                    RefreshAgendaCommand(void *);
-   LOCALE void                    RefreshCommand(void *);
-   LOCALE intBool                 EnvRefresh(void *,void *);
+   LOCALE void                   *SetSalienceEvaluationCommand(void *, EXEC_STATUS);
+   LOCALE void                   *GetSalienceEvaluationCommand(void *, EXEC_STATUS);
+   LOCALE void                    RefreshAgendaCommand(void *, EXEC_STATUS);
+   LOCALE void                    RefreshCommand(void *, EXEC_STATUS);
+   LOCALE intBool                 EnvRefresh(void *,EXEC_STATUS,void *);
 #if DEBUGGING_FUNCTIONS
-   LOCALE void                    AgendaCommand(void *);
+   LOCALE void                    AgendaCommand(void *,EXEC_STATUS);
 #endif
 
 #endif

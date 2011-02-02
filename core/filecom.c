@@ -393,8 +393,8 @@ globle int DribbleOnCommand(
   {
    char *fileName;
 
-   if (EnvArgCountCheck(theEnv,"dribble-on",EXACTLY,1) == -1) return(FALSE);
-   if ((fileName = GetFileName(theEnv,"dribble-on",1)) == NULL) return(FALSE);
+   if (EnvArgCountCheck(theEnv,execStatus,"dribble-on",EXACTLY,1) == -1) return(FALSE);
+   if ((fileName = GetFileName(theEnv,execStatus,"dribble-on",1)) == NULL) return(FALSE);
 
    return (EnvDribbleOn(theEnv,fileName));
   }
@@ -475,7 +475,7 @@ globle intBool EnvDribbleActive(
 globle int DribbleOffCommand(
   void *theEnv)
   {
-   if (EnvArgCountCheck(theEnv,"dribble-off",EXACTLY,0) == -1) return(FALSE);
+   if (EnvArgCountCheck(theEnv,execStatus,"dribble-off",EXACTLY,0) == -1) return(FALSE);
    return(EnvDribbleOff(theEnv));
   }
 
@@ -707,8 +707,8 @@ globle int BatchCommand(
   {
    char *fileName;
 
-   if (EnvArgCountCheck(theEnv,"batch",EXACTLY,1) == -1) return(FALSE);
-   if ((fileName = GetFileName(theEnv,"batch",1)) == NULL) return(FALSE);
+   if (EnvArgCountCheck(theEnv,execStatus,"batch",EXACTLY,1) == -1) return(FALSE);
+   if ((fileName = GetFileName(theEnv,execStatus,"batch",1)) == NULL) return(FALSE);
 
    return(OpenBatch(theEnv,fileName,FALSE));
   }
@@ -976,8 +976,8 @@ globle int BatchStarCommand(
   {
    char *fileName;
 
-   if (EnvArgCountCheck(theEnv,"batch*",EXACTLY,1) == -1) return(FALSE);
-   if ((fileName = GetFileName(theEnv,"batch*",1)) == NULL) return(FALSE);
+   if (EnvArgCountCheck(theEnv,execStatus,"batch*",EXACTLY,1) == -1) return(FALSE);
+   if ((fileName = GetFileName(theEnv,execStatus,"batch*",1)) == NULL) return(FALSE);
 
    return(EnvBatchStar(theEnv,fileName));
   }
@@ -1083,8 +1083,8 @@ globle int LoadCommand(
    char *theFileName;
    int rv;
 
-   if (EnvArgCountCheck(theEnv,"load",EXACTLY,1) == -1) return(FALSE);
-   if ((theFileName = GetFileName(theEnv,"load",1)) == NULL) return(FALSE);
+   if (EnvArgCountCheck(theEnv,execStatus,"load",EXACTLY,1) == -1) return(FALSE);
+   if ((theFileName = GetFileName(theEnv,execStatus,"load",1)) == NULL) return(FALSE);
 
    SetPrintWhileLoading(theEnv,TRUE);
 
@@ -1114,8 +1114,8 @@ globle int LoadStarCommand(
    char *theFileName;
    int rv;
 
-   if (EnvArgCountCheck(theEnv,"load*",EXACTLY,1) == -1) return(FALSE);
-   if ((theFileName = GetFileName(theEnv,"load*",1)) == NULL) return(FALSE);
+   if (EnvArgCountCheck(theEnv,execStatus,"load*",EXACTLY,1) == -1) return(FALSE);
+   if ((theFileName = GetFileName(theEnv,execStatus,"load*",1)) == NULL) return(FALSE);
 
    if ((rv = EnvLoad(theEnv,theFileName)) == FALSE)
      {
@@ -1141,8 +1141,8 @@ globle int SaveCommand(
 #if (! BLOAD_ONLY) && (! RUN_TIME)
    char *theFileName;
 
-   if (EnvArgCountCheck(theEnv,"save",EXACTLY,1) == -1) return(FALSE);
-   if ((theFileName = GetFileName(theEnv,"save",1)) == NULL) return(FALSE);
+   if (EnvArgCountCheck(theEnv,execStatus,"save",EXACTLY,1) == -1) return(FALSE);
+   if ((theFileName = GetFileName(theEnv,execStatus,"save",1)) == NULL) return(FALSE);
 
    if (EnvSave(theEnv,theFileName) == FALSE)
      {

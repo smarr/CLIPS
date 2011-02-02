@@ -198,13 +198,13 @@ globle long LoadInstancesCommand(
    DATA_OBJECT temp;
    long instanceCount;
 
-   if (EnvArgTypeCheck(theEnv,"load-instances",1,SYMBOL_OR_STRING,&temp) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"load-instances",1,SYMBOL_OR_STRING,&temp) == FALSE)
      return(0L);
 
    fileFound = DOToString(temp);
 
    instanceCount = EnvLoadInstances(theEnv,fileFound);
-   if (EvaluationData(theEnv)->EvaluationError)
+   if (execStatus->EvaluationError)
      ProcessFileErrorMessage(theEnv,"load-instances",fileFound);
    return(instanceCount);
   }
@@ -266,13 +266,13 @@ globle long RestoreInstancesCommand(
    DATA_OBJECT temp;
    long instanceCount;
 
-   if (EnvArgTypeCheck(theEnv,"restore-instances",1,SYMBOL_OR_STRING,&temp) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"restore-instances",1,SYMBOL_OR_STRING,&temp) == FALSE)
      return(0L);
 
    fileFound = DOToString(temp);
 
    instanceCount = EnvRestoreInstances(theEnv,fileFound);
-   if (EvaluationData(theEnv)->EvaluationError)
+   if (execStatus->EvaluationError)
      ProcessFileErrorMessage(theEnv,"restore-instances",fileFound);
    return(instanceCount);
   }
@@ -336,13 +336,13 @@ globle long BinaryLoadInstancesCommand(
    DATA_OBJECT temp;
    long instanceCount;
 
-   if (EnvArgTypeCheck(theEnv,"bload-instances",1,SYMBOL_OR_STRING,&temp) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"bload-instances",1,SYMBOL_OR_STRING,&temp) == FALSE)
      return(0L);
 
    fileFound = DOToString(temp);
 
    instanceCount = EnvBinaryLoadInstances(theEnv,fileFound);
-   if (EvaluationData(theEnv)->EvaluationError)
+   if (execStatus->EvaluationError)
      ProcessFileErrorMessage(theEnv,"bload-instances",fileFound);
    return(instanceCount);
   }
@@ -580,14 +580,14 @@ static long InstancesSaveCommandParser(
    EXPRESSION *classList = NULL;
    intBool inheritFlag = FALSE;
 
-   if (EnvArgTypeCheck(theEnv,functionName,1,SYMBOL_OR_STRING,&temp) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,functionName,1,SYMBOL_OR_STRING,&temp) == FALSE)
      return(0L);
    fileFound = DOToString(temp);
 
-   argCount = EnvRtnArgCount(theEnv);
+   argCount = EnvRtnArgCount(theEnv,execStatus);
    if (argCount > 1)
      {
-      if (EnvArgTypeCheck(theEnv,functionName,2,SYMBOL,&temp) == FALSE)
+      if (EnvArgTypeCheck(theEnv,execStatus,functionName,2,SYMBOL,&temp) == FALSE)
         {
          ExpectedTypeError1(theEnv,functionName,2,"symbol \"local\" or \"visible\"");
          SetEvaluationError(theEnv,TRUE);
@@ -778,7 +778,7 @@ static long SaveOrMarkInstances(
       if (traversalID != -1)
         {
          for (tmp = classList ;
-              (! ((tmp == NULL) || (EvaluationData(theEnv)->HaltExecution && interruptOK))) ;
+              (! ((tmp == NULL) || (execStatus->HaltExecution && interruptOK))) ;
               tmp = tmp->next)
            instanceCount += SaveOrMarkInstancesOfClass(theEnv,theOutput,currentModule,saveCode,
                                                        (DEFCLASS *) tmp->value,inheritFlag,
@@ -789,7 +789,7 @@ static long SaveOrMarkInstances(
    else
      {
       for (ins = (INSTANCE_TYPE *) GetNextInstanceInScope(theEnv,NULL) ;
-           (ins != NULL) && (EvaluationData(theEnv)->HaltExecution != TRUE) ;
+           (ins != NULL) && (execStatus->HaltExecution != TRUE) ;
            ins = (INSTANCE_TYPE *) GetNextInstanceInScope(theEnv,(void *) ins))
         {
          if ((saveCode == VISIBLE_SAVE) ? TRUE :
@@ -1205,7 +1205,7 @@ static long LoadOrRestoreInstances(
    GetToken(theEnv,ilog,&DefclassData(theEnv)->ObjectParseToken);
    svoverride = InstanceData(theEnv)->MkInsMsgPass;
    InstanceData(theEnv)->MkInsMsgPass = usemsgs;
-   while ((GetType(DefclassData(theEnv)->ObjectParseToken) != STOP) && (EvaluationData(theEnv)->HaltExecution != TRUE))
+   while ((GetType(DefclassData(theEnv)->ObjectParseToken) != STOP) && (execStatus->HaltExecution != TRUE))
      {
       if (GetType(DefclassData(theEnv)->ObjectParseToken) != LPAREN)
         {
@@ -1232,7 +1232,7 @@ static long LoadOrRestoreInstances(
       ExpressionInstall(theEnv,top);
       EvaluateExpression(theEnv,top,&temp);
       ExpressionDeinstall(theEnv,top);
-      if (! EvaluationData(theEnv)->EvaluationError)
+      if (! execStatus->EvaluationError)
         instanceCount++;
       ReturnExpression(theEnv,top->argList);
       top->argList = NULL;

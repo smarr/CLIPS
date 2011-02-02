@@ -120,6 +120,7 @@ globle void FactCommandDefinitions(
 
 static void AssertOrProcessEvent(
    void *theEnv,
+   EXEC_STATUS,
    DATA_OBJECT_PTR rv,
    int doAssert)
   {
@@ -155,12 +156,12 @@ static void AssertOrProcessEvent(
 
    if (theDeftemplate->implied == FALSE)
      {
-      newFact = CreateFactBySize(theEnv,theDeftemplate->numberOfSlots);
+      newFact = CreateFactBySize(theEnv,execStatus,theDeftemplate->numberOfSlots);
       slotPtr = theDeftemplate->slotList;
      }
    else
      {
-      newFact = CreateFactBySize(theEnv,1);
+      newFact = CreateFactBySize(theEnv,execStatus,1);
       if (theExpression->nextArg == NULL)
         {
          newFact->theProposition.theFields[0].type = MULTIFIELD;
@@ -232,7 +233,7 @@ static void AssertOrProcessEvent(
    /* Add the fact to the fact-list. */
    /*================================*/
 
-   theFact = (struct fact *) EnvAssert(theEnv,(void *) newFact, !doAssert);
+   theFact = (struct fact *) EnvAssert(theEnv,execStatus,(void *) newFact, !doAssert);
 
    /*========================================*/
    /* The asserted fact is the return value. */
@@ -256,7 +257,7 @@ globle void AssertCommand(
    void *theEnv,
    DATA_OBJECT_PTR rv)
    {
-     AssertOrProcessEvent(theEnv, rv, TRUE);
+     AssertOrProcessEvent(theEnv,execStatus, rv, TRUE);
    }    
 
 
@@ -275,7 +276,7 @@ static void * APR_THREAD_FUNC ProcessEventOnFactThread(apr_thread_t *thread, voi
   struct paramsForProcessEvent* const params = (struct paramsForProcessEvent*)parameters;
   
   DATA_OBJECT result;
-  AssertOrProcessEvent(params->theEnv, &result, FALSE);
+  AssertOrProcessEvent(params->theEnv,execStatus, &result, FALSE);
   
   free(params);
   
@@ -372,7 +373,7 @@ globle void RetractCommand(
          /*=====================================*/
 
          if (ptr != NULL)
-           { EnvRetract(theEnv,(void *) ptr); }
+           { EnvRetract(theEnv,execStatus,(void *) ptr); }
          else
            {
             char tempBuffer[20];
@@ -387,7 +388,7 @@ globle void RetractCommand(
       /*===============================================*/
 
       else if (theResult.type == FACT_ADDRESS)
-        { EnvRetract(theEnv,theResult.value); }
+        { EnvRetract(theEnv,execStatus,theResult.value); }
 
       /*============================================*/
       /* Otherwise if the argument evaluates to the */
@@ -397,7 +398,7 @@ globle void RetractCommand(
       else if ((theResult.type == SYMBOL) ?
                (strcmp(ValueToString(theResult.value),"*") == 0) : FALSE)
         {
-         RemoveAllFacts(theEnv);
+         RemoveAllFacts(theEnv,execStatus);
          return;
         }
 
@@ -434,14 +435,14 @@ globle int SetFactDuplicationCommand(
    /* Check for the correct number of arguments. */
    /*============================================*/
 
-   if (EnvArgCountCheck(theEnv,"set-fact-duplication",EXACTLY,1) == -1)
+   if (EnvArgCountCheck(theEnv,execStatus,"set-fact-duplication",EXACTLY,1) == -1)
      { return(oldValue); }
 
    /*========================*/
    /* Evaluate the argument. */
    /*========================*/
 
-   EnvRtnUnknown(theEnv,1,&theValue);
+   EnvRtnUnknown(theEnv,execStatus,1,&theValue);
 
    /*===============================================================*/
    /* If the argument evaluated to FALSE, then the fact duplication */
@@ -479,7 +480,7 @@ globle int GetFactDuplicationCommand(
    /* Check for the correct number of arguments. */
    /*============================================*/
 
-   if (EnvArgCountCheck(theEnv,"get-fact-duplication",EXACTLY,0) == -1)
+   if (EnvArgCountCheck(theEnv,execStatus,"get-fact-duplication",EXACTLY,0) == -1)
      { return(currentValue); }
 
    /*============================================================*/
@@ -502,13 +503,13 @@ globle long long FactIndexFunction(
    /* Check for the correct number of arguments. */
    /*============================================*/
 
-   if (EnvArgCountCheck(theEnv,"fact-index",EXACTLY,1) == -1) return(-1LL);
+   if (EnvArgCountCheck(theEnv,execStatus,"fact-index",EXACTLY,1) == -1) return(-1LL);
 
    /*========================*/
    /* Evaluate the argument. */
    /*========================*/
 
-   EnvRtnUnknown(theEnv,1,&item);
+   EnvRtnUnknown(theEnv,execStatus,1,&item);
 
    /*======================================*/
    /* The argument must be a fact address. */
@@ -550,7 +551,7 @@ globle void FactsCommand(
    /* Determine the number of arguments to the facts command. */
    /*=========================================================*/
 
-   if ((argumentCount = EnvArgCountCheck(theEnv,"facts",NO_MORE_THAN,4)) == -1) return;
+   if ((argumentCount = EnvArgCountCheck(theEnv,execStatus,"facts",NO_MORE_THAN,4)) == -1) return;
 
    /*==================================*/
    /* The default module for the facts */
@@ -575,7 +576,7 @@ globle void FactsCommand(
    /* or start index was specified as the first argument.    */
    /*========================================================*/
 
-   EnvRtnUnknown(theEnv,1,&theValue);
+   EnvRtnUnknown(theEnv,execStatus,1,&theValue);
 
    /*===============================================*/
    /* If the first argument is a symbol, then check */
@@ -770,7 +771,7 @@ static long long GetFactsArgument(
 
    if (whichOne > argumentCount) return(UNSPECIFIED);
 
-   if (EnvArgTypeCheck(theEnv,"facts",whichOne,INTEGER,&theValue) == FALSE) return(INVALID);
+   if (EnvArgTypeCheck(theEnv,execStatus,"facts",whichOne,INTEGER,&theValue) == FALSE) return(INVALID);
 
    factIndex = DOToLong(theValue);
 
@@ -809,9 +810,9 @@ globle void AssertStringFunction(
    /* Check for the correct number and type of arguments. */
    /*=====================================================*/
 
-   if (EnvArgCountCheck(theEnv,"assert-string",EXACTLY,1) == -1) return;
+   if (EnvArgCountCheck(theEnv,execStatus,"assert-string",EXACTLY,1) == -1) return;
 
-   if (EnvArgTypeCheck(theEnv,"assert-string",1,STRING,&argPtr) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"assert-string",1,STRING,&argPtr) == FALSE)
      { return; }
 
    /*==========================================*/
@@ -819,7 +820,7 @@ globle void AssertStringFunction(
    /* string to a fact and then assert it.     */
    /*==========================================*/
 
-   theFact = (struct fact *) EnvAssertString(theEnv,DOToString(argPtr));
+   theFact = (struct fact *) EnvAssertString(theEnv,execStatus,DOToString(argPtr));
    if (theFact != NULL)
      {
       SetpType(returnValue,FACT_ADDRESS);
@@ -846,13 +847,13 @@ globle int SaveFactsCommand(
    /* Check for the correct number of arguments. */
    /*============================================*/
 
-   if ((numArgs = EnvArgCountCheck(theEnv,"save-facts",AT_LEAST,1)) == -1) return(FALSE);
+   if ((numArgs = EnvArgCountCheck(theEnv,execStatus,"save-facts",AT_LEAST,1)) == -1) return(FALSE);
 
    /*=================================================*/
    /* Get the file name to which facts will be saved. */
    /*=================================================*/
 
-   if ((fileName = GetFileName(theEnv,"save-facts",1)) == NULL) return(FALSE);
+   if ((fileName = GetFileName(theEnv,execStatus,"save-facts",1)) == NULL) return(FALSE);
 
    /*=============================================================*/
    /* If specified, the second argument to save-facts indicates   */
@@ -1133,7 +1134,7 @@ static DATA_OBJECT_PTR GetSaveFactsDeftemplateNames(
 
       EvaluateExpression(theEnv,tempList,&theDOArray[i]);
 
-      if (EvaluationData(theEnv)->EvaluationError)
+      if (execStatus->EvaluationError)
         {
          *error = TRUE;
          rm3(theEnv,theDOArray,(long) sizeof(DATA_OBJECT) * *count);
@@ -1250,7 +1251,7 @@ globle intBool EnvLoadFacts(
    /* the facts, otherwise return FALSE.             */
    /*================================================*/
 
-   if (EvaluationData(theEnv)->EvaluationError) return(FALSE);
+   if (execStatus->EvaluationError) return(FALSE);
    return(TRUE);
   }
 
@@ -1299,7 +1300,7 @@ globle intBool EnvLoadFactsFromString(
    /* the facts, otherwise return FALSE.             */
    /*================================================*/
 
-   if (EvaluationData(theEnv)->EvaluationError) return(FALSE);
+   if (execStatus->EvaluationError) return(FALSE);
    return(TRUE);
   }
 

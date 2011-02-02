@@ -72,7 +72,7 @@
    static void                    PrintActivation(void *,char *,void *);
    static void                    AgendaClearFunction(void *);
    static char                   *SalienceEvaluationName(int);
-   static int                     EvaluateSalience(void *,void *);
+   static int                     EvaluateSalience(void *,EXEC_STATUS,void *);
    static struct salienceGroup   *ReuseOrCreateSalienceGroup(void *,struct defruleModule *,int);
    static struct salienceGroup   *FindSalienceGroup(struct defruleModule *,int);
    static void                    RemoveActivationFromGroup(void *,struct activation *,struct defruleModule *);
@@ -122,7 +122,7 @@ globle void InitializeAgenda(
 /*   patterns on the LHS of a rule have been satisfied.          */
 /*****************************************************************/
 globle void AddActivation(
-  void *theEnv,
+  void *theEnv,EXEC_STATUS,
   void *vTheRule,
   void *vBinds)
   {
@@ -152,7 +152,7 @@ globle void AddActivation(
    newActivation->theRule = theRule;
    newActivation->basis = binds;
    newActivation->timetag = AgendaData(theEnv)->CurrentTimetag++;
-   newActivation->salience = EvaluateSalience(theEnv,theRule);
+   newActivation->salience = EvaluateSalience(theEnv,execStatus,theRule);
 
    newActivation->randomID = genrand();
    newActivation->prev = NULL;
@@ -854,7 +854,7 @@ globle unsigned long GetNumberOfActivations(
 /*   Syntax: (refresh <defrule-name>)                 */
 /******************************************************/
 globle void RefreshCommand(
-  void *theEnv)
+  void *theEnv, EXEC_STATUS)
   {
    char *ruleName;
    void *rulePtr;
@@ -863,7 +863,7 @@ globle void RefreshCommand(
    /* Get the name of the rule. */
    /*===========================*/
 
-   ruleName = GetConstructName(theEnv,"refresh","rule name");
+   ruleName = GetConstructName(theEnv,execStatus,"refresh","rule name");
    if (ruleName == NULL) return;
 
    /*===============================*/
@@ -881,7 +881,7 @@ globle void RefreshCommand(
    /* Refresh the rule. */
    /*===================*/
 
-   EnvRefresh(theEnv,rulePtr);
+   EnvRefresh(theEnv,execStatus,rulePtr);
   }
 
 /************************************************************/
@@ -889,7 +889,7 @@ globle void RefreshCommand(
 /*   that have already been fired are added to the agenda.  */
 /************************************************************/
 globle intBool EnvRefresh(
-  void *theEnv,
+  void *theEnv,EXEC_STATUS,
   void *theRule)
   {
    struct defrule *rulePtr;
@@ -925,7 +925,7 @@ globle intBool EnvRefresh(
             if (((struct joinNode *) listOfMatches->owner)->ruleToActivate != NULL)
               {
                if (listOfMatches->marker == NULL)
-                 { AddActivation(theEnv,rulePtr,listOfMatches); }
+                 { AddActivation(theEnv,execStatus,rulePtr,listOfMatches); }
               }
            }
         }
@@ -939,7 +939,7 @@ globle intBool EnvRefresh(
 /*   for the refresh-agenda command.          */
 /**********************************************/
 globle void RefreshAgendaCommand(
-  void *theEnv)
+  void *theEnv, EXEC_STATUS)
   {
    int numArgs, error;
    struct defmodule *theModule;
@@ -948,7 +948,7 @@ globle void RefreshAgendaCommand(
    /* This function can have at most one argument. */
    /*==============================================*/
 
-   if ((numArgs = EnvArgCountCheck(theEnv,"refresh-agenda",NO_MORE_THAN,1)) == -1) return;
+   if ((numArgs = EnvArgCountCheck(theEnv,execStatus,"refresh-agenda",NO_MORE_THAN,1)) == -1) return;
 
    /*===============================================================*/
    /* If a module name is specified, then the agenda of that module */
@@ -958,7 +958,7 @@ globle void RefreshAgendaCommand(
 
    if (numArgs == 1)
      {
-      theModule = GetModuleName(theEnv,"refresh-agenda",1,&error);
+      theModule = GetModuleName(theEnv,execStatus,"refresh-agenda",1,&error);
       if (error) return;
      }
    else
@@ -968,7 +968,7 @@ globle void RefreshAgendaCommand(
    /* Refresh the agenda of the appropriate module. */
    /*===============================================*/
 
-   EnvRefreshAgenda(theEnv,theModule);
+   EnvRefreshAgenda(theEnv,execStatus,theModule);
   }
 
 /**************************************/
@@ -976,7 +976,7 @@ globle void RefreshAgendaCommand(
 /*   for the refresh-agenda command.  */
 /**************************************/
 globle void EnvRefreshAgenda(
-  void *theEnv,
+  void *theEnv,EXEC_STATUS,
   void *vTheModule)
   {
    struct activation *theActivation;
@@ -1032,7 +1032,7 @@ globle void EnvRefreshAgenda(
       for (theActivation = (struct activation *) EnvGetNextActivation(theEnv,NULL);
            theActivation != NULL;
            theActivation = (struct activation *) EnvGetNextActivation(theEnv,theActivation))
-        { theActivation->salience = EvaluateSalience(theEnv,theActivation->theRule); }
+        { theActivation->salience = EvaluateSalience(theEnv,execStatus,theActivation->theRule); }
 
       /*======================================================*/
       /* Reorder the agenda based on the new salience values. */
@@ -1071,7 +1071,7 @@ globle void EnvRefreshAgenda(
 /*   Syntax: (set-salience-evaluation-behavior <symbol>) */
 /*********************************************************/
 globle void *SetSalienceEvaluationCommand(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    DATA_OBJECT argPtr;
    char *argument, *oldValue;
@@ -1087,10 +1087,10 @@ globle void *SetSalienceEvaluationCommand(
    /* which must be a symbol.                 */
    /*=========================================*/
 
-   if (EnvArgCountCheck(theEnv,"set-salience-evaluation",EXACTLY,1) == -1)
+   if (EnvArgCountCheck(theEnv,execStatus,"set-salience-evaluation",EXACTLY,1) == -1)
      { return((SYMBOL_HN *) EnvAddSymbol(theEnv,oldValue)); }
 
-   if (EnvArgTypeCheck(theEnv,"set-salience-evaluation",1,SYMBOL,&argPtr) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"set-salience-evaluation",1,SYMBOL,&argPtr) == FALSE)
      { return((SYMBOL_HN *) EnvAddSymbol(theEnv,oldValue)); }
 
    /*=============================================================*/
@@ -1126,9 +1126,9 @@ globle void *SetSalienceEvaluationCommand(
 /*   Syntax: (get-salience-evaluation-behavior)          */
 /*********************************************************/
 globle void *GetSalienceEvaluationCommand(
-  void *theEnv)
+  void *theEnv, EXEC_STATUS)
   {
-   EnvArgCountCheck(theEnv,"get-salience-evaluation",EXACTLY,0);
+   EnvArgCountCheck(theEnv,execStatus,"get-salience-evaluation",EXACTLY,0);
 
    return((SYMBOL_HN *) EnvAddSymbol(theEnv,SalienceEvaluationName(EnvGetSalienceEvaluation(theEnv))));
   }
@@ -1197,7 +1197,7 @@ globle intBool EnvSetSalienceEvaluation(
 /*   rule's current salience, and it is then returned.           */
 /*****************************************************************/
 static int EvaluateSalience(
-  void *theEnv,
+  void *theEnv,EXEC_STATUS,
   void *vPtr)
   {
    struct defrule *rPtr = (struct defrule *) vPtr;
@@ -1227,8 +1227,8 @@ static int EvaluateSalience(
   /* during evaluation, print an error message.         */
   /*====================================================*/
 
-  SetEvaluationError(theEnv,FALSE);
-  if (EvaluateExpression(theEnv,rPtr->dynamicSalience,&salienceValue))
+  SetEvaluationError(theEnv,execStatus,FALSE);
+  if (EvaluateExpression(theEnv,execStatus,rPtr->dynamicSalience,&salienceValue))
     {
      SalienceInformationError(theEnv,"defrule",ValueToString(rPtr->header.name));
      return(rPtr->salience);
@@ -1242,7 +1242,7 @@ static int EvaluateSalience(
     {
      SalienceNonIntegerError(theEnv);
      SalienceInformationError(theEnv,"defrule",ValueToString(rPtr->header.name));
-     SetEvaluationError(theEnv,TRUE);
+     SetEvaluationError(theEnv,execStatus,TRUE);
      return(rPtr->salience);
     }
 
@@ -1256,7 +1256,7 @@ static int EvaluateSalience(
   if ((salience > MAX_DEFRULE_SALIENCE) || (salience < MIN_DEFRULE_SALIENCE))
     {
      SalienceRangeError(theEnv,MIN_DEFRULE_SALIENCE,MAX_DEFRULE_SALIENCE);
-     SetEvaluationError(theEnv,TRUE);
+     SetEvaluationError(theEnv,execStatus,TRUE);
      SalienceInformationError(theEnv,"defrule",ValueToString(((struct defrule *) rPtr)->header.name));
      return(rPtr->salience);
     }
@@ -1278,7 +1278,7 @@ static int EvaluateSalience(
 /*   Syntax: (agenda)                          */
 /***********************************************/
 globle void AgendaCommand(
-  void *theEnv)
+  void *theEnv, EXEC_STATUS)
   {
    int numArgs, error;
    struct defmodule *theModule;
@@ -1287,7 +1287,7 @@ globle void AgendaCommand(
    /* This function can have at most one argument. */
    /*==============================================*/
 
-   if ((numArgs = EnvArgCountCheck(theEnv,"agenda",NO_MORE_THAN,1)) == -1) return;
+   if ((numArgs = EnvArgCountCheck(theEnv,execStatus,"agenda",NO_MORE_THAN,1)) == -1) return;
 
    /*===============================================================*/
    /* If a module name is specified, then the agenda of that module */
@@ -1297,7 +1297,7 @@ globle void AgendaCommand(
 
    if (numArgs == 1)
      {
-      theModule = GetModuleName(theEnv,"agenda",1,&error);
+      theModule = GetModuleName(theEnv,execStatus,"agenda",1,&error);
       if (error) return;
      }
    else

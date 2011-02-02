@@ -88,16 +88,16 @@ LOCALE intBool DefclassInScope(void *,DEFCLASS *,struct defmodule *);
 LOCALE void *EnvGetNextDefclass(void *,void *);
 LOCALE intBool EnvIsDefclassDeletable(void *,void *);
 
-LOCALE void UndefclassCommand(void *);
+LOCALE void UndefclassCommand(void *,EXEC_STATUS);
 LOCALE unsigned short EnvSetClassDefaultsMode(void *,unsigned short);
 LOCALE unsigned short EnvGetClassDefaultsMode(void *);
-LOCALE void *GetClassDefaultsModeCommand(void *);
-LOCALE void *SetClassDefaultsModeCommand(void *);
+LOCALE void *GetClassDefaultsModeCommand(void *,EXEC_STATUS);
+LOCALE void *SetClassDefaultsModeCommand(void *,EXEC_STATUS);
 
 #if DEBUGGING_FUNCTIONS
-LOCALE void PPDefclassCommand(void *);
-LOCALE void ListDefclassesCommand(void *);
-LOCALE void EnvListDefclasses(void *,char *,struct defmodule *);
+LOCALE void PPDefclassCommand(void *,EXEC_STATUS);
+LOCALE void ListDefclassesCommand(void *,EXEC_STATUS);
+LOCALE void EnvListDefclasses(void *,EXEC_STATUS,char *,struct defmodule *);
 LOCALE unsigned EnvGetDefclassWatchInstances(void *,void *);
 LOCALE void EnvSetDefclassWatchInstances(void *,unsigned,void *);
 LOCALE unsigned EnvGetDefclassWatchSlots(void *,void *);
@@ -106,12 +106,12 @@ LOCALE unsigned DefclassWatchAccess(void *,int,unsigned,EXPRESSION *);
 LOCALE unsigned DefclassWatchPrint(void *,char *,int,EXPRESSION *);
 #endif
 
-LOCALE void GetDefclassListFunction(void *,DATA_OBJECT *);
+LOCALE void GetDefclassListFunction(void *,EXEC_STATUS,DATA_OBJECT *);
 LOCALE void EnvGetDefclassList(void *,DATA_OBJECT *,struct defmodule *);
 LOCALE intBool EnvUndefclass(void *,void *);
 LOCALE intBool HasSuperclass(DEFCLASS *,DEFCLASS *);
 
-LOCALE SYMBOL_HN *CheckClassAndSlot(void *,char *,DEFCLASS **);
+LOCALE SYMBOL_HN *CheckClassAndSlot(void *,EXEC_STATUS,char *,DEFCLASS **);
 
 #if (! BLOAD_ONLY) && (! RUN_TIME)
 LOCALE void SaveDefclasses(void *,void *,char *);

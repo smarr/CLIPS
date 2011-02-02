@@ -442,7 +442,7 @@ static struct factPatternNode *GetNextFactPatternNode(
   int finishedMatching,
   struct factPatternNode *thePattern)
   {
-   EvaluationData(theEnv)->EvaluationError = FALSE;
+   execStatus->EvaluationError = FALSE;
 
    /*===================================================*/
    /* If pattern matching was successful at the current */
@@ -586,10 +586,10 @@ static int EvaluatePatternExpression(
       /*==============================================*/
 
       case FACT_PN_CONSTANT1:
-        oldArgument = EvaluationData(theEnv)->CurrentExpression;
-        EvaluationData(theEnv)->CurrentExpression = theTest;
+        oldArgument = execStatus->CurrentExpression;
+        execStatus->CurrentExpression = theTest;
         rv = FactPNConstant1(theEnv,theTest->value,&theResult);
-        EvaluationData(theEnv)->CurrentExpression = oldArgument;
+        execStatus->CurrentExpression = oldArgument;
         return(rv);
 
       /*=============================================*/
@@ -599,10 +599,10 @@ static int EvaluatePatternExpression(
       /*=============================================*/
 
       case FACT_PN_CONSTANT2:
-        oldArgument = EvaluationData(theEnv)->CurrentExpression;
-        EvaluationData(theEnv)->CurrentExpression = theTest;
+        oldArgument = execStatus->CurrentExpression;
+        execStatus->CurrentExpression = theTest;
         rv = FactPNConstant2(theEnv,theTest->value,&theResult);
-        EvaluationData(theEnv)->CurrentExpression = oldArgument;
+        execStatus->CurrentExpression = oldArgument;
         return(rv);
 
       /*================================================*/
@@ -611,10 +611,10 @@ static int EvaluatePatternExpression(
       /*================================================*/
 
       case FACT_SLOT_LENGTH:
-        oldArgument = EvaluationData(theEnv)->CurrentExpression;
-        EvaluationData(theEnv)->CurrentExpression = theTest;
+        oldArgument = execStatus->CurrentExpression;
+        execStatus->CurrentExpression = theTest;
         rv = FactSlotLength(theEnv,theTest->value,&theResult);
-        EvaluationData(theEnv)->CurrentExpression = oldArgument;
+        execStatus->CurrentExpression = oldArgument;
         return(rv);
      }
 
@@ -632,10 +632,10 @@ static int EvaluatePatternExpression(
         {
          if (EvaluatePatternExpression(theEnv,patternPtr,theTest) == TRUE)
            {
-            if (EvaluationData(theEnv)->EvaluationError) return(FALSE);
+            if (execStatus->EvaluationError) return(FALSE);
             return(TRUE);
            }
-         if (EvaluationData(theEnv)->EvaluationError) return(FALSE);
+         if (execStatus->EvaluationError) return(FALSE);
         }
 
       return(FALSE);
@@ -655,7 +655,7 @@ static int EvaluatePatternExpression(
         {
          if (EvaluatePatternExpression(theEnv,patternPtr,theTest) == FALSE)
            { return(FALSE); }
-         if (EvaluationData(theEnv)->EvaluationError) return(FALSE);
+         if (execStatus->EvaluationError) return(FALSE);
         }
 
       return(TRUE);

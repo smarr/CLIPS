@@ -1175,7 +1175,7 @@ globle void HelpFunction(
         GenClose(theEnv,fp);
 
       main_topic = AskForNewHelpTopic(theEnv,main_topic,menu);
-      if (EvaluationData(theEnv)->HaltExecution)
+      if (execStatus->HaltExecution)
         {
          while (status != EXIT)
            if ((fp = GetEntries(theEnv,TextProcessingData(theEnv)->help_file,menu,NULL,&status)) != NULL)
@@ -1208,7 +1208,7 @@ globle void HelpPathFunction(
    char *help_name;
    DATA_OBJECT arg_ptr;
 
-   if (EnvRtnArgCount(theEnv) == 0)
+   if (EnvRtnArgCount(theEnv,execStatus) == 0)
      {
       EnvPrintRouter(theEnv,WDIALOG,"The current help entries file is ");
       if (TextProcessingData(theEnv)->help_file != NULL)
@@ -1232,7 +1232,7 @@ globle void HelpPathFunction(
            }
          rm(theEnv,(void *) TextProcessingData(theEnv)->help_file,strlen(TextProcessingData(theEnv)->help_file) + 1);
         }
-      if (EnvArgTypeCheck(theEnv,"help-path",1,SYMBOL_OR_STRING,&arg_ptr) == FALSE) return;
+      if (EnvArgTypeCheck(theEnv,execStatus,"help-path",1,SYMBOL_OR_STRING,&arg_ptr) == FALSE) return;
       help_name = DOToString(arg_ptr);
       TextProcessingData(theEnv)->help_file = (char *) gm2(theEnv,strlen(help_name) + 1);
       genstrcpy(TextProcessingData(theEnv)->help_file,help_name);
@@ -1262,7 +1262,7 @@ globle void FetchCommand(
 
    result->type = SYMBOL;
    result->value = EnvFalseSymbol(theEnv);
-   if (EnvArgTypeCheck(theEnv,"fetch",1,SYMBOL_OR_STRING,&arg_ptr) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"fetch",1,SYMBOL_OR_STRING,&arg_ptr) == FALSE)
       return;
    load_ct = TextLookupFetch(theEnv,DOToString(arg_ptr));
    if (load_ct <= 0)
@@ -1422,7 +1422,7 @@ globle int TossCommand(
    char *file;   /*Name of the file */
    DATA_OBJECT arg_ptr;
 
-   if (EnvArgTypeCheck(theEnv,"toss",1,SYMBOL_OR_STRING,&arg_ptr) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"toss",1,SYMBOL_OR_STRING,&arg_ptr) == FALSE)
      return (FALSE);
    file = DOToString(arg_ptr);
 
@@ -1539,11 +1539,11 @@ static struct topics *GetCommandLineTopics(
    DATA_OBJECT val;       /*Unknown-type H/L data structure        */
 
    head = NULL;
-   topic_num = EnvRtnArgCount(theEnv);
+   topic_num = EnvRtnArgCount(theEnv,execStatus);
    for (theIndex = 1; theIndex <= topic_num; theIndex++)
      {
       tnode = (struct topics *) gm2(theEnv,(int) sizeof(struct topics));
-      EnvRtnUnknown(theEnv,theIndex,&val);
+      EnvRtnUnknown(theEnv,execStatus,theIndex,&val);
       if ((GetType(val) == SYMBOL) || (GetType(val) == STRING))
         genstrncpy(tnode->name,DOToString(val),NAMESIZE-1);
       else if (GetType(val) == FLOAT)
@@ -1603,7 +1603,7 @@ static struct topics *AskForNewHelpTopic(
          ((list[theIndex] = (char) EnvGetcRouter(theEnv,"whelp")) != LNFEED) && (theIndex < 254);
          theIndex++ , RouterData(theEnv)->CommandBufferInputCount++)
        {
-        if (EvaluationData(theEnv)->HaltExecution)
+        if (execStatus->HaltExecution)
           break;
         if (list[theIndex] == TAB)
           list[theIndex] = BLANK;
@@ -1619,7 +1619,7 @@ static struct topics *AskForNewHelpTopic(
 
    RouterData(theEnv)->CommandBufferInputCount = 0;
    RouterData(theEnv)->AwaitingInput = FALSE;
-   if (EvaluationData(theEnv)->HaltExecution)
+   if (execStatus->HaltExecution)
      {
       EnvPrintRouter(theEnv,"whelp","\n");
       old_list->end_list = old_list;

@@ -15,6 +15,6 @@
    int                     ExitInterfaceRouter(void *,int);
    void                    MacYieldTimeFunction(void);
    void                    MacPeriodicFunction(void *);
-   void                    ClearEnvironmentWindowCommand(void *);
+   void                    ClearEnvironmentWindowCommand(void *, EXEC_STATUS);
    int                     MacBeforeOpenFunction(void *);   
    int                     MacAfterOpenFunction(void *);

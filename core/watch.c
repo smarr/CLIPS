@@ -377,7 +377,7 @@ globle void WatchCommand(
    /* Determine which item is to be watched. */
    /*========================================*/
 
-   if (EnvArgTypeCheck(theEnv,"watch",1,SYMBOL,&theValue) == FALSE) return;
+   if (EnvArgTypeCheck(theEnv,execStatus,"watch",1,SYMBOL,&theValue) == FALSE) return;
    argument = DOToString(theValue);
    wPtr = ValidWatchItem(theEnv,argument,&recognized);
    if (recognized == FALSE)
@@ -424,7 +424,7 @@ globle void UnwatchCommand(
    /* Determine which item is to be unwatched. */
    /*==========================================*/
 
-   if (EnvArgTypeCheck(theEnv,"unwatch",1,SYMBOL,&theValue) == FALSE) return;
+   if (EnvArgTypeCheck(theEnv,execStatus,"unwatch",1,SYMBOL,&theValue) == FALSE) return;
    argument = DOToString(theValue);
    wPtr = ValidWatchItem(theEnv,argument,&recognized);
    if (recognized == FALSE)
@@ -485,7 +485,7 @@ globle void ListWatchItemsCommand(
    /* Determine which item is to be listed. */
    /*=======================================*/
 
-   if (EnvArgTypeCheck(theEnv,"list-watch-items",1,SYMBOL,&theValue) == FALSE) return;
+   if (EnvArgTypeCheck(theEnv,execStatus,"list-watch-items",1,SYMBOL,&theValue) == FALSE) return;
    wPtr = ValidWatchItem(theEnv,DOToString(theValue),&recognized);
    if ((recognized == FALSE) || (wPtr == NULL))
      {
@@ -541,14 +541,14 @@ globle int GetWatchItemCommand(
    /* Check for the correct number of arguments. */
    /*============================================*/
 
-   if (EnvArgCountCheck(theEnv,"get-watch-item",EXACTLY,1) == -1)
+   if (EnvArgCountCheck(theEnv,execStatus,"get-watch-item",EXACTLY,1) == -1)
      { return(FALSE); }
 
    /*========================================*/
    /* Determine which item is to be watched. */
    /*========================================*/
 
-   if (EnvArgTypeCheck(theEnv,"get-watch-item",1,SYMBOL,&theValue) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"get-watch-item",1,SYMBOL,&theValue) == FALSE)
      { return(FALSE); }
 
    argument = DOToString(theValue);

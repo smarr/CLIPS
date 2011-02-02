@@ -71,13 +71,13 @@
    =========================================
    ***************************************** */
 
-static int CheckTwoClasses(void *,char *,DEFCLASS **,DEFCLASS **);
-static SLOT_DESC *CheckSlotExists(void *,char *,DEFCLASS **,intBool,intBool);
+static int CheckTwoClasses(void *,EXEC_STATUS,char *,DEFCLASS **,DEFCLASS **);
+static SLOT_DESC *CheckSlotExists(void *,EXEC_STATUS,char *,DEFCLASS **,intBool,intBool);
 static SLOT_DESC *LookupSlot(void *,DEFCLASS *,char *,intBool);
 
 #if DEBUGGING_FUNCTIONS
 static DEFCLASS *CheckClass(void *,char *,char *);
-static char *GetClassNameArgument(void *,char *);
+static char *GetClassNameArgument(void *,EXEC_STATUS,char *);
 static void PrintClassBrowse(void *,char *,DEFCLASS *,long);
 static void DisplaySeparator(void *,char *,char *,int,int);
 static void DisplaySlotBasicInfo(void *,char *,char *,char *,char *,DEFCLASS *);
@@ -103,11 +103,11 @@ static char *ConstraintCode(CONSTRAINT_RECORD *,unsigned,unsigned);
   NOTES        : Syntax : (browse-classes [<class>])
  ****************************************************************/
 globle void BrowseClassesCommand(
-  void *theEnv)
+  void *theEnv, EXEC_STATUS)
   {
    register DEFCLASS *cls;
    
-   if (EnvRtnArgCount(theEnv) == 0)
+   if (EnvRtnArgCount(theEnv,execStatus) == 0)
       /* ================================================
          Find the OBJECT root class (has no superclasses)
          ================================================ */
@@ -116,7 +116,7 @@ globle void BrowseClassesCommand(
      {
       DATA_OBJECT tmp;
 
-      if (EnvArgTypeCheck(theEnv,"browse-classes",1,SYMBOL,&tmp) == FALSE)
+      if (EnvArgTypeCheck(theEnv,execStatus,"browse-classes",1,SYMBOL,&tmp) == FALSE)
         return;
       cls = LookupDefclassByMdlOrScope(theEnv,DOToString(tmp));
       if (cls == NULL)
@@ -156,12 +156,12 @@ globle void EnvBrowseClasses(
   NOTES        : Syntax : (describe-class <class-name>)
  ****************************************************************/
 globle void DescribeClassCommand(
-  void *theEnv)
+  void *theEnv, EXEC_STATUS)
   {
    char *cname;
    DEFCLASS *cls;
    
-   cname = GetClassNameArgument(theEnv,"describe-class");
+   cname = GetClassNameArgument(theEnv,execStatus,"describe-class");
    if (cname == NULL)
      return;
    cls = CheckClass(theEnv,"describe-class",cname);
@@ -314,9 +314,9 @@ globle char *GetCreateAccessorString(
   NOTES        : H/L Syntax: (defclass-module <class-name>)
  ************************************************************/
 globle void *GetDefclassModuleCommand(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
-   return(GetConstructModuleCommand(theEnv,"defclass-module",DefclassData(theEnv)->DefclassConstruct));
+   return(GetConstructModuleCommand(theEnv,execStatus,"defclass-module",DefclassData(theEnv)->DefclassConstruct));
   }
 
 /*********************************************************************
@@ -328,11 +328,11 @@ globle void *GetDefclassModuleCommand(
   NOTES        : H/L Syntax : (superclassp <class-1> <class-2>)
  *********************************************************************/
 globle intBool SuperclassPCommand(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    DEFCLASS *c1,*c2;
    
-   if (CheckTwoClasses(theEnv,"superclassp",&c1,&c2) == FALSE)
+   if (CheckTwoClasses(theEnv,execStatus,"superclassp",&c1,&c2) == FALSE)
      return(FALSE);
    return(EnvSuperclassP(theEnv,(void *) c1,(void *) c2));
   }
@@ -373,11 +373,11 @@ globle intBool EnvSuperclassP(
   NOTES        : H/L Syntax : (subclassp <class-1> <class-2>)
  *********************************************************************/
 globle intBool SubclassPCommand(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    DEFCLASS *c1,*c2;
    
-   if (CheckTwoClasses(theEnv,"subclassp",&c1,&c2) == FALSE)
+   if (CheckTwoClasses(theEnv,execStatus,"subclassp",&c1,&c2) == FALSE)
      return(FALSE);
    return(EnvSubclassP(theEnv,(void *) c1,(void *) c2));
   }
@@ -418,19 +418,19 @@ globle intBool EnvSubclassP(
   NOTES        : H/L Syntax : (slot-existp <class> <slot> [inherit])
  *********************************************************************/
 globle int SlotExistPCommand(
-  void *theEnv)
+  void *theEnv, EXEC_STATUS)
   {
    DEFCLASS *cls;
    SLOT_DESC *sd;
    int inheritFlag = FALSE;
    DATA_OBJECT dobj;
    
-   sd = CheckSlotExists(theEnv,"slot-existp",&cls,FALSE,TRUE);
+   sd = CheckSlotExists(theEnv,execStatus,"slot-existp",&cls,FALSE,TRUE);
    if (sd == NULL)
      return(FALSE);
-   if (EnvRtnArgCount(theEnv) == 3)
+   if (EnvRtnArgCount(theEnv,execStatus) == 3)
      {
-      if (EnvArgTypeCheck(theEnv,"slot-existp",3,SYMBOL,&dobj) == FALSE)
+      if (EnvArgTypeCheck(theEnv,execStatus,"slot-existp",3,SYMBOL,&dobj) == FALSE)
         return(FALSE);
       if (strcmp(DOToString(dobj),"inherit") != 0)
         {
@@ -474,14 +474,14 @@ globle intBool EnvSlotExistP(
   NOTES        : H/L Syntax : (message-handler-existp <class> <hnd> [<type>])
  ************************************************************************************/
 globle int MessageHandlerExistPCommand(
-  void *theEnv)
+  void *theEnv, EXEC_STATUS)
   {
    DEFCLASS *cls;
    SYMBOL_HN *mname;
    DATA_OBJECT temp;
    unsigned mtype = MPRIMARY;
    
-   if (EnvArgTypeCheck(theEnv,"message-handler-existp",1,SYMBOL,&temp) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"message-handler-existp",1,SYMBOL,&temp) == FALSE)
      return(FALSE);
    cls = LookupDefclassByMdlOrScope(theEnv,DOToString(temp));
    if (cls == NULL)
@@ -489,12 +489,12 @@ globle int MessageHandlerExistPCommand(
       ClassExistError(theEnv,"message-handler-existp",DOToString(temp));
       return(FALSE);
      }
-   if (EnvArgTypeCheck(theEnv,"message-handler-existp",2,SYMBOL,&temp) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"message-handler-existp",2,SYMBOL,&temp) == FALSE)
      return(FALSE);
    mname = (SYMBOL_HN *) GetValue(temp);
-   if (EnvRtnArgCount(theEnv) == 3)
+   if (EnvRtnArgCount(theEnv,execStatus) == 3)
      {
-      if (EnvArgTypeCheck(theEnv,"message-handler-existp",3,SYMBOL,&temp) == FALSE)
+      if (EnvArgTypeCheck(theEnv,execStatus,"message-handler-existp",3,SYMBOL,&temp) == FALSE)
         return(FALSE);
       mtype = HandlerType(theEnv,"message-handler-existp",DOToString(temp));
       if (mtype == MERROR)
@@ -517,12 +517,12 @@ globle int MessageHandlerExistPCommand(
   NOTES        : H/L Syntax : (slot-writablep <class> <slot>)
  **********************************************************************/
 globle intBool SlotWritablePCommand(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    DEFCLASS *theDefclass;
    SLOT_DESC *sd;
    
-   sd = CheckSlotExists(theEnv,"slot-writablep",&theDefclass,TRUE,TRUE);
+   sd = CheckSlotExists(theEnv,execStatus,"slot-writablep",&theDefclass,TRUE,TRUE);
    if (sd == NULL)
      return(FALSE);
    return((sd->noWrite || sd->initializeOnly) ? FALSE : TRUE);
@@ -560,12 +560,12 @@ globle intBool EnvSlotWritableP(
   NOTES        : H/L Syntax : (slot-initablep <class> <slot>)
  **********************************************************************/
 globle intBool SlotInitablePCommand(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    DEFCLASS *theDefclass;
    SLOT_DESC *sd;
    
-   sd = CheckSlotExists(theEnv,"slot-initablep",&theDefclass,TRUE,TRUE);
+   sd = CheckSlotExists(theEnv,execStatus,"slot-initablep",&theDefclass,TRUE,TRUE);
    if (sd == NULL)
      return(FALSE);
    return((sd->noWrite && (sd->initializeOnly == 0)) ? FALSE : TRUE);
@@ -603,12 +603,12 @@ globle intBool EnvSlotInitableP(
   NOTES        : H/L Syntax : (slot-publicp <class> <slot>)
  **********************************************************************/
 globle intBool SlotPublicPCommand(
-  void *theEnv)
+  void *theEnv, EXEC_STATUS)
   {
    DEFCLASS *theDefclass;
    SLOT_DESC *sd;
    
-   sd = CheckSlotExists(theEnv,"slot-publicp",&theDefclass,TRUE,FALSE);
+   sd = CheckSlotExists(theEnv,execStatus,"slot-publicp",&theDefclass,TRUE,FALSE);
    if (sd == NULL)
      return(FALSE);
    return(sd->publicVisibility ? TRUE : FALSE);
@@ -677,12 +677,12 @@ globle int EnvSlotDefaultP(
   NOTES        : H/L Syntax : (slot-direct-accessp <class> <slot>)
  **********************************************************************/
 globle intBool SlotDirectAccessPCommand(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    DEFCLASS *theDefclass;
    SLOT_DESC *sd;
    
-   sd = CheckSlotExists(theEnv,"slot-direct-accessp",&theDefclass,TRUE,TRUE);
+   sd = CheckSlotExists(theEnv,execStatus,"slot-direct-accessp",&theDefclass,TRUE,TRUE);
    if (sd == NULL)
      return(FALSE);
    return((sd->publicVisibility || (sd->cls == theDefclass)) ? TRUE : FALSE);
@@ -723,7 +723,7 @@ globle intBool EnvSlotDirectAccessP(
   NOTES        : H/L Syntax : (slot-default-value <class> <slot>)
  **********************************************************************/
 globle void SlotDefaultValueCommand(
-  void *theEnv,
+  void *theEnv,EXEC_STATUS,
   DATA_OBJECT_PTR theValue)
   {
    DEFCLASS *theDefclass;
@@ -731,7 +731,7 @@ globle void SlotDefaultValueCommand(
 
    SetpType(theValue,SYMBOL);
    SetpValue(theValue,EnvFalseSymbol(theEnv));
-   sd = CheckSlotExists(theEnv,"slot-default-value",&theDefclass,TRUE,TRUE);
+   sd = CheckSlotExists(theEnv,execStatus,"slot-default-value",&theDefclass,TRUE,TRUE);
    if (sd == NULL)
      return;
    
@@ -799,11 +799,11 @@ globle intBool EnvSlotDefaultValue(
   NOTES        : H/L Syntax : (class-existp <arg>)
  ********************************************************/
 globle intBool ClassExistPCommand(
-  void *theEnv)
+  void *theEnv, EXEC_STATUS)
   {
    DATA_OBJECT temp;
    
-   if (EnvArgTypeCheck(theEnv,"class-existp",1,SYMBOL,&temp) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"class-existp",1,SYMBOL,&temp) == FALSE)
      return(FALSE);
    return((LookupDefclassByMdlOrScope(theEnv,DOToString(temp)) != NULL) ? TRUE : FALSE);
   }
@@ -827,13 +827,14 @@ globle intBool ClassExistPCommand(
  ******************************************************/
 static int CheckTwoClasses(
   void *theEnv,
+  EXEC_STATUS,
   char *func,
   DEFCLASS **c1,
   DEFCLASS **c2)
   {
    DATA_OBJECT temp;
 
-   if (EnvArgTypeCheck(theEnv,func,1,SYMBOL,&temp) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,func,1,SYMBOL,&temp) == FALSE)
      return(FALSE);
    *c1 = LookupDefclassByMdlOrScope(theEnv,DOToString(temp));
    if (*c1 == NULL)
@@ -841,7 +842,7 @@ static int CheckTwoClasses(
       ClassExistError(theEnv,func,ValueToString(temp.value));
       return(FALSE);
      }
-   if (EnvArgTypeCheck(theEnv,func,2,SYMBOL,&temp) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,func,2,SYMBOL,&temp) == FALSE)
      return(FALSE);
    *c2 = LookupDefclassByMdlOrScope(theEnv,DOToString(temp));
    if (*c2 == NULL)
@@ -872,6 +873,7 @@ static int CheckTwoClasses(
  ***************************************************/
 static SLOT_DESC *CheckSlotExists(
   void *theEnv,
+  EXEC_STATUS,
   char *func,
   DEFCLASS **classBuffer,
   intBool existsErrorFlag,
@@ -881,7 +883,7 @@ static SLOT_DESC *CheckSlotExists(
    int slotIndex;
    SLOT_DESC *sd;
 
-   ssym = CheckClassAndSlot(theEnv,func,classBuffer);
+   ssym = CheckClassAndSlot(theEnv,execStatus,func,classBuffer);
    if (ssym == NULL)
      return(NULL);
    slotIndex = FindInstanceTemplateSlot(theEnv,*classBuffer,ssym);
@@ -980,11 +982,12 @@ static DEFCLASS *CheckClass(
  *********************************************************/
 static char *GetClassNameArgument(
   void *theEnv,
+  EXEC_STATUS,
   char *fname)
   {
    DATA_OBJECT temp;
 
-   if (EnvArgTypeCheck(theEnv,fname,1,SYMBOL,&temp) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,fname,1,SYMBOL,&temp) == FALSE)
      return(NULL);
    return(DOToString(temp));
   }

@@ -64,8 +64,8 @@
    LOCALE void                           PlaceActivation(void *,ACTIVATION **,ACTIVATION *,struct salienceGroup *);
    LOCALE int                            EnvSetStrategy(void *,int);
    LOCALE int                            EnvGetStrategy(void *);
-   LOCALE void                          *SetStrategyCommand(void *);
-   LOCALE void                          *GetStrategyCommand(void *);
+   LOCALE void                          *SetStrategyCommand(void *,EXEC_STATUS);
+   LOCALE void                          *GetStrategyCommand(void *,EXEC_STATUS);
 
 #endif
 

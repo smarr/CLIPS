@@ -73,7 +73,7 @@
 #if DEBUGGING_FUNCTIONS
    static void                    ConstructPrintWatch(void *,char *,struct construct *,void *,
                                                       unsigned (*)(void *,void *));
-   static unsigned                ConstructWatchSupport(void *,struct construct *,char *,
+   static unsigned                ConstructWatchSupport(void *,EXEC_STATUS,struct construct *,char *,
                                                         char *,EXPRESSION *,intBool,
                                                         unsigned,unsigned (*)(void *,void *),
                                                         void (*)(void *,unsigned,void *));
@@ -240,6 +240,7 @@ globle void *FindNamedConstruct(
 /*****************************************/
 globle void UndefconstructCommand(
   void *theEnv,
+  EXEC_STATUS,
   char *command,
   struct construct *constructClass)
   {
@@ -252,7 +253,7 @@ globle void UndefconstructCommand(
 
    gensprintf(buffer,"%s name",constructClass->constructName);
 
-   constructName = GetConstructName(theEnv,command,buffer);
+   constructName = GetConstructName(theEnv,execStatus,command,buffer);
    if (constructName == NULL) return;
 
 #if (! RUN_TIME) && (! BLOAD_ONLY)
@@ -296,6 +297,7 @@ globle void UndefconstructCommand(
 /******************************************/
 globle void PPConstructCommand(
   void *theEnv,
+  EXEC_STATUS,
   char *command,
   struct construct *constructClass)
   {
@@ -309,7 +311,7 @@ globle void PPConstructCommand(
 
    gensprintf(buffer,"%s name",constructClass->constructName);
 
-   constructName = GetConstructName(theEnv,command,buffer);
+   constructName = GetConstructName(theEnv,execStatus,command,buffer);
    if (constructName == NULL) return;
 
    /*================================*/
@@ -371,7 +373,7 @@ globle int PPConstruct(
 /*   for def<construct>-module routines      */
 /*********************************************/
 globle SYMBOL_HN *GetConstructModuleCommand(
-  void *theEnv,
+  void *theEnv,EXEC_STATUS,
   char *command,
   struct construct *constructClass)
   {
@@ -386,7 +388,7 @@ globle SYMBOL_HN *GetConstructModuleCommand(
 
    gensprintf(buffer,"%s name",constructClass->constructName);
 
-   constructName = GetConstructName(theEnv,command,buffer);
+   constructName = GetConstructName(theEnv,execStatus,command,buffer);
    if (constructName == NULL) return((SYMBOL_HN *) EnvFalseSymbol(theEnv));
 
    /*==========================================*/
@@ -453,7 +455,7 @@ globle struct defmodule *GetConstructModule(
 /*   for deleting a construct.       */
 /*************************************/
 globle intBool Undefconstruct(
-  void *theEnv,
+  void *theEnv,EXEC_STATUS,
   void *theConstruct,
   struct construct *constructClass)
   {
@@ -518,8 +520,8 @@ globle intBool Undefconstruct(
       /*=======================================*/
 
       if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
-          (EvaluationData(theEnv)->CurrentExpression == NULL))
-        { PeriodicCleanup(theEnv,TRUE,FALSE); }
+          (execStatus->CurrentExpression == NULL))
+        { PeriodicCleanup(theEnv,execStatus,TRUE,FALSE); }
 
       /*============================================*/
       /* Return TRUE if all constructs successfully */
@@ -554,8 +556,8 @@ globle intBool Undefconstruct(
    /*=======================================*/
 
    if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
-       (EvaluationData(theEnv)->CurrentExpression == NULL))
-     { PeriodicCleanup(theEnv,TRUE,FALSE); }
+       (execStatus->CurrentExpression == NULL))
+     { PeriodicCleanup(theEnv,execStatus,TRUE,FALSE); }
 
    /*=============================*/
    /* Return TRUE to indicate the */
@@ -669,7 +671,7 @@ globle SYMBOL_HN *GetConstructNamePointer(
 /*   for retrieving the constructs in a module. */
 /************************************************/
 globle void GetConstructListFunction(
-  void *theEnv,
+  void *theEnv,EXEC_STATUS,
   char *functionName,
   DATA_OBJECT_PTR returnValue,
   struct construct *constructClass)
@@ -682,7 +684,7 @@ globle void GetConstructListFunction(
    /* Check for the correct number of arguments. */
    /*============================================*/
 
-   if ((numArgs = EnvArgCountCheck(theEnv,functionName,NO_MORE_THAN,1)) == -1)
+   if ((numArgs = EnvArgCountCheck(theEnv,execStatus,functionName,NO_MORE_THAN,1)) == -1)
      {
       EnvSetMultifieldErrorValue(theEnv,returnValue);
       return;
@@ -699,7 +701,7 @@ globle void GetConstructListFunction(
       /* Only symbols are valid module names. */
       /*======================================*/
 
-      EnvRtnUnknown(theEnv,1,&result);
+      EnvRtnUnknown(theEnv,execStatus,1,&result);
       if (GetType(result) != SYMBOL)
         {
          EnvSetMultifieldErrorValue(theEnv,returnValue);
@@ -928,7 +930,7 @@ globle void GetConstructList(
 /*   listing the constructs in a module.     */
 /*********************************************/
 globle void ListConstructCommand(
-  void *theEnv,
+  void *theEnv,EXEC_STATUS,
   char *functionName,
   struct construct *constructClass)
   {
@@ -940,7 +942,7 @@ globle void ListConstructCommand(
    /* Check for the correct number of arguments. */
    /*============================================*/
 
-   if ((numArgs = EnvArgCountCheck(theEnv,functionName,NO_MORE_THAN,1)) == -1) return;
+   if ((numArgs = EnvArgCountCheck(theEnv,execStatus,functionName,NO_MORE_THAN,1)) == -1) return;
 
    /*====================================*/
    /* If an argument was given, check to */
@@ -953,7 +955,7 @@ globle void ListConstructCommand(
       /* Only symbols are valid module names. */
       /*======================================*/
 
-      EnvRtnUnknown(theEnv,1,&result);
+      EnvRtnUnknown(theEnv,execStatus,1,&result);
       if (GetType(result) != SYMBOL)
         {
          ExpectedTypeError1(theEnv,functionName,1,"defmodule name");
@@ -991,7 +993,7 @@ globle void ListConstructCommand(
    /* to list the constructs. */
    /*=========================*/
 
-   ListConstruct(theEnv,constructClass,WDISPLAY,theModule);
+   ListConstruct(theEnv,execStatus,constructClass,WDISPLAY,theModule);
   }
 
 /*****************************************/
@@ -999,7 +1001,7 @@ globle void ListConstructCommand(
 /*   listing the constructs in a module. */
 /*****************************************/
 globle void ListConstruct(
-  void *theEnv,
+  void *theEnv,EXEC_STATUS,
   struct construct *constructClass,
   char *logicalName,
   struct defmodule *theModule)
@@ -1059,7 +1061,7 @@ globle void ListConstruct(
            constructPtr != NULL;
            constructPtr = (*constructClass->getNextItemFunction)(theEnv,constructPtr))
         {
-         if (EvaluationData(theEnv)->HaltExecution == TRUE) return;
+         if (execStatus->HaltExecution == TRUE) return;
 
          constructName = (*constructClass->getConstructNameFunction)((struct constructHeader *) constructPtr);
 
@@ -1411,7 +1413,7 @@ globle unsigned ConstructSetWatchAccess(
 /*   into watch and list-watch-items.                 */
 /******************************************************/
 static unsigned ConstructWatchSupport(
-  void *theEnv,
+  void *theEnv,EXEC_STATUS,
   struct construct *constructClass,
   char *funcName,
   char *logName,
@@ -1515,7 +1517,7 @@ static unsigned ConstructWatchSupport(
       /* occurs when evaluating the argument.     */
       /*==========================================*/
 
-      if (EvaluateExpression(theEnv,argExprs,&constructName))
+      if (EvaluateExpression(theEnv,execStatus,argExprs,&constructName))
         { return(FALSE); }
 
       /*================================================*/

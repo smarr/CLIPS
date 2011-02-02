@@ -124,7 +124,7 @@ static void DeallocateEngineData(
 globle long long Run(
   long long runLimit)
   {
-   return EnvRun(GetCurrentEnvironment(),runLimit);
+   return EnvRun(GetCurrentEnvironment(),GetCurrentExecutionStatus(),runLimit);
   }
 #endif
   
@@ -132,7 +132,7 @@ globle long long Run(
 /* EnvRun: C access routine for the run command. */
 /*************************************************/
 globle long long EnvRun(
-  void *theEnv,
+  void *theEnv,EXEC_STATUS,
   long long runLimit)
   {
    long long rulesFired = 0;
@@ -215,7 +215,7 @@ globle long long EnvRun(
    theActivation = NextActivationToFire(theEnv);
    while ((theActivation != NULL) &&
           (runLimit != 0) &&
-          (EvaluationData(theEnv)->HaltExecution == FALSE) &&
+          (execStatus->HaltExecution == FALSE) &&
           (EngineData(theEnv)->HaltRules == FALSE))
      {
       /*===========================================*/
@@ -303,7 +303,7 @@ globle long long EnvRun(
         { EngineData(theEnv)->TheLogicalBind = NULL; }
 
       execStatus->CurrentEvaluationDepth++;
-      SetEvaluationError(theEnv,FALSE);
+      SetEvaluationError(theEnv,execStatus,FALSE);
       EngineData(theEnv)->ExecutingRule->executing = TRUE;
 
 #if PROFILING_FUNCTIONS
@@ -321,7 +321,7 @@ globle long long EnvRun(
 #endif
 
       EngineData(theEnv)->ExecutingRule->executing = FALSE;
-      SetEvaluationError(theEnv,FALSE);
+      SetEvaluationError(theEnv,execStatus,FALSE);
       execStatus->CurrentEvaluationDepth--;
       EngineData(theEnv)->TheLogicalJoin = NULL;
       
@@ -336,9 +336,9 @@ globle long long EnvRun(
       /*=====================================================*/
 
 #if DEBUGGING_FUNCTIONS
-      if ((EvaluationData(theEnv)->HaltExecution) || (EngineData(theEnv)->HaltRules && EngineData(theEnv)->ExecutingRule->watchFiring))
+      if ((execStatus->HaltExecution) || (EngineData(theEnv)->HaltRules && EngineData(theEnv)->ExecutingRule->watchFiring))
 #else
-      if ((EvaluationData(theEnv)->HaltExecution) || (EngineData(theEnv)->HaltRules))
+      if ((execStatus->HaltExecution) || (EngineData(theEnv)->HaltRules))
 #endif
 
         {
@@ -382,7 +382,7 @@ globle long long EnvRun(
       /* while executing the rule's RHS.  */
       /*==================================*/
 
-      PeriodicCleanup(theEnv,FALSE,TRUE);
+      PeriodicCleanup(theEnv,execStatus,FALSE,TRUE);
 
       /*==========================*/
       /* Keep up with statistics. */
@@ -830,9 +830,9 @@ globle void EnvFocus(
 /*   for the clear-focus-stack command.         */
 /************************************************/
 globle void ClearFocusStackCommand(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
-   if (EnvArgCountCheck(theEnv,"list-focus-stack",EXACTLY,0) == -1) return;
+   if (EnvArgCountCheck(theEnv,execStatus,"list-focus-stack",EXACTLY,0) == -1) return;
 
    EnvClearFocusStack(theEnv);
   }
@@ -926,23 +926,23 @@ globle intBool EnvRemoveRunFunction(
 /* RunCommand: H/L access routine for the run command.   */
 /*********************************************************/
 globle void RunCommand(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    int numArgs;
    long long runLimit = -1LL;
    DATA_OBJECT argPtr;
 
-   if ((numArgs = EnvArgCountCheck(theEnv,"run",NO_MORE_THAN,1)) == -1) return;
+   if ((numArgs = EnvArgCountCheck(theEnv,execStatus,"run",NO_MORE_THAN,1)) == -1) return;
 
    if (numArgs == 0)
      { runLimit = -1LL; }
    else if (numArgs == 1)
      {
-      if (EnvArgTypeCheck(theEnv,"run",1,INTEGER,&argPtr) == FALSE) return;
+      if (EnvArgTypeCheck(theEnv,execStatus,"run",1,INTEGER,&argPtr) == FALSE) return;
       runLimit = DOToLong(argPtr);
      }
 
-   EnvRun(theEnv,runLimit);
+   EnvRun(theEnv,execStatus,runLimit);
 
    return;
   }
@@ -951,9 +951,9 @@ globle void RunCommand(
 /* HaltCommand: Causes rule execution to halt. */
 /***********************************************/
 globle void HaltCommand(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
-   EnvArgCountCheck(theEnv,"halt",EXACTLY,0);
+   EnvArgCountCheck(theEnv,execStatus,"halt",EXACTLY,0);
    EnvHalt(theEnv);
   }
 
@@ -1077,15 +1077,15 @@ globle intBool EnvDefruleHasBreakpoint(
 /*   for the set-break command.          */
 /*****************************************/
 globle void SetBreakCommand(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    DATA_OBJECT argPtr;
    char *argument;
    void *defrulePtr;
 
-   if (EnvArgCountCheck(theEnv,"set-break",EXACTLY,1) == -1) return;
+   if (EnvArgCountCheck(theEnv,execStatus,"set-break",EXACTLY,1) == -1) return;
 
-   if (EnvArgTypeCheck(theEnv,"set-break",1,SYMBOL,&argPtr) == FALSE) return;
+   if (EnvArgTypeCheck(theEnv,execStatus,"set-break",1,SYMBOL,&argPtr) == FALSE) return;
 
    argument = DOToString(argPtr);
 
@@ -1103,14 +1103,14 @@ globle void SetBreakCommand(
 /*   for the remove-break command.          */
 /********************************************/
 globle void RemoveBreakCommand(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    DATA_OBJECT argPtr;
    char *argument;
    int nargs;
    void *defrulePtr;
 
-   if ((nargs = EnvArgCountCheck(theEnv,"remove-break",NO_MORE_THAN,1)) == -1)
+   if ((nargs = EnvArgCountCheck(theEnv,execStatus,"remove-break",NO_MORE_THAN,1)) == -1)
      { return; }
 
    if (nargs == 0)
@@ -1119,7 +1119,7 @@ globle void RemoveBreakCommand(
       return;
      }
 
-   if (EnvArgTypeCheck(theEnv,"remove-break",1,SYMBOL,&argPtr) == FALSE) return;
+   if (EnvArgTypeCheck(theEnv,execStatus,"remove-break",1,SYMBOL,&argPtr) == FALSE) return;
 
    argument = DOToString(argPtr);
 
@@ -1142,16 +1142,16 @@ globle void RemoveBreakCommand(
 /*   for the show-breaks command.          */
 /*******************************************/
 globle void ShowBreaksCommand(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    int numArgs, error;
    struct defmodule *theModule;
 
-   if ((numArgs = EnvArgCountCheck(theEnv,"show-breaks",NO_MORE_THAN,1)) == -1) return;
+   if ((numArgs = EnvArgCountCheck(theEnv,execStatus,"show-breaks",NO_MORE_THAN,1)) == -1) return;
 
    if (numArgs == 1)
      {
-      theModule = GetModuleName(theEnv,"show-breaks",1,&error);
+      theModule = GetModuleName(theEnv,execStatus,"show-breaks",1,&error);
       if (error) return;
      }
    else
@@ -1165,9 +1165,9 @@ globle void ShowBreaksCommand(
 /*   for the list-focus-stack command.         */
 /***********************************************/
 globle void ListFocusStackCommand(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
-   if (EnvArgCountCheck(theEnv,"list-focus-stack",EXACTLY,0) == -1) return;
+   if (EnvArgCountCheck(theEnv,execStatus,"list-focus-stack",EXACTLY,0) == -1) return;
 
    EnvListFocusStack(theEnv,WDISPLAY);
   }
@@ -1198,10 +1198,10 @@ globle void EnvListFocusStack(
 /*   for the get-focus-stack function.         */
 /***********************************************/
 globle void GetFocusStackFunction(
-  void *theEnv,
+  void *theEnv,EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
-   if (EnvArgCountCheck(theEnv,"get-focus-stack",EXACTLY,0) == -1) return;
+   if (EnvArgCountCheck(theEnv,execStatus,"get-focus-stack",EXACTLY,0) == -1) return;
 
    EnvGetFocusStack(theEnv,returnValue);
   }
@@ -1268,11 +1268,11 @@ globle void EnvGetFocusStack(
 /*   for the pop-focus function.          */
 /******************************************/
 globle void *PopFocusFunction(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    struct defmodule *theModule;
 
-   EnvArgCountCheck(theEnv,"pop-focus",EXACTLY,0);
+   EnvArgCountCheck(theEnv,execStatus,"pop-focus",EXACTLY,0);
 
    theModule = (struct defmodule *) EnvPopFocus(theEnv);
    if (theModule == NULL) return((SYMBOL_HN *) EnvFalseSymbol(theEnv));
@@ -1284,11 +1284,11 @@ globle void *PopFocusFunction(
 /*   for the get-focus function.          */
 /******************************************/
 globle void *GetFocusFunction(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    struct defmodule *rv;
 
-   EnvArgCountCheck(theEnv,"get-focus",EXACTLY,0);
+   EnvArgCountCheck(theEnv,execStatus,"get-focus",EXACTLY,0);
    rv = (struct defmodule *) EnvGetFocus(theEnv);
    if (rv == NULL) return((SYMBOL_HN *) EnvFalseSymbol(theEnv));
    return(rv->name);
@@ -1311,7 +1311,7 @@ globle void *EnvGetFocus(
 /*   for the focus function.          */
 /**************************************/
 globle int FocusCommand(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    DATA_OBJECT argPtr;
    char *argument;
@@ -1322,7 +1322,7 @@ globle int FocusCommand(
    /* Check for the correct number and type of arguments. */
    /*=====================================================*/
 
-   if ((argCount = EnvArgCountCheck(theEnv,"focus",AT_LEAST,1)) == -1)
+   if ((argCount = EnvArgCountCheck(theEnv,execStatus,"focus",AT_LEAST,1)) == -1)
      { return(FALSE); }
 
    /*===========================================*/
@@ -1331,7 +1331,7 @@ globle int FocusCommand(
 
    for (i = argCount; i > 0; i--)
      {
-      if (EnvArgTypeCheck(theEnv,"focus",i,SYMBOL,&argPtr) == FALSE)
+      if (EnvArgTypeCheck(theEnv,execStatus,"focus",i,SYMBOL,&argPtr) == FALSE)
         { return(FALSE); }
 
       argument = DOToString(argPtr);

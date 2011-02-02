@@ -313,10 +313,10 @@ globle void InitializeConstructs(
 /*   for the clear command.           */
 /**************************************/
 globle void ClearCommand(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
-   if (EnvArgCountCheck(theEnv,"clear",EXACTLY,0) == -1) return;
-   EnvClear(theEnv);
+   if (EnvArgCountCheck(theEnv,execStatus,"clear",EXACTLY,0) == -1) return;
+   EnvClear(theEnv,execStatus);
    return;
   }
 
@@ -325,10 +325,10 @@ globle void ClearCommand(
 /*   for the reset command.           */
 /**************************************/
 globle void ResetCommand(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
-   if (EnvArgCountCheck(theEnv,"reset",EXACTLY,0) == -1) return;
-   EnvReset(theEnv);
+   if (EnvArgCountCheck(theEnv,execStatus,"reset",EXACTLY,0) == -1) return;
+   EnvReset(theEnv,execStatus);
    return;
   }
 
@@ -337,9 +337,9 @@ globle void ResetCommand(
 /*   for the reset command. */
 /****************************/
 #if ALLOW_ENVIRONMENT_GLOBALS
-globle void Reset()
+globle void Reset(EXEC_STATUS)
   {
-   EnvReset(GetCurrentEnvironment());
+   EnvReset(GetCurrentEnvironment(),execStatus);
   }  
 #endif
 
@@ -348,7 +348,7 @@ globle void Reset()
 /*   for the reset command.   */
 /******************************/
 globle void EnvReset(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    struct callFunctionItem *resetPtr;
 
@@ -412,8 +412,8 @@ globle void EnvReset(
    /*===========================================*/
 
    if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
-       (EvaluationData(theEnv)->CurrentExpression == NULL))
-     { PeriodicCleanup(theEnv,TRUE,FALSE); }
+       (execStatus->CurrentExpression == NULL))
+     { PeriodicCleanup(theEnv,execStatus,TRUE,FALSE); }
 
    /*===================================*/
    /* A reset is no longer in progress. */
@@ -496,9 +496,9 @@ globle intBool EnvRemoveResetFunction(
 /*   for the clear command. */
 /****************************/
 #if ALLOW_ENVIRONMENT_GLOBALS
-globle void Clear()
+globle void Clear(EXEC_STATUS)
   {
-   EnvClear(GetCurrentEnvironment());
+   EnvClear(GetCurrentEnvironment(),execStatus);
   }  
 #endif
     
@@ -506,7 +506,7 @@ globle void Clear()
 /* EnvClear: C access routine for the clear command. */
 /*****************************************************/
 globle void EnvClear(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    struct callFunctionItem *theFunction;
    
@@ -568,8 +568,8 @@ globle void EnvClear(
    /*===========================================*/
 
    if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
-       (EvaluationData(theEnv)->CurrentExpression == NULL))
-     { PeriodicCleanup(theEnv,TRUE,FALSE); }
+       (execStatus->CurrentExpression == NULL))
+     { PeriodicCleanup(theEnv,execStatus,TRUE,FALSE); }
 
    /*===========================*/
    /* Clear has been completed. */
@@ -585,7 +585,7 @@ globle void EnvClear(
    /* Perform reset after clear. */
    /*============================*/
    
-   EnvReset(theEnv);
+   EnvReset(theEnv,execStatus);
   }
 
 /*********************************************************/
@@ -736,6 +736,7 @@ globle void SetExecutingConstruct(
 /************************************************************/
 globle void OldGetConstructList(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue,
   void *(*nextFunction)(void *,void *),
   char *(*nameFunction)(void *,void *))
@@ -773,7 +774,7 @@ globle void OldGetConstructList(
         theConstruct != NULL;
         theConstruct = (*nextFunction)(theEnv,theConstruct), count++)
      {
-      if (EvaluationData(theEnv)->HaltExecution == TRUE)
+      if (execStatus->HaltExecution == TRUE)
         {
          EnvSetMultifieldErrorValue(theEnv,returnValue);
          return;

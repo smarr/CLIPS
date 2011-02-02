@@ -509,8 +509,8 @@ globle void PreviewGeneric(
    int oldce;
    DATA_OBJECT temp;
 
-   EvaluationData(theEnv)->EvaluationError = FALSE;
-   if (EnvArgTypeCheck(theEnv,"preview-generic",1,SYMBOL,&temp) == FALSE)
+   execStatus->EvaluationError = FALSE;
+   if (EnvArgTypeCheck(theEnv,execStatus,"preview-generic",1,SYMBOL,&temp) == FALSE)
      return;
    gfunc = LookupDefgenericByMdlOrScope(theEnv,DOToString(temp));
    if (gfunc == NULL)
@@ -530,7 +530,7 @@ globle void PreviewGeneric(
                           CountArguments(GetFirstArgument()->nextArg),
                           EnvGetDefgenericName(theEnv,(void *) gfunc),"generic function",
                           UnboundMethodErr);
-   if (EvaluationData(theEnv)->EvaluationError)
+   if (execStatus->EvaluationError)
      {
       PopProcParameters(theEnv);
       DefgenericData(theEnv)->CurrentGeneric = previousGeneric;

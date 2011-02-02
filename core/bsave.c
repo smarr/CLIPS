@@ -88,13 +88,13 @@ static void DeallocateBsaveData(
 /*   for the bsave command.           */
 /**************************************/
 globle int BsaveCommand(
-  void *theEnv)
+  void *theEnv, EXEC_STATUS)
   {
 #if (! RUN_TIME) && BLOAD_AND_BSAVE
    char *fileName;
 
-   if (EnvArgCountCheck(theEnv,"bsave",EXACTLY,1) == -1) return(FALSE);
-   fileName = GetFileName(theEnv,"bsave",1);
+   if (EnvArgCountCheck(theEnv,execStatus,"bsave",EXACTLY,1) == -1) return(FALSE);
+   fileName = GetFileName(theEnv,execStatus,"bsave",1);
    if (fileName != NULL)
      { if (EnvBsave(theEnv,fileName)) return(TRUE); }
 #else

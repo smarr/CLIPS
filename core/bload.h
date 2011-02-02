@@ -73,7 +73,7 @@ struct bloadData
 #define Bload(a) EnvBload(GetCurrentEnvironment(),a)
 
    LOCALE void                    InitializeBloadData(void *);
-   LOCALE int                     BloadCommand(void *);
+   LOCALE int                     BloadCommand(void *,EXEC_STATUS);
    LOCALE intBool                 EnvBload(void *,char *);
    LOCALE void                    BloadandRefresh(void *,long,size_t,void (*)(void *,void *,long));
    LOCALE intBool                 Bloaded(void *);

@@ -44,7 +44,7 @@
 #endif
 
    LOCALE void                           DeriveDefaultFromConstraints(void *,CONSTRAINT_RECORD *,DATA_OBJECT *,int,int);
-   LOCALE struct expr                   *ParseDefault(void *,char *,int,int,int,int *,int *,int *);
+   LOCALE struct expr                   *ParseDefault(void *,EXEC_STATUS,char *,int,int,int,int *,int *,int *);
 
 #endif
 

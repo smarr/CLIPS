@@ -154,13 +154,13 @@ globle void PrintoutFunction(
    /* The printout function requires at least one argument. */
    /*=======================================================*/
 
-   if ((argCount = EnvArgCountCheck(theEnv,"printout",AT_LEAST,1)) == -1) return;
+   if ((argCount = EnvArgCountCheck(theEnv,execStatus,"printout",AT_LEAST,1)) == -1) return;
 
    /*=====================================================*/
    /* Get the logical name to which output is to be sent. */
    /*=====================================================*/
 
-   dummyid = GetLogicalName(theEnv,1,"stdout");
+   dummyid = GetLogicalName(theEnv,execStatus,1,"stdout");
    if (dummyid == NULL)
      {
       IllegalLogicalNameMessage(theEnv,"printout");
@@ -187,8 +187,8 @@ globle void PrintoutFunction(
 
    for (i = 2; i <= argCount; i++)
      {
-      EnvRtnUnknown(theEnv,i,&theArgument);
-      if (EvaluationData(theEnv)->HaltExecution) break;
+      EnvRtnUnknown(theEnv,execStatus,i,&theArgument);
+      if (execStatus->HaltExecution) break;
 
       switch(GetType(theArgument))
         {
@@ -260,7 +260,7 @@ globle void ReadFunction(
    /* Check for an appropriate number of arguments. */
    /*===============================================*/
 
-   if ((numberOfArguments = EnvArgCountCheck(theEnv,"read",NO_MORE_THAN,1)) == -1)
+   if ((numberOfArguments = EnvArgCountCheck(theEnv,execStatus,"read",NO_MORE_THAN,1)) == -1)
      {
       returnValue->type = STRING;
       returnValue->value = (void *) EnvAddSymbol(theEnv,"*** READ ERROR ***");
@@ -275,7 +275,7 @@ globle void ReadFunction(
      { logicalName = "stdin"; }
    else if (numberOfArguments == 1)
      {
-      logicalName = GetLogicalName(theEnv,1,"stdin");
+      logicalName = GetLogicalName(theEnv,execStatus,1,"stdin");
       if (logicalName == NULL)
         {
          IllegalLogicalNameMessage(theEnv,"read");
@@ -441,20 +441,20 @@ globle int OpenFunction(
    /* Check for a valid number of arguments. */
    /*========================================*/
 
-   if ((numberOfArguments = EnvArgRangeCheck(theEnv,"open",2,3)) == -1) return(0);
+   if ((numberOfArguments = EnvArgRangeCheck(theEnv,execStatus,"open",2,3)) == -1) return(0);
 
    /*====================*/
    /* Get the file name. */
    /*====================*/
 
-   if ((fileName = GetFileName(theEnv,"open",1)) == NULL) return(0);
+   if ((fileName = GetFileName(theEnv,execStatus,"open",1)) == NULL) return(0);
 
    /*=======================================*/
    /* Get the logical name to be associated */
    /* with the opened file.                 */
    /*=======================================*/
 
-   logicalName = GetLogicalName(theEnv,2,NULL);
+   logicalName = GetLogicalName(theEnv,execStatus,2,NULL);
    if (logicalName == NULL)
      {
       SetHaltExecution(theEnv,TRUE);
@@ -487,7 +487,7 @@ globle int OpenFunction(
      { accessMode = "r"; }
    else if (numberOfArguments == 3)
      {
-      if (EnvArgTypeCheck(theEnv,"open",3,STRING,&theArgument) == FALSE) return(0);
+      if (EnvArgTypeCheck(theEnv,execStatus,"open",3,STRING,&theArgument) == FALSE) return(0);
       accessMode = DOToString(theArgument);
      }
 
@@ -536,7 +536,7 @@ globle int CloseFunction(
    /* Check for valid number of arguments. */
    /*======================================*/
 
-   if ((numberOfArguments = EnvArgCountCheck(theEnv,"close",NO_MORE_THAN,1)) == -1) return(0);
+   if ((numberOfArguments = EnvArgCountCheck(theEnv,execStatus,"close",NO_MORE_THAN,1)) == -1) return(0);
 
    /*=====================================================*/
    /* If no arguments are specified, then close all files */
@@ -550,7 +550,7 @@ globle int CloseFunction(
    /* Get the logical name argument. */
    /*================================*/
 
-   logicalName = GetLogicalName(theEnv,1,NULL);
+   logicalName = GetLogicalName(theEnv,execStatus,1,NULL);
    if (logicalName == NULL)
      {
       IllegalLogicalNameMessage(theEnv,"close");
@@ -578,14 +578,14 @@ globle int GetCharFunction(
    int numberOfArguments;
    char *logicalName;
 
-   if ((numberOfArguments = EnvArgCountCheck(theEnv,"get-char",NO_MORE_THAN,1)) == -1)
+   if ((numberOfArguments = EnvArgCountCheck(theEnv,execStatus,"get-char",NO_MORE_THAN,1)) == -1)
      { return(-1); }
 
    if (numberOfArguments == 0 )
      { logicalName = "stdin"; }
    else
      {
-      logicalName = GetLogicalName(theEnv,1,"stdin");
+      logicalName = GetLogicalName(theEnv,execStatus,1,"stdin");
       if (logicalName == NULL)
         {
          IllegalLogicalNameMessage(theEnv,"get-char");
@@ -619,7 +619,7 @@ globle void PutCharFunction(
    long long theChar;
    FILE *theFile;
 
-   if ((numberOfArguments = EnvArgRangeCheck(theEnv,"put-char",1,2)) == -1)
+   if ((numberOfArguments = EnvArgRangeCheck(theEnv,execStatus,"put-char",1,2)) == -1)
      { return; }
      
    /*=======================*/
@@ -630,7 +630,7 @@ globle void PutCharFunction(
      { logicalName = "stdout"; }
    else
      {
-      logicalName = GetLogicalName(theEnv,1,"stdout");
+      logicalName = GetLogicalName(theEnv,execStatus,1,"stdout");
       if (logicalName == NULL)
         {
          IllegalLogicalNameMessage(theEnv,"put-char");
@@ -653,9 +653,9 @@ globle void PutCharFunction(
    /*===========================*/
    
    if (numberOfArguments == 1)
-     { if (EnvArgTypeCheck(theEnv,"put-char",1,INTEGER,&theValue) == FALSE) return; }
+     { if (EnvArgTypeCheck(theEnv,execStatus,"put-char",1,INTEGER,&theValue) == FALSE) return; }
    else
-     { if (EnvArgTypeCheck(theEnv,"put-char",2,INTEGER,&theValue) == FALSE) return; }
+     { if (EnvArgTypeCheck(theEnv,execStatus,"put-char",2,INTEGER,&theValue) == FALSE) return; }
      
    theChar = DOToLong(theValue);
    
@@ -684,7 +684,7 @@ globle int RemoveFunction(
    /* Check for valid number of arguments. */
    /*======================================*/
 
-   if (EnvArgCountCheck(theEnv,"remove",EXACTLY,1) == -1) return(FALSE);
+   if (EnvArgCountCheck(theEnv,execStatus,"remove",EXACTLY,1) == -1) return(FALSE);
 
    /*====================*/
    /* Get the file name. */

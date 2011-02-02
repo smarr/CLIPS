@@ -544,7 +544,7 @@ globle void DelayedQueryDoForAllFacts(
       if (ProcedureFunctionData(theEnv)->ReturnFlag == TRUE)
         { PropagateReturnValue(theEnv,result); }
       PeriodicCleanup(theEnv,FALSE,TRUE);
-      if (EvaluationData(theEnv)->HaltExecution || ProcedureFunctionData(theEnv)->BreakFlag || ProcedureFunctionData(theEnv)->ReturnFlag)
+      if (execStatus->HaltExecution || ProcedureFunctionData(theEnv)->BreakFlag || ProcedureFunctionData(theEnv)->ReturnFlag)
         {
          while (FactQueryData(theEnv)->QueryCore->soln_set != NULL)
            PopQuerySoln(theEnv);
@@ -862,7 +862,7 @@ static int TestForFirstInChain(
       if (TestForFirstFactInTemplate(theEnv,qptr->templatePtr,qchain,indx))
         { return(TRUE); }
         
-      if ((EvaluationData(theEnv)->HaltExecution == TRUE) || (FactQueryData(theEnv)->AbortQuery == TRUE))
+      if ((execStatus->HaltExecution == TRUE) || (FactQueryData(theEnv)->AbortQuery == TRUE))
         return(FALSE);
      }
    return(FALSE);
@@ -901,7 +901,7 @@ static int TestForFirstFactInTemplate(
             break;
            }
          theFact->factHeader.busyCount--;
-         if ((EvaluationData(theEnv)->HaltExecution == TRUE) || (FactQueryData(theEnv)->AbortQuery == TRUE))
+         if ((execStatus->HaltExecution == TRUE) || (FactQueryData(theEnv)->AbortQuery == TRUE))
            break;
         }
       else
@@ -912,7 +912,7 @@ static int TestForFirstFactInTemplate(
          execStatus->CurrentEvaluationDepth--;
          PeriodicCleanup(theEnv,FALSE,TRUE);
          theFact->factHeader.busyCount--;
-         if (EvaluationData(theEnv)->HaltExecution == TRUE)
+         if (execStatus->HaltExecution == TRUE)
            break;
          if ((temp.type != SYMBOL) ? TRUE :
              (temp.value != EnvFalseSymbol(theEnv)))
@@ -924,7 +924,7 @@ static int TestForFirstFactInTemplate(
      }
 
    if (theFact != NULL)
-     return(((EvaluationData(theEnv)->HaltExecution == TRUE) || (FactQueryData(theEnv)->AbortQuery == TRUE))
+     return(((execStatus->HaltExecution == TRUE) || (FactQueryData(theEnv)->AbortQuery == TRUE))
              ? FALSE : TRUE);
 
    return(FALSE);
@@ -957,7 +957,7 @@ static void TestEntireChain(
 
       TestEntireTemplate(theEnv,qptr->templatePtr,qchain,indx);
 
-      if ((EvaluationData(theEnv)->HaltExecution == TRUE) || (FactQueryData(theEnv)->AbortQuery == TRUE))
+      if ((execStatus->HaltExecution == TRUE) || (FactQueryData(theEnv)->AbortQuery == TRUE))
         return;
      }
   }
@@ -993,7 +993,7 @@ static void TestEntireTemplate(
          theFact->factHeader.busyCount++;
          TestEntireChain(theEnv,qchain->nxt,indx+1);
          theFact->factHeader.busyCount--;
-         if ((EvaluationData(theEnv)->HaltExecution == TRUE) || (FactQueryData(theEnv)->AbortQuery == TRUE))
+         if ((execStatus->HaltExecution == TRUE) || (FactQueryData(theEnv)->AbortQuery == TRUE))
            break;
         }
       else
@@ -1004,7 +1004,7 @@ static void TestEntireTemplate(
          execStatus->CurrentEvaluationDepth--;
          PeriodicCleanup(theEnv,FALSE,TRUE);
          theFact->factHeader.busyCount--;
-         if (EvaluationData(theEnv)->HaltExecution == TRUE)
+         if (execStatus->HaltExecution == TRUE)
            break;
          if ((temp.type != SYMBOL) ? TRUE :
              (temp.value != EnvFalseSymbol(theEnv)))
@@ -1024,7 +1024,7 @@ static void TestEntireTemplate(
                   FactQueryData(theEnv)->AbortQuery = TRUE;
                   break;
                  }
-               if (EvaluationData(theEnv)->HaltExecution == TRUE)
+               if (execStatus->HaltExecution == TRUE)
                  break;
               }
             else

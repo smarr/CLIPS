@@ -138,7 +138,7 @@ globle void EnvSend(
    SYMBOL_HN *msym;
 
    if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
-       (EvaluationData(theEnv)->CurrentExpression == NULL))
+       (execStatus->CurrentExpression == NULL))
      { PeriodicCleanup(theEnv,TRUE,FALSE); }
 
    SetEvaluationError(theEnv,FALSE);
@@ -290,6 +290,7 @@ globle int NextHandlerAvailable(
  ********************************************************/
 globle void CallNextHandler(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    EXPRESSION args;
@@ -301,8 +302,8 @@ globle void CallNextHandler(
 
    SetpType(result,SYMBOL);
    SetpValue(result,EnvFalseSymbol(theEnv));
-   EvaluationData(theEnv)->EvaluationError = FALSE;
-   if (EvaluationData(theEnv)->HaltExecution)
+   execStatus->EvaluationError = FALSE;
+   if (execStatus->HaltExecution)
      return;
    if (NextHandlerAvailable(theEnv) == FALSE)
      {
@@ -311,7 +312,7 @@ globle void CallNextHandler(
       SetEvaluationError(theEnv,TRUE);
       return;
      }
-   if (EvaluationData(theEnv)->CurrentExpression->value == (void *) FindFunction(theEnv,"override-next-handler"))
+   if (execStatus->CurrentExpression->value == (void *) FindFunction(theEnv,"override-next-handler"))
      {
       overridep = 1;
       args.type = ProceduralPrimitiveData(theEnv)->ProcParamArray[0].type;
@@ -324,7 +325,7 @@ globle void CallNextHandler(
       PushProcParameters(theEnv,&args,CountArguments(&args),
                           ValueToString(MessageHandlerData(theEnv)->CurrentMessageName),"message",
                           UnboundHandlerErr);
-      if (EvaluationData(theEnv)->EvaluationError)
+      if (execStatus->EvaluationError)
         {
          ProcedureFunctionData(theEnv)->ReturnFlag = FALSE;
          return;
@@ -951,8 +952,8 @@ static void PerformMessage(
 
    result->type = SYMBOL;
    result->value = EnvFalseSymbol(theEnv);
-   EvaluationData(theEnv)->EvaluationError = FALSE;
-   if (EvaluationData(theEnv)->HaltExecution)
+   execStatus->EvaluationError = FALSE;
+   if (execStatus->HaltExecution)
      return;
    oldce = ExecutingConstruct(theEnv);
    SetExecutingConstruct(theEnv,TRUE);
@@ -965,7 +966,7 @@ static void PerformMessage(
                         UnboundHandlerErr);
 
 
-   if (EvaluationData(theEnv)->EvaluationError)
+   if (execStatus->EvaluationError)
      {
       execStatus->CurrentEvaluationDepth--;
       MessageHandlerData(theEnv)->CurrentMessageName = oldName;
@@ -1014,7 +1015,7 @@ static void PerformMessage(
       SystemError(theEnv,"MSGPASS",1);
       EnvExitRouter(theEnv,EXIT_FAILURE);
      }
-   if (EvaluationData(theEnv)->EvaluationError)
+   if (execStatus->EvaluationError)
      {
       PopProcParameters(theEnv);
       execStatus->CurrentEvaluationDepth--;
@@ -1116,7 +1117,7 @@ static void PerformMessage(
    PeriodicCleanup(theEnv,FALSE,TRUE);
    SetExecutingConstruct(theEnv,oldce);
 
-   if (EvaluationData(theEnv)->EvaluationError)
+   if (execStatus->EvaluationError)
      {
       result->type = SYMBOL;
       result->value = EnvFalseSymbol(theEnv);
@@ -1194,7 +1195,7 @@ static void CallHandlers(
    struct profileFrameInfo profileFrame;
 #endif
 
-   if (EvaluationData(theEnv)->HaltExecution)
+   if (execStatus->HaltExecution)
      return;
 
    oldCurrent = MessageHandlerData(theEnv)->CurrentCore;
@@ -1232,7 +1233,7 @@ static void CallHandlers(
         WatchHandler(theEnv,WTRACE,MessageHandlerData(theEnv)->CurrentCore,END_TRACE);
 #endif
       ProcedureFunctionData(theEnv)->ReturnFlag = FALSE;
-      if ((MessageHandlerData(theEnv)->NextInCore == NULL) || EvaluationData(theEnv)->HaltExecution)
+      if ((MessageHandlerData(theEnv)->NextInCore == NULL) || execStatus->HaltExecution)
         {
          MessageHandlerData(theEnv)->NextInCore = oldNext;
          MessageHandlerData(theEnv)->CurrentCore = oldCurrent;
@@ -1273,7 +1274,7 @@ static void CallHandlers(
 #endif
       ProcedureFunctionData(theEnv)->ReturnFlag = FALSE;
 
-      if ((MessageHandlerData(theEnv)->NextInCore == NULL) || EvaluationData(theEnv)->HaltExecution)
+      if ((MessageHandlerData(theEnv)->NextInCore == NULL) || execStatus->HaltExecution)
         {
          MessageHandlerData(theEnv)->NextInCore = oldNext;
          MessageHandlerData(theEnv)->CurrentCore = oldCurrent;
@@ -1323,7 +1324,7 @@ static void CallHandlers(
         WatchHandler(theEnv,WTRACE,MessageHandlerData(theEnv)->CurrentCore,END_TRACE);
 #endif
       ProcedureFunctionData(theEnv)->ReturnFlag = FALSE;
-      if ((MessageHandlerData(theEnv)->NextInCore == NULL) || EvaluationData(theEnv)->HaltExecution)
+      if ((MessageHandlerData(theEnv)->NextInCore == NULL) || execStatus->HaltExecution)
         {
          MessageHandlerData(theEnv)->NextInCore = oldNext;
          MessageHandlerData(theEnv)->CurrentCore = oldCurrent;

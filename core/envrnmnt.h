@@ -97,6 +97,7 @@ typedef struct environmentData * ENVIRONMENT_DATA_PTR;
    LOCALE intBool                        SetCurrentEnvironmentByIndex(unsigned long);
    LOCALE void                          *GetEnvironmentByIndex(unsigned long);
    LOCALE void                          *GetCurrentEnvironment(void);
+   LOCALE struct executionStatus        *GetCurrentExectionStatus(void);
    LOCALE unsigned long                  GetEnvironmentIndex(void *);
 #endif
    LOCALE void                          *CreateEnvironment(void);

@@ -58,26 +58,26 @@
 #define RtnUnknown(a,b) EnvRtnUnknown(GetCurrentEnvironment(),a,b)
 #define ArgTypeCheck(a,b,c,d) EnvArgTypeCheck(GetCurrentEnvironment(),a,b,c,d)
 
-   LOCALE int                            EnvRtnArgCount(void *);
-   LOCALE int                            EnvArgCountCheck(void *,char *,int,int);
-   LOCALE int                            EnvArgRangeCheck(void *,char *,int,int);
-   LOCALE char                          *EnvRtnLexeme(void *,int);
-   LOCALE double                         EnvRtnDouble(void *,int);
-   LOCALE long long                      EnvRtnLong(void *,int);
-   LOCALE struct dataObject             *EnvRtnUnknown(void *,int,struct dataObject *);
-   LOCALE int                            EnvArgTypeCheck(void *,char *,int,int,struct dataObject *);
+   LOCALE int                            EnvRtnArgCount(void *, EXEC_STATUS);
+   LOCALE int                            EnvArgCountCheck(void *, EXEC_STATUS,char *,int,int);
+   LOCALE int                            EnvArgRangeCheck(void *, EXEC_STATUS,char *,int,int);
+   LOCALE char                          *EnvRtnLexeme(void *, EXEC_STATUS,int);
+   LOCALE double                         EnvRtnDouble(void *, EXEC_STATUS, int);
+   LOCALE long long                      EnvRtnLong(void *, EXEC_STATUS,int);
+   LOCALE struct dataObject             *EnvRtnUnknown(void *, EXEC_STATUS,int,struct dataObject *);
+   LOCALE int                            EnvArgTypeCheck(void *, EXEC_STATUS,char *,int,int,struct dataObject *);
    LOCALE intBool                        GetNumericArgument(void *,struct expr *,char *,struct dataObject *,int,int);
-   LOCALE char                          *GetLogicalName(void *,int,char *);
-   LOCALE char                          *GetFileName(void *,char *,int);
-   LOCALE char                          *GetConstructName(void *,char *,char *);
+   LOCALE char                          *GetLogicalName(void *,EXEC_STATUS, int,char *);
+   LOCALE char                          *GetFileName(void *, EXEC_STATUS, char *,int);
+   LOCALE char                          *GetConstructName(void *, EXEC_STATUS, char *,char *);
    LOCALE void                           ExpectedCountError(void *,char *,int,int);
    LOCALE void                           OpenErrorMessage(void *,char *,char *);
    LOCALE intBool                        CheckFunctionArgCount(void *,char *,char *,int);
    LOCALE void                           ExpectedReturnTypeError(char *,char *);
    LOCALE void                           ExpectedTypeError1(void *,char *,int,char *);
    LOCALE void                           ExpectedTypeError2(void *,char *,int);
-   LOCALE struct defmodule              *GetModuleName(void *,char *,int,int *);
-   LOCALE void                          *GetFactOrInstanceArgument(void *,int,DATA_OBJECT *,char *);
+   LOCALE struct defmodule              *GetModuleName(void *, EXEC_STATUS, char *,int,int *);
+   LOCALE void                          *GetFactOrInstanceArgument(void *, EXEC_STATUS, int,DATA_OBJECT *,char *);
    LOCALE void                           IllegalLogicalNameMessage(void *,char *);
 
 #endif

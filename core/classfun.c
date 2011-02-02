@@ -142,7 +142,8 @@ globle void DecrementDefclassBusyCount(
   NOTES        : None
  ****************************************************/
 globle intBool InstancesPurge(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    int svdepth;
 

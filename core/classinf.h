@@ -52,22 +52,22 @@
 #define SlotTypes(a,b,c) EnvSlotTypes(GetCurrentEnvironment(),a,b,c)
 #define GetDefmessageHandlerList(a,b,c) EnvGetDefmessageHandlerList(GetCurrentEnvironment(),a,b,c)
 
-LOCALE intBool ClassAbstractPCommand(void *);
+LOCALE intBool ClassAbstractPCommand(void *,EXEC_STATUS);
 #if DEFRULE_CONSTRUCT
-LOCALE intBool ClassReactivePCommand(void *);
+LOCALE intBool ClassReactivePCommand(void *,EXEC_STATUS);
 #endif
-LOCALE void *ClassInfoFnxArgs(void *,char *,int *);
-LOCALE void ClassSlotsCommand(void *,DATA_OBJECT *);
-LOCALE void ClassSuperclassesCommand(void *,DATA_OBJECT *);
-LOCALE void ClassSubclassesCommand(void *,DATA_OBJECT *);
-LOCALE void GetDefmessageHandlersListCmd(void *,DATA_OBJECT *);
-LOCALE void SlotFacetsCommand(void *,DATA_OBJECT *);
-LOCALE void SlotSourcesCommand(void *,DATA_OBJECT *);
-LOCALE void SlotTypesCommand(void *,DATA_OBJECT *);
-LOCALE void SlotAllowedValuesCommand(void *,DATA_OBJECT *);
-LOCALE void SlotAllowedClassesCommand(void *,DATA_OBJECT *);
-LOCALE void SlotRangeCommand(void *,DATA_OBJECT *);
-LOCALE void SlotCardinalityCommand(void *,DATA_OBJECT *);
+LOCALE void *ClassInfoFnxArgs(void *,EXEC_STATUS,char *,int *);
+LOCALE void ClassSlotsCommand(void *,EXEC_STATUS,DATA_OBJECT *);
+LOCALE void ClassSuperclassesCommand(void *,EXEC_STATUS,DATA_OBJECT *);
+LOCALE void ClassSubclassesCommand(void *,EXEC_STATUS,DATA_OBJECT *);
+LOCALE void GetDefmessageHandlersListCmd(void *,EXEC_STATUS,DATA_OBJECT *);
+LOCALE void SlotFacetsCommand(void *,EXEC_STATUS,DATA_OBJECT *);
+LOCALE void SlotSourcesCommand(void *,EXEC_STATUS,DATA_OBJECT *);
+LOCALE void SlotTypesCommand(void *,EXEC_STATUS,DATA_OBJECT *);
+LOCALE void SlotAllowedValuesCommand(void *,EXEC_STATUS,DATA_OBJECT *);
+LOCALE void SlotAllowedClassesCommand(void *,EXEC_STATUS,DATA_OBJECT *);
+LOCALE void SlotRangeCommand(void *,EXEC_STATUS,DATA_OBJECT *);
+LOCALE void SlotCardinalityCommand(void *,EXEC_STATUS,DATA_OBJECT *);
 LOCALE intBool EnvClassAbstractP(void *,void *);
 #if DEFRULE_CONSTRUCT
 LOCALE intBool EnvClassReactiveP(void *,void *);

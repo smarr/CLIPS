@@ -930,7 +930,7 @@ static void ResetDefinstancesAction(
         theExp = GetNextArgument(theExp))
      {
       EvaluateExpression(theEnv,theExp,&temp);
-      if (EvaluationData(theEnv)->HaltExecution ||
+      if (execStatus->HaltExecution ||
           ((GetType(temp) == SYMBOL) &&
            (GetValue(temp) == EnvFalseSymbol(theEnv))))
         {

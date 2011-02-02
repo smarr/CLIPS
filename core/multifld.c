@@ -436,7 +436,7 @@ globle void StoreInMultifield(
       for(i = 1 ; i <= argCount ; i++ , expptr = expptr->nextArg)
         {
          EvaluateExpression(theEnv,expptr,&val_ptr);
-         if (EvaluationData(theEnv)->EvaluationError)
+         if (execStatus->EvaluationError)
            {
             SetpType(returnValue,MULTIFIELD);
             SetpDOBegin(returnValue,1);

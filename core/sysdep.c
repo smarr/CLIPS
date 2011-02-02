@@ -633,7 +633,7 @@ static void SystemFunctionDefinitions(
 #endif
 
    PredicateFunctionDefinitions(theEnv);
-   BasicMathFunctionDefinitions(theEnv);
+   BasicMathFunctionDefinitions(theEnv,execStatus);
    FileCommandDefinitions(theEnv);
    SortFunctionDefinitions(theEnv);
 
@@ -764,7 +764,7 @@ globle void gensystem(
    /* Check for the corret number of arguments. */
    /*===========================================*/
 
-   if ((numa = EnvArgCountCheck(theEnv,"system",AT_LEAST,1)) == -1) return;
+   if ((numa = EnvArgCountCheck(theEnv,execStatus,"system",AT_LEAST,1)) == -1) return;
 
    /*============================================================*/
    /* Concatenate the arguments together to form a single string */
@@ -773,7 +773,7 @@ globle void gensystem(
 
    for (i = 1 ; i <= numa; i++)
      {
-      EnvRtnUnknown(theEnv,i,&tempValue);
+      EnvRtnUnknown(theEnv,execStatus,i,&tempValue);
       if ((GetType(tempValue) != STRING) &&
           (GetType(tempValue) != SYMBOL))
         {

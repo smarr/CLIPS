@@ -55,7 +55,7 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static int                     SingleNumberCheck(void *,char *,double *);
+   static int                     SingleNumberCheck(void *,EXEC_STATUS,char *,double *);
    static int                     TestProximity(double,double);
    static void                    DomainErrorMessage(void *,char *);
    static void                    ArgumentOverflowErrorMessage(void *,char *);
@@ -125,14 +125,14 @@ globle void ExtendedMathFunctionDefinitions(
 /*   point argument.                                        */
 /************************************************************/
 static int SingleNumberCheck(
-  void *theEnv,
+  void *theEnv,EXEC_STATUS,
   char *functionName,
   double *theNumber)
   {
    DATA_OBJECT theValue;
 
-   if (EnvArgCountCheck(theEnv,functionName,EXACTLY,1) == -1) return(FALSE);
-   if (EnvArgTypeCheck(theEnv,functionName,1,FLOAT,&theValue) == FALSE) return(FALSE);
+   if (EnvArgCountCheck(theEnv,execStatus,functionName,EXACTLY,1) == -1) return(FALSE);
+   if (EnvArgTypeCheck(theEnv,execStatus,functionName,1,FLOAT,&theValue) == FALSE) return(FALSE);
 
    *theNumber = DOToDouble(theValue);
    return(TRUE);
@@ -206,11 +206,11 @@ static void SingularityErrorMessage(
 /*   for the cos function.           */
 /*************************************/
 globle double CosFunction(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"cos",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"cos",&num) == FALSE) return(0.0);
    return(cos(num));
   }
 
@@ -219,11 +219,11 @@ globle double CosFunction(
 /*   for the sin function.           */
 /*************************************/
 globle double SinFunction(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"sin",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"sin",&num) == FALSE) return(0.0);
    return(sin(num));
   }
 
@@ -232,11 +232,11 @@ globle double SinFunction(
 /*   for the tan function.           */
 /*************************************/
 globle double TanFunction(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    double num, tv;
 
-   if (SingleNumberCheck(theEnv,"tan",&num) == FALSE) return (0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"tan",&num) == FALSE) return (0.0);
    tv = cos(num);
    if ((tv < SMALLEST_ALLOWED_NUMBER) && (tv > -SMALLEST_ALLOWED_NUMBER))
      {
@@ -252,11 +252,11 @@ globle double TanFunction(
 /*   for the sec function.           */
 /*************************************/
 globle double SecFunction(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    double num, tv;
 
-   if (SingleNumberCheck(theEnv,"sec",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"sec",&num) == FALSE) return(0.0);
 
    tv = cos(num);
    if ((tv < SMALLEST_ALLOWED_NUMBER) && (tv > -SMALLEST_ALLOWED_NUMBER))
@@ -273,11 +273,11 @@ globle double SecFunction(
 /*   for the csc function.           */
 /*************************************/
 globle double CscFunction(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    double num, tv;
 
-   if (SingleNumberCheck(theEnv,"csc",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"csc",&num) == FALSE) return(0.0);
    tv = sin(num);
    if ((tv < SMALLEST_ALLOWED_NUMBER) && (tv > -SMALLEST_ALLOWED_NUMBER))
      {
@@ -293,11 +293,11 @@ globle double CscFunction(
 /*   for the cot function.           */
 /*************************************/
 globle double CotFunction(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
     double num, tv;
 
-    if (SingleNumberCheck(theEnv,"cot",&num) == FALSE) return(0.0);
+    if (SingleNumberCheck(theEnv,execStatus,"cot",&num) == FALSE) return(0.0);
 
     tv = sin(num);
     if ((tv < SMALLEST_ALLOWED_NUMBER) && (tv > -SMALLEST_ALLOWED_NUMBER))
@@ -314,11 +314,11 @@ globle double CotFunction(
 /*   for the acos function.           */
 /**************************************/
 globle double AcosFunction(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"acos",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"acos",&num) == FALSE) return(0.0);
    if ((num > 1.0) || (num < -1.0))
      {
       DomainErrorMessage(theEnv,"acos");
@@ -332,11 +332,11 @@ globle double AcosFunction(
 /*   for the asin function.           */
 /**************************************/
 globle double AsinFunction(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"asin",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"asin",&num) == FALSE) return(0.0);
    if ((num > 1.0) || (num < -1.0))
      {
       DomainErrorMessage(theEnv,"asin");
@@ -350,11 +350,11 @@ globle double AsinFunction(
 /*   for the atan function.           */
 /**************************************/
 globle double AtanFunction(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"atan",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"atan",&num) == FALSE) return(0.0);
    return(atan(num));
   }
 
@@ -363,11 +363,11 @@ globle double AtanFunction(
 /*   for the asec function.           */
 /**************************************/
 globle double AsecFunction(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"asec",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"asec",&num) == FALSE) return(0.0);
    if ((num < 1.0) && (num > -1.0))
      {
       DomainErrorMessage(theEnv,"asec");
@@ -382,11 +382,11 @@ globle double AsecFunction(
 /*   for the acsc function.           */
 /**************************************/
 globle double AcscFunction(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"acsc",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"acsc",&num) == FALSE) return(0.0);
    if ((num < 1.0) && (num > -1.0))
      {
       DomainErrorMessage(theEnv,"acsc");
@@ -401,11 +401,11 @@ globle double AcscFunction(
 /*   for the acot function.           */
 /**************************************/
 globle double AcotFunction(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"acot",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"acot",&num) == FALSE) return(0.0);
    if (TestProximity(num,1e-25) == TRUE)  return(PID2);
    num = 1.0 / num;
    return(atan(num));
@@ -416,11 +416,11 @@ globle double AcotFunction(
 /*   for the cosh function.           */
 /**************************************/
 globle double CoshFunction(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"cosh",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"cosh",&num) == FALSE) return(0.0);
    return(cosh(num));
   }
 
@@ -429,11 +429,11 @@ globle double CoshFunction(
 /*   for the sinh function.           */
 /**************************************/
 globle double SinhFunction(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"sinh",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"sinh",&num) == FALSE) return(0.0);
    return(sinh(num));
   }
 
@@ -442,11 +442,11 @@ globle double SinhFunction(
 /*   for the tanh function.           */
 /**************************************/
 globle double TanhFunction(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"tanh",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"tanh",&num) == FALSE) return(0.0);
    return(tanh(num));
   }
 
@@ -455,11 +455,11 @@ globle double TanhFunction(
 /*   for the sech function.           */
 /**************************************/
 globle double SechFunction(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"sech",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"sech",&num) == FALSE) return(0.0);
    return(1.0 / cosh(num));
   }
 
@@ -468,11 +468,11 @@ globle double SechFunction(
 /*   for the csch function.           */
 /**************************************/
 globle double CschFunction(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"csch",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"csch",&num) == FALSE) return(0.0);
    if (num == 0.0)
      {
       SingularityErrorMessage(theEnv,"csch");
@@ -491,11 +491,11 @@ globle double CschFunction(
 /*   for the coth function.           */
 /**************************************/
 globle double CothFunction(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"coth",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"coth",&num) == FALSE) return(0.0);
    if (num == 0.0)
      {
       SingularityErrorMessage(theEnv,"coth");
@@ -514,11 +514,11 @@ globle double CothFunction(
 /*   for the acosh function.           */
 /***************************************/
 globle double AcoshFunction(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"acosh",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"acosh",&num) == FALSE) return(0.0);
    if (num < 1.0)
      {
       DomainErrorMessage(theEnv,"acosh");
@@ -532,11 +532,11 @@ globle double AcoshFunction(
 /*   for the asinh function.           */
 /***************************************/
 globle double AsinhFunction(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"asinh",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"asinh",&num) == FALSE) return(0.0);
    return(genasinh(num));
   }
 
@@ -545,11 +545,11 @@ globle double AsinhFunction(
 /*   for the atanh function.           */
 /***************************************/
 globle double AtanhFunction(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"atanh",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"atanh",&num) == FALSE) return(0.0);
    if ((num >= 1.0) || (num <= -1.0))
      {
       DomainErrorMessage(theEnv,"atanh");
@@ -563,11 +563,11 @@ globle double AtanhFunction(
 /*   for the asech function.           */
 /***************************************/
 globle double AsechFunction(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"asech",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"asech",&num) == FALSE) return(0.0);
    if ((num > 1.0) || (num <= 0.0))
      {
       DomainErrorMessage(theEnv,"asech");
@@ -581,11 +581,11 @@ globle double AsechFunction(
 /*   for the acsch function.           */
 /***************************************/
 globle double AcschFunction(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"acsch",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"acsch",&num) == FALSE) return(0.0);
    if (num == 0.0)
      {
       DomainErrorMessage(theEnv,"acsch");
@@ -599,11 +599,11 @@ globle double AcschFunction(
 /*   for the acoth function.           */
 /***************************************/
 globle double AcothFunction(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"acoth",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"acoth",&num) == FALSE) return(0.0);
    if ((num <= 1.0) && (num >= -1.0))
      {
       DomainErrorMessage(theEnv,"acoth");
@@ -617,11 +617,11 @@ globle double AcothFunction(
 /*   for the exp function.           */
 /*************************************/
 globle double ExpFunction(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"exp",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"exp",&num) == FALSE) return(0.0);
    return(exp(num));
   }
 
@@ -630,11 +630,11 @@ globle double ExpFunction(
 /*   for the log function.           */
 /*************************************/
 globle double LogFunction(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"log",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"log",&num) == FALSE) return(0.0);
    if (num < 0.0)
      {
       DomainErrorMessage(theEnv,"log");
@@ -654,11 +654,11 @@ globle double LogFunction(
 /*   for the log10 function.           */
 /***************************************/
 globle double Log10Function(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"log10",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"log10",&num) == FALSE) return(0.0);
    if (num < 0.0)
      {
       DomainErrorMessage(theEnv,"log10");
@@ -678,11 +678,11 @@ globle double Log10Function(
 /*   for the sqrt function.           */
 /**************************************/
 globle double SqrtFunction(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"sqrt",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"sqrt",&num) == FALSE) return(0.0);
    if (num < 0.00000)
      {
       DomainErrorMessage(theEnv,"sqrt");
@@ -696,14 +696,14 @@ globle double SqrtFunction(
 /*   for the pow function.           */
 /*************************************/
 globle double PowFunction(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    DATA_OBJECT value1, value2;
 
-   if (EnvArgCountCheck(theEnv,"**",EXACTLY,2) == -1) return(0.0);
+   if (EnvArgCountCheck(theEnv,execStatus,"**",EXACTLY,2) == -1) return(0.0);
 
-   if (EnvArgTypeCheck(theEnv,"**",1,FLOAT,&value1) == FALSE) return(0.0);
-   if (EnvArgTypeCheck(theEnv,"**",2,FLOAT,&value2) == FALSE) return(0.0);
+   if (EnvArgTypeCheck(theEnv,execStatus,"**",1,FLOAT,&value1) == FALSE) return(0.0);
+   if (EnvArgTypeCheck(theEnv,execStatus,"**",2,FLOAT,&value2) == FALSE) return(0.0);
 
     if (((DOToDouble(value1) == 0.0) &&
         (DOToDouble(value2) <= 0.0)) ||
@@ -724,28 +724,28 @@ globle double PowFunction(
 /*   for the mod function.           */
 /*************************************/
 globle void ModFunction(
-  void *theEnv,
+  void *theEnv,EXEC_STATUS,
   DATA_OBJECT_PTR result)
   {
    DATA_OBJECT item1, item2;
    double fnum1, fnum2;
    long long lnum1, lnum2;
 
-   if (EnvArgCountCheck(theEnv,"mod",EXACTLY,2) == -1)
+   if (EnvArgCountCheck(theEnv,execStatus,"mod",EXACTLY,2) == -1)
      {
       result->type = INTEGER;
       result->value = (void *) EnvAddLong(theEnv,0L);
       return;
      }
 
-   if (EnvArgTypeCheck(theEnv,"mod",1,INTEGER_OR_FLOAT,&item1) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"mod",1,INTEGER_OR_FLOAT,&item1) == FALSE)
      {
       result->type = INTEGER;
       result->value = (void *) EnvAddLong(theEnv,0L);
       return;
      }
 
-   if (EnvArgTypeCheck(theEnv,"mod",2,INTEGER_OR_FLOAT,&item2) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"mod",2,INTEGER_OR_FLOAT,&item2) == FALSE)
      {
       result->type = INTEGER;
       result->value = (void *) EnvAddLong(theEnv,0L);
@@ -783,10 +783,10 @@ globle void ModFunction(
 /*   for the pi function.           */
 /************************************/
 globle double PiFunction(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
 
-   if (EnvArgCountCheck(theEnv,"pi",EXACTLY,0) == -1) return(acos(-1.0));
+   if (EnvArgCountCheck(theEnv,execStatus,"pi",EXACTLY,0) == -1) return(acos(-1.0));
    return(acos(-1.0));
   }
 
@@ -795,11 +795,11 @@ globle double PiFunction(
 /*   for the deg-rad function.          */
 /****************************************/
 globle double DegRadFunction(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"deg-rad",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"deg-rad",&num) == FALSE) return(0.0);
    return(num * PI / 180.0);
   }
 
@@ -808,11 +808,11 @@ globle double DegRadFunction(
 /*   for the rad-deg function.          */
 /****************************************/
 globle double RadDegFunction(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"rad-deg",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"rad-deg",&num) == FALSE) return(0.0);
    return(num * 180.0 / PI);
   }
 
@@ -821,11 +821,11 @@ globle double RadDegFunction(
 /*   for the deg-grad function.          */
 /*****************************************/
 globle double DegGradFunction(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"deg-grad",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"deg-grad",&num) == FALSE) return(0.0);
    return(num / 0.9);
   }
 
@@ -834,11 +834,11 @@ globle double DegGradFunction(
 /*   for the grad-deg function.          */
 /*****************************************/
 globle double GradDegFunction(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"grad-deg",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"grad-deg",&num) == FALSE) return(0.0);
    return(num * 0.9);
   }
 
@@ -847,14 +847,14 @@ globle double GradDegFunction(
 /*   for the round function.           */
 /***************************************/
 globle long long RoundFunction(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    DATA_OBJECT result;
 
-   if (EnvArgCountCheck(theEnv,"round",EXACTLY,1) == -1)
+   if (EnvArgCountCheck(theEnv,execStatus,"round",EXACTLY,1) == -1)
      { return(0LL); }
 
-   if (EnvArgTypeCheck(theEnv,"round",1,INTEGER_OR_FLOAT,&result) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"round",1,INTEGER_OR_FLOAT,&result) == FALSE)
      { return(0LL); }
 
    if (result.type == INTEGER)
