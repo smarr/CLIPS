@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0A45181712F98A140063F45F /* fact_command.c in Sources */ = {isa = PBXBuildFile; fileRef = 0A45181512F98A140063F45F /* fact_command.c */; };
+		0A45181812F98A140063F45F /* fact_command.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A45181612F98A140063F45F /* fact_command.h */; };
+		0A45181912F98A140063F45F /* fact_command.c in Sources */ = {isa = PBXBuildFile; fileRef = 0A45181512F98A140063F45F /* fact_command.c */; };
+		0A45181A12F98A140063F45F /* fact_command.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A45181612F98A140063F45F /* fact_command.h */; };
 		0AC5631012F6FA1900D7E70E /* apr_thread_pool.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AC5630F12F6FA1900D7E70E /* apr_thread_pool.h */; };
 		0AC5631112F6FA1900D7E70E /* apr_thread_pool.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AC5630F12F6FA1900D7E70E /* apr_thread_pool.h */; };
 		0AC5631312F6FEC500D7E70E /* apr_pools.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AC5631212F6FEC500D7E70E /* apr_pools.h */; };
@@ -72,7 +76,6 @@
 		0ADFF2FC12F5830C00AE91B5 /* factbin.c in Sources */ = {isa = PBXBuildFile; fileRef = 0ADFF25312F5830C00AE91B5 /* factbin.c */; };
 		0ADFF2FD12F5830C00AE91B5 /* factbld.c in Sources */ = {isa = PBXBuildFile; fileRef = 0ADFF25412F5830C00AE91B5 /* factbld.c */; };
 		0ADFF2FE12F5830C00AE91B5 /* factcmp.c in Sources */ = {isa = PBXBuildFile; fileRef = 0ADFF25512F5830C00AE91B5 /* factcmp.c */; };
-		0ADFF2FF12F5830C00AE91B5 /* factcom.c in Sources */ = {isa = PBXBuildFile; fileRef = 0ADFF25612F5830C00AE91B5 /* factcom.c */; };
 		0ADFF30012F5830C00AE91B5 /* factfun.c in Sources */ = {isa = PBXBuildFile; fileRef = 0ADFF25712F5830C00AE91B5 /* factfun.c */; };
 		0ADFF30112F5830C00AE91B5 /* factgen.c in Sources */ = {isa = PBXBuildFile; fileRef = 0ADFF25812F5830C00AE91B5 /* factgen.c */; };
 		0ADFF30212F5830C00AE91B5 /* facthsh.c in Sources */ = {isa = PBXBuildFile; fileRef = 0ADFF25912F5830C00AE91B5 /* facthsh.c */; };
@@ -241,7 +244,6 @@
 		0ADFF45112F5832C00AE91B5 /* factbin.h in Headers */ = {isa = PBXBuildFile; fileRef = 0ADFF3A512F5832B00AE91B5 /* factbin.h */; };
 		0ADFF45212F5832C00AE91B5 /* factbld.h in Headers */ = {isa = PBXBuildFile; fileRef = 0ADFF3A612F5832B00AE91B5 /* factbld.h */; };
 		0ADFF45312F5832C00AE91B5 /* factcmp.h in Headers */ = {isa = PBXBuildFile; fileRef = 0ADFF3A712F5832B00AE91B5 /* factcmp.h */; };
-		0ADFF45412F5832C00AE91B5 /* factcom.h in Headers */ = {isa = PBXBuildFile; fileRef = 0ADFF3A812F5832B00AE91B5 /* factcom.h */; };
 		0ADFF45512F5832C00AE91B5 /* factfun.h in Headers */ = {isa = PBXBuildFile; fileRef = 0ADFF3A912F5832B00AE91B5 /* factfun.h */; };
 		0ADFF45612F5832C00AE91B5 /* factgen.h in Headers */ = {isa = PBXBuildFile; fileRef = 0ADFF3AA12F5832B00AE91B5 /* factgen.h */; };
 		0ADFF45712F5832C00AE91B5 /* facthsh.h in Headers */ = {isa = PBXBuildFile; fileRef = 0ADFF3AB12F5832B00AE91B5 /* facthsh.h */; };
@@ -413,7 +415,6 @@
 		0ADFF50212F5884C00AE91B5 /* factbin.c in Sources */ = {isa = PBXBuildFile; fileRef = 0ADFF25312F5830C00AE91B5 /* factbin.c */; };
 		0ADFF50312F5884C00AE91B5 /* factbld.c in Sources */ = {isa = PBXBuildFile; fileRef = 0ADFF25412F5830C00AE91B5 /* factbld.c */; };
 		0ADFF50412F5884C00AE91B5 /* factcmp.c in Sources */ = {isa = PBXBuildFile; fileRef = 0ADFF25512F5830C00AE91B5 /* factcmp.c */; };
-		0ADFF50512F5884C00AE91B5 /* factcom.c in Sources */ = {isa = PBXBuildFile; fileRef = 0ADFF25612F5830C00AE91B5 /* factcom.c */; };
 		0ADFF50612F5884C00AE91B5 /* factfun.c in Sources */ = {isa = PBXBuildFile; fileRef = 0ADFF25712F5830C00AE91B5 /* factfun.c */; };
 		0ADFF50712F5884C00AE91B5 /* factgen.c in Sources */ = {isa = PBXBuildFile; fileRef = 0ADFF25812F5830C00AE91B5 /* factgen.c */; };
 		0ADFF50812F5884C00AE91B5 /* facthsh.c in Sources */ = {isa = PBXBuildFile; fileRef = 0ADFF25912F5830C00AE91B5 /* facthsh.c */; };
@@ -633,6 +634,8 @@
 
 /* Begin PBXFileReference section */
 		089C1660FE840EACC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		0A45181512F98A140063F45F /* fact_command.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fact_command.c; sourceTree = "<group>"; };
+		0A45181612F98A140063F45F /* fact_command.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fact_command.h; sourceTree = "<group>"; };
 		0AC5630F12F6FA1900D7E70E /* apr_thread_pool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = apr_thread_pool.h; path = ../libs/apr/include/apr_thread_pool.h; sourceTree = "<group>"; };
 		0AC5631212F6FEC500D7E70E /* apr_pools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = apr_pools.h; path = ../libs/apr/include/apr_pools.h; sourceTree = "<group>"; };
 		0AC5632712F70C2100D7E70E /* libapr-2.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libapr-2.0.dylib"; path = "../libs/apr/.libs/libapr-2.0.dylib"; sourceTree = "<group>"; };
@@ -697,7 +700,6 @@
 		0ADFF25312F5830C00AE91B5 /* factbin.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = factbin.c; path = ../core/factbin.c; sourceTree = "<group>"; };
 		0ADFF25412F5830C00AE91B5 /* factbld.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = factbld.c; path = ../core/factbld.c; sourceTree = "<group>"; };
 		0ADFF25512F5830C00AE91B5 /* factcmp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = factcmp.c; path = ../core/factcmp.c; sourceTree = "<group>"; };
-		0ADFF25612F5830C00AE91B5 /* factcom.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = factcom.c; path = ../core/factcom.c; sourceTree = "<group>"; };
 		0ADFF25712F5830C00AE91B5 /* factfun.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = factfun.c; path = ../core/factfun.c; sourceTree = "<group>"; };
 		0ADFF25812F5830C00AE91B5 /* factgen.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = factgen.c; path = ../core/factgen.c; sourceTree = "<group>"; };
 		0ADFF25912F5830C00AE91B5 /* facthsh.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = facthsh.c; path = ../core/facthsh.c; sourceTree = "<group>"; };
@@ -866,7 +868,6 @@
 		0ADFF3A512F5832B00AE91B5 /* factbin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = factbin.h; path = ../core/factbin.h; sourceTree = "<group>"; };
 		0ADFF3A612F5832B00AE91B5 /* factbld.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = factbld.h; path = ../core/factbld.h; sourceTree = "<group>"; };
 		0ADFF3A712F5832B00AE91B5 /* factcmp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = factcmp.h; path = ../core/factcmp.h; sourceTree = "<group>"; };
-		0ADFF3A812F5832B00AE91B5 /* factcom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = factcom.h; path = ../core/factcom.h; sourceTree = "<group>"; };
 		0ADFF3A912F5832B00AE91B5 /* factfun.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = factfun.h; path = ../core/factfun.h; sourceTree = "<group>"; };
 		0ADFF3AA12F5832B00AE91B5 /* factgen.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = factgen.h; path = ../core/factgen.h; sourceTree = "<group>"; };
 		0ADFF3AB12F5832B00AE91B5 /* facthsh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = facthsh.h; path = ../core/facthsh.h; sourceTree = "<group>"; };
@@ -1074,6 +1075,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0A45181412F98A140063F45F /* fact */ = {
+			isa = PBXGroup;
+			children = (
+				0A45181512F98A140063F45F /* fact_command.c */,
+				0A45181612F98A140063F45F /* fact_command.h */,
+			);
+			name = fact;
+			path = ../core/fact;
+			sourceTree = SOURCE_ROOT;
+		};
 		0AC5630E12F6F9FF00D7E70E /* Apache APR */ = {
 			isa = PBXGroup;
 			children = (
@@ -1280,7 +1291,6 @@
 				0ADFF3A512F5832B00AE91B5 /* factbin.h */,
 				0ADFF3A612F5832B00AE91B5 /* factbld.h */,
 				0ADFF3A712F5832B00AE91B5 /* factcmp.h */,
-				0ADFF3A812F5832B00AE91B5 /* factcom.h */,
 				0ADFF3A912F5832B00AE91B5 /* factfun.h */,
 				0ADFF3AA12F5832B00AE91B5 /* factgen.h */,
 				0ADFF3AB12F5832B00AE91B5 /* facthsh.h */,
@@ -1399,6 +1409,7 @@
 		B5BCF20509AD249F000E597B /* CLIPS Source */ = {
 			isa = PBXGroup;
 			children = (
+				0A45181412F98A140063F45F /* fact */,
 				0ADFF21A12F5830C00AE91B5 /* agenda.c */,
 				0ADFF21B12F5830C00AE91B5 /* analysis.c */,
 				0ADFF21C12F5830C00AE91B5 /* argacces.c */,
@@ -1459,7 +1470,6 @@
 				0ADFF25312F5830C00AE91B5 /* factbin.c */,
 				0ADFF25412F5830C00AE91B5 /* factbld.c */,
 				0ADFF25512F5830C00AE91B5 /* factcmp.c */,
-				0ADFF25612F5830C00AE91B5 /* factcom.c */,
 				0ADFF25712F5830C00AE91B5 /* factfun.c */,
 				0ADFF25812F5830C00AE91B5 /* factgen.c */,
 				0ADFF25912F5830C00AE91B5 /* facthsh.c */,
@@ -1639,7 +1649,6 @@
 				0ADFF45112F5832C00AE91B5 /* factbin.h in Headers */,
 				0ADFF45212F5832C00AE91B5 /* factbld.h in Headers */,
 				0ADFF45312F5832C00AE91B5 /* factcmp.h in Headers */,
-				0ADFF45412F5832C00AE91B5 /* factcom.h in Headers */,
 				0ADFF45512F5832C00AE91B5 /* factfun.h in Headers */,
 				0ADFF45612F5832C00AE91B5 /* factgen.h in Headers */,
 				0ADFF45712F5832C00AE91B5 /* facthsh.h in Headers */,
@@ -1753,6 +1762,7 @@
 				0ADFF4C312F5833100AE91B5 /* watch.h in Headers */,
 				0AC5631012F6FA1900D7E70E /* apr_thread_pool.h in Headers */,
 				0AC5631312F6FEC500D7E70E /* apr_pools.h in Headers */,
+				0A45181812F98A140063F45F /* fact_command.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1762,6 +1772,7 @@
 			files = (
 				0AC5631112F6FA1900D7E70E /* apr_thread_pool.h in Headers */,
 				0AC5631412F6FEC500D7E70E /* apr_pools.h in Headers */,
+				0A45181A12F98A140063F45F /* fact_command.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1989,7 +2000,6 @@
 				0ADFF2FC12F5830C00AE91B5 /* factbin.c in Sources */,
 				0ADFF2FD12F5830C00AE91B5 /* factbld.c in Sources */,
 				0ADFF2FE12F5830C00AE91B5 /* factcmp.c in Sources */,
-				0ADFF2FF12F5830C00AE91B5 /* factcom.c in Sources */,
 				0ADFF30012F5830C00AE91B5 /* factfun.c in Sources */,
 				0ADFF30112F5830C00AE91B5 /* factgen.c in Sources */,
 				0ADFF30212F5830C00AE91B5 /* facthsh.c in Sources */,
@@ -2098,6 +2108,7 @@
 				0ADFF36912F5831100AE91B5 /* userfunctions.c in Sources */,
 				0ADFF36A12F5831100AE91B5 /* utility.c in Sources */,
 				0ADFF36B12F5831100AE91B5 /* watch.c in Sources */,
+				0A45181712F98A140063F45F /* fact_command.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2165,7 +2176,6 @@
 				0ADFF50212F5884C00AE91B5 /* factbin.c in Sources */,
 				0ADFF50312F5884C00AE91B5 /* factbld.c in Sources */,
 				0ADFF50412F5884C00AE91B5 /* factcmp.c in Sources */,
-				0ADFF50512F5884C00AE91B5 /* factcom.c in Sources */,
 				0ADFF50612F5884C00AE91B5 /* factfun.c in Sources */,
 				0ADFF50712F5884C00AE91B5 /* factgen.c in Sources */,
 				0ADFF50812F5884C00AE91B5 /* facthsh.c in Sources */,
@@ -2274,6 +2284,7 @@
 				0ADFF56F12F5885300AE91B5 /* userfunctions.c in Sources */,
 				0ADFF57012F5885300AE91B5 /* utility.c in Sources */,
 				0ADFF57112F5885300AE91B5 /* watch.c in Sources */,
+				0A45181912F98A140063F45F /* fact_command.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

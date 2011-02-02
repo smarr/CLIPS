@@ -62,7 +62,7 @@
 #include "bload.h"
 #endif
 
-#include "factcom.h"
+#include "fact_command.h"
 
 #define INVALID     -2L
 #define UNSPECIFIED -1L
