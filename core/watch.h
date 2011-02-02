@@ -77,9 +77,9 @@ struct watchData
                                                       unsigned (*)(void *,char *,int,struct expr *));
    LOCALE char                          *GetNthWatchName(void *,int);
    LOCALE int                            GetNthWatchValue(void *,int);
-   LOCALE void                           WatchCommand(void *);
-   LOCALE void                           UnwatchCommand(void *);
-   LOCALE void                           ListWatchItemsCommand(void *);
+   LOCALE void                           WatchCommand         (void *, EXEC_STATUS);
+   LOCALE void                           UnwatchCommand       (void *, EXEC_STATUS);
+   LOCALE void                           ListWatchItemsCommand(void *, EXEC_STATUS);
    LOCALE void                           WatchFunctionDefinitions(void *);
    LOCALE int                            GetWatchItemCommand(void *);
 

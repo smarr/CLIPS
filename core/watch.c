@@ -366,7 +366,7 @@ globle int GetNthWatchValue(
 /*   for the watch command.           */
 /**************************************/
 globle void WatchCommand(
-  void *theEnv)
+  void *theEnv, EXEC_STATUS)
   {
    DATA_OBJECT theValue;
    char *argument;
@@ -413,7 +413,7 @@ globle void WatchCommand(
 /*   for the unwatch command.           */
 /****************************************/
 globle void UnwatchCommand(
-  void *theEnv)
+  void *theEnv, EXEC_STATUS)
   {
    DATA_OBJECT theValue;
    char *argument;
@@ -460,7 +460,7 @@ globle void UnwatchCommand(
 /*   for the list-watch-items command.          */
 /************************************************/
 globle void ListWatchItemsCommand(
-  void *theEnv)
+  void *theEnv, EXEC_STATUS)
   {
    struct watchItem *wPtr;
    DATA_OBJECT theValue;

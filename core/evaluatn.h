@@ -178,6 +178,9 @@ struct executionStatus
    int CurrentEvaluationDepth;
   };
 
+// STEFAN: parameter macro for the new executionStatus
+#define EXEC_STATUS struct executionStatus* execStatus
+
 struct evaluationData
   {
    int numberOfAddressTypes;
