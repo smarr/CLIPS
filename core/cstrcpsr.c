@@ -61,9 +61,9 @@
 /************************************************/
 #if ALLOW_ENVIRONMENT_GLOBALS
 globle int Load(
-  char *fileName)
+  char *fileName,EXEC_STATUS)
   {
-   return EnvLoad(GetCurrentEnvironment(),fileName);
+   return EnvLoad(GetCurrentEnvironment(),execStatus,fileName);
   }
 #endif
   
@@ -75,7 +75,7 @@ globle int Load(
 /*   while loading.                                         */
 /************************************************************/
 globle int EnvLoad(
-  void *theEnv,
+  void *theEnv,EXEC_STATUS,
   char *fileName)
   {
    FILE *theFile;
@@ -94,7 +94,7 @@ globle int EnvLoad(
    /*===================================================*/
 
    SetFastLoad(theEnv,theFile);
-   noErrorsDetected = LoadConstructsFromLogicalName(theEnv,(char *) theFile);
+   noErrorsDetected = LoadConstructsFromLogicalName(theEnv,execStatus,(char *) theFile);
    SetFastLoad(theEnv,NULL);
 
    /*=================*/
@@ -118,7 +118,7 @@ globle int EnvLoad(
 /*   the current environment from a specified logical name.      */
 /*****************************************************************/
 globle int LoadConstructsFromLogicalName(
-  void *theEnv,
+  void *theEnv,EXEC_STATUS,
   char *readSource)
   {
    int constructFlag;
@@ -158,7 +158,7 @@ globle int LoadConstructsFromLogicalName(
       /* Parse the construct. */
       /*======================*/
 
-      constructFlag = ParseConstruct(theEnv,ValueToString(theToken.value),readSource);
+      constructFlag = ParseConstruct(theEnv,execStatus,ValueToString(theToken.value),readSource);
 
       /*==============================================================*/
       /* If an error occurred while parsing, then find the beginning  */
@@ -345,7 +345,7 @@ static int FindConstructBeginning(
 /*   the construct was parsed unsuccessfully.              */
 /***********************************************************/
 globle int ParseConstruct(
-  void *theEnv,
+  void *theEnv,EXEC_STATUS,
   char *name,
   char *logicalName)
   {

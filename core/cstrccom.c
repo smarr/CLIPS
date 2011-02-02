@@ -240,6 +240,7 @@ globle void *FindNamedConstruct(
 /*****************************************/
 globle void UndefconstructCommand(
   void *theEnv,
+  EXEC_STATUS,
   char *command,
   struct construct *constructClass)
   {
@@ -296,6 +297,7 @@ globle void UndefconstructCommand(
 /******************************************/
 globle void PPConstructCommand(
   void *theEnv,
+  EXEC_STATUS,
   char *command,
   struct construct *constructClass)
   {
@@ -371,7 +373,7 @@ globle int PPConstruct(
 /*   for def<construct>-module routines      */
 /*********************************************/
 globle SYMBOL_HN *GetConstructModuleCommand(
-  void *theEnv,
+  void *theEnv,EXEC_STATUS,
   char *command,
   struct construct *constructClass)
   {
@@ -453,7 +455,7 @@ globle struct defmodule *GetConstructModule(
 /*   for deleting a construct.       */
 /*************************************/
 globle intBool Undefconstruct(
-  void *theEnv,
+  void *theEnv,EXEC_STATUS,
   void *theConstruct,
   struct construct *constructClass)
   {
@@ -669,7 +671,7 @@ globle SYMBOL_HN *GetConstructNamePointer(
 /*   for retrieving the constructs in a module. */
 /************************************************/
 globle void GetConstructListFunction(
-  void *theEnv,
+  void *theEnv,EXEC_STATUS,
   char *functionName,
   DATA_OBJECT_PTR returnValue,
   struct construct *constructClass)
@@ -928,7 +930,7 @@ globle void GetConstructList(
 /*   listing the constructs in a module.     */
 /*********************************************/
 globle void ListConstructCommand(
-  void *theEnv,
+  void *theEnv,EXEC_STATUS,
   char *functionName,
   struct construct *constructClass)
   {
@@ -991,7 +993,7 @@ globle void ListConstructCommand(
    /* to list the constructs. */
    /*=========================*/
 
-   ListConstruct(theEnv,constructClass,WDISPLAY,theModule);
+   ListConstruct(theEnv,execStatus,constructClass,WDISPLAY,theModule);
   }
 
 /*****************************************/
@@ -999,7 +1001,7 @@ globle void ListConstructCommand(
 /*   listing the constructs in a module. */
 /*****************************************/
 globle void ListConstruct(
-  void *theEnv,
+  void *theEnv,EXEC_STATUS,
   struct construct *constructClass,
   char *logicalName,
   struct defmodule *theModule)

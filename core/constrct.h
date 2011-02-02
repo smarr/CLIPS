@@ -111,13 +111,13 @@ struct constructData
 #define RemoveResetFunction(a) EnvRemoveResetFunction(GetCurrentEnvironment(),a)
 
 #if ALLOW_ENVIRONMENT_GLOBALS
-   LOCALE void                           Clear(void);
-   LOCALE void                           Reset(void);
+   LOCALE void                           Clear(EXEC_STATUS);
+   LOCALE void                           Reset(EXEC_STATUS);
    LOCALE int                            Save(char *);
 #endif
 
-   LOCALE void                           EnvClear(void *);
-   LOCALE void                           EnvReset(void *);
+   LOCALE void                           EnvClear(void *,EXEC_STATUS);
+   LOCALE void                           EnvReset(void *,EXEC_STATUS);
    LOCALE int                            EnvSave(void *,char *);
 
    LOCALE void                           InitializeConstructData(void *);
@@ -151,11 +151,11 @@ struct constructData
    LOCALE void                           SetExecutingConstruct(void *,int);
    LOCALE void                           InitializeConstructs(void *);
    LOCALE int                          (*SetBeforeResetFunction(void *,int (*)(void *)))(void *);
-   LOCALE void                           OldGetConstructList(void *,DATA_OBJECT *,
+   LOCALE void                           OldGetConstructList(void *,EXEC_STATUS,DATA_OBJECT *,
                                                           void *(*)(void *,void *),
                                                           char *(*)(void *,void *));
-   LOCALE void                           ResetCommand(void *);
-   LOCALE void                           ClearCommand(void *);
+   LOCALE void                           ResetCommand(void *,EXEC_STATUS);
+   LOCALE void                           ClearCommand(void *,EXEC_STATUS);
    LOCALE intBool                        ClearReady(void *);
    LOCALE struct construct              *FindConstruct(void *,char *);
    LOCALE void                           DeinstallConstructHeader(void *,struct constructHeader *);

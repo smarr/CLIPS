@@ -653,7 +653,7 @@ globle intBool ExecuteIfCommandComplete(
    SetPPBufferStatus(theEnv,OFF);
    RouterData(theEnv)->CommandBufferInputCount = 0;
    RouterData(theEnv)->AwaitingInput = FALSE;
-   RouteCommand(theEnv,CommandLineData(theEnv)->CommandString,TRUE);
+   RouteCommand(theEnv,execStatus,CommandLineData(theEnv)->CommandString,TRUE);
    FlushPPBuffer(theEnv);
    SetHaltExecution(theEnv,FALSE);
    SetEvaluationError(theEnv,FALSE);
@@ -725,7 +725,7 @@ globle void SetBeforeCommandExecutionFunction(
 /* RouteCommand: Processes a completed command. */
 /************************************************/
 globle intBool RouteCommand(
-  void *theEnv,
+  void *theEnv,EXEC_STATUS,
   char *command,
   int printResult)
   {
@@ -820,7 +820,7 @@ globle intBool RouteCommand(
    {
     int errorFlag;
 
-    errorFlag = ParseConstruct(theEnv,commandName,"command");
+    errorFlag = ParseConstruct(theEnv,execStatus,commandName,"command");
     if (errorFlag != -1)
       {
        CloseStringSource(theEnv,"command");

@@ -44,12 +44,12 @@
 #endif
 
 #if ALLOW_ENVIRONMENT_GLOBALS
-   LOCALE int                            Load(char *);
+   LOCALE int                            Load(char *,EXEC_STATUS);
 #endif
 
-   LOCALE int                            EnvLoad(void *,char *);
-   LOCALE int                            LoadConstructsFromLogicalName(void *,char *);
-   LOCALE int                            ParseConstruct(void *,char *,char *);
+   LOCALE int                            EnvLoad(void *,EXEC_STATUS,char *);
+   LOCALE int                            LoadConstructsFromLogicalName(void *,EXEC_STATUS,char *);
+   LOCALE int                            ParseConstruct(void *,EXEC_STATUS,char *,char *);
    LOCALE void                           RemoveConstructFromModule(void *,struct constructHeader *);
    LOCALE struct symbolHashNode         *GetConstructNameAndComment(void *,char *,
                                          struct token *,char *,

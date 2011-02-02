@@ -491,7 +491,7 @@ static void InstallConstraintRecord(
 /*   set-dynamic-constraint-checking command. */
 /**********************************************/
 globle int SDCCommand(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    int oldValue;
    DATA_OBJECT arg_ptr;
@@ -516,7 +516,7 @@ globle int SDCCommand(
 /*   get-dynamic-constraint-checking command. */
 /**********************************************/
 globle int GDCCommand(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    int oldValue;
 
@@ -533,7 +533,7 @@ globle int GDCCommand(
 /*   set-static-constraint-checking command. */
 /*********************************************/
 globle int SSCCommand(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    int oldValue;
    DATA_OBJECT arg_ptr;
@@ -558,7 +558,7 @@ globle int SSCCommand(
 /*   get-static-constraint-checking command. */
 /*********************************************/
 globle int GSCCommand(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    int oldValue;
 

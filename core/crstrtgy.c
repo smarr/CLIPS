@@ -965,7 +965,7 @@ globle int EnvGetStrategy(
 /*   for the get-strategy command.          */
 /********************************************/
 globle void *GetStrategyCommand(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    EnvArgCountCheck(theEnv,execStatus,"get-strategy",EXACTLY,0);
 
@@ -977,7 +977,7 @@ globle void *GetStrategyCommand(
 /*   for the set-strategy command.          */
 /********************************************/
 globle void *SetStrategyCommand(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    DATA_OBJECT argPtr;
    char *argument;

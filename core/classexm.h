@@ -63,7 +63,7 @@ LOCALE void EnvDescribeClass(void *,char *,void *);
 
 LOCALE char *GetCreateAccessorString(void *);
 
-LOCALE void *GetDefclassModuleCommand(void *);
+LOCALE void *GetDefclassModuleCommand(void *,EXEC_STATUS);
 LOCALE intBool SuperclassPCommand(void *,EXEC_STATUS);
 LOCALE intBool EnvSuperclassP(void *,void *,void *);
 LOCALE intBool SubclassPCommand(void *,EXEC_STATUS);
