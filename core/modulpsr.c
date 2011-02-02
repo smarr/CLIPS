@@ -69,7 +69,8 @@
 /*   of defmodules currently defined.        */
 /*********************************************/
 globle long GetNumberOfDefmodules(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return(DefmoduleData(theEnv)->NumberOfDefmodules);
   }
@@ -80,6 +81,7 @@ globle long GetNumberOfDefmodules(
 /******************************************/
 globle void SetNumberOfDefmodules(
   void *theEnv,
+  EXEC_STATUS,
   long value)
   {
    DefmoduleData(theEnv)->NumberOfDefmodules = value;
@@ -92,6 +94,7 @@ globle void SetNumberOfDefmodules(
 /****************************************************/
 globle void AddAfterModuleDefinedFunction(
   void *theEnv,
+  EXEC_STATUS,
   char *name,
   void (*func)(void *),
   int priority)
@@ -106,6 +109,7 @@ globle void AddAfterModuleDefinedFunction(
 /******************************************************/
 globle void AddPortConstructItem(
   void *theEnv,
+  EXEC_STATUS,
   char *theName,
   int theType)
   {
@@ -125,6 +129,7 @@ globle void AddPortConstructItem(
 /******************************************************/
 globle int ParseDefmodule(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource)
   {
    SYMBOL_HN *defmoduleName;
@@ -362,6 +367,7 @@ globle int ParseDefmodule(
 /*************************************************************/
 static intBool DeleteDefmodule(
   void *theEnv,
+  EXEC_STATUS,
   void *theConstruct)
   {
    if (strcmp(EnvGetDefmoduleName(theEnv,theConstruct),"MAIN") == 0)
@@ -376,6 +382,7 @@ static intBool DeleteDefmodule(
 /*********************************************************/
 static int ParsePortSpecifications(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   struct token *theToken,
   struct defmodule *theDefmodule)
@@ -475,6 +482,7 @@ static int ParsePortSpecifications(
 /**********************************************************/
 static int ParseImportSpec(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   struct token *theToken,
   struct defmodule *newModule)
@@ -636,6 +644,7 @@ static int ParseImportSpec(
 /**********************************************************/
 static int ParseExportSpec(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   struct token *theToken,
   struct defmodule *newModule,
@@ -914,6 +923,7 @@ static int ParseExportSpec(
 /*************************************************************/
 globle struct portConstructItem *ValidPortConstructItem(
   void *theEnv,
+  EXEC_STATUS,
   char *theName)
   {
    struct portConstructItem *theItem;
@@ -933,6 +943,7 @@ globle struct portConstructItem *ValidPortConstructItem(
 /***********************************************************/
 static int FindMultiImportConflict(
   void *theEnv,
+  EXEC_STATUS,
   struct defmodule *theModule)
   {
    struct defmodule *testModule;
@@ -1024,6 +1035,7 @@ static int FindMultiImportConflict(
 /******************************************************/
 static void NotExportedErrorMessage(
   void *theEnv,
+  EXEC_STATUS,
   char *theModule,
   char *theConstruct,
   char *theName)
@@ -1060,6 +1072,7 @@ static void NotExportedErrorMessage(
 /*************************************************************/
 globle int FindImportExportConflict(
   void *theEnv,
+  EXEC_STATUS,
   char *constructName,
   struct defmodule *matchModule,
   char *findName)

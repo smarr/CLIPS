@@ -51,7 +51,8 @@
 /*    for use with the constructs-to-c command.                */
 /***************************************************************/
 globle void DefglobalCompilerSetup(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DefglobalData(theEnv)->DefglobalCodeItem = 
       AddCodeGeneratorItem(theEnv,"defglobal",0,BeforeDefglobalsToCode,
@@ -64,7 +65,8 @@ globle void DefglobalCompilerSetup(
 /*   structures are written to a file as C code               */
 /**************************************************************/
 static void BeforeDefglobalsToCode(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    MarkConstructBsaveIDs(theEnv,DefglobalData(theEnv)->DefglobalModuleIndex);
   }
@@ -78,6 +80,7 @@ static void BeforeDefglobalsToCode(
 #endif
 static void InitDefglobalsCode(
   void *theEnv,
+  EXEC_STATUS,
   FILE *initFP,
   int imageID,
   int maxIndices)
@@ -96,6 +99,7 @@ static void InitDefglobalsCode(
 /***********************************************************/
 static int ConstructToCode(
   void *theEnv,
+  EXEC_STATUS,
   char *fileName,
   char *pathName,
   char *fileNameBuffer,
@@ -179,6 +183,7 @@ static int ConstructToCode(
 /**********************************************************/
 static void CloseDefglobalFiles(
   void *theEnv,
+  EXEC_STATUS,
   FILE *moduleFile,
   FILE *defglobalFile,
   int maxIndices)
@@ -208,6 +213,7 @@ static void CloseDefglobalFiles(
 #endif
 static void DefglobalModuleToCode(
   void *theEnv,
+  EXEC_STATUS,
   FILE *theFile,
   struct defmodule *theModule,
   int imageID,
@@ -232,6 +238,7 @@ static void DefglobalModuleToCode(
 /**********************************************************/
 static void DefglobalToCode(
   void *theEnv,
+  EXEC_STATUS,
   FILE *theFile,
   struct defglobal *theDefglobal,
   int imageID,
@@ -278,6 +285,7 @@ static void DefglobalToCode(
 /***************************************************************/
 globle void DefglobalCModuleReference(
   void *theEnv,
+  EXEC_STATUS,
   FILE *theFile,
   int count,
   int imageID,
@@ -296,6 +304,7 @@ globle void DefglobalCModuleReference(
 /******************************************************************/
 globle void DefglobalCConstructReference(
   void *theEnv,
+  EXEC_STATUS,
   FILE *theFile,
   void *vTheGlobal,
   int imageID,

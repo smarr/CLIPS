@@ -76,6 +76,7 @@ static EXPRESSION *GenTypeExpression(void *,EXPRESSION *,int,int,char *);
  ********************************************************/
 globle void AddImplicitMethods(
   void *theEnv,
+  EXEC_STATUS,
   DEFGENERIC *gfunc)
   {
    struct FunctionDefinition *sysfunc;
@@ -111,6 +112,7 @@ globle void AddImplicitMethods(
  **********************************************************************/
 static void FormMethodsFromRestrictions(
   void *theEnv,
+  EXEC_STATUS,
   DEFGENERIC *gfunc,
   char *rstring,
   EXPRESSION *actions)
@@ -303,6 +305,7 @@ static void FormMethodsFromRestrictions(
  *******************************************************************/
 static RESTRICTION *ParseRestrictionType(
   void *theEnv,
+  EXEC_STATUS,
   int code)
   {
    RESTRICTION *rptr;
@@ -382,6 +385,7 @@ static RESTRICTION *ParseRestrictionType(
 #endif
 static EXPRESSION *GenTypeExpression(
   void *theEnv,
+  EXEC_STATUS,
   EXPRESSION *top,
   int nonCOOLCode,
   int primitiveCode,

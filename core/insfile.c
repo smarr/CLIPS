@@ -136,7 +136,8 @@ static void FreeReadBuffer(void *);
   NOTES        : None
  ***************************************************/
 globle void SetupInstanceFileCommands(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
 #if BLOAD_INSTANCES || BSAVE_INSTANCES
    AllocateEnvironmentData(theEnv,INSTANCE_FILE_DATA,sizeof(struct instanceFileData),NULL);
@@ -177,7 +178,8 @@ globle void SetupInstanceFileCommands(
                  (save-instances <file> [local|visible [[inherit] <class>+]])
  ****************************************************************************/
 globle long SaveInstancesCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return(InstancesSaveCommandParser(theEnv,"save-instances",EnvSaveInstances));
   }
@@ -192,7 +194,8 @@ globle long SaveInstancesCommand(
   NOTES        : H/L Syntax : (load-instances <file>)
  ******************************************************/
 globle long LoadInstancesCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    char *fileFound;
    DATA_OBJECT temp;
@@ -219,6 +222,7 @@ globle long LoadInstancesCommand(
  ***************************************************/
 globle long EnvLoadInstances(
   void *theEnv,
+  EXEC_STATUS,
   char *file)
   {
    return(LoadOrRestoreInstances(theEnv,file,TRUE,TRUE));
@@ -236,6 +240,7 @@ globle long EnvLoadInstances(
  ***************************************************/
 globle long EnvLoadInstancesFromString(
   void *theEnv,
+  EXEC_STATUS,
   char *theString,
   int theMax)
   {
@@ -260,7 +265,8 @@ globle long EnvLoadInstancesFromString(
   NOTES        : H/L Syntax : (restore-instances <file>)
  *********************************************************/
 globle long RestoreInstancesCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    char *fileFound;
    DATA_OBJECT temp;
@@ -287,6 +293,7 @@ globle long RestoreInstancesCommand(
  ***************************************************/
 globle long EnvRestoreInstances(
   void *theEnv,
+  EXEC_STATUS,
   char *file)
   {
    return(LoadOrRestoreInstances(theEnv,file,FALSE,TRUE));
@@ -304,6 +311,7 @@ globle long EnvRestoreInstances(
  ***************************************************/
 globle long EnvRestoreInstancesFromString(
   void *theEnv,
+  EXEC_STATUS,
   char *theString,
   int theMax)
   {
@@ -330,7 +338,8 @@ globle long EnvRestoreInstancesFromString(
   NOTES        : H/L Syntax : (bload-instances <file>)
  *******************************************************/
 globle long BinaryLoadInstancesCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    char *fileFound;
    DATA_OBJECT temp;
@@ -358,6 +367,7 @@ globle long BinaryLoadInstancesCommand(
  ****************************************************/
 globle long EnvBinaryLoadInstances(
   void *theEnv,
+  EXEC_STATUS,
   char *theFile)
   {
    long i,instanceCount;
@@ -425,6 +435,7 @@ globle long EnvBinaryLoadInstances(
  *******************************************************/
 globle long EnvSaveInstances(
   void *theEnv,
+  EXEC_STATUS,
   char *file,
   int saveCode,
   EXPRESSION *classExpressionList,
@@ -484,7 +495,8 @@ globle long EnvSaveInstances(
                  (bsave-instances <file> [local|visible [[inherit] <class>+]])
  *****************************************************************************/
 globle long BinarySaveInstancesCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return(InstancesSaveCommandParser(theEnv,"bsave-instances",EnvBinarySaveInstances));
   }
@@ -509,6 +521,7 @@ globle long BinarySaveInstancesCommand(
  *******************************************************/
 globle long EnvBinarySaveInstances(
   void *theEnv,
+  EXEC_STATUS,
   char *file,
   int saveCode,
   EXPRESSION *classExpressionList,
@@ -571,6 +584,7 @@ globle long EnvBinarySaveInstances(
  ******************************************************/
 static long InstancesSaveCommandParser(
   void *theEnv,
+  EXEC_STATUS,
   char *functionName,
   long (*saveFunction)(void *,char *,int,EXPRESSION *,intBool))
   {
@@ -645,6 +659,7 @@ static long InstancesSaveCommandParser(
  ****************************************************/
 static DATA_OBJECT *ProcessSaveClassList(
   void *theEnv,
+  EXEC_STATUS,
   char *functionName,
   EXPRESSION *classExps,
   int saveCode,
@@ -718,6 +733,7 @@ ProcessClassListError:
  ****************************************************/
 static void ReturnSaveClassList(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *classList)
   {
    DATA_OBJECT *tmp;
@@ -758,6 +774,7 @@ static void ReturnSaveClassList(
  ***************************************************/
 static long SaveOrMarkInstances(
   void *theEnv,
+  EXEC_STATUS,
   void *theOutput,
   int saveCode,
   DATA_OBJECT *classList,
@@ -829,6 +846,7 @@ static long SaveOrMarkInstances(
  ***************************************************/
 static long SaveOrMarkInstancesOfClass(
   void *theEnv,
+  EXEC_STATUS,
   void *theOutput,
   struct defmodule *currentModule,
   int saveCode,
@@ -885,6 +903,7 @@ static long SaveOrMarkInstancesOfClass(
  ***************************************************/
 static void SaveSingleInstanceText(
   void *theEnv,
+  EXEC_STATUS,
   void *vLogicalName,
   INSTANCE_TYPE *theInstance)
   {
@@ -931,6 +950,7 @@ static void SaveSingleInstanceText(
  ***************************************************/
 static void WriteBinaryHeader(
   void *theEnv,
+  EXEC_STATUS,
   FILE *bsaveFP)
   {   
    fwrite((void *) InstanceFileData(theEnv)->InstanceBinaryPrefixID,
@@ -954,6 +974,7 @@ static void WriteBinaryHeader(
 #endif
 static void MarkSingleInstance(
   void *theEnv,
+  EXEC_STATUS,
   void *theOutput,
   INSTANCE_TYPE *theInstance)
   {
@@ -998,6 +1019,7 @@ static void MarkSingleInstance(
  ***************************************************/
 static void MarkNeededAtom(
   void *theEnv,
+  EXEC_STATUS,
   int type,
   void *value)
   {
@@ -1039,6 +1061,7 @@ static void MarkNeededAtom(
  ****************************************************/
 static void SaveSingleInstanceBinary(
   void *theEnv,
+  EXEC_STATUS,
   void *vBsaveFP,
   INSTANCE_TYPE *theInstance)
   {
@@ -1125,6 +1148,7 @@ static void SaveSingleInstanceBinary(
  ***************************************************/
 static void SaveAtomBinary(
   void *theEnv,
+  EXEC_STATUS,
   unsigned short type,
   void *value,
   FILE *bsaveFP)
@@ -1178,6 +1202,7 @@ static void SaveAtomBinary(
  **********************************************************************/
 static long LoadOrRestoreInstances(
   void *theEnv,
+  EXEC_STATUS,
   char *file,
   int usemsgs,
   int isFileName)
@@ -1260,6 +1285,7 @@ static long LoadOrRestoreInstances(
  ***************************************************/
 static void ProcessFileErrorMessage(
   void *theEnv,
+  EXEC_STATUS,
   char *functionName,
   char *fileName)
   {
@@ -1286,6 +1312,7 @@ static void ProcessFileErrorMessage(
  *******************************************************/
 static intBool VerifyBinaryHeader(
   void *theEnv,
+  EXEC_STATUS,
   char *theFile)
   {
    char buf[20];
@@ -1322,7 +1349,8 @@ static intBool VerifyBinaryHeader(
   NOTES        : Uses global GenReadBinary(theEnv,)
  ***************************************************/
 static intBool LoadSingleBinaryInstance(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    SYMBOL_HN *instanceName,
              *className;
@@ -1453,6 +1481,7 @@ LoadError:
  ***************************************************/
 static void BinaryLoadInstanceError(
   void *theEnv,
+  EXEC_STATUS,
   SYMBOL_HN *instanceName,
   DEFCLASS *theDefclass)
   {
@@ -1479,6 +1508,7 @@ static void BinaryLoadInstanceError(
  ***************************************************/
 static void CreateSlotValue(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result,
   struct bsaveSlotValueAtom *bsaValues,
   unsigned long valueCount)
@@ -1522,6 +1552,7 @@ static void CreateSlotValue(
  ***************************************************/
 static void *GetBinaryAtomValue(
   void *theEnv,
+  EXEC_STATUS,
   struct bsaveSlotValueAtom *ba)
   {
    switch (ba->type)
@@ -1565,6 +1596,7 @@ static void *GetBinaryAtomValue(
  ***************************************************/
 static void BufferedRead(
   void *theEnv,
+  EXEC_STATUS,
   void *buf,
   unsigned long bufsz)
   {
@@ -1628,7 +1660,8 @@ static void BufferedRead(
   NOTES        : None
  *****************************************************/
 static void FreeReadBuffer(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    if (InstanceFileData(theEnv)->CurrentReadBufferSize != 0L)
      {

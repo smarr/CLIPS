@@ -67,7 +67,8 @@
 /* InitializePatterns: Initializes the global data associated with patterns. */
 /*****************************************************************************/
 globle void InitializePatterns(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {   
    AllocateEnvironmentData(theEnv,PATTERN_DATA,sizeof(struct patternData),DeallocatePatternData);
    PatternData(theEnv)->NextPosition = 1;
@@ -80,6 +81,7 @@ globle void InitializePatterns(
 /*******************************************************************/
 static struct patternNodeHashEntry **CreatePatternHashTable(
    void *theEnv,
+  EXEC_STATUS,
    unsigned long tableSize)
    {
     unsigned long i;
@@ -100,7 +102,8 @@ static struct patternNodeHashEntry **CreatePatternHashTable(
 /*    data for rule pattern registration.         */
 /**************************************************/
 static void DeallocatePatternData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct reservedSymbol *tmpRSPtr, *nextRSPtr;
    struct patternParser *tmpPPPtr, *nextPPPtr;
@@ -144,6 +147,7 @@ static void DeallocatePatternData(
 /******************************************************************************/
 globle void AddHashedPatternNode(
   void *theEnv,
+  EXEC_STATUS,
   void *parent,
   void *child,
   unsigned short keyType,
@@ -173,6 +177,7 @@ globle void AddHashedPatternNode(
 /***************************************************/
 globle intBool RemoveHashedPatternNode(
   void *theEnv,
+  EXEC_STATUS,
   void *parent,
   void *child,
   unsigned short keyType,
@@ -215,6 +220,7 @@ globle intBool RemoveHashedPatternNode(
 /***********************************************/
 globle void *FindHashedPatternNode(
   void *theEnv,
+  EXEC_STATUS,
   void *parent,
   unsigned short keyType,
   void *keyValue)
@@ -248,6 +254,7 @@ globle void *FindHashedPatternNode(
 /******************************************************************/
 void AddReservedPatternSymbol(
   void *theEnv,
+  EXEC_STATUS,
   char *theSymbol,
   char *reservedBy)
   {
@@ -268,6 +275,7 @@ void AddReservedPatternSymbol(
 /******************************************************************/
 intBool ReservedPatternSymbol(
   void *theEnv,
+  EXEC_STATUS,
   char *theSymbol,
   char *checkedBy)
   {
@@ -297,6 +305,7 @@ intBool ReservedPatternSymbol(
 /********************************************************/
 void ReservedPatternSymbolErrorMsg(
   void *theEnv,
+  EXEC_STATUS,
   char *theSymbol,
   char *usedFor)
   {
@@ -316,6 +325,7 @@ void ReservedPatternSymbolErrorMsg(
 /************************************************************/
 globle void GetNextPatternEntity(
   void *theEnv,
+  EXEC_STATUS,
   struct patternParser **theParser,
   struct patternEntity **theEntity)
   {
@@ -389,6 +399,7 @@ globle void GetNextPatternEntity(
 /**************************************************************/
 void DetachPattern(
   void *theEnv,
+  EXEC_STATUS,
   int rhsType,
   struct patternNodeHeader *theHeader)
   {
@@ -408,6 +419,7 @@ void DetachPattern(
 /**************************************************/
 globle intBool AddPatternParser(
   void *theEnv,
+  EXEC_STATUS,
   struct patternParser *newPtr)
   {
    struct patternParser *currentPtr, *lastPtr = NULL;
@@ -467,6 +479,7 @@ globle intBool AddPatternParser(
 /****************************************************/
 globle struct patternParser *FindPatternParser(
   void *theEnv,
+  EXEC_STATUS,
   char *name)
   {
    struct patternParser *tempParser;
@@ -485,6 +498,7 @@ globle struct patternParser *FindPatternParser(
 /******************************************************/
 struct patternParser *GetPatternParser(
   void *theEnv,
+  EXEC_STATUS,
   int rhsType)
   {
    if (rhsType == 0) return(NULL);
@@ -500,6 +514,7 @@ struct patternParser *GetPatternParser(
 /*************************************************************/
 globle void PatternNodeHeaderToCode(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp,
   struct patternNodeHeader *theHeader,
   int imageID,
@@ -539,6 +554,7 @@ globle void PatternNodeHeaderToCode(
 /****************************************************************/
 globle intBool PostPatternAnalysis(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *theLHS)
   {
    struct lhsParseNode *patternPtr;
@@ -569,6 +585,7 @@ globle intBool PostPatternAnalysis(
 /******************************************************************/
 struct lhsParseNode *RestrictionParse(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   struct token *theToken,
   int multifieldSlot,
@@ -888,6 +905,7 @@ static void TallyFieldTypes(
 /*******************************************************************/
 static struct lhsParseNode *ConjuctiveRestrictionParse(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   struct token *theToken,
   int *error)
@@ -1015,6 +1033,7 @@ static struct lhsParseNode *ConjuctiveRestrictionParse(
 /*****************************************************/
 static int CheckForVariableMixing(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *theRestriction)
   {
    struct lhsParseNode *tempRestriction;
@@ -1116,6 +1135,7 @@ static int CheckForVariableMixing(
 /***********************************************************/
 static struct lhsParseNode *LiteralRestrictionParse(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   struct token *theToken,
   int *error)

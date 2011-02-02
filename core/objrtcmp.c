@@ -82,7 +82,8 @@ static int AlphaPatternNodesToCode(void *,char *,char *,char *,int,FILE *,int,in
   NOTES        : None
  ***************************************************/
 globle void ObjectPatternsCompilerSetup(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    ObjectReteData(theEnv)->ObjectPatternCodeItem =
          AddCodeGeneratorItem(theEnv,"object-patterns",0,BeforeObjectPatternsToCode,
@@ -109,6 +110,7 @@ globle void ObjectPatternsCompilerSetup(
  ***************************************************/
 globle void ObjectPatternNodeReference(
   void *theEnv,
+  EXEC_STATUS,
   void *theVPattern,
   FILE *theFile,
   int imageID,
@@ -146,7 +148,8 @@ globle void ObjectPatternNodeReference(
   NOTES        : None
  *****************************************************/
 static void BeforeObjectPatternsToCode(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    long whichPattern;
    OBJECT_PATTERN_NODE *intermediateNode;
@@ -208,6 +211,7 @@ static OBJECT_PATTERN_NODE *GetNextObjectPatternNode(
  ***************************************************/
 static void InitObjectPatternsCode(
   void *theEnv,
+  EXEC_STATUS,
   FILE *initFP,
   int imageID,
   int maxIndices)
@@ -251,6 +255,7 @@ static void InitObjectPatternsCode(
  ***********************************************************/
 static int ObjectPatternsToCode(
   void *theEnv,
+  EXEC_STATUS,
   char *fileName,
   char *pathName,
   char *fileNameBuffer,
@@ -288,6 +293,7 @@ static int ObjectPatternsToCode(
  ***************************************************/
 static void IntermediatePatternNodeReference(
   void *theEnv,
+  EXEC_STATUS,
   OBJECT_PATTERN_NODE *thePattern,
   FILE *theFile,
   int imageID,
@@ -321,6 +327,7 @@ static void IntermediatePatternNodeReference(
  *************************************************************/
 static int IntermediatePatternNodesToCode(
   void *theEnv,
+  EXEC_STATUS,
   char *fileName,
   char *pathName,
   char *fileNameBuffer,
@@ -426,6 +433,7 @@ static int IntermediatePatternNodesToCode(
  ***********************************************************/
 static int AlphaPatternNodesToCode(
   void *theEnv,
+  EXEC_STATUS,
   char *fileName,
   char *pathName,
   char *fileNameBuffer,

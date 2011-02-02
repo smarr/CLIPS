@@ -121,7 +121,8 @@ static void DeallocateMessageHandlerData(void *);
                  INSMODDP.C
  ***************************************************/
 globle void SetupMessageHandlers(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    ENTITY_RECORD handlerGetInfo = { "HANDLER_GET", HANDLER_GET,0,1,1,
                                         PrintHandlerSlotGetFunction,
@@ -208,7 +209,8 @@ globle void SetupMessageHandlers(
 /*    data for the message handler functionality.        */
 /******************************************************/
 static void DeallocateMessageHandlerData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    HANDLER_LINK *tmp, *mhead, *chead;
     
@@ -250,6 +252,7 @@ static void DeallocateMessageHandlerData(
 #endif
 char *EnvGetDefmessageHandlerName(
   void *theEnv,
+  EXEC_STATUS,
   void *ptr,
   int theIndex)
   {
@@ -272,6 +275,7 @@ char *EnvGetDefmessageHandlerName(
  *****************************************************/
 globle char *EnvGetDefmessageHandlerType(
   void *theEnv,
+  EXEC_STATUS,
   void *ptr,
   int theIndex)
   {
@@ -294,6 +298,7 @@ globle char *EnvGetDefmessageHandlerType(
 #endif
 globle int EnvGetNextDefmessageHandler(
   void *theEnv,
+  EXEC_STATUS,
   void *ptr,
   int theIndex)
   {
@@ -345,6 +350,7 @@ globle HANDLER *GetDefmessageHandlerPointer(
 #endif
 globle unsigned EnvGetDefmessageHandlerWatch(
   void *theEnv,
+  EXEC_STATUS,
   void *theClass,
   int theIndex)
   {
@@ -372,6 +378,7 @@ globle unsigned EnvGetDefmessageHandlerWatch(
 #endif
 globle void EnvSetDefmessageHandlerWatch(
   void *theEnv,
+  EXEC_STATUS,
   int newState,
   void *theClass,
   int theIndex)
@@ -400,6 +407,7 @@ globle void EnvSetDefmessageHandlerWatch(
  ***************************************************/
 globle unsigned EnvFindDefmessageHandler(
   void *theEnv,
+  EXEC_STATUS,
   void *ptr,
   char *hname,
   char *htypestr)
@@ -432,6 +440,7 @@ globle unsigned EnvFindDefmessageHandler(
  ***************************************************/
 globle int EnvIsDefmessageHandlerDeletable(
   void *theEnv,
+  EXEC_STATUS,
   void *ptr,
   int theIndex)
   {
@@ -460,7 +469,8 @@ globle int EnvIsDefmessageHandlerDeletable(
   NOTES        : H/L Syntax: (undefmessage-handler <class> <handler> [<type>])
  ******************************************************************************/
 globle void UndefmessageHandlerCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
 #if RUN_TIME || BLOAD_ONLY
    PrintErrorID(theEnv,"MSGCOM",3,FALSE);
@@ -515,6 +525,7 @@ globle void UndefmessageHandlerCommand(
  ***********************************************************/
 globle int EnvUndefmessageHandler(
   void *theEnv,
+  EXEC_STATUS,
   void *vptr,
   int mhi)
   {
@@ -573,7 +584,8 @@ globle int EnvUndefmessageHandler(
   NOTES        : H/L Syntax: (ppdefmessage-handler <class> <message> [<type>])
  *******************************************************************************/
 globle void PPDefmessageHandlerCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DATA_OBJECT temp;
    SYMBOL_HN *csym,*msym;
@@ -632,7 +644,8 @@ globle void PPDefmessageHandlerCommand(
   NOTES        : H/L Syntax: (list-defmessage-handlers [<class> [inherit]]))
  *****************************************************************************/
 globle void ListDefmessageHandlersCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    int inhp;
    void *clsptr;
@@ -658,7 +671,8 @@ globle void ListDefmessageHandlersCommand(
   NOTES        : H/L Syntax: (preview-send <class> <msg>)
  ********************************************************************/
 globle void PreviewSendCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DEFCLASS *cls;
    DATA_OBJECT temp;
@@ -694,6 +708,7 @@ globle void PreviewSendCommand(
 #endif
 globle char *EnvGetDefmessageHandlerPPForm(
   void *theEnv,
+  EXEC_STATUS,
   void *ptr,
   int theIndex)
   {
@@ -717,6 +732,7 @@ globle char *EnvGetDefmessageHandlerPPForm(
  *******************************************************************/
 globle void EnvListDefmessageHandlers(
   void *theEnv,
+  EXEC_STATUS,
   char *logName,
   void *vptr,
   int inhp)
@@ -765,6 +781,7 @@ globle void EnvListDefmessageHandlers(
  ********************************************************************/
 globle void EnvPreviewSend(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   void *clsptr,
   char *msgname)
@@ -796,6 +813,7 @@ globle void EnvPreviewSend(
  ****************************************************/
 globle long DisplayHandlersInLinks(
   void *theEnv,
+  EXEC_STATUS,
   char *logName,
   PACKED_CLASS_LINKS *plinks,
   int theIndex)
@@ -831,7 +849,8 @@ globle long DisplayHandlersInLinks(
   NOTES        : Must be called after CreateSystemClasses()
  **********************************************************/
 static void CreateSystemHandlers(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    NewSystemHandler(theEnv,USER_TYPE_NAME,INIT_STRING,"init-slots",0);
    NewSystemHandler(theEnv,USER_TYPE_NAME,DELETE_STRING,"delete-instance",0);
@@ -863,6 +882,7 @@ static void CreateSystemHandlers(
  ************************************************************/
 static int WildDeleteHandler(
   void *theEnv,
+  EXEC_STATUS,
   DEFCLASS *cls,
   SYMBOL_HN *msym,
   char *tname)
@@ -916,6 +936,7 @@ static int WildDeleteHandler(
 #endif
 static unsigned DefmessageHandlerWatchAccess(
   void *theEnv,
+  EXEC_STATUS,
   int code,
   unsigned newState,
   EXPRESSION *argExprs)
@@ -950,6 +971,7 @@ static unsigned DefmessageHandlerWatchAccess(
 #endif
 static unsigned DefmessageHandlerWatchPrint(
   void *theEnv,
+  EXEC_STATUS,
   char *logName,
   int code,
   EXPRESSION *argExprs)
@@ -978,6 +1000,7 @@ static unsigned DefmessageHandlerWatchPrint(
  *******************************************************/
 static unsigned DefmessageHandlerWatchSupport(
   void *theEnv,
+  EXEC_STATUS,
   char *funcName,
   char *logName,
   int newState,
@@ -1105,6 +1128,7 @@ static unsigned DefmessageHandlerWatchSupport(
  *******************************************************/
 static unsigned WatchClassHandlers(
   void *theEnv,
+  EXEC_STATUS,
   void *theClass,
   char *theHandlerStr,
   int theType,
@@ -1156,6 +1180,7 @@ static unsigned WatchClassHandlers(
  ***************************************************/
 static void PrintHandlerWatchFlag(
   void *theEnv,
+  EXEC_STATUS,
   char *logName,
   void *theClass,
   int theHandler)

@@ -75,6 +75,7 @@ globle unsigned FindModuleSeparator(
 /*******************************************************************/
 globle SYMBOL_HN *ExtractModuleName(
   void *theEnv,
+  EXEC_STATUS,
   unsigned thePosition,
   char *theString)
   {
@@ -135,6 +136,7 @@ globle SYMBOL_HN *ExtractModuleName(
 /********************************************************************/
 globle SYMBOL_HN *ExtractConstructName(
   void *theEnv,
+  EXEC_STATUS,
   unsigned thePosition,
   char *theString)
   {
@@ -203,6 +205,7 @@ globle SYMBOL_HN *ExtractConstructName(
 /****************************************************/
 globle char *ExtractModuleAndConstructName(
   void *theEnv,
+  EXEC_STATUS,
   char *theName)
   {
    unsigned separatorPosition;
@@ -252,6 +255,7 @@ globle char *ExtractModuleAndConstructName(
 /************************************************************/
 globle void *FindImportedConstruct(
   void *theEnv,
+  EXEC_STATUS,
   char *constructName,
   struct defmodule *matchModule,
   char *findName,
@@ -341,6 +345,7 @@ globle void *FindImportedConstruct(
 /*********************************************************/
 globle void AmbiguousReferenceErrorMessage(
   void *theEnv,
+  EXEC_STATUS,
   char *constructName,
   char *findName)
   {
@@ -357,7 +362,8 @@ globle void AmbiguousReferenceErrorMessage(
 /*   the visited flag of each module to FALSE.      */
 /****************************************************/
 globle void MarkModulesAsUnvisited(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct defmodule *theModule;
 
@@ -375,6 +381,7 @@ globle void MarkModulesAsUnvisited(
 /***********************************************************/
 static void *SearchImportedConstructModules(
   void *theEnv,
+  EXEC_STATUS,
   struct symbolHashNode *constructType,
   struct defmodule *matchModule,
   struct moduleItem *theModuleItem,
@@ -546,6 +553,7 @@ static void *SearchImportedConstructModules(
 /**************************************************************/
 globle intBool ConstructExported(
   void *theEnv,
+  EXEC_STATUS,
   char *constructTypeStr,
   struct symbolHashNode *moduleName,
   struct symbolHashNode *findName)
@@ -586,6 +594,7 @@ globle intBool ConstructExported(
 /***************************************/
 globle void ListItemsDriver(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   struct defmodule *theModule,
   char *singleName,
@@ -674,6 +683,7 @@ globle void ListItemsDriver(
 /********************************************************/
 globle long DoForAllModules(
   void *theEnv,
+  EXEC_STATUS,
   void (*actionFunction)(struct defmodule *,void *),
   int interruptable,
   void *userBuffer)

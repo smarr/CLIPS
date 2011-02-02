@@ -58,7 +58,8 @@
 /*   save/load feature for defmodules.       */
 /*********************************************/
 globle void DefmoduleBinarySetup(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    AddBeforeBloadFunction(theEnv,"defmodule",RemoveAllDefmodules,2000);
 
@@ -84,6 +85,7 @@ globle void DefmoduleBinarySetup(
 /**************************************************************/
 globle void UpdateDefmoduleItemHeader(
   void *theEnv,
+  EXEC_STATUS,
   struct bsaveDefmoduleItemHeader *theBsaveHeader,
   struct defmoduleItemHeader *theHeader,
   int itemSize,
@@ -137,7 +139,8 @@ globle void AssignBsaveDefmdlItemHdrVals(
 /*   in the current environment.                          */
 /**********************************************************/
 static void BsaveFind(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct defmodule *defmodulePtr;
    struct portItem *theList;
@@ -228,6 +231,7 @@ static void BsaveFind(
 /*********************************************************/
 static void BsaveStorage(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp)
   {
    size_t space;
@@ -244,6 +248,7 @@ static void BsaveStorage(
 /*********************************************/
 static void BsaveBinaryItem(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp)
   {
    size_t space;
@@ -374,7 +379,8 @@ static void BsaveBinaryItem(
 /*   defmodules and port items used by this binary image. */
 /**********************************************************/
 static void BloadStorage(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    size_t space;
 
@@ -421,7 +427,8 @@ static void BloadStorage(
 /*   defmodules used by this binary image.  */
 /********************************************/
 static void BloadBinaryItem(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    size_t space;
 
@@ -441,6 +448,7 @@ static void BloadBinaryItem(
 /******************************************/
 static void UpdateDefmodule(
   void *theEnv,
+  EXEC_STATUS,
   void *buf,
   long obji)
   {
@@ -498,6 +506,7 @@ static void UpdateDefmodule(
 /*****************************************/
 static void UpdatePortItem(
   void *theEnv,
+  EXEC_STATUS,
   void *buf,
   long obji)
   {
@@ -540,7 +549,8 @@ static void UpdatePortItem(
 /*   when a binary load is in effect.  */
 /***************************************/
 static void ClearBload(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    long i;
    size_t space;

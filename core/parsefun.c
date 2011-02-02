@@ -74,7 +74,8 @@ struct parseFunctionData
 /*   the parsing related functions.      */
 /*****************************************/
 globle void ParseFunctionDefinitions(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    AllocateEnvironmentData(theEnv,PARSEFUN_DATA,sizeof(struct parseFunctionData),NULL);
 
@@ -90,6 +91,7 @@ globle void ParseFunctionDefinitions(
 /*******************************************/
 globle void CheckSyntaxFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *returnValue)
   {
    DATA_OBJECT theArg;
@@ -128,6 +130,7 @@ globle void CheckSyntaxFunction(
 /*********************************/
 globle int CheckSyntax(
   void *theEnv,
+  EXEC_STATUS,
   char *theString,
   DATA_OBJECT_PTR returnValue)
   {
@@ -269,7 +272,8 @@ globle int CheckSyntax(
 /*   the captured information.                    */
 /**************************************************/
 static void DeactivateErrorCapture(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {   
    if (ParseFunctionData(theEnv)->ErrorString != NULL)
      {
@@ -301,6 +305,7 @@ static void DeactivateErrorCapture(
 /******************************************************************/
 static void SetErrorCaptureValues(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
    struct multifield *theMultifield;
@@ -344,6 +349,7 @@ static void SetErrorCaptureValues(
 #endif
 static int FindErrorCapture(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
@@ -363,6 +369,7 @@ static int FindErrorCapture(
 /************************************/
 static int PrintErrorCapture(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   char *str)
   {
@@ -389,6 +396,7 @@ static int PrintErrorCapture(
 /****************************************************/
 globle void CheckSyntaxFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *returnValue)
   {
    PrintErrorID(theEnv,"PARSEFUN",1,FALSE);
@@ -403,6 +411,7 @@ globle void CheckSyntaxFunction(
 /************************************************/
 globle int CheckSyntax(
   void *theEnv,
+  EXEC_STATUS,
   char *theString,
   DATA_OBJECT_PTR returnValue)
   {

@@ -119,7 +119,8 @@ static intBool EvaluateBadCall(void *,void *,DATA_OBJECT *);
   NOTES        : None
  ****************************************************/
 globle void InstallProcedurePrimitives(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    ENTITY_RECORD procParameterInfo = { "PROC_PARAM", PROC_PARAM,0,1,0,NULL,NULL,NULL,
                                            RtnProcParam,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL },
@@ -190,7 +191,8 @@ globle void InstallProcedurePrimitives(
 /*    data for the procedural primitives functionality.       */
 /**************************************************************/
 static void DeallocateProceduralPrimitiveData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    ReturnMultifield(theEnv,(struct multifield *) ProceduralPrimitiveData(theEnv)->NoParamValue);
    ReleaseProcParameters(theEnv);
@@ -226,6 +228,7 @@ static void DeallocateProceduralPrimitiveData(
  ************************************************************/
 globle EXPRESSION *ParseProcParameters(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   struct token *tkn,
   EXPRESSION *parameterList,
@@ -352,6 +355,7 @@ NOTES        : None
 *************************************************************************/
 globle EXPRESSION *ParseProcActions(
   void *theEnv,
+  EXEC_STATUS,
   char *bodytype,
   char *readSource,
   struct token *tkn,
@@ -456,6 +460,7 @@ globle EXPRESSION *ParseProcActions(
  *************************************************************************/
 globle int ReplaceProcVars(
   void *theEnv,
+  EXEC_STATUS,
   char *bodytype,
   EXPRESSION *actions,
   EXPRESSION *parameterList,
@@ -604,6 +609,7 @@ globle int ReplaceProcVars(
  *****************************************************/
 globle EXPRESSION *GenProcWildcardReference(
   void *theEnv,
+  EXEC_STATUS,
   int theIndex)
   {
    return(GenConstant(theEnv,PROC_WILD_PARAM,EnvAddBitMap(theEnv,(void *) &theIndex,(int) sizeof(int))));
@@ -643,6 +649,7 @@ globle EXPRESSION *GenProcWildcardReference(
  *******************************************************************/
 globle void PushProcParameters(
   void *theEnv,
+  EXEC_STATUS,
   EXPRESSION *parameterList,
   int numberOfParameters,
   char *pname,
@@ -690,7 +697,8 @@ globle void PushProcParameters(
   NOTES        : Assumes pstack != NULL
  ******************************************************************/
 globle void PopProcParameters(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    register PROC_PARAM_STACK *ptmp;
 
@@ -732,7 +740,8 @@ globle void PopProcParameters(
   NOTES        : Assumes pstack != NULL
  ******************************************************************/
 static void ReleaseProcParameters(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    register PROC_PARAM_STACK *ptmp, *next;
 
@@ -795,7 +804,8 @@ static void ReleaseProcParameters(
   NOTES        : None
  ***********************************************************/
 globle EXPRESSION *GetProcParamExpressions(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    register int i;
 
@@ -840,6 +850,7 @@ globle EXPRESSION *GetProcParamExpressions(
  ***********************************************************/
 globle void EvaluateProcActions(
   void *theEnv,
+  EXEC_STATUS,
   struct defmodule *theModule,
   EXPRESSION *actions,
   int lvarcnt,
@@ -917,6 +928,7 @@ globle void EvaluateProcActions(
  ****************************************************/
 globle void PrintProcParamArray(
   void *theEnv,
+  EXEC_STATUS,
   char *logName)
   {
    register int i;
@@ -946,6 +958,7 @@ globle void PrintProcParamArray(
  ****************************************************************/
 globle void GrabProcWildargs(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result,
   int theIndex)
   {
@@ -1038,6 +1051,7 @@ globle void GrabProcWildargs(
  *******************************************************************/
 static void EvaluateProcParameters(
   void *theEnv,
+  EXEC_STATUS,
   EXPRESSION *parameterList,
   int numberOfParameters,
   char *pname,
@@ -1103,6 +1117,7 @@ static void EvaluateProcParameters(
  ***************************************************/
 static intBool RtnProcParam(
   void *theEnv,
+  EXEC_STATUS,
   void *value,
   DATA_OBJECT *result)
   {
@@ -1131,6 +1146,7 @@ static intBool RtnProcParam(
  **************************************************************/
 static intBool GetProcBind(
   void *theEnv,
+  EXEC_STATUS,
   void *value,
   DATA_OBJECT *result)
   {
@@ -1196,6 +1212,7 @@ static intBool GetProcBind(
  **************************************************************/
 static intBool PutProcBind(
   void *theEnv,
+  EXEC_STATUS,
   void *value,
   DATA_OBJECT *result)
   {
@@ -1243,6 +1260,7 @@ static intBool PutProcBind(
  ****************************************************************/
 static intBool RtnProcWild(
   void *theEnv,
+  EXEC_STATUS,
   void *value,
   DATA_OBJECT *result)
   {
@@ -1324,6 +1342,7 @@ static int FindProcParameter(
  *************************************************************************/
 static int ReplaceProcBinds(
   void *theEnv,
+  EXEC_STATUS,
   EXPRESSION *actions,
   int (*altbindfunc)(void *,EXPRESSION *,void *),
   void *userBuffer)
@@ -1371,6 +1390,7 @@ static int ReplaceProcBinds(
  *****************************************************/
 static EXPRESSION *CompactActions(
   void *theEnv,
+  EXEC_STATUS,
   EXPRESSION *actions)
   {
    register struct expr *tmp;
@@ -1413,6 +1433,7 @@ static EXPRESSION *CompactActions(
 #endif
 static intBool EvaluateBadCall(
   void *theEnv,
+  EXEC_STATUS,
   void *value,
   DATA_OBJECT *result)
   {

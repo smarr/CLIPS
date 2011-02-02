@@ -45,7 +45,8 @@
 /*   math and predicate functions.                */
 /**************************************************/
 globle void PredicateFunctionDefinitions(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
 #if ! RUN_TIME
    EnvDefineFunction2(theEnv,"not", 'b', NotFunction, "NotFunction", "11");
@@ -87,7 +88,8 @@ globle void PredicateFunctionDefinitions(
 /*   for the eq function.           */
 /************************************/
 globle intBool EqFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DATA_OBJECT item, nextItem;
    int numArgs, i;
@@ -145,7 +147,8 @@ globle intBool EqFunction(
 /*   for the neq function.           */
 /*************************************/
 globle intBool NeqFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DATA_OBJECT item, nextItem;
    int numArgs, i;
@@ -200,7 +203,8 @@ globle intBool NeqFunction(
 /*   for the stringp function.           */
 /*****************************************/
 globle intBool StringpFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DATA_OBJECT item;
 
@@ -219,7 +223,8 @@ globle intBool StringpFunction(
 /*   for the symbolp function.           */
 /*****************************************/
 globle intBool SymbolpFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DATA_OBJECT item;
 
@@ -238,7 +243,8 @@ globle intBool SymbolpFunction(
 /*   for the lexemep function.           */
 /*****************************************/
 globle intBool LexemepFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DATA_OBJECT item;
 
@@ -257,7 +263,8 @@ globle intBool LexemepFunction(
 /*   for the numberp function.           */
 /*****************************************/
 globle intBool NumberpFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DATA_OBJECT item;
 
@@ -276,7 +283,8 @@ globle intBool NumberpFunction(
 /*   for the floatp function.           */
 /****************************************/
 globle intBool FloatpFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DATA_OBJECT item;
 
@@ -295,7 +303,8 @@ globle intBool FloatpFunction(
 /*   for the integerp function.           */
 /******************************************/
 globle intBool IntegerpFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DATA_OBJECT item;
 
@@ -313,7 +322,8 @@ globle intBool IntegerpFunction(
 /*   for the multifieldp function.           */
 /*********************************************/
 globle intBool MultifieldpFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DATA_OBJECT item;
 
@@ -331,7 +341,8 @@ globle intBool MultifieldpFunction(
 /*   for the pointerp function.           */
 /******************************************/
 globle intBool PointerpFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DATA_OBJECT item;
 
@@ -349,7 +360,8 @@ globle intBool PointerpFunction(
 /*   for the not function.           */
 /*************************************/
 globle intBool NotFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    EXPRESSION *theArgument;
    DATA_OBJECT result;
@@ -370,7 +382,8 @@ globle intBool NotFunction(
 /*   for the and function.           */
 /*************************************/
 globle intBool AndFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    EXPRESSION *theArgument;
    DATA_OBJECT result;
@@ -392,7 +405,8 @@ globle intBool AndFunction(
 /*   for the or function.           */
 /************************************/
 globle intBool OrFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    EXPRESSION *theArgument;
    DATA_OBJECT result;
@@ -415,7 +429,8 @@ globle intBool OrFunction(
 /*   routine for the <= function.        */
 /*****************************************/
 globle intBool LessThanOrEqualFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    EXPRESSION *theArgument;
    DATA_OBJECT rv1, rv2;
@@ -484,7 +499,8 @@ globle intBool LessThanOrEqualFunction(
 /*   routine for the >= function.           */
 /********************************************/
 globle intBool GreaterThanOrEqualFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    EXPRESSION *theArgument;
    DATA_OBJECT rv1, rv2;
@@ -553,7 +569,8 @@ globle intBool GreaterThanOrEqualFunction(
 /*   routine for the < function.  */
 /**********************************/
 globle intBool LessThanFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    EXPRESSION *theArgument;
    DATA_OBJECT rv1, rv2;
@@ -623,7 +640,8 @@ globle intBool LessThanFunction(
 /*   routine for the > function.     */
 /*************************************/
 globle intBool GreaterThanFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    EXPRESSION *theArgument;
    DATA_OBJECT rv1, rv2;
@@ -693,7 +711,8 @@ globle intBool GreaterThanFunction(
 /*   routine for the = function.      */
 /**************************************/
 globle intBool NumericEqualFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    EXPRESSION *theArgument;
    DATA_OBJECT rv1, rv2;
@@ -760,7 +779,8 @@ globle intBool NumericEqualFunction(
 /*   routine for the <> function.        */
 /*****************************************/
 globle intBool NumericNotEqualFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    EXPRESSION *theArgument;
    DATA_OBJECT rv1, rv2;
@@ -826,7 +846,8 @@ globle intBool NumericNotEqualFunction(
 /*   for the oddp function.           */
 /**************************************/
 globle intBool OddpFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DATA_OBJECT item;
    long long num, halfnum;
@@ -847,7 +868,8 @@ globle intBool OddpFunction(
 /*   for the evenp function.           */
 /***************************************/
 globle intBool EvenpFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DATA_OBJECT item;
    long long num, halfnum;

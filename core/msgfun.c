@@ -76,7 +76,8 @@ static void PrintPreviewHandler(void *,char *,HANDLER_LINK *,int,char *);
   NOTES        : None
  ********************************************************/
 globle void UnboundHandlerErr(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    EnvPrintRouter(theEnv,WERROR,"message-handler ");
    PrintHandler(theEnv,WERROR,MessageHandlerData(theEnv)->CurrentCore->hnd,TRUE);
@@ -92,6 +93,7 @@ globle void UnboundHandlerErr(
  *****************************************************************/
 globle void PrintNoHandlerError(
   void *theEnv,
+  EXEC_STATUS,
   char *msg)
   {
    PrintErrorID(theEnv,"MSGFUN",1,FALSE);
@@ -111,7 +113,8 @@ globle void PrintNoHandlerError(
   NOTES        : Uses ProcParamArraySize and CurrentCore globals
  ***************************************************************/
 globle int CheckHandlerArgCount(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    HANDLER *hnd;
 
@@ -155,6 +158,7 @@ globle int CheckHandlerArgCount(
  ***************************************************/
 globle void SlotAccessViolationError(
   void *theEnv,
+  EXEC_STATUS,
   char *slotName,
   intBool instanceFlag,
   void *theInstanceOrClass)
@@ -185,6 +189,7 @@ globle void SlotAccessViolationError(
  ***************************************************/
 globle void SlotVisibilityViolationError(
   void *theEnv,
+  EXEC_STATUS,
   SLOT_DESC *sd,
   DEFCLASS *theDefclass)
   {
@@ -222,6 +227,7 @@ globle void SlotVisibilityViolationError(
  *******************************************************************************/
 globle void NewSystemHandler(
   void *theEnv,
+  EXEC_STATUS,
   char *cname,
   char *mname,
   char *fname,
@@ -259,6 +265,7 @@ globle void NewSystemHandler(
  ***************************************************/
 globle HANDLER *InsertHandlerHeader(
   void *theEnv,
+  EXEC_STATUS,
   DEFCLASS *cls,
   SYMBOL_HN *mname,
   int mtype)
@@ -362,6 +369,7 @@ globle int HandlersExecuting(
  **********************************************************************/
 globle int DeleteHandler(
    void *theEnv,
+  EXEC_STATUS,
    DEFCLASS *cls,
    SYMBOL_HN *mname,
    int mtype,
@@ -460,6 +468,7 @@ globle int DeleteHandler(
  ***************************************************/
 globle void DeallocateMarkedHandlers(
   void *theEnv,
+  EXEC_STATUS,
   DEFCLASS *cls)
   {
    short count;
@@ -552,6 +561,7 @@ globle void DeallocateMarkedHandlers(
  *****************************************************/
 globle unsigned HandlerType(
   void *theEnv,
+  EXEC_STATUS,
   char *func,
   char *str)
   {
@@ -584,6 +594,7 @@ globle unsigned HandlerType(
  *****************************************************************/
 globle int CheckCurrentMessage(
   void *theEnv,
+  EXEC_STATUS,
   char *func,
   int ins_reqd)
   {
@@ -629,6 +640,7 @@ globle int CheckCurrentMessage(
  ***************************************************/
 globle void PrintHandler(
   void *theEnv,
+  EXEC_STATUS,
   char *logName,
   HANDLER *theHandler,
   int crtn)
@@ -787,6 +799,7 @@ globle int FindHandlerNameGroup(
  ***************************************************/
 globle void HandlerDeleteError(
   void *theEnv,
+  EXEC_STATUS,
   char *cname)
   {
    PrintErrorID(theEnv,"MSGFUN",8,FALSE);
@@ -818,6 +831,7 @@ globle void HandlerDeleteError(
  ********************************************************************/
 globle void DisplayCore(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   HANDLER_LINK *core,
   int sdepth)
@@ -864,6 +878,7 @@ globle void DisplayCore(
  ******************************************************************/
 globle HANDLER_LINK *FindPreviewApplicableHandlers(
   void *theEnv,
+  EXEC_STATUS,
   DEFCLASS *cls,
   SYMBOL_HN *mname)
   {
@@ -891,6 +906,7 @@ globle HANDLER_LINK *FindPreviewApplicableHandlers(
  ***********************************************************/
 globle void WatchMessage(
   void *theEnv,
+  EXEC_STATUS,
   char *logName,
   char *tstring)
   {
@@ -917,6 +933,7 @@ globle void WatchMessage(
  ***********************************************************/
 globle void WatchHandler(
   void *theEnv,
+  EXEC_STATUS,
   char *logName,
   HANDLER_LINK *hndl,
   char *tstring)
@@ -964,6 +981,7 @@ globle void WatchHandler(
  ********************************************************************/
 static HANDLER_LINK *DisplayPrimaryCore(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   HANDLER_LINK *core,
   int pdepth)
@@ -992,6 +1010,7 @@ static HANDLER_LINK *DisplayPrimaryCore(
  ***************************************************/
 static void PrintPreviewHandler(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   HANDLER_LINK *cptr,
   int sdepth,

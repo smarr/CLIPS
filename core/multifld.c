@@ -57,7 +57,8 @@
 /*    data for multifield values.                  */
 /***************************************************/
 globle void InitializeMultifieldData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    AllocateEnvironmentData(theEnv,MULTIFIELD_DATA,sizeof(struct multifieldData),DeallocateMultifieldData);
   }
@@ -67,7 +68,8 @@ globle void InitializeMultifieldData(
 /*    data for multifield values.                    */
 /*****************************************************/
 static void DeallocateMultifieldData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct multifield *tmpPtr, *nextPtr; 
    
@@ -85,6 +87,7 @@ static void DeallocateMultifieldData(
 /***********************************************************/
 globle void *CreateMultifield2(
   void *theEnv,
+  EXEC_STATUS,
   long size)
   {
    struct multifield *theSegment;
@@ -107,6 +110,7 @@ globle void *CreateMultifield2(
 /*****************************************************************/
 globle void ReturnMultifield(
   void *theEnv,
+  EXEC_STATUS,
   struct multifield *theSegment)
   {
    unsigned long newSize;
@@ -124,6 +128,7 @@ globle void ReturnMultifield(
 /******************************/
 globle void MultifieldInstall(
   void *theEnv,
+  EXEC_STATUS,
   struct multifield *theSegment)
   {
    unsigned long length, i;
@@ -145,6 +150,7 @@ globle void MultifieldInstall(
 /******************************/
 globle void MultifieldDeinstall(
   void *theEnv,
+  EXEC_STATUS,
   struct multifield *theSegment)
   {
    unsigned long length, i;
@@ -166,6 +172,7 @@ globle void MultifieldDeinstall(
 /*******************************************************/
 globle struct multifield *StringToMultifield(
   void *theEnv,
+  EXEC_STATUS,
   char *theString)
   {
    struct token theToken;
@@ -241,6 +248,7 @@ globle struct multifield *StringToMultifield(
 /**************************************************************/
 globle void *EnvCreateMultifield(
   void *theEnv,
+  EXEC_STATUS,
   long size)
   {
    struct multifield *theSegment;
@@ -270,6 +278,7 @@ globle void *EnvCreateMultifield(
 /*********************************************************************/
 globle void *DOToMultifield(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *theValue)
   {
    struct multifield *dst, *src;
@@ -290,6 +299,7 @@ globle void *DOToMultifield(
 /***********************************************************/
 globle void AddToMultifieldList(
   void *theEnv,
+  EXEC_STATUS,
   struct multifield *theSegment)
   {
    theSegment->depth = (short) execStatus->CurrentEvaluationDepth;
@@ -304,7 +314,8 @@ globle void AddToMultifieldList(
 /* FlushMultifields:                                         */
 /***********************************************************/
 globle void FlushMultifields(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct multifield *theSegment, *nextPtr, *lastPtr = NULL;
    unsigned long newSize;
@@ -337,6 +348,7 @@ globle void FlushMultifields(
 /*********************************************************************/
 globle void DuplicateMultifield(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR dst,
   DATA_OBJECT_PTR src)
   {
@@ -353,6 +365,7 @@ globle void DuplicateMultifield(
 /*********************************************************************/
 globle void *CopyMultifield(
   void *theEnv,
+  EXEC_STATUS,
   struct multifield *src)
   {
    struct multifield *dst;
@@ -367,6 +380,7 @@ globle void *CopyMultifield(
 /**********************************************************/
 globle void PrintMultifield(
   void *theEnv,
+  EXEC_STATUS,
   char *fileid,
   struct multifield *segment,
   long begin,
@@ -395,6 +409,7 @@ globle void PrintMultifield(
 /*****************************************************/
 globle void StoreInMultifield(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *returnValue,
   EXPRESSION *expptr,
   int garbageSegment)
@@ -682,7 +697,8 @@ globle unsigned long HashMultifield(
 /* GetMultifieldList: */
 /**********************/
 globle struct multifield *GetMultifieldList(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return(MultifieldData(theEnv)->ListOfMultifields);
   }
@@ -693,6 +709,7 @@ globle struct multifield *GetMultifieldList(
 /***************************************/
 globle void *ImplodeMultifield(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *value)
   {
    size_t strsize = 0;

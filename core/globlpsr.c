@@ -69,6 +69,7 @@
 /*********************************************************************/
 globle intBool ParseDefglobal(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource)
   {
    int defglobalError = FALSE;
@@ -194,6 +195,7 @@ globle intBool ParseDefglobal(
 /***************************************************************/
 static intBool GetVariableDefinition(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   int *defglobalError,
   int tokenRead,
@@ -325,6 +327,7 @@ static intBool GetVariableDefinition(
 /*********************************************************/
 static void AddDefglobal(
   void *theEnv,
+  EXEC_STATUS,
   SYMBOL_HN *name,
   DATA_OBJECT_PTR vPtr,
   struct expr *ePtr)
@@ -435,6 +438,7 @@ static void AddDefglobal(
 /*****************************************************************/
 globle intBool ReplaceGlobalVariable(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *ePtr)
   {
    struct defglobal *theGlobal;
@@ -487,6 +491,7 @@ globle intBool ReplaceGlobalVariable(
 /*****************************************************************/
 globle void GlobalReferenceErrorMessage(
   void *theEnv,
+  EXEC_STATUS,
   char *variableName)
   {
    PrintErrorID(theEnv,"GLOBLPSR",1,TRUE);

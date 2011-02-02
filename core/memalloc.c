@@ -67,7 +67,8 @@
 /* InitializeMemory: Sets up memory tables. */
 /********************************************/
 globle void InitializeMemory(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    int i;
 
@@ -93,6 +94,7 @@ globle void InitializeMemory(
 /***************************************************/
 globle void *genalloc(
   void *theEnv,
+  EXEC_STATUS,
   size_t size)
   {
    char *memPtr;
@@ -151,6 +153,7 @@ globle void *genalloc(
 #endif
 globle int DefaultOutOfMemoryFunction(
   void *theEnv,
+  EXEC_STATUS,
   size_t size)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
@@ -167,7 +170,10 @@ globle int DefaultOutOfMemoryFunction(
 /* EnvSetOutOfMemoryFunction: Allows the function which is */
 /*   called when the KB runs out of memory to be changed.  */
 /***********************************************************/
-globle int (*EnvSetOutOfMemoryFunction(void *theEnv,int (*functionPtr)(void *,size_t)))(void *,size_t)
+globle int (*EnvSetOutOfMemoryFunction(
+	void *theEnv,
+  EXEC_STATUS,
+	int (*functionPtr)(void *,size_t)))(void *,size_t)
   {
    int (*tmpPtr)(void *,size_t);
 
@@ -181,6 +187,7 @@ globle int (*EnvSetOutOfMemoryFunction(void *theEnv,int (*functionPtr)(void *,si
 /****************************************************/
 globle int genfree(
   void *theEnv,
+  EXEC_STATUS,
   void *waste,
   size_t size)
   {   
@@ -206,6 +213,7 @@ globle int genfree(
 /******************************************************/
 globle void *genrealloc(
   void *theEnv,
+  EXEC_STATUS,
   void *oldaddr,
   size_t oldsz,
   size_t newsz)
@@ -234,7 +242,8 @@ globle void *genrealloc(
 /*   for the mem-used command.  */
 /********************************/
 globle long int EnvMemUsed(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return(MemoryData(theEnv)->MemoryAmount);
   }
@@ -244,7 +253,8 @@ globle long int EnvMemUsed(
 /*   for the mem-requests command.  */
 /************************************/
 globle long int EnvMemRequests(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return(MemoryData(theEnv)->MemoryCalls);
   }
@@ -255,6 +265,7 @@ globle long int EnvMemRequests(
 /***************************************/
 globle long int UpdateMemoryUsed(
   void *theEnv,
+  EXEC_STATUS,
   long int value)
   {
    MemoryData(theEnv)->MemoryAmount += value;
@@ -267,6 +278,7 @@ globle long int UpdateMemoryUsed(
 /*******************************************/
 globle long int UpdateMemoryRequests(
   void *theEnv,
+  EXEC_STATUS,
   long int value)
   {
    MemoryData(theEnv)->MemoryCalls += value;
@@ -279,6 +291,7 @@ globle long int UpdateMemoryRequests(
 /***********************************/
 globle long int EnvReleaseMem(
   void *theEnv,
+  EXEC_STATUS,
   long int maximum,
   int printMessage)
   {
@@ -324,6 +337,7 @@ globle long int EnvReleaseMem(
 /*****************************************************/
 globle void *gm1(
   void *theEnv,
+  EXEC_STATUS,
   size_t size)
   {
    struct memoryPtr *memPtr;
@@ -363,6 +377,7 @@ globle void *gm1(
 /*****************************************************/
 globle void *gm2(
   void *theEnv,
+  EXEC_STATUS,
   size_t size)
   {
    struct memoryPtr *memPtr;
@@ -387,6 +402,7 @@ globle void *gm2(
 /*****************************************************/
 globle void *gm3(
   void *theEnv,
+  EXEC_STATUS,
   size_t size)
   {
    struct memoryPtr *memPtr;
@@ -410,6 +426,7 @@ globle void *gm3(
 /****************************************/
 globle int rm(
   void *theEnv,
+  EXEC_STATUS,
   void *str,
   size_t size)
   {
@@ -438,6 +455,7 @@ globle int rm(
 /********************************************/
 globle int rm3(
   void *theEnv,
+  EXEC_STATUS,
   void *str,
   size_t size)
   {
@@ -463,7 +481,8 @@ globle int rm3(
 /* PoolSize: Returns number of bytes in free pool. */
 /***************************************************/
 globle unsigned long PoolSize(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    register int i;
    struct memoryPtr *memPtr;
@@ -487,7 +506,8 @@ globle unsigned long PoolSize(
 /*   equivalent to pool_size on anything other than the IBM-PC */
 /***************************************************************/
 globle unsigned long ActualPoolSize(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
 #if WIN_BTC
    register int i;
@@ -521,6 +541,7 @@ globle unsigned long ActualPoolSize(
 /********************************************/
 globle intBool EnvSetConserveMemory(
   void *theEnv,
+  EXEC_STATUS,
   intBool value)
   {
    int ov;
@@ -535,7 +556,8 @@ globle intBool EnvSetConserveMemory(
 /*    of the memory conservation flag.     */
 /*******************************************/
 globle intBool EnvGetConserveMemory(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return(MemoryData(theEnv)->ConserveMemory);
   }
@@ -566,6 +588,7 @@ globle void genmemcpy(
 /***************************************************/
 static int InitializeBlockMemory(
   void *theEnv,
+  EXEC_STATUS,
   unsigned int requestSize)
   {
    struct chunkInfo *chunkPtr;
@@ -637,6 +660,7 @@ static int InitializeBlockMemory(
 /***************************************************************************/
 static int AllocateBlock(
   void *theEnv,
+  EXEC_STATUS,
   struct blockInfo *blockPtr,
   unsigned int requestSize)
   {
@@ -694,6 +718,7 @@ static int AllocateBlock(
 /*******************************************************/
 globle void *RequestChunk(
   void *theEnv,
+  EXEC_STATUS,
   size_t requestSize)
   {
    struct chunkInfo *chunkPtr;
@@ -759,6 +784,7 @@ globle void *RequestChunk(
 /********************************************/
 static void AllocateChunk(
   void *theEnv,
+  EXEC_STATUS,
   struct blockInfo *parentBlock,
   struct chunkInfo *chunkPtr,
   size_t requestSize)
@@ -831,6 +857,7 @@ static void AllocateChunk(
 /***********************************************************/
 globle int ReturnChunk(
   void *theEnv,
+  EXEC_STATUS,
   void *memPtr,
   size_t size)
   {
@@ -978,7 +1005,8 @@ globle int ReturnChunk(
 /*   back to the operating system.             */
 /***********************************************/
 globle void ReturnAllBlocks(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct blockInfo *theBlock, *nextBlock;
 

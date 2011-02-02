@@ -67,6 +67,7 @@
 /**************************************************************/
 globle void IncrementalReset(
   void *theEnv,
+  EXEC_STATUS,
   struct defrule *tempRule)
   {
 #if (MAC_MCW || WIN_MCW) && (RUN_TIME || BLOAD_ONLY)
@@ -143,6 +144,7 @@ globle void IncrementalReset(
 /**********************************************************************/
 static void MarkNetworkForIncrementalReset(
   void *theEnv,
+  EXEC_STATUS,
   struct defrule *tempRule,
   int value)
   {
@@ -163,6 +165,7 @@ static void MarkNetworkForIncrementalReset(
 /**********************************************************************/
 static void MarkJoinsForIncrementalReset(
   void *theEnv,
+  EXEC_STATUS,
   struct joinNode *joinPtr,
   int value)
   {
@@ -211,6 +214,7 @@ static void MarkJoinsForIncrementalReset(
 /*******************************************************************************/
 static void CheckForPrimableJoins(
   void *theEnv,
+  EXEC_STATUS,
   struct defrule *tempRule,
   struct joinNode *joinPtr)
   {   
@@ -274,6 +278,7 @@ static void CheckForPrimableJoins(
 /****************************************************************************/
 static void PrimeJoinFromLeftMemory(
   void *theEnv,
+  EXEC_STATUS,
   struct joinNode *joinPtr)
   {
    struct partialMatch *theList, *linker;
@@ -391,6 +396,7 @@ static void PrimeJoinFromLeftMemory(
 /****************************************************************************/
 static void PrimeJoinFromRightMemory(
   void *theEnv,
+  EXEC_STATUS,
   struct joinNode *joinPtr)
   {
    struct partialMatch *theList, *linker;
@@ -494,6 +500,7 @@ static void PrimeJoinFromRightMemory(
 /*********************************************************************/
 static void MarkPatternForIncrementalReset(
   void *theEnv,
+  EXEC_STATUS,
   int rhsType,
   struct patternNodeHeader *theHeader,
   int value)
@@ -516,7 +523,8 @@ static void MarkPatternForIncrementalReset(
 /*   for the get-incremental-reset command. */
 /********************************************/
 globle intBool EnvGetIncrementalReset(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {   
    return(EngineData(theEnv)->IncrementalResetFlag);
   }
@@ -527,6 +535,7 @@ globle intBool EnvGetIncrementalReset(
 /********************************************/
 globle intBool EnvSetIncrementalReset(
   void *theEnv,
+  EXEC_STATUS,
   int value)
   {
    int ov;
@@ -558,7 +567,8 @@ globle intBool EnvSetIncrementalReset(
 /*   for the set-incremental-reset command.         */
 /****************************************************/
 globle int SetIncrementalResetCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    int oldValue;
    DATA_OBJECT argPtr;
@@ -621,7 +631,8 @@ globle int SetIncrementalResetCommand(
 /*   for the get-incremental-reset command.         */
 /****************************************************/
 globle int GetIncrementalResetCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    int oldValue;
 

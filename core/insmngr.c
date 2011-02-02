@@ -109,6 +109,7 @@ static void PrintInstanceWatch(void *,char *,INSTANCE_TYPE *);
  ***********************************************************/
 globle void InitializeInstanceCommand(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    INSTANCE_TYPE *ins;
@@ -137,6 +138,7 @@ globle void InitializeInstanceCommand(
  ****************************************************************/
 globle void MakeInstanceCommand(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    SYMBOL_HN *iname;
@@ -212,6 +214,7 @@ globle void MakeInstanceCommand(
  ***************************************************/
 globle SYMBOL_HN *GetFullInstanceName(
   void *theEnv,
+  EXEC_STATUS,
   INSTANCE_TYPE *ins)
   {
    char *moduleName,*buffer;
@@ -253,6 +256,7 @@ globle SYMBOL_HN *GetFullInstanceName(
  ***************************************************/
 globle INSTANCE_TYPE *BuildInstance(
   void *theEnv,
+  EXEC_STATUS,
   SYMBOL_HN *iname,
   DEFCLASS *cls,
   intBool initMessage)
@@ -431,6 +435,7 @@ globle INSTANCE_TYPE *BuildInstance(
  *****************************************************************************/
 globle void InitSlotsCommand(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    SetpType(result,SYMBOL);
@@ -464,6 +469,7 @@ globle void InitSlotsCommand(
  ******************************************************/
 globle intBool QuashInstance(
   void *theEnv,
+  EXEC_STATUS,
   INSTANCE_TYPE *ins)
   {
    register int iflag;
@@ -584,6 +590,7 @@ globle intBool QuashInstance(
  ****************************************************/
 globle void InactiveInitializeInstance(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    int ov;
@@ -608,6 +615,7 @@ globle void InactiveInitializeInstance(
  **************************************************************/
 globle void InactiveMakeInstance(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    int ov;
@@ -634,7 +642,8 @@ globle void InactiveMakeInstance(
   NOTES        : None
  ********************************************************/
 static INSTANCE_TYPE *NewInstance(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    INSTANCE_TYPE *instance;
 
@@ -685,6 +694,7 @@ static INSTANCE_TYPE *NewInstance(
  *****************************************************************/
 static INSTANCE_TYPE *InstanceLocationInfo(
   void *theEnv,
+  EXEC_STATUS,
   DEFCLASS *cls,
   SYMBOL_HN *iname,
   INSTANCE_TYPE **prv,
@@ -732,6 +742,7 @@ static INSTANCE_TYPE *InstanceLocationInfo(
  ********************************************************/
 static void InstallInstance(
   void *theEnv,
+  EXEC_STATUS,
   INSTANCE_TYPE *ins,
   int set)
   {
@@ -784,6 +795,7 @@ static void InstallInstance(
  ****************************************************************/
 static void BuildDefaultSlots(
   void *theEnv,
+  EXEC_STATUS,
   intBool initMessage)
   {
    register unsigned i,j;
@@ -860,6 +872,7 @@ static void BuildDefaultSlots(
  *******************************************************************/
 static int CoreInitializeInstance(
   void *theEnv,
+  EXEC_STATUS,
   INSTANCE_TYPE *ins,
   EXPRESSION *ovrexp)
   {
@@ -934,6 +947,7 @@ static int CoreInitializeInstance(
  **********************************************************/
 static int InsertSlotOverrides(
   void *theEnv,
+  EXEC_STATUS,
   INSTANCE_TYPE *ins,
   EXPRESSION *slot_exp)
   {
@@ -1004,6 +1018,7 @@ static int InsertSlotOverrides(
  *****************************************************************************/
 static void EvaluateClassDefaults(
   void *theEnv,
+  EXEC_STATUS,
   INSTANCE_TYPE *ins)
   {
    INSTANCE_SLOT *slot;
@@ -1078,6 +1093,7 @@ static void EvaluateClassDefaults(
  ***************************************************/
 static void PrintInstanceWatch(
   void *theEnv,
+  EXEC_STATUS,
   char *traceString,
   INSTANCE_TYPE *theInstance)
   {

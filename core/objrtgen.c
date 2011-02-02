@@ -68,6 +68,7 @@ static EXPRESSION *GenerateSlotComparisonTest(void *,int,int,struct lhsParseNode
  **********************************************/
 globle void ReplaceGetJNObjectValue(
   void *theEnv,
+  EXEC_STATUS,
   EXPRESSION *theItem,
   struct lhsParseNode *theNode,
   int side)
@@ -77,6 +78,7 @@ globle void ReplaceGetJNObjectValue(
 
 globle EXPRESSION *GenGetJNObjectValue(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *theNode,
   int side)
   {
@@ -89,6 +91,7 @@ globle EXPRESSION *GenGetJNObjectValue(
 
 globle EXPRESSION *ObjectJNVariableComparison(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *selfNode,
   struct lhsParseNode *referringNode,
   int isNand)
@@ -102,6 +105,7 @@ globle EXPRESSION *ObjectJNVariableComparison(
  **********************************************/
 globle EXPRESSION *GenObjectPNConstantCompare(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *theNode)
   {
    struct ObjectCmpPNConstant hack;
@@ -161,6 +165,7 @@ globle EXPRESSION *GenObjectPNConstantCompare(
 
 globle void ReplaceGetPNObjectValue(
   void *theEnv,
+  EXEC_STATUS,
   EXPRESSION *theItem,
   struct lhsParseNode *theNode)
   {
@@ -169,6 +174,7 @@ globle void ReplaceGetPNObjectValue(
 
 globle EXPRESSION *GenGetPNObjectValue(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *theNode)
   {
    EXPRESSION *theItem;
@@ -180,6 +186,7 @@ globle EXPRESSION *GenGetPNObjectValue(
 
 globle EXPRESSION *ObjectPNVariableComparison(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *selfNode,
   struct lhsParseNode *referringNode)
   {
@@ -199,6 +206,7 @@ globle EXPRESSION *ObjectPNVariableComparison(
  ****************************************************/
 globle void GenObjectLengthTest(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *theNode)
   {
    struct ObjectMatchLength hack;
@@ -245,6 +253,7 @@ globle void GenObjectLengthTest(
  ****************************************************/
 globle void GenObjectZeroLengthTest(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *theNode)
   {
    struct ObjectMatchLength hack;
@@ -285,6 +294,7 @@ globle void GenObjectZeroLengthTest(
  ***************************************************/
 static void GenObjectGetVar(
   void *theEnv,
+  EXEC_STATUS,
   int joinReference,
   EXPRESSION *theItem,
   struct lhsParseNode *theNode,
@@ -466,6 +476,7 @@ static intBool IsSimpleSlotVariable(
  ***************************************************************/
 static EXPRESSION *GenerateSlotComparisonTest(
   void *theEnv,
+  EXEC_STATUS,
   int joinTest,
   int isNand,
   struct lhsParseNode *selfNode,

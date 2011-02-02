@@ -79,7 +79,8 @@ static void PopQuerySoln(void *);
   NOTES        : None
  ****************************************************/
 globle void SetupQuery(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    AllocateEnvironmentData(theEnv,INSTANCE_QUERY_DATA,sizeof(struct instanceQueryData),NULL);
 
@@ -129,7 +130,8 @@ globle void SetupQuery(
   NOTES        : H/L Syntax : ((query-instance) <index>)
  *************************************************************/
 globle void *GetQueryInstance(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    register QUERY_CORE *core;
 
@@ -148,6 +150,7 @@ globle void *GetQueryInstance(
  **************************************************************************/
 globle void GetQueryInstanceSlot(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    INSTANCE_TYPE *ins;
@@ -247,7 +250,8 @@ globle void GetQueryInstanceSlot(
   NOTES        : H/L Syntax : See ParseQueryNoAction()
  ******************************************************************************/
 globle intBool AnyInstances(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    QUERY_CLASS *qclasses;
    unsigned rcnt;
@@ -284,6 +288,7 @@ globle intBool AnyInstances(
  ******************************************************************************/
 globle void QueryFindInstance(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    QUERY_CLASS *qclasses;
@@ -343,6 +348,7 @@ globle void QueryFindInstance(
  ******************************************************************************/
 globle void QueryFindAllInstances(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    QUERY_CLASS *qclasses;
@@ -402,6 +408,7 @@ globle void QueryFindAllInstances(
  ******************************************************************************/
 globle void QueryDoForInstance(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    QUERY_CLASS *qclasses;
@@ -443,6 +450,7 @@ globle void QueryDoForInstance(
  ******************************************************************************/
 globle void QueryDoForAllInstances(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    QUERY_CLASS *qclasses;
@@ -491,6 +499,7 @@ globle void QueryDoForAllInstances(
  ******************************************************************************/
 globle void DelayedQueryDoForAllInstances(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    QUERY_CLASS *qclasses;
@@ -555,7 +564,8 @@ globle void DelayedQueryDoForAllInstances(
   NOTES        : None
  *******************************************************/
 static void PushQueryCore(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    QUERY_STACK *qptr;
 
@@ -576,7 +586,8 @@ static void PushQueryCore(
   NOTES        : Assumes stack is not empty
  ******************************************************/
 static void PopQueryCore(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    QUERY_STACK *qptr;
 
@@ -598,6 +609,7 @@ static void PopQueryCore(
  ***************************************************/
 static QUERY_CORE *FindQueryCore(
   void *theEnv,
+  EXEC_STATUS,
   int depth)
   {
    QUERY_STACK *qptr;
@@ -635,6 +647,7 @@ static QUERY_CORE *FindQueryCore(
  **********************************************************/
 static QUERY_CLASS *DetermineQueryClasses(
   void *theEnv,
+  EXEC_STATUS,
   EXPRESSION *classExp,
   char *func,
   unsigned *rcnt)
@@ -698,6 +711,7 @@ static QUERY_CLASS *DetermineQueryClasses(
  *************************************************************/
 static QUERY_CLASS *FormChain(
   void *theEnv,
+  EXEC_STATUS,
   char *func,
   DATA_OBJECT *val)
   {
@@ -799,6 +813,7 @@ static QUERY_CLASS *FormChain(
  ******************************************************/
 static void DeleteQueryClasses(
   void *theEnv,
+  EXEC_STATUS,
   QUERY_CLASS *qlist)
   {
    QUERY_CLASS *tmp;
@@ -833,6 +848,7 @@ static void DeleteQueryClasses(
  ************************************************************/
 static int TestForFirstInChain(
   void *theEnv,
+  EXEC_STATUS,
   QUERY_CLASS *qchain,
   int indx)
   {
@@ -873,6 +889,7 @@ static int TestForFirstInChain(
  *****************************************************************/
 static int TestForFirstInstanceInClass(
   void *theEnv,
+  EXEC_STATUS,
   struct defmodule *theModule,
   int id,
   DEFCLASS *cls,
@@ -951,6 +968,7 @@ static int TestForFirstInstanceInClass(
  ************************************************************/
 static void TestEntireChain(
   void *theEnv,
+  EXEC_STATUS,
   QUERY_CLASS *qchain,
   int indx)
   {
@@ -987,6 +1005,7 @@ static void TestEntireChain(
  *****************************************************************/
 static void TestEntireClass(
   void *theEnv,
+  EXEC_STATUS,
   struct defmodule *theModule,
   int id,
   DEFCLASS *cls,
@@ -1074,7 +1093,8 @@ static void TestEntireClass(
   NOTES        : Solutions are stored as sequential arrays of INSTANCE_TYPE *
  ***************************************************************************/
 static void AddSolution(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    QUERY_SOLN *new_soln;
    register unsigned i;
@@ -1103,7 +1123,8 @@ static void AddSolution(
   NOTES        : Assumes QueryCore->soln_set != 0
  ***************************************************/
 static void PopQuerySoln(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    InstanceQueryData(theEnv)->QueryCore->soln_bottom = InstanceQueryData(theEnv)->QueryCore->soln_set;
    InstanceQueryData(theEnv)->QueryCore->soln_set = InstanceQueryData(theEnv)->QueryCore->soln_set->nxt;

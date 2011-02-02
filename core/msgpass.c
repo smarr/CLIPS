@@ -95,6 +95,7 @@ static void EarlySlotBindError(void *,INSTANCE_TYPE *,DEFCLASS *,unsigned);
  *****************************************************/
 globle void DirectMessage(
   void *theEnv,
+  EXEC_STATUS,
   SYMBOL_HN *msg,
   INSTANCE_TYPE *ins,
   DATA_OBJECT *resultbuf,
@@ -128,6 +129,7 @@ globle void DirectMessage(
  ***************************************************/
 globle void EnvSend(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *idata,
   char *msg,
   char *args,
@@ -173,6 +175,7 @@ globle void EnvSend(
  *****************************************************/
 globle void DestroyHandlerLinks(
   void *theEnv,
+  EXEC_STATUS,
   HANDLER_LINK *mhead)
   {
    HANDLER_LINK *tmp;
@@ -199,6 +202,7 @@ globle void DestroyHandlerLinks(
  ***********************************************************************/
 globle void SendCommand(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    EXPRESSION args;
@@ -237,6 +241,7 @@ globle void SendCommand(
  ***************************************************/
 globle DATA_OBJECT *GetNthMessageArgument(
   void *theEnv,
+  EXEC_STATUS,
   int n)
   {
    return(&ProceduralPrimitiveData(theEnv)->ProcParamArray[n]);
@@ -254,7 +259,8 @@ globle DATA_OBJECT *GetNthMessageArgument(
   NOTES        : H/L Syntax: (next-handlerp)
  *****************************************************/
 globle int NextHandlerAvailable(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    if (MessageHandlerData(theEnv)->CurrentCore == NULL)
      return(FALSE);
@@ -421,6 +427,7 @@ globle void CallNextHandler(
  *************************************************************************/
 globle void FindApplicableOfName(
   void *theEnv,
+  EXEC_STATUS,
   DEFCLASS *cls,
   HANDLER_LINK *tops[4],
   HANDLER_LINK *bots[4],
@@ -481,6 +488,7 @@ globle void FindApplicableOfName(
  *************************************************************************/
 globle HANDLER_LINK *JoinHandlerLinks(
   void *theEnv,
+  EXEC_STATUS,
   HANDLER_LINK *tops[4],
   HANDLER_LINK *bots[4],
   SYMBOL_HN *mname)
@@ -532,6 +540,7 @@ globle HANDLER_LINK *JoinHandlerLinks(
 #endif
 globle void PrintHandlerSlotGetFunction(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   void *theValue)
   {
@@ -583,6 +592,7 @@ globle void PrintHandlerSlotGetFunction(
  ***************************************************/
 globle intBool HandlerSlotGetFunction(
   void *theEnv,
+  EXEC_STATUS,
   void *theValue,
   DATA_OBJECT *theResult)
   {
@@ -655,6 +665,7 @@ HandlerGetError:
 #endif
 globle void PrintHandlerSlotPutFunction(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   void *theValue)
   {
@@ -712,6 +723,7 @@ globle void PrintHandlerSlotPutFunction(
  ***************************************************/
 globle intBool HandlerSlotPutFunction(
   void *theEnv,
+  EXEC_STATUS,
   void *theValue,
   DATA_OBJECT *theResult)
   {
@@ -810,6 +822,7 @@ HandlerPutError2:
  *****************************************************/
 globle void DynamicHandlerGetSlot(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    INSTANCE_SLOT *sp;
@@ -862,6 +875,7 @@ globle void DynamicHandlerGetSlot(
  ***********************************************************/
 globle void DynamicHandlerPutSlot(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *theResult)
   {
    INSTANCE_SLOT *sp;
@@ -937,6 +951,7 @@ globle void DynamicHandlerPutSlot(
  *****************************************************/
 static void PerformMessage(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result,
   EXPRESSION *args,
   SYMBOL_HN *mname)
@@ -1148,6 +1163,7 @@ static void PerformMessage(
  *****************************************************************************/
 static HANDLER_LINK *FindApplicableHandlers(
   void *theEnv,
+  EXEC_STATUS,
   DEFCLASS *cls,
   SYMBOL_HN *mname)
   {
@@ -1183,6 +1199,7 @@ static HANDLER_LINK *FindApplicableHandlers(
  ***************************************************************/
 static void CallHandlers(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
 #if WIN_BTC
@@ -1355,6 +1372,7 @@ static void CallHandlers(
  ********************************************************/
 static void EarlySlotBindError(
   void *theEnv,
+  EXEC_STATUS,
   INSTANCE_TYPE *theInstance,
   DEFCLASS *theDefclass,
   unsigned slotID)

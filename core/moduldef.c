@@ -67,7 +67,8 @@
 /* InitializeDefmodules: Initializes the defmodule construct. */
 /**************************************************************/
 globle void AllocateDefmoduleGlobals(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    AllocateEnvironmentData(theEnv,DEFMODULE_DATA,sizeof(struct defmoduleData),NULL);
    AddEnvironmentCleanupFunction(theEnv,"defmodules",DeallocateDefmoduleData,-1000);
@@ -80,7 +81,8 @@ globle void AllocateDefmoduleGlobals(
 /*    data for the defmodule construct.             */
 /****************************************************/
 static void DeallocateDefmoduleData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct moduleStackItem *tmpMSPtr, *nextMSPtr;
    struct moduleItem *tmpMIPtr, *nextMIPtr;
@@ -158,7 +160,8 @@ static void DeallocateDefmoduleData(
 /* InitializeDefmodules: Initializes the defmodule construct. */
 /**************************************************************/
 globle void InitializeDefmodules(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DefmoduleBasicCommands(theEnv);
 
@@ -188,6 +191,7 @@ globle void InitializeDefmodules(
 /******************************************************/
 globle int RegisterModuleItem(
    void *theEnv,
+  EXEC_STATUS,
    char *theItem,
    void *(*allocateFunction)(void *),
    void (*freeFunction)(void *,void *),
@@ -225,7 +229,8 @@ globle int RegisterModuleItem(
 /* GetListOfModuleItems: Returns the list of module items. */
 /***********************************************************/
 globle struct moduleItem *GetListOfModuleItems(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return (DefmoduleData(theEnv)->ListOfModuleItems);
   }
@@ -234,7 +239,8 @@ globle struct moduleItem *GetListOfModuleItems(
 /* GetNumberOfModuleItems: Returns the number of module items. */
 /***************************************************************/
 globle int GetNumberOfModuleItems(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return (DefmoduleData(theEnv)->NumberOfModuleItems);
   }
@@ -245,6 +251,7 @@ globle int GetNumberOfModuleItems(
 /********************************************************/
 globle struct moduleItem *FindModuleItem(
   void *theEnv,
+  EXEC_STATUS,
   char *theName)
   {
    struct moduleItem *theModuleItem;
@@ -262,7 +269,8 @@ globle struct moduleItem *FindModuleItem(
 /*   to the current module.               */
 /******************************************/
 globle void *EnvGetCurrentModule(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return ((void *) DefmoduleData(theEnv)->CurrentModule);
   }
@@ -272,6 +280,7 @@ globle void *EnvGetCurrentModule(
 /**************************************************************/
 globle void *EnvSetCurrentModule(
   void *theEnv,
+  EXEC_STATUS,
   void *xNewValue)
   {
    struct defmodule *newValue = (struct defmodule *) xNewValue;
@@ -320,7 +329,8 @@ globle void *EnvSetCurrentModule(
 /*   functions                                          */
 /********************************************************/
 globle void SaveCurrentModule(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    MODULE_STACK_ITEM *tmp;
 
@@ -338,7 +348,8 @@ globle void SaveCurrentModule(
 /*   functions to previous state                          */
 /**********************************************************/
 globle void RestoreCurrentModule(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    MODULE_STACK_ITEM *tmp;
 
@@ -357,6 +368,7 @@ globle void RestoreCurrentModule(
 /*************************************************************/
 globle void *GetModuleItem(
   void *theEnv,
+  EXEC_STATUS,
   struct defmodule *theModule,
   int moduleItemIndex)
   {
@@ -378,6 +390,7 @@ globle void *GetModuleItem(
 /************************************************************/
 globle void SetModuleItem(
   void *theEnv,
+  EXEC_STATUS,
   struct defmodule *theModule,
   int moduleItemIndex,
   void *newValue)
@@ -396,7 +409,8 @@ globle void SetModuleItem(
 /* CreateMainModule: Creates the default MAIN module. */
 /******************************************************/
 globle void CreateMainModule(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct defmodule *newDefmodule;
    struct moduleItem *theItem;
@@ -467,6 +481,7 @@ globle void CreateMainModule(
 /*********************************************************************/
 globle void SetListOfDefmodules(
   void *theEnv,
+  EXEC_STATUS,
   void *defmodulePtr)
   {
    DefmoduleData(theEnv)->ListOfDefmodules = (struct defmodule *) defmodulePtr;
@@ -483,6 +498,7 @@ globle void SetListOfDefmodules(
 /********************************************************************/
 globle void *EnvGetNextDefmodule(
   void *theEnv,
+  EXEC_STATUS,
   void *defmodulePtr)
   {
    if (defmodulePtr == NULL)
@@ -500,6 +516,7 @@ globle void *EnvGetNextDefmodule(
 #endif
 globle char *EnvGetDefmoduleName(
   void *theEnv,
+  EXEC_STATUS,
   void *defmodulePtr)
   { 
 #if MAC_MCW || WIN_MCW || MAC_XCD
@@ -518,6 +535,7 @@ globle char *EnvGetDefmoduleName(
 #endif
 globle char *EnvGetDefmodulePPForm(
   void *theEnv,
+  EXEC_STATUS,
   void *defmodulePtr)
   { 
 #if MAC_MCW || WIN_MCW || MAC_XCD
@@ -534,7 +552,8 @@ globle char *EnvGetDefmodulePPForm(
 /*   from the current environment.             */
 /***********************************************/
 globle void RemoveAllDefmodules(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct defmodule *nextDefmodule;
 
@@ -555,6 +574,7 @@ globle void RemoveAllDefmodules(
 /************************************************************/
 static void ReturnDefmodule(
   void *theEnv,
+  EXEC_STATUS,
   struct defmodule *theDefmodule,
   intBool environmentClear)
   {
@@ -666,6 +686,7 @@ static void ReturnDefmodule(
 /**********************************************************************/
 globle void *EnvFindDefmodule(
   void *theEnv,
+  EXEC_STATUS,
   char *defmoduleName)
   {
    struct defmodule *defmodulePtr;
@@ -690,7 +711,8 @@ globle void *EnvFindDefmodule(
 /*   for the get-current-module command.         */
 /*************************************************/
 globle void *GetCurrentModuleCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct defmodule *theModule;
 
@@ -708,7 +730,8 @@ globle void *GetCurrentModuleCommand(
 /*   for the set-current-module command.         */
 /*************************************************/
 globle void *SetCurrentModuleCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DATA_OBJECT argPtr;
    char *argument;
@@ -760,6 +783,7 @@ globle void *SetCurrentModuleCommand(
 /*************************************************/
 globle void AddAfterModuleChangeFunction(
   void *theEnv,
+  EXEC_STATUS,
   char *name,
   void (*func)(void *),
   int priority)
@@ -773,7 +797,8 @@ globle void AddAfterModuleChangeFunction(
 /*   for the illegal use of a module specifier. */
 /************************************************/
 globle void IllegalModuleSpecifierMessage(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    PrintErrorID(theEnv,"MODULDEF",1,TRUE);
    EnvPrintRouter(theEnv,WERROR,"Illegal use of the module specifier.\n");

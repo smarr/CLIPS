@@ -54,7 +54,8 @@
 /* DefmoduleBasicCommands: Initializes basic defmodule commands. */
 /*****************************************************************/
 globle void DefmoduleBasicCommands(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    EnvAddClearFunction(theEnv,"defmodule",ClearDefmodules,2000);
 
@@ -85,7 +86,8 @@ globle void DefmoduleBasicCommands(
 /*   the clear command. Creates the MAIN module.         */
 /*********************************************************/
 static void ClearDefmodules(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
 #if (BLOAD || BLOAD_AND_BSAVE || BLOAD_ONLY) && (! RUN_TIME)
    if (Bloaded(theEnv) == TRUE) return;
@@ -110,6 +112,7 @@ static void ClearDefmodules(
 /******************************************/
 static void SaveDefmodules(
   void *theEnv,
+  EXEC_STATUS,
   void *theModule,
   char *logicalName)
   {
@@ -129,6 +132,7 @@ static void SaveDefmodules(
 /*************************************************/
 globle void EnvGetDefmoduleList(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
    OldGetConstructList(theEnv,returnValue,EnvGetNextDefmodule,EnvGetDefmoduleName); 
@@ -141,7 +145,8 @@ globle void EnvGetDefmoduleList(
 /*   for the ppdefmodule command.           */
 /********************************************/
 globle void PPDefmoduleCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    char *defmoduleName;
 
@@ -159,6 +164,7 @@ globle void PPDefmoduleCommand(
 /*************************************/
 globle int PPDefmodule(
   void *theEnv,
+  EXEC_STATUS,
   char *defmoduleName,
   char *logicalName)
   {
@@ -181,7 +187,8 @@ globle int PPDefmodule(
 /*   for the list-defmodules command.          */
 /***********************************************/
 globle void ListDefmodulesCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    if (EnvArgCountCheck(theEnv,execStatus,"list-defmodules",EXACTLY,0) == -1) return;
 
@@ -194,6 +201,7 @@ globle void ListDefmodulesCommand(
 /***************************************/
 globle void EnvListDefmodules(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName)
   {
    void *theModule;

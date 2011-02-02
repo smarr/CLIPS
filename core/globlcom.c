@@ -50,7 +50,8 @@
 /* DefglobalCommandDefinitions: Defines defglobal commands. */
 /************************************************************/
 globle void DefglobalCommandDefinitions(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
 #if ! RUN_TIME
    EnvDefineFunction2(theEnv,"set-reset-globals",'b',
@@ -75,7 +76,8 @@ globle void DefglobalCommandDefinitions(
 /*   for the get-reset-globals command.         */
 /************************************************/
 globle int SetResetGlobalsCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    int oldValue;
    DATA_OBJECT arg_ptr;
@@ -117,6 +119,7 @@ globle int SetResetGlobalsCommand(
 /****************************************/
 globle intBool EnvSetResetGlobals(
   void *theEnv,
+  EXEC_STATUS,
   int value)
   {
    int ov;
@@ -131,7 +134,8 @@ globle intBool EnvSetResetGlobals(
 /*   for the get-reset-globals command.         */
 /************************************************/
 globle int GetResetGlobalsCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    int oldValue;
 
@@ -148,7 +152,8 @@ globle int GetResetGlobalsCommand(
 /*   for the get-reset-globals command. */
 /****************************************/
 globle intBool EnvGetResetGlobals(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {   
    return(DefglobalData(theEnv)->ResetGlobals); 
   }
@@ -160,7 +165,8 @@ globle intBool EnvGetResetGlobals(
 /*   for the show-defglobals command.          */
 /***********************************************/
 globle void ShowDefglobalsCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct defmodule *theModule;
    int numArgs, error;
@@ -184,6 +190,7 @@ globle void ShowDefglobalsCommand(
 /***************************************/
 globle void EnvShowDefglobals(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   void *vTheModule)
   {
@@ -257,6 +264,7 @@ globle void EnvShowDefglobals(
 /*****************************************************/
 static void PrintDefglobalValueForm(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   void *vTheGlobal)
   {

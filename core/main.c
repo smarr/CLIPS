@@ -58,7 +58,7 @@ int main(
   char *argv[])
   {
    void *theEnv;
-   
+   // Lode: TODO EXEC_STATUS ?
    theEnv = CreateEnvironment();
    RerouteStdin(theEnv,argc,argv);
    CommandLoop(theEnv);

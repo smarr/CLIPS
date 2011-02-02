@@ -65,7 +65,8 @@
 /*   the procedural functions.                */
 /**********************************************/
 globle void ProceduralFunctionDefinitions(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    AllocateEnvironmentData(theEnv,PRCDRFUN_DATA,sizeof(struct procedureFunctionData),DeallocateProceduralFunctionData);
 
@@ -99,7 +100,8 @@ globle void ProceduralFunctionDefinitions(
 /*    data for procedural functions.                         */
 /*************************************************************/
 static void DeallocateProceduralFunctionData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DATA_OBJECT_PTR nextPtr, garbagePtr;
 
@@ -119,6 +121,7 @@ static void DeallocateProceduralFunctionData(
 /***************************************/
 globle void WhileFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
    DATA_OBJECT theResult;
@@ -182,6 +185,7 @@ globle void WhileFunction(
 /**********************************************/
 globle void LoopForCountFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR loopResult)
   {
    DATA_OBJECT arg_ptr;
@@ -247,7 +251,8 @@ globle void LoopForCountFunction(
 /* GetLoopCount                                 */
 /************************************************/
 globle long long GetLoopCount(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    int depth;
    LOOP_COUNTER_STACK *tmpCounter;
@@ -268,6 +273,7 @@ globle long long GetLoopCount(
 /************************************/
 globle void IfFunction(
   void *theEnv,
+  EXEC_STATUS,
   EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
@@ -393,6 +399,7 @@ globle void IfFunction(
 /**************************************/
 globle void BindFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
    DATA_OBJECT *theBind, *lastBind;
@@ -516,6 +523,7 @@ globle void BindFunction(
 /*******************************************/
 globle intBool GetBoundVariable(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR vPtr,
   SYMBOL_HN *varName)
   {
@@ -541,7 +549,8 @@ globle intBool GetBoundVariable(
 /*   list of currently bound local variables.    */
 /*************************************************/
 globle void FlushBindList(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    ReturnValues(theEnv,ProcedureFunctionData(theEnv)->BindList,TRUE);
    ProcedureFunctionData(theEnv)->BindList = NULL;
@@ -553,6 +562,7 @@ globle void FlushBindList(
 /***************************************/
 globle void PrognFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
    struct expr *argPtr;
@@ -590,6 +600,7 @@ globle void PrognFunction(
 /*****************************************************************/
 globle void ReturnFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR result)
   {
    if (EnvRtnArgCount(theEnv) == 0)
@@ -606,7 +617,8 @@ globle void ReturnFunction(
 /* BreakFunction: H/L access routine for the break function.   */
 /***************************************************************/
 globle void BreakFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    ProcedureFunctionData(theEnv)->BreakFlag = TRUE;
   }
@@ -616,6 +628,7 @@ globle void BreakFunction(
 /*****************************************************************/
 globle void SwitchFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR result)
   {
    DATA_OBJECT switch_val,case_val;

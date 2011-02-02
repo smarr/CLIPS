@@ -76,6 +76,7 @@
 /***********************************************************************/
 globle intBool AddLogicalDependencies(
   void *theEnv,
+  EXEC_STATUS,
   struct patternEntity *theEntity,
   int existingEntity)
   {
@@ -178,6 +179,7 @@ globle struct partialMatch *FindLogicalBind(
 /*********************************************************************/
 globle void RemoveEntityDependencies(
   void *theEnv,
+  EXEC_STATUS,
   struct patternEntity *theEntity)
   {
    struct dependency *fdPtr, *nextPtr, *theList;
@@ -237,6 +239,7 @@ globle void RemoveEntityDependencies(
 /********************************************************************/
 globle void ReturnEntityDependencies(
   void *theEnv,
+  EXEC_STATUS,
   struct patternEntity *theEntity)
   {
    struct dependency *fdPtr, *nextPtr;
@@ -262,6 +265,7 @@ globle void ReturnEntityDependencies(
 /*******************************************************************/
 static struct dependency *DetachAssociatedDependencies(
   void *theEnv,
+  EXEC_STATUS,
   struct dependency *theList,
   void *theEntity)
   {
@@ -296,6 +300,7 @@ static struct dependency *DetachAssociatedDependencies(
 /**************************************************************************/
 globle void RemovePMDependencies(
   void *theEnv,
+  EXEC_STATUS,
   struct partialMatch *theBinds)
   {
    struct dependency *fdPtr, *nextPtr, *theList;
@@ -326,6 +331,7 @@ globle void RemovePMDependencies(
 /************************************************************/
 globle void DestroyPMDependencies(
   void *theEnv,
+  EXEC_STATUS,
   struct partialMatch *theBinds)
   {
    struct dependency *fdPtr, *nextPtr;
@@ -355,6 +361,7 @@ globle void DestroyPMDependencies(
 /************************************************************************/
 globle void RemoveLogicalSupport(
   void *theEnv,
+  EXEC_STATUS,
   struct partialMatch *theBinds)
   {
    struct dependency *dlPtr, *tempPtr, *theList;
@@ -434,7 +441,8 @@ globle void RemoveLogicalSupport(
 /*   lost their logical support.                                    */
 /********************************************************************/
 globle void ForceLogicalRetractions(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct dependency *tempPtr;
    struct patternEntity *theEntity;
@@ -492,6 +500,7 @@ globle void ForceLogicalRetractions(
 /****************************************************************/
 globle void Dependencies(
   void *theEnv,
+  EXEC_STATUS,
   struct patternEntity *theEntity)
   {
    struct dependency *fdPtr;
@@ -527,6 +536,7 @@ globle void Dependencies(
 /************************************************************/
 globle void Dependents(
   void *theEnv,
+  EXEC_STATUS,
   struct patternEntity *theEntity)
   {
    struct patternEntity *entityPtr = NULL;
@@ -593,7 +603,8 @@ globle void Dependents(
 /*   for the dependencies command.           */
 /*********************************************/
 globle void DependenciesCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DATA_OBJECT item;
    void *ptr;
@@ -616,7 +627,8 @@ globle void DependenciesCommand(
 /*   for the dependents command.           */
 /*******************************************/
 globle void DependentsCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DATA_OBJECT item;
    void *ptr;

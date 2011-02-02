@@ -61,7 +61,8 @@
 /*    for use with the constructs-to-c command.                */
 /***************************************************************/
 globle void DefmoduleCompilerSetup(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DefmoduleData(theEnv)->DefmoduleCodeItem = 
       AddCodeGeneratorItem(theEnv,"defmodule",200,BeforeDefmodulesToCode,
@@ -74,7 +75,8 @@ globle void DefmoduleCompilerSetup(
 /*   data structures are written to a file as C code       */
 /***********************************************************/
 static void BeforeDefmodulesToCode(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    int value = 0;
    struct defmodule *theModule;
@@ -91,6 +93,7 @@ static void BeforeDefmodulesToCode(
 /*************************************************************/
 globle void PrintDefmoduleReference(
   void *theEnv,
+  EXEC_STATUS,
   FILE *theFile,
   struct defmodule *theModule)
   {
@@ -109,6 +112,7 @@ globle void PrintDefmoduleReference(
 #endif
 static void InitDefmoduleCode(
   void *theEnv,
+  EXEC_STATUS,
   FILE *initFP,
   int imageID,
   int maxIndices)
@@ -130,6 +134,7 @@ static void InitDefmoduleCode(
 /***********************************************************/
 static int ConstructToCode(
   void *theEnv,
+  EXEC_STATUS,
   char *fileName,
   char *pathName,
   char *fileNameBuffer,
@@ -314,6 +319,7 @@ static int ConstructToCode(
 /************************************************************/
 static int PortItemsToCode(
   void *theEnv,
+  EXEC_STATUS,
   char *fileName,
   char *pathName,
   char *fileNameBuffer,
@@ -408,6 +414,7 @@ static int PortItemsToCode(
 /*********************************************************************/
 static struct portItem *GetNextPortItem(
   void *theEnv,
+  EXEC_STATUS,
   struct defmodule **theDefmodule,
   struct portItem **thePortItem,
   int *importChecked,

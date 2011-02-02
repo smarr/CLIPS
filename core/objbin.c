@@ -203,7 +203,8 @@ static void DeallocateObjectBinaryData(void *);
   NOTES        : None
  ***********************************************************/
 globle void SetupObjectsBload(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    AllocateEnvironmentData(theEnv,OBJECTBIN_DATA,sizeof(struct objectBinaryData),DeallocateObjectBinaryData);
    
@@ -228,7 +229,8 @@ globle void SetupObjectsBload(
 /*    data for object binary functionality.            */
 /*******************************************************/
 static void DeallocateObjectBinaryData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    size_t space;
    long i;
@@ -298,6 +300,7 @@ static void DeallocateObjectBinaryData(
  ***************************************************/
 globle void *BloadDefclassModuleReference(
   void *theEnv,
+  EXEC_STATUS,
   int theIndex)
   {
    return ((void *) &ObjectBinaryData(theEnv)->ModuleArray[theIndex]);
@@ -326,7 +329,8 @@ globle void *BloadDefclassModuleReference(
                    will be bsaved in order of binary list)
  ***************************************************************************/
 static void BsaveObjectsFind(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    register unsigned i;
    SLOT_NAME *snp;
@@ -389,6 +393,7 @@ static void BsaveObjectsFind(
 #endif
 static void MarkDefclassItems(
   void *theEnv,
+  EXEC_STATUS,
   struct constructHeader *theDefclass,
   void *buf)
   {
@@ -468,6 +473,7 @@ static void MarkDefclassItems(
  ***************************************************/
 static void BsaveObjectsExpressions(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp)
   {
    if ((ObjectBinaryData(theEnv)->ClassCount == 0L) && (ObjectBinaryData(theEnv)->HandlerCount == 0L))
@@ -498,6 +504,7 @@ static void BsaveObjectsExpressions(
  ***************************************************/
 static void BsaveDefaultSlotExpressions(
   void *theEnv,
+  EXEC_STATUS,
   struct constructHeader *theDefclass,
   void *buf)
   {
@@ -538,6 +545,7 @@ static void BsaveDefaultSlotExpressions(
  ***************************************************/
 static void BsaveHandlerActionExpressions(
   void *theEnv,
+  EXEC_STATUS,
   struct constructHeader *theDefclass,
   void *buf)
   {
@@ -566,6 +574,7 @@ static void BsaveHandlerActionExpressions(
  *************************************************************************************/
 static void BsaveStorageObjects(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp)
   {
    size_t space;
@@ -603,6 +612,7 @@ static void BsaveStorageObjects(
  *************************************************************************************/
 static void BsaveObjects(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp)
   {
    size_t space;
@@ -724,6 +734,7 @@ static void BsaveObjects(
  ***************************************************/
 static void BsaveDefclass(
   void *theEnv,
+  EXEC_STATUS,
   struct constructHeader *theDefclass,
   void *buf)
   {
@@ -809,6 +820,7 @@ static void BsaveDefclass(
  ***************************************************/
 static void BsaveClassLinks(
   void *theEnv,
+  EXEC_STATUS,
   struct constructHeader *theDefclass,
   void *buf)
   {
@@ -847,6 +859,7 @@ static void BsaveClassLinks(
  ***************************************************/
 static void BsaveSlots(
   void *theEnv,
+  EXEC_STATUS,
   struct constructHeader *theDefclass,
   void *buf)
   {
@@ -907,6 +920,7 @@ static void BsaveSlots(
 #endif
 static void BsaveTemplateSlots(
   void *theEnv,
+  EXEC_STATUS,
   struct constructHeader *theDefclass,
   void *buf)
   {
@@ -938,6 +952,7 @@ static void BsaveTemplateSlots(
 #endif
 static void BsaveSlotMap(
   void *theEnv,
+  EXEC_STATUS,
   struct constructHeader *theDefclass,
   void *buf)
   {
@@ -962,6 +977,7 @@ static void BsaveSlotMap(
  ************************************************************/
 static void BsaveHandlers(
   void *theEnv,
+  EXEC_STATUS,
   struct constructHeader *theDefclass,
   void *buf)
   {
@@ -1005,6 +1021,7 @@ static void BsaveHandlers(
 #endif
 static void BsaveHandlerMap(
   void *theEnv,
+  EXEC_STATUS,
   struct constructHeader *theDefclass,
   void *buf)
   {
@@ -1035,7 +1052,8 @@ static void BsaveHandlerMap(
                  Bload fails if there are still classes in the system!!
  ***********************************************************************/
 static void BloadStorageObjects(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    size_t space;
    long counts[9];
@@ -1117,7 +1135,8 @@ static void BloadStorageObjects(
   NOTES        : Assumes all loading is finished
  **************************************************************/
 static void BloadObjects(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    size_t space;
 
@@ -1161,7 +1180,8 @@ static void BloadObjects(
                  codes in the source file CONSTANT.H
  ***************************************************/
 static void UpdatePrimitiveClassesMap(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    register unsigned i;
 
@@ -1174,6 +1194,7 @@ static void UpdatePrimitiveClassesMap(
  *********************************************************/
 static void UpdateDefclassModule(
   void *theEnv,
+  EXEC_STATUS,
   void *buf,
   long obji)
   {
@@ -1186,6 +1207,7 @@ static void UpdateDefclassModule(
 
 static void UpdateDefclass(
   void *theEnv,
+  EXEC_STATUS,
   void *buf,
   long obji)
   {
@@ -1239,6 +1261,7 @@ static void UpdateDefclass(
 
 static void UpdateLink(
   void *theEnv,
+  EXEC_STATUS,
   void *buf,
   long obji)
   {
@@ -1250,6 +1273,7 @@ static void UpdateLink(
 
 static void UpdateSlot(
   void *theEnv,
+  EXEC_STATUS,
   void *buf,
   long obji)
   {
@@ -1301,6 +1325,7 @@ static void UpdateSlot(
 
 static void UpdateSlotName(
   void *theEnv,
+  EXEC_STATUS,
   void *buf,
   long obji)
   {
@@ -1321,6 +1346,7 @@ static void UpdateSlotName(
 
 static void UpdateTemplateSlot(
   void *theEnv,
+  EXEC_STATUS,
   void *buf,
   long obji)
   {
@@ -1329,6 +1355,7 @@ static void UpdateTemplateSlot(
 
 static void UpdateHandler(
   void *theEnv,
+  EXEC_STATUS,
   void *buf,
   long obji)
   {
@@ -1366,7 +1393,8 @@ static void UpdateHandler(
   NOTES        : None
  ***************************************************************/
 static void ClearBloadObjects(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    register long i;
    size_t space;

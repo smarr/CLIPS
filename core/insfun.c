@@ -115,6 +115,7 @@ static void NetworkModifyForSharedSlot(void *,int,DEFCLASS *,SLOT_DESC *);
 #endif
 globle void EnvIncrementInstanceCount(
   void *theEnv,
+  EXEC_STATUS,
   void *vptr)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
@@ -138,6 +139,7 @@ globle void EnvIncrementInstanceCount(
 #endif
 globle void EnvDecrementInstanceCount(
   void *theEnv,
+  EXEC_STATUS,
   void *vptr)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
@@ -157,7 +159,8 @@ globle void EnvDecrementInstanceCount(
   NOTES        : None
  ***************************************************/
 globle void InitializeInstanceTable(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    register int i;
 
@@ -179,7 +182,8 @@ globle void InitializeInstanceTable(
   NOTES        : None
  *******************************************************/
 globle void CleanupInstances(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    IGARBAGE *gprv,*gtmp,*dump;
 
@@ -247,7 +251,8 @@ globle unsigned HashInstance(
   NOTES        : None
  ***************************************************/
 globle void DestroyAllInstances(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    INSTANCE_TYPE *iptr;
    int svmaintain;
@@ -284,6 +289,7 @@ globle void DestroyAllInstances(
  ******************************************************/
 globle void RemoveInstanceData(
   void *theEnv,
+  EXEC_STATUS,
   INSTANCE_TYPE *ins)
   {
    long i;
@@ -330,6 +336,7 @@ globle void RemoveInstanceData(
  ***************************************************************************/
 globle INSTANCE_TYPE *FindInstanceBySymbol(
   void *theEnv,
+  EXEC_STATUS,
   SYMBOL_HN *moduleAndInstanceName)
   {
    unsigned modulePosition,searchImports;
@@ -397,6 +404,7 @@ globle INSTANCE_TYPE *FindInstanceBySymbol(
  ***************************************************/
 globle INSTANCE_TYPE *FindInstanceInModule(
   void *theEnv,
+  EXEC_STATUS,
   SYMBOL_HN *instanceName,
   struct defmodule *theModule,
   struct defmodule *currentModule,
@@ -453,6 +461,7 @@ globle INSTANCE_TYPE *FindInstanceInModule(
  ********************************************************************/
 globle INSTANCE_SLOT *FindInstanceSlot(
   void *theEnv,
+  EXEC_STATUS,
   INSTANCE_TYPE *ins,
   SYMBOL_HN *sname)
   {
@@ -475,6 +484,7 @@ globle INSTANCE_SLOT *FindInstanceSlot(
  ********************************************************************/
 globle int FindInstanceTemplateSlot(
   void *theEnv,
+  EXEC_STATUS,
   DEFCLASS *cls,
   SYMBOL_HN *sname)
   {
@@ -508,6 +518,7 @@ globle int FindInstanceTemplateSlot(
  *******************************************************/
 globle int PutSlotValue(
   void *theEnv,
+  EXEC_STATUS,
   INSTANCE_TYPE *ins,
   INSTANCE_SLOT *sp,
   DATA_OBJECT *val,
@@ -542,6 +553,7 @@ globle int PutSlotValue(
  *******************************************************/
 globle int DirectPutSlotValue(
   void *theEnv,
+  EXEC_STATUS,
   INSTANCE_TYPE *ins,
   INSTANCE_SLOT *sp,
   DATA_OBJECT *val,
@@ -734,6 +746,7 @@ globle int DirectPutSlotValue(
  *******************************************************************/
 globle int ValidSlotValue(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *val,
   SLOT_DESC *sd,
   INSTANCE_TYPE *ins,
@@ -801,6 +814,7 @@ globle int ValidSlotValue(
  ********************************************************/
 globle INSTANCE_TYPE *CheckInstance(
   void *theEnv,
+  EXEC_STATUS,
   char *func)
   {
    INSTANCE_TYPE *ins;
@@ -852,6 +866,7 @@ globle INSTANCE_TYPE *CheckInstance(
  ***************************************************/
 globle void NoInstanceError(
   void *theEnv,
+  EXEC_STATUS,
   char *iname,
   char *func)
   {
@@ -876,6 +891,7 @@ globle void NoInstanceError(
  ***************************************************/
 globle void StaleInstanceAddress(
   void *theEnv,
+  EXEC_STATUS,
   char *func,
   int whichArg)
   {
@@ -901,7 +917,8 @@ globle void StaleInstanceAddress(
   NOTES        : Used by interfaces to update instance windows
  **********************************************************************/
 globle int EnvGetInstancesChanged(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return(InstanceData(theEnv)->ChangesToInstances);
   }
@@ -916,6 +933,7 @@ globle int EnvGetInstancesChanged(
  *******************************************************/
 globle void EnvSetInstancesChanged(
   void *theEnv,
+  EXEC_STATUS,
   int changed)
   {
    InstanceData(theEnv)->ChangesToInstances = changed;
@@ -936,6 +954,7 @@ globle void EnvSetInstancesChanged(
  *******************************************************************/
 globle void PrintSlot(
   void *theEnv,
+  EXEC_STATUS,
   char *logName,
   SLOT_DESC *sd,
   INSTANCE_TYPE *ins,
@@ -974,6 +993,7 @@ globle void PrintSlot(
  *****************************************************/
 globle void PrintInstanceNameAndClass(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   INSTANCE_TYPE *theInstance,
   intBool linefeedFlag)
@@ -997,6 +1017,7 @@ globle void PrintInstanceNameAndClass(
  ***************************************************/
 globle void PrintInstanceName(
   void *theEnv,
+  EXEC_STATUS,
   char *logName,
   void *vins)
   {
@@ -1029,6 +1050,7 @@ globle void PrintInstanceName(
  ***************************************************/
 globle void PrintInstanceLongForm(
   void *theEnv,
+  EXEC_STATUS,
   char *logName,
   void *vins)
   {
@@ -1086,6 +1108,7 @@ globle void PrintInstanceLongForm(
  ***************************************************/
 globle void DecrementObjectBasisCount(
   void *theEnv,
+  EXEC_STATUS,
   void *vins)
   {
    INSTANCE_TYPE *ins;
@@ -1133,6 +1156,7 @@ globle void DecrementObjectBasisCount(
  ***************************************************/
 globle void IncrementObjectBasisCount(
   void *theEnv,
+  EXEC_STATUS,
   void *vins)
   {
    INSTANCE_TYPE *ins;
@@ -1168,6 +1192,7 @@ globle void IncrementObjectBasisCount(
  ***************************************************/
 globle void MatchObjectFunction(
   void *theEnv,
+  EXEC_STATUS,
   void *vins)
   {
    ObjectNetworkAction(theEnv,OBJECT_ASSERT,(INSTANCE_TYPE *) vins,-1);
@@ -1190,6 +1215,7 @@ globle void MatchObjectFunction(
 #endif
 globle intBool NetworkSynchronized(
   void *theEnv,
+  EXEC_STATUS,
   void *vins)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
@@ -1225,6 +1251,7 @@ globle intBool NetworkSynchronized(
  *****************************************************/
 static INSTANCE_TYPE *FindImportedInstance(
   void *theEnv,
+  EXEC_STATUS,
   struct defmodule *theModule,
   struct defmodule *currentModule,
   INSTANCE_TYPE *startInstance)
@@ -1286,6 +1313,7 @@ static INSTANCE_TYPE *FindImportedInstance(
  *****************************************************/
 static void NetworkModifyForSharedSlot(
   void *theEnv,
+  EXEC_STATUS,
   int sharedTraversalID,
   DEFCLASS *cls,
   SLOT_DESC *sd)

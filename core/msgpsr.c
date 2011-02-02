@@ -103,6 +103,7 @@ static void GenHandlerSlotReference(void *,EXPRESSION *,unsigned short,SLOT_DESC
  ***********************************************************************/
 globle int ParseDefmessageHandler(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource)
   {
    DEFCLASS *cls;
@@ -314,6 +315,7 @@ globle int ParseDefmessageHandler(
  *******************************************************************************/
 globle void CreateGetAndPutHandlers(
   void *theEnv,
+  EXEC_STATUS,
   SLOT_DESC *sd)
   {
    char *className,*slotName;
@@ -417,6 +419,7 @@ globle void CreateGetAndPutHandlers(
  *****************************************************************/
 static intBool IsParameterSlotReference(
   void *theEnv,
+  EXEC_STATUS,
   char *pname)
   {
    if ((strncmp(pname,SELF_STRING,SELF_LEN) == 0) ?
@@ -451,6 +454,7 @@ static intBool IsParameterSlotReference(
  ****************************************************************************/
 static int SlotReferenceVar(
   void *theEnv,
+  EXEC_STATUS,
   EXPRESSION *varexp,
   void *userBuffer)
   {
@@ -503,6 +507,7 @@ static int SlotReferenceVar(
  ****************************************************************************/
 static int BindSlotReference(
   void *theEnv,
+  EXEC_STATUS,
   EXPRESSION *bindExp,
   void *userBuffer)
   {
@@ -574,6 +579,7 @@ static int BindSlotReference(
  *********************************************************/
 static SLOT_DESC *CheckSlotReference(
   void *theEnv,
+  EXEC_STATUS,
   DEFCLASS *theDefclass,
   int theType,
   void *theValue,
@@ -656,6 +662,7 @@ static SLOT_DESC *CheckSlotReference(
  ***************************************************/
 static void GenHandlerSlotReference(
   void *theEnv,
+  EXEC_STATUS,
   EXPRESSION *theExp,
   unsigned short theType,
   SLOT_DESC *sd)

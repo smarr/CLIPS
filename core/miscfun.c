@@ -80,7 +80,8 @@ struct miscFunctionData
 /* MiscFunctionDefinitions: Initializes miscellaneous functions. */
 /*****************************************************************/
 globle void MiscFunctionDefinitions(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    AllocateEnvironmentData(theEnv,MISCFUN_DATA,sizeof(struct miscFunctionData),NULL);
    MiscFunctionData(theEnv)->GensymNumber = 1;
@@ -131,6 +132,7 @@ globle void MiscFunctionDefinitions(
 /******************************************************************/
 globle void CreateFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
    StoreInMultifield(theEnv,execStatus,returnValue,GetFirstArgument(),TRUE);
@@ -140,7 +142,8 @@ globle void CreateFunction(
 /* SetgenFunction: H/L access routine for the setgen function.   */
 /*****************************************************************/
 globle long long SetgenFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    long long theLong;
    DATA_OBJECT theValue;
@@ -178,7 +181,8 @@ globle long long SetgenFunction(
 /*   for the gensym function.           */
 /****************************************/
 globle void *GensymFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    char genstring[128];
    
@@ -208,7 +212,8 @@ globle void *GensymFunction(
 /*   the gensym* function.                      */
 /************************************************/
 globle void *GensymStarFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    /*============================================*/
    /* The gensym* function accepts no arguments. */
@@ -228,7 +233,8 @@ globle void *GensymStarFunction(
 /*   the gensym* function.          */
 /************************************/
 globle void *GensymStar(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    char genstring[128];
    
@@ -258,7 +264,8 @@ globle void *GensymStar(
 /*   the random function.                   */
 /********************************************/
 globle long long RandomFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    int argCount;
    long long rv;
@@ -309,7 +316,8 @@ globle long long RandomFunction(
 /*   the seed function.                   */
 /******************************************/
 globle void SeedFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DATA_OBJECT theValue;
 
@@ -332,7 +340,8 @@ globle void SeedFunction(
 /*   the length$ function.                  */
 /********************************************/
 globle long long LengthFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DATA_OBJECT item;
 
@@ -374,7 +383,8 @@ globle long long LengthFunction(
 /*   for the release-mem function.         */
 /*******************************************/
 globle long long ReleaseMemCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    /*================================================*/
    /* The release-mem function accepts no arguments. */
@@ -395,7 +405,8 @@ globle long long ReleaseMemCommand(
 /*   for the conserve-mem command.        */
 /******************************************/
 globle void ConserveMemCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    char *argument;
    DATA_OBJECT theValue;
@@ -449,7 +460,8 @@ globle void ConserveMemCommand(
 /*   for the mem-used command.          */
 /****************************************/
 globle long long MemUsedCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    /*=============================================*/
    /* The mem-used function accepts no arguments. */
@@ -470,7 +482,8 @@ globle long long MemUsedCommand(
 /*   for the mem-requests command.          */
 /********************************************/
 globle long long MemRequestsCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    /*=================================================*/
    /* The mem-requests function accepts no arguments. */
@@ -493,7 +506,8 @@ globle long long MemRequestsCommand(
 /*   for the apropos command.           */
 /****************************************/
 globle void AproposCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    char *argument;
    DATA_OBJECT argPtr;
@@ -533,7 +547,8 @@ globle void AproposCommand(
 /*   for the options command.           */
 /****************************************/
 globle void OptionsCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    /*===========================================*/
    /* The options command accepts no arguments. */
@@ -797,7 +812,8 @@ EnvPrintRouter(theEnv,WDISPLAY,"Run time module is ");
 /*   for the operating system function.        */
 /***********************************************/
 globle void *OperatingSystemFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    EnvArgCountCheck(theEnv,"operating-system",EXACTLY,0);
 
@@ -857,6 +873,7 @@ globle void *OperatingSystemFunction(
  *******************************************************************/
 globle void ExpandFuncCall(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    EXPRESSION *newargexp,*fcallexp;
@@ -927,6 +944,7 @@ globle void ExpandFuncCall(
  **********************************************************************/
 globle void DummyExpandFuncMultifield(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    result->type = SYMBOL;
@@ -957,6 +975,7 @@ globle void DummyExpandFuncMultifield(
  **********************************************************************/
 static void ExpandFuncMultifield(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result,
   EXPRESSION *theExp,
   EXPRESSION **sto,
@@ -1030,7 +1049,8 @@ static void ExpandFuncMultifield(
   NOTES        : None
  ****************************************************************/
 globle void *CauseEvaluationError(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    SetEvaluationError(theEnv,TRUE);
    return((SYMBOL_HN *) EnvFalseSymbol(theEnv));
@@ -1047,7 +1067,8 @@ globle void *CauseEvaluationError(
   NOTES        : None
  ****************************************************************/
 globle intBool SetSORCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
 #if (! RUN_TIME) && (! BLOAD_ONLY)
    DATA_OBJECT arg;
@@ -1070,7 +1091,8 @@ globle intBool SetSORCommand(
   NOTES        : None
  ********************************************************************/
 globle void *GetFunctionRestrictions(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DATA_OBJECT temp;
    struct FunctionDefinition *fptr;
@@ -1095,6 +1117,7 @@ globle void *GetFunctionRestrictions(
 /*************************************************/
 globle void GetFunctionListFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *returnValue)
   {
    struct FunctionDefinition *theFunction;
@@ -1133,6 +1156,7 @@ globle void GetFunctionListFunction(
 /***************************************/
 globle void FuncallFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *returnValue)
   {
    int argCount, i, j;
@@ -1283,6 +1307,7 @@ globle void FuncallFunction(
 /***********************************/
 globle void NewFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *returnValue)
   {
    int theType;
@@ -1339,6 +1364,7 @@ globle void NewFunction(
 /************************************/
 globle void CallFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *returnValue)
   {
    int theType;
@@ -1425,6 +1451,7 @@ globle void CallFunction(
 /************************************/
 static int FindLanguageType(
   void *theEnv,
+  EXEC_STATUS,
   char *languageName)
   {
    int theType;
@@ -1443,7 +1470,8 @@ static int FindLanguageType(
 /*   for the time function.         */
 /************************************/
 globle double TimeFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    /*=========================================*/
    /* The time function accepts no arguments. */
@@ -1463,7 +1491,8 @@ globle double TimeFunction(
 /*   for the timer function.           */
 /***************************************/
 globle double TimerFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    int numa, i;
    double startTime;

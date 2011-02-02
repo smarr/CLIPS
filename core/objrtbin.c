@@ -122,7 +122,8 @@ static void DeallocateObjectReteBinaryData(void *);
   NOTES        : None
  ***********************************************************/
 globle void SetupObjectPatternsBload(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    AllocateEnvironmentData(theEnv,OBJECTRETEBIN_DATA,sizeof(struct objectReteBinaryData),DeallocateObjectReteBinaryData);
 
@@ -144,7 +145,8 @@ globle void SetupObjectPatternsBload(
 /*    data for object rete binary functionality.           */
 /***********************************************************/
 static void DeallocateObjectReteBinaryData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
 #if (BLOAD || BLOAD_ONLY || BLOAD_AND_BSAVE) && (! RUN_TIME)
    size_t space;
@@ -183,7 +185,8 @@ static void DeallocateObjectReteBinaryData(
   NOTES        : None
  ***************************************************/
 static void BsaveObjectPatternsFind(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    OBJECT_ALPHA_NODE *alphaPtr;
    OBJECT_PATTERN_NODE *patternPtr;
@@ -235,6 +238,7 @@ static void BsaveObjectPatternsFind(
  ****************************************************/
 static void BsaveStorageObjectPatterns(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp)
   {
    size_t space;
@@ -258,6 +262,7 @@ static void BsaveStorageObjectPatterns(
  ***************************************************/
 static void BsaveObjectPatterns(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp)
   {
    size_t space;
@@ -344,7 +349,8 @@ static void BsaveObjectPatterns(
   NOTES        : None
  ***************************************************/
 static void BloadStorageObjectPatterns(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    size_t space;
    long counts[2];
@@ -381,7 +387,8 @@ static void BloadStorageObjectPatterns(
   NOTES        : Assumes storage allocated previously
  ****************************************************/
 static void BloadObjectPatterns(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    size_t space;
    long i;
@@ -430,6 +437,7 @@ static void BloadObjectPatterns(
  ***************************************************/
 static void UpdateAlpha(
   void *theEnv,
+  EXEC_STATUS,
   void *buf,
   long obji)
   {
@@ -471,6 +479,7 @@ static void UpdateAlpha(
  ***************************************************/
 static void UpdatePattern(
   void *theEnv,
+  EXEC_STATUS,
   void *buf,
   long obji)
   {
@@ -508,7 +517,8 @@ static void UpdatePattern(
   NOTES        : None
  ***************************************************/
 static void ClearBloadObjectPatterns(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    size_t space;
    register long i;

@@ -124,7 +124,8 @@ static void DestroyObjectAlphaNodes(void *,OBJECT_ALPHA_NODE *);
   NOTES        : None
  ***************************************************/
 globle void InstallObjectPrimitives(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct entityRecord objectGVInfo1 = { "OBJ_GET_SLOT_JNVAR1", OBJ_GET_SLOT_JNVAR1,0,1,0,
                                              PrintObjectGetVarJN1,
@@ -233,7 +234,8 @@ globle void InstallObjectPrimitives(
 /*    data for the object rete network.              */
 /*****************************************************/
 static void DeallocateObjectReteData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    OBJECT_PATTERN_NODE *theNetwork;
    
@@ -251,6 +253,7 @@ static void DeallocateObjectReteData(
 /****************************************************************/
 static void DestroyObjectPatternNetwork(
   void *theEnv,
+  EXEC_STATUS,
   OBJECT_PATTERN_NODE *thePattern)
   {
    OBJECT_PATTERN_NODE *patternPtr;
@@ -276,6 +279,7 @@ static void DestroyObjectPatternNetwork(
 /************************************************************/
 static void DestroyObjectAlphaNodes(
   void *theEnv,
+  EXEC_STATUS,
   OBJECT_ALPHA_NODE *theNode)
   {
    OBJECT_ALPHA_NODE *nodePtr;
@@ -311,6 +315,7 @@ static void DestroyObjectAlphaNodes(
  *****************************************************/
 globle intBool ObjectCmpConstantFunction(
   void *theEnv,
+  EXEC_STATUS,
   void *theValue,
   DATA_OBJECT *theResult)
   {
@@ -373,6 +378,7 @@ globle intBool ObjectCmpConstantFunction(
 #endif
 static void PrintObjectGetVarJN1(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   void *theValue)
   {
@@ -414,6 +420,7 @@ static void PrintObjectGetVarJN1(
 
 static intBool ObjectGetVarJNFunction1(
   void *theEnv,
+  EXEC_STATUS,
   void *theValue,
   DATA_OBJECT *theResult)
   {
@@ -432,6 +439,7 @@ static intBool ObjectGetVarJNFunction1(
 #endif
 static void PrintObjectGetVarJN2(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   void *theValue)
   {
@@ -465,6 +473,7 @@ static void PrintObjectGetVarJN2(
 
 static intBool ObjectGetVarJNFunction2(
   void *theEnv,
+  EXEC_STATUS,
   void *theValue,
   DATA_OBJECT *theResult)
   {
@@ -483,6 +492,7 @@ static intBool ObjectGetVarJNFunction2(
 #endif
 static void PrintObjectGetVarPN1(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   void *theValue)
   {
@@ -517,6 +527,7 @@ static void PrintObjectGetVarPN1(
 
 static intBool ObjectGetVarPNFunction1(
   void *theEnv,
+  EXEC_STATUS,
   void *theValue,
   DATA_OBJECT *theResult)
   {
@@ -532,6 +543,7 @@ static intBool ObjectGetVarPNFunction1(
 #endif
 static void PrintObjectGetVarPN2(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   void *theValue)
   {
@@ -563,6 +575,7 @@ static void PrintObjectGetVarPN2(
 
 static intBool ObjectGetVarPNFunction2(
   void *theEnv,
+  EXEC_STATUS,
   void *theValue,
   DATA_OBJECT *theResult)
   {
@@ -578,6 +591,7 @@ static intBool ObjectGetVarPNFunction2(
 #endif
 static void PrintObjectCmpConstant(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   void *theValue)
   {
@@ -612,6 +626,7 @@ static void PrintObjectCmpConstant(
 #endif
 static void PrintSlotLengthTest(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   void *theValue)
   {
@@ -638,6 +653,7 @@ static void PrintSlotLengthTest(
 
 static intBool SlotLengthTestFunction(
   void *theEnv,
+  EXEC_STATUS,
   void *theValue,
   DATA_OBJECT *theResult)
   {
@@ -659,6 +675,7 @@ static intBool SlotLengthTestFunction(
 #endif
 static void PrintPNSimpleCompareFunction1(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   void *theValue)
   {
@@ -684,6 +701,7 @@ static void PrintPNSimpleCompareFunction1(
 
 static intBool PNSimpleCompareFunction1(
   void *theEnv,
+  EXEC_STATUS,
   void *theValue,
   DATA_OBJECT *theResult)
   {
@@ -710,6 +728,7 @@ static intBool PNSimpleCompareFunction1(
 #endif
 static void PrintPNSimpleCompareFunction2(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   void *theValue)
   {
@@ -737,6 +756,7 @@ static void PrintPNSimpleCompareFunction2(
 
 static intBool PNSimpleCompareFunction2(
   void *theEnv,
+  EXEC_STATUS,
   void *theValue,
   DATA_OBJECT *theResult)
   {
@@ -765,6 +785,7 @@ static intBool PNSimpleCompareFunction2(
 #endif
 static void PrintPNSimpleCompareFunction3(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   void *theValue)
   {
@@ -794,6 +815,7 @@ static void PrintPNSimpleCompareFunction3(
 
 static intBool PNSimpleCompareFunction3(
   void *theEnv,
+  EXEC_STATUS,
   void *theValue,
   DATA_OBJECT *theResult)
   {
@@ -822,6 +844,7 @@ static intBool PNSimpleCompareFunction3(
 #endif
 static void PrintJNSimpleCompareFunction1(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   void *theValue)
   {
@@ -851,6 +874,7 @@ static void PrintJNSimpleCompareFunction1(
 
 static intBool JNSimpleCompareFunction1(
   void *theEnv,
+  EXEC_STATUS,
   void *theValue,
   DATA_OBJECT *theResult)
   {
@@ -881,6 +905,7 @@ static intBool JNSimpleCompareFunction1(
 #endif
 static void PrintJNSimpleCompareFunction2(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   void *theValue)
   {
@@ -912,6 +937,7 @@ static void PrintJNSimpleCompareFunction2(
 
 static intBool JNSimpleCompareFunction2(
   void *theEnv,
+  EXEC_STATUS,
   void *theValue,
   DATA_OBJECT *theResult)
   {
@@ -944,6 +970,7 @@ static intBool JNSimpleCompareFunction2(
 #endif
 static void PrintJNSimpleCompareFunction3(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   void *theValue)
   {
@@ -977,6 +1004,7 @@ static void PrintJNSimpleCompareFunction3(
 
 static intBool JNSimpleCompareFunction3(
   void *theEnv,
+  EXEC_STATUS,
   void *theValue,
   DATA_OBJECT *theResult)
   {
@@ -1022,6 +1050,7 @@ static intBool JNSimpleCompareFunction3(
  ****************************************************/
 static void GetPatternObjectAndMarks(
   void *theEnv,
+  EXEC_STATUS,
   int pattern,
   int lhs,
   int rhs,
@@ -1081,6 +1110,7 @@ static void GetPatternObjectAndMarks(
  ***************************************************/
 static void GetObjectValueGeneral(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result,
   INSTANCE_TYPE *theInstance,
   struct multifieldMarker *theMarks,
@@ -1188,6 +1218,7 @@ static void GetObjectValueGeneral(
  ***************************************************/
 static void GetObjectValueSimple(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result,
   INSTANCE_TYPE *theInstance,
   struct ObjectMatchVar2 *matchVar)

@@ -86,7 +86,8 @@ struct procedureParserData
 /* ProceduralFunctionParsers        */
 /*******************************************/
 globle void ProceduralFunctionParsers(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    AllocateEnvironmentData(theEnv,PRCDRPSR_DATA,sizeof(struct procedureParserData),DeallocateProceduralFunctionData);
 
@@ -107,7 +108,8 @@ globle void ProceduralFunctionParsers(
 /*    data for procedural functions.                         */
 /*************************************************************/
 static void DeallocateProceduralFunctionData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   { 
    struct BindInfo *temp_bind;
 
@@ -123,7 +125,8 @@ static void DeallocateProceduralFunctionData(
 /* GetParsedBindNames:                                      */
 /********************************************************/
 globle struct BindInfo *GetParsedBindNames(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return(ProcedureParserData(theEnv)->ListOfParsedBindNames);
   }
@@ -133,6 +136,7 @@ globle struct BindInfo *GetParsedBindNames(
 /********************************************************/
 globle void SetParsedBindNames(
   void *theEnv,
+  EXEC_STATUS,
   struct BindInfo *newValue)
   {
    ProcedureParserData(theEnv)->ListOfParsedBindNames = newValue;
@@ -142,7 +146,8 @@ globle void SetParsedBindNames(
 /* ClearParsedBindNames:                                     */
 /********************************************************/
 globle void ClearParsedBindNames(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct BindInfo *temp_bind;
 
@@ -159,7 +164,8 @@ globle void ClearParsedBindNames(
 /* ParsedBindNamesEmpty:                                     */
 /********************************************************/
 globle intBool ParsedBindNamesEmpty(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    if (ProcedureParserData(theEnv)->ListOfParsedBindNames != NULL) return(FALSE);
 
@@ -175,6 +181,7 @@ globle intBool ParsedBindNamesEmpty(
 /*********************************************************/
 static struct expr *WhileParse(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *parse,
   char *infile)
   {
@@ -264,6 +271,7 @@ static struct expr *WhileParse(
 /******************************************************************************************/
 static struct expr *LoopForCountParse(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *parse,
   char *infile)
   {
@@ -449,6 +457,7 @@ LoopForCountParseError:
 /***************************************************/
 static void ReplaceLoopCountVars(
   void *theEnv,
+  EXEC_STATUS,
   SYMBOL_HN *loopVar,
   EXPRESSION *theExp,
   int depth)
@@ -482,6 +491,7 @@ static void ReplaceLoopCountVars(
 /*********************************************************/
 static struct expr *IfParse(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *top,
   char *infile)
   {
@@ -603,6 +613,7 @@ static struct expr *IfParse(
 /********************************************************/
 static struct expr *PrognParse(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *top,
   char *infile)
   {
@@ -629,6 +640,7 @@ static struct expr *PrognParse(
 /***********************************************************/
 static struct expr *BindParse(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *top,
   char *infile)
   {
@@ -712,6 +724,7 @@ static struct expr *BindParse(
 /********************************************/
 static struct expr *ReturnParse(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *top,
   char *infile)
   {
@@ -765,6 +778,7 @@ static struct expr *ReturnParse(
 /**********************************************/
 static struct expr *BreakParse(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *top,
   char *infile)
   {
@@ -797,6 +811,7 @@ static struct expr *BreakParse(
 /**********************************************/
 static struct expr *SwitchParse(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *top,
   char *infile)
   {
@@ -896,6 +911,7 @@ SwitchParseError:
 /********************************************************/
 globle int SearchParsedBindNames(
   void *theEnv,
+  EXEC_STATUS,
   SYMBOL_HN *name_sought)
   {
    struct BindInfo *var_ptr;
@@ -918,6 +934,7 @@ globle int SearchParsedBindNames(
 /********************************************************/
 globle struct constraintRecord *FindBindConstraints(
   void *theEnv,
+  EXEC_STATUS,
   SYMBOL_HN *nameSought)
   {
    struct BindInfo *theVariable;
@@ -939,7 +956,8 @@ globle struct constraintRecord *FindBindConstraints(
 /*   in the current context (e.g. the RHS of a rule).   */
 /********************************************************/
 globle int CountParsedBindNames(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct BindInfo *theVariable;
    int theIndex = 0;
@@ -961,6 +979,7 @@ globle int CountParsedBindNames(
 /****************************************************************/
 static int AddBindName(
   void *theEnv,
+  EXEC_STATUS,
   SYMBOL_HN *variableName,
   CONSTRAINT_RECORD *theConstraint)
   {
@@ -1017,6 +1036,7 @@ static int AddBindName(
 /********************************************************/
 globle void RemoveParsedBindName(
   void *theEnv,
+  EXEC_STATUS,
   struct symbolHashNode *bname)
   {
    struct BindInfo *prv,*tmp;

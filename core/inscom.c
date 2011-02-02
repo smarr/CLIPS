@@ -105,7 +105,8 @@ static void DeallocateInstanceData(void *);
   NOTES        : None
  *********************************************************/
 globle void SetupInstances(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct patternEntityRecord instanceInfo = { { "INSTANCE_ADDRESS",
                                                      INSTANCE_ADDRESS,0,0,0,
@@ -212,7 +213,8 @@ globle void SetupInstances(
 /*    environment data for instances.  */
 /***************************************/
 static void DeallocateInstanceData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    INSTANCE_TYPE *tmpIPtr, *nextIPtr;
    long i;
@@ -301,6 +303,7 @@ static void DeallocateInstanceData(
  *******************************************************************/
 globle intBool EnvDeleteInstance(
   void *theEnv,
+  EXEC_STATUS,
   void *iptr)
   {
    INSTANCE_TYPE *ins,*itmp;
@@ -334,6 +337,7 @@ globle intBool EnvDeleteInstance(
  *******************************************************************/
 globle intBool EnvUnmakeInstance(
   void *theEnv,
+  EXEC_STATUS,
   void *iptr)
   {
    INSTANCE_TYPE *ins;
@@ -388,7 +392,8 @@ globle intBool EnvUnmakeInstance(
   NOTES        : H/L Syntax : (instances [<class-name> [inherit]])
  *******************************************************************/
 globle void InstancesCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    int argno, inheritFlag = FALSE;
    void *theDefmodule;
@@ -452,7 +457,8 @@ globle void InstancesCommand(
   NOTES        : H/L Syntax : (ppinstance <instance>)
  ********************************************************/
 globle void PPInstanceCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    INSTANCE_TYPE *ins;
 
@@ -480,6 +486,7 @@ globle void PPInstanceCommand(
  **************************************************************/
 globle void EnvInstances(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   void *theVModule,
   char *className,
@@ -553,6 +560,7 @@ globle void EnvInstances(
  *********************************************************/
 globle void *EnvMakeInstance(
   void *theEnv,
+  EXEC_STATUS,
   char *mkstr)
   {
    char *router = "***MKINS***";
@@ -610,6 +618,7 @@ globle void *EnvMakeInstance(
  ***************************************************************/
 globle void *EnvCreateRawInstance(
   void *theEnv,
+  EXEC_STATUS,
   void *cptr,
   char *iname)
   {
@@ -626,6 +635,7 @@ globle void *EnvCreateRawInstance(
  ***************************************************************************/
 globle void *EnvFindInstance(
   void *theEnv,
+  EXEC_STATUS,
   void *theModule,
   char *iname,
   unsigned searchImports)
@@ -654,6 +664,7 @@ globle void *EnvFindInstance(
 #endif
 globle int EnvValidInstanceAddress(
   void *theEnv,
+  EXEC_STATUS,
   void *iptr)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
@@ -675,6 +686,7 @@ globle int EnvValidInstanceAddress(
  ***************************************************/
 globle void EnvDirectGetSlot(
   void *theEnv,
+  EXEC_STATUS,
   void *ins,
   char *sname,
   DATA_OBJECT *result)
@@ -718,6 +730,7 @@ globle void EnvDirectGetSlot(
  *********************************************************/
 globle int EnvDirectPutSlot(
   void *theEnv,
+  EXEC_STATUS,
   void *ins,
   char *sname,
   DATA_OBJECT *val)
@@ -760,6 +773,7 @@ globle int EnvDirectPutSlot(
 #endif
 globle char *EnvGetInstanceName(
   void *theEnv,
+  EXEC_STATUS,
   void *iptr)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
@@ -800,6 +814,7 @@ globle char *GetInstanceName(
 #endif
 globle void *EnvGetInstanceClass(
   void *theEnv,
+  EXEC_STATUS,
   void *iptr)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
@@ -821,7 +836,8 @@ globle void *EnvGetInstanceClass(
   NOTES        : None
  ***************************************************/
 globle unsigned long GetGlobalNumberOfInstances(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return(InstanceData(theEnv)->GlobalNumberOfInstances);
   }
@@ -838,6 +854,7 @@ globle unsigned long GetGlobalNumberOfInstances(
  ***************************************************/
 globle void *EnvGetNextInstance(
   void *theEnv,
+  EXEC_STATUS,
   void *iptr)
   {
    if (iptr == NULL)
@@ -862,6 +879,7 @@ globle void *EnvGetNextInstance(
  ***************************************************/
 globle void *GetNextInstanceInScope(
   void *theEnv,
+  EXEC_STATUS,
   void *iptr)
   {
    INSTANCE_TYPE *ins = (INSTANCE_TYPE *) iptr;
@@ -897,6 +915,7 @@ globle void *GetNextInstanceInScope(
 #endif
 globle void *EnvGetNextInstanceInClass(
   void *theEnv,
+  EXEC_STATUS,
   void *cptr,
   void *iptr)
   {
@@ -925,6 +944,7 @@ globle void *EnvGetNextInstanceInClass(
  ***************************************************/
 globle void *EnvGetNextInstanceInClassAndSubclasses(
   void *theEnv,
+  EXEC_STATUS,
   void **cptr,
   void *iptr,
   DATA_OBJECT *iterationInfo)
@@ -971,6 +991,7 @@ globle void *EnvGetNextInstanceInClassAndSubclasses(
  ***************************************************/
 globle void EnvGetInstancePPForm(
   void *theEnv,
+  EXEC_STATUS,
   char *buf,
   unsigned buflen,
   void *iptr)
@@ -1068,7 +1089,8 @@ globle void ClassCommand(
 #pragma argsused
 #endif
 globle intBool CreateInstanceHandler(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
 #pragma unused(theEnv)
@@ -1090,7 +1112,8 @@ globle intBool CreateInstanceHandler(
                    only be called by a handler
  ******************************************************/
 globle intBool DeleteInstanceCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    if (CheckCurrentMessage(theEnv,"delete-instance",TRUE))
      return(QuashInstance(theEnv,GetActiveInstance(theEnv)));
@@ -1107,7 +1130,8 @@ globle intBool DeleteInstanceCommand(
   NOTES        : Syntax: (unmake-instance <instance-expression>+ | *)
  ********************************************************************/
 globle intBool UnmakeInstanceCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    EXPRESSION *theArgument;
    DATA_OBJECT theResult;
@@ -1164,6 +1188,7 @@ globle intBool UnmakeInstanceCommand(
  *****************************************************************/
 globle void SymbolToInstanceName(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    if (EnvArgTypeCheck(theEnv,execStatus,"symbol-to-instance-name",1,SYMBOL,result) == FALSE)
@@ -1185,7 +1210,8 @@ globle void SymbolToInstanceName(
   NOTES        : H/L Syntax : (instance-name-to-symbol <iname>)
  *****************************************************************/
 globle void *InstanceNameToSymbol(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DATA_OBJECT result;
 
@@ -1204,6 +1230,7 @@ globle void *InstanceNameToSymbol(
  *********************************************************************************/
 globle void InstanceAddressCommand(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    INSTANCE_TYPE *ins;
@@ -1284,6 +1311,7 @@ globle void InstanceAddressCommand(
  ***************************************************************/
 globle void InstanceNameCommand(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    INSTANCE_TYPE *ins;
@@ -1325,7 +1353,8 @@ globle void InstanceNameCommand(
   NOTES        : H/L Syntax : (instance-addressp <arg>)
  **************************************************************/
 globle intBool InstanceAddressPCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DATA_OBJECT temp;
 
@@ -1342,7 +1371,8 @@ globle intBool InstanceAddressPCommand(
   NOTES        : H/L Syntax : (instance-namep <arg>)
  **************************************************************/
 globle intBool InstanceNamePCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DATA_OBJECT temp;
 
@@ -1361,7 +1391,8 @@ globle intBool InstanceNamePCommand(
   NOTES        : H/L Syntax : (instancep <arg>)
  *****************************************************************/
 globle intBool InstancePCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DATA_OBJECT temp;
 
@@ -1380,7 +1411,8 @@ globle intBool InstancePCommand(
   NOTES        : H/L Syntax : (instance-existp <arg>)
  ********************************************************/
 globle intBool InstanceExistPCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DATA_OBJECT temp;
 
@@ -1423,6 +1455,7 @@ globle intBool InstanceExistPCommand(
  ***************************************************/
 static long ListInstancesInModule(
   void *theEnv,
+  EXEC_STATUS,
   int id,
   char *logicalName,
   char *className,
@@ -1508,6 +1541,7 @@ static long ListInstancesInModule(
  ******************************************************/
 static long TabulateInstances(
   void *theEnv,
+  EXEC_STATUS,
   int id,
   char *logicalName,
   DEFCLASS *cls,
@@ -1558,6 +1592,7 @@ static long TabulateInstances(
  ***************************************************/
 static void PrintInstance(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   INSTANCE_TYPE *ins,
   char *separator)
@@ -1600,6 +1635,7 @@ static void PrintInstance(
  ***************************************************/
 static INSTANCE_SLOT *FindISlotByName(
   void *theEnv,
+  EXEC_STATUS,
   INSTANCE_TYPE *ins,
   char *sname)
   {

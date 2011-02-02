@@ -105,7 +105,8 @@ struct IOFunctionData
 /*   the I/O functions.               */
 /**************************************/
 globle void IOFunctionDefinitions(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    AllocateEnvironmentData(theEnv,IO_FUNCTION_DATA,sizeof(struct IOFunctionData),NULL);
 
@@ -144,7 +145,8 @@ globle void IOFunctionDefinitions(
 /*   for the printout function.           */
 /******************************************/
 globle void PrintoutFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    char *dummyid;
    int i, argCount;
@@ -236,6 +238,7 @@ globle void PrintoutFunction(
 /*****************************************************/
 globle intBool SetFullCRLF(
   void *theEnv,
+  EXEC_STATUS,
   intBool value)
   {
    intBool oldValue = IOFunctionData(theEnv)->useFullCRLF;
@@ -250,6 +253,7 @@ globle intBool SetFullCRLF(
 /*************************************************************/
 globle void ReadFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
    struct token theToken;
@@ -350,6 +354,7 @@ globle void ReadFunction(
 /********************************************************/
 static void ReadTokenFromStdin(
   void *theEnv,
+  EXEC_STATUS,
   struct token *theToken)
   {
    char *inputString;
@@ -431,7 +436,8 @@ static void ReadTokenFromStdin(
 /* OpenFunction: H/L access routine for the open function.   */
 /*************************************************************/
 globle int OpenFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    int numberOfArguments;
    char *fileName, *logicalName, *accessMode = NULL;
@@ -527,7 +533,8 @@ globle int OpenFunction(
 /* CloseFunction: H/L access routine for the close function.   */
 /***************************************************************/
 globle int CloseFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    int numberOfArguments;
    char *logicalName;
@@ -573,7 +580,8 @@ globle int CloseFunction(
 /*   for the get-char function.        */
 /***************************************/
 globle int GetCharFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    int numberOfArguments;
    char *logicalName;
@@ -611,7 +619,8 @@ globle int GetCharFunction(
 /*   for the put-char function.        */
 /***************************************/
 globle void PutCharFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    int numberOfArguments;
    char *logicalName;
@@ -676,7 +685,8 @@ globle void PutCharFunction(
 /*   for the remove function.           */
 /****************************************/
 globle int RemoveFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    char *theFileName;
 
@@ -705,7 +715,8 @@ globle int RemoveFunction(
 /*   for the rename function.           */
 /****************************************/
 globle int RenameFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    char *oldFileName, *newFileName;
 
@@ -735,7 +746,8 @@ globle int RenameFunction(
 /*   for the format function.           */
 /****************************************/
 globle void *FormatFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    int argCount;
    size_t start_pos;
@@ -849,6 +861,7 @@ globle void *FormatFunction(
 /*********************************************************************/
 static char *ControlStringCheck(
   void *theEnv,
+  EXEC_STATUS,
   int argCount)
   {
    DATA_OBJECT t_ptr;
@@ -1017,6 +1030,7 @@ static char FindFormatFlag(
 /**********************************************************************/
 static char *PrintFormatFlag(
   void *theEnv,
+  EXEC_STATUS,
   char *formatString,
   int whichArg,
   int formatType)
@@ -1117,6 +1131,7 @@ static char *PrintFormatFlag(
 /******************************************/
 globle void ReadlineFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
    char *buffer;
@@ -1188,6 +1203,7 @@ globle void ReadlineFunction(
 /*************************************************************/
 static char *FillBuffer(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   size_t *currentPosition,
   size_t *maximumSize)
@@ -1229,6 +1245,7 @@ static char *FillBuffer(
 /*****************************************/
 globle void SetLocaleFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
    DATA_OBJECT theResult;
@@ -1290,6 +1307,7 @@ globle void SetLocaleFunction(
 /******************************************/
 globle void ReadNumberFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
    struct token theToken;
@@ -1390,6 +1408,7 @@ globle void ReadNumberFunction(
 /********************************************/
 static void ReadNumber(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   struct token *theToken,
   int isStdin)

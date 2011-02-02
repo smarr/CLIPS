@@ -113,6 +113,7 @@ static void PrintClassLinks(void *,char *,char *,CLASS_LINK *);
  ***************************************************************/
 globle PACKED_CLASS_LINKS *ParseSuperclasses(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   SYMBOL_HN *newClassName)
   {
@@ -307,6 +308,7 @@ SuperclassParseError:
  ***************************************************************************/
 globle PACKED_CLASS_LINKS *FindPrecedenceList(
   void *theEnv,
+  EXEC_STATUS,
   DEFCLASS *cls,
   PACKED_CLASS_LINKS *supers)
   {
@@ -501,6 +503,7 @@ globle PACKED_CLASS_LINKS *FindPrecedenceList(
  ***************************************************/
 globle void PackClassLinks(
   void *theEnv,
+  EXEC_STATUS,
   PACKED_CLASS_LINKS *plinks,
   CLASS_LINK *lptop)
   {
@@ -543,6 +546,7 @@ globle void PackClassLinks(
  **************************************************************************/
 static PARTIAL_ORDER *InitializePartialOrderTable(
   void *theEnv,
+  EXEC_STATUS,
   PARTIAL_ORDER *po_table,
   PACKED_CLASS_LINKS *supers)
   {
@@ -623,6 +627,7 @@ static PARTIAL_ORDER *InitializePartialOrderTable(
  ***********************************************************************************/
 static void RecordPartialOrders(
   void *theEnv,
+  EXEC_STATUS,
   PARTIAL_ORDER *po_table,
   DEFCLASS *cls,
   PACKED_CLASS_LINKS *successors,
@@ -719,6 +724,7 @@ static PARTIAL_ORDER *FindPartialOrder(
  **************************************************************************/
 static void PrintPartialOrderLoop(
   void *theEnv,
+  EXEC_STATUS,
   PARTIAL_ORDER *po_table)
   {
    register PARTIAL_ORDER *pop1,*pop2;
@@ -819,6 +825,7 @@ static void PrintPartialOrderLoop(
  ***************************************************/
 static void PrintClassLinks(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   char *title,
   CLASS_LINK *clink)

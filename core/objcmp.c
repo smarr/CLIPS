@@ -151,7 +151,8 @@ static intBool OrderedHandlersToCode(void *,FILE **,char *,char *,char *,int,int
   NOTES        : None
  ***************************************************/
 globle void SetupObjectsCompiler(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    AllocateEnvironmentData(theEnv,OBJECT_COMPILER_DATA,sizeof(struct objectCompilerData),NULL);
 
@@ -174,6 +175,7 @@ globle void SetupObjectsCompiler(
  *********************************************************/
 globle void PrintClassReference(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp,
   DEFCLASS *cls,
   int imageID,
@@ -204,6 +206,7 @@ globle void PrintClassReference(
  ****************************************************/
 globle void DefclassCModuleReference(
   void *theEnv,
+  EXEC_STATUS,
   FILE *theFile,
   int count,
   int imageID,
@@ -233,7 +236,8 @@ globle void DefclassCModuleReference(
   NOTES        : None
  *******************************************************/
 static void ReadyObjectsForCode(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    MARK_INFO markInfo;
    register long i;
@@ -285,6 +289,7 @@ static void ReadyObjectsForCode(
 #endif
 static void MarkDefclassAndSlots(
   void *theEnv,
+  EXEC_STATUS,
   struct constructHeader *vTheDefclass,
   void *vTheBuffer)
   {
@@ -325,6 +330,7 @@ static void MarkDefclassAndSlots(
  *************************************************************/
 static void PrintSlotNameReference(
   void *theEnv,
+  EXEC_STATUS,
   FILE *fp,
   SLOT_NAME *snp,
   int imageID,
@@ -357,6 +363,7 @@ static void PrintSlotNameReference(
 #endif
 static void InitObjectsCode(
   void *theEnv,
+  EXEC_STATUS,
   FILE *initFP,
   int imageID,
   int maxIndices)
@@ -388,6 +395,7 @@ static void InitObjectsCode(
  *************************************************************/
 static int ObjectsToCode(
   void *theEnv,
+  EXEC_STATUS,
   char *fileName,
   char *pathName,
   char *fileNameBuffer,
@@ -551,6 +559,7 @@ ObjectCodeError:
  ***********************************************************/
 static int ClassIDMapToCode(
   void *theEnv,
+  EXEC_STATUS,
   char *fileName,
   char *pathName,
   char *fileNameBuffer,
@@ -600,6 +609,7 @@ static int ClassIDMapToCode(
  ***********************************************************/
 static int ClassHashTableToCode(
   void *theEnv,
+  EXEC_STATUS,
   char *fileName,
   char *pathName,
   char *fileNameBuffer,
@@ -647,6 +657,7 @@ static int ClassHashTableToCode(
  ***********************************************************/
 static int SlotNameHashTableToCode(
   void *theEnv,
+  EXEC_STATUS,
   char *fileName,
   char *pathName,
   char *fileNameBuffer,
@@ -695,6 +706,7 @@ static int SlotNameHashTableToCode(
  ***********************************************************/
 static int SlotNameEntriesToCode(
   void *theEnv,
+  EXEC_STATUS,
   char *fileName,
   char *pathName,
   char *fileNameBuffer,
@@ -756,6 +768,7 @@ static int SlotNameEntriesToCode(
  *****************************************************/
 static void CloseObjectFiles(
   void *theEnv,
+  EXEC_STATUS,
   FILE *itemFiles[SAVE_ITEMS],
   int itemReopenFlags[SAVE_ITEMS],
   struct CodeGeneratorFile itemCodeFiles[SAVE_ITEMS],
@@ -789,6 +802,7 @@ static void CloseObjectFiles(
  ***************************************************/
 static void DefclassModuleToCode(
   void *theEnv,
+  EXEC_STATUS,
   FILE *theFile,
   struct defmodule *theModule,
   int imageID,
@@ -840,6 +854,7 @@ static void DefclassModuleToCode(
  ***************************************************************/
 static void SingleDefclassToCode(
   void *theEnv,
+  EXEC_STATUS,
   FILE *theFile,
   int imageID,
   int maxIndices,
@@ -976,6 +991,7 @@ static void SingleDefclassToCode(
  ***********************************************************/
 static intBool InheritanceLinksToCode(
   void *theEnv,
+  EXEC_STATUS,
   FILE **classLinkFile,
   char *fileName,
   char *pathName,
@@ -1074,6 +1090,7 @@ static intBool InheritanceLinksToCode(
  ***********************************************************/
 static intBool SlotsToCode(
   void *theEnv,
+  EXEC_STATUS,
   FILE **slotFile,
   char *fileName,
   char *pathName,
@@ -1189,6 +1206,7 @@ static intBool SlotsToCode(
  *************************************************************/
 static intBool TemplateSlotsToCode(
   void *theEnv,
+  EXEC_STATUS,
   FILE **templateSlotFile,
   char *fileName,
   char *pathName,
@@ -1268,6 +1286,7 @@ static intBool TemplateSlotsToCode(
  *************************************************************/
 static intBool OrderedSlotsToCode(
   void *theEnv,
+  EXEC_STATUS,
   FILE **orderedSlotFile,
   char *fileName,
   char *pathName,
@@ -1339,6 +1358,7 @@ static intBool OrderedSlotsToCode(
  *************************************************************/
 static intBool HandlersToCode(
   void *theEnv,
+  EXEC_STATUS,
   FILE **handlerFile,
   char *fileName,
   char *pathName,
@@ -1420,6 +1440,7 @@ static intBool HandlersToCode(
  ****************************************************************/
 static intBool OrderedHandlersToCode(
   void *theEnv,
+  EXEC_STATUS,
   FILE **orderedHandlerFile,
   char *fileName,
   char *pathName,

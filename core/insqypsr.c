@@ -108,6 +108,7 @@ static int IsQueryFunction(EXPRESSION *);
  ***********************************************************************/
 globle EXPRESSION *ParseQueryNoAction(
   void *theEnv,
+  EXEC_STATUS,
   EXPRESSION *top,
   char *readSource)
   {
@@ -170,6 +171,7 @@ globle EXPRESSION *ParseQueryNoAction(
  ***********************************************************************/
 globle EXPRESSION *ParseQueryAction(
   void *theEnv,
+  EXEC_STATUS,
   EXPRESSION *top,
   char *readSource)
   {
@@ -231,6 +233,7 @@ globle EXPRESSION *ParseQueryAction(
  ***************************************************************/
 static EXPRESSION *ParseQueryRestrictions(
   void *theEnv,
+  EXEC_STATUS,
   EXPRESSION *top,
   char *readSource,
   struct token *queryInputToken)
@@ -339,6 +342,7 @@ ParseQueryRestrictionsError2:
  ***************************************************/
 static intBool ReplaceClassNameWithReference(
   void *theEnv,
+  EXEC_STATUS,
   EXPRESSION *theExp)
   {
    char *theClassName;
@@ -373,6 +377,7 @@ static intBool ReplaceClassNameWithReference(
  *************************************************************/
 static int ParseQueryTestExpression(
   void *theEnv,
+  EXEC_STATUS,
   EXPRESSION *top,
   char *readSource)
   {
@@ -430,6 +435,7 @@ static int ParseQueryTestExpression(
  *************************************************************/
 static int ParseQueryActionExpression(
   void *theEnv,
+  EXEC_STATUS,
   EXPRESSION *top,
   char *readSource,
   EXPRESSION *insQuerySetVars,
@@ -519,6 +525,7 @@ static int ParseQueryActionExpression(
  ***********************************************************************************/
 static void ReplaceInstanceVariables(
   void *theEnv,
+  EXEC_STATUS,
   EXPRESSION *vlist,
   EXPRESSION *bexp,
   int sdirect,
@@ -580,6 +587,7 @@ static void ReplaceInstanceVariables(
  *************************************************************************/
 static void ReplaceSlotReference(
   void *theEnv,
+  EXEC_STATUS,
   EXPRESSION *vlist,
   EXPRESSION *theExp,
   struct FunctionDefinition *func,

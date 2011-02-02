@@ -110,6 +110,7 @@ static void TraceErrorToObjectPattern(void *,int,OBJECT_PATTERN_NODE *);
  ***************************************************************************/
 globle void ObjectMatchDelay(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    register int ov;
@@ -141,6 +142,7 @@ globle void ObjectMatchDelay(
  ***************************************************/
 globle intBool SetDelayObjectPatternMatching(
   void *theEnv,
+  EXEC_STATUS,
   int value)
   {
    intBool oldval;
@@ -167,7 +169,8 @@ globle intBool SetDelayObjectPatternMatching(
   NOTES        : None
  ***************************************************/
 globle intBool GetDelayObjectPatternMatching(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return(ObjectReteData(theEnv)->DelayObjectPatternMatching);
   }
@@ -182,7 +185,8 @@ globle intBool GetDelayObjectPatternMatching(
   NOTES        : None
  ********************************************************/
 globle OBJECT_PATTERN_NODE *ObjectNetworkPointer(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return(ObjectReteData(theEnv)->ObjectPatternNetworkPointer);
   }
@@ -196,7 +200,8 @@ globle OBJECT_PATTERN_NODE *ObjectNetworkPointer(
   NOTES        : None
  ********************************************************/
 globle OBJECT_ALPHA_NODE *ObjectNetworkTerminalPointer(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return(ObjectReteData(theEnv)->ObjectPatternNetworkTerminalPointer);
   }
@@ -212,6 +217,7 @@ globle OBJECT_ALPHA_NODE *ObjectNetworkTerminalPointer(
  ***************************************************/
 globle void SetObjectNetworkPointer(
   void *theEnv,
+  EXEC_STATUS,
   OBJECT_PATTERN_NODE *value)
   {
    ObjectReteData(theEnv)->ObjectPatternNetworkPointer = value;
@@ -229,6 +235,7 @@ globle void SetObjectNetworkPointer(
  *******************************************************/
 globle void SetObjectNetworkTerminalPointer(
   void *theEnv,
+  EXEC_STATUS,
   OBJECT_ALPHA_NODE *value)
   {
    ObjectReteData(theEnv)->ObjectPatternNetworkTerminalPointer = value;
@@ -259,6 +266,7 @@ globle void SetObjectNetworkTerminalPointer(
  ************************************************************************/
 globle void ObjectNetworkAction(
   void *theEnv,
+  EXEC_STATUS,
   int type,
   INSTANCE_TYPE *ins,
   int slotNameID)
@@ -352,7 +360,8 @@ globle void ObjectNetworkAction(
   NOTES        : None
  ***************************************************/
 globle void ResetObjectMatchTimeTags(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    OBJECT_ALPHA_NODE *alphaPtr;
    OBJECT_PATTERN_NODE *lastLevel;
@@ -398,6 +407,7 @@ globle void ResetObjectMatchTimeTags(
  ***************************************************/
 static void QueueObjectMatchAction(
   void *theEnv,
+  EXEC_STATUS,
   int type,
   INSTANCE_TYPE *ins,
   int slotNameID)
@@ -536,6 +546,7 @@ static void QueueObjectMatchAction(
  ****************************************************/
 static SLOT_BITMAP *QueueModifySlotMap(
   void *theEnv,
+  EXEC_STATUS,
   SLOT_BITMAP *oldMap,
   int slotNameID)
   {
@@ -576,6 +587,7 @@ static SLOT_BITMAP *QueueModifySlotMap(
  ***************************************************/
 static void ReturnObjectMatchAction(
   void *theEnv,
+  EXEC_STATUS,
   OBJECT_MATCH_ACTION *omaPtr)
   {
    if (omaPtr->slotNameIDs != NULL)
@@ -593,7 +605,8 @@ static void ReturnObjectMatchAction(
   NOTES        : None
  ***************************************************/
 static void ProcessObjectMatchQueue(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    OBJECT_MATCH_ACTION *cur;
 
@@ -638,6 +651,7 @@ static void ProcessObjectMatchQueue(
  ******************************************************/
 static void MarkObjectPatternNetwork(
   void *theEnv,
+  EXEC_STATUS,
   SLOT_BITMAP *slotNameIDs)
   {
    OBJECT_ALPHA_NODE *alphaPtr;
@@ -774,6 +788,7 @@ static intBool CompareSlotBitMaps(
  **********************************************************************************/
 static void ObjectPatternMatch(
   void *theEnv,
+  EXEC_STATUS,
   int offset,
   OBJECT_PATTERN_NODE *patternTop,
   struct multifieldMarker *endMark)
@@ -889,6 +904,7 @@ static void ObjectPatternMatch(
  **********************************************************************************/
 static void ProcessPatternNode(
   void *theEnv,
+  EXEC_STATUS,
   int offset,
   OBJECT_PATTERN_NODE *patternNode,
   struct multifieldMarker *endMark)
@@ -1094,6 +1110,7 @@ static void ProcessPatternNode(
  ***************************************************/
 static void CreateObjectAlphaMatch(
   void *theEnv,
+  EXEC_STATUS,
   OBJECT_ALPHA_NODE *alphaPtr)
   {
    struct joinNode *listOfJoins;
@@ -1165,6 +1182,7 @@ static void CreateObjectAlphaMatch(
  ******************************************************/
 static intBool EvaluateObjectPatternTest(
   void *theEnv,
+  EXEC_STATUS,
   int objectSlotField,
   struct multifieldMarker *selfSlotMarker,
   EXPRESSION *networkTest,
@@ -1272,6 +1290,7 @@ static intBool EvaluateObjectPatternTest(
  ***************************************************/
 static void ObjectAssertAction(
   void *theEnv,
+  EXEC_STATUS,
   INSTANCE_TYPE *ins)
   {
    ins->header.timeTag = ObjectReteData(theEnv)->UseEntityTimeTag;
@@ -1296,7 +1315,8 @@ static void ObjectAssertAction(
   NOTES        : None
  **********************************************************************/
 static void ObjectModifyAction(
-  void *theEnv,  
+  void *theEnv,
+  EXEC_STATUS,  
   INSTANCE_TYPE *ins,
   SLOT_BITMAP *slotNameIDs)
   {
@@ -1327,6 +1347,7 @@ static void ObjectModifyAction(
  ****************************************************/
 static void ObjectRetractAction(
   void *theEnv,
+  EXEC_STATUS,
   INSTANCE_TYPE *ins,
   SLOT_BITMAP *slotNameIDs)
   {
@@ -1420,6 +1441,7 @@ static void ObjectRetractAction(
  *****************************************************/
 static void ObjectPatternNetErrorMessage(
   void *theEnv,
+  EXEC_STATUS,
   OBJECT_PATTERN_NODE *patternPtr)
   {
    PrintErrorID(theEnv,"OBJRTMCH",1,TRUE);
@@ -1451,6 +1473,7 @@ static void ObjectPatternNetErrorMessage(
  *********************************************************/
 static void TraceErrorToObjectPattern(
   void *theEnv,
+  EXEC_STATUS,
   int errorNode,
   OBJECT_PATTERN_NODE *patternPtr)
   {

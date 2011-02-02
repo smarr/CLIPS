@@ -112,7 +112,8 @@ struct multiFunctionData
 /*   the multifield functions.                */
 /**********************************************/
 globle void MultifieldFunctionDefinitions(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    AllocateEnvironmentData(theEnv,MULTIFUN_DATA,sizeof(struct multiFunctionData),NULL);
 
@@ -157,6 +158,7 @@ globle void MultifieldFunctionDefinitions(
 /****************************************/
 globle void DeleteFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
    DATA_OBJECT value1, value2, value3;
@@ -192,6 +194,7 @@ globle void DeleteFunction(
 /******************************************/
 globle void MVDeleteFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
    DATA_OBJECT value1, value2;
@@ -226,6 +229,7 @@ globle void MVDeleteFunction(
 /*****************************************/
 globle void ReplaceFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
    DATA_OBJECT value1, value2, value3, value4;
@@ -272,6 +276,7 @@ globle void ReplaceFunction(
 /*******************************************/
 globle void MVReplaceFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
    DATA_OBJECT value1, value2, value3;
@@ -312,6 +317,7 @@ globle void MVReplaceFunction(
 /**********************************************/
 globle void DeleteMemberFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
    DATA_OBJECT resultValue,*delVals,tmpVal;
@@ -380,6 +386,7 @@ globle void DeleteMemberFunction(
 /***********************************************/
 globle void ReplaceMemberFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
    DATA_OBJECT resultValue,replVal,*delVals,tmpVal;
@@ -461,6 +468,7 @@ globle void ReplaceMemberFunction(
 /****************************************/
 globle void InsertFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
    DATA_OBJECT value1, value2, value3;
@@ -506,6 +514,7 @@ globle void InsertFunction(
 /*****************************************/
 globle void ExplodeFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
    DATA_OBJECT value;
@@ -565,7 +574,8 @@ globle void ExplodeFunction(
 /*   for the implode$ function.          */
 /*****************************************/
 globle void *ImplodeFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DATA_OBJECT value;
 
@@ -596,6 +606,7 @@ globle void *ImplodeFunction(
 /****************************************/
 globle void SubseqFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR sub_value)
   {
    DATA_OBJECT value;
@@ -668,6 +679,7 @@ globle void SubseqFunction(
 /******************************************/
 globle void MVSubseqFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR sub_value)
   {
    DATA_OBJECT value;
@@ -740,6 +752,7 @@ globle void MVSubseqFunction(
 /***************************************/
 globle void FirstFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
    DATA_OBJECT theValue;
@@ -776,6 +789,7 @@ globle void FirstFunction(
 /**************************************/
 globle void RestFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
    DATA_OBJECT theValue;
@@ -812,6 +826,7 @@ globle void RestFunction(
 /*************************************/
 globle void NthFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR nth_value)
   {
    DATA_OBJECT value1, value2;
@@ -866,7 +881,8 @@ globle void NthFunction(
  */
 
 globle intBool SubsetpFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DATA_OBJECT item1, item2, tmpItem;
    long i,j,k; 
@@ -902,6 +918,7 @@ globle intBool SubsetpFunction(
 /****************************************/
 globle void MemberFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR result)
   {
    DATA_OBJECT item1, item2;
@@ -1018,6 +1035,7 @@ static intBool MVRangeCheck(
 /******************************************************/
 static struct expr *MultifieldPrognParser(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *top,
   char *infile)
   {
@@ -1139,6 +1157,7 @@ MvPrognParseError:
 /******************************************************/
 static struct expr *ForeachParser(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *top,
   char *infile)
   {
@@ -1223,6 +1242,7 @@ ForeachParseError:
 /**********************************************/
 static void ReplaceMvPrognFieldVars(
   void *theEnv,
+  EXEC_STATUS,
   SYMBOL_HN *fieldVar,
   struct expr *theExp,
   int depth)
@@ -1269,6 +1289,7 @@ static void ReplaceMvPrognFieldVars(
 /*****************************************/
 globle void MultifieldPrognFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR result)
   {
    MultifieldPrognDriver(theEnv,result,"progn$");
@@ -1280,6 +1301,7 @@ globle void MultifieldPrognFunction(
 /***************************************/
 globle void ForeachFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR result)
   {
    MultifieldPrognDriver(theEnv,result,"foreach");
@@ -1291,6 +1313,7 @@ globle void ForeachFunction(
 /******************************************/
 static void MultifieldPrognDriver(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR result,
   char *functionName)
   {
@@ -1355,6 +1378,7 @@ static void MultifieldPrognDriver(
 /***************************************************/
 globle void GetMvPrognField(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR result)
   {
    int depth;
@@ -1375,7 +1399,8 @@ globle void GetMvPrognField(
 /* GetMvPrognIndex                                 */
 /***************************************************/
 globle long GetMvPrognIndex(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    int depth;
    FIELD_VAR_STACK *tmpField;
@@ -1412,6 +1437,7 @@ globle long GetMvPrognIndex(
  **************************************************************************/
 globle int ReplaceMultiValueField(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *dst,
   DATA_OBJECT *src,
   long rb,
@@ -1494,6 +1520,7 @@ globle int ReplaceMultiValueField(
  **************************************************************************/
 globle int InsertMultiValueField(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *dst,
   DATA_OBJECT *src,
   long theIndex,
@@ -1584,6 +1611,7 @@ globle int InsertMultiValueField(
  ******************************************************/
 static void MVRangeError(
   void *theEnv,
+  EXEC_STATUS,
   long brb,
   long bre,
   long max,
@@ -1627,6 +1655,7 @@ static void MVRangeError(
  **************************************************************************/
 globle int DeleteMultiValueField(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *dst,
   DATA_OBJECT *src,
   long rb,

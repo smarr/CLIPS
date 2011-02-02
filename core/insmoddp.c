@@ -89,7 +89,8 @@ static void DuplicateMsgHandlerSupport(void *,DATA_OBJECT *,int);
   NOTES        : None
  ***************************************************/
 globle void SetupInstanceModDupCommands(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
 #if DEFRULE_CONSTRUCT
    EnvDefineFunction2(theEnv,"modify-instance",'u',PTIEF InactiveModifyInstance,"InactiveModifyInstance",NULL);
@@ -144,6 +145,7 @@ globle void SetupInstanceModDupCommands(
  *************************************************************/
 globle void ModifyInstance(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    INSTANCE_TYPE *ins;
@@ -212,6 +214,7 @@ globle void ModifyInstance(
  *************************************************************/
 globle void MsgModifyInstance(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    INSTANCE_TYPE *ins;
@@ -279,6 +282,7 @@ globle void MsgModifyInstance(
  *************************************************************/
 globle void DuplicateInstance(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    INSTANCE_TYPE *ins;
@@ -359,6 +363,7 @@ globle void DuplicateInstance(
  *************************************************************/
 globle void MsgDuplicateInstance(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    INSTANCE_TYPE *ins;
@@ -442,6 +447,7 @@ globle void MsgDuplicateInstance(
  **************************************************************/
 globle void InactiveModifyInstance(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    int ov;
@@ -465,6 +471,7 @@ globle void InactiveModifyInstance(
  **************************************************************/
 globle void InactiveMsgModifyInstance(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    int ov;
@@ -488,6 +495,7 @@ globle void InactiveMsgModifyInstance(
  *******************************************************************/
 globle void InactiveDuplicateInstance(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    int ov;
@@ -512,6 +520,7 @@ globle void InactiveDuplicateInstance(
  **************************************************************/
 globle void InactiveMsgDuplicateInstance(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    int ov;
@@ -539,6 +548,7 @@ globle void InactiveMsgDuplicateInstance(
  *****************************************************/
 globle void DirectDuplicateMsgHandler(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    DuplicateMsgHandlerSupport(theEnv,result,FALSE);
@@ -559,6 +569,7 @@ globle void DirectDuplicateMsgHandler(
  *****************************************************/
 globle void MsgDuplicateMsgHandler(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    DuplicateMsgHandlerSupport(theEnv,result,TRUE);
@@ -580,6 +591,7 @@ globle void MsgDuplicateMsgHandler(
  ***************************************************/
 globle void DirectModifyMsgHandler(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    ModifyMsgHandlerSupport(theEnv,result,FALSE);
@@ -600,6 +612,7 @@ globle void DirectModifyMsgHandler(
  ***************************************************/
 globle void MsgModifyMsgHandler(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    ModifyMsgHandlerSupport(theEnv,result,TRUE);
@@ -635,6 +648,7 @@ globle void MsgModifyMsgHandler(
  ***********************************************************/
 static DATA_OBJECT *EvaluateSlotOverrides(
   void *theEnv,
+  EXEC_STATUS,
   EXPRESSION *ovExprs,
   int *ovCnt,
   int *error)
@@ -710,6 +724,7 @@ EvaluateOverridesError:
  **********************************************************/
 static void DeleteSlotOverrideEvaluations(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *ovEvals,
   int ovCnt)
   {
@@ -733,6 +748,7 @@ static void DeleteSlotOverrideEvaluations(
  **********************************************************/
 static void ModifyMsgHandlerSupport(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result,
   int msgpass)
   {
@@ -834,6 +850,7 @@ static void ModifyMsgHandlerSupport(
  *************************************************************/
 static void DuplicateMsgHandlerSupport(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result,
   int msgpass)
   {

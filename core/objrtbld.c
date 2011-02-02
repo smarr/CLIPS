@@ -166,7 +166,8 @@ static void ResetInitialObject(void *);
   NOTES        : None
  ********************************************************/
 globle void SetupObjectPatternStuff(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
 #if (! BLOAD_ONLY) && (! RUN_TIME)
    struct patternParser *newPtr;
@@ -251,7 +252,8 @@ globle void SetupObjectPatternStuff(
 #if ! DEFINSTANCES_CONSTRUCT
 
 static void ResetInitialObject(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    EXPRESSION *tmp;
    DATA_OBJECT rtn;
@@ -309,6 +311,7 @@ static intBool PatternParserFind(
 #endif
 static struct lhsParseNode *ObjectLHSParse(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   struct token *lastToken)
   {
@@ -484,6 +487,7 @@ ObjectLHSParseERROR:
  **************************************************************/
 static intBool ReorderAndAnalyzeObjectPattern(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *topNode)
   {
    CLASS_BITMAP *clsset,*tmpset;
@@ -649,6 +653,7 @@ static intBool ReorderAndAnalyzeObjectPattern(
  *****************************************************/
 static struct patternNodeHeader *PlaceObjectPattern(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *thePattern)
   {
    OBJECT_PATTERN_NODE *currentLevel,*lastLevel;
@@ -877,6 +882,7 @@ static OBJECT_PATTERN_NODE *FindObjectPatternNode(
  *****************************************************************/
 static OBJECT_PATTERN_NODE *CreateNewObjectPatternNode(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *thePattern,
   OBJECT_PATTERN_NODE *nodeSlotGroup,
   OBJECT_PATTERN_NODE *upperLevel,
@@ -1033,6 +1039,7 @@ static OBJECT_PATTERN_NODE *CreateNewObjectPatternNode(
  ********************************************************/
 static void DetachObjectPattern(
   void *theEnv,
+  EXEC_STATUS,
   struct patternNodeHeader *thePattern)
   {
    OBJECT_ALPHA_NODE *alphaPtr,*prv,*terminalPtr;
@@ -1205,6 +1212,7 @@ static void DetachObjectPattern(
  ***************************************************/
 static void ClearObjectPatternMatches(
   void *theEnv,
+  EXEC_STATUS,
   OBJECT_ALPHA_NODE *alphaPtr)
   {
    INSTANCE_TYPE *ins;
@@ -1245,6 +1253,7 @@ static void ClearObjectPatternMatches(
  ***************************************************/
 static void RemoveObjectPartialMatches(
   void *theEnv,
+  EXEC_STATUS,
   INSTANCE_TYPE *ins,
   struct patternNodeHeader *phead)
   {
@@ -1295,6 +1304,7 @@ static void RemoveObjectPartialMatches(
  ******************************************************/
 static intBool CheckDuplicateSlots(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *nodeList,
   SYMBOL_HN *slotName)
   {
@@ -1327,6 +1337,7 @@ static intBool CheckDuplicateSlots(
  **********************************************************/
 static struct lhsParseNode *ParseClassRestriction(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   struct token *theToken)
   {
@@ -1379,6 +1390,7 @@ static struct lhsParseNode *ParseClassRestriction(
  **********************************************************/
 static struct lhsParseNode *ParseNameRestriction(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   struct token *theToken)
   {
@@ -1439,6 +1451,7 @@ static struct lhsParseNode *ParseNameRestriction(
  ***************************************************/
 static struct lhsParseNode *ParseSlotRestriction(
   void *theEnv,
+  EXEC_STATUS,
   char *readSource,
   struct token *theToken,
   CONSTRAINT_RECORD *slotConstraints,
@@ -1493,6 +1506,7 @@ static struct lhsParseNode *ParseSlotRestriction(
  ********************************************************/
 static CLASS_BITMAP *NewClassBitMap(
   void *theEnv,
+  EXEC_STATUS,
   int maxid,
   int set)
   {
@@ -1522,6 +1536,7 @@ static CLASS_BITMAP *NewClassBitMap(
  ***********************************************************/
 static void InitializeClassBitMap(
   void *theEnv,
+  EXEC_STATUS,
   CLASS_BITMAP *bmp,
   int set)
   {
@@ -1560,6 +1575,7 @@ static void InitializeClassBitMap(
  ********************************************/
 static void DeleteIntermediateClassBitMap(
   void *theEnv,
+  EXEC_STATUS,
   CLASS_BITMAP *bmp)
   {
    rm(theEnv,(void *) bmp,ClassBitMapSize(bmp));
@@ -1582,6 +1598,7 @@ static void DeleteIntermediateClassBitMap(
 #endif
 static void *CopyClassBitMap(
   void *theEnv,
+  EXEC_STATUS,
   void *gset)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
@@ -1605,6 +1622,7 @@ static void *CopyClassBitMap(
  **********************************************************/
 static void DeleteClassBitMap(
   void *theEnv,
+  EXEC_STATUS,
   void *gset)
   {
    if (gset == NULL)
@@ -1625,6 +1643,7 @@ static void DeleteClassBitMap(
  ***************************************************/
 static void MarkBitMapClassesBusy(
   void *theEnv,
+  EXEC_STATUS,
   BITMAP_HN *bmphn,
   int offset)
   {
@@ -1713,6 +1732,7 @@ static intBool IdenticalClassBitMap(
  *****************************************************************/
 static intBool ProcessClassRestriction(
   void *theEnv,
+  EXEC_STATUS,
   CLASS_BITMAP *clsset,
   struct lhsParseNode **classRestrictions,
   int recursiveCall)
@@ -1810,6 +1830,7 @@ static intBool ProcessClassRestriction(
  ****************************************************************/
 static CONSTRAINT_RECORD *ProcessSlotRestriction(
   void *theEnv,
+  EXEC_STATUS,
   CLASS_BITMAP *clsset,
   SYMBOL_HN *slotName,
   int *multip)
@@ -1904,6 +1925,7 @@ static void UnionClassBitMaps(
  *****************************************************/
 static CLASS_BITMAP *PackClassBitMap(
   void *theEnv,
+  EXEC_STATUS,
   CLASS_BITMAP *oldset)
   {
    register unsigned short newmaxid;
@@ -1944,6 +1966,7 @@ static CLASS_BITMAP *PackClassBitMap(
  *****************************************************************/
 static struct lhsParseNode *FilterObjectPattern(
   void *theEnv,
+  EXEC_STATUS,
   struct patternParser *selfPatternType,
   struct lhsParseNode *unfilteredSlots,
   struct lhsParseNode **bitmap_slot,
@@ -2009,6 +2032,7 @@ static struct lhsParseNode *FilterObjectPattern(
  ***************************************************/
 static BITMAP_HN *FormSlotBitMap(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *thePattern)
   {
    struct lhsParseNode *node;
@@ -2066,6 +2090,7 @@ static BITMAP_HN *FormSlotBitMap(
  ****************************************************/
 static struct lhsParseNode *RemoveSlotExistenceTests(
   void *theEnv,
+  EXEC_STATUS,
   struct lhsParseNode *thePattern,
   BITMAP_HN **bmp)
   {
@@ -2238,7 +2263,8 @@ static struct lhsParseNode *RemoveSlotExistenceTests(
                          (name [initial-object]))
  ***************************************************/
 static struct lhsParseNode *CreateInitialObjectPattern(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct lhsParseNode *topNode;
    CLASS_BITMAP *clsset;
@@ -2279,6 +2305,7 @@ static struct lhsParseNode *CreateInitialObjectPattern(
  **************************************************************/
 static EXPRESSION *ObjectMatchDelayParse(
   void *theEnv,
+  EXEC_STATUS,
   struct expr *top,
   char *infile)
   {
@@ -2318,6 +2345,7 @@ static EXPRESSION *ObjectMatchDelayParse(
 #endif
 static void MarkObjectPtnIncrementalReset(
   void *theEnv,
+  EXEC_STATUS,
   struct patternNodeHeader *thePattern,
   int value)
   {
@@ -2343,7 +2371,8 @@ static void MarkObjectPtnIncrementalReset(
   NOTES        : None
  ***********************************************************/
 static void ObjectIncrementalReset(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    INSTANCE_TYPE *ins;
    

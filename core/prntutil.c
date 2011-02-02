@@ -57,7 +57,8 @@
 /*    data for print utility routines.               */
 /*****************************************************/
 globle void InitializePrintUtilityData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    AllocateEnvironmentData(theEnv,PRINT_UTILITY_DATA,sizeof(struct printUtilityData),NULL);
   }
@@ -69,6 +70,7 @@ globle void InitializePrintUtilityData(
 /***********************************************************/
 globle void PrintInChunks(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   char *bigString)
   {
@@ -96,6 +98,7 @@ globle void PrintInChunks(
 /************************************************************/
 globle void PrintFloat(
   void *theEnv,
+  EXEC_STATUS,
   char *fileid,
   double number)
   {
@@ -110,6 +113,7 @@ globle void PrintFloat(
 /****************************************************/
 globle void PrintLongInteger(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   long long number)
   {
@@ -124,6 +128,7 @@ globle void PrintLongInteger(
 /**************************************/
 globle void PrintAtom(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   int type,
   void *value)
@@ -206,6 +211,7 @@ globle void PrintAtom(
 /**********************************************************/
 globle void PrintTally(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   long long count,
   char *singular,
@@ -229,6 +235,7 @@ globle void PrintTally(
 /********************************************/
 globle void PrintErrorID(
   void *theEnv,
+  EXEC_STATUS,
   char *module,
   int errorID,
   int printCR)
@@ -246,6 +253,7 @@ globle void PrintErrorID(
 /**********************************************/
 globle void PrintWarningID(
   void *theEnv,
+  EXEC_STATUS,
   char *module,
   int warningID,
   int printCR)
@@ -263,6 +271,7 @@ globle void PrintWarningID(
 /***************************************************/
 globle void CantFindItemErrorMessage(
   void *theEnv,
+  EXEC_STATUS,
   char *itemType,
   char *itemName)
   {
@@ -280,6 +289,7 @@ globle void CantFindItemErrorMessage(
 /*****************************************************/
 globle void CantFindItemInFunctionErrorMessage(
   void *theEnv,
+  EXEC_STATUS,
   char *itemType,
   char *itemName,
   char *func)
@@ -300,6 +310,7 @@ globle void CantFindItemInFunctionErrorMessage(
 /*****************************************************/
 globle void CantDeleteItemErrorMessage(
   void *theEnv,
+  EXEC_STATUS,
   char *itemType,
   char *itemName)
   {
@@ -317,6 +328,7 @@ globle void CantDeleteItemErrorMessage(
 /****************************************************/
 globle void AlreadyParsedErrorMessage(
   void *theEnv,
+  EXEC_STATUS,
   char *itemType,
   char *itemName)
   {
@@ -332,6 +344,7 @@ globle void AlreadyParsedErrorMessage(
 /*********************************************************/
 globle void SyntaxErrorMessage(
   void *theEnv,
+  EXEC_STATUS,
   char *location)
   {
    PrintErrorID(theEnv,"PRNTUTIL",2,TRUE);
@@ -353,6 +366,7 @@ globle void SyntaxErrorMessage(
 /****************************************************/
 globle void LocalVariableErrorMessage(
   void *theEnv,
+  EXEC_STATUS,
   char *byWhat)
   {
    PrintErrorID(theEnv,"PRNTUTIL",6,TRUE);
@@ -367,6 +381,7 @@ globle void LocalVariableErrorMessage(
 /******************************************/
 globle void SystemError(
   void *theEnv,
+  EXEC_STATUS,
   char *module,
   int errorID)
   {
@@ -393,6 +408,7 @@ globle void SystemError(
 /*******************************************************/
 globle void DivideByZeroErrorMessage(
   void *theEnv,
+  EXEC_STATUS,
   char *functionName)
   {
    PrintErrorID(theEnv,"PRNTUTIL",7,FALSE);
@@ -406,6 +422,7 @@ globle void DivideByZeroErrorMessage(
 /*******************************************************/
 globle char *FloatToString(
   void *theEnv,
+  EXEC_STATUS,
   double number)
   {
    char floatString[40];
@@ -435,6 +452,7 @@ globle char *FloatToString(
 /*******************************************************************/
 globle char *LongIntegerToString(
   void *theEnv,
+  EXEC_STATUS,
   long long number)
   {
    char buffer[50];
@@ -451,6 +469,7 @@ globle char *LongIntegerToString(
 /*******************************************************************/
 globle char *DataObjectToString(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *theDO)
   {
    void *thePtr;
@@ -554,6 +573,7 @@ globle char *DataObjectToString(
 /************************************************************/
 globle void SalienceInformationError(
   void *theEnv,
+  EXEC_STATUS,
   char *constructType,
   char *constructName)
   {
@@ -576,6 +596,7 @@ globle void SalienceInformationError(
 /**********************************************************/
 globle void SalienceRangeError(
   void *theEnv,
+  EXEC_STATUS,
   int min,
   int max)
   {
@@ -592,7 +613,8 @@ globle void SalienceRangeError(
 /*   a rule's salience does not evaluate to an integer.        */
 /***************************************************************/
 globle void SalienceNonIntegerError(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    PrintErrorID(theEnv,"PRNTUTIL",10,TRUE);
    EnvPrintRouter(theEnv,WERROR,"Salience value must be an integer value.\n");
@@ -606,6 +628,7 @@ globle void SalienceNonIntegerError(
 /***************************************************/
 globle void SlotExistError(
   void *theEnv,
+  EXEC_STATUS,
   char *sname,
   char *func)
   {

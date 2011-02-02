@@ -76,7 +76,8 @@
 /*   the construct profiling functions.               */
 /******************************************************/
 globle void ConstructProfilingFunctionDefinitions(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct userDataRecord profileDataInfo = { 0, CreateProfileData, DeleteProfileData };
 
@@ -111,7 +112,8 @@ globle void ConstructProfilingFunctionDefinitions(
 /*   profile user data structure. */
 /**********************************/
 globle void *CreateProfileData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct constructProfileInfo *theInfo;
    
@@ -132,6 +134,7 @@ globle void *CreateProfileData(
 /**************************************/
 globle void DeleteProfileData(
   void *theEnv,
+  EXEC_STATUS,
   void *theData)
   {
    genfree(theEnv,theData,sizeof(struct constructProfileInfo));
@@ -142,7 +145,8 @@ globle void DeleteProfileData(
 /*   for the profile command.         */
 /**************************************/
 globle void ProfileCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    char *argument;
    DATA_OBJECT theValue;
@@ -167,6 +171,7 @@ globle void ProfileCommand(
 /******************************/
 globle intBool Profile(
   void *theEnv,
+  EXEC_STATUS,
   char *argument)
   {
    /*======================================================*/
@@ -222,7 +227,8 @@ globle intBool Profile(
 /*   for the profile-info command.        */
 /******************************************/
 globle void ProfileInfoCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    int argCount;
    DATA_OBJECT theValue;
@@ -291,6 +297,7 @@ globle void ProfileInfoCommand(
 /**********************************************/
 globle void StartProfile(
   void *theEnv,
+  EXEC_STATUS,
   struct profileFrameInfo *theFrame,
   struct userData **theList,
   intBool checkFlag)
@@ -337,6 +344,7 @@ globle void StartProfile(
 /*******************************************/
 globle void EndProfile(
   void *theEnv,
+  EXEC_STATUS,
   struct profileFrameInfo *theFrame)
   {
    double endTime, addTime;
@@ -366,6 +374,7 @@ globle void EndProfile(
 /******************************************/
 static intBool OutputProfileInfo(
   void *theEnv,
+  EXEC_STATUS,
   char *itemName,
   struct constructProfileInfo *profileInfo,
   char *printPrefixBefore,
@@ -431,7 +440,8 @@ static intBool OutputProfileInfo(
 /*   for the profile-reset command.        */
 /*******************************************/
 globle void ProfileResetCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct FunctionDefinition *theFunction;
    int i;
@@ -553,7 +563,8 @@ globle void ResetProfileInfo(
 /* OutputUserFunctionsInfo:       */
 /*************************************************/
 static void OutputUserFunctionsInfo(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct FunctionDefinition *theFunction;
    int i;
@@ -589,7 +600,8 @@ static void OutputUserFunctionsInfo(
 #pragma argsused
 #endif
 static void OutputConstructsCodeInfo(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
 #if (! DEFFUNCTION_CONSTRUCT) && (! DEFGENERIC_CONSTRUCT) && (! OBJECT_SYSTEM) && (! DEFRULE_CONSTRUCT)
 #pragma unused(theEnv)
@@ -711,7 +723,8 @@ static void OutputConstructsCodeInfo(
 /*   for the set-profile-percent-threshold command.      */
 /*********************************************************/
 globle double SetProfilePercentThresholdCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DATA_OBJECT theValue;
    double newThreshold;
@@ -743,6 +756,7 @@ globle double SetProfilePercentThresholdCommand(
 /****************************************************/
 globle double SetProfilePercentThreshold(
   void *theEnv,
+  EXEC_STATUS,
   double value)
   {
    double oldPercentThreshhold;
@@ -762,7 +776,8 @@ globle double SetProfilePercentThreshold(
 /*   for the get-profile-percent-threshold command.      */
 /*********************************************************/
 globle double GetProfilePercentThresholdCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {   
    EnvArgCountCheck(theEnv,"get-profile-percent-threshold",EXACTLY,0);
 
@@ -774,7 +789,8 @@ globle double GetProfilePercentThresholdCommand(
 /*   the get-profile-percent-threshold command.     */
 /****************************************************/
 globle double GetProfilePercentThreshold(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return(ProfileFunctionData(theEnv)->PercentThreshold);
   }
@@ -784,6 +800,7 @@ globle double GetProfilePercentThreshold(
 /**********************************************************/
 globle char *SetProfileOutputString(
   void *theEnv,
+  EXEC_STATUS,
   char *value)
   {
    char *oldOutputString;
@@ -804,7 +821,8 @@ globle char *SetProfileOutputString(
 /*   clear command. Removes user data attached to user functions. */
 /******************************************************************/
 static void ProfileClearFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct FunctionDefinition *theFunction;
    int i;
