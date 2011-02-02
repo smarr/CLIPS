@@ -656,8 +656,9 @@ static void * APR_THREAD_FUNC ParallelFactMatchAndLogicRetract(apr_thread_t *thr
                    params->offset,
                    params->markers,
                    params->endMark);
-  
-  EngineData(params->theEnv)->JoinOperationInProgress = FALSE;
+
+  // STEFAN: don't do that anymore for the moment
+  // EngineData(params->theEnv)->JoinOperationInProgress = FALSE;
   
   
   /*===================================================*/
@@ -819,47 +820,59 @@ globle void *EnvAssert(
    /* Pattern match the fact using the associated */
    /* deftemplate's pattern network.              */
    /*=============================================*/
-
-   EngineData(theEnv)->JoinOperationInProgress = TRUE;
-    
-    // STEFAN: Lets go parallel
-    
-    struct paramsForFactMatchAndRetract * parameters = (struct paramsForFactMatchAndRetract *)malloc(sizeof(struct paramsForFactMatchAndRetract));
-    
-    if (!parameters) {
-      SystemError(theEnv,"malloc failed",1);
+  
+    if (goParallel) {  
+      // STEFAN: Lets go parallel
+      struct paramsForFactMatchAndRetract * parameters = (struct paramsForFactMatchAndRetract *)malloc(sizeof(struct paramsForFactMatchAndRetract));
+      
+      if (!parameters) {
+        SystemError(theEnv,"malloc failed",1);
+      }
+      else {
+        parameters->theEnv     = theEnv;
+        parameters->theFact    = theFact;
+        parameters->patternPtr = theFact->whichDeftemplate->patternNetwork;
+        parameters->offset     = 0;
+        parameters->markers    = NULL;
+        parameters->endMark    = NULL;
+        
+        apr_status_t rv;
+        rv = apr_thread_pool_push(Env(theEnv)->threadPool,
+                                  ParallelFactMatchAndLogicRetract,
+                                  parameters,
+                                  0, NULL);
+        if (rv) {
+          SystemError(theEnv,"Putting task on thread pool failed",1);
+        }
+      }
+          
+      while ((apr_thread_pool_tasks_count(Env(theEnv)->threadPool) > 0)
+             || ((apr_thread_pool_busy_count(Env(theEnv)->threadPool)) > 0)) {
+        usleep(100);
+      }
+       
+      assert(apr_thread_pool_idle_count(Env(theEnv)->threadPool) == 1);
     }
     else {
-      parameters->theEnv     = theEnv;
-      parameters->theFact    = theFact;
-      parameters->patternPtr = theFact->whichDeftemplate->patternNetwork;
-      parameters->offset     = 0;
-      parameters->markers    = NULL;
-      parameters->endMark    = NULL;
+      EngineData(theEnv)->JoinOperationInProgress = TRUE;
       
-      apr_status_t rv;
-      rv = apr_thread_pool_push(Env(theEnv)->threadPool,
-                                ParallelFactMatchAndLogicRetract,
-                                parameters,
-                                0, NULL);
-      if (rv) {
-        SystemError(theEnv,"Putting task on thread pool failed",1);
-      }
+      FactPatternMatch(theEnv,
+                       theFact,
+                       theFact->whichDeftemplate->patternNetwork,
+                       0,
+                       NULL,
+                       NULL);
+      
+      EngineData(theEnv)->JoinOperationInProgress = FALSE;
+      
+      
+      /*===================================================*/
+      /* Retract other facts that were logically dependent */
+      /* on the non-existence of the fact just asserted.   */
+      /*===================================================*/
+      
+      ForceLogicalRetractions(theEnv);
     }
-    
-    /*===================================================*/
-    /* Retract other facts that were logically dependent */
-    /* on the non-existence of the fact just asserted.   */
-    /*===================================================*/
-    
-    ForceLogicalRetractions(theEnv);
-    
-    while ((apr_thread_pool_tasks_count(Env(theEnv)->threadPool) > 0)
-           || ((apr_thread_pool_busy_count(Env(theEnv)->threadPool)) > 0)) {
-      usleep(100);
-    }
-       
-    assert(apr_thread_pool_idle_count(Env(theEnv)->threadPool) == 1);
 
    /*=========================================*/
    /* Free partial matches that were released */
