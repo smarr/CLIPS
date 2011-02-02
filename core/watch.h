@@ -37,8 +37,8 @@ struct watchItem
    char *name;
    unsigned *flag;
    int code,priority;
-   unsigned (*accessFunc)(void *,int,unsigned,struct expr *);
-   unsigned (*printFunc)(void *,char *,int,struct expr *);
+   unsigned (*accessFunc)(void *,EXEC_STATUS,int,unsigned,struct expr *);
+   unsigned (*printFunc)(void *,EXEC_STATUS,char *,int,struct expr *);
    struct watchItem *next;
   };
 
@@ -67,21 +67,21 @@ struct watchData
    LOCALE intBool                        Unwatch(char *);
 #endif
 
-   LOCALE intBool                        EnvWatch(void *,char *);
-   LOCALE intBool                        EnvUnwatch(void *,char *);
-   LOCALE void                           InitializeWatchData(void *);   
-   LOCALE int                            EnvSetWatchItem(void *,char *,unsigned,struct expr *);
-   LOCALE int                            EnvGetWatchItem(void *,char *);
-   LOCALE intBool                        AddWatchItem(void *,char *,int,unsigned *,int,
-                                                      unsigned (*)(void *,int,unsigned,struct expr *),
-                                                      unsigned (*)(void *,char *,int,struct expr *));
-   LOCALE char                          *GetNthWatchName(void *,int);
-   LOCALE int                            GetNthWatchValue(void *,int);
+   LOCALE intBool                        EnvWatch(void *,EXEC_STATUS,char *);
+   LOCALE intBool                        EnvUnwatch(void *,EXEC_STATUS,char *);
+   LOCALE void                           InitializeWatchData(void *,EXEC_STATUS);   
+   LOCALE int                            EnvSetWatchItem(void *,EXEC_STATUS,char *,unsigned,struct expr *);
+   LOCALE int                            EnvGetWatchItem(void *,EXEC_STATUS,char *);
+   LOCALE intBool                        AddWatchItem(void *,EXEC_STATUS,char *,int,unsigned *,int,
+                                                      unsigned (*)(void *,EXEC_STATUS,int,unsigned,struct expr *),
+                                                      unsigned (*)(void *,EXEC_STATUS,char *,int,struct expr *));
+   LOCALE char                          *GetNthWatchName(void *,EXEC_STATUS,int);
+   LOCALE int                            GetNthWatchValue(void *,EXEC_STATUS,int);
    LOCALE void                           WatchCommand         (void *, EXEC_STATUS);
    LOCALE void                           UnwatchCommand       (void *, EXEC_STATUS);
    LOCALE void                           ListWatchItemsCommand(void *, EXEC_STATUS);
-   LOCALE void                           WatchFunctionDefinitions(void *);
-   LOCALE int                            GetWatchItemCommand(void *);
+   LOCALE void                           WatchFunctionDefinitions(void *,EXEC_STATUS);
+   LOCALE int                            GetWatchItemCommand(void *,EXEC_STATUS);
 
 #endif
 

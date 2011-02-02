@@ -37,13 +37,8 @@ struct exprHashNode;
 /* Expression Data Structures */
 /******************************/
 
-struct expr
-   {
-    unsigned short type;
-    void *value;
-    struct expr *argList;
-    struct expr *nextArg;
-   };
+# include "expression.h"
+
 
 #define arg_list argList
 #define next_arg nextArg
@@ -130,21 +125,23 @@ struct expressionData
 #define LOCALE extern
 #endif
 
-   LOCALE void                           ReturnExpression(void *,struct expr *);
-   LOCALE void                           ExpressionInstall(void *,struct expr *);
-   LOCALE void                           ExpressionDeinstall(void *,struct expr *);
-   LOCALE struct expr                   *PackExpression(void *,struct expr *);
-   LOCALE void                           ReturnPackedExpression(void *,struct expr *);
-   LOCALE void                           InitExpressionData(void *);
-   LOCALE void                           InitExpressionPointers(void *);
+# include "evaluatn.h"
+
+   LOCALE void                           ReturnExpression(void *,EXEC_STATUS,struct expr *);
+   LOCALE void                           ExpressionInstall(void *,EXEC_STATUS,struct expr *);
+   LOCALE void                           ExpressionDeinstall(void *,EXEC_STATUS,struct expr *);
+   LOCALE struct expr                   *PackExpression(void *,EXEC_STATUS,struct expr *);
+   LOCALE void                           ReturnPackedExpression(void *,EXEC_STATUS,struct expr *);
+   LOCALE void                           InitExpressionData(void *,EXEC_STATUS);
+   LOCALE void                           InitExpressionPointers(void *,EXEC_STATUS);
 #if (! BLOAD_ONLY) && (! RUN_TIME)
-   LOCALE EXPRESSION                    *AddHashedExpression(void *,EXPRESSION *);
+   LOCALE EXPRESSION                    *AddHashedExpression(void *,EXEC_STATUS,EXPRESSION *);
 #endif
 #if (! RUN_TIME)
-   LOCALE void                           RemoveHashedExpression(void *,EXPRESSION *);
+   LOCALE void                           RemoveHashedExpression(void *,EXEC_STATUS,EXPRESSION *);
 #endif
 #if BLOAD_AND_BSAVE || BLOAD_ONLY || BLOAD || CONSTRUCT_COMPILER
-   LOCALE long                           HashedExpressionIndex(void *,EXPRESSION *);
+   LOCALE long                           HashedExpressionIndex(void *,EXEC_STATUS,EXPRESSION *);
 #endif
 
 #endif

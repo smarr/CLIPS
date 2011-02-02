@@ -40,19 +40,21 @@
 #define LOCALE extern
 #endif
 
+# include "execution_status.h"
+
    LOCALE intBool                        ConstantExpression(struct expr *);
-   LOCALE void                           PrintExpression(void *,char *,struct expr *);
+   LOCALE void                           PrintExpression(void *,EXEC_STATUS,char *,struct expr *);
    LOCALE long                           ExpressionSize(struct expr *);
    LOCALE int                            CountArguments(struct expr *);
-   LOCALE struct expr                   *CopyExpression(void *,struct expr *);
+   LOCALE struct expr                   *CopyExpression(void *,EXEC_STATUS,struct expr *);
    LOCALE intBool                        ExpressionContainsVariables(struct expr *,int);
    LOCALE intBool                        IdenticalExpression(struct expr *,struct expr *);
-   LOCALE struct expr                   *GenConstant(void *,unsigned short,void *);
+   LOCALE struct expr                   *GenConstant(void *,EXEC_STATUS,unsigned short,void *);
 #if ! RUN_TIME
-   LOCALE int                            CheckArgumentAgainstRestriction(void *,struct expr *,int);
+   LOCALE int                            CheckArgumentAgainstRestriction(void *,EXEC_STATUS,struct expr *,int);
 #endif
    LOCALE intBool                        ConstantType(int);
-   LOCALE struct expr                   *CombineExpressions(void *,struct expr *,struct expr *);
+   LOCALE struct expr                   *CombineExpressions(void *,EXEC_STATUS,struct expr *,struct expr *);
    LOCALE struct expr                   *AppendExpressions(struct expr *,struct expr *);
 
 #endif

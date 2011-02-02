@@ -85,15 +85,17 @@ struct factQueryData
 
 #define QUERY_DELIMETER_STRING     "(QDS)"
 
-LOCALE void SetupFactQuery(void *);
-LOCALE void GetQueryFact(void *,DATA_OBJECT *);
-LOCALE void GetQueryFactSlot(void *,DATA_OBJECT *);
-LOCALE intBool AnyFacts(void *);
-LOCALE void QueryFindFact(void *,DATA_OBJECT *);
-LOCALE void QueryFindAllFacts(void *,DATA_OBJECT *);
-LOCALE void QueryDoForFact(void *,DATA_OBJECT *);
-LOCALE void QueryDoForAllFacts(void *,DATA_OBJECT *);
-LOCALE void DelayedQueryDoForAllFacts(void *,DATA_OBJECT *);
+# include "execution_status.h"
+
+LOCALE void SetupFactQuery(void *,EXEC_STATUS);
+LOCALE void GetQueryFact(void *,EXEC_STATUS,DATA_OBJECT *);
+LOCALE void GetQueryFactSlot(void *,EXEC_STATUS,DATA_OBJECT *);
+LOCALE intBool AnyFacts(void *,EXEC_STATUS);
+LOCALE void QueryFindFact(void *,EXEC_STATUS,DATA_OBJECT *);
+LOCALE void QueryFindAllFacts(void *,EXEC_STATUS,DATA_OBJECT *);
+LOCALE void QueryDoForFact(void *,EXEC_STATUS,DATA_OBJECT *);
+LOCALE void QueryDoForAllFacts(void *,EXEC_STATUS,DATA_OBJECT *);
+LOCALE void DelayedQueryDoForAllFacts(void *,EXEC_STATUS,DATA_OBJECT *);
 
 #endif
 

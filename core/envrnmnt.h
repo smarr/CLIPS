@@ -52,6 +52,8 @@
 # include <apr_thread_pool.h>
 # include <apr_thread_rwlock.h>
 
+# include "evaluatn.h"
+
 struct environmentCleanupFunction
   {
    char *name;

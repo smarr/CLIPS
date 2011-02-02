@@ -53,12 +53,14 @@ struct fileRouterData
 #define LOCALE extern
 #endif
 
-   LOCALE void                           InitializeFileRouter(void *);
-   LOCALE FILE                          *FindFptr(void *,char *);
-   LOCALE int                            OpenAFile(void *,char *,char *,char *);
-   LOCALE int                            CloseAllFiles(void *);
-   LOCALE int                            CloseFile(void *,char *);
-   LOCALE int                            FindFile(void *,char *);
+# include "execution_status.h"
+
+   LOCALE void                           InitializeFileRouter(void *,EXEC_STATUS);
+   LOCALE FILE                          *FindFptr(void *,EXEC_STATUS,char *);
+   LOCALE int                            OpenAFile(void *,EXEC_STATUS,char *,char *,char *);
+   LOCALE int                            CloseAllFiles(void *,EXEC_STATUS);
+   LOCALE int                            CloseFile(void *,EXEC_STATUS,char *);
+   LOCALE int                            FindFile(void *,EXEC_STATUS,char *);
 
 #endif
 

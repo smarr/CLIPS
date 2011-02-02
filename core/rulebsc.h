@@ -51,23 +51,23 @@
 #define SetDefruleWatchFirings(a,b) EnvSetDefruleWatchFirings(GetCurrentEnvironment(),a,b)
 #define Undefrule(a) EnvUndefrule(GetCurrentEnvironment(),a)
 
-   LOCALE void                           DefruleBasicCommands(void *);
-   LOCALE void                           UndefruleCommand(void *);
-   LOCALE intBool                        EnvUndefrule(void *,void *);
-   LOCALE void                           GetDefruleListFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                           EnvGetDefruleList(void *,DATA_OBJECT_PTR,void *);
-   LOCALE void                          *DefruleModuleFunction(void *);
+   LOCALE void                           DefruleBasicCommands(void *,EXEC_STATUS);
+   LOCALE void                           UndefruleCommand(void *,EXEC_STATUS);
+   LOCALE intBool                        EnvUndefrule(void *,EXEC_STATUS,void *);
+   LOCALE void                           GetDefruleListFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
+   LOCALE void                           EnvGetDefruleList(void *,EXEC_STATUS,DATA_OBJECT_PTR,void *);
+   LOCALE void                          *DefruleModuleFunction(void *,EXEC_STATUS);
 #if DEBUGGING_FUNCTIONS
-   LOCALE void                           PPDefruleCommand(void *);
-   LOCALE int                            PPDefrule(void *,char *,char *);
-   LOCALE void                           ListDefrulesCommand(void *);
-   LOCALE void                           EnvListDefrules(void *,char *,void *);
-   LOCALE unsigned                       EnvGetDefruleWatchFirings(void *,void *);
-   LOCALE unsigned                       EnvGetDefruleWatchActivations(void *,void *);
-   LOCALE void                           EnvSetDefruleWatchFirings(void *,unsigned,void *);
-   LOCALE void                           EnvSetDefruleWatchActivations(void *,unsigned,void *);
-   LOCALE unsigned                       DefruleWatchAccess(void *,int,unsigned,struct expr *);
-   LOCALE unsigned                       DefruleWatchPrint(void *,char *,int,struct expr *);
+   LOCALE void                           PPDefruleCommand(void *,EXEC_STATUS);
+   LOCALE int                            PPDefrule(void *,EXEC_STATUS,char *,char *);
+   LOCALE void                           ListDefrulesCommand(void *,EXEC_STATUS);
+   LOCALE void                           EnvListDefrules(void *,EXEC_STATUS,char *,void *);
+   LOCALE unsigned                       EnvGetDefruleWatchFirings(void *,EXEC_STATUS,void *);
+   LOCALE unsigned                       EnvGetDefruleWatchActivations(void *,EXEC_STATUS,void *);
+   LOCALE void                           EnvSetDefruleWatchFirings(void *,EXEC_STATUS,unsigned,void *);
+   LOCALE void                           EnvSetDefruleWatchActivations(void *,EXEC_STATUS,unsigned,void *);
+   LOCALE unsigned                       DefruleWatchAccess(void *,EXEC_STATUS,int,unsigned,struct expr *);
+   LOCALE unsigned                       DefruleWatchPrint(void *,EXEC_STATUS,char *,int,struct expr *);
 #endif
 
 #endif

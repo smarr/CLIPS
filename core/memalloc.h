@@ -126,7 +126,7 @@ struct memoryData
    long int MemoryAmount;
    long int MemoryCalls;
    intBool ConserveMemory;
-   int (*OutOfMemoryFunction)(void *,size_t);
+   int (*OutOfMemoryFunction)(void *,EXEC_STATUS,size_t);
 #if BLOCK_MEMORY
    struct blockInfo *TopMemoryBlock;
    int BlockInfoSize;
@@ -147,30 +147,30 @@ struct memoryData
 #define SetConserveMemory(a) EnvSetConserveMemory(GetCurrentEnvironment(),a)
 #define SetOutOfMemoryFunction(a) EnvSetOutOfMemoryFunction(GetCurrentEnvironment(),a)
 
-   LOCALE void                           InitializeMemory(void *);
-   LOCALE void                          *genalloc(void *,size_t);
-   LOCALE int                            DefaultOutOfMemoryFunction(void *,size_t);
-   LOCALE int                          (*EnvSetOutOfMemoryFunction(void *,int (*)(void *,size_t)))(void *,size_t);
-   LOCALE int                            genfree(void *,void *,size_t);
-   LOCALE void                          *genrealloc(void *,void *,size_t,size_t);
-   LOCALE long                           EnvMemUsed(void *);
-   LOCALE long                           EnvMemRequests(void *);
-   LOCALE long                           UpdateMemoryUsed(void *,long int);
-   LOCALE long                           UpdateMemoryRequests(void *,long int);
-   LOCALE long                           EnvReleaseMem(void *,long,int);
-   LOCALE void                          *gm1(void *,size_t);
-   LOCALE void                          *gm2(void *,size_t);
-   LOCALE void                          *gm3(void *,size_t);
-   LOCALE int                            rm(void *,void *,size_t);
-   LOCALE int                            rm3(void *,void *,size_t);
-   LOCALE unsigned long                  PoolSize(void *);
-   LOCALE unsigned long                  ActualPoolSize(void *);
-   LOCALE void                          *RequestChunk(void *,size_t);
-   LOCALE int                            ReturnChunk(void *,void *,size_t);
-   LOCALE intBool                        EnvSetConserveMemory(void *,intBool);
-   LOCALE intBool                        EnvGetConserveMemory(void *);
+   LOCALE void                           InitializeMemory(void *,EXEC_STATUS);
+   LOCALE void                          *genalloc(void *,EXEC_STATUS,size_t);
+   LOCALE int                            DefaultOutOfMemoryFunction(void *,EXEC_STATUS,size_t);
+   LOCALE int                          (*EnvSetOutOfMemoryFunction(void *,EXEC_STATUS,int (*)(void *,EXEC_STATUS,size_t)))(void *,EXEC_STATUS,size_t);
+   LOCALE int                            genfree(void *,EXEC_STATUS,void *,size_t);
+   LOCALE void                          *genrealloc(void *,EXEC_STATUS,void *,size_t,size_t);
+   LOCALE long                           EnvMemUsed(void *,EXEC_STATUS);
+   LOCALE long                           EnvMemRequests(void *,EXEC_STATUS);
+   LOCALE long                           UpdateMemoryUsed(void *,EXEC_STATUS,long int);
+   LOCALE long                           UpdateMemoryRequests(void *,EXEC_STATUS,long int);
+   LOCALE long                           EnvReleaseMem(void *,EXEC_STATUS,long,int);
+   LOCALE void                          *gm1(void *,EXEC_STATUS,size_t);
+   LOCALE void                          *gm2(void *,EXEC_STATUS,size_t);
+   LOCALE void                          *gm3(void *,EXEC_STATUS,size_t);
+   LOCALE int                            rm(void *,EXEC_STATUS,void *,size_t);
+   LOCALE int                            rm3(void *,EXEC_STATUS,void *,size_t);
+   LOCALE unsigned long                  PoolSize(void *,EXEC_STATUS);
+   LOCALE unsigned long                  ActualPoolSize(void *,EXEC_STATUS);
+   LOCALE void                          *RequestChunk(void *,EXEC_STATUS,size_t);
+   LOCALE int                            ReturnChunk(void *,EXEC_STATUS,void *,size_t);
+   LOCALE intBool                        EnvSetConserveMemory(void *,EXEC_STATUS,intBool);
+   LOCALE intBool                        EnvGetConserveMemory(void *,EXEC_STATUS);
    LOCALE void                           genmemcpy(char *,char *,unsigned long);
-   LOCALE void                           ReturnAllBlocks(void *);
+   LOCALE void                           ReturnAllBlocks(void *,EXEC_STATUS);
 
 #endif
 

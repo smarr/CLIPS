@@ -44,7 +44,9 @@ struct factBinaryData
 #define LOCALE extern
 #endif
 
-   LOCALE void                           FactBinarySetup(void *);
+# include "evaluatn.h"
+
+   LOCALE void                           FactBinarySetup(void *,EXEC_STATUS);
 
 #define BsaveFactPatternIndex(patPtr) ((patPtr == NULL) ? -1L : ((struct factPatternNode *) patPtr)->bsaveID)
 #define BloadFactPatternPointer(i) ((struct factPatternNode *) ((i == -1L) ? NULL : &FactBinaryData(theEnv)->FactPatternArray[i]))

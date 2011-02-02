@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0A3581FC12FA243E00B7BEEF /* execution_status.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A3581FA12FA243E00B7BEEF /* execution_status.h */; };
+		0A3581FD12FA243E00B7BEEF /* expression.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A3581FB12FA243E00B7BEEF /* expression.h */; };
+		0A3581FE12FA243E00B7BEEF /* execution_status.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A3581FA12FA243E00B7BEEF /* execution_status.h */; };
+		0A3581FF12FA243E00B7BEEF /* expression.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A3581FB12FA243E00B7BEEF /* expression.h */; };
 		0A45181712F98A140063F45F /* fact_command.c in Sources */ = {isa = PBXBuildFile; fileRef = 0A45181512F98A140063F45F /* fact_command.c */; };
 		0A45181812F98A140063F45F /* fact_command.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A45181612F98A140063F45F /* fact_command.h */; };
 		0A45181912F98A140063F45F /* fact_command.c in Sources */ = {isa = PBXBuildFile; fileRef = 0A45181512F98A140063F45F /* fact_command.c */; };
@@ -635,6 +639,8 @@
 
 /* Begin PBXFileReference section */
 		089C1660FE840EACC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		0A3581FA12FA243E00B7BEEF /* execution_status.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = execution_status.h; path = ../core/execution_status.h; sourceTree = SOURCE_ROOT; };
+		0A3581FB12FA243E00B7BEEF /* expression.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = expression.h; path = ../core/expression.h; sourceTree = SOURCE_ROOT; };
 		0A45181512F98A140063F45F /* fact_command.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fact_command.c; sourceTree = "<group>"; };
 		0A45181612F98A140063F45F /* fact_command.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fact_command.h; sourceTree = "<group>"; };
 		0A45182812F98B2D0063F45F /* fact_manager.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fact_manager.c; sourceTree = "<group>"; };
@@ -1287,6 +1293,8 @@
 				0ADFF39E12F5832B00AE91B5 /* envrnmnt.h */,
 				0ADFF39F12F5832B00AE91B5 /* evaluatn.h */,
 				0ADFF3A012F5832B00AE91B5 /* expressn.h */,
+				0A3581FA12FA243E00B7BEEF /* execution_status.h */,
+				0A3581FB12FA243E00B7BEEF /* expression.h */,
 				0ADFF3A112F5832B00AE91B5 /* exprnbin.h */,
 				0ADFF3A212F5832B00AE91B5 /* exprnops.h */,
 				0ADFF3A312F5832B00AE91B5 /* exprnpsr.h */,
@@ -1764,6 +1772,8 @@
 				0AC5631312F6FEC500D7E70E /* apr_pools.h in Headers */,
 				0A45181812F98A140063F45F /* fact_command.h in Headers */,
 				0A45182B12F98B2D0063F45F /* fact_manager.h in Headers */,
+				0A3581FC12FA243E00B7BEEF /* execution_status.h in Headers */,
+				0A3581FD12FA243E00B7BEEF /* expression.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1775,6 +1785,8 @@
 				0AC5631412F6FEC500D7E70E /* apr_pools.h in Headers */,
 				0A45181A12F98A140063F45F /* fact_command.h in Headers */,
 				0A45182D12F98B2D0063F45F /* fact_manager.h in Headers */,
+				0A3581FE12FA243E00B7BEEF /* execution_status.h in Headers */,
+				0A3581FF12FA243E00B7BEEF /* expression.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
