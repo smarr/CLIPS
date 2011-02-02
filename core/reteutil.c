@@ -1365,10 +1365,10 @@ unsigned long ComputeRightHashValue(
        DATA_OBJECT theResult;
        struct expr *oldArgument;
         
-       oldArgument = EvaluationData(theEnv)->CurrentExpression;
-       EvaluationData(theEnv)->CurrentExpression = tempExpr;
+       oldArgument = execStatus->CurrentExpression;
+       execStatus->CurrentExpression = tempExpr;
        (*EvaluationData(theEnv)->PrimitivesArray[tempExpr->type]->evaluateFunction)(theEnv,tempExpr->value,&theResult);
-       EvaluationData(theEnv)->CurrentExpression = oldArgument;
+       execStatus->CurrentExpression = oldArgument;
         
        switch (theResult.type)
          {

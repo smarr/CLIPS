@@ -55,33 +55,33 @@
 #define SlotDefaultValue(a,b,c) EnvSlotDefaultValue(GetCurrentEnvironment(),a,b,c)
 
 #if DEBUGGING_FUNCTIONS
-LOCALE void BrowseClassesCommand(void *);
+LOCALE void BrowseClassesCommand(void *, EXEC_STATUS);
 LOCALE void EnvBrowseClasses(void *,char *,void *);
-LOCALE void DescribeClassCommand(void *);
+LOCALE void DescribeClassCommand(void *,EXEC_STATUS);
 LOCALE void EnvDescribeClass(void *,char *,void *);
 #endif
 
 LOCALE char *GetCreateAccessorString(void *);
 
 LOCALE void *GetDefclassModuleCommand(void *);
-LOCALE intBool SuperclassPCommand(void *);
+LOCALE intBool SuperclassPCommand(void *,EXEC_STATUS);
 LOCALE intBool EnvSuperclassP(void *,void *,void *);
-LOCALE intBool SubclassPCommand(void *);
+LOCALE intBool SubclassPCommand(void *,EXEC_STATUS);
 LOCALE intBool EnvSubclassP(void *,void *,void *);
-LOCALE int SlotExistPCommand(void *);
+LOCALE int SlotExistPCommand(void *, EXEC_STATUS);
 LOCALE intBool EnvSlotExistP(void *,void *,char *,intBool);
-LOCALE int MessageHandlerExistPCommand(void *);
-LOCALE intBool SlotWritablePCommand(void *);
+LOCALE int MessageHandlerExistPCommand(void *, EXEC_STATUS);
+LOCALE intBool SlotWritablePCommand(void *,EXEC_STATUS);
 LOCALE intBool EnvSlotWritableP(void *,void *,char *);
-LOCALE intBool SlotInitablePCommand(void *);
+LOCALE intBool SlotInitablePCommand(void *,EXEC_STATUS);
 LOCALE intBool EnvSlotInitableP(void *,void *,char *);
-LOCALE intBool SlotPublicPCommand(void *);
+LOCALE intBool SlotPublicPCommand(void *,EXEC_STATUS);
 LOCALE intBool EnvSlotPublicP(void *,void *,char *);
-LOCALE intBool SlotDirectAccessPCommand(void *);
+LOCALE intBool SlotDirectAccessPCommand(void *,EXEC_STATUS);
 LOCALE intBool EnvSlotDirectAccessP(void *,void *,char *);
-LOCALE void SlotDefaultValueCommand(void *,DATA_OBJECT_PTR);
+LOCALE void SlotDefaultValueCommand(void *,EXEC_STATUS,DATA_OBJECT_PTR);
 LOCALE intBool EnvSlotDefaultValue(void *,void *,char *,DATA_OBJECT_PTR);
-LOCALE int ClassExistPCommand(void *);
+LOCALE int ClassExistPCommand(void *, EXEC_STATUS);
 LOCALE int EnvSlotDefaultP(void *,void *,char *);
   
 #ifndef _CLASSEXM_SOURCE_

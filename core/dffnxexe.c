@@ -96,8 +96,8 @@ globle void CallDeffunction(
 
    result->type = SYMBOL;
    result->value = EnvFalseSymbol(theEnv);
-   EvaluationData(theEnv)->EvaluationError = FALSE;
-   if (EvaluationData(theEnv)->HaltExecution)
+   execStatus->EvaluationError = FALSE;
+   if (execStatus->HaltExecution)
      return;
    oldce = ExecutingConstruct(theEnv);
    SetExecutingConstruct(theEnv,TRUE);
@@ -107,12 +107,12 @@ globle void CallDeffunction(
    dptr->executing++;
    PushProcParameters(theEnv,args,CountArguments(args),EnvGetDeffunctionName(theEnv,(void *) dptr),
                       "deffunction",UnboundDeffunctionErr);
-   if (EvaluationData(theEnv)->EvaluationError)
+   if (execStatus->EvaluationError)
      {
       dptr->executing--;
       DeffunctionData(theEnv)->ExecutingDeffunction = previouslyExecutingDeffunction;
       execStatus->CurrentEvaluationDepth--;
-      PeriodicCleanup(theEnv,FALSE,TRUE);
+      PeriodicCleanup(theEnv,execStatus,FALSE,TRUE);
       SetExecutingConstruct(theEnv,oldce);
       return;
      }
@@ -147,7 +147,7 @@ globle void CallDeffunction(
    DeffunctionData(theEnv)->ExecutingDeffunction = previouslyExecutingDeffunction;
    execStatus->CurrentEvaluationDepth--;
    PropagateReturnValue(theEnv,result);
-   PeriodicCleanup(theEnv,FALSE,TRUE);
+   PeriodicCleanup(theEnv,execStatus,FALSE,TRUE);
    SetExecutingConstruct(theEnv,oldce);
   }
 

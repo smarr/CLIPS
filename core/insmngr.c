@@ -172,7 +172,7 @@ globle void MakeInstanceCommand(
       cls = LookupDefclassInScope(theEnv,DOToString(temp));
       if (cls == NULL)
         {
-         ClassExistError(theEnv,ValueToString(ExpressionFunctionCallName(EvaluationData(theEnv)->CurrentExpression)),
+         ClassExistError(theEnv,ValueToString(ExpressionFunctionCallName(execStatus->CurrentExpression)),
                          DOToString(temp));
          SetEvaluationError(theEnv,TRUE);
          return;
@@ -435,11 +435,11 @@ globle void InitSlotsCommand(
   {
    SetpType(result,SYMBOL);
    SetpValue(result,EnvFalseSymbol(theEnv));
-   EvaluationData(theEnv)->EvaluationError = FALSE;
+   execStatus->EvaluationError = FALSE;
    if (CheckCurrentMessage(theEnv,"init-slots",TRUE) == FALSE)
      return;
    EvaluateClassDefaults(theEnv,GetActiveInstance(theEnv));
-   if (! EvaluationData(theEnv)->EvaluationError)
+   if (! execStatus->EvaluationError)
      {
       SetpType(result,INSTANCE_ADDRESS);
       SetpValue(result,(void *) GetActiveInstance(theEnv));
@@ -907,7 +907,7 @@ static int CoreInitializeInstance(
 
    ins->busy--;
    ins->installed = 1;
-   if (EvaluationData(theEnv)->EvaluationError)
+   if (execStatus->EvaluationError)
      {
       PrintErrorID(theEnv,"INSMNGR",8,FALSE);
       EnvPrintRouter(theEnv,WERROR,"An error occurred during the initialization of instance ");
@@ -940,7 +940,7 @@ static int InsertSlotOverrides(
    INSTANCE_SLOT *slot;
    DATA_OBJECT temp,junk;
 
-   EvaluationData(theEnv)->EvaluationError = FALSE;
+   execStatus->EvaluationError = FALSE;
    while (slot_exp != NULL)
      {
       if ((EvaluateExpression(theEnv,slot_exp,&temp) == TRUE) ? TRUE :
@@ -982,7 +982,7 @@ static int InsertSlotOverrides(
          PutSlotValue(theEnv,ins,slot,&temp,&junk,"function make-instance");
         }
 
-      if (EvaluationData(theEnv)->EvaluationError)
+      if (execStatus->EvaluationError)
         return(FALSE);
       slot->override = TRUE;
       slot_exp = slot_exp->nextArg->nextArg;
@@ -1055,7 +1055,7 @@ static void EvaluateClassDefaults(
             EnvPrintRouter(theEnv,WERROR," instance deleted by slot-override evaluation.\n");
             SetEvaluationError(theEnv,TRUE);
            }
-         if (EvaluationData(theEnv)->EvaluationError)
+         if (execStatus->EvaluationError)
             return;
         }
       slot->override = FALSE;

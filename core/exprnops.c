@@ -378,10 +378,10 @@ globle void PrintExpression(
            break;
 
          default:
-           oldExpression = EvaluationData(theEnv)->CurrentExpression;
-           EvaluationData(theEnv)->CurrentExpression = theExpression;
+           oldExpression = execStatus->CurrentExpression;
+           execStatus->CurrentExpression = theExpression;
            PrintAtom(theEnv,fileid,theExpression->type,theExpression->value);
-           EvaluationData(theEnv)->CurrentExpression = oldExpression;
+           execStatus->CurrentExpression = oldExpression;
            break;
         }
 

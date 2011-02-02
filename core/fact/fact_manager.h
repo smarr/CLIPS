@@ -121,18 +121,18 @@ struct factsData
    LOCALE long long                      FactIndex(void *);
 #endif
 
-   LOCALE void                          *EnvAssert(void *,void *, int);
-   LOCALE void                          *EnvAssertString(void *,char *);
-   LOCALE struct fact                   *EnvCreateFact(void *,void *);
+   LOCALE void                          *EnvAssert(void *,EXEC_STATUS,void *, int);
+   LOCALE void                          *EnvAssertString(void *,EXEC_STATUS,char *);
+   LOCALE struct fact                   *EnvCreateFact(void *,EXEC_STATUS,void *);
    LOCALE void                           EnvDecrementFactCount(void *,void *);
    LOCALE long long                      EnvFactIndex(void *,void *);
    LOCALE intBool                        EnvGetFactSlot(void *,void *,char *,DATA_OBJECT *);
    LOCALE void                           PrintFactWithIdentifier(void *,char *,struct fact *);
    LOCALE void                           PrintFact(void *,char *,struct fact *,int,int);
    LOCALE void                           PrintFactIdentifierInLongForm(void *,char *,void *);
-   LOCALE intBool                        EnvRetract(void *,void *);
-   LOCALE void                           RemoveAllFacts(void *);
-   LOCALE struct fact                   *CreateFactBySize(void *,unsigned);
+   LOCALE intBool                        EnvRetract(void *,EXEC_STATUS,void *);
+   LOCALE void                           RemoveAllFacts(void *,EXEC_STATUS);
+   LOCALE struct fact                   *CreateFactBySize(void *,EXEC_STATUS,unsigned);
    LOCALE void                           FactInstall(void *,struct fact *);
    LOCALE void                           FactDeinstall(void *,struct fact *);
    LOCALE void                          *EnvGetNextFact(void *,void *);

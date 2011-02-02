@@ -252,7 +252,7 @@ static void DuplicateModifyCommand(
    /* Duplicate the values from the old fact (skipping multifields). */
    /*================================================================*/
 
-   newFact = (struct fact *) CreateFactBySize(theEnv,oldFact->theProposition.multifieldLength);
+   newFact = (struct fact *) CreateFactBySize(theEnv,execStatus,oldFact->theProposition.multifieldLength);
    newFact->whichDeftemplate = templatePtr;
    for (i = 0; i < (int) oldFact->theProposition.multifieldLength; i++)
      {
@@ -406,8 +406,8 @@ static void DuplicateModifyCommand(
    /*======================================*/
 
 # warning STEFAN: check back here, whether we need to use DuplicateModifyCommand and want to do EnvAssert with (..,.., TRUE)
-   if (retractIt) EnvRetract(theEnv,oldFact);
-   theFact = (struct fact *) EnvAssert(theEnv,newFact, FALSE);
+   if (retractIt) EnvRetract(theEnv,execStatus,oldFact);
+   theFact = (struct fact *) EnvAssert(theEnv,execStatus,newFact, FALSE);
 
    /*========================================*/
    /* The asserted fact is the return value. */
@@ -446,13 +446,13 @@ globle void DeftemplateSlotNamesFunction(
    /* Check for the correct number of arguments. */
    /*============================================*/
 
-   if (EnvArgCountCheck(theEnv,"deftemplate-slot-names",EXACTLY,1) == -1) return;
+   if (EnvArgCountCheck(theEnv,execStatus,"deftemplate-slot-names",EXACTLY,1) == -1) return;
 
    /*=======================================*/
    /* Get the reference to the deftemplate. */
    /*=======================================*/
 
-   deftemplateName = GetConstructName(theEnv,"deftemplate-slot-names","deftemplate name");
+   deftemplateName = GetConstructName(theEnv,execStatus,"deftemplate-slot-names","deftemplate name");
    if (deftemplateName == NULL) return;
 
    theDeftemplate = (struct deftemplate *) EnvFindDeftemplate(theEnv,deftemplateName);
@@ -1481,7 +1481,7 @@ globle int DeftemplateSlotFacetExistPFunction(
    /* Get the name of the facet. */
    /*============================*/
 
-   if (EnvArgTypeCheck(theEnv,"deftemplate-slot-facet-existp",3,SYMBOL,&facetName) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"deftemplate-slot-facet-existp",3,SYMBOL,&facetName) == FALSE)
      { return(FALSE); }
      
    /*======================*/
@@ -1573,7 +1573,7 @@ globle void DeftemplateSlotFacetValueFunction(
    /* Get the name of the facet. */
    /*============================*/
 
-   if (EnvArgTypeCheck(theEnv,"deftemplate-slot-facet-existp",3,SYMBOL,&facetName) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"deftemplate-slot-facet-existp",3,SYMBOL,&facetName) == FALSE)
      { return; }
      
    /*===========================*/
@@ -1655,21 +1655,21 @@ static SYMBOL_HN *CheckDeftemplateAndSlotArguments(
    /* Check for the correct number of arguments. */
    /*============================================*/
 
-   if (EnvArgCountCheck(theEnv,functionName,EXACTLY,expectedArgs) == -1) 
+   if (EnvArgCountCheck(theEnv,execStatus,functionName,EXACTLY,expectedArgs) == -1) 
      { return(NULL); }
 
    /*=====================================*/
    /* There must be at least 2 arguments. */
    /*=====================================*/
 
-   if (EnvArgCountCheck(theEnv,functionName,AT_LEAST,2) == -1) 
+   if (EnvArgCountCheck(theEnv,execStatus,functionName,AT_LEAST,2) == -1) 
      { return(NULL); }
 
    /*=======================================*/
    /* Get the reference to the deftemplate. */
    /*=======================================*/
 
-   EnvRtnUnknown(theEnv,1,&tempDO);
+   EnvRtnUnknown(theEnv,execStatus,1,&tempDO);
 
    if (GetType(tempDO) != SYMBOL)
      {
@@ -1690,7 +1690,7 @@ static SYMBOL_HN *CheckDeftemplateAndSlotArguments(
    /* Get the name of the slot. */
    /*===========================*/
 
-   if (EnvArgTypeCheck(theEnv,functionName,2,SYMBOL,&tempDO) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,functionName,2,SYMBOL,&tempDO) == FALSE)
      { return(NULL); }
      
    return((SYMBOL_HN *) GetValue(tempDO));

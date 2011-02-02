@@ -318,8 +318,8 @@ globle intBool EnvDeleteInstance(
      }
 
    if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
-       (EvaluationData(theEnv)->CurrentExpression == NULL))
-     { PeriodicCleanup(theEnv,TRUE,FALSE); }
+       (execStatus->CurrentExpression == NULL))
+     { PeriodicCleanup(theEnv,execStatus,TRUE,FALSE); }
 
    return(success);
   }
@@ -370,8 +370,8 @@ globle intBool EnvUnmakeInstance(
    CleanupInstances(theEnv);
 
    if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
-       (EvaluationData(theEnv)->CurrentExpression == NULL))
-     { PeriodicCleanup(theEnv,TRUE,FALSE); }
+       (execStatus->CurrentExpression == NULL))
+     { PeriodicCleanup(theEnv,execStatus,TRUE,FALSE); }
 
    return(success);
   }
@@ -397,10 +397,10 @@ globle void InstancesCommand(
 
    theDefmodule = (void *) EnvGetCurrentModule(theEnv);
 
-   argno = EnvRtnArgCount(theEnv);
+   argno = EnvRtnArgCount(theEnv,execStatus);
    if (argno > 0)
      {
-      if (EnvArgTypeCheck(theEnv,"instances",1,SYMBOL,&temp) == FALSE)
+      if (EnvArgTypeCheck(theEnv,execStatus,"instances",1,SYMBOL,&temp) == FALSE)
         return;
       theDefmodule = EnvFindDefmodule(theEnv,DOToString(temp));
       if ((theDefmodule != NULL) ? FALSE :
@@ -412,7 +412,7 @@ globle void InstancesCommand(
         }
       if (argno > 1)
         {
-         if (EnvArgTypeCheck(theEnv,"instances",2,SYMBOL,&temp) == FALSE)
+         if (EnvArgTypeCheck(theEnv,execStatus,"instances",2,SYMBOL,&temp) == FALSE)
            return;
          className = DOToString(temp);
          if (LookupDefclassAnywhere(theEnv,(struct defmodule *) theDefmodule,className) == NULL)
@@ -427,7 +427,7 @@ globle void InstancesCommand(
            }
          if (argno > 2)
            {
-            if (EnvArgTypeCheck(theEnv,"instances",3,SYMBOL,&temp) == FALSE)
+            if (EnvArgTypeCheck(theEnv,execStatus,"instances",3,SYMBOL,&temp) == FALSE)
               return;
             if (strcmp(DOToString(temp),ALL_QUALIFIER) != 0)
               {
@@ -533,7 +533,7 @@ globle void EnvInstances(
 
    RestoreCurrentModule(theEnv);
    ReleaseTraversalID(theEnv);
-   if (EvaluationData(theEnv)->HaltExecution == FALSE)
+   if (execStatus->HaltExecution == FALSE)
      PrintTally(theEnv,logicalName,count,"instance","instances");
   }
 
@@ -587,8 +587,8 @@ globle void *EnvMakeInstance(
    CloseStringSource(theEnv,router);
 
    if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
-       (EvaluationData(theEnv)->CurrentExpression == NULL))
-     { PeriodicCleanup(theEnv,TRUE,FALSE); }
+       (execStatus->CurrentExpression == NULL))
+     { PeriodicCleanup(theEnv,execStatus,TRUE,FALSE); }
 
    if ((result.type == SYMBOL) && (result.value == EnvFalseSymbol(theEnv)))
      return(NULL);
@@ -740,8 +740,8 @@ globle int EnvDirectPutSlot(
    if (PutSlotValue(theEnv,(INSTANCE_TYPE *) ins,sp,val,&junk,"external put"))
      {
       if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
-          (EvaluationData(theEnv)->CurrentExpression == NULL))
-        { PeriodicCleanup(theEnv,TRUE,FALSE); }
+          (execStatus->CurrentExpression == NULL))
+        { PeriodicCleanup(theEnv,execStatus,TRUE,FALSE); }
       return(TRUE);
      }
    return(FALSE);
@@ -997,6 +997,7 @@ globle void EnvGetInstancePPForm(
  *********************************************************/
 globle void ClassCommand(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT *result)
   {
    INSTANCE_TYPE *ins;
@@ -1004,7 +1005,7 @@ globle void ClassCommand(
    DATA_OBJECT temp;
 
    func = ValueToString(((struct FunctionDefinition *)
-                       EvaluationData(theEnv)->CurrentExpression->value)->callFunctionName);
+                       execStatus->CurrentExpression->value)->callFunctionName);
    result->type = SYMBOL;
    result->value = EnvFalseSymbol(theEnv);
    EvaluateExpression(theEnv,GetFirstArgument(),&temp);
@@ -1165,7 +1166,7 @@ globle void SymbolToInstanceName(
   void *theEnv,
   DATA_OBJECT *result)
   {
-   if (EnvArgTypeCheck(theEnv,"symbol-to-instance-name",1,SYMBOL,result) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"symbol-to-instance-name",1,SYMBOL,result) == FALSE)
      {
       SetpType(result,SYMBOL);
       SetpValue(result,EnvFalseSymbol(theEnv));
@@ -1188,7 +1189,7 @@ globle void *InstanceNameToSymbol(
   {
    DATA_OBJECT result;
 
-   if (EnvArgTypeCheck(theEnv,"instance-name-to-symbol",1,INSTANCE_NAME,&result) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"instance-name-to-symbol",1,INSTANCE_NAME,&result) == FALSE)
      return((SYMBOL_HN *) EnvFalseSymbol(theEnv));
    return((SYMBOL_HN *) result.value);
   }
@@ -1212,9 +1213,9 @@ globle void InstanceAddressCommand(
 
    result->type = SYMBOL;
    result->value = EnvFalseSymbol(theEnv);
-   if (EnvRtnArgCount(theEnv) > 1)
+   if (EnvRtnArgCount(theEnv,execStatus) > 1)
      {
-      if (EnvArgTypeCheck(theEnv,"instance-address",1,SYMBOL,&temp) == FALSE)
+      if (EnvArgTypeCheck(theEnv,execStatus,"instance-address",1,SYMBOL,&temp) == FALSE)
         return;
       theModule = (struct defmodule *) EnvFindDefmodule(theEnv,DOToString(temp));
       if ((theModule == NULL) ? (strcmp(DOToString(temp),"*") != 0) : FALSE)
@@ -1230,7 +1231,7 @@ globle void InstanceAddressCommand(
         }
       else
         searchImports = FALSE;
-      if (EnvArgTypeCheck(theEnv,"instance-address",2,INSTANCE_NAME,&temp)
+      if (EnvArgTypeCheck(theEnv,execStatus,"instance-address",2,INSTANCE_NAME,&temp)
              == FALSE)
         return;
       ins = FindInstanceInModule(theEnv,(SYMBOL_HN *) temp.value,theModule,
@@ -1522,7 +1523,7 @@ static long TabulateInstances(
    SetTraversalID(cls->traversalRecord,id);
    for (ins = cls->instanceList ; ins != NULL ; ins = ins->nxtClass)
      {
-      if (EvaluationData(theEnv)->HaltExecution)
+      if (execStatus->HaltExecution)
         return(count);
       if (allModulesFlag)
         EnvPrintRouter(theEnv,logicalName,"   ");
@@ -1533,7 +1534,7 @@ static long TabulateInstances(
      {
       for (i = 0 ; i < cls->directSubclasses.classCount ; i++)
         {
-         if (EvaluationData(theEnv)->HaltExecution)
+         if (execStatus->HaltExecution)
            return(count);
          count += TabulateInstances(theEnv,id,logicalName,
                      cls->directSubclasses.classArray[i],inheritFlag,allModulesFlag);

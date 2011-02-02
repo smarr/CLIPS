@@ -635,12 +635,13 @@ globle int HasSuperclass(
  ********************************************************************/
 globle SYMBOL_HN *CheckClassAndSlot(
    void *theEnv,
+   EXEC_STATUS,
    char *func,
    DEFCLASS **cls)
   {
    DATA_OBJECT temp;
 
-   if (EnvArgTypeCheck(theEnv,func,1,SYMBOL,&temp) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,func,1,SYMBOL,&temp) == FALSE)
      return(NULL);
    *cls = LookupDefclassByMdlOrScope(theEnv,DOToString(temp));
    if (*cls == NULL)
@@ -648,7 +649,7 @@ globle SYMBOL_HN *CheckClassAndSlot(
       ClassExistError(theEnv,func,DOToString(temp));
       return(NULL);
      }
-   if (EnvArgTypeCheck(theEnv,func,2,SYMBOL,&temp) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,func,2,SYMBOL,&temp) == FALSE)
      return(NULL);
    return((SYMBOL_HN *) GetValue(temp));
   }
@@ -761,9 +762,9 @@ globle unsigned short EnvGetClassDefaultsMode(
 /*   for the get-class-defaults-mode command.      */
 /***************************************************/
 globle void *GetClassDefaultsModeCommand(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
-   EnvArgCountCheck(theEnv,"get-class-defaults-mode",EXACTLY,0);
+   EnvArgCountCheck(theEnv,execStatus,"get-class-defaults-mode",EXACTLY,0);
 
    return((SYMBOL_HN *) EnvAddSymbol(theEnv,GetClassDefaultsModeName(EnvGetClassDefaultsMode(theEnv))));
   }
@@ -773,7 +774,7 @@ globle void *GetClassDefaultsModeCommand(
 /*   for the set-class-defaults-mode command.      */
 /***************************************************/
 globle void *SetClassDefaultsModeCommand(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    DATA_OBJECT argPtr;
    char *argument;
@@ -785,10 +786,10 @@ globle void *SetClassDefaultsModeCommand(
    /* Check for the correct number and type of arguments. */
    /*=====================================================*/
 
-   if (EnvArgCountCheck(theEnv,"set-class-defaults-mode",EXACTLY,1) == -1)
+   if (EnvArgCountCheck(theEnv,execStatus,"set-class-defaults-mode",EXACTLY,1) == -1)
      { return((SYMBOL_HN *) EnvAddSymbol(theEnv,GetClassDefaultsModeName(EnvGetClassDefaultsMode(theEnv)))); }
 
-   if (EnvArgTypeCheck(theEnv,"set-class-defaults-mode",1,SYMBOL,&argPtr) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"set-class-defaults-mode",1,SYMBOL,&argPtr) == FALSE)
      { return((SYMBOL_HN *) EnvAddSymbol(theEnv,GetClassDefaultsModeName(EnvGetClassDefaultsMode(theEnv)))); }
 
    argument = DOToString(argPtr);

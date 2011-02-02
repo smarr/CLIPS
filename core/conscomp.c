@@ -189,13 +189,13 @@ globle void ConstructsToCCommand(
    /* Check for appropriate number of arguments. */
    /*============================================*/
 
-   if ((argCount = EnvArgRangeCheck(theEnv,"constructs-to-c",2,4)) == -1) return;
+   if ((argCount = EnvArgRangeCheck(theEnv,execStatus,"constructs-to-c",2,4)) == -1) return;
 
    /*====================================================*/
    /* Get the name of the file in which to place C code. */
    /*====================================================*/
 
-   if (EnvArgTypeCheck(theEnv,"constructs-to-c",1,SYMBOL_OR_STRING,&theArg) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"constructs-to-c",1,SYMBOL_OR_STRING,&theArg) == FALSE)
      { return; }
 
    fileName = DOToString(theArg);
@@ -256,7 +256,7 @@ globle void ConstructsToCCommand(
    /* Get the runtime image ID argument. */
    /*====================================*/
 
-   if (EnvArgTypeCheck(theEnv,"constructs-to-c",2,INTEGER,&theArg) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"constructs-to-c",2,INTEGER,&theArg) == FALSE)
      { return; }
 
    id = DOToLong(theArg);
@@ -272,7 +272,7 @@ globle void ConstructsToCCommand(
    
    if (argCount == 3)
      {
-      if (EnvArgTypeCheck(theEnv,"constructs-to-c",3,SYMBOL_OR_STRING,&theArg) == FALSE)
+      if (EnvArgTypeCheck(theEnv,execStatus,"constructs-to-c",3,SYMBOL_OR_STRING,&theArg) == FALSE)
         { return; }
 
       pathName = DOToString(theArg);
@@ -291,7 +291,7 @@ globle void ConstructsToCCommand(
 
    if (argCount == 4)
      {
-      if (EnvArgTypeCheck(theEnv,"constructs-to-c",4,INTEGER,&theArg) == FALSE)
+      if (EnvArgTypeCheck(theEnv,execStatus,"constructs-to-c",4,INTEGER,&theArg) == FALSE)
         { return; }
 
       max = DOToLong(theArg);
@@ -356,7 +356,7 @@ static int ConstructsToC(
    /* that it isn't written out as C data structures. */
    /*=================================================*/
 
-   PeriodicCleanup(theEnv,FALSE,FALSE);
+   PeriodicCleanup(theEnv,execStatus,FALSE,FALSE);
 
    /*=====================================*/
    /* Initialize some global information. */

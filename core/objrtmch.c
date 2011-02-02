@@ -116,7 +116,7 @@ globle void ObjectMatchDelay(
 
    ov = SetDelayObjectPatternMatching(theEnv,TRUE);
    EvaluateExpression(theEnv,GetFirstArgument(),result);
-   if (EvaluationData(theEnv)->EvaluationError)
+   if (execStatus->EvaluationError)
      {
       SetHaltExecution(theEnv,FALSE);
       SetEvaluationError(theEnv,FALSE);
@@ -1179,10 +1179,10 @@ static intBool EvaluateObjectPatternTest(
      {
       struct expr *oldArgument;
 
-      oldArgument = EvaluationData(theEnv)->CurrentExpression;
-      EvaluationData(theEnv)->CurrentExpression = networkTest;
+      oldArgument = execStatus->CurrentExpression;
+      execStatus->CurrentExpression = networkTest;
       rv = ObjectCmpConstantFunction(theEnv,networkTest->value,&vresult);
-      EvaluationData(theEnv)->CurrentExpression = oldArgument;
+      execStatus->CurrentExpression = oldArgument;
       if (rv)
         {
          if (((struct ObjectCmpPNConstant *)
@@ -1247,12 +1247,12 @@ static intBool EvaluateObjectPatternTest(
       ======================================================= */
    else
      {
-      EvaluationData(theEnv)->HaltExecution = FALSE;
+      execStatus->HaltExecution = FALSE;
       if (EvaluateExpression(theEnv,networkTest,&vresult))
         {
          ObjectPatternNetErrorMessage(theEnv,patternNode);
-         EvaluationData(theEnv)->EvaluationError = FALSE;
-         EvaluationData(theEnv)->HaltExecution = FALSE;
+         execStatus->EvaluationError = FALSE;
+         execStatus->HaltExecution = FALSE;
          return(FALSE);
         }
       if ((vresult.value != EnvFalseSymbol(theEnv)) || (vresult.type != SYMBOL))

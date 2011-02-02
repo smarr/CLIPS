@@ -61,7 +61,7 @@ struct procedureFunctionData
    LOCALE void                           WhileFunction(void *,DATA_OBJECT_PTR);
    LOCALE void                           LoopForCountFunction(void *,DATA_OBJECT_PTR);
    LOCALE long long                      GetLoopCount(void *);
-   LOCALE void                           IfFunction(void *,DATA_OBJECT_PTR);
+   LOCALE void                           IfFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
    LOCALE void                           BindFunction(void *,DATA_OBJECT_PTR);
    LOCALE void                           PrognFunction(void *,DATA_OBJECT_PTR);
    LOCALE void                           ReturnFunction(void *,DATA_OBJECT_PTR);

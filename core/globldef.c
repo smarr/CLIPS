@@ -391,7 +391,7 @@ globle void QSetDefglobalValue(
    if (resetVar)
      {
       EvaluateExpression(theEnv,theGlobal->initial,vPtr);
-      if (EvaluationData(theEnv)->EvaluationError)
+      if (execStatus->EvaluationError)
         {
          vPtr->type = SYMBOL;
          vPtr->value = EnvFalseSymbol(theEnv);
@@ -441,8 +441,8 @@ globle void QSetDefglobalValue(
    DefglobalData(theEnv)->ChangeToGlobals = TRUE;
 
    if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
-       (EvaluationData(theEnv)->CurrentExpression == NULL))
-     { PeriodicCleanup(theEnv,TRUE,FALSE); }
+       (execStatus->CurrentExpression == NULL))
+     { PeriodicCleanup(theEnv,execStatus,TRUE,FALSE); }
   }
 
 /**************************************************************/

@@ -80,7 +80,7 @@ globle void PrintInChunks(
 
    while (((int) strlen(subString)) > 500)
      {
-      if (EvaluationData(theEnv)->HaltExecution) return;
+      if (execStatus->HaltExecution) return;
       tc = subString[500];
       subString[500] = EOS;
       EnvPrintRouter(theEnv,logicalName,subString);

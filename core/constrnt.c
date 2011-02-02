@@ -498,10 +498,10 @@ globle int SDCCommand(
 
    oldValue = EnvGetDynamicConstraintChecking(theEnv);
 
-   if (EnvArgCountCheck(theEnv,"set-dynamic-constraint-checking",EXACTLY,1) == -1)
+   if (EnvArgCountCheck(theEnv,execStatus,"set-dynamic-constraint-checking",EXACTLY,1) == -1)
      { return(oldValue); }
 
-   EnvRtnUnknown(theEnv,1,&arg_ptr);
+   EnvRtnUnknown(theEnv,execStatus,1,&arg_ptr);
 
    if ((arg_ptr.value == EnvFalseSymbol(theEnv)) && (arg_ptr.type == SYMBOL))
      { EnvSetDynamicConstraintChecking(theEnv,FALSE); }
@@ -522,7 +522,7 @@ globle int GDCCommand(
 
    oldValue = EnvGetDynamicConstraintChecking(theEnv);
 
-   if (EnvArgCountCheck(theEnv,"get-dynamic-constraint-checking",EXACTLY,0) == -1)
+   if (EnvArgCountCheck(theEnv,execStatus,"get-dynamic-constraint-checking",EXACTLY,0) == -1)
      { return(oldValue); }
 
    return(oldValue);
@@ -540,10 +540,10 @@ globle int SSCCommand(
 
    oldValue = EnvGetStaticConstraintChecking(theEnv);
 
-   if (EnvArgCountCheck(theEnv,"set-static-constraint-checking",EXACTLY,1) == -1)
+   if (EnvArgCountCheck(theEnv,execStatus,"set-static-constraint-checking",EXACTLY,1) == -1)
      { return(oldValue); }
 
-   EnvRtnUnknown(theEnv,1,&arg_ptr);
+   EnvRtnUnknown(theEnv,execStatus,1,&arg_ptr);
 
    if ((arg_ptr.value == EnvFalseSymbol(theEnv)) && (arg_ptr.type == SYMBOL))
      { EnvSetStaticConstraintChecking(theEnv,FALSE); }
@@ -564,7 +564,7 @@ globle int GSCCommand(
 
    oldValue = EnvGetStaticConstraintChecking(theEnv);
 
-   if (EnvArgCountCheck(theEnv,"get-static-constraint-checking",EXACTLY,0) == -1)
+   if (EnvArgCountCheck(theEnv,execStatus,"get-static-constraint-checking",EXACTLY,0) == -1)
      { return(oldValue); }
 
    return(oldValue);

@@ -190,7 +190,7 @@ globle int SetBetaMemoryResizingCommand(
    /* Check for the correct number of arguments. */
    /*============================================*/
 
-   if (EnvArgCountCheck(theEnv,"set-beta-memory-resizing",EXACTLY,1) == -1)
+   if (EnvArgCountCheck(theEnv,execStatus,"set-beta-memory-resizing",EXACTLY,1) == -1)
      { return(oldValue); }
 
    /*=================================================*/
@@ -198,7 +198,7 @@ globle int SetBetaMemoryResizingCommand(
    /* Any other value enables beta memory resizing.   */
    /*=================================================*/
 
-   EnvRtnUnknown(theEnv,1,&argPtr);
+   EnvRtnUnknown(theEnv,execStatus,1,&argPtr);
 
    if ((argPtr.value == EnvFalseSymbol(theEnv)) && (argPtr.type == SYMBOL))
      { EnvSetBetaMemoryResizing(theEnv,FALSE); }
@@ -223,7 +223,7 @@ globle int GetBetaMemoryResizingCommand(
 
    oldValue = EnvGetBetaMemoryResizing(theEnv);
 
-   if (EnvArgCountCheck(theEnv,"get-beta-memory-resizing",EXACTLY,0) == -1)
+   if (EnvArgCountCheck(theEnv,execStatus,"get-beta-memory-resizing",EXACTLY,0) == -1)
      { return(oldValue); }
 
    return(oldValue);
@@ -241,7 +241,7 @@ globle void MatchesCommand(
    char *ruleName;
    void *rulePtr;
 
-   ruleName = GetConstructName(theEnv,"matches","rule name");
+   ruleName = GetConstructName(theEnv,execStatus,"matches","rule name");
    if (ruleName == NULL) return;
 
    rulePtr = EnvFindDefrule(theEnv,ruleName);
@@ -501,7 +501,7 @@ globle long long JoinActivityCommand(
    char *ruleName;
    void *rulePtr;
 
-   ruleName = GetConstructName(theEnv,"join-activity","rule name");
+   ruleName = GetConstructName(theEnv,execStatus,"join-activity","rule name");
    if (ruleName == NULL) return(0);
 
    rulePtr = EnvFindDefrule(theEnv,ruleName);
@@ -629,7 +629,7 @@ globle void MatchesCountCommand(
    char *ruleName;
    void *rulePtr;
 
-   ruleName = GetConstructName(theEnv,"matches-count","rule name");
+   ruleName = GetConstructName(theEnv,execStatus,"matches-count","rule name");
    if (ruleName == NULL) return;
 
    rulePtr = EnvFindDefrule(theEnv,ruleName);
@@ -835,9 +835,9 @@ globle long long TimetagFunction(
    DATA_OBJECT item;
    void *ptr;
 
-   if (EnvArgCountCheck(theEnv,"timetag",EXACTLY,1) == -1) return(-1LL);
+   if (EnvArgCountCheck(theEnv,execStatus,"timetag",EXACTLY,1) == -1) return(-1LL);
 
-   ptr = GetFactOrInstanceArgument(theEnv,1,&item,"timetag");
+   ptr = GetFactOrInstanceArgument(theEnv,execStatus,1,&item,"timetag");
 
    if (ptr == NULL) return(-1);
 

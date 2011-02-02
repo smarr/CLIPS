@@ -598,9 +598,9 @@ globle void DependenciesCommand(
    DATA_OBJECT item;
    void *ptr;
 
-   if (EnvArgCountCheck(theEnv,"dependencies",EXACTLY,1) == -1) return;
+   if (EnvArgCountCheck(theEnv,execStatus,"dependencies",EXACTLY,1) == -1) return;
 
-   ptr = GetFactOrInstanceArgument(theEnv,1,&item,"dependencies");
+   ptr = GetFactOrInstanceArgument(theEnv,execStatus,1,&item,"dependencies");
 
    if (ptr == NULL) return;
 
@@ -621,9 +621,9 @@ globle void DependentsCommand(
    DATA_OBJECT item;
    void *ptr;
 
-   if (EnvArgCountCheck(theEnv,"dependents",EXACTLY,1) == -1) return;
+   if (EnvArgCountCheck(theEnv,execStatus,"dependents",EXACTLY,1) == -1) return;
 
-   ptr = GetFactOrInstanceArgument(theEnv,1,&item,"dependents");
+   ptr = GetFactOrInstanceArgument(theEnv,execStatus,1,&item,"dependents");
 
    if (ptr == NULL) return;
 

@@ -233,7 +233,7 @@ globle void NetworkAssertRight(
 #endif
          EngineData(theEnv)->GlobalLHSBinds = lhsBinds;
          exprResult = EvaluateJoinExpression(theEnv,join->networkTest,join);
-         if (EvaluationData(theEnv)->EvaluationError)
+         if (execStatus->EvaluationError)
            {
             if (join->patternIsNegated) exprResult = TRUE;
             SetEvaluationError(theEnv,FALSE);
@@ -250,7 +250,7 @@ globle void NetworkAssertRight(
          /* EngineData(theEnv)->GlobalRHSBinds = NULL; */
          
          exprResult = EvaluateJoinExpression(theEnv,join->secondaryNetworkTest,join);
-         if (EvaluationData(theEnv)->EvaluationError)
+         if (execStatus->EvaluationError)
            { SetEvaluationError(theEnv,FALSE); }
         }
 
@@ -406,7 +406,7 @@ globle void NetworkAssertLeft(
          EngineData(theEnv)->GlobalRHSBinds = rhsBinds;
          
          exprResult = EvaluateJoinExpression(theEnv,join->networkTest,join);
-         if (EvaluationData(theEnv)->EvaluationError)
+         if (execStatus->EvaluationError)
            {
             if (join->patternIsNegated) exprResult = TRUE;
             SetEvaluationError(theEnv,FALSE);
@@ -498,7 +498,7 @@ globle void NetworkAssertLeft(
          EngineData(theEnv)->GlobalRHSBinds = NULL;
          
          exprResult = EvaluateJoinExpression(theEnv,join->secondaryNetworkTest,join);
-         if (EvaluationData(theEnv)->EvaluationError)
+         if (execStatus->EvaluationError)
            { SetEvaluationError(theEnv,FALSE); }
            
          if (exprResult)
@@ -580,10 +580,10 @@ globle intBool EvaluateJoinExpression(
         {
          struct expr *oldArgument;
 
-         oldArgument = EvaluationData(theEnv)->CurrentExpression;
-         EvaluationData(theEnv)->CurrentExpression = joinExpr;
+         oldArgument = execStatus->CurrentExpression;
+         execStatus->CurrentExpression = joinExpr;
          result = (*EvaluationData(theEnv)->PrimitivesArray[joinExpr->type]->evaluateFunction)(theEnv,joinExpr->value,&theResult);
-         EvaluationData(theEnv)->CurrentExpression = oldArgument;
+         execStatus->CurrentExpression = oldArgument;
         }
 
       /*=============================*/
@@ -595,11 +595,11 @@ globle intBool EvaluateJoinExpression(
          result = FALSE;
          if (EvaluateJoinExpression(theEnv,joinExpr,joinPtr) == TRUE)
            {
-            if (EvaluationData(theEnv)->EvaluationError)
+            if (execStatus->EvaluationError)
               { return(FALSE); }
             result = TRUE;
            }
-         else if (EvaluationData(theEnv)->EvaluationError)
+         else if (execStatus->EvaluationError)
            { return(FALSE); }
         }
 
@@ -612,11 +612,11 @@ globle intBool EvaluateJoinExpression(
          result = TRUE;
          if (EvaluateJoinExpression(theEnv,joinExpr,joinPtr) == FALSE)
            {
-            if (EvaluationData(theEnv)->EvaluationError)
+            if (execStatus->EvaluationError)
               { return(FALSE); }
             result = FALSE;
            }
-         else if (EvaluationData(theEnv)->EvaluationError)
+         else if (execStatus->EvaluationError)
            { return(FALSE); }
         }
 
@@ -628,7 +628,7 @@ globle intBool EvaluateJoinExpression(
         {
          EvaluateExpression(theEnv,joinExpr,&theResult);
 
-         if (EvaluationData(theEnv)->EvaluationError)
+         if (execStatus->EvaluationError)
            {
             JoinNetErrorMessage(theEnv,joinPtr);
             return(FALSE);
@@ -691,7 +691,7 @@ globle intBool EvaluateSecondaryNetworkTest(
    EngineData(theEnv)->GlobalJoin = joinPtr;
 
    joinExpr = EvaluateJoinExpression(theEnv,joinPtr->secondaryNetworkTest,joinPtr);
-   EvaluationData(theEnv)->EvaluationError = FALSE;
+   execStatus->EvaluationError = FALSE;
 
    EngineData(theEnv)->GlobalLHSBinds = oldLHSBinds;
    EngineData(theEnv)->GlobalRHSBinds = oldRHSBinds;
@@ -752,10 +752,10 @@ globle unsigned long BetaMemoryHashValue(
         {
          struct expr *oldArgument;
 
-         oldArgument = EvaluationData(theEnv)->CurrentExpression;
-         EvaluationData(theEnv)->CurrentExpression = hashExpr;
+         oldArgument = execStatus->CurrentExpression;
+         execStatus->CurrentExpression = hashExpr;
          (*EvaluationData(theEnv)->PrimitivesArray[hashExpr->type]->evaluateFunction)(theEnv,hashExpr->value,&theResult);
-         EvaluationData(theEnv)->CurrentExpression = oldArgument;
+         execStatus->CurrentExpression = oldArgument;
         }
 
       /*==========================================================*/
@@ -952,7 +952,7 @@ static void EmptyDrive(
       EngineData(theEnv)->GlobalJoin = join;
 
       joinExpr = EvaluateJoinExpression(theEnv,join->networkTest,join);
-      EvaluationData(theEnv)->EvaluationError = FALSE;
+      execStatus->EvaluationError = FALSE;
 
       EngineData(theEnv)->GlobalLHSBinds = oldLHSBinds;
       EngineData(theEnv)->GlobalRHSBinds = oldRHSBinds;

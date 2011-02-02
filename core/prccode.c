@@ -658,7 +658,7 @@ globle void PushProcParameters(
    ptmp->nxt = ProceduralPrimitiveData(theEnv)->pstack;
    ProceduralPrimitiveData(theEnv)->pstack = ptmp;
    EvaluateProcParameters(theEnv,parameterList,numberOfParameters,pname,bodytype);
-   if (EvaluationData(theEnv)->EvaluationError)
+   if (execStatus->EvaluationError)
      {
       ptmp = ProceduralPrimitiveData(theEnv)->pstack;
       ProceduralPrimitiveData(theEnv)->pstack = ProceduralPrimitiveData(theEnv)->pstack->nxt;
@@ -879,7 +879,7 @@ globle void EvaluateProcActions(
    ProceduralPrimitiveData(theEnv)->CurrentProcActions = oldActions;
    if (oldModule != ((struct defmodule *) EnvGetCurrentModule(theEnv)))
      EnvSetCurrentModule(theEnv,(void *) oldModule);
-   if ((crtproc != NULL) ? EvaluationData(theEnv)->HaltExecution : FALSE)
+   if ((crtproc != NULL) ? execStatus->HaltExecution : FALSE)
      {
       PrintErrorID(theEnv,"PRCCODE",4,FALSE);
       EnvPrintRouter(theEnv,WERROR,"Execution halted during the actions of ");

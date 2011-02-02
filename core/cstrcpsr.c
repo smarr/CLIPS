@@ -194,7 +194,7 @@ globle int LoadConstructsFromLogicalName(
        if (foundConstruct)
          { IncrementSymbolCount(theToken.value); }
        execStatus->CurrentEvaluationDepth--;
-       PeriodicCleanup(theEnv,FALSE,TRUE);
+       PeriodicCleanup(theEnv,execStatus,FALSE,TRUE);
        YieldTime(theEnv);
        execStatus->CurrentEvaluationDepth++;
        if (foundConstruct)

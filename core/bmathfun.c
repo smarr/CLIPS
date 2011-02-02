@@ -51,7 +51,7 @@ struct basicMathFunctionData
 /* BasicMathFunctionDefinitions: Defines basic math functions. */
 /***************************************************************/
 globle void BasicMathFunctionDefinitions(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {   
    AllocateEnvironmentData(theEnv,BMATHFUN_DATA,sizeof(struct basicMathFunctionData),NULL);
    
@@ -83,6 +83,7 @@ globle void BasicMathFunctionDefinitions(
 /**********************************/
 globle void AdditionFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
    double ftotal = 0.0;
@@ -145,6 +146,7 @@ globle void AdditionFunction(
 /****************************************/
 globle void MultiplicationFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
    double ftotal = 1.0;
@@ -206,6 +208,7 @@ globle void MultiplicationFunction(
 /*************************************/
 globle void SubtractionFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
    double ftotal = 0.0;
@@ -287,6 +290,7 @@ globle void SubtractionFunction(
 /***********************************/
 globle void DivisionFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
    double ftotal = 1.0;
@@ -383,7 +387,8 @@ globle void DivisionFunction(
 /*   for the div function.           */
 /*************************************/
 globle long long DivFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    long long total = 1LL;
    EXPRESSION *theExpression;
@@ -454,7 +459,8 @@ globle long long DivFunction(
 /*   for the set-auto-float-dividend command.        */
 /*****************************************************/
 globle int SetAutoFloatDividendCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    int oldValue;
    DATA_OBJECT theArgument;
@@ -469,10 +475,10 @@ globle int SetAutoFloatDividendCommand(
    /* Check for the correct number of arguments. */
    /*============================================*/
 
-   if (EnvArgCountCheck(theEnv,"set-auto-float-dividend",EXACTLY,1) == -1)
+   if (EnvArgCountCheck(theEnv,execStatus,"set-auto-float-dividend",EXACTLY,1) == -1)
      { return(oldValue); }
 
-   EnvRtnUnknown(theEnv,1,&theArgument);
+   EnvRtnUnknown(theEnv,execStatus,1,&theArgument);
 
    /*============================================================*/
    /* The symbol FALSE disables the auto float dividend feature. */
@@ -495,13 +501,14 @@ globle int SetAutoFloatDividendCommand(
 /*   for the get-auto-float-dividend command.        */
 /*****************************************************/
 globle int GetAutoFloatDividendCommand(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    /*============================================*/
    /* Check for the correct number of arguments. */
    /*============================================*/
 
-   EnvArgCountCheck(theEnv,"get-auto-float-dividend",EXACTLY,0);
+   EnvArgCountCheck(theEnv,execStatus,"get-auto-float-dividend",EXACTLY,0);
 
    /*=============================*/
    /* Return the current setting. */
@@ -515,7 +522,8 @@ globle int GetAutoFloatDividendCommand(
 /*   the get-auto-float-dividend command.        */
 /*************************************************/
 globle intBool EnvGetAutoFloatDividend(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return(BasicMathFunctionData(theEnv)->AutoFloatDividend);
   }
@@ -526,6 +534,7 @@ globle intBool EnvGetAutoFloatDividend(
 /*************************************************/
 globle intBool EnvSetAutoFloatDividend(
   void *theEnv,
+  EXEC_STATUS,
   int value)
   {
    int ov;
@@ -540,7 +549,8 @@ globle intBool EnvSetAutoFloatDividend(
 /*   for the integer function.           */
 /*****************************************/
 globle long long IntegerFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DATA_OBJECT valstruct;
 
@@ -548,7 +558,7 @@ globle long long IntegerFunction(
    /* Check for the correct number of arguments. */
    /*============================================*/
 
-   if (EnvArgCountCheck(theEnv,"integer",EXACTLY,1) == -1) return(0LL);
+   if (EnvArgCountCheck(theEnv,execStatus,"integer",EXACTLY,1) == -1) return(0LL);
 
    /*================================================================*/
    /* Check for the correct type of argument. Note that ArgTypeCheck */
@@ -556,7 +566,7 @@ globle long long IntegerFunction(
    /* (which is the purpose of the integer function).                */
    /*================================================================*/
 
-   if (EnvArgTypeCheck(theEnv,"integer",1,INTEGER,&valstruct) == FALSE) return(0LL);
+   if (EnvArgTypeCheck(theEnv,execStatus,"integer",1,INTEGER,&valstruct) == FALSE) return(0LL);
 
    /*===================================================*/
    /* Return the numeric value converted to an integer. */
@@ -570,7 +580,8 @@ globle long long IntegerFunction(
 /*   for the float function.           */
 /***************************************/
 globle double FloatFunction(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    DATA_OBJECT valstruct;
 
@@ -578,7 +589,7 @@ globle double FloatFunction(
    /* Check for the correct number of arguments. */
    /*============================================*/
 
-   if (EnvArgCountCheck(theEnv,"float",EXACTLY,1) == -1) return(0.0);
+   if (EnvArgCountCheck(theEnv,execStatus,"float",EXACTLY,1) == -1) return(0.0);
 
    /*================================================================*/
    /* Check for the correct type of argument. Note that ArgTypeCheck */
@@ -586,7 +597,7 @@ globle double FloatFunction(
    /* (which is the purpose of the float function).                  */
    /*================================================================*/
 
-   if (EnvArgTypeCheck(theEnv,"float",1,FLOAT,&valstruct) == FALSE) return(0.0);
+   if (EnvArgTypeCheck(theEnv,execStatus,"float",1,FLOAT,&valstruct) == FALSE) return(0.0);
 
    /*================================================*/
    /* Return the numeric value converted to a float. */
@@ -601,13 +612,14 @@ globle double FloatFunction(
 /*************************************/
 globle void AbsFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
    /*============================================*/
    /* Check for the correct number of arguments. */
    /*============================================*/
 
-   if (EnvArgCountCheck(theEnv,"abs",EXACTLY,1) == -1)
+   if (EnvArgCountCheck(theEnv,execStatus,"abs",EXACTLY,1) == -1)
      {
       returnValue->type = INTEGER;
       returnValue->value = (void *) EnvAddLong(theEnv,0L);
@@ -618,7 +630,7 @@ globle void AbsFunction(
    /* Check that the argument is a number. */
    /*======================================*/
 
-   if (EnvArgTypeCheck(theEnv,"abs",1,INTEGER_OR_FLOAT,returnValue) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"abs",1,INTEGER_OR_FLOAT,returnValue) == FALSE)
      {
       returnValue->type = INTEGER;
       returnValue->value = (void *) EnvAddLong(theEnv,0L);
@@ -644,6 +656,7 @@ globle void AbsFunction(
 /*************************************/
 globle void MinFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
    DATA_OBJECT argValue;
@@ -653,7 +666,7 @@ globle void MinFunction(
    /* Check for the correct number of arguments. */
    /*============================================*/
 
-   if ((numberOfArguments = EnvArgCountCheck(theEnv,"min",AT_LEAST,1)) == -1)
+   if ((numberOfArguments = EnvArgCountCheck(theEnv,execStatus,"min",AT_LEAST,1)) == -1)
      {
       returnValue->type = INTEGER;
       returnValue->value = (void *) EnvAddLong(theEnv,0L);
@@ -664,7 +677,7 @@ globle void MinFunction(
    /* Check that the first argument is a number. */
    /*============================================*/
 
-   if (EnvArgTypeCheck(theEnv,"min",1,INTEGER_OR_FLOAT,returnValue) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"min",1,INTEGER_OR_FLOAT,returnValue) == FALSE)
      {
       returnValue->type = INTEGER;
       returnValue->value = (void *) EnvAddLong(theEnv,0L);
@@ -680,7 +693,7 @@ globle void MinFunction(
 
    for (i = 2 ; i <= numberOfArguments ; i++)
      {
-      if (EnvArgTypeCheck(theEnv,"min",i,INTEGER_OR_FLOAT,&argValue) == FALSE) return;
+      if (EnvArgTypeCheck(theEnv,execStatus,"min",i,INTEGER_OR_FLOAT,&argValue) == FALSE) return;
 
       if (returnValue->type == INTEGER)
         {
@@ -733,6 +746,7 @@ globle void MinFunction(
 /*************************************/
 globle void MaxFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
    DATA_OBJECT argValue;
@@ -742,7 +756,7 @@ globle void MaxFunction(
    /* Check for the correct number of arguments. */
    /*============================================*/
 
-   if ((numberOfArguments = EnvArgCountCheck(theEnv,"max",AT_LEAST,1)) == -1)
+   if ((numberOfArguments = EnvArgCountCheck(theEnv,execStatus,"max",AT_LEAST,1)) == -1)
      {
       returnValue->type = INTEGER;
       returnValue->value = (void *) EnvAddLong(theEnv,0L);
@@ -753,7 +767,7 @@ globle void MaxFunction(
    /* Check that the first argument is a number. */
    /*============================================*/
 
-   if (EnvArgTypeCheck(theEnv,"max",1,INTEGER_OR_FLOAT,returnValue) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"max",1,INTEGER_OR_FLOAT,returnValue) == FALSE)
      {
       returnValue->type = INTEGER;
       returnValue->value = (void *) EnvAddLong(theEnv,0L);
@@ -769,7 +783,7 @@ globle void MaxFunction(
 
    for (i = 2 ; i <= numberOfArguments ; i++)
      {
-      if (EnvArgTypeCheck(theEnv,"max",i,INTEGER_OR_FLOAT,&argValue) == FALSE) return;
+      if (EnvArgTypeCheck(theEnv,execStatus,"max",i,INTEGER_OR_FLOAT,&argValue) == FALSE) return;
 
       if (returnValue->type == INTEGER)
         {

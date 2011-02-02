@@ -629,7 +629,7 @@ globle void ListItemsDriver(
       constructPtr = (*nextFunction)(theEnv,NULL);
       while (constructPtr != NULL)
         {
-         if (EvaluationData(theEnv)->HaltExecution == TRUE) return;
+         if (execStatus->HaltExecution == TRUE) return;
 
          if (doItFunction == NULL) doIt = TRUE;
          else doIt = (*doItFunction)(theEnv,constructPtr);

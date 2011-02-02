@@ -967,7 +967,7 @@ globle int EnvGetStrategy(
 globle void *GetStrategyCommand(
   void *theEnv)
   {
-   EnvArgCountCheck(theEnv,"get-strategy",EXACTLY,0);
+   EnvArgCountCheck(theEnv,execStatus,"get-strategy",EXACTLY,0);
 
    return((SYMBOL_HN *) EnvAddSymbol(theEnv,GetStrategyName(EnvGetStrategy(theEnv))));
   }
@@ -989,10 +989,10 @@ globle void *SetStrategyCommand(
    /* Check for the correct number and type of arguments. */
    /*=====================================================*/
 
-   if (EnvArgCountCheck(theEnv,"set-strategy",EXACTLY,1) == -1)
+   if (EnvArgCountCheck(theEnv,execStatus,"set-strategy",EXACTLY,1) == -1)
      { return((SYMBOL_HN *) EnvAddSymbol(theEnv,GetStrategyName(EnvGetStrategy(theEnv)))); }
 
-   if (EnvArgTypeCheck(theEnv,"set-strategy",1,SYMBOL,&argPtr) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"set-strategy",1,SYMBOL,&argPtr) == FALSE)
      { return((SYMBOL_HN *) EnvAddSymbol(theEnv,GetStrategyName(EnvGetStrategy(theEnv)))); }
 
    argument = DOToString(argPtr);

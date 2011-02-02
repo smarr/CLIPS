@@ -91,8 +91,8 @@ LOCALE intBool EnvIsDefclassDeletable(void *,void *);
 LOCALE void UndefclassCommand(void *);
 LOCALE unsigned short EnvSetClassDefaultsMode(void *,unsigned short);
 LOCALE unsigned short EnvGetClassDefaultsMode(void *);
-LOCALE void *GetClassDefaultsModeCommand(void *);
-LOCALE void *SetClassDefaultsModeCommand(void *);
+LOCALE void *GetClassDefaultsModeCommand(void *,EXEC_STATUS);
+LOCALE void *SetClassDefaultsModeCommand(void *,EXEC_STATUS);
 
 #if DEBUGGING_FUNCTIONS
 LOCALE void PPDefclassCommand(void *);
@@ -111,7 +111,7 @@ LOCALE void EnvGetDefclassList(void *,DATA_OBJECT *,struct defmodule *);
 LOCALE intBool EnvUndefclass(void *,void *);
 LOCALE intBool HasSuperclass(DEFCLASS *,DEFCLASS *);
 
-LOCALE SYMBOL_HN *CheckClassAndSlot(void *,char *,DEFCLASS **);
+LOCALE SYMBOL_HN *CheckClassAndSlot(void *,EXEC_STATUS,char *,DEFCLASS **);
 
 #if (! BLOAD_ONLY) && (! RUN_TIME)
 LOCALE void SaveDefclasses(void *,void *,char *);

@@ -570,7 +570,7 @@ globle int SetIncrementalResetCommand(
    /* Check for the correct number of arguments. */
    /*============================================*/
 
-   if (EnvArgCountCheck(theEnv,"set-incremental-reset",EXACTLY,1) == -1)
+   if (EnvArgCountCheck(theEnv,execStatus,"set-incremental-reset",EXACTLY,1) == -1)
      { return(oldValue); }
 
    /*=========================================*/
@@ -602,7 +602,7 @@ globle int SetIncrementalResetCommand(
    /* other value enables incremental reset.           */
    /*==================================================*/
 
-   EnvRtnUnknown(theEnv,1,&argPtr);
+   EnvRtnUnknown(theEnv,execStatus,1,&argPtr);
 
    if ((argPtr.value == EnvFalseSymbol(theEnv)) && (argPtr.type == SYMBOL))
      { EnvSetIncrementalReset(theEnv,FALSE); }
@@ -627,7 +627,7 @@ globle int GetIncrementalResetCommand(
 
    oldValue = EnvGetIncrementalReset(theEnv);
 
-   if (EnvArgCountCheck(theEnv,"get-incremental-reset",EXACTLY,0) == -1)
+   if (EnvArgCountCheck(theEnv,execStatus,"get-incremental-reset",EXACTLY,0) == -1)
      { return(oldValue); }
 
    return(oldValue);

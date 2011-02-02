@@ -136,14 +136,14 @@ globle void SortFunction(
    /* The function expects at least one argument. */
    /*=============================================*/
 
-   if ((argumentCount = EnvArgCountCheck(theEnv,"sort",AT_LEAST,1)) == -1)
+   if ((argumentCount = EnvArgCountCheck(theEnv,execStatus,execStatus,"sort",AT_LEAST,1)) == -1)
      { return; }
 
    /*=============================================*/
    /* Verify that the comparison function exists. */
    /*=============================================*/
 
-   if (EnvArgTypeCheck(theEnv,"sort",1,SYMBOL,&theArg) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"sort",1,SYMBOL,&theArg) == FALSE)
      { return; }
 
    functionName = DOToString(theArg);
@@ -213,7 +213,7 @@ globle void SortFunction(
 
    for (i = 2; i <= argumentCount; i++)
      {
-      EnvRtnUnknown(theEnv,i,&theArguments[i-2]);
+      EnvRtnUnknown(theEnv,execStatus,i,&theArguments[i-2]);
       if (GetType(theArguments[i-2]) == MULTIFIELD)
         { argumentSize += GetpDOLength(&theArguments[i-2]); }
       else

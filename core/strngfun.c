@@ -152,7 +152,7 @@ static void StrOrSymCatFunction(
    /* the string representation of each argument.   */
    /*===============================================*/
 
-   numArgs = EnvRtnArgCount(theEnv);
+   numArgs = EnvRtnArgCount(theEnv,execStatus);
    arrayOfStrings = (SYMBOL_HN **) gm1(theEnv,(int) sizeof(SYMBOL_HN *) * numArgs);
    for (i = 0; i < numArgs; i++)   
      { arrayOfStrings[i] = NULL; }
@@ -165,7 +165,7 @@ static void StrOrSymCatFunction(
    total = 1;
    for (i = 1 ; i <= numArgs ; i++)
      {
-      EnvRtnUnknown(theEnv,i,&theArg);
+      EnvRtnUnknown(theEnv,execStatus,i,&theArg);
 
       switch(GetType(theArg))
         {
@@ -197,7 +197,7 @@ static void StrOrSymCatFunction(
            break;
         }
 
-      if (EvaluationData(theEnv)->EvaluationError)
+      if (execStatus->EvaluationError)
         {
          for (i = 0; i < numArgs; i++)
            {
@@ -257,14 +257,14 @@ globle long long StrLengthFunction(
    /* Function str-length expects exactly one argument. */
    /*===================================================*/
 
-   if (EnvArgCountCheck(theEnv,"str-length",EXACTLY,1) == -1)
+   if (EnvArgCountCheck(theEnv,execStatus,"str-length",EXACTLY,1) == -1)
      { return(-1LL); }
 
    /*==================================================*/
    /* The argument should be of type symbol or string. */
    /*==================================================*/
 
-   if (EnvArgTypeCheck(theEnv,"str-length",1,SYMBOL_OR_STRING,&theArg) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"str-length",1,SYMBOL_OR_STRING,&theArg) == FALSE)
      { return(-1LL); }
 
    /*============================================*/
@@ -291,7 +291,7 @@ globle void UpcaseFunction(
    /* Function upcase expects exactly one argument. */
    /*===============================================*/
 
-   if (EnvArgCountCheck(theEnv,"upcase",EXACTLY,1) == -1)
+   if (EnvArgCountCheck(theEnv,execStatus,"upcase",EXACTLY,1) == -1)
      {
       SetpType(returnValue,STRING);
       SetpValue(returnValue,(void *) EnvAddSymbol(theEnv,""));
@@ -302,7 +302,7 @@ globle void UpcaseFunction(
    /* The argument should be of type symbol or string. */
    /*==================================================*/
 
-   if (EnvArgTypeCheck(theEnv,"upcase",1,SYMBOL_OR_STRING,&theArg) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"upcase",1,SYMBOL_OR_STRING,&theArg) == FALSE)
      {
       SetpType(returnValue,STRING);
       SetpValue(returnValue,(void *) EnvAddSymbol(theEnv,""));
@@ -354,7 +354,7 @@ globle void LowcaseFunction(
    /* Function lowcase expects exactly one argument. */
    /*================================================*/
 
-   if (EnvArgCountCheck(theEnv,"lowcase",EXACTLY,1) == -1)
+   if (EnvArgCountCheck(theEnv,execStatus,"lowcase",EXACTLY,1) == -1)
      {
       SetpType(returnValue,STRING);
       SetpValue(returnValue,(void *) EnvAddSymbol(theEnv,""));
@@ -365,7 +365,7 @@ globle void LowcaseFunction(
    /* The argument should be of type symbol or string. */
    /*==================================================*/
 
-   if (EnvArgTypeCheck(theEnv,"lowcase",1,SYMBOL_OR_STRING,&theArg) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"lowcase",1,SYMBOL_OR_STRING,&theArg) == FALSE)
      {
       SetpType(returnValue,STRING);
       SetpValue(returnValue,(void *) EnvAddSymbol(theEnv,""));
@@ -415,16 +415,16 @@ globle long long StrCompareFunction(
    /* Function str-compare expects either 2 or 3 arguments. */
    /*=======================================================*/
 
-   if ((numArgs = EnvArgRangeCheck(theEnv,"str-compare",2,3)) == -1) return(0L);
+   if ((numArgs = EnvArgRangeCheck(theEnv,execStatus,"str-compare",2,3)) == -1) return(0L);
 
    /*=============================================================*/
    /* The first two arguments should be of type symbol or string. */
    /*=============================================================*/
 
-   if (EnvArgTypeCheck(theEnv,"str-compare",1,SYMBOL_OR_STRING,&arg1) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"str-compare",1,SYMBOL_OR_STRING,&arg1) == FALSE)
      { return(0L); }
 
-   if (EnvArgTypeCheck(theEnv,"str-compare",2,SYMBOL_OR_STRING,&arg2) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"str-compare",2,SYMBOL_OR_STRING,&arg2) == FALSE)
      { return(0L); }
 
    /*===================================================*/
@@ -434,7 +434,7 @@ globle long long StrCompareFunction(
 
    if (numArgs == 3)
      {
-      if (EnvArgTypeCheck(theEnv,"str-compare",3,INTEGER,&arg3) == FALSE)
+      if (EnvArgTypeCheck(theEnv,execStatus,"str-compare",3,INTEGER,&arg3) == FALSE)
         { return(0L); }
 
       length = CoerceToInteger(GetType(arg3),GetValue(arg3));
@@ -472,10 +472,10 @@ globle void *SubStringFunction(
    /* Check and retrieve the arguments. */
    /*===================================*/
 
-   if (EnvArgCountCheck(theEnv,"sub-string",EXACTLY,3) == -1)
+   if (EnvArgCountCheck(theEnv,execStatus,"sub-string",EXACTLY,3) == -1)
      { return((void *) EnvAddSymbol(theEnv,"")); }
 
-   if (EnvArgTypeCheck(theEnv,"sub-string",1,INTEGER,&theArgument) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"sub-string",1,INTEGER,&theArgument) == FALSE)
      { return((void *) EnvAddSymbol(theEnv,"")); }
 
    if (CoerceToLongInteger(theArgument.type,theArgument.value) < 1)
@@ -483,7 +483,7 @@ globle void *SubStringFunction(
    else
      { start = (size_t) CoerceToLongInteger(theArgument.type,theArgument.value) - 1; }
 
-   if (EnvArgTypeCheck(theEnv,"sub-string",2,INTEGER,&theArgument) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"sub-string",2,INTEGER,&theArgument) == FALSE)
      {  return((void *) EnvAddSymbol(theEnv,"")); }
 
    if (CoerceToLongInteger(theArgument.type,theArgument.value) < 1)
@@ -491,7 +491,7 @@ globle void *SubStringFunction(
    else
      { end = (size_t) CoerceToLongInteger(theArgument.type,theArgument.value) - 1; }
 
-   if (EnvArgTypeCheck(theEnv,"sub-string",3,SYMBOL_OR_STRING,&theArgument) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"sub-string",3,SYMBOL_OR_STRING,&theArgument) == FALSE)
      { return((void *) EnvAddSymbol(theEnv,"")); }
    
    tempString = DOToString(theArgument);
@@ -558,9 +558,9 @@ globle void StrIndexFunction(
    /* Check and retrieve the arguments. */
    /*===================================*/
 
-   if (EnvArgCountCheck(theEnv,"str-index",EXACTLY,2) == -1) return;
+   if (EnvArgCountCheck(theEnv,execStatus,"str-index",EXACTLY,2) == -1) return;
 
-   if (EnvArgTypeCheck(theEnv,"str-index",1,SYMBOL_OR_STRING,&theArgument1) == FALSE) return;
+   if (EnvArgTypeCheck(theEnv,execStatus,"str-index",1,SYMBOL_OR_STRING,&theArgument1) == FALSE) return;
 
    if (EnvArgTypeCheck(theEnv,"str-index",2,SYMBOL_OR_STRING,&theArgument2) == FALSE) return;
 
@@ -859,7 +859,7 @@ globle int EnvEval(
    /*==========================================*/
 
    if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
-       (EvaluationData(theEnv)->CurrentExpression == NULL))
+       (execStatus->CurrentExpression == NULL))
      { 
       ValueInstall(theEnv,returnValue);
       PeriodicCleanup(theEnv,TRUE,FALSE); 
@@ -1036,7 +1036,7 @@ globle int EnvBuild(
    /*===========================================*/
 
    if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
-       (EvaluationData(theEnv)->CurrentExpression == NULL))
+       (execStatus->CurrentExpression == NULL))
      { PeriodicCleanup(theEnv,TRUE,FALSE); }
 
    /*===============================================*/

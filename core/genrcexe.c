@@ -127,8 +127,8 @@ globle void GenericDispatch(
 
    result->type = SYMBOL;
    result->value = EnvFalseSymbol(theEnv);
-   EvaluationData(theEnv)->EvaluationError = FALSE;
-   if (EvaluationData(theEnv)->HaltExecution)
+   execStatus->EvaluationError = FALSE;
+   if (execStatus->HaltExecution)
      return;
    oldce = ExecutingConstruct(theEnv);
    SetExecutingConstruct(theEnv,TRUE);
@@ -140,13 +140,13 @@ globle void GenericDispatch(
    PushProcParameters(theEnv,params,CountArguments(params),
                       EnvGetDefgenericName(theEnv,(void *) gfunc),
                       "generic function",UnboundMethodErr);
-   if (EvaluationData(theEnv)->EvaluationError)
+   if (execStatus->EvaluationError)
      {
       gfunc->busy--;
       DefgenericData(theEnv)->CurrentGeneric = previousGeneric;
       DefgenericData(theEnv)->CurrentMethod = previousMethod;
       execStatus->CurrentEvaluationDepth--;
-      PeriodicCleanup(theEnv,FALSE,TRUE);
+      PeriodicCleanup(theEnv,execStatus,FALSE,TRUE);
       SetExecutingConstruct(theEnv,oldce);
       return;
      }
@@ -213,7 +213,7 @@ globle void GenericDispatch(
         WatchGeneric(theEnv,END_TRACE);
 #endif
      }
-   else if (! EvaluationData(theEnv)->EvaluationError)
+   else if (! execStatus->EvaluationError)
      {
       PrintErrorID(theEnv,"GENRCEXE",1,FALSE);
       EnvPrintRouter(theEnv,WERROR,"No applicable methods for ");
@@ -228,7 +228,7 @@ globle void GenericDispatch(
    DefgenericData(theEnv)->CurrentMethod = previousMethod;
    execStatus->CurrentEvaluationDepth--;
    PropagateReturnValue(theEnv,result);
-   PeriodicCleanup(theEnv,FALSE,TRUE);
+   PeriodicCleanup(theEnv,execStatus,FALSE,TRUE);
    SetExecutingConstruct(theEnv,oldce);
   }
 
@@ -388,7 +388,7 @@ globle void CallNextMethod(
 
    result->type = SYMBOL;
    result->value = EnvFalseSymbol(theEnv);
-   if (EvaluationData(theEnv)->HaltExecution)
+   if (execStatus->HaltExecution)
      return;
    oldMethod = DefgenericData(theEnv)->CurrentMethod;
    if (DefgenericData(theEnv)->CurrentMethod != NULL)
@@ -464,12 +464,12 @@ globle void CallSpecificMethod(
 
    result->type = SYMBOL;
    result->value = EnvFalseSymbol(theEnv);
-   if (EnvArgTypeCheck(theEnv,"call-specific-method",1,SYMBOL,&temp) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"call-specific-method",1,SYMBOL,&temp) == FALSE)
      return;
    gfunc = CheckGenericExists(theEnv,"call-specific-method",DOToString(temp));
    if (gfunc == NULL)
      return;
-   if (EnvArgTypeCheck(theEnv,"call-specific-method",2,INTEGER,&temp) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"call-specific-method",2,INTEGER,&temp) == FALSE)
      return;
    mi = CheckMethodExists(theEnv,"call-specific-method",gfunc,(long) DOToLong(temp));
    if (mi == -1)
@@ -495,7 +495,7 @@ globle void OverrideNextMethod(
   {
    result->type = SYMBOL;
    result->value = EnvFalseSymbol(theEnv);
-   if (EvaluationData(theEnv)->HaltExecution)
+   if (execStatus->HaltExecution)
      return;
    if (DefgenericData(theEnv)->CurrentMethod == NULL)
      {

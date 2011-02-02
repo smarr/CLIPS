@@ -98,7 +98,7 @@ globle void *FactRelationFunction(
   {
    struct fact *theFact;
 
-   if (EnvArgCountCheck(theEnv,"fact-relation",EXACTLY,1) == -1) return(EnvFalseSymbol(theEnv));
+   if (EnvArgCountCheck(theEnv,execStatus,"fact-relation",EXACTLY,1) == -1) return(EnvFalseSymbol(theEnv));
 
    theFact = GetFactAddressOrIndexArgument(theEnv,"fact-relation",1,FALSE);
 
@@ -148,7 +148,7 @@ globle int FactExistpFunction(
   {
    struct fact *theFact;
 
-   if (EnvArgCountCheck(theEnv,"fact-existp",EXACTLY,1) == -1) return(-1L);
+   if (EnvArgCountCheck(theEnv,execStatus,"fact-existp",EXACTLY,1) == -1) return(-1L);
 
    theFact = GetFactAddressOrIndexArgument(theEnv,"fact-existp",1,FALSE);
 
@@ -200,7 +200,7 @@ globle void FactSlotValueFunction(
    /* Check for the correct number of arguments. */
    /*============================================*/
 
-   if (EnvArgCountCheck(theEnv,"fact-slot-value",EXACTLY,2) == -1) return;
+   if (EnvArgCountCheck(theEnv,execStatus,"fact-slot-value",EXACTLY,2) == -1) return;
 
    /*================================*/
    /* Get the reference to the fact. */
@@ -213,7 +213,7 @@ globle void FactSlotValueFunction(
    /* Get the name of the slot. */
    /*===========================*/
 
-   if (EnvArgTypeCheck(theEnv,"fact-slot-value",2,SYMBOL,&theValue) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"fact-slot-value",2,SYMBOL,&theValue) == FALSE)
      { return; }
 
    /*=======================*/
@@ -291,7 +291,7 @@ globle void FactSlotNamesFunction(
    /* Check for the correct number of arguments. */
    /*============================================*/
 
-   if (EnvArgCountCheck(theEnv,"fact-slot-names",EXACTLY,1) == -1) return;
+   if (EnvArgCountCheck(theEnv,execStatus,"fact-slot-names",EXACTLY,1) == -1) return;
 
    /*================================*/
    /* Get the reference to the fact. */
@@ -386,7 +386,7 @@ globle void GetFactListFunction(
    /* Determine if a module name was specified. */
    /*===========================================*/
 
-   if ((numArgs = EnvArgCountCheck(theEnv,"get-fact-list",NO_MORE_THAN,1)) == -1)
+   if ((numArgs = EnvArgCountCheck(theEnv,execStatus,"get-fact-list",NO_MORE_THAN,1)) == -1)
      {
       EnvSetMultifieldErrorValue(theEnv,returnValue);
       return;
@@ -394,7 +394,7 @@ globle void GetFactListFunction(
 
    if (numArgs == 1)
      {
-      EnvRtnUnknown(theEnv,1,&result);
+      EnvRtnUnknown(theEnv,execStatus,1,&result);
 
       if (GetType(result) != SYMBOL)
         {
@@ -526,7 +526,7 @@ globle void PPFactFunction(
    int ignoreDefaults = FALSE;
    DATA_OBJECT theArg;
 
-   if ((numberOfArguments = EnvArgRangeCheck(theEnv,"ppfact",1,3)) == -1) return;
+   if ((numberOfArguments = EnvArgRangeCheck(theEnv,execStatus,"ppfact",1,3)) == -1) return;
 
    theFact = GetFactAddressOrIndexArgument(theEnv,"ppfact",1,TRUE);
    if (theFact == NULL) return;
@@ -539,7 +539,7 @@ globle void PPFactFunction(
      { logicalName = "stdout"; }
    else
      {
-      logicalName = GetLogicalName(theEnv,2,"stdout");
+      logicalName = GetLogicalName(theEnv,execStatus,2,"stdout");
       if (logicalName == NULL)
         {
          IllegalLogicalNameMessage(theEnv,"ppfact");
@@ -556,7 +556,7 @@ globle void PPFactFunction(
    
    if (numberOfArguments == 3)
      {
-      EnvRtnUnknown(theEnv,3,&theArg);
+      EnvRtnUnknown(theEnv,execStatus,3,&theArg);
 
       if ((theArg.value == EnvFalseSymbol(theEnv)) && (theArg.type == SYMBOL))
         { ignoreDefaults = FALSE; }
@@ -621,7 +621,7 @@ globle struct fact *GetFactAddressOrIndexArgument(
    struct fact *theFact;
    char tempBuffer[20];
 
-   EnvRtnUnknown(theEnv,position,&item);
+   EnvRtnUnknown(theEnv,execStatus,position,&item);
 
    if (GetType(item) == FACT_ADDRESS)
      {

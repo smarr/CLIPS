@@ -133,7 +133,7 @@ globle void CreateFunction(
   void *theEnv,
   DATA_OBJECT_PTR returnValue)
   {
-   StoreInMultifield(theEnv,returnValue,GetFirstArgument(),TRUE);
+   StoreInMultifield(theEnv,execStatus,returnValue,GetFirstArgument(),TRUE);
   }
 
 /*****************************************************************/
@@ -149,8 +149,8 @@ globle long long SetgenFunction(
    /* Check to see that a single integer argument is provided. */
    /*==========================================================*/
 
-   if (EnvArgCountCheck(theEnv,"setgen",EXACTLY,1) == -1) return(MiscFunctionData(theEnv)->GensymNumber);
-   if (EnvArgTypeCheck(theEnv,"setgen",1,INTEGER,&theValue) == FALSE) return(MiscFunctionData(theEnv)->GensymNumber);
+   if (EnvArgCountCheck(theEnv,execStatus,"setgen",EXACTLY,1) == -1) return(MiscFunctionData(theEnv)->GensymNumber);
+   if (EnvArgTypeCheck(theEnv,execStatus,"setgen",1,INTEGER,&theValue) == FALSE) return(MiscFunctionData(theEnv)->GensymNumber);
 
    /*========================================*/
    /* The integer must be greater than zero. */
@@ -186,7 +186,7 @@ globle void *GensymFunction(
    /* The gensym function accepts no arguments. */
    /*===========================================*/
 
-   EnvArgCountCheck(theEnv,"gensym",EXACTLY,0);
+   EnvArgCountCheck(theEnv,execStatus,"gensym",EXACTLY,0);
 
    /*================================================*/
    /* Create a symbol using the current gensym index */
@@ -214,7 +214,7 @@ globle void *GensymStarFunction(
    /* The gensym* function accepts no arguments. */
    /*============================================*/
 
-   EnvArgCountCheck(theEnv,"gensym*",EXACTLY,0);
+   EnvArgCountCheck(theEnv,execStatus,"gensym*",EXACTLY,0);
 
    /*====================*/
    /* Return the symbol. */
@@ -270,7 +270,7 @@ globle long long RandomFunction(
    /* zero or two arguments.             */
    /*====================================*/
 
-   argCount = EnvRtnArgCount(theEnv);
+   argCount = EnvRtnArgCount(theEnv,execStatus);
    
    if ((argCount != 0) && (argCount != 2))
      {
@@ -286,9 +286,9 @@ globle long long RandomFunction(
    
    if (argCount == 2)
      {
-      if (EnvArgTypeCheck(theEnv,"random",1,INTEGER,&theValue) == FALSE) return(rv);
+      if (EnvArgTypeCheck(theEnv,execStatus,"random",1,INTEGER,&theValue) == FALSE) return(rv);
       begin = DOToLong(theValue);
-      if (EnvArgTypeCheck(theEnv,"random",2,INTEGER,&theValue) == FALSE) return(rv);
+      if (EnvArgTypeCheck(theEnv,execStatus,"random",2,INTEGER,&theValue) == FALSE) return(rv);
       end = DOToLong(theValue);
       if (end < begin)
         {
@@ -317,8 +317,8 @@ globle void SeedFunction(
    /* Check to see that a single integer argument is provided. */
    /*==========================================================*/
 
-   if (EnvArgCountCheck(theEnv,"seed",EXACTLY,1) == -1) return;
-   if (EnvArgTypeCheck(theEnv,"seed",1,INTEGER,&theValue) == FALSE) return;
+   if (EnvArgCountCheck(theEnv,execStatus,"seed",EXACTLY,1) == -1) return;
+   if (EnvArgTypeCheck(theEnv,execStatus,"seed",1,INTEGER,&theValue) == FALSE) return;
 
    /*=============================================================*/
    /* Seed the random number generator with the provided integer. */
@@ -340,8 +340,8 @@ globle long long LengthFunction(
    /* The length$ function expects exactly one argument. */
    /*====================================================*/
 
-   if (EnvArgCountCheck(theEnv,"length$",EXACTLY,1) == -1) return(-1L);
-   EnvRtnUnknown(theEnv,1,&item);
+   if (EnvArgCountCheck(theEnv,execStatus,"length$",EXACTLY,1) == -1) return(-1L);
+   EnvRtnUnknown(theEnv,execStatus,1,&item);
 
    /*====================================================*/
    /* If the argument is a string or symbol, then return */
@@ -380,14 +380,14 @@ globle long long ReleaseMemCommand(
    /* The release-mem function accepts no arguments. */
    /*================================================*/
 
-   if (EnvArgCountCheck(theEnv,"release-mem",EXACTLY,0) == -1) return(0LL);
+   if (EnvArgCountCheck(theEnv,execStatus,"release-mem",EXACTLY,0) == -1) return(0LL);
 
    /*========================================*/
    /* Release memory to the operating system */
    /* and return the amount of memory freed. */
    /*========================================*/
 
-   return(EnvReleaseMem(theEnv,-1L,FALSE));
+   return(EnvReleaseMem(theEnv,execStatus,-1L,FALSE));
   }
 
 /******************************************/
@@ -405,8 +405,8 @@ globle void ConserveMemCommand(
    /* a single symbol argument.         */
    /*===================================*/
 
-   if (EnvArgCountCheck(theEnv,"conserve-mem",EXACTLY,1) == -1) return;
-   if (EnvArgTypeCheck(theEnv,"conserve-mem",1,SYMBOL,&theValue) == FALSE) return;
+   if (EnvArgCountCheck(theEnv,execStatus,"conserve-mem",EXACTLY,1) == -1) return;
+   if (EnvArgTypeCheck(theEnv,execStatus,"conserve-mem",1,SYMBOL,&theValue) == FALSE) return;
 
    argument = DOToString(theValue);
 
@@ -455,7 +455,7 @@ globle long long MemUsedCommand(
    /* The mem-used function accepts no arguments. */
    /*=============================================*/
 
-   if (EnvArgCountCheck(theEnv,"mem-used",EXACTLY,0) == -1) return(0);
+   if (EnvArgCountCheck(theEnv,execStatus,"mem-used",EXACTLY,0) == -1) return(0);
 
    /*============================================*/
    /* Return the amount of memory currently held */
@@ -476,7 +476,7 @@ globle long long MemRequestsCommand(
    /* The mem-requests function accepts no arguments. */
    /*=================================================*/
 
-   if (EnvArgCountCheck(theEnv,"mem-requests",EXACTLY,0) == -1) return(0);
+   if (EnvArgCountCheck(theEnv,execStatus,"mem-requests",EXACTLY,0) == -1) return(0);
 
    /*==================================*/
    /* Return the number of outstanding */
@@ -504,8 +504,8 @@ globle void AproposCommand(
    /* The apropos command expects a single symbol argument. */
    /*=======================================================*/
 
-   if (EnvArgCountCheck(theEnv,"apropos",EXACTLY,1) == -1) return;
-   if (EnvArgTypeCheck(theEnv,"apropos",1,SYMBOL,&argPtr) == FALSE) return;
+   if (EnvArgCountCheck(theEnv,execStatus,"apropos",EXACTLY,1) == -1) return;
+   if (EnvArgTypeCheck(theEnv,execStatus,"apropos",1,SYMBOL,&argPtr) == FALSE) return;
 
    /*=======================================*/
    /* Determine the length of the argument. */
@@ -971,14 +971,14 @@ static void ExpandFuncMultifield(
         {
          EvaluateExpression(theEnv,theExp->argList,result);
          ReturnExpression(theEnv,theExp->argList);
-         if ((EvaluationData(theEnv)->EvaluationError) || (result->type != MULTIFIELD))
+         if ((execStatus->EvaluationError) || (result->type != MULTIFIELD))
            {
             theExp->argList = NULL;
-            if ((EvaluationData(theEnv)->EvaluationError == FALSE) && (result->type != MULTIFIELD))
+            if ((execStatus->EvaluationError == FALSE) && (result->type != MULTIFIELD))
               ExpectedTypeError2(theEnv,"expand$",1);
             theExp->value = (void *) FindFunction(theEnv,"(set-evaluation-error)");
-            EvaluationData(theEnv)->EvaluationError = FALSE;
-            EvaluationData(theEnv)->HaltExecution = FALSE;
+            execStatus->EvaluationError = FALSE;
+            execStatus->HaltExecution = FALSE;
             return;
            }
          top = bot = NULL;

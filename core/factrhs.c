@@ -587,7 +587,7 @@ globle struct fact *StringToFact(
    for (tempPtr = assertArgs->nextArg; tempPtr != NULL; tempPtr = tempPtr->nextArg)
      { numberOfFields++; }
 
-   factPtr = (struct fact *) CreateFactBySize(theEnv,numberOfFields);
+   factPtr = (struct fact *) CreateFactBySize(theEnv,execStatus,numberOfFields);
    factPtr->whichDeftemplate = (struct deftemplate *) assertArgs->value;
 
    /*=============================================*/

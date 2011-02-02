@@ -132,7 +132,7 @@ globle void WhileFunction(
    EnvRtnUnknown(theEnv,1,&theResult);
    while (((theResult.value != EnvFalseSymbol(theEnv)) ||
            (theResult.type != SYMBOL)) &&
-           (EvaluationData(theEnv)->HaltExecution != TRUE))
+           (execStatus->HaltExecution != TRUE))
      {
       if ((ProcedureFunctionData(theEnv)->BreakFlag == TRUE) || (ProcedureFunctionData(theEnv)->ReturnFlag == TRUE))
         break;
@@ -211,7 +211,7 @@ globle void LoopForCountFunction(
      }
    iterationEnd = DOToLong(arg_ptr);
    while ((tmpCounter->loopCounter <= iterationEnd) &&
-          (EvaluationData(theEnv)->HaltExecution != TRUE))
+          (execStatus->HaltExecution != TRUE))
      {
       if ((ProcedureFunctionData(theEnv)->BreakFlag == TRUE) || (ProcedureFunctionData(theEnv)->ReturnFlag == TRUE))
         break;
@@ -268,6 +268,7 @@ globle long long GetLoopCount(
 /************************************/
 globle void IfFunction(
   void *theEnv,
+  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
    int numArgs;
@@ -277,8 +278,8 @@ globle void IfFunction(
    /* Check for the correct number of arguments. */
    /*============================================*/
 
-   if ((EvaluationData(theEnv)->CurrentExpression->argList == NULL) ||
-       (EvaluationData(theEnv)->CurrentExpression->argList->nextArg == NULL))
+   if ((execStatus->CurrentExpression->argList == NULL) ||
+       (execStatus->CurrentExpression->argList->nextArg == NULL))
      {
       EnvArgRangeCheck(theEnv,"if",2,3);
       returnValue->type = SYMBOL;
@@ -286,9 +287,9 @@ globle void IfFunction(
       return;
      }
 
-   if (EvaluationData(theEnv)->CurrentExpression->argList->nextArg->nextArg == NULL)
+   if (execStatus->CurrentExpression->>argList->nextArg->nextArg == NULL)
      { numArgs = 2; }
-   else if (EvaluationData(theEnv)->CurrentExpression->argList->nextArg->nextArg->nextArg == NULL)
+   else if (execStatus->CurrentExpression->>argList->nextArg->nextArg->nextArg == NULL)
      { numArgs = 3; }
    else
      {
@@ -302,7 +303,7 @@ globle void IfFunction(
    /* Evaluate the condition. */
    /*=========================*/
 
-   EvaluateExpression(theEnv,EvaluationData(theEnv)->CurrentExpression->argList,returnValue);
+   EvaluateExpression(theEnv,execStatus->CurrentExpression->>argList,returnValue);
 
    if ((ProcedureFunctionData(theEnv)->BreakFlag == TRUE) || (ProcedureFunctionData(theEnv)->ReturnFlag == TRUE))
      {
@@ -321,7 +322,7 @@ globle void IfFunction(
        (returnValue->type == SYMBOL) &&
        (numArgs == 3))
      {
-      theExpr = EvaluationData(theEnv)->CurrentExpression->argList->nextArg->nextArg;
+      theExpr = execStatus->CurrentExpression->>argList->nextArg->nextArg;
       switch (theExpr->type)
         {
          case INTEGER:
@@ -352,7 +353,7 @@ globle void IfFunction(
    else if ((returnValue->value != EnvFalseSymbol(theEnv)) ||
             (returnValue->type != SYMBOL))
      {
-      theExpr = EvaluationData(theEnv)->CurrentExpression->argList->nextArg;
+      theExpr = execStatus->CurrentExpression->>argList->nextArg;
       switch (theExpr->type)
         {
          case INTEGER:
@@ -556,7 +557,7 @@ globle void PrognFunction(
   {
    struct expr *argPtr;
 
-   argPtr = EvaluationData(theEnv)->CurrentExpression->argList;
+   argPtr = execStatus->CurrentExpression->>argList;
 
    if (argPtr == NULL)
      {
@@ -627,7 +628,7 @@ globle void SwitchFunction(
       Get the value to switch on
       ========================== */
    EvaluateExpression(theEnv,GetFirstArgument(),&switch_val);
-   if (EvaluationData(theEnv)->EvaluationError)
+   if (execStatus->EvaluationError)
      return;
    for (theExp = GetFirstArgument()->nextArg ; theExp != NULL ; theExp = theExp->nextArg->nextArg)
      {
@@ -644,7 +645,7 @@ globle void SwitchFunction(
          If the case matches, evaluate the actions and return
          ==================================================== */
       EvaluateExpression(theEnv,theExp,&case_val);
-      if (EvaluationData(theEnv)->EvaluationError)
+      if (execStatus->EvaluationError)
         return;
       if (switch_val.type == case_val.type)
         {

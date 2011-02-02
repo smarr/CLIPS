@@ -92,9 +92,9 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static void                    ResetFacts(void *);
-   static int                     ClearFactsReady(void *);
-   static void                    RemoveGarbageFacts(void *);
+   static void                    ResetFacts(void *,EXEC_STATUS);
+   static int                     ClearFactsReady(void *,EXEC_STATUS);
+   static void                    RemoveGarbageFacts(void *, EXEC_STATUS);
    static void                    DeallocateFactData(void *);
 
 /**************************************************************/
@@ -416,6 +416,7 @@ globle void MatchFactFunction(
 /*********************************************************/
 globle intBool EnvRetract(
   void *theEnv,
+  EXEC_STATUS,
   void *vTheFact)
   {
    struct fact *theFact = (struct fact *) vTheFact;
@@ -440,7 +441,7 @@ globle intBool EnvRetract(
 
    if (theFact == NULL)
      {
-      RemoveAllFacts(theEnv);
+      RemoveAllFacts(theEnv,execStatus);
       return(TRUE);
      }
 
@@ -580,8 +581,8 @@ globle intBool EnvRetract(
    /*===========================================*/
 
    if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
-       (EvaluationData(theEnv)->CurrentExpression == NULL))
-     { PeriodicCleanup(theEnv,TRUE,FALSE); }
+       (execStatus->CurrentExpression == NULL))
+     { PeriodicCleanup(theEnv,execStatus,TRUE,FALSE); }
 
    /*==================================*/
    /* Return TRUE to indicate the fact */
@@ -599,7 +600,7 @@ globle intBool EnvRetract(
 /*   and the facts may be in use in other data structures.         */
 /*******************************************************************/
 static void RemoveGarbageFacts(
-  void *theEnv)
+  void *theEnv, EXEC_STATUS)
   {
    struct fact *factPtr, *nextPtr, *lastPtr = NULL;
 
@@ -679,6 +680,7 @@ static void * APR_THREAD_FUNC ParallelFactMatchAndLogicRetract(apr_thread_t *thr
 /********************************************************/
 globle void *EnvAssert(
   void *theEnv,
+  EXEC_STATUS,
   void *vTheFact,
   int  goParallel)
   {
@@ -895,8 +897,8 @@ globle void *EnvAssert(
    /*==========================================*/
 
    if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
-       (EvaluationData(theEnv)->CurrentExpression == NULL))
-     { PeriodicCleanup(theEnv,TRUE,FALSE); }
+       (execStatus->CurrentExpression == NULL))
+     { PeriodicCleanup(theEnv,execStatus,TRUE,FALSE); }
 
    /*===============================*/
    /* Return a pointer to the fact. */
@@ -910,10 +912,10 @@ globle void *EnvAssert(
 /*   fact-list and removes each fact. */
 /**************************************/
 globle void RemoveAllFacts(
-  void *theEnv)
+  void *theEnv, EXEC_STATUS)
   {
    while (FactData(theEnv)->FactList != NULL)
-     { EnvRetract(theEnv,(void *) FactData(theEnv)->FactList); }
+     { EnvRetract(theEnv,execStatus,(void *) FactData(theEnv)->FactList); }
   }
 
 /************************************************/
@@ -922,6 +924,7 @@ globle void RemoveAllFacts(
 /************************************************/
 globle struct fact *EnvCreateFact(
   void *theEnv,
+  EXEC_STATUS,
   void *vTheDeftemplate)
   {
    struct deftemplate *theDeftemplate = (struct deftemplate *) vTheDeftemplate;
@@ -941,7 +944,7 @@ globle struct fact *EnvCreateFact(
 
    if (theDeftemplate->implied == FALSE)
      {
-      newFact = CreateFactBySize(theEnv,theDeftemplate->numberOfSlots);
+      newFact = CreateFactBySize(theEnv,execStatus,theDeftemplate->numberOfSlots);
       for (i = 0;
            i < (int) theDeftemplate->numberOfSlots;
            i++)
@@ -954,7 +957,7 @@ globle struct fact *EnvCreateFact(
 
    else
      {
-      newFact = CreateFactBySize(theEnv,1);
+      newFact = CreateFactBySize(theEnv,execStatus,1);
       newFact->theProposition.theFields[0].type = MULTIFIELD;
       newFact->theProposition.theFields[0].value = CreateMultifield2(theEnv,0L);
      }
@@ -1321,6 +1324,7 @@ globle intBool CopyFactSlotValues(
 /*********************************************/
 globle struct fact *CreateFactBySize(
   void *theEnv,
+  EXEC_STATUS,
   unsigned size)
   {
    struct fact *theFact;
@@ -1597,13 +1601,14 @@ globle long long FactIndex(
 /*************************************/
 globle void *EnvAssertString(
   void *theEnv,
+  EXEC_STATUS,
   char *theString)
   {
    struct fact *theFact;
 
    if ((theFact = StringToFact(theEnv,theString)) == NULL) return(NULL);
 
-   return((void *) EnvAssert(theEnv,(void *) theFact, FALSE));
+   return((void *) EnvAssert(theEnv,execStatus,(void *) theFact, FALSE));
   }
 
 /******************************************************/
@@ -1642,7 +1647,7 @@ globle unsigned long GetNumberOfFacts(
 /*   fact index to zero and removes all facts.             */
 /***********************************************************/
 static void ResetFacts(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    /*====================================*/
    /* Initialize the fact index to zero. */
@@ -1654,7 +1659,7 @@ static void ResetFacts(
    /* Remove all facts from the fact list. */
    /*======================================*/
 
-   RemoveAllFacts(theEnv);
+   RemoveAllFacts(theEnv,execStatus);
   }
 
 /************************************************************/
@@ -1663,7 +1668,7 @@ static void ResetFacts(
 /*   command can continue, otherwise FALSE.                 */
 /************************************************************/
 static int ClearFactsReady(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    /*====================================*/
    /* Initialize the fact index to zero. */
@@ -1675,7 +1680,7 @@ static int ClearFactsReady(
    /* Remove all facts from the fact list. */
    /*======================================*/
 
-   RemoveAllFacts(theEnv);
+   RemoveAllFacts(theEnv,execStatus);
 
    /*==============================================*/
    /* If for some reason there are any facts still */

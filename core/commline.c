@@ -489,7 +489,7 @@ globle void CommandLoop(
    EnvPrintRouter(theEnv,WPROMPT,CommandLineData(theEnv)->BannerString);
    SetHaltExecution(theEnv,FALSE);
    SetEvaluationError(theEnv,FALSE);
-   PeriodicCleanup(theEnv,TRUE,FALSE);
+   PeriodicCleanup(theEnv,execStatus,TRUE,FALSE);
    PrintPrompt(theEnv);
    RouterData(theEnv)->CommandBufferInputCount = 0;
    RouterData(theEnv)->AwaitingInput = TRUE;
@@ -549,7 +549,7 @@ globle void CommandLoopBatch(
   {
    SetHaltExecution(theEnv,FALSE);
    SetEvaluationError(theEnv,FALSE);
-   PeriodicCleanup(theEnv,TRUE,FALSE);
+   PeriodicCleanup(theEnv,execStatus,TRUE,FALSE);
    PrintPrompt(theEnv);
    RouterData(theEnv)->CommandBufferInputCount = 0;
    RouterData(theEnv)->AwaitingInput = TRUE;
@@ -658,7 +658,7 @@ globle intBool ExecuteIfCommandComplete(
    SetHaltExecution(theEnv,FALSE);
    SetEvaluationError(theEnv,FALSE);
    FlushCommandString(theEnv);
-   PeriodicCleanup(theEnv,TRUE,FALSE);
+   PeriodicCleanup(theEnv,execStatus,TRUE,FALSE);
    PrintPrompt(theEnv);
          
    return TRUE;

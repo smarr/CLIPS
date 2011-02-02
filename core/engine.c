@@ -215,7 +215,7 @@ globle long long EnvRun(
    theActivation = NextActivationToFire(theEnv);
    while ((theActivation != NULL) &&
           (runLimit != 0) &&
-          (EvaluationData(theEnv)->HaltExecution == FALSE) &&
+          (execStatus->HaltExecution == FALSE) &&
           (EngineData(theEnv)->HaltRules == FALSE))
      {
       /*===========================================*/
@@ -336,9 +336,9 @@ globle long long EnvRun(
       /*=====================================================*/
 
 #if DEBUGGING_FUNCTIONS
-      if ((EvaluationData(theEnv)->HaltExecution) || (EngineData(theEnv)->HaltRules && EngineData(theEnv)->ExecutingRule->watchFiring))
+      if ((execStatus->HaltExecution) || (EngineData(theEnv)->HaltRules && EngineData(theEnv)->ExecutingRule->watchFiring))
 #else
-      if ((EvaluationData(theEnv)->HaltExecution) || (EngineData(theEnv)->HaltRules))
+      if ((execStatus->HaltExecution) || (EngineData(theEnv)->HaltRules))
 #endif
 
         {
@@ -382,7 +382,7 @@ globle long long EnvRun(
       /* while executing the rule's RHS.  */
       /*==================================*/
 
-      PeriodicCleanup(theEnv,FALSE,TRUE);
+      PeriodicCleanup(theEnv,execStatus,FALSE,TRUE);
 
       /*==========================*/
       /* Keep up with statistics. */
@@ -832,7 +832,7 @@ globle void EnvFocus(
 globle void ClearFocusStackCommand(
   void *theEnv)
   {
-   if (EnvArgCountCheck(theEnv,"list-focus-stack",EXACTLY,0) == -1) return;
+   if (EnvArgCountCheck(theEnv,execStatus,"list-focus-stack",EXACTLY,0) == -1) return;
 
    EnvClearFocusStack(theEnv);
   }
@@ -932,13 +932,13 @@ globle void RunCommand(
    long long runLimit = -1LL;
    DATA_OBJECT argPtr;
 
-   if ((numArgs = EnvArgCountCheck(theEnv,"run",NO_MORE_THAN,1)) == -1) return;
+   if ((numArgs = EnvArgCountCheck(theEnv,execStatus,"run",NO_MORE_THAN,1)) == -1) return;
 
    if (numArgs == 0)
      { runLimit = -1LL; }
    else if (numArgs == 1)
      {
-      if (EnvArgTypeCheck(theEnv,"run",1,INTEGER,&argPtr) == FALSE) return;
+      if (EnvArgTypeCheck(theEnv,execStatus,"run",1,INTEGER,&argPtr) == FALSE) return;
       runLimit = DOToLong(argPtr);
      }
 
@@ -953,7 +953,7 @@ globle void RunCommand(
 globle void HaltCommand(
   void *theEnv)
   {
-   EnvArgCountCheck(theEnv,"halt",EXACTLY,0);
+   EnvArgCountCheck(theEnv,execStatus,"halt",EXACTLY,0);
    EnvHalt(theEnv);
   }
 
@@ -1083,9 +1083,9 @@ globle void SetBreakCommand(
    char *argument;
    void *defrulePtr;
 
-   if (EnvArgCountCheck(theEnv,"set-break",EXACTLY,1) == -1) return;
+   if (EnvArgCountCheck(theEnv,execStatus,"set-break",EXACTLY,1) == -1) return;
 
-   if (EnvArgTypeCheck(theEnv,"set-break",1,SYMBOL,&argPtr) == FALSE) return;
+   if (EnvArgTypeCheck(theEnv,execStatus,"set-break",1,SYMBOL,&argPtr) == FALSE) return;
 
    argument = DOToString(argPtr);
 
@@ -1110,7 +1110,7 @@ globle void RemoveBreakCommand(
    int nargs;
    void *defrulePtr;
 
-   if ((nargs = EnvArgCountCheck(theEnv,"remove-break",NO_MORE_THAN,1)) == -1)
+   if ((nargs = EnvArgCountCheck(theEnv,execStatus,"remove-break",NO_MORE_THAN,1)) == -1)
      { return; }
 
    if (nargs == 0)
@@ -1119,7 +1119,7 @@ globle void RemoveBreakCommand(
       return;
      }
 
-   if (EnvArgTypeCheck(theEnv,"remove-break",1,SYMBOL,&argPtr) == FALSE) return;
+   if (EnvArgTypeCheck(theEnv,execStatus,"remove-break",1,SYMBOL,&argPtr) == FALSE) return;
 
    argument = DOToString(argPtr);
 
@@ -1147,11 +1147,11 @@ globle void ShowBreaksCommand(
    int numArgs, error;
    struct defmodule *theModule;
 
-   if ((numArgs = EnvArgCountCheck(theEnv,"show-breaks",NO_MORE_THAN,1)) == -1) return;
+   if ((numArgs = EnvArgCountCheck(theEnv,execStatus,"show-breaks",NO_MORE_THAN,1)) == -1) return;
 
    if (numArgs == 1)
      {
-      theModule = GetModuleName(theEnv,"show-breaks",1,&error);
+      theModule = GetModuleName(theEnv,execStatus,"show-breaks",1,&error);
       if (error) return;
      }
    else
@@ -1167,7 +1167,7 @@ globle void ShowBreaksCommand(
 globle void ListFocusStackCommand(
   void *theEnv)
   {
-   if (EnvArgCountCheck(theEnv,"list-focus-stack",EXACTLY,0) == -1) return;
+   if (EnvArgCountCheck(theEnv,execStatus,"list-focus-stack",EXACTLY,0) == -1) return;
 
    EnvListFocusStack(theEnv,WDISPLAY);
   }
@@ -1201,7 +1201,7 @@ globle void GetFocusStackFunction(
   void *theEnv,
   DATA_OBJECT_PTR returnValue)
   {
-   if (EnvArgCountCheck(theEnv,"get-focus-stack",EXACTLY,0) == -1) return;
+   if (EnvArgCountCheck(theEnv,execStatus,"get-focus-stack",EXACTLY,0) == -1) return;
 
    EnvGetFocusStack(theEnv,returnValue);
   }
@@ -1272,7 +1272,7 @@ globle void *PopFocusFunction(
   {
    struct defmodule *theModule;
 
-   EnvArgCountCheck(theEnv,"pop-focus",EXACTLY,0);
+   EnvArgCountCheck(theEnv,execStatus,"pop-focus",EXACTLY,0);
 
    theModule = (struct defmodule *) EnvPopFocus(theEnv);
    if (theModule == NULL) return((SYMBOL_HN *) EnvFalseSymbol(theEnv));

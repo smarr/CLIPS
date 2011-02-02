@@ -525,7 +525,7 @@ globle void DelayedQueryDoForAllInstances(
       if (ProcedureFunctionData(theEnv)->ReturnFlag == TRUE)
         { PropagateReturnValue(theEnv,result); }
       PeriodicCleanup(theEnv,FALSE,TRUE);
-      if (EvaluationData(theEnv)->HaltExecution || ProcedureFunctionData(theEnv)->BreakFlag || ProcedureFunctionData(theEnv)->ReturnFlag)
+      if (execStatus->HaltExecution || ProcedureFunctionData(theEnv)->BreakFlag || ProcedureFunctionData(theEnv)->ReturnFlag)
         {
          while (InstanceQueryData(theEnv)->QueryCore->soln_set != NULL)
            PopQuerySoln(theEnv);
@@ -851,7 +851,7 @@ static int TestForFirstInChain(
          return(TRUE);
         }
       ReleaseTraversalID(theEnv);
-      if ((EvaluationData(theEnv)->HaltExecution == TRUE) || (InstanceQueryData(theEnv)->AbortQuery == TRUE))
+      if ((execStatus->HaltExecution == TRUE) || (InstanceQueryData(theEnv)->AbortQuery == TRUE))
         return(FALSE);
      }
    return(FALSE);
@@ -901,7 +901,7 @@ static int TestForFirstInstanceInClass(
             break;
            }
          ins->busy--;
-         if ((EvaluationData(theEnv)->HaltExecution == TRUE) || (InstanceQueryData(theEnv)->AbortQuery == TRUE))
+         if ((execStatus->HaltExecution == TRUE) || (InstanceQueryData(theEnv)->AbortQuery == TRUE))
            break;
         }
       else
@@ -912,7 +912,7 @@ static int TestForFirstInstanceInClass(
          execStatus->CurrentEvaluationDepth--;
          PeriodicCleanup(theEnv,FALSE,TRUE);
          ins->busy--;
-         if (EvaluationData(theEnv)->HaltExecution == TRUE)
+         if (execStatus->HaltExecution == TRUE)
            break;
          if ((temp.type != SYMBOL) ? TRUE :
              (temp.value != EnvFalseSymbol(theEnv)))
@@ -923,14 +923,14 @@ static int TestForFirstInstanceInClass(
         ins = ins->nxtClass;
      }
    if (ins != NULL)
-     return(((EvaluationData(theEnv)->HaltExecution == TRUE) || (InstanceQueryData(theEnv)->AbortQuery == TRUE))
+     return(((execStatus->HaltExecution == TRUE) || (InstanceQueryData(theEnv)->AbortQuery == TRUE))
              ? FALSE : TRUE);
    for (i = 0 ; i < cls->directSubclasses.classCount ; i++)
      {
       if (TestForFirstInstanceInClass(theEnv,theModule,id,cls->directSubclasses.classArray[i],
                                       qchain,indx))
         return(TRUE);
-      if ((EvaluationData(theEnv)->HaltExecution == TRUE) || (InstanceQueryData(theEnv)->AbortQuery == TRUE))
+      if ((execStatus->HaltExecution == TRUE) || (InstanceQueryData(theEnv)->AbortQuery == TRUE))
         return(FALSE);
      }
    return(FALSE);
@@ -965,7 +965,7 @@ static void TestEntireChain(
         return;
       TestEntireClass(theEnv,qptr->theModule,id,qptr->cls,qchain,indx);
       ReleaseTraversalID(theEnv);
-      if ((EvaluationData(theEnv)->HaltExecution == TRUE) || (InstanceQueryData(theEnv)->AbortQuery == TRUE))
+      if ((execStatus->HaltExecution == TRUE) || (InstanceQueryData(theEnv)->AbortQuery == TRUE))
         return;
      }
   }
@@ -1011,7 +1011,7 @@ static void TestEntireClass(
          ins->busy++;
          TestEntireChain(theEnv,qchain->nxt,indx+1);
          ins->busy--;
-         if ((EvaluationData(theEnv)->HaltExecution == TRUE) || (InstanceQueryData(theEnv)->AbortQuery == TRUE))
+         if ((execStatus->HaltExecution == TRUE) || (InstanceQueryData(theEnv)->AbortQuery == TRUE))
            break;
         }
       else
@@ -1022,7 +1022,7 @@ static void TestEntireClass(
          execStatus->CurrentEvaluationDepth--;
          PeriodicCleanup(theEnv,FALSE,TRUE);
          ins->busy--;
-         if (EvaluationData(theEnv)->HaltExecution == TRUE)
+         if (execStatus->HaltExecution == TRUE)
            break;
          if ((temp.type != SYMBOL) ? TRUE :
              (temp.value != EnvFalseSymbol(theEnv)))
@@ -1042,7 +1042,7 @@ static void TestEntireClass(
                   InstanceQueryData(theEnv)->AbortQuery = TRUE;
                   break;
                  }
-               if (EvaluationData(theEnv)->HaltExecution == TRUE)
+               if (execStatus->HaltExecution == TRUE)
                  break;
               }
             else
@@ -1059,7 +1059,7 @@ static void TestEntireClass(
    for (i = 0 ; i < cls->directSubclasses.classCount ; i++)
      {
       TestEntireClass(theEnv,theModule,id,cls->directSubclasses.classArray[i],qchain,indx);
-      if ((EvaluationData(theEnv)->HaltExecution == TRUE) || (InstanceQueryData(theEnv)->AbortQuery == TRUE))
+      if ((execStatus->HaltExecution == TRUE) || (InstanceQueryData(theEnv)->AbortQuery == TRUE))
         return;
      }
   }

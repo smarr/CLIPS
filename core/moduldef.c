@@ -694,7 +694,7 @@ globle void *GetCurrentModuleCommand(
   {
    struct defmodule *theModule;
 
-   EnvArgCountCheck(theEnv,"get-current-module",EXACTLY,0);
+   EnvArgCountCheck(theEnv,execStatus,"get-current-module",EXACTLY,0);
 
    theModule = (struct defmodule *) EnvGetCurrentModule(theEnv);
 
@@ -724,10 +724,10 @@ globle void *SetCurrentModuleCommand(
 
    defaultReturn = (SYMBOL_HN *) EnvAddSymbol(theEnv,ValueToString(((struct defmodule *) EnvGetCurrentModule(theEnv))->name));
 
-   if (EnvArgCountCheck(theEnv,"set-current-module",EXACTLY,1) == -1)
+   if (EnvArgCountCheck(theEnv,execStatus,"set-current-module",EXACTLY,1) == -1)
      { return(defaultReturn); }
 
-   if (EnvArgTypeCheck(theEnv,"set-current-module",1,SYMBOL,&argPtr) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"set-current-module",1,SYMBOL,&argPtr) == FALSE)
      { return(defaultReturn); }
 
    argument = DOToString(argPtr);

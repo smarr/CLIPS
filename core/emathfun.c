@@ -131,8 +131,8 @@ static int SingleNumberCheck(
   {
    DATA_OBJECT theValue;
 
-   if (EnvArgCountCheck(theEnv,functionName,EXACTLY,1) == -1) return(FALSE);
-   if (EnvArgTypeCheck(theEnv,functionName,1,FLOAT,&theValue) == FALSE) return(FALSE);
+   if (EnvArgCountCheck(theEnv,execStatus,functionName,EXACTLY,1) == -1) return(FALSE);
+   if (EnvArgTypeCheck(theEnv,execStatus,functionName,1,FLOAT,&theValue) == FALSE) return(FALSE);
 
    *theNumber = DOToDouble(theValue);
    return(TRUE);
@@ -700,10 +700,10 @@ globle double PowFunction(
   {
    DATA_OBJECT value1, value2;
 
-   if (EnvArgCountCheck(theEnv,"**",EXACTLY,2) == -1) return(0.0);
+   if (EnvArgCountCheck(theEnv,execStatus,"**",EXACTLY,2) == -1) return(0.0);
 
-   if (EnvArgTypeCheck(theEnv,"**",1,FLOAT,&value1) == FALSE) return(0.0);
-   if (EnvArgTypeCheck(theEnv,"**",2,FLOAT,&value2) == FALSE) return(0.0);
+   if (EnvArgTypeCheck(theEnv,execStatus,"**",1,FLOAT,&value1) == FALSE) return(0.0);
+   if (EnvArgTypeCheck(theEnv,execStatus,"**",2,FLOAT,&value2) == FALSE) return(0.0);
 
     if (((DOToDouble(value1) == 0.0) &&
         (DOToDouble(value2) <= 0.0)) ||
@@ -731,21 +731,21 @@ globle void ModFunction(
    double fnum1, fnum2;
    long long lnum1, lnum2;
 
-   if (EnvArgCountCheck(theEnv,"mod",EXACTLY,2) == -1)
+   if (EnvArgCountCheck(theEnv,execStatus,"mod",EXACTLY,2) == -1)
      {
       result->type = INTEGER;
       result->value = (void *) EnvAddLong(theEnv,0L);
       return;
      }
 
-   if (EnvArgTypeCheck(theEnv,"mod",1,INTEGER_OR_FLOAT,&item1) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"mod",1,INTEGER_OR_FLOAT,&item1) == FALSE)
      {
       result->type = INTEGER;
       result->value = (void *) EnvAddLong(theEnv,0L);
       return;
      }
 
-   if (EnvArgTypeCheck(theEnv,"mod",2,INTEGER_OR_FLOAT,&item2) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"mod",2,INTEGER_OR_FLOAT,&item2) == FALSE)
      {
       result->type = INTEGER;
       result->value = (void *) EnvAddLong(theEnv,0L);
@@ -786,7 +786,7 @@ globle double PiFunction(
   void *theEnv)
   {
 
-   if (EnvArgCountCheck(theEnv,"pi",EXACTLY,0) == -1) return(acos(-1.0));
+   if (EnvArgCountCheck(theEnv,execStatus,"pi",EXACTLY,0) == -1) return(acos(-1.0));
    return(acos(-1.0));
   }
 
@@ -799,7 +799,7 @@ globle double DegRadFunction(
   {
    double num;
 
-   if (SingleNumberCheck(theEnv,"deg-rad",&num) == FALSE) return(0.0);
+   if (SingleNumberCheck(theEnv,execStatus,"deg-rad",&num) == FALSE) return(0.0);
    return(num * PI / 180.0);
   }
 
@@ -851,10 +851,10 @@ globle long long RoundFunction(
   {
    DATA_OBJECT result;
 
-   if (EnvArgCountCheck(theEnv,"round",EXACTLY,1) == -1)
+   if (EnvArgCountCheck(theEnv,execStatus,"round",EXACTLY,1) == -1)
      { return(0LL); }
 
-   if (EnvArgTypeCheck(theEnv,"round",1,INTEGER_OR_FLOAT,&result) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"round",1,INTEGER_OR_FLOAT,&result) == FALSE)
      { return(0LL); }
 
    if (result.type == INTEGER)

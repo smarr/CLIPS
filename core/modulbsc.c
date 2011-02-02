@@ -145,7 +145,7 @@ globle void PPDefmoduleCommand(
   {
    char *defmoduleName;
 
-   defmoduleName = GetConstructName(theEnv,"ppdefmodule","defmodule name");
+   defmoduleName = GetConstructName(theEnv,execStatus,"ppdefmodule","defmodule name");
    if (defmoduleName == NULL) return;
 
    PPDefmodule(theEnv,defmoduleName,WDISPLAY);
@@ -183,7 +183,7 @@ globle int PPDefmodule(
 globle void ListDefmodulesCommand(
   void *theEnv)
   {
-   if (EnvArgCountCheck(theEnv,"list-defmodules",EXACTLY,0) == -1) return;
+   if (EnvArgCountCheck(theEnv,execStatus,"list-defmodules",EXACTLY,0) == -1) return;
 
    EnvListDefmodules(theEnv,WDISPLAY);
   }

@@ -59,7 +59,7 @@ typedef struct messageHandlerLink
    LOCALE DATA_OBJECT     *GetNthMessageArgument(void *,int);
 
    LOCALE int              NextHandlerAvailable(void *);
-   LOCALE void             CallNextHandler(void *,DATA_OBJECT *);
+   LOCALE void             CallNextHandler(void *,EXEC_STATUS,DATA_OBJECT *);
 
    LOCALE void             FindApplicableOfName(void *,DEFCLASS *,HANDLER_LINK *[],
                                                 HANDLER_LINK *[],SYMBOL_HN *);

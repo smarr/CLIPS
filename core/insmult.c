@@ -360,7 +360,7 @@ static INSTANCE_TYPE *CheckMultifieldSlotInstance(
    INSTANCE_TYPE *ins;
    DATA_OBJECT temp;
 
-   if (EnvArgTypeCheck(theEnv,func,1,INSTANCE_OR_INSTANCE_NAME,&temp) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,func,1,INSTANCE_OR_INSTANCE_NAME,&temp) == FALSE)
      {
       SetEvaluationError(theEnv,TRUE);
       return(NULL);
@@ -427,7 +427,7 @@ static INSTANCE_SLOT *CheckMultifieldSlotModify(
    int start;
 
    start = (args == GetFirstArgument()) ? 1 : 2;
-   EvaluationData(theEnv)->EvaluationError = FALSE;
+   execStatus->EvaluationError = FALSE;
    EvaluateExpression(theEnv,args,&temp);
    if (temp.type != SYMBOL)
      {

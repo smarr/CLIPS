@@ -315,7 +315,7 @@ globle void InitializeConstructs(
 globle void ClearCommand(
   void *theEnv)
   {
-   if (EnvArgCountCheck(theEnv,"clear",EXACTLY,0) == -1) return;
+   if (EnvArgCountCheck(theEnv,execStatus,"clear",EXACTLY,0) == -1) return;
    EnvClear(theEnv);
    return;
   }
@@ -327,7 +327,7 @@ globle void ClearCommand(
 globle void ResetCommand(
   void *theEnv)
   {
-   if (EnvArgCountCheck(theEnv,"reset",EXACTLY,0) == -1) return;
+   if (EnvArgCountCheck(theEnv,execStatus,"reset",EXACTLY,0) == -1) return;
    EnvReset(theEnv);
    return;
   }
@@ -412,8 +412,8 @@ globle void EnvReset(
    /*===========================================*/
 
    if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
-       (EvaluationData(theEnv)->CurrentExpression == NULL))
-     { PeriodicCleanup(theEnv,TRUE,FALSE); }
+       (execStatus->CurrentExpression == NULL))
+     { PeriodicCleanup(theEnv,execStatus,TRUE,FALSE); }
 
    /*===================================*/
    /* A reset is no longer in progress. */
@@ -568,8 +568,8 @@ globle void EnvClear(
    /*===========================================*/
 
    if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
-       (EvaluationData(theEnv)->CurrentExpression == NULL))
-     { PeriodicCleanup(theEnv,TRUE,FALSE); }
+       (execStatus->CurrentExpression == NULL))
+     { PeriodicCleanup(theEnv,execStatus,TRUE,FALSE); }
 
    /*===========================*/
    /* Clear has been completed. */
@@ -773,7 +773,7 @@ globle void OldGetConstructList(
         theConstruct != NULL;
         theConstruct = (*nextFunction)(theEnv,theConstruct), count++)
      {
-      if (EvaluationData(theEnv)->HaltExecution == TRUE)
+      if (execStatus->HaltExecution == TRUE)
         {
          EnvSetMultifieldErrorValue(theEnv,returnValue);
          return;

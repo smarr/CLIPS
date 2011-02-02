@@ -854,7 +854,7 @@ globle unsigned long GetNumberOfActivations(
 /*   Syntax: (refresh <defrule-name>)                 */
 /******************************************************/
 globle void RefreshCommand(
-  void *theEnv)
+  void *theEnv, EXEC_STATUS)
   {
    char *ruleName;
    void *rulePtr;
@@ -863,7 +863,7 @@ globle void RefreshCommand(
    /* Get the name of the rule. */
    /*===========================*/
 
-   ruleName = GetConstructName(theEnv,"refresh","rule name");
+   ruleName = GetConstructName(theEnv,execStatus,"refresh","rule name");
    if (ruleName == NULL) return;
 
    /*===============================*/
@@ -939,7 +939,7 @@ globle intBool EnvRefresh(
 /*   for the refresh-agenda command.          */
 /**********************************************/
 globle void RefreshAgendaCommand(
-  void *theEnv)
+  void *theEnv, EXEC_STATUS)
   {
    int numArgs, error;
    struct defmodule *theModule;
@@ -948,7 +948,7 @@ globle void RefreshAgendaCommand(
    /* This function can have at most one argument. */
    /*==============================================*/
 
-   if ((numArgs = EnvArgCountCheck(theEnv,"refresh-agenda",NO_MORE_THAN,1)) == -1) return;
+   if ((numArgs = EnvArgCountCheck(theEnv,execStatus,"refresh-agenda",NO_MORE_THAN,1)) == -1) return;
 
    /*===============================================================*/
    /* If a module name is specified, then the agenda of that module */
@@ -958,7 +958,7 @@ globle void RefreshAgendaCommand(
 
    if (numArgs == 1)
      {
-      theModule = GetModuleName(theEnv,"refresh-agenda",1,&error);
+      theModule = GetModuleName(theEnv,execStatus,"refresh-agenda",1,&error);
       if (error) return;
      }
    else
@@ -1071,7 +1071,7 @@ globle void EnvRefreshAgenda(
 /*   Syntax: (set-salience-evaluation-behavior <symbol>) */
 /*********************************************************/
 globle void *SetSalienceEvaluationCommand(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    DATA_OBJECT argPtr;
    char *argument, *oldValue;
@@ -1087,10 +1087,10 @@ globle void *SetSalienceEvaluationCommand(
    /* which must be a symbol.                 */
    /*=========================================*/
 
-   if (EnvArgCountCheck(theEnv,"set-salience-evaluation",EXACTLY,1) == -1)
+   if (EnvArgCountCheck(theEnv,execStatus,"set-salience-evaluation",EXACTLY,1) == -1)
      { return((SYMBOL_HN *) EnvAddSymbol(theEnv,oldValue)); }
 
-   if (EnvArgTypeCheck(theEnv,"set-salience-evaluation",1,SYMBOL,&argPtr) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"set-salience-evaluation",1,SYMBOL,&argPtr) == FALSE)
      { return((SYMBOL_HN *) EnvAddSymbol(theEnv,oldValue)); }
 
    /*=============================================================*/
@@ -1126,9 +1126,9 @@ globle void *SetSalienceEvaluationCommand(
 /*   Syntax: (get-salience-evaluation-behavior)          */
 /*********************************************************/
 globle void *GetSalienceEvaluationCommand(
-  void *theEnv)
+  void *theEnv, EXEC_STATUS)
   {
-   EnvArgCountCheck(theEnv,"get-salience-evaluation",EXACTLY,0);
+   EnvArgCountCheck(theEnv,execStatus,"get-salience-evaluation",EXACTLY,0);
 
    return((SYMBOL_HN *) EnvAddSymbol(theEnv,SalienceEvaluationName(EnvGetSalienceEvaluation(theEnv))));
   }
@@ -1278,7 +1278,7 @@ static int EvaluateSalience(
 /*   Syntax: (agenda)                          */
 /***********************************************/
 globle void AgendaCommand(
-  void *theEnv)
+  void *theEnv, EXEC_STATUS)
   {
    int numArgs, error;
    struct defmodule *theModule;
@@ -1287,7 +1287,7 @@ globle void AgendaCommand(
    /* This function can have at most one argument. */
    /*==============================================*/
 
-   if ((numArgs = EnvArgCountCheck(theEnv,"agenda",NO_MORE_THAN,1)) == -1) return;
+   if ((numArgs = EnvArgCountCheck(theEnv,execStatus,"agenda",NO_MORE_THAN,1)) == -1) return;
 
    /*===============================================================*/
    /* If a module name is specified, then the agenda of that module */
@@ -1297,7 +1297,7 @@ globle void AgendaCommand(
 
    if (numArgs == 1)
      {
-      theModule = GetModuleName(theEnv,"agenda",1,&error);
+      theModule = GetModuleName(theEnv,execStatus,"agenda",1,&error);
       if (error) return;
      }
    else

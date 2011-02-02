@@ -90,7 +90,7 @@ struct bsaveData
 #define Bsave(a) EnvBsave(GetCurrentEnvironment(),a)
 
    LOCALE void                    InitializeBsaveData(void *);
-   LOCALE int                     BsaveCommand(void *);
+   LOCALE int                     BsaveCommand(void *, EXEC_STATUS);
 #if BLOAD_AND_BSAVE
    LOCALE intBool                 EnvBsave(void *,char *);
    LOCALE void                    MarkNeededItems(void *,struct expr *);

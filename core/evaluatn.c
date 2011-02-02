@@ -126,7 +126,7 @@ globle int EvaluateExpression(
      {
       returnValue->type = SYMBOL;
       returnValue->value = EnvFalseSymbol(theEnv);
-      return(EvaluationData(theEnv)->EvaluationError);
+      return(execStatus->EvaluationError);
      }
 
    switch (problem->type)
@@ -160,8 +160,8 @@ globle int EvaluateExpression(
                       ProfileFunctionData(theEnv)->ProfileUserFunctions);
 #endif
 
-         oldArgument = EvaluationData(theEnv)->CurrentExpression;
-         EvaluationData(theEnv)->CurrentExpression = problem;
+         oldArgument = execStatus->CurrentExpression;
+         execStatus->CurrentExpression = problem;
 
          switch(fptr->returnValueType)
            {
@@ -365,7 +365,7 @@ globle int EvaluateExpression(
 #endif
 
         SetEnvironmentFunctionContext(theEnv,oldContext);
-        EvaluationData(theEnv)->CurrentExpression = oldArgument;
+        execStatus->CurrentExpression = oldArgument;
         break;
         }
 
@@ -410,8 +410,8 @@ globle int EvaluateExpression(
            EnvExitRouter(theEnv,EXIT_FAILURE);
           }
 
-        oldArgument = EvaluationData(theEnv)->CurrentExpression;
-        EvaluationData(theEnv)->CurrentExpression = problem;
+        oldArgument = execStatus->CurrentExpression;
+        execStatus->CurrentExpression = problem;
 
 #if PROFILING_FUNCTIONS 
         StartProfile(theEnv,&profileFrame,
@@ -425,12 +425,12 @@ globle int EvaluateExpression(
         EndProfile(theEnv,&profileFrame);
 #endif
 
-        EvaluationData(theEnv)->CurrentExpression = oldArgument;
+        execStatus->CurrentExpression = oldArgument;
         break;
      }
 
    PropagateReturnValue(theEnv,returnValue);
-   return(EvaluationData(theEnv)->EvaluationError);
+   return(execStatus->EvaluationError);
   }
 
 /******************************************/
@@ -483,9 +483,9 @@ globle void SetEvaluationError(
   void *theEnv,
   int value)
   {
-   EvaluationData(theEnv)->EvaluationError = value;
+   execStatus->EvaluationError = value;
    if (value == TRUE) 
-     { EvaluationData(theEnv)->HaltExecution = TRUE; }
+     { execStatus->HaltExecution = TRUE; }
   }
 
 /*********************************************************/
@@ -494,7 +494,7 @@ globle void SetEvaluationError(
 globle int GetEvaluationError(
   void *theEnv)
   {
-   return(EvaluationData(theEnv)->EvaluationError);
+   return(execStatus->EvaluationError);
   }
 
 /**************************************************/
@@ -504,7 +504,7 @@ globle void SetHaltExecution(
   void *theEnv,
   int value)
   { 
-   EvaluationData(theEnv)->HaltExecution = value; 
+   execStatus->HaltExecution = value; 
   }
 
 /*****************************************************/
@@ -513,7 +513,7 @@ globle void SetHaltExecution(
 globle int GetHaltExecution(
   void *theEnv)
   {
-   return(EvaluationData(theEnv)->HaltExecution);
+   return(execStatus->HaltExecution);
   }
 
 /******************************************************/
@@ -853,7 +853,7 @@ globle int FunctionCall2(
    /*=============================================*/
 
    if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
-       (EvaluationData(theEnv)->CurrentExpression == NULL))
+       (execStatus->CurrentExpression == NULL))
      { PeriodicCleanup(theEnv,TRUE,FALSE); }
 
    /*========================*/
@@ -861,7 +861,7 @@ globle int FunctionCall2(
    /*========================*/
 
    if (execStatus->CurrentEvaluationDepth == 0) SetHaltExecution(theEnv,FALSE);
-   EvaluationData(theEnv)->EvaluationError = FALSE;
+   execStatus->EvaluationError = FALSE;
 
    /*======================================*/
    /* Initialize the default return value. */
@@ -1214,7 +1214,7 @@ globle int EvaluateAndStoreInDataObject(
    else
      StoreInMultifield(theEnv,val,theExp,garbageSegment);
    
-   return(EvaluationData(theEnv)->EvaluationError ? FALSE : TRUE);
+   return(execStatus->EvaluationError ? FALSE : TRUE);
   }
 
 /*******************************************************/

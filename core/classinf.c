@@ -87,7 +87,7 @@ globle int ClassAbstractPCommand(
    DATA_OBJECT tmp;
    DEFCLASS *cls;
    
-   if (EnvArgTypeCheck(theEnv,"class-abstractp",1,SYMBOL,&tmp) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"class-abstractp",1,SYMBOL,&tmp) == FALSE)
      return(FALSE);
    cls = LookupDefclassByMdlOrScope(theEnv,DOToString(tmp));
    if (cls == NULL)
@@ -116,7 +116,7 @@ globle int ClassReactivePCommand(
    DATA_OBJECT tmp;
    DEFCLASS *cls;
    
-   if (EnvArgTypeCheck(theEnv,"class-reactivep",1,SYMBOL,&tmp) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,"class-reactivep",1,SYMBOL,&tmp) == FALSE)
      return(FALSE);
    cls = LookupDefclassByMdlOrScope(theEnv,DOToString(tmp));
    if (cls == NULL)
@@ -152,13 +152,13 @@ globle void *ClassInfoFnxArgs(
    DATA_OBJECT tmp;
 
    *inhp = 0;
-   if (EnvRtnArgCount(theEnv) == 0)
+   if (EnvRtnArgCount(theEnv,execStatus) == 0)
      {
       ExpectedCountError(theEnv,fnx,AT_LEAST,1);
       SetEvaluationError(theEnv,TRUE);
       return(NULL);
      }
-   if (EnvArgTypeCheck(theEnv,fnx,1,SYMBOL,&tmp) == FALSE)
+   if (EnvArgTypeCheck(theEnv,execStatus,fnx,1,SYMBOL,&tmp) == FALSE)
      return(NULL);
    clsptr = (void *) LookupDefclassByMdlOrScope(theEnv,DOToString(tmp));
    if (clsptr == NULL)
@@ -166,9 +166,9 @@ globle void *ClassInfoFnxArgs(
       ClassExistError(theEnv,fnx,ValueToString(tmp.value));
       return(NULL);
      }
-   if (EnvRtnArgCount(theEnv) == 2)
+   if (EnvRtnArgCount(theEnv,execStatus) == 2)
      {
-      if (EnvArgTypeCheck(theEnv,fnx,2,SYMBOL,&tmp) == FALSE)
+      if (EnvArgTypeCheck(theEnv,execStatus,fnx,2,SYMBOL,&tmp) == FALSE)
         return(NULL);
       if (strcmp(ValueToString(tmp.value),"inherit") == 0)
         *inhp = 1;
@@ -277,7 +277,7 @@ globle void GetDefmessageHandlersListCmd(
    int inhp;
    void *clsptr;
    
-   if (EnvRtnArgCount(theEnv) == 0)
+   if (EnvRtnArgCount(theEnv,execStatus) == 0)
       EnvGetDefmessageHandlerList(theEnv,NULL,result,0);
    else
      {

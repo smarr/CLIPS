@@ -149,13 +149,13 @@ struct agendaData
    LOCALE void                    EnvRefreshAgenda(void *,void *);
    LOCALE void                    EnvReorderAgenda(void *,void *);
    LOCALE void                    InitializeAgenda(void *);
-   LOCALE void                   *SetSalienceEvaluationCommand(void *);
-   LOCALE void                   *GetSalienceEvaluationCommand(void *);
-   LOCALE void                    RefreshAgendaCommand(void *);
-   LOCALE void                    RefreshCommand(void *);
+   LOCALE void                   *SetSalienceEvaluationCommand(void *, EXEC_STATUS);
+   LOCALE void                   *GetSalienceEvaluationCommand(void *, EXEC_STATUS);
+   LOCALE void                    RefreshAgendaCommand(void *, EXEC_STATUS);
+   LOCALE void                    RefreshCommand(void *, EXEC_STATUS);
    LOCALE intBool                 EnvRefresh(void *,void *);
 #if DEBUGGING_FUNCTIONS
-   LOCALE void                    AgendaCommand(void *);
+   LOCALE void                    AgendaCommand(void *,EXEC_STATUS);
 #endif
 
 #endif

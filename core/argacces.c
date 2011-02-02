@@ -63,6 +63,7 @@
 /*******************************************************************/
 globle char *EnvRtnLexeme(
   void *theEnv,
+  EXEC_STATUS,
   int argumentPosition)
   {
    int count = 1;
@@ -73,7 +74,7 @@ globle char *EnvRtnLexeme(
    /* Find the appropriate argument in the argument list. */
    /*=====================================================*/
 
-   for (argPtr = EvaluationData(theEnv)->CurrentExpression->argList;
+   for (argPtr = execStatus->CurrentExpression->argList;
         (argPtr != NULL) && (count < argumentPosition);
         argPtr = argPtr->nextArg)
      { count++; }
@@ -81,7 +82,7 @@ globle char *EnvRtnLexeme(
    if (argPtr == NULL)
      {
       NonexistantError(theEnv,"RtnLexeme",
-                       ValueToString(ExpressionFunctionCallName(EvaluationData(theEnv)->CurrentExpression)),
+                       ValueToString(ExpressionFunctionCallName(execStatus->CurrentExpression)),
                        argumentPosition);
       SetHaltExecution(theEnv,TRUE);
       SetEvaluationError(theEnv,TRUE);
@@ -107,7 +108,7 @@ globle char *EnvRtnLexeme(
    /*======================================================*/
 
    ExpectedTypeError3(theEnv,"RtnLexeme",
-                  ValueToString(ExpressionFunctionCallName(EvaluationData(theEnv)->CurrentExpression)),
+                  ValueToString(ExpressionFunctionCallName(execStatus->CurrentExpression)),
                   argumentPosition,"symbol, string, or instance name");
    SetHaltExecution(theEnv,TRUE);
    SetEvaluationError(theEnv,TRUE);
@@ -125,6 +126,7 @@ globle char *EnvRtnLexeme(
 /*******************************************************************/
 globle double EnvRtnDouble(
   void *theEnv,
+  EXEC_STATUS,
   int argumentPosition)
   {
    int count = 1;
@@ -135,7 +137,7 @@ globle double EnvRtnDouble(
    /* Find the appropriate argument in the argument list. */
    /*=====================================================*/
 
-   for (argPtr = EvaluationData(theEnv)->CurrentExpression->argList;
+   for (argPtr = execStatus->CurrentExpression->argList;
         (argPtr != NULL) && (count < argumentPosition);
         argPtr = argPtr->nextArg)
      { count++; }
@@ -143,7 +145,7 @@ globle double EnvRtnDouble(
    if (argPtr == NULL)
      {
       NonexistantError(theEnv,"RtnDouble",
-                       ValueToString(ExpressionFunctionCallName(EvaluationData(theEnv)->CurrentExpression)),
+                       ValueToString(ExpressionFunctionCallName(execStatus->CurrentExpression)),
                        argumentPosition);
       SetHaltExecution(theEnv,TRUE);
       SetEvaluationError(theEnv,TRUE);
@@ -167,7 +169,7 @@ globle double EnvRtnDouble(
    /*======================================================*/
 
    ExpectedTypeError3(theEnv,"RtnDouble",
-                  ValueToString(ExpressionFunctionCallName(EvaluationData(theEnv)->CurrentExpression)),
+                  ValueToString(ExpressionFunctionCallName(execStatus->CurrentExpression)),
                   argumentPosition,"number");
    SetHaltExecution(theEnv,TRUE);
    SetEvaluationError(theEnv,TRUE);
@@ -185,6 +187,7 @@ globle double EnvRtnDouble(
 /*****************************************************************/
 globle long long EnvRtnLong(
   void *theEnv,
+  EXEC_STATUS,
   int argumentPosition)
   {
    int count = 1;
@@ -195,7 +198,7 @@ globle long long EnvRtnLong(
    /* Find the appropriate argument in the argument list. */
    /*=====================================================*/
 
-   for (argPtr = EvaluationData(theEnv)->CurrentExpression->argList;
+   for (argPtr = execStatus->CurrentExpression->argList;
         (argPtr != NULL) && (count < argumentPosition);
         argPtr = argPtr->nextArg)
      { count++; }
@@ -203,7 +206,7 @@ globle long long EnvRtnLong(
    if (argPtr == NULL)
      {
       NonexistantError(theEnv,"RtnLong",
-                       ValueToString(ExpressionFunctionCallName(EvaluationData(theEnv)->CurrentExpression)),
+                       ValueToString(ExpressionFunctionCallName(execStatus->CurrentExpression)),
                        argumentPosition);
       SetHaltExecution(theEnv,TRUE);
       SetEvaluationError(theEnv,TRUE);
@@ -227,7 +230,7 @@ globle long long EnvRtnLong(
    /*======================================================*/
 
    ExpectedTypeError3(theEnv,"RtnLong",
-                  ValueToString(ExpressionFunctionCallName(EvaluationData(theEnv)->CurrentExpression)),
+                  ValueToString(ExpressionFunctionCallName(execStatus->CurrentExpression)),
                   argumentPosition,"number");
    SetHaltExecution(theEnv,TRUE);
    SetEvaluationError(theEnv,TRUE);
@@ -243,6 +246,7 @@ globle long long EnvRtnLong(
 /********************************************************************/
 globle DATA_OBJECT_PTR EnvRtnUnknown(
   void *theEnv,
+  EXEC_STATUS,
   int argumentPosition,
   DATA_OBJECT_PTR returnValue)
   {
@@ -253,7 +257,7 @@ globle DATA_OBJECT_PTR EnvRtnUnknown(
    /* Find the appropriate argument in the argument list. */
    /*=====================================================*/
 
-   for (argPtr = EvaluationData(theEnv)->CurrentExpression->argList;
+   for (argPtr = execStatus->CurrentExpression->argList;
         (argPtr != NULL) && (count < argumentPosition);
         argPtr = argPtr->nextArg)
      { count++; }
@@ -261,7 +265,7 @@ globle DATA_OBJECT_PTR EnvRtnUnknown(
    if (argPtr == NULL)
      {
       NonexistantError(theEnv,"RtnUnknown",
-                       ValueToString(ExpressionFunctionCallName(EvaluationData(theEnv)->CurrentExpression)),
+                       ValueToString(ExpressionFunctionCallName(execStatus->CurrentExpression)),
                        argumentPosition);
       SetHaltExecution(theEnv,TRUE);
       SetEvaluationError(theEnv,TRUE);
@@ -281,12 +285,13 @@ globle DATA_OBJECT_PTR EnvRtnUnknown(
 /*   for the function call currently being evaluated.      */
 /***********************************************************/
 globle int EnvRtnArgCount(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    int count = 0;
    struct expr *argPtr;
 
-   for (argPtr = EvaluationData(theEnv)->CurrentExpression->argList;
+   for (argPtr = execStatus->CurrentExpression->argList;
         argPtr != NULL;
         argPtr = argPtr->nextArg)
      { count++; }
@@ -306,6 +311,7 @@ globle int EnvRtnArgCount(
 /************************************************************************/
 globle int EnvArgCountCheck(
   void *theEnv,
+  EXEC_STATUS,
   char *functionName,
   int countRelation,
   int expectedNumber)
@@ -317,7 +323,7 @@ globle int EnvArgCountCheck(
    /* currently being evaluated.                   */
    /*==============================================*/
 
-   numberOfArguments = EnvRtnArgCount(theEnv);
+   numberOfArguments = EnvRtnArgCount(theEnv,execStatus);
 
    /*=========================================================*/
    /* If the function satisfies expected number of arguments, */
@@ -352,13 +358,14 @@ globle int EnvArgCountCheck(
 /****************************************************************/
 globle int EnvArgRangeCheck(
   void *theEnv,
+  EXEC_STATUS,
   char *functionName,
   int min,
   int max)
   {
    int numberOfArguments;
 
-   numberOfArguments = EnvRtnArgCount(theEnv);
+   numberOfArguments = EnvRtnArgCount(theEnv,execStatus);
    if ((numberOfArguments < min) || (numberOfArguments > max))
      {
       PrintErrorID(theEnv,"ARGACCES",1,FALSE);
@@ -386,6 +393,7 @@ globle int EnvArgRangeCheck(
 /*************************************************************/
 globle int EnvArgTypeCheck(
   void *theEnv,
+  EXEC_STATUS,
   char *functionName,
   int argumentPosition,
   int expectedType,
@@ -395,8 +403,8 @@ globle int EnvArgTypeCheck(
    /* Retrieve the argument. */
    /*========================*/
 
-   EnvRtnUnknown(theEnv,argumentPosition,returnValue);
-   if (EvaluationData(theEnv)->EvaluationError) return(FALSE);
+   EnvRtnUnknown(theEnv,execStatus,argumentPosition,returnValue);
+   if (execStatus->EvaluationError) return(FALSE);
 
    /*========================================*/
    /* If the argument's type exactly matches */
@@ -563,13 +571,14 @@ globle intBool GetNumericArgument(
 /*********************************************************************/
 globle char *GetLogicalName(
   void *theEnv,
+  EXEC_STATUS,
   int whichArgument,
   char *defaultLogicalName)
   {
    char *logicalName;
    DATA_OBJECT result;
 
-   EnvRtnUnknown(theEnv,whichArgument,&result);
+   EnvRtnUnknown(theEnv,execStatus,whichArgument,&result);
 
    if ((GetType(result) == SYMBOL) ||
        (GetType(result) == STRING) ||
@@ -601,12 +610,13 @@ globle char *GetLogicalName(
 /************************************************************/
 globle char *GetFileName(
   void *theEnv,
+  EXEC_STATUS,
   char *functionName,
   int whichArgument)
   {
    DATA_OBJECT result;
 
-   EnvRtnUnknown(theEnv,whichArgument,&result);
+   EnvRtnUnknown(theEnv,execStatus,whichArgument,&result);
    if ((GetType(result) != STRING) && (GetType(result) != SYMBOL))
      {
       ExpectedTypeError1(theEnv,functionName,whichArgument,"file name");
@@ -641,6 +651,7 @@ globle void OpenErrorMessage(
 /************************************************************/
 globle struct defmodule *GetModuleName(
   void *theEnv,
+  EXEC_STATUS,
   char *functionName,
   int whichArgument,
   int *error)
@@ -654,7 +665,7 @@ globle struct defmodule *GetModuleName(
    /* Retrieve the argument. */
    /*========================*/
 
-   EnvRtnUnknown(theEnv,whichArgument,&result);
+   EnvRtnUnknown(theEnv,execStatus,whichArgument,&result);
 
    /*=================================*/
    /* A module name must be a symbol. */
@@ -699,18 +710,19 @@ globle struct defmodule *GetModuleName(
 /****************************************************************/
 globle char *GetConstructName(
   void *theEnv,
+  EXEC_STATUS,
   char *functionName,
   char *constructType)
   {
    DATA_OBJECT result;
 
-   if (EnvRtnArgCount(theEnv) != 1)
+   if (EnvRtnArgCount(theEnv,execStatus) != 1)
      {
       ExpectedCountError(theEnv,functionName,EXACTLY,1);
       return(NULL);
      }
 
-   EnvRtnUnknown(theEnv,1,&result);
+   EnvRtnUnknown(theEnv,execStatus,1,&result);
 
    if (GetType(result) != SYMBOL)
      {
@@ -949,6 +961,7 @@ static void ExpectedTypeError3(
 /***************************************************/
 void *GetFactOrInstanceArgument(
   void *theEnv,
+  EXEC_STATUS,
   int thePosition,
   DATA_OBJECT *item,
   char *functionName)
@@ -961,7 +974,7 @@ void *GetFactOrInstanceArgument(
    /* Retrieve the first argument. */
    /*==============================*/
 
-   EnvRtnUnknown(theEnv,thePosition,item);
+   EnvRtnUnknown(theEnv,execStatus,thePosition,item);
 
    /*==================================================*/
    /* Fact and instance addresses are valid arguments. */
