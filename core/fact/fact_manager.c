@@ -740,12 +740,16 @@ globle void *EnvAssert(
    /* Add the fact to the fact hash table. */
    /*======================================*/
 
+    // STEFAN: GLOBAL STUFF...
+    
    AddHashedFact(theEnv,theFact,hashValue);
 
    /*================================*/
    /* Add the fact to the fact list. */
    /*================================*/
 
+    // STEFAN: GLOBAL STUFF...
+    
    theFact->nextFact = NULL;
    theFact->list = NULL;
    theFact->previousFact = FactData(theEnv)->LastFact;
@@ -759,6 +763,8 @@ globle void *EnvAssert(
    /* Add the fact to its template list. */
    /*====================================*/
    
+    // STEFAN: GLOBAL STUFF...
+    
    theFact->previousTemplateFact = theFact->whichDeftemplate->lastFact;
    theFact->nextTemplateFact = NULL;
    
@@ -772,6 +778,8 @@ globle void *EnvAssert(
    /*==================================*/
    /* Set the fact index and time tag. */
    /*==================================*/
+    
+    // STEFAN: GLOBAL STUFF...
 
    theFact->factIndex = FactData(theEnv)->NextFactIndex++;
    theFact->factHeader.timeTag = DefruleData(theEnv)->CurrentEntityTimeTag++;

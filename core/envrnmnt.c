@@ -382,6 +382,13 @@ globle void *CreateEnvironmentDriver(
       return(NULL);
     }
     
+	  
+	rv = apr_thread_rwlock_create(&theEnvironment->factHashLock, theEnvironment->memoryPool);
+	if (rv) {
+	  printf("\n[ENVRNMNT_THREAD] Unable to create thread read/write lock.\n");
+	  return(NULL);
+	}
+	  
 
    /*=============================================*/
    /* Allocate storage for the cleanup functions. */
