@@ -150,8 +150,8 @@ typedef struct entityRecord * ENTITY_RECORD_PTR;
 #define CoerceToInteger(t,v) ((t == INTEGER) ? (int) ValueToLong(v) : (int) ValueToDouble(v))
 #define CoerceToDouble(t,v) ((t == INTEGER) ? (double) ValueToLong(v) : ValueToDouble(v))
 
-#define GetFirstArgument()           (EvaluationData(theEnv)->CurrentExpression->argList)
-#define GetNextArgument(ep)          (ep->nextArg)
+#define GetFirstArgument()   (execStatus->CurrentExpression->argList)
+#define GetNextArgument(ep)  (ep->nextArg)
 
 #define MAXIMUM_PRIMITIVES 150
 #define MAXIMUM_EXTERNAL_ADDRESS_TYPES 10
@@ -168,12 +168,18 @@ typedef struct entityRecord * ENTITY_RECORD_PTR;
 
 #define EVALUATION_DATA 44
 
-struct evaluationData
-  { 
+// STEFAN: new additional parameter that needs to be passed around similar to
+//         theEnv. But needs to be handled independently for different threads.
+struct executionStatus
+  {
    struct expr *CurrentExpression;
    int EvaluationError;
    int HaltExecution;
    int CurrentEvaluationDepth;
+  };
+
+struct evaluationData
+  {
    int numberOfAddressTypes;
    struct entityRecord *PrimitivesArray[MAXIMUM_PRIMITIVES];
    struct externalAddressType *ExternalAddressTypes[MAXIMUM_EXTERNAL_ADDRESS_TYPES];
