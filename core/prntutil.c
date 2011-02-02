@@ -44,7 +44,7 @@
 #include "argacces.h"
 #include "router.h"
 #include "multifun.h"
-#include "factmngr.h"
+#include "fact/fact_manager.h"
 #include "inscom.h"
 #include "insmngr.h"
 #include "memalloc.h"

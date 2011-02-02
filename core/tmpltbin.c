@@ -36,7 +36,7 @@
 #include "bsave.h"
 #include "factbin.h"
 #include "cstrnbin.h"
-#include "factmngr.h"
+#include "fact/fact_manager.h"
 #include "tmpltpsr.h"
 #include "tmpltdef.h"
 #include "tmpltutl.h"

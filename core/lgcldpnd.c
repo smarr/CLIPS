@@ -45,7 +45,7 @@
 #include "reteutil.h"
 #include "pattern.h"
 #include "argacces.h"
-#include "factmngr.h"
+#include "fact/fact_manager.h"
 
 #if OBJECT_SYSTEM
 #include "insfun.h"

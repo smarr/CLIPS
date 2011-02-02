@@ -26,7 +26,7 @@
 #define _H_factfun
 
 #ifndef _H_factmngr
-#include "factmngr.h"
+#include "fact/fact_manager.h"
 #endif
 
 #ifdef LOCALE

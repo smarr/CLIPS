@@ -27,7 +27,7 @@
 struct factHashEntry;
 
 #ifndef _H_factmngr
-#include "factmngr.h"
+#include "fact/fact_manager.h"
 #endif
 
 struct factHashEntry

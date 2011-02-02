@@ -37,7 +37,7 @@
 #include "evaluatn.h"
 #endif
 #ifndef _H_factmngr
-#include "factmngr.h"
+#include "fact/fact_manager.h"
 #endif
 #ifndef _H_constrnt
 #include "constrnt.h"

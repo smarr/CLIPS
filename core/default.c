@@ -41,7 +41,7 @@
 #include "exprnpsr.h"
 #include "scanner.h"
 #include "router.h"
-#include "factmngr.h"
+#include "fact/fact_manager.h"
 #include "cstrnutl.h"
 #include "envrnmnt.h"
 

@@ -53,7 +53,7 @@ struct deftemplateModule;
 #endif
 #include "factbld.h"
 #ifndef _H_factmngr
-#include "factmngr.h"
+#include "fact/fact_manager.h"
 #endif
 #ifndef _H_cstrccom
 #include "cstrccom.h"

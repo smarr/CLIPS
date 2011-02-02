@@ -40,7 +40,7 @@
 #include "router.h"
 #include "cstrnchk.h"
 #include "insfun.h"
-#include "factmngr.h"
+#include "fact/fact_manager.h"
 #include "prntutil.h"
 #include "sysdep.h"
 

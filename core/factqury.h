@@ -31,7 +31,7 @@
 #if FACT_SET_QUERIES
 
 #ifndef _H_factmngr
-#include "factmngr.h"
+#include "fact/fact_manager.h"
 #endif
 
 typedef struct query_template

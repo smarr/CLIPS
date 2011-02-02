@@ -54,7 +54,7 @@
 #include "envrnmnt.h"
 
 #if DEFTEMPLATE_CONSTRUCT && DEFRULE_CONSTRUCT
-#include "factmngr.h"
+#include "fact/fact_manager.h"
 #endif
 
 #define _INSFILE_SOURCE_

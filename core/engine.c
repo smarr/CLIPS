@@ -56,7 +56,7 @@
 #include "argacces.h"
 #include "constant.h"
 #include "envrnmnt.h"
-#include "factmngr.h"
+#include "fact/fact_manager.h"
 #include "inscom.h"
 #include "memalloc.h"
 #include "modulutl.h"

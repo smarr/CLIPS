@@ -52,7 +52,7 @@
 #include "router.h"
 #include "cstrnchk.h"
 #include "default.h"
-#include "factmngr.h"
+#include "fact/fact_manager.h"
 #include "commline.h"
 #include "factrhs.h"
 #include "modulutl.h"

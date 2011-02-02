@@ -11,6 +11,10 @@
 		0A45181812F98A140063F45F /* fact_command.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A45181612F98A140063F45F /* fact_command.h */; };
 		0A45181912F98A140063F45F /* fact_command.c in Sources */ = {isa = PBXBuildFile; fileRef = 0A45181512F98A140063F45F /* fact_command.c */; };
 		0A45181A12F98A140063F45F /* fact_command.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A45181612F98A140063F45F /* fact_command.h */; };
+		0A45182A12F98B2D0063F45F /* fact_manager.c in Sources */ = {isa = PBXBuildFile; fileRef = 0A45182812F98B2D0063F45F /* fact_manager.c */; };
+		0A45182B12F98B2D0063F45F /* fact_manager.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A45182912F98B2D0063F45F /* fact_manager.h */; };
+		0A45182C12F98B2D0063F45F /* fact_manager.c in Sources */ = {isa = PBXBuildFile; fileRef = 0A45182812F98B2D0063F45F /* fact_manager.c */; };
+		0A45182D12F98B2D0063F45F /* fact_manager.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A45182912F98B2D0063F45F /* fact_manager.h */; };
 		0AC5631012F6FA1900D7E70E /* apr_thread_pool.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AC5630F12F6FA1900D7E70E /* apr_thread_pool.h */; };
 		0AC5631112F6FA1900D7E70E /* apr_thread_pool.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AC5630F12F6FA1900D7E70E /* apr_thread_pool.h */; };
 		0AC5631312F6FEC500D7E70E /* apr_pools.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AC5631212F6FEC500D7E70E /* apr_pools.h */; };
@@ -81,7 +85,6 @@
 		0ADFF30212F5830C00AE91B5 /* facthsh.c in Sources */ = {isa = PBXBuildFile; fileRef = 0ADFF25912F5830C00AE91B5 /* facthsh.c */; };
 		0ADFF30312F5830C00AE91B5 /* factlhs.c in Sources */ = {isa = PBXBuildFile; fileRef = 0ADFF25A12F5830C00AE91B5 /* factlhs.c */; };
 		0ADFF30412F5830C00AE91B5 /* factmch.c in Sources */ = {isa = PBXBuildFile; fileRef = 0ADFF25B12F5830C00AE91B5 /* factmch.c */; };
-		0ADFF30512F5830C00AE91B5 /* factmngr.c in Sources */ = {isa = PBXBuildFile; fileRef = 0ADFF25C12F5830C00AE91B5 /* factmngr.c */; };
 		0ADFF30612F5830C00AE91B5 /* factprt.c in Sources */ = {isa = PBXBuildFile; fileRef = 0ADFF25D12F5830C00AE91B5 /* factprt.c */; };
 		0ADFF30712F5830C00AE91B5 /* factqpsr.c in Sources */ = {isa = PBXBuildFile; fileRef = 0ADFF25E12F5830C00AE91B5 /* factqpsr.c */; };
 		0ADFF30812F5830C00AE91B5 /* factqury.c in Sources */ = {isa = PBXBuildFile; fileRef = 0ADFF25F12F5830C00AE91B5 /* factqury.c */; };
@@ -249,7 +252,6 @@
 		0ADFF45712F5832C00AE91B5 /* facthsh.h in Headers */ = {isa = PBXBuildFile; fileRef = 0ADFF3AB12F5832B00AE91B5 /* facthsh.h */; };
 		0ADFF45812F5832C00AE91B5 /* factlhs.h in Headers */ = {isa = PBXBuildFile; fileRef = 0ADFF3AC12F5832B00AE91B5 /* factlhs.h */; };
 		0ADFF45912F5832C00AE91B5 /* factmch.h in Headers */ = {isa = PBXBuildFile; fileRef = 0ADFF3AD12F5832B00AE91B5 /* factmch.h */; };
-		0ADFF45A12F5832C00AE91B5 /* factmngr.h in Headers */ = {isa = PBXBuildFile; fileRef = 0ADFF3AE12F5832B00AE91B5 /* factmngr.h */; };
 		0ADFF45B12F5832C00AE91B5 /* factprt.h in Headers */ = {isa = PBXBuildFile; fileRef = 0ADFF3AF12F5832B00AE91B5 /* factprt.h */; };
 		0ADFF45C12F5832C00AE91B5 /* factqpsr.h in Headers */ = {isa = PBXBuildFile; fileRef = 0ADFF3B012F5832B00AE91B5 /* factqpsr.h */; };
 		0ADFF45D12F5832C00AE91B5 /* factqury.h in Headers */ = {isa = PBXBuildFile; fileRef = 0ADFF3B112F5832B00AE91B5 /* factqury.h */; };
@@ -420,7 +422,6 @@
 		0ADFF50812F5884C00AE91B5 /* facthsh.c in Sources */ = {isa = PBXBuildFile; fileRef = 0ADFF25912F5830C00AE91B5 /* facthsh.c */; };
 		0ADFF50912F5884C00AE91B5 /* factlhs.c in Sources */ = {isa = PBXBuildFile; fileRef = 0ADFF25A12F5830C00AE91B5 /* factlhs.c */; };
 		0ADFF50A12F5884C00AE91B5 /* factmch.c in Sources */ = {isa = PBXBuildFile; fileRef = 0ADFF25B12F5830C00AE91B5 /* factmch.c */; };
-		0ADFF50B12F5884C00AE91B5 /* factmngr.c in Sources */ = {isa = PBXBuildFile; fileRef = 0ADFF25C12F5830C00AE91B5 /* factmngr.c */; };
 		0ADFF50C12F5884C00AE91B5 /* factprt.c in Sources */ = {isa = PBXBuildFile; fileRef = 0ADFF25D12F5830C00AE91B5 /* factprt.c */; };
 		0ADFF50D12F5884C00AE91B5 /* factqpsr.c in Sources */ = {isa = PBXBuildFile; fileRef = 0ADFF25E12F5830C00AE91B5 /* factqpsr.c */; };
 		0ADFF50E12F5884C00AE91B5 /* factqury.c in Sources */ = {isa = PBXBuildFile; fileRef = 0ADFF25F12F5830C00AE91B5 /* factqury.c */; };
@@ -636,6 +637,8 @@
 		089C1660FE840EACC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		0A45181512F98A140063F45F /* fact_command.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fact_command.c; sourceTree = "<group>"; };
 		0A45181612F98A140063F45F /* fact_command.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fact_command.h; sourceTree = "<group>"; };
+		0A45182812F98B2D0063F45F /* fact_manager.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fact_manager.c; sourceTree = "<group>"; };
+		0A45182912F98B2D0063F45F /* fact_manager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fact_manager.h; sourceTree = "<group>"; };
 		0AC5630F12F6FA1900D7E70E /* apr_thread_pool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = apr_thread_pool.h; path = ../libs/apr/include/apr_thread_pool.h; sourceTree = "<group>"; };
 		0AC5631212F6FEC500D7E70E /* apr_pools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = apr_pools.h; path = ../libs/apr/include/apr_pools.h; sourceTree = "<group>"; };
 		0AC5632712F70C2100D7E70E /* libapr-2.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libapr-2.0.dylib"; path = "../libs/apr/.libs/libapr-2.0.dylib"; sourceTree = "<group>"; };
@@ -705,7 +708,6 @@
 		0ADFF25912F5830C00AE91B5 /* facthsh.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = facthsh.c; path = ../core/facthsh.c; sourceTree = "<group>"; };
 		0ADFF25A12F5830C00AE91B5 /* factlhs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = factlhs.c; path = ../core/factlhs.c; sourceTree = "<group>"; };
 		0ADFF25B12F5830C00AE91B5 /* factmch.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = factmch.c; path = ../core/factmch.c; sourceTree = "<group>"; };
-		0ADFF25C12F5830C00AE91B5 /* factmngr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = factmngr.c; path = ../core/factmngr.c; sourceTree = "<group>"; };
 		0ADFF25D12F5830C00AE91B5 /* factprt.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = factprt.c; path = ../core/factprt.c; sourceTree = "<group>"; };
 		0ADFF25E12F5830C00AE91B5 /* factqpsr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = factqpsr.c; path = ../core/factqpsr.c; sourceTree = "<group>"; };
 		0ADFF25F12F5830C00AE91B5 /* factqury.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = factqury.c; path = ../core/factqury.c; sourceTree = "<group>"; };
@@ -873,7 +875,6 @@
 		0ADFF3AB12F5832B00AE91B5 /* facthsh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = facthsh.h; path = ../core/facthsh.h; sourceTree = "<group>"; };
 		0ADFF3AC12F5832B00AE91B5 /* factlhs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = factlhs.h; path = ../core/factlhs.h; sourceTree = "<group>"; };
 		0ADFF3AD12F5832B00AE91B5 /* factmch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = factmch.h; path = ../core/factmch.h; sourceTree = "<group>"; };
-		0ADFF3AE12F5832B00AE91B5 /* factmngr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = factmngr.h; path = ../core/factmngr.h; sourceTree = "<group>"; };
 		0ADFF3AF12F5832B00AE91B5 /* factprt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = factprt.h; path = ../core/factprt.h; sourceTree = "<group>"; };
 		0ADFF3B012F5832B00AE91B5 /* factqpsr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = factqpsr.h; path = ../core/factqpsr.h; sourceTree = "<group>"; };
 		0ADFF3B112F5832B00AE91B5 /* factqury.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = factqury.h; path = ../core/factqury.h; sourceTree = "<group>"; };
@@ -1080,6 +1081,8 @@
 			children = (
 				0A45181512F98A140063F45F /* fact_command.c */,
 				0A45181612F98A140063F45F /* fact_command.h */,
+				0A45182812F98B2D0063F45F /* fact_manager.c */,
+				0A45182912F98B2D0063F45F /* fact_manager.h */,
 			);
 			name = fact;
 			path = ../core/fact;
@@ -1296,7 +1299,6 @@
 				0ADFF3AB12F5832B00AE91B5 /* facthsh.h */,
 				0ADFF3AC12F5832B00AE91B5 /* factlhs.h */,
 				0ADFF3AD12F5832B00AE91B5 /* factmch.h */,
-				0ADFF3AE12F5832B00AE91B5 /* factmngr.h */,
 				0ADFF3AF12F5832B00AE91B5 /* factprt.h */,
 				0ADFF3B012F5832B00AE91B5 /* factqpsr.h */,
 				0ADFF3B112F5832B00AE91B5 /* factqury.h */,
@@ -1475,7 +1477,6 @@
 				0ADFF25912F5830C00AE91B5 /* facthsh.c */,
 				0ADFF25A12F5830C00AE91B5 /* factlhs.c */,
 				0ADFF25B12F5830C00AE91B5 /* factmch.c */,
-				0ADFF25C12F5830C00AE91B5 /* factmngr.c */,
 				0ADFF25D12F5830C00AE91B5 /* factprt.c */,
 				0ADFF25E12F5830C00AE91B5 /* factqpsr.c */,
 				0ADFF25F12F5830C00AE91B5 /* factqury.c */,
@@ -1654,7 +1655,6 @@
 				0ADFF45712F5832C00AE91B5 /* facthsh.h in Headers */,
 				0ADFF45812F5832C00AE91B5 /* factlhs.h in Headers */,
 				0ADFF45912F5832C00AE91B5 /* factmch.h in Headers */,
-				0ADFF45A12F5832C00AE91B5 /* factmngr.h in Headers */,
 				0ADFF45B12F5832C00AE91B5 /* factprt.h in Headers */,
 				0ADFF45C12F5832C00AE91B5 /* factqpsr.h in Headers */,
 				0ADFF45D12F5832C00AE91B5 /* factqury.h in Headers */,
@@ -1763,6 +1763,7 @@
 				0AC5631012F6FA1900D7E70E /* apr_thread_pool.h in Headers */,
 				0AC5631312F6FEC500D7E70E /* apr_pools.h in Headers */,
 				0A45181812F98A140063F45F /* fact_command.h in Headers */,
+				0A45182B12F98B2D0063F45F /* fact_manager.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1773,6 +1774,7 @@
 				0AC5631112F6FA1900D7E70E /* apr_thread_pool.h in Headers */,
 				0AC5631412F6FEC500D7E70E /* apr_pools.h in Headers */,
 				0A45181A12F98A140063F45F /* fact_command.h in Headers */,
+				0A45182D12F98B2D0063F45F /* fact_manager.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2005,7 +2007,6 @@
 				0ADFF30212F5830C00AE91B5 /* facthsh.c in Sources */,
 				0ADFF30312F5830C00AE91B5 /* factlhs.c in Sources */,
 				0ADFF30412F5830C00AE91B5 /* factmch.c in Sources */,
-				0ADFF30512F5830C00AE91B5 /* factmngr.c in Sources */,
 				0ADFF30612F5830C00AE91B5 /* factprt.c in Sources */,
 				0ADFF30712F5830C00AE91B5 /* factqpsr.c in Sources */,
 				0ADFF30812F5830C00AE91B5 /* factqury.c in Sources */,
@@ -2109,6 +2110,7 @@
 				0ADFF36A12F5831100AE91B5 /* utility.c in Sources */,
 				0ADFF36B12F5831100AE91B5 /* watch.c in Sources */,
 				0A45181712F98A140063F45F /* fact_command.c in Sources */,
+				0A45182A12F98B2D0063F45F /* fact_manager.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2181,7 +2183,6 @@
 				0ADFF50812F5884C00AE91B5 /* facthsh.c in Sources */,
 				0ADFF50912F5884C00AE91B5 /* factlhs.c in Sources */,
 				0ADFF50A12F5884C00AE91B5 /* factmch.c in Sources */,
-				0ADFF50B12F5884C00AE91B5 /* factmngr.c in Sources */,
 				0ADFF50C12F5884C00AE91B5 /* factprt.c in Sources */,
 				0ADFF50D12F5884C00AE91B5 /* factqpsr.c in Sources */,
 				0ADFF50E12F5884C00AE91B5 /* factqury.c in Sources */,
@@ -2285,6 +2286,7 @@
 				0ADFF57012F5885300AE91B5 /* utility.c in Sources */,
 				0ADFF57112F5885300AE91B5 /* watch.c in Sources */,
 				0A45181912F98A140063F45F /* fact_command.c in Sources */,
+				0A45182C12F98B2D0063F45F /* fact_manager.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

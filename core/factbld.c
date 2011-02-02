@@ -41,7 +41,7 @@
 #include "factcmp.h"
 #include "factmch.h"
 #include "factgen.h"
-#include "factmngr.h"
+#include "fact/fact_manager.h"
 #include "factlhs.h"
 #include "argacces.h"
 #include "modulutl.h"

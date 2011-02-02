@@ -46,7 +46,7 @@
 #include "extnfunc.h"
 #include "prcdrfun.h"
 #include "multifld.h"
-#include "factmngr.h"
+#include "fact/fact_manager.h"
 #include "prntutil.h"
 #include "exprnpsr.h"
 #include "utility.h"

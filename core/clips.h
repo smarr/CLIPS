@@ -92,10 +92,10 @@
 #include "tmpltdef.h"
 #include "tmpltbsc.h"
 #include "tmpltfun.h"
-#include "factcom.h"
+#include "fact/fact_command.h"
 #include "factfun.h"
 #ifndef _H_factmngr
-#include "factmngr.h"
+#include "fact/fact_manager.h"
 #endif
 #include "facthsh.h"
 #endif

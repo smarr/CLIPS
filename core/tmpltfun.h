@@ -48,7 +48,7 @@
 #include "expressn.h"
 #endif
 #ifndef _H_factmngr
-#include "factmngr.h"
+#include "fact/fact_manager.h"
 #endif
 #ifndef _H_tmpltdef
 #include "tmpltdef.h"

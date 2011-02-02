@@ -42,7 +42,7 @@
 #include "reteutil.h"
 #include "factmch.h"
 #include "factrete.h"
-#include "factmngr.h"
+#include "fact/fact_manager.h"
 #include "pattern.h"
 #include "factprt.h"
 #include "envrnmnt.h"

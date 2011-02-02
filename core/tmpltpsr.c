@@ -38,7 +38,7 @@
 #include "router.h"
 #include "constrct.h"
 #include "envrnmnt.h"
-#include "factmngr.h"
+#include "fact/fact_manager.h"
 #include "cstrnchk.h"
 #include "cstrnpsr.h"
 #include "cstrcpsr.h"

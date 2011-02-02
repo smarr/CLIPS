@@ -40,7 +40,7 @@
 #include "memalloc.h"
 #include "envrnmnt.h"
 #include "exprnpsr.h"
-#include "factmngr.h"
+#include "fact_manager.h"
 #include "argacces.h"
 #include "match.h"
 #include "router.h"
