@@ -90,34 +90,34 @@ struct bsaveSlotValueAtom
    =========================================
    ***************************************** */
 
-static long InstancesSaveCommandParser(void *,char *,long (*)(void *,char *,int,
+static long InstancesSaveCommandParser(void *,EXEC_STATUS,char *,long (*)(void *,EXEC_STATUS,char *,int,
                                                    EXPRESSION *,intBool));
-static DATA_OBJECT *ProcessSaveClassList(void *,char *,EXPRESSION *,int,intBool);
-static void ReturnSaveClassList(void *,DATA_OBJECT *);
-static long SaveOrMarkInstances(void *,void *,int,DATA_OBJECT *,intBool,intBool,
-                                         void (*)(void *,void *,INSTANCE_TYPE *));
-static long SaveOrMarkInstancesOfClass(void *,void *,struct defmodule *,int,DEFCLASS *,
-                                                intBool,int,void (*)(void *,void *,INSTANCE_TYPE *));
-static void SaveSingleInstanceText(void *,void *,INSTANCE_TYPE *);
-static void ProcessFileErrorMessage(void *,char *,char *);
+static DATA_OBJECT *ProcessSaveClassList(void *,EXEC_STATUS,char *,EXPRESSION *,int,intBool);
+static void ReturnSaveClassList(void *,EXEC_STATUS,DATA_OBJECT *);
+static long SaveOrMarkInstances(void *,EXEC_STATUS,void *,int,DATA_OBJECT *,intBool,intBool,
+                                         void (*)(void *,EXEC_STATUS,void *,INSTANCE_TYPE *));
+static long SaveOrMarkInstancesOfClass(void *,EXEC_STATUS,void *,struct defmodule *,int,DEFCLASS *,
+                                                intBool,int,void (*)(void *,EXEC_STATUS,void *,INSTANCE_TYPE *));
+static void SaveSingleInstanceText(void *,EXEC_STATUS,void *,INSTANCE_TYPE *);
+static void ProcessFileErrorMessage(void *,EXEC_STATUS,char *,char *);
 #if BSAVE_INSTANCES
-static void WriteBinaryHeader(void *,FILE *);
-static void MarkSingleInstance(void *,void *,INSTANCE_TYPE *);
-static void MarkNeededAtom(void *,int,void *);
-static void SaveSingleInstanceBinary(void *,void *,INSTANCE_TYPE *);
-static void SaveAtomBinary(void *,unsigned short,void *,FILE *);
+static void WriteBinaryHeader(void *,EXEC_STATUS,FILE *);
+static void MarkSingleInstance(void *,EXEC_STATUS,void *,INSTANCE_TYPE *);
+static void MarkNeededAtom(void *,EXEC_STATUS,int,void *);
+static void SaveSingleInstanceBinary(void *,EXEC_STATUS,void *,INSTANCE_TYPE *);
+static void SaveAtomBinary(void *,EXEC_STATUS,unsigned short,void *,FILE *);
 #endif
 
-static long LoadOrRestoreInstances(void *,char *,int,int);
+static long LoadOrRestoreInstances(void *,EXEC_STATUS,char *,int,int);
 
 #if BLOAD_INSTANCES
-static intBool VerifyBinaryHeader(void *,char *);
-static intBool LoadSingleBinaryInstance(void *);
-static void BinaryLoadInstanceError(void *,SYMBOL_HN *,DEFCLASS *);
-static void CreateSlotValue(void *,DATA_OBJECT *,struct bsaveSlotValueAtom *,unsigned long); 
-static void *GetBinaryAtomValue(void *,struct bsaveSlotValueAtom *);
-static void BufferedRead(void *,void *,unsigned long);
-static void FreeReadBuffer(void *);
+static intBool VerifyBinaryHeader(void *,EXEC_STATUS,char *);
+static intBool LoadSingleBinaryInstance(void *,EXEC_STATUS);
+static void BinaryLoadInstanceError(void *,EXEC_STATUS,SYMBOL_HN *,DEFCLASS *);
+static void CreateSlotValue(void *,EXEC_STATUS,DATA_OBJECT *,struct bsaveSlotValueAtom *,unsigned long); 
+static void *GetBinaryAtomValue(void *,EXEC_STATUS,struct bsaveSlotValueAtom *);
+static void BufferedRead(void *,EXEC_STATUS,void *,unsigned long);
+static void FreeReadBuffer(void *,EXEC_STATUS);
 #endif
 
 /* =========================================
@@ -142,8 +142,8 @@ globle void SetupInstanceFileCommands(
 #if BLOAD_INSTANCES || BSAVE_INSTANCES
    AllocateEnvironmentData(theEnv,execStatus,INSTANCE_FILE_DATA,sizeof(struct instanceFileData),NULL);
 
-   InstanceFileData(theEnv)->InstanceBinaryPrefixID = "\5\6\7CLIPS";
-   InstanceFileData(theEnv)->InstanceBinaryVersionID = "V6.00";
+   InstanceFileData(theEnv,execStatus)->InstanceBinaryPrefixID = "\5\6\7CLIPS";
+   InstanceFileData(theEnv,execStatus)->InstanceBinaryVersionID = "V6.00";
 #endif
 
 #if (! RUN_TIME)
@@ -379,37 +379,37 @@ globle long EnvBinaryLoadInstances(
      }
    if (VerifyBinaryHeader(theEnv,execStatus,theFile) == FALSE)
      {
-      GenCloseBinary(theEnv);
+      GenCloseBinary(theEnv,execStatus);
       SetEvaluationError(theEnv,execStatus,TRUE);
       return(-1L);
      }
    
-   EnvIncrementGCLocks(theEnv);
-   ReadNeededAtomicValues(theEnv);
+   EnvIncrementGCLocks(theEnv,execStatus);
+   ReadNeededAtomicValues(theEnv,execStatus);
 
-   InstanceFileData(theEnv)->BinaryInstanceFileOffset = 0L;
+   InstanceFileData(theEnv,execStatus)->BinaryInstanceFileOffset = 0L;
 
-   GenReadBinary(theEnv,execStatus,(void *) &InstanceFileData(theEnv)->BinaryInstanceFileSize,sizeof(unsigned long));
+   GenReadBinary(theEnv,execStatus,(void *) &InstanceFileData(theEnv,execStatus)->BinaryInstanceFileSize,sizeof(unsigned long));
    GenReadBinary(theEnv,execStatus,(void *) &instanceCount,sizeof(long));
 
    for (i = 0L ; i < instanceCount ; i++)
      {
-      if (LoadSingleBinaryInstance(theEnv) == FALSE)
+      if (LoadSingleBinaryInstance(theEnv,execStatus) == FALSE)
         {
-         FreeReadBuffer(theEnv);
-         FreeAtomicValueStorage(theEnv);
-         GenCloseBinary(theEnv);
+         FreeReadBuffer(theEnv,execStatus);
+         FreeAtomicValueStorage(theEnv,execStatus);
+         GenCloseBinary(theEnv,execStatus);
          SetEvaluationError(theEnv,execStatus,TRUE);
-         EnvDecrementGCLocks(theEnv);
+         EnvDecrementGCLocks(theEnv,execStatus);
          return(i);
         }
      }
 
-   FreeReadBuffer(theEnv);
-   FreeAtomicValueStorage(theEnv);
-   GenCloseBinary(theEnv);
+   FreeReadBuffer(theEnv,execStatus);
+   FreeAtomicValueStorage(theEnv,execStatus);
+   GenCloseBinary(theEnv,execStatus);
 
-   EnvDecrementGCLocks(theEnv);
+   EnvDecrementGCLocks(theEnv,execStatus);
    return(instanceCount);
   }
 
@@ -462,12 +462,12 @@ globle long EnvSaveInstances(
       return(0L);
      }
 
-   oldPEC = PrintUtilityData(theEnv)->PreserveEscapedCharacters;
-   PrintUtilityData(theEnv)->PreserveEscapedCharacters = TRUE;
-   oldATS = PrintUtilityData(theEnv)->AddressesToStrings;
-   PrintUtilityData(theEnv)->AddressesToStrings = TRUE;
-   oldIAN = PrintUtilityData(theEnv)->InstanceAddressesToNames;
-   PrintUtilityData(theEnv)->InstanceAddressesToNames = TRUE;
+   oldPEC = PrintUtilityData(theEnv,execStatus)->PreserveEscapedCharacters;
+   PrintUtilityData(theEnv,execStatus)->PreserveEscapedCharacters = TRUE;
+   oldATS = PrintUtilityData(theEnv,execStatus)->AddressesToStrings;
+   PrintUtilityData(theEnv,execStatus)->AddressesToStrings = TRUE;
+   oldIAN = PrintUtilityData(theEnv,execStatus)->InstanceAddressesToNames;
+   PrintUtilityData(theEnv,execStatus)->InstanceAddressesToNames = TRUE;
 
    SetFastSave(theEnv,execStatus,sfile);
    instanceCount = SaveOrMarkInstances(theEnv,execStatus,(void *) sfile,saveCode,classList,
@@ -475,9 +475,9 @@ globle long EnvSaveInstances(
    GenClose(theEnv,execStatus,sfile);
    SetFastSave(theEnv,execStatus,NULL);
 
-   PrintUtilityData(theEnv)->PreserveEscapedCharacters = oldPEC;
-   PrintUtilityData(theEnv)->AddressesToStrings = oldATS;
-   PrintUtilityData(theEnv)->InstanceAddressesToNames = oldIAN;
+   PrintUtilityData(theEnv,execStatus)->PreserveEscapedCharacters = oldPEC;
+   PrintUtilityData(theEnv,execStatus)->AddressesToStrings = oldATS;
+   PrintUtilityData(theEnv,execStatus)->InstanceAddressesToNames = oldIAN;
    ReturnSaveClassList(theEnv,execStatus,classList);
    return(instanceCount);
   }
@@ -536,8 +536,8 @@ globle long EnvBinarySaveInstances(
    if ((classList == NULL) && (classExpressionList != NULL))
      return(0L);
 
-   InstanceFileData(theEnv)->BinaryInstanceFileSize = 0L;
-   InitAtomicValueNeededFlags(theEnv);
+   InstanceFileData(theEnv,execStatus)->BinaryInstanceFileSize = 0L;
+   InitAtomicValueNeededFlags(theEnv,execStatus);
    instanceCount = SaveOrMarkInstances(theEnv,execStatus,NULL,saveCode,classList,inheritFlag,
                                        FALSE,MarkSingleInstance);
 
@@ -551,13 +551,13 @@ globle long EnvBinarySaveInstances(
    WriteBinaryHeader(theEnv,execStatus,bsaveFP);
    WriteNeededAtomicValues(theEnv,execStatus,bsaveFP);
 
-   fwrite((void *) &InstanceFileData(theEnv)->BinaryInstanceFileSize,sizeof(unsigned long),1,bsaveFP);
+   fwrite((void *) &InstanceFileData(theEnv,execStatus)->BinaryInstanceFileSize,sizeof(unsigned long),1,bsaveFP);
    fwrite((void *) &instanceCount,sizeof(long),1,bsaveFP);
 
    SetAtomicValueIndices(theEnv,execStatus,FALSE);
    SaveOrMarkInstances(theEnv,execStatus,(void *) bsaveFP,saveCode,classList,
                        inheritFlag,FALSE,SaveSingleInstanceBinary);
-   RestoreAtomicValueBuckets(theEnv);
+   RestoreAtomicValueBuckets(theEnv,execStatus);
    GenClose(theEnv,execStatus,bsaveFP);
    ReturnSaveClassList(theEnv,execStatus,classList);
    return(instanceCount);
@@ -586,7 +586,7 @@ static long InstancesSaveCommandParser(
   void *theEnv,
   EXEC_STATUS,
   char *functionName,
-  long (*saveFunction)(void *,char *,int,EXPRESSION *,intBool))
+  long (*saveFunction)(void *,EXEC_STATUS,char *,int,EXPRESSION *,intBool))
   {
    char *fileFound;
    DATA_OBJECT temp;
@@ -670,7 +670,7 @@ static DATA_OBJECT *ProcessSaveClassList(
    struct defmodule *currentModule;
    int argIndex = inheritFlag ? 4 : 3;
 
-   currentModule = ((struct defmodule *) EnvGetCurrentModule(theEnv));
+   currentModule = ((struct defmodule *) EnvGetCurrentModule(theEnv,execStatus));
    while (classExps != NULL)
      {
       if (EvaluateExpression(theEnv,execStatus,classExps,&tmp))
@@ -780,7 +780,7 @@ static long SaveOrMarkInstances(
   DATA_OBJECT *classList,
   intBool inheritFlag,
   intBool interruptOK,
-  void (*saveInstanceFunc)(void *,void *,INSTANCE_TYPE *))
+  void (*saveInstanceFunc)(void *,EXEC_STATUS,void *,INSTANCE_TYPE *))
   {
    struct defmodule *currentModule;
    int traversalID;
@@ -788,10 +788,10 @@ static long SaveOrMarkInstances(
    INSTANCE_TYPE *ins;
    long instanceCount = 0L;
 
-   currentModule = ((struct defmodule *) EnvGetCurrentModule(theEnv));
+   currentModule = ((struct defmodule *) EnvGetCurrentModule(theEnv,execStatus));
    if (classList != NULL)
      {
-      traversalID = GetTraversalID(theEnv);
+      traversalID = GetTraversalID(theEnv,execStatus);
       if (traversalID != -1)
         {
          for (tmp = classList ;
@@ -800,7 +800,7 @@ static long SaveOrMarkInstances(
            instanceCount += SaveOrMarkInstancesOfClass(theEnv,execStatus,theOutput,currentModule,saveCode,
                                                        (DEFCLASS *) tmp->value,inheritFlag,
                                                        traversalID,saveInstanceFunc);
-         ReleaseTraversalID(theEnv);
+         ReleaseTraversalID(theEnv,execStatus);
         }
      }
    else
@@ -853,7 +853,7 @@ static long SaveOrMarkInstancesOfClass(
   DEFCLASS *theDefclass,
   intBool inheritFlag,
   int traversalID,
-  void (*saveInstanceFunc)(void *,void *,INSTANCE_TYPE *))
+  void (*saveInstanceFunc)(void *,EXEC_STATUS,void *,INSTANCE_TYPE *))
   {
    INSTANCE_TYPE *theInstance;
    DEFCLASS *subclass;
@@ -953,10 +953,10 @@ static void WriteBinaryHeader(
   EXEC_STATUS,
   FILE *bsaveFP)
   {   
-   fwrite((void *) InstanceFileData(theEnv)->InstanceBinaryPrefixID,
-          (STD_SIZE) (strlen(InstanceFileData(theEnv)->InstanceBinaryPrefixID) + 1),1,bsaveFP);
-   fwrite((void *) InstanceFileData(theEnv)->InstanceBinaryVersionID,
-          (STD_SIZE) (strlen(InstanceFileData(theEnv)->InstanceBinaryVersionID) + 1),1,bsaveFP);
+   fwrite((void *) InstanceFileData(theEnv,execStatus)->InstanceBinaryPrefixID,
+          (STD_SIZE) (strlen(InstanceFileData(theEnv,execStatus)->InstanceBinaryPrefixID) + 1),1,bsaveFP);
+   fwrite((void *) InstanceFileData(theEnv,execStatus)->InstanceBinaryVersionID,
+          (STD_SIZE) (strlen(InstanceFileData(theEnv,execStatus)->InstanceBinaryVersionID) + 1),1,bsaveFP);
   }
 
 /***************************************************
@@ -984,10 +984,10 @@ static void MarkSingleInstance(
    INSTANCE_SLOT *sp;
    long i, j;
 
-   InstanceFileData(theEnv)->BinaryInstanceFileSize += (unsigned long) (sizeof(long) * 2);
+   InstanceFileData(theEnv,execStatus)->BinaryInstanceFileSize += (unsigned long) (sizeof(long) * 2);
    theInstance->name->neededSymbol = TRUE;
    theInstance->cls->header.name->neededSymbol = TRUE;
-   InstanceFileData(theEnv)->BinaryInstanceFileSize +=
+   InstanceFileData(theEnv,execStatus)->BinaryInstanceFileSize +=
        (unsigned long) ((sizeof(long) * 2) +
                         (sizeof(struct bsaveSlotValue) *
                          theInstance->cls->instanceSlotCount) +
@@ -1023,7 +1023,7 @@ static void MarkNeededAtom(
   int type,
   void *value)
   {
-   InstanceFileData(theEnv)->BinaryInstanceFileSize += (unsigned long) sizeof(struct bsaveSlotValueAtom);
+   InstanceFileData(theEnv,execStatus)->BinaryInstanceFileSize += (unsigned long) sizeof(struct bsaveSlotValueAtom);
 
    /* =====================================
       Assumes slot value atoms  can only be
@@ -1220,19 +1220,19 @@ static long LoadOrRestoreInstances(
         SetEvaluationError(theEnv,execStatus,TRUE);
         return(-1L);
        }
-     svload = GetFastLoad(theEnv);
+     svload = GetFastLoad(theEnv,execStatus);
      ilog = (char *) sfile;
      SetFastLoad(theEnv,execStatus,sfile);
    } else {
      ilog = file;
    }
    top = GenConstant(theEnv,execStatus,FCALL,(void *) FindFunction(theEnv,execStatus,"make-instance"));
-   GetToken(theEnv,execStatus,ilog,&DefclassData(theEnv)->ObjectParseToken);
-   svoverride = InstanceData(theEnv)->MkInsMsgPass;
-   InstanceData(theEnv)->MkInsMsgPass = usemsgs;
-   while ((GetType(DefclassData(theEnv)->ObjectParseToken) != STOP) && (execStatus->HaltExecution != TRUE))
+   GetToken(theEnv,execStatus,ilog,&DefclassData(theEnv,execStatus)->ObjectParseToken);
+   svoverride = InstanceData(theEnv,execStatus)->MkInsMsgPass;
+   InstanceData(theEnv,execStatus)->MkInsMsgPass = usemsgs;
+   while ((GetType(DefclassData(theEnv,execStatus)->ObjectParseToken) != STOP) && (execStatus->HaltExecution != TRUE))
      {
-      if (GetType(DefclassData(theEnv)->ObjectParseToken) != LPAREN)
+      if (GetType(DefclassData(theEnv,execStatus)->ObjectParseToken) != LPAREN)
         {
          SyntaxErrorMessage(theEnv,execStatus,"instance definition");
          rtn_struct(theEnv,execStatus,expr,top);
@@ -1241,7 +1241,7 @@ static long LoadOrRestoreInstances(
            SetFastLoad(theEnv,execStatus,svload);
          }
          SetEvaluationError(theEnv,execStatus,TRUE);
-         InstanceData(theEnv)->MkInsMsgPass = svoverride;
+         InstanceData(theEnv,execStatus)->MkInsMsgPass = svoverride;
          return(instanceCount);
         }
       if (ParseSimpleInstance(theEnv,execStatus,top,ilog) == NULL)
@@ -1250,7 +1250,7 @@ static long LoadOrRestoreInstances(
            GenClose(theEnv,execStatus,sfile);
            SetFastLoad(theEnv,execStatus,svload);
          }
-         InstanceData(theEnv)->MkInsMsgPass = svoverride;
+         InstanceData(theEnv,execStatus)->MkInsMsgPass = svoverride;
          SetEvaluationError(theEnv,execStatus,TRUE);
          return(instanceCount);
         }
@@ -1261,14 +1261,14 @@ static long LoadOrRestoreInstances(
         instanceCount++;
       ReturnExpression(theEnv,execStatus,top->argList);
       top->argList = NULL;
-      GetToken(theEnv,execStatus,ilog,&DefclassData(theEnv)->ObjectParseToken);
+      GetToken(theEnv,execStatus,ilog,&DefclassData(theEnv,execStatus)->ObjectParseToken);
      }
    rtn_struct(theEnv,execStatus,expr,top);
    if (isFileName) {
      GenClose(theEnv,execStatus,sfile);
      SetFastLoad(theEnv,execStatus,svload);
    }
-   InstanceData(theEnv)->MkInsMsgPass = svoverride;
+   InstanceData(theEnv,execStatus)->MkInsMsgPass = svoverride;
    return(instanceCount);
   }
 
@@ -1317,16 +1317,16 @@ static intBool VerifyBinaryHeader(
   {
    char buf[20];
 
-   GenReadBinary(theEnv,execStatus,(void *) buf,(unsigned long) (strlen(InstanceFileData(theEnv)->InstanceBinaryPrefixID) + 1));
-   if (strcmp(buf,InstanceFileData(theEnv)->InstanceBinaryPrefixID) != 0)
+   GenReadBinary(theEnv,execStatus,(void *) buf,(unsigned long) (strlen(InstanceFileData(theEnv,execStatus)->InstanceBinaryPrefixID) + 1));
+   if (strcmp(buf,InstanceFileData(theEnv,execStatus)->InstanceBinaryPrefixID) != 0)
      {
       PrintErrorID(theEnv,execStatus,"INSFILE",2,FALSE);
       EnvPrintRouter(theEnv,execStatus,WERROR,theFile);
       EnvPrintRouter(theEnv,execStatus,WERROR," file is not a binary instances file.\n");
       return(FALSE);
      }
-   GenReadBinary(theEnv,execStatus,(void *) buf,(unsigned long) (strlen(InstanceFileData(theEnv)->InstanceBinaryVersionID) + 1));
-   if (strcmp(buf,InstanceFileData(theEnv)->InstanceBinaryVersionID) != 0)
+   GenReadBinary(theEnv,execStatus,(void *) buf,(unsigned long) (strlen(InstanceFileData(theEnv,execStatus)->InstanceBinaryVersionID) + 1));
+   if (strcmp(buf,InstanceFileData(theEnv,execStatus)->InstanceBinaryVersionID) != 0)
      {
       PrintErrorID(theEnv,execStatus,"INSFILE",3,FALSE);
       EnvPrintRouter(theEnv,execStatus,WERROR,theFile);
@@ -1567,7 +1567,7 @@ static void *GetBinaryAtomValue(
          return((void *) IntegerPointer(ba->value));
       case FACT_ADDRESS:
 #if DEFTEMPLATE_CONSTRUCT && DEFRULE_CONSTRUCT
-         return((void *) &FactData(theEnv)->DummyFact);
+         return((void *) &FactData(theEnv,execStatus)->DummyFact);
 #else
          return(NULL);
 #endif
@@ -1602,27 +1602,27 @@ static void BufferedRead(
   {
    unsigned long i,amountLeftToRead;
 
-   if (InstanceFileData(theEnv)->CurrentReadBuffer != NULL)
+   if (InstanceFileData(theEnv,execStatus)->CurrentReadBuffer != NULL)
      {
-      amountLeftToRead = InstanceFileData(theEnv)->CurrentReadBufferSize - InstanceFileData(theEnv)->CurrentReadBufferOffset;
+      amountLeftToRead = InstanceFileData(theEnv,execStatus)->CurrentReadBufferSize - InstanceFileData(theEnv,execStatus)->CurrentReadBufferOffset;
       if (bufsz <= amountLeftToRead)
         {
          for (i = 0L ; i < bufsz ; i++)
-           ((char *) buf)[i] = InstanceFileData(theEnv)->CurrentReadBuffer[i + InstanceFileData(theEnv)->CurrentReadBufferOffset];
-         InstanceFileData(theEnv)->CurrentReadBufferOffset += bufsz;
-         if (InstanceFileData(theEnv)->CurrentReadBufferOffset == InstanceFileData(theEnv)->CurrentReadBufferSize)
-           FreeReadBuffer(theEnv);
+           ((char *) buf)[i] = InstanceFileData(theEnv,execStatus)->CurrentReadBuffer[i + InstanceFileData(theEnv,execStatus)->CurrentReadBufferOffset];
+         InstanceFileData(theEnv,execStatus)->CurrentReadBufferOffset += bufsz;
+         if (InstanceFileData(theEnv,execStatus)->CurrentReadBufferOffset == InstanceFileData(theEnv,execStatus)->CurrentReadBufferSize)
+           FreeReadBuffer(theEnv,execStatus);
         }
       else
         {
-         if (InstanceFileData(theEnv)->CurrentReadBufferOffset < InstanceFileData(theEnv)->CurrentReadBufferSize)
+         if (InstanceFileData(theEnv,execStatus)->CurrentReadBufferOffset < InstanceFileData(theEnv,execStatus)->CurrentReadBufferSize)
            {
             for (i = 0L ; i < amountLeftToRead ; i++)
-              ((char *) buf)[i] = InstanceFileData(theEnv)->CurrentReadBuffer[i + InstanceFileData(theEnv)->CurrentReadBufferOffset];
+              ((char *) buf)[i] = InstanceFileData(theEnv,execStatus)->CurrentReadBuffer[i + InstanceFileData(theEnv,execStatus)->CurrentReadBufferOffset];
             bufsz -= amountLeftToRead;
             buf = (void *) (((char *) buf) + amountLeftToRead);
            }
-         FreeReadBuffer(theEnv);
+         FreeReadBuffer(theEnv,execStatus);
          BufferedRead(theEnv,execStatus,buf,bufsz);
         }
      }
@@ -1630,24 +1630,24 @@ static void BufferedRead(
      {
       if (bufsz > MAX_BLOCK_SIZE)
         {
-         InstanceFileData(theEnv)->CurrentReadBufferSize = bufsz;
-         if (bufsz > (InstanceFileData(theEnv)->BinaryInstanceFileSize - InstanceFileData(theEnv)->BinaryInstanceFileOffset))
+         InstanceFileData(theEnv,execStatus)->CurrentReadBufferSize = bufsz;
+         if (bufsz > (InstanceFileData(theEnv,execStatus)->BinaryInstanceFileSize - InstanceFileData(theEnv,execStatus)->BinaryInstanceFileOffset))
            {
             SystemError(theEnv,execStatus,"INSFILE",2);
             EnvExitRouter(theEnv,execStatus,EXIT_FAILURE);
            }
         }
       else if (MAX_BLOCK_SIZE >
-              (InstanceFileData(theEnv)->BinaryInstanceFileSize - InstanceFileData(theEnv)->BinaryInstanceFileOffset))
-        InstanceFileData(theEnv)->CurrentReadBufferSize = InstanceFileData(theEnv)->BinaryInstanceFileSize - InstanceFileData(theEnv)->BinaryInstanceFileOffset;
+              (InstanceFileData(theEnv,execStatus)->BinaryInstanceFileSize - InstanceFileData(theEnv,execStatus)->BinaryInstanceFileOffset))
+        InstanceFileData(theEnv,execStatus)->CurrentReadBufferSize = InstanceFileData(theEnv,execStatus)->BinaryInstanceFileSize - InstanceFileData(theEnv,execStatus)->BinaryInstanceFileOffset;
       else
-        InstanceFileData(theEnv)->CurrentReadBufferSize = (unsigned long) MAX_BLOCK_SIZE;
-      InstanceFileData(theEnv)->CurrentReadBuffer = (char *) genalloc(theEnv,execStatus,InstanceFileData(theEnv)->CurrentReadBufferSize);
-      GenReadBinary(theEnv,execStatus,(void *) InstanceFileData(theEnv)->CurrentReadBuffer,InstanceFileData(theEnv)->CurrentReadBufferSize);
+        InstanceFileData(theEnv,execStatus)->CurrentReadBufferSize = (unsigned long) MAX_BLOCK_SIZE;
+      InstanceFileData(theEnv,execStatus)->CurrentReadBuffer = (char *) genalloc(theEnv,execStatus,InstanceFileData(theEnv,execStatus)->CurrentReadBufferSize);
+      GenReadBinary(theEnv,execStatus,(void *) InstanceFileData(theEnv,execStatus)->CurrentReadBuffer,InstanceFileData(theEnv,execStatus)->CurrentReadBufferSize);
       for (i = 0L ; i < bufsz ; i++)
-        ((char *) buf)[i] = InstanceFileData(theEnv)->CurrentReadBuffer[i];
-      InstanceFileData(theEnv)->CurrentReadBufferOffset = bufsz;
-      InstanceFileData(theEnv)->BinaryInstanceFileOffset += InstanceFileData(theEnv)->CurrentReadBufferSize;
+        ((char *) buf)[i] = InstanceFileData(theEnv,execStatus)->CurrentReadBuffer[i];
+      InstanceFileData(theEnv,execStatus)->CurrentReadBufferOffset = bufsz;
+      InstanceFileData(theEnv,execStatus)->BinaryInstanceFileOffset += InstanceFileData(theEnv,execStatus)->CurrentReadBufferSize;
      }
   }
 
@@ -1663,11 +1663,11 @@ static void FreeReadBuffer(
   void *theEnv,
   EXEC_STATUS)
   {
-   if (InstanceFileData(theEnv)->CurrentReadBufferSize != 0L)
+   if (InstanceFileData(theEnv,execStatus)->CurrentReadBufferSize != 0L)
      {
-      genfree(theEnv,execStatus,(void *) InstanceFileData(theEnv)->CurrentReadBuffer,InstanceFileData(theEnv)->CurrentReadBufferSize);
-      InstanceFileData(theEnv)->CurrentReadBuffer = NULL;
-      InstanceFileData(theEnv)->CurrentReadBufferSize = 0L;
+      genfree(theEnv,execStatus,(void *) InstanceFileData(theEnv,execStatus)->CurrentReadBuffer,InstanceFileData(theEnv,execStatus)->CurrentReadBufferSize);
+      InstanceFileData(theEnv,execStatus)->CurrentReadBuffer = NULL;
+      InstanceFileData(theEnv,execStatus)->CurrentReadBufferSize = 0L;
      }
   }
 

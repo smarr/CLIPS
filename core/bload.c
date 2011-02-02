@@ -44,12 +44,12 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static struct FunctionDefinition **ReadNeededFunctions(void *,long *,int *);
-   static struct FunctionDefinition  *FastFindFunction(void *,char *,struct FunctionDefinition *);
-   static int                         ClearBload(void *);
-   static void                        AbortBload(void *);
-   static int                         BloadOutOfMemoryFunction(void *,size_t);
-   static void                        DeallocateBloadData(void *);
+   static struct FunctionDefinition **ReadNeededFunctions(void *,EXEC_STATUS,long *,int *);
+   static struct FunctionDefinition  *FastFindFunction(void *,EXEC_STATUS,char *,struct FunctionDefinition *);
+   static int                         ClearBload(void *,EXEC_STATUS);
+   static void                        AbortBload(void *,EXEC_STATUS);
+   static int                         BloadOutOfMemoryFunction(void *,EXEC_STATUS,size_t);
+   static void                        DeallocateBloadData(void *,EXEC_STATUS);
 
 /**********************************************/
 /* InitializeBloadData: Allocates environment */
@@ -62,8 +62,8 @@ globle void InitializeBloadData(
    AllocateEnvironmentData(theEnv,execStatus,BLOAD_DATA,sizeof(struct bloadData),NULL);
    AddEnvironmentCleanupFunction(theEnv,execStatus,"bload",DeallocateBloadData,-1500);
 
-   BloadData(theEnv)->BinaryPrefixID = "\1\2\3\4CLIPS";
-   BloadData(theEnv)->BinaryVersionID = "V6.30";
+   BloadData(theEnv,execStatus)->BinaryPrefixID = "\1\2\3\4CLIPS";
+   BloadData(theEnv,execStatus)->BinaryVersionID = "V6.30";
   }
   
 /************************************************/
@@ -74,10 +74,10 @@ static void DeallocateBloadData(
   void *theEnv,
   EXEC_STATUS)
   {   
-   DeallocateCallList(theEnv,execStatus,BloadData(theEnv)->BeforeBloadFunctions);
-   DeallocateCallList(theEnv,execStatus,BloadData(theEnv)->AfterBloadFunctions);
-   DeallocateCallList(theEnv,execStatus,BloadData(theEnv)->ClearBloadReadyFunctions);
-   DeallocateCallList(theEnv,execStatus,BloadData(theEnv)->AbortBloadFunctions);
+   DeallocateCallList(theEnv,execStatus,BloadData(theEnv,execStatus)->BeforeBloadFunctions);
+   DeallocateCallList(theEnv,execStatus,BloadData(theEnv,execStatus)->AfterBloadFunctions);
+   DeallocateCallList(theEnv,execStatus,BloadData(theEnv,execStatus)->ClearBloadReadyFunctions);
+   DeallocateCallList(theEnv,execStatus,BloadData(theEnv,execStatus)->AbortBloadFunctions);
   }
 
 /******************************/
@@ -107,14 +107,14 @@ globle int EnvBload(
    /* Determine if this is a binary file. */
    /*=====================================*/
 
-   GenReadBinary(theEnv,execStatus,IDbuffer,(unsigned long) strlen(BloadData(theEnv)->BinaryPrefixID) + 1);
-   if (strcmp(IDbuffer,BloadData(theEnv)->BinaryPrefixID) != 0)
+   GenReadBinary(theEnv,execStatus,IDbuffer,(unsigned long) strlen(BloadData(theEnv,execStatus)->BinaryPrefixID) + 1);
+   if (strcmp(IDbuffer,BloadData(theEnv,execStatus)->BinaryPrefixID) != 0)
      {
       PrintErrorID(theEnv,execStatus,"BLOAD",2,FALSE);
       EnvPrintRouter(theEnv,execStatus,WERROR,"File ");
       EnvPrintRouter(theEnv,execStatus,WERROR,fileName);
       EnvPrintRouter(theEnv,execStatus,WERROR," is not a binary construct file.\n");
-      GenCloseBinary(theEnv);
+      GenCloseBinary(theEnv,execStatus);
       return(FALSE);
      }
 
@@ -123,14 +123,14 @@ globle int EnvBload(
    /* a format from a different version.    */
    /*=======================================*/
 
-   GenReadBinary(theEnv,execStatus,IDbuffer,(unsigned long) strlen(BloadData(theEnv)->BinaryVersionID) + 1);
-   if (strcmp(IDbuffer,BloadData(theEnv)->BinaryVersionID) != 0)
+   GenReadBinary(theEnv,execStatus,IDbuffer,(unsigned long) strlen(BloadData(theEnv,execStatus)->BinaryVersionID) + 1);
+   if (strcmp(IDbuffer,BloadData(theEnv,execStatus)->BinaryVersionID) != 0)
      {
       PrintErrorID(theEnv,execStatus,"BLOAD",3,FALSE);
       EnvPrintRouter(theEnv,execStatus,WERROR,"File ");
       EnvPrintRouter(theEnv,execStatus,WERROR,fileName);
       EnvPrintRouter(theEnv,execStatus,WERROR," is an incompatible binary construct file.\n");
-      GenCloseBinary(theEnv);
+      GenCloseBinary(theEnv,execStatus);
       return(FALSE);
      }
      
@@ -138,11 +138,11 @@ globle int EnvBload(
    /* Clear environment. */
    /*====================*/
 
-   if (BloadData(theEnv)->BloadActive)
+   if (BloadData(theEnv,execStatus)->BloadActive)
      {
-      if (ClearBload(theEnv) == FALSE)
+      if (ClearBload(theEnv,execStatus) == FALSE)
         {
-         GenCloseBinary(theEnv);
+         GenCloseBinary(theEnv,execStatus);
          return(FALSE);
         }
      }
@@ -152,9 +152,9 @@ globle int EnvBload(
    /* was successfully cleared.       */
    /*=================================*/
 
-   if (ClearReady(theEnv) == FALSE)
+   if (ClearReady(theEnv,execStatus) == FALSE)
      {
-      GenCloseBinary(theEnv);
+      GenCloseBinary(theEnv,execStatus);
       EnvPrintRouter(theEnv,execStatus,WERROR,"The ");
       EnvPrintRouter(theEnv,execStatus,WERROR,APPLICATION_NAME);
       EnvPrintRouter(theEnv,execStatus,WERROR," environment could not be cleared.\n");
@@ -167,12 +167,12 @@ globle int EnvBload(
    /* executed before a bload occurs.  */
    /*==================================*/
 
-   for (bfPtr = BloadData(theEnv)->BeforeBloadFunctions;
+   for (bfPtr = BloadData(theEnv,execStatus)->BeforeBloadFunctions;
         bfPtr != NULL;
         bfPtr = bfPtr->next)
      { 
       if (bfPtr->environmentAware)
-        { (*bfPtr->func)(theEnv); }
+        { (*bfPtr->func)(theEnv,execStatus); }
       else            
         { (* (void (*)(void)) bfPtr->func)(); }
      }
@@ -181,11 +181,11 @@ globle int EnvBload(
    /* Read in the functions needed by this binary image. */
    /*====================================================*/
 
-   BloadData(theEnv)->FunctionArray = ReadNeededFunctions(theEnv,execStatus,&numberOfFunctions,&error);
+   BloadData(theEnv,execStatus)->FunctionArray = ReadNeededFunctions(theEnv,execStatus,&numberOfFunctions,&error);
    if (error)
      {
-      GenCloseBinary(theEnv);
-      AbortBload(theEnv);
+      GenCloseBinary(theEnv,execStatus);
+      AbortBload(theEnv,execStatus);
       return(FALSE);
      }
 
@@ -193,14 +193,14 @@ globle int EnvBload(
    /* Read in the atoms needed by this binary image. */
    /*================================================*/
 
-   ReadNeededAtomicValues(theEnv);
+   ReadNeededAtomicValues(theEnv,execStatus);
 
    /*===========================================*/
    /* Determine the number of expressions to be */
    /* read and allocate the appropriate space   */
    /*===========================================*/
 
-   AllocateExpressions(theEnv);
+   AllocateExpressions(theEnv,execStatus);
 
    /*==========================================================*/
    /* Read in the memory requirements of the constructs stored */
@@ -208,7 +208,7 @@ globle int EnvBload(
    /*==========================================================*/
 
    for (GenReadBinary(theEnv,execStatus,constructBuffer,(unsigned long) CONSTRUCT_HEADER_SIZE);
-        strncmp(constructBuffer,BloadData(theEnv)->BinaryPrefixID,CONSTRUCT_HEADER_SIZE) != 0;
+        strncmp(constructBuffer,BloadData(theEnv,execStatus)->BinaryPrefixID,CONSTRUCT_HEADER_SIZE) != 0;
         GenReadBinary(theEnv,execStatus,constructBuffer,(unsigned long) CONSTRUCT_HEADER_SIZE))
      {
       intBool found;
@@ -220,7 +220,7 @@ globle int EnvBload(
       /*================================================*/
 
       found = FALSE;
-      for (biPtr = BsaveData(theEnv)->ListOfBinaryItems;
+      for (biPtr = BsaveData(theEnv,execStatus)->ListOfBinaryItems;
            biPtr != NULL;
            biPtr = biPtr->next)
         {
@@ -228,7 +228,7 @@ globle int EnvBload(
            {
             if (biPtr->bloadStorageFunction != NULL)
               {
-               (*biPtr->bloadStorageFunction)(theEnv);
+               (*biPtr->bloadStorageFunction)(theEnv,execStatus);
                found = TRUE;
               }
             break;
@@ -258,20 +258,20 @@ globle int EnvBload(
    /* Refresh the pointers in expressions. */
    /*======================================*/
 
-   RefreshExpressions(theEnv);
+   RefreshExpressions(theEnv,execStatus);
 
    /*==========================*/
    /* Read in the constraints. */
    /*==========================*/
 
-   ReadNeededConstraints(theEnv);
+   ReadNeededConstraints(theEnv,execStatus);
 
    /*======================================================*/
    /* Read in the constructs stored in this binary image.  */
    /*======================================================*/
 
    for (GenReadBinary(theEnv,execStatus,constructBuffer,(unsigned long) CONSTRUCT_HEADER_SIZE);
-        strncmp(constructBuffer,BloadData(theEnv)->BinaryPrefixID,CONSTRUCT_HEADER_SIZE) != 0;
+        strncmp(constructBuffer,BloadData(theEnv,execStatus)->BinaryPrefixID,CONSTRUCT_HEADER_SIZE) != 0;
         GenReadBinary(theEnv,execStatus,constructBuffer,(unsigned long) CONSTRUCT_HEADER_SIZE))
      {
       intBool found;
@@ -283,7 +283,7 @@ globle int EnvBload(
       /*==================================================*/
 
       found = FALSE;
-      for (biPtr = BsaveData(theEnv)->ListOfBinaryItems;
+      for (biPtr = BsaveData(theEnv,execStatus)->ListOfBinaryItems;
            biPtr != NULL;
            biPtr = biPtr->next)
         {
@@ -291,7 +291,7 @@ globle int EnvBload(
            {
             if (biPtr->bloadFunction != NULL)
               {
-               (*biPtr->bloadFunction)(theEnv);
+               (*biPtr->bloadFunction)(theEnv,execStatus);
                found = TRUE;
               }
             break;
@@ -314,31 +314,31 @@ globle int EnvBload(
    /* Close the file. */
    /*=================*/
 
-   GenCloseBinary(theEnv);
+   GenCloseBinary(theEnv,execStatus);
 
    /*========================================*/
    /* Free up temporary storage used for the */
    /* function and atomic value information. */
    /*========================================*/
 
-   if (BloadData(theEnv)->FunctionArray != NULL)
+   if (BloadData(theEnv,execStatus)->FunctionArray != NULL)
      {
-      genfree(theEnv,execStatus,(void *) BloadData(theEnv)->FunctionArray,
+      genfree(theEnv,execStatus,(void *) BloadData(theEnv,execStatus)->FunctionArray,
               sizeof(struct FunctionDefinition *) * numberOfFunctions);
      }
-   FreeAtomicValueStorage(theEnv);
+   FreeAtomicValueStorage(theEnv,execStatus);
 
    /*==================================*/
    /* Call the list of functions to be */
    /* executed after a bload occurs.   */
    /*==================================*/
 
-   for (bfPtr = BloadData(theEnv)->AfterBloadFunctions;
+   for (bfPtr = BloadData(theEnv,execStatus)->AfterBloadFunctions;
         bfPtr != NULL;
         bfPtr = bfPtr->next)
      {       
       if (bfPtr->environmentAware)
-        { (*bfPtr->func)(theEnv); }
+        { (*bfPtr->func)(theEnv,execStatus); }
       else            
         { (* (void (*)(void)) bfPtr->func)(); }
      }
@@ -348,7 +348,7 @@ globle int EnvBload(
    /* load when a clear command is issued.  */
    /*=======================================*/
 
-   BloadData(theEnv)->BloadActive = TRUE;
+   BloadData(theEnv,execStatus)->BloadActive = TRUE;
    EnvAddClearFunction(theEnv,execStatus,"bload",(void (*)(void *)) ClearBload,10000);
 
    /*=============================*/
@@ -380,13 +380,13 @@ globle void BloadandRefresh(
   EXEC_STATUS,
   long objcnt,
   size_t objsz,
-  void (*objupdate)(void *,void *,long))
+  void (*objupdate)(void *,EXEC_STATUS,void *,long))
   {
    register long i,bi;
    char *buf;
    long objsmaxread,objsread;
    size_t space;
-   int (*oldOutOfMemoryFunction)(void *,size_t);
+   int (*oldOutOfMemoryFunction)(void *,EXEC_STATUS,size_t);
 
    if (objcnt == 0L) return;
 
@@ -534,7 +534,7 @@ static struct FunctionDefinition *FastFindFunction(
    /* Get the function list. */
    /*========================*/
 
-   theList = GetFunctionList(theEnv);
+   theList = GetFunctionList(theEnv,execStatus);
    if (theList == NULL) { return(NULL); }
 
    /*=======================================*/
@@ -576,7 +576,7 @@ globle intBool Bloaded(
   void *theEnv,
   EXEC_STATUS)
   {
-   return(BloadData(theEnv)->BloadActive);
+   return(BloadData(theEnv,execStatus)->BloadActive);
   }
 
 /*************************************/
@@ -596,12 +596,12 @@ static int ClearBload(
    /*=================================================*/
 
    error = FALSE;
-   for (bfPtr = BloadData(theEnv)->ClearBloadReadyFunctions;
+   for (bfPtr = BloadData(theEnv,execStatus)->ClearBloadReadyFunctions;
         bfPtr != NULL;
         bfPtr = bfPtr->next)
      {
       if (bfPtr->environmentAware)
-        { ready = (* ((int (*)(void *)) bfPtr->func))(theEnv); }
+        { ready = (* ((int (*)(void *)) bfPtr->func))(theEnv,execStatus); }
       else            
         { ready = (* ((int (*)(void)) bfPtr->func))(); }
 
@@ -636,28 +636,28 @@ static int ClearBload(
    /* Call bload clear functions. */
    /*=============================*/
 
-   for (biPtr = BsaveData(theEnv)->ListOfBinaryItems;
+   for (biPtr = BsaveData(theEnv,execStatus)->ListOfBinaryItems;
         biPtr != NULL;
         biPtr = biPtr->next)
-     { if (biPtr->clearFunction != NULL) (*biPtr->clearFunction)(theEnv); }
+     { if (biPtr->clearFunction != NULL) (*biPtr->clearFunction)(theEnv,execStatus); }
 
    /*===========================*/
    /* Free bloaded expressions. */
    /*===========================*/
 
-   ClearBloadedExpressions(theEnv);
+   ClearBloadedExpressions(theEnv,execStatus);
 
    /*===========================*/
    /* Free bloaded constraints. */
    /*===========================*/
 
-   ClearBloadedConstraints(theEnv);
+   ClearBloadedConstraints(theEnv,execStatus);
 
    /*==================================*/
    /* Remove the bload clear function. */
    /*==================================*/
 
-   BloadData(theEnv)->BloadActive = FALSE;
+   BloadData(theEnv,execStatus)->BloadActive = FALSE;
    EnvRemoveClearFunction(theEnv,execStatus,"bload");
 
    /*====================================*/
@@ -678,12 +678,12 @@ static void AbortBload(
   {
    struct callFunctionItem *bfPtr;
 
-   for (bfPtr = BloadData(theEnv)->AbortBloadFunctions;
+   for (bfPtr = BloadData(theEnv,execStatus)->AbortBloadFunctions;
         bfPtr != NULL;
         bfPtr = bfPtr->next)
      { 
       if (bfPtr->environmentAware)
-        { (*bfPtr->func)(theEnv); }
+        { (*bfPtr->func)(theEnv,execStatus); }
       else            
         { (* (void (*)(void)) bfPtr->func)(); }
      }
@@ -701,8 +701,8 @@ globle void AddBeforeBloadFunction(
   void (*func)(void *),
   int priority)
   {
-   BloadData(theEnv)->BeforeBloadFunctions =
-     AddFunctionToCallList(theEnv,execStatus,name,priority,func,BloadData(theEnv)->BeforeBloadFunctions,TRUE);
+   BloadData(theEnv,execStatus)->BeforeBloadFunctions =
+     AddFunctionToCallList(theEnv,execStatus,name,priority,func,BloadData(theEnv,execStatus)->BeforeBloadFunctions,TRUE);
   }
 
 /*******************************************/
@@ -717,8 +717,8 @@ globle void AddAfterBloadFunction(
   void (*func)(void *),
   int priority)
   {
-   BloadData(theEnv)->AfterBloadFunctions =
-      AddFunctionToCallList(theEnv,execStatus,name,priority,func,BloadData(theEnv)->AfterBloadFunctions,TRUE);
+   BloadData(theEnv,execStatus)->AfterBloadFunctions =
+      AddFunctionToCallList(theEnv,execStatus,name,priority,func,BloadData(theEnv,execStatus)->AfterBloadFunctions,TRUE);
   }
 
 /**************************************************/
@@ -733,10 +733,10 @@ globle void AddClearBloadReadyFunction(
   int (*func)(void *),
   int priority)
   {
-   BloadData(theEnv)->ClearBloadReadyFunctions =
+   BloadData(theEnv,execStatus)->ClearBloadReadyFunctions =
       AddFunctionToCallList(theEnv,execStatus,name,priority,
                             (void (*)(void *)) func,
-                            BloadData(theEnv)->ClearBloadReadyFunctions,TRUE);
+                            BloadData(theEnv,execStatus)->ClearBloadReadyFunctions,TRUE);
   }
 
 /*********************************************/
@@ -751,7 +751,7 @@ globle void AddAbortBloadFunction(
   void (*func)(void *),
   int priority)
   {
-   BloadData(theEnv)->AbortBloadFunctions = AddFunctionToCallList(theEnv,execStatus,name,priority,func,BloadData(theEnv)->AbortBloadFunctions,TRUE);
+   BloadData(theEnv,execStatus)->AbortBloadFunctions = AddFunctionToCallList(theEnv,execStatus,name,priority,func,BloadData(theEnv,execStatus)->AbortBloadFunctions,TRUE);
   }
 
 /*******************************************************
@@ -814,7 +814,7 @@ globle int BloadCommand(
    if (fileName != NULL) return(EnvBload(theEnv,execStatus,fileName));
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 #endif
    return(FALSE);

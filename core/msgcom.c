@@ -78,27 +78,27 @@
    ***************************************** */
 
 #if ! RUN_TIME
-static void CreateSystemHandlers(void *);
+static void CreateSystemHandlers(void *,EXEC_STATUS);
 #endif
 
 #if (! BLOAD_ONLY) && (! RUN_TIME)
-static int WildDeleteHandler(void *,DEFCLASS *,SYMBOL_HN *,char *);
+static int WildDeleteHandler(void *,EXEC_STATUS,DEFCLASS *,SYMBOL_HN *,char *);
 #endif
 
 #if DEBUGGING_FUNCTIONS
-static unsigned DefmessageHandlerWatchAccess(void *,int,unsigned,EXPRESSION *);
-static unsigned DefmessageHandlerWatchPrint(void *,char *,int,EXPRESSION *);
-static unsigned DefmessageHandlerWatchSupport(void *,char *,char *,int,
-                                              void (*)(void *,char *,void *,int),
-                                              void (*)(void *,int,void *,int),
+static unsigned DefmessageHandlerWatchAccess(void *,EXEC_STATUS,int,unsigned,EXPRESSION *);
+static unsigned DefmessageHandlerWatchPrint(void *,EXEC_STATUS,char *,int,EXPRESSION *);
+static unsigned DefmessageHandlerWatchSupport(void *,EXEC_STATUS,char *,char *,int,
+                                              void (*)(void *,EXEC_STATUS,char *,void *,int),
+                                              void (*)(void *,EXEC_STATUS,int,void *,int),
                                               EXPRESSION *);
-static unsigned WatchClassHandlers(void *,void *,char *,int,char *,int,int,
-                                  void (*)(void *,char *,void *,int),
-                                  void (*)(void *,int,void *,int));
-static void PrintHandlerWatchFlag(void *,char *,void *,int);
+static unsigned WatchClassHandlers(void *,EXEC_STATUS,void *,char *,int,char *,int,int,
+                                  void (*)(void *,EXEC_STATUS,char *,void *,int),
+                                  void (*)(void *,EXEC_STATUS,int,void *,int));
+static void PrintHandlerWatchFlag(void *,EXEC_STATUS,char *,void *,int);
 #endif
 
-static void DeallocateMessageHandlerData(void *);
+static void DeallocateMessageHandlerData(void *,EXEC_STATUS);
   
 /* =========================================
    *****************************************
@@ -137,32 +137,32 @@ globle void SetupMessageHandlers(
                                         NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL };
 
    AllocateEnvironmentData(theEnv,execStatus,MESSAGE_HANDLER_DATA,sizeof(struct messageHandlerData),DeallocateMessageHandlerData);
-   memcpy(&MessageHandlerData(theEnv)->HandlerGetInfo,&handlerGetInfo,sizeof(struct entityRecord));   
-   memcpy(&MessageHandlerData(theEnv)->HandlerPutInfo,&handlerPutInfo,sizeof(struct entityRecord));   
+   memcpy(&MessageHandlerData(theEnv,execStatus)->HandlerGetInfo,&handlerGetInfo,sizeof(struct entityRecord));   
+   memcpy(&MessageHandlerData(theEnv,execStatus)->HandlerPutInfo,&handlerPutInfo,sizeof(struct entityRecord));   
 
-   MessageHandlerData(theEnv)->hndquals[0] = "around";
-   MessageHandlerData(theEnv)->hndquals[1] = "before";
-   MessageHandlerData(theEnv)->hndquals[2] = "primary";
-   MessageHandlerData(theEnv)->hndquals[3] = "after";
+   MessageHandlerData(theEnv,execStatus)->hndquals[0] = "around";
+   MessageHandlerData(theEnv,execStatus)->hndquals[1] = "before";
+   MessageHandlerData(theEnv,execStatus)->hndquals[2] = "primary";
+   MessageHandlerData(theEnv,execStatus)->hndquals[3] = "after";
 
-   InstallPrimitive(theEnv,execStatus,&MessageHandlerData(theEnv)->HandlerGetInfo,HANDLER_GET);
-   InstallPrimitive(theEnv,execStatus,&MessageHandlerData(theEnv)->HandlerPutInfo,HANDLER_PUT);
+   InstallPrimitive(theEnv,execStatus,&MessageHandlerData(theEnv,execStatus)->HandlerGetInfo,HANDLER_GET);
+   InstallPrimitive(theEnv,execStatus,&MessageHandlerData(theEnv,execStatus)->HandlerPutInfo,HANDLER_PUT);
 
 #if ! RUN_TIME
-   MessageHandlerData(theEnv)->INIT_SYMBOL = (SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,INIT_STRING);
-   IncrementSymbolCount(MessageHandlerData(theEnv)->INIT_SYMBOL);
+   MessageHandlerData(theEnv,execStatus)->INIT_SYMBOL = (SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,INIT_STRING);
+   IncrementSymbolCount(MessageHandlerData(theEnv,execStatus)->INIT_SYMBOL);
 
-   MessageHandlerData(theEnv)->DELETE_SYMBOL = (SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,DELETE_STRING);
-   IncrementSymbolCount(MessageHandlerData(theEnv)->DELETE_SYMBOL);
+   MessageHandlerData(theEnv,execStatus)->DELETE_SYMBOL = (SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,DELETE_STRING);
+   IncrementSymbolCount(MessageHandlerData(theEnv,execStatus)->DELETE_SYMBOL);
    
-   MessageHandlerData(theEnv)->CREATE_SYMBOL = (SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,CREATE_STRING);
-   IncrementSymbolCount(MessageHandlerData(theEnv)->CREATE_SYMBOL);
+   MessageHandlerData(theEnv,execStatus)->CREATE_SYMBOL = (SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,CREATE_STRING);
+   IncrementSymbolCount(MessageHandlerData(theEnv,execStatus)->CREATE_SYMBOL);
    
    EnvAddClearFunction(theEnv,execStatus,"defclass",CreateSystemHandlers,-100);
 
 #if ! BLOAD_ONLY
-   MessageHandlerData(theEnv)->SELF_SYMBOL = (SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,SELF_STRING);
-   IncrementSymbolCount(MessageHandlerData(theEnv)->SELF_SYMBOL);
+   MessageHandlerData(theEnv,execStatus)->SELF_SYMBOL = (SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,SELF_STRING);
+   IncrementSymbolCount(MessageHandlerData(theEnv,execStatus)->SELF_SYMBOL);
 
    AddConstruct(theEnv,execStatus,"defmessage-handler","defmessage-handlers",
                 ParseDefmessageHandler,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
@@ -198,8 +198,8 @@ globle void SetupMessageHandlers(
 #endif
 
 #if DEBUGGING_FUNCTIONS
-   AddWatchItem(theEnv,execStatus,"messages",0,&MessageHandlerData(theEnv)->WatchMessages,36,NULL,NULL);
-   AddWatchItem(theEnv,execStatus,"message-handlers",0,&MessageHandlerData(theEnv)->WatchHandlers,35,
+   AddWatchItem(theEnv,execStatus,"messages",0,&MessageHandlerData(theEnv,execStatus)->WatchMessages,36,NULL,NULL);
+   AddWatchItem(theEnv,execStatus,"message-handlers",0,&MessageHandlerData(theEnv,execStatus)->WatchHandlers,35,
                 DefmessageHandlerWatchAccess,DefmessageHandlerWatchPrint);
 #endif
   }
@@ -214,7 +214,7 @@ static void DeallocateMessageHandlerData(
   {
    HANDLER_LINK *tmp, *mhead, *chead;
     
-   mhead = MessageHandlerData(theEnv)->TopOfCore;
+   mhead = MessageHandlerData(theEnv,execStatus)->TopOfCore;
    while (mhead != NULL)
      { 
       tmp = mhead;
@@ -222,7 +222,7 @@ static void DeallocateMessageHandlerData(
       rtn_struct(theEnv,execStatus,messageHandlerLink,tmp);
      }
      
-   chead = MessageHandlerData(theEnv)->OldCore;
+   chead = MessageHandlerData(theEnv,execStatus)->OldCore;
    while (chead != NULL)
      { 
       mhead = chead;
@@ -257,7 +257,7 @@ char *EnvGetDefmessageHandlerName(
   int theIndex)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 
    return(ValueToString(((DEFCLASS *) ptr)->handlers[theIndex-1].name));
@@ -279,7 +279,7 @@ globle char *EnvGetDefmessageHandlerType(
   void *ptr,
   int theIndex)
   {
-   return(MessageHandlerData(theEnv)->hndquals[((DEFCLASS *) ptr)->handlers[theIndex-1].type]);
+   return(MessageHandlerData(theEnv,execStatus)->hndquals[((DEFCLASS *) ptr)->handlers[theIndex-1].type]);
   }
 
 /**************************************************************
@@ -304,7 +304,7 @@ globle int EnvGetNextDefmessageHandler(
   {
    DEFCLASS *cls;
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 
    cls = (DEFCLASS *) ptr;
@@ -355,7 +355,7 @@ globle unsigned EnvGetDefmessageHandlerWatch(
   int theIndex)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 
    return(((DEFCLASS *) theClass)->handlers[theIndex-1].trace);
@@ -384,7 +384,7 @@ globle void EnvSetDefmessageHandlerWatch(
   int theIndex)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 
    ((DEFCLASS *) theClass)->handlers[theIndex-1].trace = newState;
@@ -446,7 +446,7 @@ globle int EnvIsDefmessageHandlerDeletable(
   {
    DEFCLASS *cls;
 
-   if (! ConstructsDeletable(theEnv))
+   if (! ConstructsDeletable(theEnv,execStatus))
      { return FALSE; }
 
    cls = (DEFCLASS *) ptr;
@@ -482,7 +482,7 @@ globle void UndefmessageHandlerCommand(
    DEFCLASS *cls;
 
 #if BLOAD || BLOAD_AND_BSAVE
-   if (Bloaded(theEnv))
+   if (Bloaded(theEnv,execStatus))
      {
       PrintErrorID(theEnv,execStatus,"MSGCOM",3,FALSE);
       EnvPrintRouter(theEnv,execStatus,WERROR,"Unable to delete message-handlers.\n");
@@ -500,7 +500,7 @@ globle void UndefmessageHandlerCommand(
    if (EnvArgTypeCheck(theEnv,execStatus,"undefmessage-handler",2,SYMBOL,&tmp) == FALSE)
      return;
    mname = (SYMBOL_HN *) tmp.value;
-   if (EnvRtnArgCount(theEnv) == 3)
+   if (EnvRtnArgCount(theEnv,execStatus) == 3)
      {
       if (EnvArgTypeCheck(theEnv,execStatus,"undefmessage-handler",3,SYMBOL,&tmp) == FALSE)
         return;
@@ -509,7 +509,7 @@ globle void UndefmessageHandlerCommand(
         tname = NULL;
      }
    else
-     tname = MessageHandlerData(theEnv)->hndquals[MPRIMARY];
+     tname = MessageHandlerData(theEnv,execStatus)->hndquals[MPRIMARY];
    WildDeleteHandler(theEnv,execStatus,cls,mname,tname);
 #endif
   }
@@ -542,7 +542,7 @@ globle int EnvUndefmessageHandler(
    DEFCLASS *cls;
 
 #if BLOAD || BLOAD_AND_BSAVE
-   if (Bloaded(theEnv))
+   if (Bloaded(theEnv,execStatus))
      {
       PrintErrorID(theEnv,execStatus,"MSGCOM",3,FALSE);
       EnvPrintRouter(theEnv,execStatus,WERROR,"Unable to delete message-handlers.\n");
@@ -600,14 +600,14 @@ globle void PPDefmessageHandlerCommand(
    if (EnvArgTypeCheck(theEnv,execStatus,"ppdefmessage-handler",2,SYMBOL,&temp) == FALSE)
      return;
    msym = FindSymbolHN(theEnv,execStatus,DOToString(temp));
-   if (EnvRtnArgCount(theEnv) == 3)
+   if (EnvRtnArgCount(theEnv,execStatus) == 3)
      {
       if (EnvArgTypeCheck(theEnv,execStatus,"ppdefmessage-handler",3,SYMBOL,&temp) == FALSE)
         return;
       tname = DOToString(temp);
      }
    else
-     tname = MessageHandlerData(theEnv)->hndquals[MPRIMARY];
+     tname = MessageHandlerData(theEnv,execStatus)->hndquals[MPRIMARY];
    mtype = HandlerType(theEnv,execStatus,"ppdefmessage-handler",tname);
    if (mtype == MERROR)
      {
@@ -650,7 +650,7 @@ globle void ListDefmessageHandlersCommand(
    int inhp;
    void *clsptr;
 
-   if (EnvRtnArgCount(theEnv) == 0)
+   if (EnvRtnArgCount(theEnv,execStatus) == 0)
      EnvListDefmessageHandlers(theEnv,execStatus,WDISPLAY,NULL,0);
    else
      {
@@ -713,7 +713,7 @@ globle char *EnvGetDefmessageHandlerPPForm(
   int theIndex)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 
    return(((DEFCLASS *) ptr)->handlers[theIndex-1].ppForm);
@@ -1004,8 +1004,8 @@ static unsigned DefmessageHandlerWatchSupport(
   char *funcName,
   char *logName,
   int newState,
-  void (*printFunc)(void *,char *,void *,int),
-  void (*traceFunc)(void *,int,void *,int),
+  void (*printFunc)(void *,EXEC_STATUS,char *,void *,int),
+  void (*traceFunc)(void *,EXEC_STATUS,int,void *,int),
   EXPRESSION *argExprs)
   {
    struct defmodule *theModule;
@@ -1022,7 +1022,7 @@ static unsigned DefmessageHandlerWatchSupport(
       =============================== */
    if (argExprs == NULL)
      {
-      SaveCurrentModule(theEnv);
+      SaveCurrentModule(theEnv,execStatus);
       theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,NULL);
       while (theModule != NULL)
         {
@@ -1042,7 +1042,7 @@ static unsigned DefmessageHandlerWatchSupport(
             }
           theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,(void *) theModule);
          }
-      RestoreCurrentModule(theEnv);
+      RestoreCurrentModule(theEnv,execStatus);
       return(TRUE);
      }
 
@@ -1135,8 +1135,8 @@ static unsigned WatchClassHandlers(
   char *logName,
   int newState,
   int indentp,
-  void (*printFunc)(void *,char *,void *,int),
-  void (*traceFunc)(void *,int,void *,int))
+  void (*printFunc)(void *,EXEC_STATUS,char *,void *,int),
+  void (*traceFunc)(void *,EXEC_STATUS,int,void *,int))
   {
    unsigned theHandler;
    int found = FALSE;

@@ -70,10 +70,10 @@
 /***************************************/
 
 #if ! DEFFACTS_CONSTRUCT
-   static void                    ResetDeftemplates(void *);
+   static void                    ResetDeftemplates(void *,EXEC_STATUS);
 #endif
-   static void                    ClearDeftemplates(void *);
-   static void                    SaveDeftemplates(void *,void *,char *);
+   static void                    ClearDeftemplates(void *,EXEC_STATUS);
+   static void                    SaveDeftemplates(void *,EXEC_STATUS,void *,char *);
 
 /*********************************************************************/
 /* DeftemplateBasicCommands: Initializes basic deftemplate commands. */
@@ -99,11 +99,11 @@ globle void DeftemplateBasicCommands(
 #endif
 
 #if (BLOAD || BLOAD_ONLY || BLOAD_AND_BSAVE)
-   DeftemplateBinarySetup(theEnv);
+   DeftemplateBinarySetup(theEnv,execStatus);
 #endif
 
 #if CONSTRUCT_COMPILER && (! RUN_TIME)
-   DeftemplateCompilerSetup(theEnv);
+   DeftemplateCompilerSetup(theEnv,execStatus);
 #endif
 
 #endif
@@ -142,7 +142,7 @@ static void ClearDeftemplates(
    CreateImpliedDeftemplate(theEnv,execStatus,(SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,"initial-fact"),FALSE);
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 #endif
   }
@@ -157,7 +157,7 @@ static void SaveDeftemplates(
   void *theModule,
   char *logicalName)
   {   
-   SaveConstruct(theEnv,execStatus,theModule,logicalName,DeftemplateData(theEnv)->DeftemplateConstruct);
+   SaveConstruct(theEnv,execStatus,theModule,logicalName,DeftemplateData(theEnv,execStatus)->DeftemplateConstruct);
   }
 
 /**********************************************/
@@ -168,7 +168,7 @@ globle void UndeftemplateCommand(
   void *theEnv,
   EXEC_STATUS)
   {   
-   UndefconstructCommand(theEnv,execStatus,"undeftemplate",DeftemplateData(theEnv)->DeftemplateConstruct); 
+   UndefconstructCommand(theEnv,execStatus,"undeftemplate",DeftemplateData(theEnv,execStatus)->DeftemplateConstruct); 
   }
 
 /**************************************/
@@ -180,7 +180,7 @@ globle intBool EnvUndeftemplate(
   EXEC_STATUS,
   void *theDeftemplate)
   {   
-   return(Undefconstruct(theEnv,execStatus,theDeftemplate,DeftemplateData(theEnv)->DeftemplateConstruct)); 
+   return(Undefconstruct(theEnv,execStatus,theDeftemplate,DeftemplateData(theEnv,execStatus)->DeftemplateConstruct)); 
   }
 
 /****************************************************/
@@ -192,7 +192,7 @@ globle void GetDeftemplateListFunction(
   EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {   
-   GetConstructListFunction(theEnv,execStatus,"get-deftemplate-list",returnValue,DeftemplateData(theEnv)->DeftemplateConstruct); 
+   GetConstructListFunction(theEnv,execStatus,"get-deftemplate-list",returnValue,DeftemplateData(theEnv,execStatus)->DeftemplateConstruct); 
   }
 
 /***********************************************/
@@ -205,7 +205,7 @@ globle void EnvGetDeftemplateList(
   DATA_OBJECT_PTR returnValue,
   void *theModule)
   {   
-   GetConstructList(theEnv,execStatus,returnValue,DeftemplateData(theEnv)->DeftemplateConstruct,(struct defmodule *) theModule); 
+   GetConstructList(theEnv,execStatus,returnValue,DeftemplateData(theEnv,execStatus)->DeftemplateConstruct,(struct defmodule *) theModule); 
   }
 
 /***************************************************/
@@ -216,7 +216,7 @@ globle void *DeftemplateModuleFunction(
   void *theEnv,
   EXEC_STATUS)
   {   
-   return(GetConstructModuleCommand(theEnv,execStatus,"deftemplate-module",DeftemplateData(theEnv)->DeftemplateConstruct)); 
+   return(GetConstructModuleCommand(theEnv,execStatus,"deftemplate-module",DeftemplateData(theEnv,execStatus)->DeftemplateConstruct)); 
   }
 
 #if DEBUGGING_FUNCTIONS
@@ -229,7 +229,7 @@ globle void PPDeftemplateCommand(
   void *theEnv,
   EXEC_STATUS)
   {   
-   PPConstructCommand(theEnv,execStatus,"ppdeftemplate",DeftemplateData(theEnv)->DeftemplateConstruct); 
+   PPConstructCommand(theEnv,execStatus,"ppdeftemplate",DeftemplateData(theEnv,execStatus)->DeftemplateConstruct); 
   }
 
 /***************************************/
@@ -242,7 +242,7 @@ globle int PPDeftemplate(
   char *deftemplateName,
   char *logicalName)
   {   
-   return(PPConstruct(theEnv,execStatus,deftemplateName,logicalName,DeftemplateData(theEnv)->DeftemplateConstruct)); 
+   return(PPConstruct(theEnv,execStatus,deftemplateName,logicalName,DeftemplateData(theEnv,execStatus)->DeftemplateConstruct)); 
   }
 
 /*************************************************/
@@ -253,7 +253,7 @@ globle void ListDeftemplatesCommand(
   void *theEnv,
   EXEC_STATUS)
   {    
-   ListConstructCommand(theEnv,execStatus,"list-deftemplates",DeftemplateData(theEnv)->DeftemplateConstruct); 
+   ListConstructCommand(theEnv,execStatus,"list-deftemplates",DeftemplateData(theEnv,execStatus)->DeftemplateConstruct); 
   }
 
 /*****************************************/
@@ -266,7 +266,7 @@ globle void EnvListDeftemplates(
   char *logicalName,
   void *theModule)
   {   
-   ListConstruct(theEnv,execStatus,DeftemplateData(theEnv)->DeftemplateConstruct,logicalName,(struct defmodule *) theModule); 
+   ListConstruct(theEnv,execStatus,DeftemplateData(theEnv,execStatus)->DeftemplateConstruct,logicalName,(struct defmodule *) theModule); 
   }
 
 /***********************************************************/
@@ -282,7 +282,7 @@ globle unsigned EnvGetDeftemplateWatch(
   void *theTemplate)
   { 
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 
    return(((struct deftemplate *) theTemplate)->watch); 
@@ -302,7 +302,7 @@ globle void EnvSetDeftemplateWatch(
   void *theTemplate)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 
    ((struct deftemplate *) theTemplate)->watch = newState; 
@@ -326,7 +326,7 @@ globle unsigned DeftemplateWatchAccess(
 #pragma unused(code)
 #endif
 
-   return(ConstructSetWatchAccess(theEnv,execStatus,DeftemplateData(theEnv)->DeftemplateConstruct,newState,argExprs,
+   return(ConstructSetWatchAccess(theEnv,execStatus,DeftemplateData(theEnv,execStatus)->DeftemplateConstruct,newState,argExprs,
                                   EnvGetDeftemplateWatch,EnvSetDeftemplateWatch));
   }
 
@@ -348,7 +348,7 @@ globle unsigned DeftemplateWatchPrint(
 #pragma unused(code)
 #endif
 
-   return(ConstructPrintWatchAccess(theEnv,execStatus,DeftemplateData(theEnv)->DeftemplateConstruct,logName,argExprs,
+   return(ConstructPrintWatchAccess(theEnv,execStatus,DeftemplateData(theEnv,execStatus)->DeftemplateConstruct,logName,argExprs,
                                     EnvGetDeftemplateWatch,EnvSetDeftemplateWatch));
   }
 

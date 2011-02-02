@@ -41,12 +41,12 @@
 #define GetDefmoduleList(a) EnvGetDefmoduleList(GetCurrentEnvironment(),a)
 #define ListDefmodules(a) EnvListDefmodules(GetCurrentEnvironment(),a)
 
-   LOCALE void                           DefmoduleBasicCommands(void *);
-   LOCALE void                           EnvGetDefmoduleList(void *,DATA_OBJECT_PTR);
-   LOCALE void                           PPDefmoduleCommand(void *);
-   LOCALE int                            PPDefmodule(void *,char *,char *);
-   LOCALE void                           ListDefmodulesCommand(void *);
-   LOCALE void                           EnvListDefmodules(void *,char *);
+   LOCALE void                           DefmoduleBasicCommands(void *,EXEC_STATUS);
+   LOCALE void                           EnvGetDefmoduleList(void *,EXEC_STATUS,DATA_OBJECT_PTR);
+   LOCALE void                           PPDefmoduleCommand(void *,EXEC_STATUS);
+   LOCALE int                            PPDefmodule(void *,EXEC_STATUS,char *,char *);
+   LOCALE void                           ListDefmodulesCommand(void *,EXEC_STATUS);
+   LOCALE void                           EnvListDefmodules(void *,EXEC_STATUS,char *);
 
 #endif
 

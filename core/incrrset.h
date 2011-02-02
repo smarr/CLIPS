@@ -43,11 +43,11 @@
 #define GetIncrementalReset() EnvGetIncrementalReset(GetCurrentEnvironment())
 #define SetIncrementalReset(a) EnvSetIncrementalReset(GetCurrentEnvironment(),a)
 
-   LOCALE void                           IncrementalReset(void *,struct defrule *);
-   LOCALE intBool                        EnvGetIncrementalReset(void *);
-   LOCALE intBool                        EnvSetIncrementalReset(void *,intBool);
-   LOCALE int                            GetIncrementalResetCommand(void *);
-   LOCALE int                            SetIncrementalResetCommand(void *);
+   LOCALE void                           IncrementalReset(void *,EXEC_STATUS,struct defrule *);
+   LOCALE intBool                        EnvGetIncrementalReset(void *,EXEC_STATUS);
+   LOCALE intBool                        EnvSetIncrementalReset(void *,EXEC_STATUS,intBool);
+   LOCALE int                            GetIncrementalResetCommand(void *,EXEC_STATUS);
+   LOCALE int                            SetIncrementalResetCommand(void *,EXEC_STATUS);
 
 #endif
 

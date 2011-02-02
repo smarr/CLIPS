@@ -47,7 +47,7 @@ struct commandLineData
 #endif
   };
 
-#define CommandLineData(theEnv) ((struct commandLineData *) GetEnvironmentData(theEnv,execStatus,COMMANDLINE_DATA))
+#define CommandLineData(theEnv,execStatus) ((struct commandLineData *) GetEnvironmentData(theEnv,execStatus,COMMANDLINE_DATA))
 
 #ifdef LOCALE
 #undef LOCALE
@@ -59,32 +59,32 @@ struct commandLineData
 #define LOCALE extern
 #endif
 
-   LOCALE void                           InitializeCommandLineData(void *);
-   LOCALE int                            ExpandCommandString(void *,int);
-   LOCALE void                           FlushCommandString(void *);
-   LOCALE void                           SetCommandString(void *,char *);
-   LOCALE void                           AppendCommandString(void *,char *);
-   LOCALE void                           InsertCommandString(void *,char *,unsigned);
-   LOCALE char                          *GetCommandString(void *);
+   LOCALE void                           InitializeCommandLineData(void *,EXEC_STATUS);
+   LOCALE int                            ExpandCommandString(void *,EXEC_STATUS,int);
+   LOCALE void                           FlushCommandString(void *,EXEC_STATUS);
+   LOCALE void                           SetCommandString(void *,EXEC_STATUS,char *);
+   LOCALE void                           AppendCommandString(void *,EXEC_STATUS,char *);
+   LOCALE void                           InsertCommandString(void *,EXEC_STATUS,char *,unsigned);
+   LOCALE char                          *GetCommandString(void *,EXEC_STATUS);
    LOCALE int                            CompleteCommand(char *);
    LOCALE void                           CommandLoop(void *,EXEC_STATUS);
    LOCALE void                           CommandLoopBatch(void *,EXEC_STATUS);
    LOCALE void                           CommandLoopBatchDriver(void *,EXEC_STATUS);
-   LOCALE void                           PrintPrompt(void *);
-   LOCALE void                           PrintBanner(void *);
-   LOCALE void                           SetAfterPromptFunction(void *,int (*)(void *));
-   LOCALE void                           SetBeforeCommandExecutionFunction(void *,int (*)(void *));
+   LOCALE void                           PrintPrompt(void *,EXEC_STATUS);
+   LOCALE void                           PrintBanner(void *,EXEC_STATUS);
+   LOCALE void                           SetAfterPromptFunction(void *,EXEC_STATUS,int (*)(void *));
+   LOCALE void                           SetBeforeCommandExecutionFunction(void *,EXEC_STATUS,int (*)(void *));
    LOCALE intBool                        RouteCommand(void *,EXEC_STATUS,char *,int);
-   LOCALE int                          (*SetEventFunction(void *,int (*)(void *)))(void *);
-   LOCALE intBool                        TopLevelCommand(void *);
-   LOCALE void                           AppendNCommandString(void *,char *,unsigned);
-   LOCALE void                           SetNCommandString(void *,char *,unsigned);
-   LOCALE char                          *GetCommandCompletionString(void *,char *,size_t);
+   LOCALE int                          (*SetEventFunction(void *,EXEC_STATUS,int (*)(void *)))(void *);
+   LOCALE intBool                        TopLevelCommand(void *,EXEC_STATUS);
+   LOCALE void                           AppendNCommandString(void *,EXEC_STATUS,char *,unsigned);
+   LOCALE void                           SetNCommandString(void *,EXEC_STATUS,char *,unsigned);
+   LOCALE char                          *GetCommandCompletionString(void *,EXEC_STATUS,char *,size_t);
    LOCALE intBool                        ExecuteIfCommandComplete(void *,EXEC_STATUS);
    LOCALE void                           CommandLoopOnceThenBatch(void *,EXEC_STATUS);
-   LOCALE intBool                        CommandCompleteAndNotEmpty(void *);
-   LOCALE void                           SetHaltCommandLoopBatch(void *,int);
-   LOCALE int                            GetHaltCommandLoopBatch(void *);
+   LOCALE intBool                        CommandCompleteAndNotEmpty(void *,EXEC_STATUS);
+   LOCALE void                           SetHaltCommandLoopBatch(void *,EXEC_STATUS,int);
+   LOCALE int                            GetHaltCommandLoopBatch(void *,EXEC_STATUS);
 
 #endif
 

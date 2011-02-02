@@ -55,23 +55,23 @@ typedef struct saved_contexts
 #define GetSequenceOperatorRecognition() EnvGetSequenceOperatorRecognition(GetCurrentEnvironment())
 #define SetSequenceOperatorRecognition(a) EnvSetSequenceOperatorRecognition(GetCurrentEnvironment(),a)
 
-   LOCALE struct expr                   *Function0Parse(void *,char *);
-   LOCALE struct expr                   *Function1Parse(void *,char *);
-   LOCALE struct expr                   *Function2Parse(void *,char *,char *);
-   LOCALE void                           PushRtnBrkContexts(void *);
-   LOCALE void                           PopRtnBrkContexts(void *);
-   LOCALE intBool                        ReplaceSequenceExpansionOps(void *,struct expr *,struct expr *,
+   LOCALE struct expr                   *Function0Parse(void *,EXEC_STATUS,char *);
+   LOCALE struct expr                   *Function1Parse(void *,EXEC_STATUS,char *);
+   LOCALE struct expr                   *Function2Parse(void *,EXEC_STATUS,char *,char *);
+   LOCALE void                           PushRtnBrkContexts(void *,EXEC_STATUS);
+   LOCALE void                           PopRtnBrkContexts(void *,EXEC_STATUS);
+   LOCALE intBool                        ReplaceSequenceExpansionOps(void *,EXEC_STATUS,struct expr *,struct expr *,
                                                                      void *,void *);
-   LOCALE struct expr                   *CollectArguments(void *,struct expr *,char *);
-   LOCALE struct expr                   *ArgumentParse(void *,char *,int *);
-   LOCALE struct expr                   *ParseAtomOrExpression(void *,char *,struct token *);
-   LOCALE EXPRESSION                    *ParseConstantArguments(void *,char *,int *);
-   LOCALE intBool                        EnvSetSequenceOperatorRecognition(void *,int);
-   LOCALE intBool                        EnvGetSequenceOperatorRecognition(void *);
-   LOCALE struct expr                   *GroupActions(void *,char *,struct token *,int,char *,int);
-   LOCALE struct expr                   *RemoveUnneededProgn(void *,struct expr *);
+   LOCALE struct expr                   *CollectArguments(void *,EXEC_STATUS,struct expr *,char *);
+   LOCALE struct expr                   *ArgumentParse(void *,EXEC_STATUS,char *,int *);
+   LOCALE struct expr                   *ParseAtomOrExpression(void *,EXEC_STATUS,char *,struct token *);
+   LOCALE EXPRESSION                    *ParseConstantArguments(void *,EXEC_STATUS,char *,int *);
+   LOCALE intBool                        EnvSetSequenceOperatorRecognition(void *,EXEC_STATUS,int);
+   LOCALE intBool                        EnvGetSequenceOperatorRecognition(void *,EXEC_STATUS);
+   LOCALE struct expr                   *GroupActions(void *,EXEC_STATUS,char *,struct token *,int,char *,int);
+   LOCALE struct expr                   *RemoveUnneededProgn(void *,EXEC_STATUS,struct expr *);
 #if (! RUN_TIME)
-   LOCALE int                     CheckExpressionAgainstRestrictions(void *,struct expr *,char *,char *);
+   LOCALE int                     CheckExpressionAgainstRestrictions(void *,EXEC_STATUS,struct expr *,char *,char *);
 #endif
 
 #endif

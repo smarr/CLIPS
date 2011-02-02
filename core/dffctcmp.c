@@ -39,12 +39,12 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static int                     ConstructToCode(void *,char *,char *,char *,int,FILE *,int,int);
-   static void                    DeffactsToCode(void *,FILE *,struct deffacts *,
+   static int                     ConstructToCode(void *,EXEC_STATUS,char *,char *,char *,int,FILE *,int,int);
+   static void                    DeffactsToCode(void *,EXEC_STATUS,FILE *,struct deffacts *,
                                                  int,int,int);
-   static void                    DeffactsModuleToCode(void *,FILE *,struct defmodule *,int,int,int);
-   static void                    CloseDeffactsFiles(void *,FILE *,FILE *,int);
-   static void                    BeforeDeffactsToCode(void *);
+   static void                    DeffactsModuleToCode(void *,EXEC_STATUS,FILE *,struct defmodule *,int,int,int);
+   static void                    CloseDeffactsFiles(void *,EXEC_STATUS,FILE *,FILE *,int);
+   static void                    BeforeDeffactsToCode(void *,EXEC_STATUS);
 
 /*************************************************************/
 /* DeffactsCompilerSetup: Initializes the deffacts construct */
@@ -54,7 +54,7 @@ globle void DeffactsCompilerSetup(
   void *theEnv,
   EXEC_STATUS)
   {
-   DeffactsData(theEnv)->DeffactsCodeItem = 
+   DeffactsData(theEnv,execStatus)->DeffactsCodeItem = 
       AddCodeGeneratorItem(theEnv,execStatus,"deffacts",0,BeforeDeffactsToCode,
                            NULL,ConstructToCode,2);
   }
@@ -68,7 +68,7 @@ static void BeforeDeffactsToCode(
   void *theEnv,
   EXEC_STATUS)
   {
-   MarkConstructBsaveIDs(theEnv,execStatus,DeffactsData(theEnv)->DeffactsModuleIndex);
+   MarkConstructBsaveIDs(theEnv,execStatus,DeffactsData(theEnv,execStatus)->DeffactsModuleIndex);
   }
 
 /**********************************************************/
@@ -112,7 +112,7 @@ static int ConstructToCode(
 
       moduleFile = OpenFileIfNeeded(theEnv,execStatus,moduleFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
                                     moduleArrayVersion,headerFP,
-                                    "struct deffactsModule",ModulePrefix(DeffactsData(theEnv)->DeffactsCodeItem),
+                                    "struct deffactsModule",ModulePrefix(DeffactsData(theEnv,execStatus)->DeffactsCodeItem),
                                     FALSE,NULL);
 
       if (moduleFile == NULL)
@@ -135,7 +135,7 @@ static int ConstructToCode(
         {
          deffactsFile = OpenFileIfNeeded(theEnv,execStatus,deffactsFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
                                          deffactsArrayVersion,headerFP,
-                                         "struct deffacts",ConstructPrefix(DeffactsData(theEnv)->DeffactsCodeItem),
+                                         "struct deffacts",ConstructPrefix(DeffactsData(theEnv,execStatus)->DeffactsCodeItem),
                                          FALSE,NULL);
          if (deffactsFile == NULL)
            {
@@ -209,8 +209,8 @@ static void DeffactsModuleToCode(
    fprintf(theFile,"{");
 
    ConstructModuleToCode(theEnv,execStatus,theFile,theModule,imageID,maxIndices,
-                                  DeffactsData(theEnv)->DeffactsModuleIndex,
-                                  ConstructPrefix(DeffactsData(theEnv)->DeffactsCodeItem));
+                                  DeffactsData(theEnv,execStatus)->DeffactsModuleIndex,
+                                  ConstructPrefix(DeffactsData(theEnv,execStatus)->DeffactsCodeItem));
 
    fprintf(theFile,"}");
   }
@@ -235,8 +235,8 @@ static void DeffactsToCode(
    fprintf(theFile,"{");
 
    ConstructHeaderToCode(theEnv,execStatus,theFile,&theDeffacts->header,imageID,maxIndices,
-                         moduleCount,ModulePrefix(DeffactsData(theEnv)->DeffactsCodeItem),
-                         ConstructPrefix(DeffactsData(theEnv)->DeffactsCodeItem));
+                         moduleCount,ModulePrefix(DeffactsData(theEnv,execStatus)->DeffactsCodeItem),
+                         ConstructPrefix(DeffactsData(theEnv,execStatus)->DeffactsCodeItem));
 
    fprintf(theFile,",");
 
@@ -261,7 +261,7 @@ globle void DeffactsCModuleReference(
   int maxIndices)
   {
    fprintf(theFile,"MIHS &%s%d_%d[%d]",
-                      ModulePrefix(DeffactsData(theEnv)->DeffactsCodeItem),
+                      ModulePrefix(DeffactsData(theEnv,execStatus)->DeffactsCodeItem),
                       imageID,
                       (count / maxIndices) + 1,
                       (count % maxIndices));

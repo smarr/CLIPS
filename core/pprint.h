@@ -36,7 +36,7 @@ struct prettyPrintData
    char *PrettyPrintBuffer;
   };
 
-#define PrettyPrintData(theEnv) ((struct prettyPrintData *) GetEnvironmentData(theEnv,execStatus,PRETTY_PRINT_DATA))
+#define PrettyPrintData(theEnv,execStatus) ((struct prettyPrintData *) GetEnvironmentData(theEnv,execStatus,PRETTY_PRINT_DATA))
 
 #ifdef LOCALE
 #undef LOCALE
@@ -48,21 +48,21 @@ struct prettyPrintData
 #define LOCALE extern
 #endif
 
-   LOCALE void                           InitializePrettyPrintData(void *);
-   LOCALE void                           FlushPPBuffer(void *);
-   LOCALE void                           DestroyPPBuffer(void *);
-   LOCALE void                           SavePPBuffer(void *,char *);
-   LOCALE void                           PPBackup(void *);
-   LOCALE char                          *CopyPPBuffer(void *);
-   LOCALE char                          *GetPPBuffer(void *);
-   LOCALE void                           PPCRAndIndent(void *);
-   LOCALE void                           IncrementIndentDepth(void *,int);
-   LOCALE void                           DecrementIndentDepth(void *,int);
-   LOCALE void                           SetIndentDepth(void *,int);
-   LOCALE void                           SetPPBufferStatus(void *,int);
-   LOCALE int                            GetPPBufferStatus(void *);
-   LOCALE int                            SetPPBufferEnabled(void *,int);
-   LOCALE int                            GetPPBufferEnabled(void *);
+   LOCALE void                           InitializePrettyPrintData(void *,EXEC_STATUS);
+   LOCALE void                           FlushPPBuffer(void *,EXEC_STATUS);
+   LOCALE void                           DestroyPPBuffer(void *,EXEC_STATUS);
+   LOCALE void                           SavePPBuffer(void *,EXEC_STATUS,char *);
+   LOCALE void                           PPBackup(void *,EXEC_STATUS);
+   LOCALE char                          *CopyPPBuffer(void *,EXEC_STATUS);
+   LOCALE char                          *GetPPBuffer(void *,EXEC_STATUS);
+   LOCALE void                           PPCRAndIndent(void *,EXEC_STATUS);
+   LOCALE void                           IncrementIndentDepth(void *,EXEC_STATUS,int);
+   LOCALE void                           DecrementIndentDepth(void *,EXEC_STATUS,int);
+   LOCALE void                           SetIndentDepth(void *,EXEC_STATUS,int);
+   LOCALE void                           SetPPBufferStatus(void *,EXEC_STATUS,int);
+   LOCALE int                            GetPPBufferStatus(void *,EXEC_STATUS);
+   LOCALE int                            SetPPBufferEnabled(void *,EXEC_STATUS,int);
+   LOCALE int                            GetPPBufferEnabled(void *,EXEC_STATUS);
 
 #endif
 

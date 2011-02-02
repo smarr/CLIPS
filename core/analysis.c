@@ -56,21 +56,21 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static int                     GetVariables(void *,struct lhsParseNode *);
-   static intBool                 UnboundVariablesInPattern(void *,struct lhsParseNode *,int);
-   static int                     PropagateVariableToNodes(void *,
+   static int                     GetVariables(void *,EXEC_STATUS,struct lhsParseNode *);
+   static intBool                 UnboundVariablesInPattern(void *,EXEC_STATUS,struct lhsParseNode *,int);
+   static int                     PropagateVariableToNodes(void *,EXEC_STATUS,
                                                            struct lhsParseNode *,
                                                            int,
                                                            struct symbolHashNode *,
                                                            struct lhsParseNode *,
                                                            int,int,int);
-   static struct lhsParseNode    *CheckExpression(void *,
+   static struct lhsParseNode    *CheckExpression(void *,EXEC_STATUS,
                                                   struct lhsParseNode *,
                                                   struct lhsParseNode *,
                                                   int,
                                                   struct symbolHashNode *,
                                                   int);
-   static void                    VariableReferenceErrorMessage(void *,
+   static void                    VariableReferenceErrorMessage(void *,EXEC_STATUS,
                                                                 struct symbolHashNode *,
                                                                 struct lhsParseNode *,
                                                                 int,
@@ -81,19 +81,19 @@
                                                struct lhsParseNode *,
                                                struct lhsParseNode *,
                                                struct lhsParseNode *);
-   static int                     ProcessVariable(void *,
+   static int                     ProcessVariable(void *,EXEC_STATUS,
                                                struct lhsParseNode *,
                                                struct lhsParseNode *,
                                                struct lhsParseNode *);
-   static void                    VariableMixingErrorMessage(void *,struct symbolHashNode *);
-   static int                     PropagateVariableDriver(void *,
+   static void                    VariableMixingErrorMessage(void *,EXEC_STATUS,struct symbolHashNode *);
+   static int                     PropagateVariableDriver(void *,EXEC_STATUS,
                                                           struct lhsParseNode *,
                                                           struct lhsParseNode *,
                                                           struct lhsParseNode *,
                                                           int,struct symbolHashNode *,
                                                           struct lhsParseNode *,
                                                           int);
-   static void                    CombineNandExpressions(void *,struct lhsParseNode *);
+   static void                    CombineNandExpressions(void *,EXEC_STATUS,struct lhsParseNode *);
 
 /******************************************************************/
 /* VariableAnalysis: Propagates variables references to other     */
@@ -350,7 +350,7 @@ static int ProcessVariable(
       theType = SF_VARIABLE;
       theVariable = (struct symbolHashNode *) thePattern->value;
       if (thePattern->derivedConstraints) RemoveConstraint(theEnv,execStatus,thePattern->constraints);
-      theConstraints = GetConstraintRecord(theEnv);
+      theConstraints = GetConstraintRecord(theEnv,execStatus);
       thePattern->constraints = theConstraints;
       thePattern->constraints->anyAllowed = FALSE;
       thePattern->constraints->instanceAddressesAllowed = TRUE;
@@ -793,7 +793,7 @@ static intBool UnboundVariablesInPattern(
          else if (((andField->type == INTEGER) || (andField->type == FLOAT) ||
                    (andField->type == SYMBOL) || (andField->type == STRING) ||
                    (andField->type == INSTANCE_NAME)) &&
-                  EnvGetStaticConstraintChecking(theEnv))
+                  EnvGetStaticConstraintChecking(theEnv,execStatus))
            {
             result = ConstraintCheckValue(theEnv,execStatus,andField->type,andField->value,theConstraints);
             if (result != NO_VIOLATION)
@@ -850,7 +850,7 @@ static struct lhsParseNode *CheckExpression(
             return(exprPtr);
            }
          else if ((UnmatchableConstraint(exprPtr->constraints)) &&
-                  EnvGetStaticConstraintChecking(theEnv))
+                  EnvGetStaticConstraintChecking(theEnv,execStatus))
            {
             ConstraintReferenceErrorMessage(theEnv,execStatus,(SYMBOL_HN *) exprPtr->value,lastOne,i,
                                             whichCE,slotName,theField);

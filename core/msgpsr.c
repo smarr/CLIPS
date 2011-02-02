@@ -75,11 +75,11 @@
    =========================================
    ***************************************** */
 
-static intBool IsParameterSlotReference(void *,char *);
-static int SlotReferenceVar(void *,EXPRESSION *,void *);
-static int BindSlotReference(void *,EXPRESSION *,void *);
-static SLOT_DESC *CheckSlotReference(void *,DEFCLASS *,int,void *,intBool,EXPRESSION *);
-static void GenHandlerSlotReference(void *,EXPRESSION *,unsigned short,SLOT_DESC *);
+static intBool IsParameterSlotReference(void *,EXEC_STATUS,char *);
+static int SlotReferenceVar(void *,EXEC_STATUS,EXPRESSION *,void *);
+static int BindSlotReference(void *,EXEC_STATUS,EXPRESSION *,void *);
+static SLOT_DESC *CheckSlotReference(void *,EXEC_STATUS,DEFCLASS *,int,void *,intBool,EXPRESSION *);
+static void GenHandlerSlotReference(void *,EXEC_STATUS,EXPRESSION *,unsigned short,SLOT_DESC *);
 
 /* =========================================
    *****************************************
@@ -114,18 +114,18 @@ globle int ParseDefmessageHandler(
    HANDLER *hnd;
 
    SetPPBufferStatus(theEnv,execStatus,ON);
-   FlushPPBuffer(theEnv);
+   FlushPPBuffer(theEnv,execStatus);
    SetIndentDepth(theEnv,execStatus,3);
    SavePPBuffer(theEnv,execStatus,"(defmessage-handler ");
 
 #if BLOAD || BLOAD_AND_BSAVE
-   if ((Bloaded(theEnv)) && (! ConstructData(theEnv)->CheckSyntaxMode))
+   if ((Bloaded(theEnv,execStatus)) && (! ConstructData(theEnv,execStatus)->CheckSyntaxMode))
      {
       CannotLoadWithBloadMessage(theEnv,execStatus,"defmessage-handler");
       return(TRUE);
      }
 #endif
-   cname = GetConstructNameAndComment(theEnv,execStatus,readSource,&DefclassData(theEnv)->ObjectParseToken,"defmessage-handler",
+   cname = GetConstructNameAndComment(theEnv,execStatus,readSource,&DefclassData(theEnv,execStatus)->ObjectParseToken,"defmessage-handler",
                                       NULL,NULL,"~",TRUE,FALSE,TRUE);
    if (cname == NULL)
      return(TRUE);
@@ -136,9 +136,9 @@ globle int ParseDefmessageHandler(
       EnvPrintRouter(theEnv,execStatus,WERROR,"A class must be defined before its message-handlers.\n");
       return(TRUE);
      }
-   if ((cls == DefclassData(theEnv)->PrimitiveClassMap[INSTANCE_NAME]) ||
-       (cls == DefclassData(theEnv)->PrimitiveClassMap[INSTANCE_ADDRESS]) ||
-       (cls == DefclassData(theEnv)->PrimitiveClassMap[INSTANCE_NAME]->directSuperclasses.classArray[0]))
+   if ((cls == DefclassData(theEnv,execStatus)->PrimitiveClassMap[INSTANCE_NAME]) ||
+       (cls == DefclassData(theEnv,execStatus)->PrimitiveClassMap[INSTANCE_ADDRESS]) ||
+       (cls == DefclassData(theEnv,execStatus)->PrimitiveClassMap[INSTANCE_NAME]->directSuperclasses.classArray[0]))
      {
       PrintErrorID(theEnv,execStatus,"MSGPSR",8,FALSE);
       EnvPrintRouter(theEnv,execStatus,WERROR,"Message-handlers cannot be attached to the class ");
@@ -153,57 +153,57 @@ globle int ParseDefmessageHandler(
       EnvPrintRouter(theEnv,execStatus,WERROR,"  other message-handlers for the same class.\n");
       return(TRUE);
      }
-   if (GetType(DefclassData(theEnv)->ObjectParseToken) != SYMBOL)
+   if (GetType(DefclassData(theEnv,execStatus)->ObjectParseToken) != SYMBOL)
      {
       SyntaxErrorMessage(theEnv,execStatus,"defmessage-handler");
       return(TRUE);
      }
-   PPBackup(theEnv);
-   PPBackup(theEnv);
+   PPBackup(theEnv,execStatus);
+   PPBackup(theEnv,execStatus);
    SavePPBuffer(theEnv,execStatus," ");
-   SavePPBuffer(theEnv,execStatus,DefclassData(theEnv)->ObjectParseToken.printForm);
+   SavePPBuffer(theEnv,execStatus,DefclassData(theEnv,execStatus)->ObjectParseToken.printForm);
    SavePPBuffer(theEnv,execStatus," ");
-   mname = (SYMBOL_HN *) GetValue(DefclassData(theEnv)->ObjectParseToken);
-   GetToken(theEnv,execStatus,readSource,&DefclassData(theEnv)->ObjectParseToken);
-   if (GetType(DefclassData(theEnv)->ObjectParseToken) != LPAREN)
+   mname = (SYMBOL_HN *) GetValue(DefclassData(theEnv,execStatus)->ObjectParseToken);
+   GetToken(theEnv,execStatus,readSource,&DefclassData(theEnv,execStatus)->ObjectParseToken);
+   if (GetType(DefclassData(theEnv,execStatus)->ObjectParseToken) != LPAREN)
      {
       SavePPBuffer(theEnv,execStatus," ");
-      if (GetType(DefclassData(theEnv)->ObjectParseToken) != STRING)
+      if (GetType(DefclassData(theEnv,execStatus)->ObjectParseToken) != STRING)
         {
-         if (GetType(DefclassData(theEnv)->ObjectParseToken) != SYMBOL)
+         if (GetType(DefclassData(theEnv,execStatus)->ObjectParseToken) != SYMBOL)
            {
             SyntaxErrorMessage(theEnv,execStatus,"defmessage-handler");
             return(TRUE);
            }
-         mtype = HandlerType(theEnv,execStatus,"defmessage-handler",DOToString(DefclassData(theEnv)->ObjectParseToken));
+         mtype = HandlerType(theEnv,execStatus,"defmessage-handler",DOToString(DefclassData(theEnv,execStatus)->ObjectParseToken));
          if (mtype == MERROR)
            return(TRUE);
 
-         GetToken(theEnv,execStatus,readSource,&DefclassData(theEnv)->ObjectParseToken);
-         if (GetType(DefclassData(theEnv)->ObjectParseToken) == STRING)
+         GetToken(theEnv,execStatus,readSource,&DefclassData(theEnv,execStatus)->ObjectParseToken);
+         if (GetType(DefclassData(theEnv,execStatus)->ObjectParseToken) == STRING)
            {
             SavePPBuffer(theEnv,execStatus," ");
-            GetToken(theEnv,execStatus,readSource,&DefclassData(theEnv)->ObjectParseToken);
+            GetToken(theEnv,execStatus,readSource,&DefclassData(theEnv,execStatus)->ObjectParseToken);
            }
         }
       else
         {
          SavePPBuffer(theEnv,execStatus," ");
-         GetToken(theEnv,execStatus,readSource,&DefclassData(theEnv)->ObjectParseToken);
+         GetToken(theEnv,execStatus,readSource,&DefclassData(theEnv,execStatus)->ObjectParseToken);
         }
      }
-   PPBackup(theEnv);
-   PPBackup(theEnv);
-   PPCRAndIndent(theEnv);
-   SavePPBuffer(theEnv,execStatus,DefclassData(theEnv)->ObjectParseToken.printForm);
+   PPBackup(theEnv,execStatus);
+   PPBackup(theEnv,execStatus);
+   PPCRAndIndent(theEnv,execStatus);
+   SavePPBuffer(theEnv,execStatus,DefclassData(theEnv,execStatus)->ObjectParseToken.printForm);
 
    hnd = FindHandlerByAddress(cls,mname,mtype);
-   if (GetPrintWhileLoading(theEnv) && GetCompilationsWatch(theEnv))
+   if (GetPrintWhileLoading(theEnv,execStatus) && GetCompilationsWatch(theEnv,execStatus))
      {
       EnvPrintRouter(theEnv,execStatus,WDIALOG,"   Handler ");
       EnvPrintRouter(theEnv,execStatus,WDIALOG,ValueToString(mname));
       EnvPrintRouter(theEnv,execStatus,WDIALOG," ");
-      EnvPrintRouter(theEnv,execStatus,WDIALOG,MessageHandlerData(theEnv)->hndquals[mtype]);
+      EnvPrintRouter(theEnv,execStatus,WDIALOG,MessageHandlerData(theEnv,execStatus)->hndquals[mtype]);
       if (hnd == NULL)
         EnvPrintRouter(theEnv,execStatus,WDIALOG," defined.\n");
       else
@@ -217,15 +217,15 @@ globle int ParseDefmessageHandler(
       return(TRUE);
      }
 
-   hndParams = GenConstant(theEnv,execStatus,SYMBOL,(void *) MessageHandlerData(theEnv)->SELF_SYMBOL);
-   hndParams = ParseProcParameters(theEnv,execStatus,readSource,&DefclassData(theEnv)->ObjectParseToken,hndParams,
+   hndParams = GenConstant(theEnv,execStatus,SYMBOL,(void *) MessageHandlerData(theEnv,execStatus)->SELF_SYMBOL);
+   hndParams = ParseProcParameters(theEnv,execStatus,readSource,&DefclassData(theEnv,execStatus)->ObjectParseToken,hndParams,
                                     &wildcard,&min,&max,&error,IsParameterSlotReference);
    if (error)
      return(TRUE);
-   PPCRAndIndent(theEnv);
-   ExpressionData(theEnv)->ReturnContext = TRUE;
+   PPCRAndIndent(theEnv,execStatus);
+   ExpressionData(theEnv,execStatus)->ReturnContext = TRUE;
    actions = ParseProcActions(theEnv,execStatus,"message-handler",readSource,
-                              &DefclassData(theEnv)->ObjectParseToken,hndParams,wildcard,
+                              &DefclassData(theEnv,execStatus)->ObjectParseToken,hndParams,wildcard,
                               SlotReferenceVar,BindSlotReference,&lvars,
                               (void *) cls);
    if (actions == NULL)
@@ -233,16 +233,16 @@ globle int ParseDefmessageHandler(
       ReturnExpression(theEnv,execStatus,hndParams);
       return(TRUE);
      }
-   if (GetType(DefclassData(theEnv)->ObjectParseToken) != RPAREN)
+   if (GetType(DefclassData(theEnv,execStatus)->ObjectParseToken) != RPAREN)
      {
       SyntaxErrorMessage(theEnv,execStatus,"defmessage-handler");
       ReturnExpression(theEnv,execStatus,hndParams);
       ReturnPackedExpression(theEnv,execStatus,actions);
       return(TRUE);
      }
-   PPBackup(theEnv);
-   PPBackup(theEnv);
-   SavePPBuffer(theEnv,execStatus,DefclassData(theEnv)->ObjectParseToken.printForm);
+   PPBackup(theEnv,execStatus);
+   PPBackup(theEnv,execStatus);
+   SavePPBuffer(theEnv,execStatus,DefclassData(theEnv,execStatus)->ObjectParseToken.printForm);
    SavePPBuffer(theEnv,execStatus,"\n");
 
    /* ===================================================
@@ -250,7 +250,7 @@ globle int ParseDefmessageHandler(
       successfully parsed defmessage-handler to the KB.
       =================================================== */
 
-   if (ConstructData(theEnv)->CheckSyntaxMode)
+   if (ConstructData(theEnv,execStatus)->CheckSyntaxMode)
      {
       ReturnExpression(theEnv,execStatus,hndParams);
       ReturnPackedExpression(theEnv,execStatus,actions);
@@ -282,8 +282,8 @@ globle int ParseDefmessageHandler(
    /* ===================================================
       Old handler trace status is automatically preserved
       =================================================== */
-   if (EnvGetConserveMemory(theEnv) == FALSE)
-     hnd->ppForm = CopyPPBuffer(theEnv);
+   if (EnvGetConserveMemory(theEnv,execStatus) == FALSE)
+     hnd->ppForm = CopyPPBuffer(theEnv,execStatus);
    else
 #endif
      hnd->ppForm = NULL;
@@ -334,7 +334,7 @@ globle void CreateGetAndPutHandlers(
    bufsz = (sizeof(char) * (strlen(className) + (strlen(slotName) * 2) + 80));
    buf = (char *) gm2(theEnv,execStatus,bufsz);
 
-   oldPWL = GetPrintWhileLoading(theEnv);
+   oldPWL = GetPrintWhileLoading(theEnv,execStatus);
    SetPrintWhileLoading(theEnv,execStatus,FALSE);
    oldCM = EnvSetConserveMemory(theEnv,execStatus,TRUE);
 
@@ -342,16 +342,16 @@ globle void CreateGetAndPutHandlers(
      {
       gensprintf(buf,"%s get-%s () ?self:%s)",className,slotName,slotName);
       
-      oldRouter = RouterData(theEnv)->FastCharGetRouter;
-      oldString = RouterData(theEnv)->FastCharGetString;
-      oldIndex = RouterData(theEnv)->FastCharGetIndex;
+      oldRouter = RouterData(theEnv,execStatus)->FastCharGetRouter;
+      oldString = RouterData(theEnv,execStatus)->FastCharGetString;
+      oldIndex = RouterData(theEnv,execStatus)->FastCharGetIndex;
    
-      RouterData(theEnv)->FastCharGetRouter = handlerRouter;
-      RouterData(theEnv)->FastCharGetIndex = 0;
-      RouterData(theEnv)->FastCharGetString = buf;
+      RouterData(theEnv,execStatus)->FastCharGetRouter = handlerRouter;
+      RouterData(theEnv,execStatus)->FastCharGetIndex = 0;
+      RouterData(theEnv,execStatus)->FastCharGetString = buf;
       
       ParseDefmessageHandler(theEnv,execStatus,handlerRouter);
-      DestroyPPBuffer(theEnv);
+      DestroyPPBuffer(theEnv,execStatus);
       /*
       if (OpenStringSource(theEnv,execStatus,handlerRouter,buf,0))
         {
@@ -360,9 +360,9 @@ globle void CreateGetAndPutHandlers(
          CloseStringSource(theEnv,execStatus,handlerRouter);
         }
       */
-      RouterData(theEnv)->FastCharGetRouter = oldRouter;
-      RouterData(theEnv)->FastCharGetIndex = oldIndex;
-      RouterData(theEnv)->FastCharGetString = oldString;
+      RouterData(theEnv,execStatus)->FastCharGetRouter = oldRouter;
+      RouterData(theEnv,execStatus)->FastCharGetIndex = oldIndex;
+      RouterData(theEnv,execStatus)->FastCharGetString = oldString;
      }
 
    if (sd->createWriteAccessor)
@@ -370,16 +370,16 @@ globle void CreateGetAndPutHandlers(
       gensprintf(buf,"%s put-%s ($?value) (bind ?self:%s ?value))",
                   className,slotName,slotName);
                   
-      oldRouter = RouterData(theEnv)->FastCharGetRouter;
-      oldString = RouterData(theEnv)->FastCharGetString;
-      oldIndex = RouterData(theEnv)->FastCharGetIndex;
+      oldRouter = RouterData(theEnv,execStatus)->FastCharGetRouter;
+      oldString = RouterData(theEnv,execStatus)->FastCharGetString;
+      oldIndex = RouterData(theEnv,execStatus)->FastCharGetIndex;
    
-      RouterData(theEnv)->FastCharGetRouter = handlerRouter;
-      RouterData(theEnv)->FastCharGetIndex = 0;
-      RouterData(theEnv)->FastCharGetString = buf;
+      RouterData(theEnv,execStatus)->FastCharGetRouter = handlerRouter;
+      RouterData(theEnv,execStatus)->FastCharGetIndex = 0;
+      RouterData(theEnv,execStatus)->FastCharGetString = buf;
       
       ParseDefmessageHandler(theEnv,execStatus,handlerRouter);
-      DestroyPPBuffer(theEnv);
+      DestroyPPBuffer(theEnv,execStatus);
 
 /*     
       if (OpenStringSource(theEnv,execStatus,handlerRouter,buf,0))
@@ -389,9 +389,9 @@ globle void CreateGetAndPutHandlers(
          CloseStringSource(theEnv,execStatus,handlerRouter);
         }
 */        
-      RouterData(theEnv)->FastCharGetRouter = oldRouter;
-      RouterData(theEnv)->FastCharGetIndex = oldIndex;
-      RouterData(theEnv)->FastCharGetString = oldString;
+      RouterData(theEnv,execStatus)->FastCharGetRouter = oldRouter;
+      RouterData(theEnv,execStatus)->FastCharGetIndex = oldIndex;
+      RouterData(theEnv,execStatus)->FastCharGetString = oldString;
      }
 
    SetPrintWhileLoading(theEnv,execStatus,oldPWL);
@@ -468,7 +468,7 @@ static int SlotReferenceVar(
                (ValueToString(varexp->value)[SELF_LEN] == SELF_SLOT_REF) : FALSE)
      {
       OpenStringSource(theEnv,execStatus,"hnd-var",ValueToString(varexp->value) + SELF_LEN + 1,0);
-      oldpp = GetPPBufferStatus(theEnv);
+      oldpp = GetPPBufferStatus(theEnv,execStatus);
       SetPPBufferStatus(theEnv,execStatus,OFF);
       GetToken(theEnv,execStatus,"hnd-var",&itkn);
       SetPPBufferStatus(theEnv,execStatus,oldpp);
@@ -528,7 +528,7 @@ static int BindSlotReference(
                (bindName[SELF_LEN] == SELF_SLOT_REF) : FALSE)
      {
       OpenStringSource(theEnv,execStatus,"hnd-var",bindName + SELF_LEN + 1,0);
-      oldpp = GetPPBufferStatus(theEnv);
+      oldpp = GetPPBufferStatus(theEnv,execStatus);
       SetPPBufferStatus(theEnv,execStatus,OFF);
       GetToken(theEnv,execStatus,"hnd-var",&itkn);
       SetPPBufferStatus(theEnv,execStatus,oldpp);
@@ -629,7 +629,7 @@ static SLOT_DESC *CheckSlotReference(
       return(NULL);
      }
 
-   if (EnvGetStaticConstraintChecking(theEnv))
+   if (EnvGetStaticConstraintChecking(theEnv,execStatus))
      {
       vCode = ConstraintCheckExpressionChain(theEnv,execStatus,writeExpression,sd->constraint);
       if (vCode != NO_VIOLATION)

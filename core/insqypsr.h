@@ -37,8 +37,8 @@
 #define LOCALE extern
 #endif
 
-LOCALE EXPRESSION *ParseQueryNoAction(void *,EXPRESSION *,char *);
-LOCALE EXPRESSION *ParseQueryAction(void *,EXPRESSION *,char *);
+LOCALE EXPRESSION *ParseQueryNoAction(void *,EXEC_STATUS,EXPRESSION *,char *);
+LOCALE EXPRESSION *ParseQueryAction(void *,EXEC_STATUS,EXPRESSION *,char *);
 
 #ifndef _INSQYPSR_SOURCE_
 #endif

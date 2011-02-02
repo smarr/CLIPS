@@ -198,7 +198,7 @@ struct systemDependentData
   { 
    void (*RedrawScreenFunction)(void *);
    void (*PauseEnvFunction)(void *);
-   void (*ContinueEnvFunction)(void *,int);
+   void (*ContinueEnvFunction)(void *,EXEC_STATUS,int);
 /*
 #if ! WINDOW_INTERFACE
 #if WIN_BTC
@@ -225,23 +225,23 @@ struct systemDependentData
    jmp_buf *jmpBuffer;
   };
 
-#define SystemDependentData(theEnv) ((struct systemDependentData *) GetEnvironmentData(theEnv,execStatus,SYSTEM_DEPENDENT_DATA))
+#define SystemDependentData(theEnv,execStatus) ((struct systemDependentData *) GetEnvironmentData(theEnv,execStatus,SYSTEM_DEPENDENT_DATA))
 
 /****************************************/
 /* GLOBAL EXTERNAL FUNCTION DEFINITIONS */
 /****************************************/
 
    extern void                    UserFunctions(void);
-   extern void                    EnvUserFunctions(void *);
+   extern void                    EnvUserFunctions(void *,EXEC_STATUS);
 
 /***************************************/
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static void                    InitializeSystemDependentData(void *);
-   static void                    SystemFunctionDefinitions(void *);
-   static void                    InitializeKeywords(void *);
-   static void                    InitializeNonportableFeatures(void *);
+   static void                    InitializeSystemDependentData(void *,EXEC_STATUS);
+   static void                    SystemFunctionDefinitions(void *,EXEC_STATUS);
+   static void                    InitializeKeywords(void *,EXEC_STATUS);
+   static void                    InitializeNonportableFeatures(void *,EXEC_STATUS);
 #if   (VAX_VMS || UNIX_V || LINUX || DARWIN || UNIX_7 || WIN_GCC || WIN_BTC || WIN_MVC) && (! WINDOW_INTERFACE)
    static void                    CatchCtrlC(int);
 #endif
@@ -483,7 +483,7 @@ globle void SetRedrawFunction(
   EXEC_STATUS,
   void (*theFunction)(void *))
   {
-   SystemDependentData(theEnv)->RedrawScreenFunction = theFunction;
+   SystemDependentData(theEnv,execStatus)->RedrawScreenFunction = theFunction;
   }
 
 /******************************************************/
@@ -495,7 +495,7 @@ globle void SetPauseEnvFunction(
   EXEC_STATUS,
   void (*theFunction)(void *))
   {
-   SystemDependentData(theEnv)->PauseEnvFunction = theFunction;
+   SystemDependentData(theEnv,execStatus)->PauseEnvFunction = theFunction;
   }
 
 /*********************************************************/
@@ -506,34 +506,34 @@ globle void SetPauseEnvFunction(
 globle void SetContinueEnvFunction(
   void *theEnv,
   EXEC_STATUS,
-  void (*theFunction)(void *,int))
+  void (*theFunction)(void *,EXEC_STATUS,int))
   {
-   SystemDependentData(theEnv)->ContinueEnvFunction = theFunction;
+   SystemDependentData(theEnv,execStatus)->ContinueEnvFunction = theFunction;
   }
 
 /*******************************************************/
 /* GetRedrawFunction: Gets the redraw screen function. */
 /*******************************************************/
-globle void (*GetRedrawFunction(void *theEnv))(void *)
+globle void (*GetRedrawFunction(void *theEnv,EXEC_STATUS))(void *)
   {
-   return SystemDependentData(theEnv)->RedrawScreenFunction;
+   return SystemDependentData(theEnv,execStatus)->RedrawScreenFunction;
   }
 
 /*****************************************************/
 /* GetPauseEnvFunction: Gets the normal state function. */
 /*****************************************************/
-globle void (*GetPauseEnvFunction(void *theEnv))(void *)
+globle void (*GetPauseEnvFunction(void *theEnv,EXEC_STATUS))(void *)
   {
-   return SystemDependentData(theEnv)->PauseEnvFunction;
+   return SystemDependentData(theEnv,execStatus)->PauseEnvFunction;
   }
 
 /*********************************************/
 /* GetContinueEnvFunction: Gets the continue */
 /*   environment function.                   */
 /*********************************************/
-globle void (*GetContinueEnvFunction(void *theEnv))(void *,int)
+globle void (*GetContinueEnvFunction(void *theEnv,EXEC_STATUS))(void *,EXEC_STATUS,int)
   {
-   return SystemDependentData(theEnv)->ContinueEnvFunction;
+   return SystemDependentData(theEnv,execStatus)->ContinueEnvFunction;
   }
 
 /*************************************************/
@@ -631,51 +631,51 @@ static void SystemFunctionDefinitions(
   void *theEnv,
   EXEC_STATUS)
   {
-   ProceduralFunctionDefinitions(theEnv);
-   MiscFunctionDefinitions(theEnv);
+   ProceduralFunctionDefinitions(theEnv,execStatus);
+   MiscFunctionDefinitions(theEnv,execStatus);
 
 #if IO_FUNCTIONS
-   IOFunctionDefinitions(theEnv);
+   IOFunctionDefinitions(theEnv,execStatus);
 #endif
 
-   PredicateFunctionDefinitions(theEnv);
+   PredicateFunctionDefinitions(theEnv,execStatus);
    BasicMathFunctionDefinitions(theEnv,execStatus,execStatus);
-   FileCommandDefinitions(theEnv);
-   SortFunctionDefinitions(theEnv);
+   FileCommandDefinitions(theEnv,execStatus);
+   SortFunctionDefinitions(theEnv,execStatus);
 
 #if DEBUGGING_FUNCTIONS
-   WatchFunctionDefinitions(theEnv);
+   WatchFunctionDefinitions(theEnv,execStatus);
 #endif
 
 #if MULTIFIELD_FUNCTIONS
-   MultifieldFunctionDefinitions(theEnv);
+   MultifieldFunctionDefinitions(theEnv,execStatus);
 #endif
 
 #if STRING_FUNCTIONS
-   StringFunctionDefinitions(theEnv);
+   StringFunctionDefinitions(theEnv,execStatus);
 #endif
 
 #if EXTENDED_MATH_FUNCTIONS
-   ExtendedMathFunctionDefinitions(theEnv);
+   ExtendedMathFunctionDefinitions(theEnv,execStatus);
 #endif
 
 #if TEXTPRO_FUNCTIONS || HELP_FUNCTIONS
-   HelpFunctionDefinitions(theEnv);
+   HelpFunctionDefinitions(theEnv,execStatus);
 #endif
 
 #if EMACS_EDITOR
-   EditorFunctionDefinition(theEnv);
+   EditorFunctionDefinition(theEnv,execStatus);
 #endif
 
 #if CONSTRUCT_COMPILER && (! RUN_TIME)
-   ConstructsToCCommandDefinition(theEnv);
+   ConstructsToCCommandDefinition(theEnv,execStatus);
 #endif
 
 #if PROFILING_FUNCTIONS
-   ConstructProfilingFunctionDefinitions(theEnv);
+   ConstructProfilingFunctionDefinitions(theEnv,execStatus);
 #endif
 
-   ParseFunctionDefinitions(theEnv);
+   ParseFunctionDefinitions(theEnv,execStatus);
   }
   
 /*********************************************************/
@@ -802,18 +802,18 @@ globle void gensystem(
    /*=======================================*/
 
 #if VAX_VMS
-   if (SystemDependentData(theEnv)->PauseEnvFunction != NULL) (*SystemDependentData(theEnv)->PauseEnvFunction)(theEnv);
+   if (SystemDependentData(theEnv,execStatus)->PauseEnvFunction != NULL) (*SystemDependentData(theEnv,execStatus)->PauseEnvFunction)(theEnv,execStatus);
    VMSSystem(commandBuffer);
    putchar('\n');
-   if (SystemDependentData(theEnv)->ContinueEnvFunction != NULL) (*SystemDependentData(theEnv)->ContinueEnvFunction)(theEnv,execStatus,1);
-   if (SystemDependentData(theEnv)->RedrawScreenFunction != NULL) (*SystemDependentData(theEnv)->RedrawScreenFunction)(theEnv);
+   if (SystemDependentData(theEnv,execStatus)->ContinueEnvFunction != NULL) (*SystemDependentData(theEnv,execStatus)->ContinueEnvFunction)(theEnv,execStatus,1);
+   if (SystemDependentData(theEnv,execStatus)->RedrawScreenFunction != NULL) (*SystemDependentData(theEnv,execStatus)->RedrawScreenFunction)(theEnv,execStatus);
 #endif
 
 #if   UNIX_7 || UNIX_V || LINUX || DARWIN || WIN_MVC || WIN_BTC || WIN_MCW || WIN_GCC || MAC_XCD
-   if (SystemDependentData(theEnv)->PauseEnvFunction != NULL) (*SystemDependentData(theEnv)->PauseEnvFunction)(theEnv);
+   if (SystemDependentData(theEnv,execStatus)->PauseEnvFunction != NULL) (*SystemDependentData(theEnv,execStatus)->PauseEnvFunction)(theEnv,execStatus);
    system(commandBuffer);
-   if (SystemDependentData(theEnv)->ContinueEnvFunction != NULL) (*SystemDependentData(theEnv)->ContinueEnvFunction)(theEnv,execStatus,1);
-   if (SystemDependentData(theEnv)->RedrawScreenFunction != NULL) (*SystemDependentData(theEnv)->RedrawScreenFunction)(theEnv);
+   if (SystemDependentData(theEnv,execStatus)->ContinueEnvFunction != NULL) (*SystemDependentData(theEnv,execStatus)->ContinueEnvFunction)(theEnv,execStatus,1);
+   if (SystemDependentData(theEnv,execStatus)->RedrawScreenFunction != NULL) (*SystemDependentData(theEnv,execStatus)->RedrawScreenFunction)(theEnv,execStatus);
 #else
 
 #if ! VAX_VMS
@@ -861,8 +861,8 @@ globle int gengetchar(
   EXEC_STATUS)
   {
 #if WIN_BTC || WIN_MVC
-   if (SystemDependentData(theEnv)->getcLength ==
-       SystemDependentData(theEnv)->getcPosition)
+   if (SystemDependentData(theEnv,execStatus)->getcLength ==
+       SystemDependentData(theEnv,execStatus)->getcPosition)
      {
       TCHAR tBuffer = 0;
       DWORD count = 0;
@@ -872,15 +872,15 @@ globle int gengetchar(
       
       wBuffer = tBuffer;
       
-      SystemDependentData(theEnv)->getcLength = 
+      SystemDependentData(theEnv,execStatus)->getcLength = 
          WideCharToMultiByte(CP_UTF8,0,&wBuffer,1,
-                             (char *) SystemDependentData(theEnv)->getcBuffer,
+                             (char *) SystemDependentData(theEnv,execStatus)->getcBuffer,
                              7,NULL,NULL);
                              
-      SystemDependentData(theEnv)->getcPosition = 0;
+      SystemDependentData(theEnv,execStatus)->getcPosition = 0;
      }
      
-   return SystemDependentData(theEnv)->getcBuffer[SystemDependentData(theEnv)->getcPosition++];
+   return SystemDependentData(theEnv,execStatus)->getcBuffer[SystemDependentData(theEnv,execStatus)->getcPosition++];
 #else
    return(getc(stdin));
 #endif
@@ -896,9 +896,9 @@ globle int genungetchar(
   int theChar)
   {
 #if WIN_BTC || WIN_MVC
-   if (SystemDependentData(theEnv)->getcPosition > 0)
+   if (SystemDependentData(theEnv,execStatus)->getcPosition > 0)
      { 
-      SystemDependentData(theEnv)->getcPosition--;
+      SystemDependentData(theEnv,execStatus)->getcPosition--;
       return theChar;
      }
    else
@@ -960,7 +960,7 @@ static void InitializeNonportableFeatures(
   void *theEnv)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 #if ! WINDOW_INTERFACE
 
@@ -970,8 +970,8 @@ static void InitializeNonportableFeatures(
 
 /*
 #if WIN_BTC
-   SystemDependentData(theEnv)->OldCtrlC = getvect(0x23);
-   SystemDependentData(theEnv)->OldBreak = getvect(0x1b);
+   SystemDependentData(theEnv,execStatus)->OldCtrlC = getvect(0x23);
+   SystemDependentData(theEnv,execStatus)->OldBreak = getvect(0x1b);
    setvect(0x23,CatchCtrlC);
    setvect(0x1b,CatchCtrlC);
    atexit(RestoreInterruptVectors);
@@ -979,8 +979,8 @@ static void InitializeNonportableFeatures(
 */
 /*
 #if WIN_MVC
-   SystemDependentData(theEnv)->OldCtrlC = _dos_getvect(0x23);
-   SystemDependentData(theEnv)->OldBreak = _dos_getvect(0x1b);
+   SystemDependentData(theEnv,execStatus)->OldCtrlC = _dos_getvect(0x23);
+   SystemDependentData(theEnv,execStatus)->OldBreak = _dos_getvect(0x1b);
    _dos_setvect(0x23,CatchCtrlC);
    _dos_setvect(0x1b,CatchCtrlC);
    atexit(RestoreInterruptVectors);
@@ -1045,8 +1045,8 @@ static void RestoreInterruptVectors()
    
    theEnv = GetCurrentEnvironment();
 
-   _dos_setvect(0x23,SystemDependentData(theEnv)->OldCtrlC);
-   _dos_setvect(0x1b,SystemDependentData(theEnv)->OldBreak);
+   _dos_setvect(0x23,SystemDependentData(theEnv,execStatus)->OldCtrlC);
+   _dos_setvect(0x1b,SystemDependentData(theEnv,execStatus)->OldBreak);
 #endif
   }
 */
@@ -1062,8 +1062,8 @@ globle void genexit(
   EXEC_STATUS,
   int num)
   {
-   if (SystemDependentData(theEnv)->jmpBuffer != NULL)
-     { longjmp(*SystemDependentData(theEnv)->jmpBuffer,1); }
+   if (SystemDependentData(theEnv,execStatus)->jmpBuffer != NULL)
+     { longjmp(*SystemDependentData(theEnv,execStatus)->jmpBuffer,1); }
      
    exit(num);
   }
@@ -1076,7 +1076,7 @@ globle void SetJmpBuffer(
   EXEC_STATUS,
   jmp_buf *theJmpBuffer)
   {
-   SystemDependentData(theEnv)->jmpBuffer = theJmpBuffer;
+   SystemDependentData(theEnv,execStatus)->jmpBuffer = theJmpBuffer;
   }
   
 /******************************************/
@@ -1210,8 +1210,8 @@ globle int (*EnvSetBeforeOpenFunction(void *theEnv,
   {
    int (*tempFunction)(void *);
 
-   tempFunction = SystemDependentData(theEnv)->BeforeOpenFunction;
-   SystemDependentData(theEnv)->BeforeOpenFunction = theFunction;
+   tempFunction = SystemDependentData(theEnv,execStatus)->BeforeOpenFunction;
+   SystemDependentData(theEnv,execStatus)->BeforeOpenFunction = theFunction;
    return(tempFunction);
   }
 
@@ -1224,8 +1224,8 @@ globle int (*EnvSetAfterOpenFunction(void *theEnv,
   {
    int (*tempFunction)(void *);
 
-   tempFunction = SystemDependentData(theEnv)->AfterOpenFunction;
-   SystemDependentData(theEnv)->AfterOpenFunction = theFunction;
+   tempFunction = SystemDependentData(theEnv,execStatus)->AfterOpenFunction;
+   SystemDependentData(theEnv,execStatus)->AfterOpenFunction = theFunction;
    return(tempFunction);
   }
 
@@ -1240,8 +1240,8 @@ globle FILE *GenOpen(
   {
    FILE *theFile;
    
-   if (SystemDependentData(theEnv)->BeforeOpenFunction != NULL)
-     { (*SystemDependentData(theEnv)->BeforeOpenFunction)(theEnv); }
+   if (SystemDependentData(theEnv,execStatus)->BeforeOpenFunction != NULL)
+     { (*SystemDependentData(theEnv,execStatus)->BeforeOpenFunction)(theEnv,execStatus); }
 
 #if WIN_MVC
 #if _MSC_VER >= 1400
@@ -1253,8 +1253,8 @@ globle FILE *GenOpen(
    theFile = fopen(fileName,accessType);
 #endif
    
-   if (SystemDependentData(theEnv)->AfterOpenFunction != NULL)
-     { (*SystemDependentData(theEnv)->AfterOpenFunction)(theEnv); }
+   if (SystemDependentData(theEnv,execStatus)->AfterOpenFunction != NULL)
+     { (*SystemDependentData(theEnv,execStatus)->AfterOpenFunction)(theEnv,execStatus); }
      
    return theFile;
   }
@@ -1269,13 +1269,13 @@ globle int GenClose(
   {
    int rv;
    
-   if (SystemDependentData(theEnv)->BeforeOpenFunction != NULL)
-     { (*SystemDependentData(theEnv)->BeforeOpenFunction)(theEnv); }
+   if (SystemDependentData(theEnv,execStatus)->BeforeOpenFunction != NULL)
+     { (*SystemDependentData(theEnv,execStatus)->BeforeOpenFunction)(theEnv,execStatus); }
 
    rv = fclose(theFile);
 
-   if (SystemDependentData(theEnv)->AfterOpenFunction != NULL)
-     { (*SystemDependentData(theEnv)->AfterOpenFunction)(theEnv); }
+   if (SystemDependentData(theEnv,execStatus)->AfterOpenFunction != NULL)
+     { (*SystemDependentData(theEnv,execStatus)->AfterOpenFunction)(theEnv,execStatus); }
    
    return rv;
   }
@@ -1292,20 +1292,20 @@ globle int GenOpenReadBinary(
   char *funcName,
   char *fileName)
   {
-   if (SystemDependentData(theEnv)->BeforeOpenFunction != NULL)
-     { (*SystemDependentData(theEnv)->BeforeOpenFunction)(theEnv); }
+   if (SystemDependentData(theEnv,execStatus)->BeforeOpenFunction != NULL)
+     { (*SystemDependentData(theEnv,execStatus)->BeforeOpenFunction)(theEnv,execStatus); }
 
 #if WIN_BTC || WIN_MVC
 
 #if WIN_MVC
-   SystemDependentData(theEnv)->BinaryFileHandle = _open(fileName,O_RDONLY | O_BINARY);
+   SystemDependentData(theEnv,execStatus)->BinaryFileHandle = _open(fileName,O_RDONLY | O_BINARY);
 #else
-   SystemDependentData(theEnv)->BinaryFileHandle = open(fileName,O_RDONLY | O_BINARY);
+   SystemDependentData(theEnv,execStatus)->BinaryFileHandle = open(fileName,O_RDONLY | O_BINARY);
 #endif
-   if (SystemDependentData(theEnv)->BinaryFileHandle == -1)
+   if (SystemDependentData(theEnv,execStatus)->BinaryFileHandle == -1)
      {
-      if (SystemDependentData(theEnv)->AfterOpenFunction != NULL)
-        { (*SystemDependentData(theEnv)->AfterOpenFunction)(theEnv); }
+      if (SystemDependentData(theEnv,execStatus)->AfterOpenFunction != NULL)
+        { (*SystemDependentData(theEnv,execStatus)->AfterOpenFunction)(theEnv,execStatus); }
       OpenErrorMessage(theEnv,execStatus,funcName,fileName);
       return(FALSE);
      }
@@ -1313,17 +1313,17 @@ globle int GenOpenReadBinary(
 
 #if (! WIN_BTC) && (! WIN_MVC)
 
-   if ((SystemDependentData(theEnv)->BinaryFP = fopen(fileName,"rb")) == NULL)
+   if ((SystemDependentData(theEnv,execStatus)->BinaryFP = fopen(fileName,"rb")) == NULL)
      {
-      if (SystemDependentData(theEnv)->AfterOpenFunction != NULL)
-        { (*SystemDependentData(theEnv)->AfterOpenFunction)(theEnv); }
+      if (SystemDependentData(theEnv,execStatus)->AfterOpenFunction != NULL)
+        { (*SystemDependentData(theEnv,execStatus)->AfterOpenFunction)(theEnv,execStatus); }
       OpenErrorMessage(theEnv,execStatus,funcName,fileName);
       return(FALSE);
      }
 #endif
 
-   if (SystemDependentData(theEnv)->AfterOpenFunction != NULL)
-     { (*SystemDependentData(theEnv)->AfterOpenFunction)(theEnv); }
+   if (SystemDependentData(theEnv,execStatus)->AfterOpenFunction != NULL)
+     { (*SystemDependentData(theEnv,execStatus)->AfterOpenFunction)(theEnv,execStatus); }
 
    return(TRUE);
   }
@@ -1344,13 +1344,13 @@ globle void GenReadBinary(
    tempPtr = (char *) dataPtr;
    while (size > INT_MAX)
      {
-      _read(SystemDependentData(theEnv)->BinaryFileHandle,tempPtr,INT_MAX);
+      _read(SystemDependentData(theEnv,execStatus)->BinaryFileHandle,tempPtr,INT_MAX);
       size -= INT_MAX;
       tempPtr = tempPtr + INT_MAX;
      }
 
    if (size > 0) 
-     { _read(SystemDependentData(theEnv)->BinaryFileHandle,tempPtr,(unsigned int) size); }
+     { _read(SystemDependentData(theEnv,execStatus)->BinaryFileHandle,tempPtr,(unsigned int) size); }
 #endif
 
 #if WIN_BTC
@@ -1359,17 +1359,17 @@ globle void GenReadBinary(
    tempPtr = (char *) dataPtr;
    while (size > INT_MAX)
      {
-      read(SystemDependentData(theEnv)->BinaryFileHandle,tempPtr,INT_MAX);
+      read(SystemDependentData(theEnv,execStatus)->BinaryFileHandle,tempPtr,INT_MAX);
       size -= INT_MAX;
       tempPtr = tempPtr + INT_MAX;
      }
 
    if (size > 0) 
-     { read(SystemDependentData(theEnv)->BinaryFileHandle,tempPtr,(STD_SIZE) size); }
+     { read(SystemDependentData(theEnv,execStatus)->BinaryFileHandle,tempPtr,(STD_SIZE) size); }
 #endif
 
 #if (! WIN_BTC) && (! WIN_MVC)
-   fread(dataPtr,size,1,SystemDependentData(theEnv)->BinaryFP); 
+   fread(dataPtr,size,1,SystemDependentData(theEnv,execStatus)->BinaryFP); 
 #endif
   }
 
@@ -1383,15 +1383,15 @@ globle void GetSeekCurBinary(
   long offset)
   {
 #if WIN_BTC
-   lseek(SystemDependentData(theEnv)->BinaryFileHandle,offset,SEEK_CUR);
+   lseek(SystemDependentData(theEnv,execStatus)->BinaryFileHandle,offset,SEEK_CUR);
 #endif
 
 #if WIN_MVC
-   _lseek(SystemDependentData(theEnv)->BinaryFileHandle,offset,SEEK_CUR);
+   _lseek(SystemDependentData(theEnv,execStatus)->BinaryFileHandle,offset,SEEK_CUR);
 #endif
 
 #if (! WIN_BTC) && (! WIN_MVC)
-   fseek(SystemDependentData(theEnv)->BinaryFP,offset,SEEK_CUR);
+   fseek(SystemDependentData(theEnv,execStatus)->BinaryFP,offset,SEEK_CUR);
 #endif
   }
   
@@ -1405,15 +1405,15 @@ globle void GetSeekSetBinary(
   long offset)
   {
 #if WIN_BTC
-   lseek(SystemDependentData(theEnv)->BinaryFileHandle,offset,SEEK_SET);
+   lseek(SystemDependentData(theEnv,execStatus)->BinaryFileHandle,offset,SEEK_SET);
 #endif
 
 #if WIN_MVC
-   _lseek(SystemDependentData(theEnv)->BinaryFileHandle,offset,SEEK_SET);
+   _lseek(SystemDependentData(theEnv,execStatus)->BinaryFileHandle,offset,SEEK_SET);
 #endif
 
 #if (! WIN_BTC) && (! WIN_MVC)
-   fseek(SystemDependentData(theEnv)->BinaryFP,offset,SEEK_SET);
+   fseek(SystemDependentData(theEnv,execStatus)->BinaryFP,offset,SEEK_SET);
 #endif
   }
 
@@ -1427,15 +1427,15 @@ globle void GenTellBinary(
   long *offset)
   {
 #if WIN_BTC
-   *offset = lseek(SystemDependentData(theEnv)->BinaryFileHandle,0,SEEK_CUR);
+   *offset = lseek(SystemDependentData(theEnv,execStatus)->BinaryFileHandle,0,SEEK_CUR);
 #endif
 
 #if WIN_MVC
-   *offset = _lseek(SystemDependentData(theEnv)->BinaryFileHandle,0,SEEK_CUR);
+   *offset = _lseek(SystemDependentData(theEnv,execStatus)->BinaryFileHandle,0,SEEK_CUR);
 #endif
 
 #if (! WIN_BTC) && (! WIN_MVC)
-   *offset = ftell(SystemDependentData(theEnv)->BinaryFP);
+   *offset = ftell(SystemDependentData(theEnv,execStatus)->BinaryFP);
 #endif
   }
 
@@ -1447,23 +1447,23 @@ globle void GenCloseBinary(
   void *theEnv,
   EXEC_STATUS)
   {
-   if (SystemDependentData(theEnv)->BeforeOpenFunction != NULL)
-     { (*SystemDependentData(theEnv)->BeforeOpenFunction)(theEnv); }
+   if (SystemDependentData(theEnv,execStatus)->BeforeOpenFunction != NULL)
+     { (*SystemDependentData(theEnv,execStatus)->BeforeOpenFunction)(theEnv,execStatus); }
 
 #if WIN_BTC
-   close(SystemDependentData(theEnv)->BinaryFileHandle);
+   close(SystemDependentData(theEnv,execStatus)->BinaryFileHandle);
 #endif
 
 #if WIN_MVC
-   _close(SystemDependentData(theEnv)->BinaryFileHandle);
+   _close(SystemDependentData(theEnv,execStatus)->BinaryFileHandle);
 #endif
 
 #if (! WIN_BTC) && (! WIN_MVC)
-   fclose(SystemDependentData(theEnv)->BinaryFP);
+   fclose(SystemDependentData(theEnv,execStatus)->BinaryFP);
 #endif
 
-   if (SystemDependentData(theEnv)->AfterOpenFunction != NULL)
-     { (*SystemDependentData(theEnv)->AfterOpenFunction)(theEnv); }
+   if (SystemDependentData(theEnv,execStatus)->AfterOpenFunction != NULL)
+     { (*SystemDependentData(theEnv,execStatus)->AfterOpenFunction)(theEnv,execStatus); }
   }
   
 /***********************************************/
@@ -1722,7 +1722,7 @@ static void InitializeKeywords(
    IncrementSymbolCount(ts);
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 #endif
   }

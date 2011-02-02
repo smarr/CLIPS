@@ -79,9 +79,9 @@ typedef struct bsaveConstraintRecord BSAVE_CONSTRAINT_RECORD;
 /***************************************/
 
 #if BLOAD_AND_BSAVE
-   static void                    CopyToBsaveConstraintRecord(void *,CONSTRAINT_RECORD *,BSAVE_CONSTRAINT_RECORD *);
+   static void                    CopyToBsaveConstraintRecord(void *,EXEC_STATUS,CONSTRAINT_RECORD *,BSAVE_CONSTRAINT_RECORD *);
 #endif
-   static void                    CopyFromBsaveConstraintRecord(void *,void *,long);
+   static void                    CopyFromBsaveConstraintRecord(void *,EXEC_STATUS,void *,long);
 
 #if BLOAD_AND_BSAVE
 
@@ -107,7 +107,7 @@ globle void WriteNeededConstraints(
 
    for (i = 0; i < SIZE_CONSTRAINT_HASH; i++)
      {
-      for (tmpPtr = ConstraintData(theEnv)->ConstraintHashtable[i];
+      for (tmpPtr = ConstraintData(theEnv,execStatus)->ConstraintHashtable[i];
            tmpPtr != NULL;
            tmpPtr = tmpPtr->next)
         {
@@ -121,7 +121,7 @@ globle void WriteNeededConstraints(
    /* then no constraints are saved.              */
    /*=============================================*/
 
-   if ((! EnvGetDynamicConstraintChecking(theEnv)) && (numberOfUsedConstraints != 0))
+   if ((! EnvGetDynamicConstraintChecking(theEnv,execStatus)) && (numberOfUsedConstraints != 0))
      {
       numberOfUsedConstraints = 0;
       PrintWarningID(theEnv,execStatus,"CSTRNBIN",1,FALSE);
@@ -140,7 +140,7 @@ globle void WriteNeededConstraints(
 
    for (i = 0 ; i < SIZE_CONSTRAINT_HASH; i++)
      {
-      for (tmpPtr = ConstraintData(theEnv)->ConstraintHashtable[i];
+      for (tmpPtr = ConstraintData(theEnv,execStatus)->ConstraintHashtable[i];
            tmpPtr != NULL;
            tmpPtr = tmpPtr->next)
         {
@@ -198,13 +198,13 @@ globle void ReadNeededConstraints(
   void *theEnv,
   EXEC_STATUS)
   {
-   GenReadBinary(theEnv,execStatus,(void *) &ConstraintData(theEnv)->NumberOfConstraints,sizeof(unsigned long int));
-   if (ConstraintData(theEnv)->NumberOfConstraints == 0) return;
+   GenReadBinary(theEnv,execStatus,(void *) &ConstraintData(theEnv,execStatus)->NumberOfConstraints,sizeof(unsigned long int));
+   if (ConstraintData(theEnv,execStatus)->NumberOfConstraints == 0) return;
 
-   ConstraintData(theEnv)->ConstraintArray = (CONSTRAINT_RECORD *)
-           genalloc(theEnv,execStatus,(sizeof(CONSTRAINT_RECORD) * ConstraintData(theEnv)->NumberOfConstraints));
+   ConstraintData(theEnv,execStatus)->ConstraintArray = (CONSTRAINT_RECORD *)
+           genalloc(theEnv,execStatus,(sizeof(CONSTRAINT_RECORD) * ConstraintData(theEnv,execStatus)->NumberOfConstraints));
 
-   BloadandRefresh(theEnv,execStatus,ConstraintData(theEnv)->NumberOfConstraints,sizeof(BSAVE_CONSTRAINT_RECORD),
+   BloadandRefresh(theEnv,execStatus,ConstraintData(theEnv,execStatus)->NumberOfConstraints,sizeof(BSAVE_CONSTRAINT_RECORD),
                    CopyFromBsaveConstraintRecord);
   }
 
@@ -223,7 +223,7 @@ static void CopyFromBsaveConstraintRecord(
    CONSTRAINT_RECORD *constraints;
 
    bsaveConstraints = (BSAVE_CONSTRAINT_RECORD *) buf;
-   constraints = (CONSTRAINT_RECORD *) &ConstraintData(theEnv)->ConstraintArray[theIndex];
+   constraints = (CONSTRAINT_RECORD *) &ConstraintData(theEnv,execStatus)->ConstraintArray[theIndex];
 
    constraints->anyAllowed = bsaveConstraints->anyAllowed;
    constraints->symbolsAllowed = bsaveConstraints->symbolsAllowed;
@@ -262,11 +262,11 @@ globle void ClearBloadedConstraints(
   void *theEnv,
   EXEC_STATUS)
   {
-   if (ConstraintData(theEnv)->NumberOfConstraints != 0)
+   if (ConstraintData(theEnv,execStatus)->NumberOfConstraints != 0)
      {
-      genfree(theEnv,execStatus,(void *) ConstraintData(theEnv)->ConstraintArray,
-                     (sizeof(CONSTRAINT_RECORD) * ConstraintData(theEnv)->NumberOfConstraints));
-      ConstraintData(theEnv)->NumberOfConstraints = 0;
+      genfree(theEnv,execStatus,(void *) ConstraintData(theEnv,execStatus)->ConstraintArray,
+                     (sizeof(CONSTRAINT_RECORD) * ConstraintData(theEnv,execStatus)->NumberOfConstraints));
+      ConstraintData(theEnv,execStatus)->NumberOfConstraints = 0;
      }
   }
 

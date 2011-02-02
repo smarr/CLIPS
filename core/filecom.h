@@ -41,26 +41,26 @@
 #define DribbleOff() EnvDribbleOff(GetCurrentEnvironment())
 #define BatchStar(a) EnvBatchStar(GetCurrentEnvironment(),a)
 
-   LOCALE void                           FileCommandDefinitions(void *);
-   LOCALE intBool                        EnvDribbleOn(void *,char *);
-   LOCALE intBool                        EnvDribbleActive(void *);
-   LOCALE intBool                        EnvDribbleOff(void *);
-   LOCALE void                           SetDribbleStatusFunction(void *,int (*)(void *,int));
-   LOCALE int                            LLGetcBatch(void *,char *,int);
-   LOCALE int                            Batch(void *,char *);
-   LOCALE int                            OpenBatch(void *,char *,int);
-   LOCALE int                            OpenStringBatch(void *,char *,char *,int);
-   LOCALE int                            RemoveBatch(void *);
-   LOCALE intBool                        BatchActive(void *);
-   LOCALE void                           CloseAllBatchSources(void *);
-   LOCALE int                            BatchCommand(void *);
-   LOCALE int                            BatchStarCommand(void *);
-   LOCALE int                            EnvBatchStar(void *,char *);
-   LOCALE int                            LoadCommand(void *);
-   LOCALE int                            LoadStarCommand(void *);
-   LOCALE int                            SaveCommand(void *);
-   LOCALE int                            DribbleOnCommand(void *);
-   LOCALE int                            DribbleOffCommand(void *);
+   LOCALE void                           FileCommandDefinitions(void *,EXEC_STATUS);
+   LOCALE intBool                        EnvDribbleOn(void *,EXEC_STATUS,char *);
+   LOCALE intBool                        EnvDribbleActive(void *,EXEC_STATUS);
+   LOCALE intBool                        EnvDribbleOff(void *,EXEC_STATUS);
+   LOCALE void                           SetDribbleStatusFunction(void *,EXEC_STATUS,int (*)(void *,EXEC_STATUS,int));
+   LOCALE int                            LLGetcBatch(void *,EXEC_STATUS,char *,int);
+   LOCALE int                            Batch(void *,EXEC_STATUS,char *);
+   LOCALE int                            OpenBatch(void *,EXEC_STATUS,char *,int);
+   LOCALE int                            OpenStringBatch(void *,EXEC_STATUS,char *,char *,int);
+   LOCALE int                            RemoveBatch(void *,EXEC_STATUS);
+   LOCALE intBool                        BatchActive(void *,EXEC_STATUS);
+   LOCALE void                           CloseAllBatchSources(void *,EXEC_STATUS);
+   LOCALE int                            BatchCommand(void *,EXEC_STATUS);
+   LOCALE int                            BatchStarCommand(void *,EXEC_STATUS);
+   LOCALE int                            EnvBatchStar(void *,EXEC_STATUS,char *);
+   LOCALE int                            LoadCommand(void *,EXEC_STATUS);
+   LOCALE int                            LoadStarCommand(void *,EXEC_STATUS);
+   LOCALE int                            SaveCommand(void *,EXEC_STATUS);
+   LOCALE int                            DribbleOnCommand(void *,EXEC_STATUS);
+   LOCALE int                            DribbleOffCommand(void *,EXEC_STATUS);
 
 #endif
 

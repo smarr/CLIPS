@@ -51,7 +51,7 @@ struct bsavePortItem
    long next;
   };
 
-#define ModulePointer(i) ((struct defmodule *) (&DefmoduleData(theEnv)->DefmoduleArray[i]))
+#define ModulePointer(i) ((struct defmodule *) (&DefmoduleData(theEnv,execStatus)->DefmoduleArray[i]))
 
 #ifdef LOCALE
 #undef LOCALE
@@ -63,9 +63,9 @@ struct bsavePortItem
 #define LOCALE extern
 #endif
 
-   LOCALE void                           DefmoduleBinarySetup(void *);
+   LOCALE void                           DefmoduleBinarySetup(void *,EXEC_STATUS);
    LOCALE void                           UpdateDefmoduleItemHeader
-                                                 (void *,struct bsaveDefmoduleItemHeader *,
+                                                 (void *,EXEC_STATUS,struct bsaveDefmoduleItemHeader *,
                                                   struct defmoduleItemHeader *,int,void *);
 
 #if BLOAD_AND_BSAVE

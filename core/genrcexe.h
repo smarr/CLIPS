@@ -43,16 +43,16 @@
 #define LOCALE extern
 #endif
 
-LOCALE void GenericDispatch(void *,DEFGENERIC *,DEFMETHOD *,DEFMETHOD *,EXPRESSION *,DATA_OBJECT *);
-LOCALE void UnboundMethodErr(void *);
-LOCALE intBool IsMethodApplicable(void *,DEFMETHOD *);
+LOCALE void GenericDispatch(void *,EXEC_STATUS,DEFGENERIC *,DEFMETHOD *,DEFMETHOD *,EXPRESSION *,DATA_OBJECT *);
+LOCALE void UnboundMethodErr(void *,EXEC_STATUS);
+LOCALE intBool IsMethodApplicable(void *,EXEC_STATUS,DEFMETHOD *);
 
-LOCALE int NextMethodP(void *);
-LOCALE void CallNextMethod(void *,DATA_OBJECT *);
-LOCALE void CallSpecificMethod(void *,DATA_OBJECT *);
-LOCALE void OverrideNextMethod(void *,DATA_OBJECT *);
+LOCALE int NextMethodP(void *,EXEC_STATUS);
+LOCALE void CallNextMethod(void *,EXEC_STATUS,DATA_OBJECT *);
+LOCALE void CallSpecificMethod(void *,EXEC_STATUS,DATA_OBJECT *);
+LOCALE void OverrideNextMethod(void *,EXEC_STATUS,DATA_OBJECT *);
 
-LOCALE void GetGenericCurrentArgument(void *,DATA_OBJECT *);
+LOCALE void GetGenericCurrentArgument(void *,EXEC_STATUS,DATA_OBJECT *);
 
 #ifndef _GENRCEXE_SOURCE_
 #endif

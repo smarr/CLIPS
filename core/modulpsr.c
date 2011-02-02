@@ -52,17 +52,17 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static int                        ParsePortSpecifications(void *,
+   static int                        ParsePortSpecifications(void *,EXEC_STATUS,
                                                              char *,struct token *,
                                                              struct defmodule *);
-   static int                        ParseImportSpec(void *,char *,struct token *,
+   static int                        ParseImportSpec(void *,EXEC_STATUS,char *,struct token *,
                                                      struct defmodule *);
-   static int                        ParseExportSpec(void *,char *,struct token *,
+   static int                        ParseExportSpec(void *,EXEC_STATUS,char *,struct token *,
                                                      struct defmodule *,
                                                      struct defmodule *);
-   static intBool                    DeleteDefmodule(void *,void *);
-   static int                        FindMultiImportConflict(void *,struct defmodule *);
-   static void                       NotExportedErrorMessage(void *,char *,char *,char *);
+   static intBool                    DeleteDefmodule(void *,EXEC_STATUS,void *);
+   static int                        FindMultiImportConflict(void *,EXEC_STATUS,struct defmodule *);
+   static void                       NotExportedErrorMessage(void *,EXEC_STATUS,char *,char *,char *);
 
 /*********************************************/
 /* GetNumberOfDefmodules: Returns the number */
@@ -72,7 +72,7 @@ globle long GetNumberOfDefmodules(
   void *theEnv,
   EXEC_STATUS)
   {
-   return(DefmoduleData(theEnv)->NumberOfDefmodules);
+   return(DefmoduleData(theEnv,execStatus)->NumberOfDefmodules);
   }
 
 /******************************************/
@@ -84,7 +84,7 @@ globle void SetNumberOfDefmodules(
   EXEC_STATUS,
   long value)
   {
-   DefmoduleData(theEnv)->NumberOfDefmodules = value;
+   DefmoduleData(theEnv,execStatus)->NumberOfDefmodules = value;
   }
 
 /****************************************************/
@@ -99,8 +99,8 @@ globle void AddAfterModuleDefinedFunction(
   void (*func)(void *),
   int priority)
   {
-   DefmoduleData(theEnv)->AfterModuleDefinedFunctions =
-     AddFunctionToCallList(theEnv,execStatus,name,priority,func,DefmoduleData(theEnv)->AfterModuleDefinedFunctions,TRUE);
+   DefmoduleData(theEnv,execStatus)->AfterModuleDefinedFunctions =
+     AddFunctionToCallList(theEnv,execStatus,name,priority,func,DefmoduleData(theEnv,execStatus)->AfterModuleDefinedFunctions,TRUE);
   }
 
 /******************************************************/
@@ -118,8 +118,8 @@ globle void AddPortConstructItem(
    newItem = get_struct(theEnv,execStatus,portConstructItem);
    newItem->constructName = theName;
    newItem->typeExpected = theType;
-   newItem->next = DefmoduleData(theEnv)->ListOfPortConstructItems;
-   DefmoduleData(theEnv)->ListOfPortConstructItems = newItem;
+   newItem->next = DefmoduleData(theEnv,execStatus)->ListOfPortConstructItems;
+   DefmoduleData(theEnv,execStatus)->ListOfPortConstructItems = newItem;
   }
 
 /******************************************************/
@@ -152,7 +152,7 @@ globle int ParseDefmodule(
    /*================================================*/
 
    SetPPBufferStatus(theEnv,execStatus,ON);
-   FlushPPBuffer(theEnv);
+   FlushPPBuffer(theEnv,execStatus);
    SetIndentDepth(theEnv,execStatus,3);
    SavePPBuffer(theEnv,execStatus,"(defmodule ");
 
@@ -162,7 +162,7 @@ globle int ParseDefmodule(
    /*===============================*/
 
 #if BLOAD || BLOAD_ONLY || BLOAD_AND_BSAVE
-   if ((Bloaded(theEnv) == TRUE) && (! ConstructData(theEnv)->CheckSyntaxMode))
+   if ((Bloaded(theEnv,execStatus) == TRUE) && (! ConstructData(theEnv,execStatus)->CheckSyntaxMode))
      {
       CannotLoadWithBloadMessage(theEnv,execStatus,"defmodule");
       return(TRUE);
@@ -234,7 +234,7 @@ globle int ParseDefmodule(
    /* at this point as well.                               */
    /*======================================================*/
 
-   if (parseError || ConstructData(theEnv)->CheckSyntaxMode)
+   if (parseError || ConstructData(theEnv,execStatus)->CheckSyntaxMode)
      {
       while (newDefmodule->importList != NULL)
         {
@@ -274,7 +274,7 @@ globle int ParseDefmodule(
      {
       if ((newDefmodule->importList != NULL) ||
           (newDefmodule->exportList != NULL))
-        { DefmoduleData(theEnv)->MainModuleRedefinable = FALSE; }
+        { DefmoduleData(theEnv,execStatus)->MainModuleRedefinable = FALSE; }
      }
 
    for (portSpecs = newDefmodule->importList; portSpecs != NULL; portSpecs = portSpecs->next)
@@ -296,12 +296,12 @@ globle int ParseDefmodule(
    /*====================================================*/
 
    if (redefiningMainModule != NULL) { /* Do nothing */ }
-   else if (DefmoduleData(theEnv)->NumberOfModuleItems == 0) newDefmodule->itemsArray = NULL;
+   else if (DefmoduleData(theEnv,execStatus)->NumberOfModuleItems == 0) newDefmodule->itemsArray = NULL;
    else
      {
-      newDefmodule->itemsArray = (struct defmoduleItemHeader **) gm2(theEnv,execStatus,sizeof(void *) * DefmoduleData(theEnv)->NumberOfModuleItems);
-      for (i = 0, theItem = DefmoduleData(theEnv)->ListOfModuleItems;
-           (i < DefmoduleData(theEnv)->NumberOfModuleItems) && (theItem != NULL);
+      newDefmodule->itemsArray = (struct defmoduleItemHeader **) gm2(theEnv,execStatus,sizeof(void *) * DefmoduleData(theEnv,execStatus)->NumberOfModuleItems);
+      for (i = 0, theItem = DefmoduleData(theEnv,execStatus)->ListOfModuleItems;
+           (i < DefmoduleData(theEnv,execStatus)->NumberOfModuleItems) && (theItem != NULL);
            i++, theItem = theItem->next)
         {
          if (theItem->allocateFunction == NULL)
@@ -309,7 +309,7 @@ globle int ParseDefmodule(
          else
            {
             newDefmodule->itemsArray[i] = (struct defmoduleItemHeader *)
-                                          (*theItem->allocateFunction)(theEnv);
+                                          (*theItem->allocateFunction)(theEnv,execStatus);
             theHeader = (struct defmoduleItemHeader *) newDefmodule->itemsArray[i];
             theHeader->theModule = newDefmodule;
             theHeader->firstItem = NULL;
@@ -324,10 +324,10 @@ globle int ParseDefmodule(
 
    SavePPBuffer(theEnv,execStatus,"\n");
 
-   if (EnvGetConserveMemory(theEnv) == TRUE)
+   if (EnvGetConserveMemory(theEnv,execStatus) == TRUE)
      { newDefmodule->ppForm = NULL; }
    else
-     { newDefmodule->ppForm = CopyPPBuffer(theEnv); }
+     { newDefmodule->ppForm = CopyPPBuffer(theEnv,execStatus); }
 
    /*==============================================*/
    /* Add the defmodule to the list of defmodules. */
@@ -335,10 +335,10 @@ globle int ParseDefmodule(
 
    if (redefiningMainModule == NULL)
      {
-      if (DefmoduleData(theEnv)->LastDefmodule == NULL) DefmoduleData(theEnv)->ListOfDefmodules = newDefmodule;
-      else DefmoduleData(theEnv)->LastDefmodule->next = newDefmodule;
-      DefmoduleData(theEnv)->LastDefmodule = newDefmodule;
-      newDefmodule->bsaveID = DefmoduleData(theEnv)->NumberOfDefmodules++;
+      if (DefmoduleData(theEnv,execStatus)->LastDefmodule == NULL) DefmoduleData(theEnv,execStatus)->ListOfDefmodules = newDefmodule;
+      else DefmoduleData(theEnv,execStatus)->LastDefmodule->next = newDefmodule;
+      DefmoduleData(theEnv,execStatus)->LastDefmodule = newDefmodule;
+      newDefmodule->bsaveID = DefmoduleData(theEnv,execStatus)->NumberOfDefmodules++;
      }
 
    EnvSetCurrentModule(theEnv,execStatus,(void *) newDefmodule);
@@ -348,10 +348,10 @@ globle int ParseDefmodule(
    /* constructs when a new module is defined */
    /*=========================================*/
 
-   for (defineFunctions = DefmoduleData(theEnv)->AfterModuleDefinedFunctions;
+   for (defineFunctions = DefmoduleData(theEnv,execStatus)->AfterModuleDefinedFunctions;
         defineFunctions != NULL;
         defineFunctions = defineFunctions->next)
-     { (* (void (*)(void *)) defineFunctions->func)(theEnv); }
+     { (* (void (*)(void *)) defineFunctions->func)(theEnv,execStatus); }
 
    /*===============================================*/
    /* Defmodule successfully parsed with no errors. */
@@ -371,7 +371,7 @@ static intBool DeleteDefmodule(
   void *theConstruct)
   {
    if (strcmp(EnvGetDefmoduleName(theEnv,execStatus,theConstruct),"MAIN") == 0)
-     { return(DefmoduleData(theEnv)->MainModuleRedefinable); }
+     { return(DefmoduleData(theEnv,execStatus)->MainModuleRedefinable); }
 
    return(FALSE);
   }
@@ -448,13 +448,13 @@ static int ParsePortSpecifications(
       /* Begin parsing the next port specification. */
       /*============================================*/
 
-      PPCRAndIndent(theEnv);
+      PPCRAndIndent(theEnv,execStatus);
       GetToken(theEnv,execStatus,readSource,theToken);
 
       if (theToken->type == RPAREN)
         {
-         PPBackup(theEnv);
-         PPBackup(theEnv);
+         PPBackup(theEnv,execStatus);
+         PPBackup(theEnv,execStatus);
          SavePPBuffer(theEnv,execStatus,")");
         }
      }
@@ -602,7 +602,7 @@ static int ParseImportSpec(
    /* and can be seen from the module importing them.      */
    /*======================================================*/
 
-   SaveCurrentModule(theEnv);
+   SaveCurrentModule(theEnv,execStatus);
    EnvSetCurrentModule(theEnv,execStatus,(void *) newModule);
 
    for (thePort = newModule->importList;
@@ -622,12 +622,12 @@ static int ParseImportSpec(
          NotExportedErrorMessage(theEnv,execStatus,EnvGetDefmoduleName(theEnv,execStatus,theModule),
                                  ValueToString(thePort->constructType),
                                  ValueToString(thePort->constructName));
-         RestoreCurrentModule(theEnv);
+         RestoreCurrentModule(theEnv,execStatus);
          return(TRUE);
         }
      }
 
-   RestoreCurrentModule(theEnv);
+   RestoreCurrentModule(theEnv,execStatus);
 
    /*===============================================*/
    /* The import list has been successfully parsed. */
@@ -711,7 +711,7 @@ static int ParseExportSpec(
       if (theToken->type != RPAREN)
         {
          if (newPort != NULL) rtn_struct(theEnv,execStatus,portItem,newPort);
-         PPBackup(theEnv);
+         PPBackup(theEnv,execStatus);
          SavePPBuffer(theEnv,execStatus," ");
          SavePPBuffer(theEnv,execStatus,theToken->printForm);
          SyntaxErrorMessage(theEnv,execStatus,errorMessage);
@@ -807,7 +807,7 @@ static int ParseExportSpec(
       if (theToken->type != RPAREN)
         {
          if (newPort != NULL) rtn_struct(theEnv,execStatus,portItem,newPort);
-         PPBackup(theEnv);
+         PPBackup(theEnv,execStatus);
          SavePPBuffer(theEnv,execStatus," ");
          SavePPBuffer(theEnv,execStatus,theToken->printForm);
          SyntaxErrorMessage(theEnv,execStatus,errorMessage);
@@ -904,8 +904,8 @@ static int ParseExportSpec(
    /* Fix up pretty print buffer. */
    /*=============================*/
 
-   PPBackup(theEnv);
-   PPBackup(theEnv);
+   PPBackup(theEnv,execStatus);
+   PPBackup(theEnv,execStatus);
    SavePPBuffer(theEnv,execStatus,")");
 
    /*============================================*/
@@ -928,7 +928,7 @@ globle struct portConstructItem *ValidPortConstructItem(
   {
    struct portConstructItem *theItem;
 
-   for (theItem = DefmoduleData(theEnv)->ListOfPortConstructItems;
+   for (theItem = DefmoduleData(theEnv,execStatus)->ListOfPortConstructItems;
         theItem != NULL;
         theItem = theItem->next)
      { if (strcmp(theName,theItem->constructName) == 0) return(theItem); }
@@ -956,7 +956,7 @@ static int FindMultiImportConflict(
    /* Save the current module. */
    /*==========================*/
 
-   SaveCurrentModule(theEnv);
+   SaveCurrentModule(theEnv,execStatus);
 
    /*============================*/
    /* Loop through every module. */
@@ -971,7 +971,7 @@ static int FindMultiImportConflict(
       /* can be imported/exported by a module.  */
       /*========================================*/
 
-      for (thePCItem = DefmoduleData(theEnv)->ListOfPortConstructItems;
+      for (thePCItem = DefmoduleData(theEnv,execStatus)->ListOfPortConstructItems;
            thePCItem != NULL;
            thePCItem = thePCItem->next)
         {
@@ -1005,7 +1005,7 @@ static int FindMultiImportConflict(
                                             thePCItem->constructName,
                                             ValueToString((*theConstruct->getConstructNameFunction)
                                                           ((struct constructHeader *) theCItem)));
-                RestoreCurrentModule(theEnv);
+                RestoreCurrentModule(theEnv,execStatus);
                 return(TRUE);
                }
 
@@ -1018,7 +1018,7 @@ static int FindMultiImportConflict(
    /* Restore the current module. */
    /*=============================*/
 
-   RestoreCurrentModule(theEnv);
+   RestoreCurrentModule(theEnv,execStatus);
 
    /*=======================================*/
    /* Return FALSE to indicate no ambiguous */
@@ -1110,7 +1110,7 @@ globle int FindImportExportConflict(
    /* Save the current module. */
    /*==========================*/
 
-   SaveCurrentModule(theEnv);
+   SaveCurrentModule(theEnv,execStatus);
 
    /*================================================================*/
    /* Look at each module and count each definition of the specified */
@@ -1128,7 +1128,7 @@ globle int FindImportExportConflict(
       FindImportedConstruct(theEnv,execStatus,constructName,NULL,findName,&count,TRUE,matchModule);
       if (count > 1)
         {
-         RestoreCurrentModule(theEnv);
+         RestoreCurrentModule(theEnv,execStatus);
          return(TRUE);
         }
      }
@@ -1138,7 +1138,7 @@ globle int FindImportExportConflict(
    /* were detected so FALSE is returned.      */
    /*==========================================*/
 
-   RestoreCurrentModule(theEnv);
+   RestoreCurrentModule(theEnv,execStatus);
    return(FALSE);
   }
 

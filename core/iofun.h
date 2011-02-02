@@ -36,21 +36,21 @@
 #define LOCALE extern
 #endif
 
-   LOCALE void                           IOFunctionDefinitions(void *);
+   LOCALE void                           IOFunctionDefinitions(void *,EXEC_STATUS);
 #if IO_FUNCTIONS
-   LOCALE intBool                        SetFullCRLF(void *,intBool);
-   LOCALE void                           PrintoutFunction(void *);
-   LOCALE void                           ReadFunction(void *,DATA_OBJECT_PTR);
-   LOCALE int                            OpenFunction(void *);
-   LOCALE int                            CloseFunction(void *);
-   LOCALE int                            GetCharFunction(void *);
-   LOCALE void                           PutCharFunction(void *);
-   LOCALE void                           ReadlineFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                          *FormatFunction(void *);
-   LOCALE int                            RemoveFunction(void *);
-   LOCALE int                            RenameFunction(void *);
-   LOCALE void                           SetLocaleFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                           ReadNumberFunction(void *,DATA_OBJECT_PTR);
+   LOCALE intBool                        SetFullCRLF(void *,EXEC_STATUS,intBool);
+   LOCALE void                           PrintoutFunction(void *,EXEC_STATUS);
+   LOCALE void                           ReadFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
+   LOCALE int                            OpenFunction(void *,EXEC_STATUS);
+   LOCALE int                            CloseFunction(void *,EXEC_STATUS);
+   LOCALE int                            GetCharFunction(void *,EXEC_STATUS);
+   LOCALE void                           PutCharFunction(void *,EXEC_STATUS);
+   LOCALE void                           ReadlineFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
+   LOCALE void                          *FormatFunction(void *,EXEC_STATUS);
+   LOCALE int                            RemoveFunction(void *,EXEC_STATUS);
+   LOCALE int                            RenameFunction(void *,EXEC_STATUS);
+   LOCALE void                           SetLocaleFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
+   LOCALE void                           ReadNumberFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
 #endif
 
 #endif

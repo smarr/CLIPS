@@ -75,17 +75,17 @@
 /***************************************/
 
 #if (! RUN_TIME) && (! BLOAD_ONLY)
-   static struct expr            *ParseRuleRHS(void *,char *);
-   static int                     ReplaceRHSVariable(void *,struct expr *,void *);
-   static struct defrule         *ProcessRuleLHS(void *,struct lhsParseNode *,struct expr *,SYMBOL_HN *,int *);
-   static struct defrule         *CreateNewDisjunct(void *,SYMBOL_HN *,int,struct expr *,
+   static struct expr            *ParseRuleRHS(void *,EXEC_STATUS,char *);
+   static int                     ReplaceRHSVariable(void *,EXEC_STATUS,struct expr *,void *);
+   static struct defrule         *ProcessRuleLHS(void *,EXEC_STATUS,struct lhsParseNode *,struct expr *,SYMBOL_HN *,int *);
+   static struct defrule         *CreateNewDisjunct(void *,EXEC_STATUS,SYMBOL_HN *,int,struct expr *,
                                                     int,unsigned,struct joinNode *);
-   static int                     RuleComplexity(void *,struct lhsParseNode *);
-   static int                     ExpressionComplexity(void *,struct expr *);
-   static int                     LogicalAnalysis(void *,struct lhsParseNode *);
+   static int                     RuleComplexity(void *,EXEC_STATUS,struct lhsParseNode *);
+   static int                     ExpressionComplexity(void *,EXEC_STATUS,struct expr *);
+   static int                     LogicalAnalysis(void *,EXEC_STATUS,struct lhsParseNode *);
    static void                    AddToDefruleList(struct defrule *);
 #if DEVELOPER && DEBUGGING_FUNCTIONS
-   static void                    DumpRuleAnalysis(void *,struct lhsParseNode *);
+   static void                    DumpRuleAnalysis(void *,EXEC_STATUS,struct lhsParseNode *);
 #endif
 #endif
 
@@ -119,7 +119,7 @@ globle int ParseDefrule(
    /*================================================*/
 
    SetPPBufferStatus(theEnv,execStatus,ON);
-   FlushPPBuffer(theEnv);
+   FlushPPBuffer(theEnv,execStatus);
    SavePPBuffer(theEnv,execStatus,"(defrule ");
 
    /*=========================================================*/
@@ -127,7 +127,7 @@ globle int ParseDefrule(
    /*=========================================================*/
 
 #if BLOAD || BLOAD_ONLY || BLOAD_AND_BSAVE
-   if ((Bloaded(theEnv) == TRUE) && (! ConstructData(theEnv)->CheckSyntaxMode))
+   if ((Bloaded(theEnv,execStatus) == TRUE) && (! ConstructData(theEnv,execStatus)->CheckSyntaxMode))
      {
       CannotLoadWithBloadMessage(theEnv,execStatus,"defrule");
       return(TRUE);
@@ -140,7 +140,7 @@ globle int ParseDefrule(
    /*================================================*/
 
 #if DEBUGGING_FUNCTIONS
-   DefruleData(theEnv)->DeletedRuleDebugFlags = 0;
+   DefruleData(theEnv,execStatus)->DeletedRuleDebugFlags = 0;
 #endif
 
    ruleName = GetConstructNameAndComment(theEnv,execStatus,readSource,&theToken,"defrule",
@@ -156,8 +156,8 @@ globle int ParseDefrule(
    theLHS = ParseRuleLHS(theEnv,execStatus,readSource,&theToken,ValueToString(ruleName),&error);
    if (error)
      {
-      ReturnPackedExpression(theEnv,execStatus,PatternData(theEnv)->SalienceExpression);
-      PatternData(theEnv)->SalienceExpression = NULL;
+      ReturnPackedExpression(theEnv,execStatus,PatternData(theEnv,execStatus)->SalienceExpression);
+      PatternData(theEnv,execStatus)->SalienceExpression = NULL;
       return(TRUE);
      }
 
@@ -165,14 +165,14 @@ globle int ParseDefrule(
    /* Parse the RHS of the rule. */
    /*============================*/
 
-   ClearParsedBindNames(theEnv);
-   ExpressionData(theEnv)->ReturnContext = TRUE;
+   ClearParsedBindNames(theEnv,execStatus);
+   ExpressionData(theEnv,execStatus)->ReturnContext = TRUE;
    actions = ParseRuleRHS(theEnv,execStatus,readSource);
 
    if (actions == NULL)
      {
-      ReturnPackedExpression(theEnv,execStatus,PatternData(theEnv)->SalienceExpression);
-      PatternData(theEnv)->SalienceExpression = NULL;
+      ReturnPackedExpression(theEnv,execStatus,PatternData(theEnv,execStatus)->SalienceExpression);
+      PatternData(theEnv,execStatus)->SalienceExpression = NULL;
       ReturnLHSParseNodes(theEnv,execStatus,theLHS);
       return(TRUE);
      }
@@ -184,13 +184,13 @@ globle int ParseDefrule(
    topDisjunct = ProcessRuleLHS(theEnv,execStatus,theLHS,actions,ruleName,&error);
 
    ReturnExpression(theEnv,execStatus,actions);
-   ClearParsedBindNames(theEnv);
+   ClearParsedBindNames(theEnv,execStatus);
    ReturnLHSParseNodes(theEnv,execStatus,theLHS);
 
    if (error)
      {
-      ReturnPackedExpression(theEnv,execStatus,PatternData(theEnv)->SalienceExpression);
-      PatternData(theEnv)->SalienceExpression = NULL;
+      ReturnPackedExpression(theEnv,execStatus,PatternData(theEnv,execStatus)->SalienceExpression);
+      PatternData(theEnv,execStatus)->SalienceExpression = NULL;
       return(TRUE);
      }
 
@@ -199,24 +199,24 @@ globle int ParseDefrule(
    /* successfully parsed defrule to the KB.       */
    /*==============================================*/
 
-   if (ConstructData(theEnv)->CheckSyntaxMode)
+   if (ConstructData(theEnv,execStatus)->CheckSyntaxMode)
      {
-      ReturnPackedExpression(theEnv,execStatus,PatternData(theEnv)->SalienceExpression);
-      PatternData(theEnv)->SalienceExpression = NULL;
+      ReturnPackedExpression(theEnv,execStatus,PatternData(theEnv,execStatus)->SalienceExpression);
+      PatternData(theEnv,execStatus)->SalienceExpression = NULL;
       return(FALSE);
      }
 
-   PatternData(theEnv)->SalienceExpression = NULL;
+   PatternData(theEnv,execStatus)->SalienceExpression = NULL;
 
    /*======================================*/
    /* Save the nice printout of the rules. */
    /*======================================*/
 
    SavePPBuffer(theEnv,execStatus,"\n");
-   if (EnvGetConserveMemory(theEnv) == TRUE)
+   if (EnvGetConserveMemory(theEnv,execStatus) == TRUE)
      { topDisjunct->header.ppForm = NULL; }
    else
-     { topDisjunct->header.ppForm = CopyPPBuffer(theEnv); }
+     { topDisjunct->header.ppForm = CopyPPBuffer(theEnv,execStatus); }
 
    /*=======================================*/
    /* Store a pointer to the rule's module. */
@@ -242,11 +242,11 @@ globle int ParseDefrule(
    /*========================================================================*/
 
 #if DEBUGGING_FUNCTIONS
-   if (BitwiseTest(DefruleData(theEnv)->DeletedRuleDebugFlags,0))
+   if (BitwiseTest(DefruleData(theEnv,execStatus)->DeletedRuleDebugFlags,0))
      { EnvSetBreak(theEnv,execStatus,topDisjunct); }
-   if (BitwiseTest(DefruleData(theEnv)->DeletedRuleDebugFlags,1) || EnvGetWatchItem(theEnv,execStatus,"activations"))
+   if (BitwiseTest(DefruleData(theEnv,execStatus)->DeletedRuleDebugFlags,1) || EnvGetWatchItem(theEnv,execStatus,"activations"))
      { EnvSetDefruleWatchActivations(theEnv,execStatus,ON,(void *) topDisjunct); }
-   if (BitwiseTest(DefruleData(theEnv)->DeletedRuleDebugFlags,2) || EnvGetWatchItem(theEnv,execStatus,"rules"))
+   if (BitwiseTest(DefruleData(theEnv,execStatus)->DeletedRuleDebugFlags,2) || EnvGetWatchItem(theEnv,execStatus,"rules"))
      { EnvSetDefruleWatchFirings(theEnv,execStatus,ON,(void *) topDisjunct); }
 #endif
 
@@ -310,7 +310,7 @@ static struct defrule *ProcessRuleLHS(
    /* Loop through each disjunct of the rule. */
    /*=========================================*/
 
-   localVarCnt = CountParsedBindNames(theEnv);
+   localVarCnt = CountParsedBindNames(theEnv,execStatus);
    
    while ((theLHS != NULL) || (emptyLHS == TRUE))
      {
@@ -396,7 +396,7 @@ static struct defrule *ProcessRuleLHS(
       /* if we're only checking syntax.   */
       /*==================================*/
 
-      if (ConstructData(theEnv)->CheckSyntaxMode)
+      if (ConstructData(theEnv,execStatus)->CheckSyntaxMode)
         {
          ReturnExpression(theEnv,execStatus,newActions);
          if (emptyLHS)
@@ -494,14 +494,14 @@ static struct defrule *CreateNewDisjunct(
    newDisjunct->header.name = ruleName;
    IncrementSymbolCount(newDisjunct->header.name);
    newDisjunct->actions = theActions;
-   newDisjunct->salience = PatternData(theEnv)->GlobalSalience;
+   newDisjunct->salience = PatternData(theEnv,execStatus)->GlobalSalience;
    newDisjunct->afterBreakpoint = 0;
    newDisjunct->watchActivation = 0;
    newDisjunct->watchFiring = 0;
    newDisjunct->executing = 0;
    newDisjunct->complexity = complexity;
-   newDisjunct->autoFocus = PatternData(theEnv)->GlobalAutoFocus;
-   newDisjunct->dynamicSalience = PatternData(theEnv)->SalienceExpression;
+   newDisjunct->autoFocus = PatternData(theEnv,execStatus)->GlobalAutoFocus;
+   newDisjunct->dynamicSalience = PatternData(theEnv,execStatus)->SalienceExpression;
    newDisjunct->localVarCnt = localVarCnt;
 
    /*=====================================*/
@@ -634,8 +634,8 @@ static struct expr *ParseRuleRHS(
    /* Reformat the closing token. */
    /*=============================*/
 
-   PPBackup(theEnv);
-   PPBackup(theEnv);
+   PPBackup(theEnv,execStatus);
+   PPBackup(theEnv,execStatus);
    SavePPBuffer(theEnv,execStatus,theToken.printForm);
 
    /*======================================================*/
@@ -713,9 +713,9 @@ static int ExpressionComplexity(
          /* complexity, but their arguments do.     */
          /*=========================================*/
 
-         if ((exprPtr->value == ExpressionData(theEnv)->PTR_AND) ||
-                  (exprPtr->value == ExpressionData(theEnv)->PTR_NOT) ||
-                  (exprPtr->value == ExpressionData(theEnv)->PTR_OR))
+         if ((exprPtr->value == ExpressionData(theEnv,execStatus)->PTR_AND) ||
+                  (exprPtr->value == ExpressionData(theEnv,execStatus)->PTR_NOT) ||
+                  (exprPtr->value == ExpressionData(theEnv,execStatus)->PTR_OR))
            { complexity += ExpressionComplexity(theEnv,execStatus,exprPtr->argList); }
 
          /*=========================================*/
@@ -726,8 +726,8 @@ static int ExpressionComplexity(
          else
            { complexity++; }
         }
-      else if ((EvaluationData(theEnv)->PrimitivesArray[exprPtr->type] != NULL) ?
-               EvaluationData(theEnv)->PrimitivesArray[exprPtr->type]->addsToRuleComplexity : FALSE)
+      else if ((EvaluationData(theEnv,execStatus)->PrimitivesArray[exprPtr->type] != NULL) ?
+               EvaluationData(theEnv,execStatus)->PrimitivesArray[exprPtr->type]->addsToRuleComplexity : FALSE)
         { complexity++; }
 
       exprPtr = exprPtr->nextArg;

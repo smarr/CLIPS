@@ -111,7 +111,7 @@ globle int compile_region(
    if (( s = getregion(&region)) != TRUE)
       return(s);
    if ((lastflag&CFKILL) == 0)
-     kdelete(theEnv);
+     kdelete(theEnv,execStatus);
    thisflag |= CFKILL;
    linep = region.r_linep;
    loffs = region.r_offset;
@@ -202,7 +202,7 @@ globle int get_compile(
    EnvActivateRouter(theEnv,execStatus,"cmp_router");
    SetPrintWhileLoading(theEnv,execStatus,TRUE);
    LoadConstructsFromLogicalName(theEnv,execStatus,str2);
-   DestroyPPBuffer(theEnv);
+   DestroyPPBuffer(theEnv,execStatus);
    /* Flush last diagnostic line (if any) to buffer */
    if (CompileLineIndex != 0)
      addline(theEnv,execStatus,CompileBufferp,CompileLine);
@@ -213,7 +213,7 @@ globle int get_compile(
 
    genstrcpy(CompileBufferp->b_fname, "");
    if (CompileBufferp->b_nwnd == 0) {          /* Not on screen yet.   */
-           if ((wp=wpopup(theEnv)) == NULL)
+           if ((wp=wpopup(theEnv,execStatus)) == NULL)
                    return (0);
            bp = wp->w_bufp;
            if (--bp->b_nwnd == 0) {
@@ -666,7 +666,7 @@ globle int quote(
                 return (TRUE);
         if (c == '\n') {
                 do {
-                        s = lnewline(theEnv);
+                        s = lnewline(theEnv,execStatus);
                 } while (s==TRUE && --n);
                 return (s);
         }
@@ -723,7 +723,7 @@ globle int openline(
                 return (TRUE);
         i = n;                                  /* Insert newlines.     */
         do {
-                s = lnewline(theEnv);
+                s = lnewline(theEnv,execStatus);
         } while (s==TRUE && --i);
         if (s == TRUE)                          /* Then back up overtop */
                 s = backchar(theEnv,execStatus,f, n);             /* of them all.         */
@@ -758,7 +758,7 @@ globle int newline(
                 && llength(lforw(lp)) == 0) {
                         if ((s=forwchar(theEnv,execStatus,FALSE, 1)) != TRUE)
                                 return (s);
-                } else if ((s=lnewline(theEnv)) != TRUE)
+                } else if ((s=lnewline(theEnv,execStatus)) != TRUE)
                         return (s);
         }
         return (TRUE);
@@ -832,7 +832,7 @@ globle int indent(
                                 nicol |= 0x07;
                         ++nicol;
                 }
-                if (lnewline(theEnv) == FALSE
+                if (lnewline(theEnv,execStatus) == FALSE
                 || ((i=nicol/8)!=0 && linsert(theEnv,execStatus,i, '\t')==FALSE)
                 || ((i=nicol%8)!=0 && linsert(theEnv,execStatus,i,  ' ')==FALSE))
                         return (FALSE);
@@ -859,7 +859,7 @@ globle int forwdel(
                 return (backdel(theEnv,execStatus,f, -n));
         if (f != FALSE) {                       /* Really a kill.       */
                 if ((lastflag&CFKILL) == 0)
-                        kdelete(theEnv);
+                        kdelete(theEnv,execStatus);
                 thisflag |= CFKILL;
         }
         return (ldelete(theEnv,execStatus,(long) n, f));
@@ -886,7 +886,7 @@ globle int backdel(
                 return (forwdel(theEnv,execStatus,f, -n));
         if (f != FALSE) {                       /* Really a kill.       */
                 if ((lastflag&CFKILL) == 0)
-                        kdelete(theEnv);
+                        kdelete(theEnv,execStatus);
                 thisflag |= CFKILL;
         }
         if ((s=backchar(theEnv,execStatus,f, n)) == TRUE)
@@ -915,7 +915,7 @@ globle int kill_fwd(
         register LINE   *nextp;
 
         if ((lastflag&CFKILL) == 0)             /* Clear kill buffer if */
-                kdelete(theEnv);                      /* last wasn't a kill.  */
+                kdelete(theEnv,execStatus);                      /* last wasn't a kill.  */
         thisflag |= CFKILL;
         if (f == FALSE) {
                 chunk = llength(curwp->w_dotp)-curwp->w_doto;

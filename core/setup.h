@@ -522,8 +522,8 @@
 #define WCLIPS WPROMPT
 #define CLIPSTrueSymbol EnvTrueSymbol(GetCurrentEnvironment())
 #define CLIPSFalseSymbol EnvFalseSymbol(GetCurrentEnvironment())
-#define EnvCLIPSTrueSymbol(theEnv) EnvTrueSymbol(theEnv)
-#define EnvCLIPSFalseSymbol(theEnv) EnvFalseSymbol(theEnv)
+#define EnvCLIPSTrueSymbol(theEnv,execStatus) EnvTrueSymbol(theEnv,execStatus)
+#define EnvCLIPSFalseSymbol(theEnv,execStatus) EnvFalseSymbol(theEnv,execStatus)
 #define CLIPS_FALSE 0
 #define CLIPS_TRUE 1
 

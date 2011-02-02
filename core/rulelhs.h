@@ -45,7 +45,7 @@
 #define LOCALE extern
 #endif
 
-LOCALE struct lhsParseNode           *ParseRuleLHS(void *,char *,struct token *,char *,int *);
+LOCALE struct lhsParseNode           *ParseRuleLHS(void *,EXEC_STATUS,char *,struct token *,char *,int *);
 LOCALE void                           PropagatePatternType(struct lhsParseNode *,struct patternParser *);
 
 #endif

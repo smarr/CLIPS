@@ -40,16 +40,16 @@
 #define LOCALE extern
 #endif
 
-#define ExpressionPointer(i) ((struct expr *) (((i) == -1L) ? NULL : &ExpressionData(theEnv)->ExpressionArray[i]))
+#define ExpressionPointer(i) ((struct expr *) (((i) == -1L) ? NULL : &ExpressionData(theEnv,execStatus)->ExpressionArray[i]))
 #define HashedExpressionPointer(i) ExpressionPointer(i)
 
-   LOCALE void                        AllocateExpressions(void *);
-   LOCALE void                        RefreshExpressions(void *);
-   LOCALE void                        ClearBloadedExpressions(void *);
-   LOCALE void                        FindHashedExpressions(void *);
-   LOCALE void                        BsaveHashedExpressions(void *,FILE *);
-   LOCALE void                        BsaveConstructExpressions(void *,FILE *);
-   LOCALE void                        BsaveExpression(void *,struct expr *,FILE *);
+   LOCALE void                        AllocateExpressions(void *,EXEC_STATUS);
+   LOCALE void                        RefreshExpressions(void *,EXEC_STATUS);
+   LOCALE void                        ClearBloadedExpressions(void *,EXEC_STATUS);
+   LOCALE void                        FindHashedExpressions(void *,EXEC_STATUS);
+   LOCALE void                        BsaveHashedExpressions(void *,EXEC_STATUS,FILE *);
+   LOCALE void                        BsaveConstructExpressions(void *,EXEC_STATUS,FILE *);
+   LOCALE void                        BsaveExpression(void *,EXEC_STATUS,struct expr *,FILE *);
 
 #endif
 

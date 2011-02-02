@@ -57,16 +57,16 @@ struct constraintParseRecord
 
 typedef struct constraintParseRecord CONSTRAINT_PARSE_RECORD;
 
-   LOCALE intBool                        CheckConstraintParseConflicts(void *,CONSTRAINT_RECORD *);
-   LOCALE void                           AttributeConflictErrorMessage(void *,char *,char *);
+   LOCALE intBool                        CheckConstraintParseConflicts(void *,EXEC_STATUS,CONSTRAINT_RECORD *);
+   LOCALE void                           AttributeConflictErrorMessage(void *,EXEC_STATUS,char *,char *);
 #if (! RUN_TIME) && (! BLOAD_ONLY)
    LOCALE void                           InitializeConstraintParseRecord(CONSTRAINT_PARSE_RECORD *);
    LOCALE intBool                        StandardConstraint(char *);
-   LOCALE intBool                        ParseStandardConstraint(void *,char *,char *,
+   LOCALE intBool                        ParseStandardConstraint(void *,EXEC_STATUS,char *,char *,
                                                                  CONSTRAINT_RECORD *,
                                                                  CONSTRAINT_PARSE_RECORD *,
                                                                  int);
-   LOCALE void                           OverlayConstraint(void *,CONSTRAINT_PARSE_RECORD *,
+   LOCALE void                           OverlayConstraint(void *,EXEC_STATUS,CONSTRAINT_PARSE_RECORD *,
                                                            CONSTRAINT_RECORD *,CONSTRAINT_RECORD *);
    LOCALE void                           OverlayConstraintParseRecord(CONSTRAINT_PARSE_RECORD *,
                                                                       CONSTRAINT_PARSE_RECORD *);

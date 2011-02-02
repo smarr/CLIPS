@@ -68,53 +68,53 @@ struct memoryPtr
 // STEFAN: TODO: make those thread-safe
 
 #define get_struct(theEnv,execStatus,type) \
-  ((MemoryData(theEnv)->MemoryTable[sizeof(struct type)] == NULL) \
+  ((MemoryData(theEnv,execStatus)->MemoryTable[sizeof(struct type)] == NULL) \
     ? ((struct type *) genalloc(theEnv,execStatus,sizeof(struct type))) \
-    : ((MemoryData(theEnv)->TempMemoryPtr = MemoryData(theEnv)->MemoryTable[sizeof(struct type)]),\
-    MemoryData(theEnv)->MemoryTable[sizeof(struct type)] = MemoryData(theEnv)->TempMemoryPtr->next,\
-    ((struct type *) MemoryData(theEnv)->TempMemoryPtr)))
+    : ((MemoryData(theEnv,execStatus)->TempMemoryPtr = MemoryData(theEnv,execStatus)->MemoryTable[sizeof(struct type)]),\
+    MemoryData(theEnv,execStatus)->MemoryTable[sizeof(struct type)] = MemoryData(theEnv,execStatus)->TempMemoryPtr->next,\
+    ((struct type *) MemoryData(theEnv,execStatus)->TempMemoryPtr)))
 
 #define rtn_struct(theEnv,execStatus,type,struct_ptr) \
-  (MemoryData(theEnv)->TempMemoryPtr = (struct memoryPtr *) struct_ptr,\
-   MemoryData(theEnv)->TempMemoryPtr->next = MemoryData(theEnv)->MemoryTable[sizeof(struct type)], \
-   MemoryData(theEnv)->MemoryTable[sizeof(struct type)] = MemoryData(theEnv)->TempMemoryPtr)
+  (MemoryData(theEnv,execStatus)->TempMemoryPtr = (struct memoryPtr *) struct_ptr,\
+   MemoryData(theEnv,execStatus)->TempMemoryPtr->next = MemoryData(theEnv,execStatus)->MemoryTable[sizeof(struct type)], \
+   MemoryData(theEnv,execStatus)->MemoryTable[sizeof(struct type)] = MemoryData(theEnv,execStatus)->TempMemoryPtr)
 
 #define rtn_sized_struct(theEnv,execStatus,size,struct_ptr) \
-  (MemoryData(theEnv)->TempMemoryPtr = (struct memoryPtr *) struct_ptr,\
-   MemoryData(theEnv)->TempMemoryPtr->next = MemoryData(theEnv)->MemoryTable[size], \
-   MemoryData(theEnv)->MemoryTable[size] = MemoryData(theEnv)->TempMemoryPtr)
+  (MemoryData(theEnv,execStatus)->TempMemoryPtr = (struct memoryPtr *) struct_ptr,\
+   MemoryData(theEnv,execStatus)->TempMemoryPtr->next = MemoryData(theEnv,execStatus)->MemoryTable[size], \
+   MemoryData(theEnv,execStatus)->MemoryTable[size] = MemoryData(theEnv,execStatus)->TempMemoryPtr)
 
 #define get_var_struct(theEnv,execStatus,type,vsize) \
   ((((sizeof(struct type) + vsize) <  MEM_TABLE_SIZE) ? \
-    (MemoryData(theEnv)->MemoryTable[sizeof(struct type) + vsize] == NULL) : 1) ? \
+    (MemoryData(theEnv,execStatus)->MemoryTable[sizeof(struct type) + vsize] == NULL) : 1) ? \
    ((struct type *) genalloc(theEnv,execStatus,(sizeof(struct type) + vsize))) :\
-   ((MemoryData(theEnv)->TempMemoryPtr = MemoryData(theEnv)->MemoryTable[sizeof(struct type) + vsize]),\
-    MemoryData(theEnv)->MemoryTable[sizeof(struct type) + vsize] = MemoryData(theEnv)->TempMemoryPtr->next,\
-    ((struct type *) MemoryData(theEnv)->TempMemoryPtr)))
+   ((MemoryData(theEnv,execStatus)->TempMemoryPtr = MemoryData(theEnv,execStatus)->MemoryTable[sizeof(struct type) + vsize]),\
+    MemoryData(theEnv,execStatus)->MemoryTable[sizeof(struct type) + vsize] = MemoryData(theEnv,execStatus)->TempMemoryPtr->next,\
+    ((struct type *) MemoryData(theEnv,execStatus)->TempMemoryPtr)))
 
 #define rtn_var_struct(theEnv,execStatus,type,vsize,struct_ptr) \
-  (MemoryData(theEnv)->TempSize = sizeof(struct type) + vsize, \
-   ((MemoryData(theEnv)->TempSize < MEM_TABLE_SIZE) ? \
-    (MemoryData(theEnv)->TempMemoryPtr = (struct memoryPtr *) struct_ptr,\
-     MemoryData(theEnv)->TempMemoryPtr->next = MemoryData(theEnv)->MemoryTable[MemoryData(theEnv)->TempSize], \
-     MemoryData(theEnv)->MemoryTable[MemoryData(theEnv)->TempSize] =  MemoryData(theEnv)->TempMemoryPtr) : \
-    (genfree(theEnv,execStatus,(void *) struct_ptr,MemoryData(theEnv)->TempSize),(struct memoryPtr *) struct_ptr)))
+  (MemoryData(theEnv,execStatus)->TempSize = sizeof(struct type) + vsize, \
+   ((MemoryData(theEnv,execStatus)->TempSize < MEM_TABLE_SIZE) ? \
+    (MemoryData(theEnv,execStatus)->TempMemoryPtr = (struct memoryPtr *) struct_ptr,\
+     MemoryData(theEnv,execStatus)->TempMemoryPtr->next = MemoryData(theEnv,execStatus)->MemoryTable[MemoryData(theEnv,execStatus)->TempSize], \
+     MemoryData(theEnv,execStatus)->MemoryTable[MemoryData(theEnv,execStatus)->TempSize] =  MemoryData(theEnv,execStatus)->TempMemoryPtr) : \
+    (genfree(theEnv,execStatus,(void *) struct_ptr,MemoryData(theEnv,execStatus)->TempSize),(struct memoryPtr *) struct_ptr)))
 
 #define get_mem(theEnv,execStatus,size) \
   (((size <  MEM_TABLE_SIZE) ? \
-    (MemoryData(theEnv)->MemoryTable[size] == NULL) : 1) ? \
+    (MemoryData(theEnv,execStatus)->MemoryTable[size] == NULL) : 1) ? \
    ((struct type *) genalloc(theEnv,execStatus,(size_t) (size))) :\
-   ((MemoryData(theEnv)->TempMemoryPtr = MemoryData(theEnv)->MemoryTable[size]),\
-    MemoryData(theEnv)->MemoryTable[size] = MemoryData(theEnv)->TempMemoryPtr->next,\
-    ((struct type *) MemoryData(theEnv)->TempMemoryPtr)))
+   ((MemoryData(theEnv,execStatus)->TempMemoryPtr = MemoryData(theEnv,execStatus)->MemoryTable[size]),\
+    MemoryData(theEnv,execStatus)->MemoryTable[size] = MemoryData(theEnv,execStatus)->TempMemoryPtr->next,\
+    ((struct type *) MemoryData(theEnv,execStatus)->TempMemoryPtr)))
 
 #define rtn_mem(theEnv,execStatus,size,ptr) \
-  (MemoryData(theEnv)->TempSize = size, \
-   ((MemoryData(theEnv)->TempSize < MEM_TABLE_SIZE) ? \
-    (MemoryData(theEnv)->TempMemoryPtr = (struct memoryPtr *) ptr,\
-     MemoryData(theEnv)->TempMemoryPtr->next = MemoryData(theEnv)->MemoryTable[MemoryData(theEnv)->TempSize], \
-     MemoryData(theEnv)->MemoryTable[MemoryData(theEnv)->TempSize] =  MemoryData(theEnv)->TempMemoryPtr) : \
-    (genfree(theEnv,execStatus,(void *) ptr,MemoryData(theEnv)->TempSize),(struct memoryPtr *) ptr)))
+  (MemoryData(theEnv,execStatus)->TempSize = size, \
+   ((MemoryData(theEnv,execStatus)->TempSize < MEM_TABLE_SIZE) ? \
+    (MemoryData(theEnv,execStatus)->TempMemoryPtr = (struct memoryPtr *) ptr,\
+     MemoryData(theEnv,execStatus)->TempMemoryPtr->next = MemoryData(theEnv,execStatus)->MemoryTable[MemoryData(theEnv,execStatus)->TempSize], \
+     MemoryData(theEnv,execStatus)->MemoryTable[MemoryData(theEnv,execStatus)->TempSize] =  MemoryData(theEnv,execStatus)->TempMemoryPtr) : \
+    (genfree(theEnv,execStatus,(void *) ptr,MemoryData(theEnv,execStatus)->TempSize),(struct memoryPtr *) ptr)))
 
 #define GenCopyMemory(type,cnt,dst,src) \
    memcpy((void *) (dst),(void *) (src),sizeof(type) * (size_t) (cnt))
@@ -126,7 +126,7 @@ struct memoryData
    long int MemoryAmount;
    long int MemoryCalls;
    intBool ConserveMemory;
-   int (*OutOfMemoryFunction)(void *,size_t);
+   int (*OutOfMemoryFunction)(void *,EXEC_STATUS,size_t);
 #if BLOCK_MEMORY
    struct blockInfo *TopMemoryBlock;
    int BlockInfoSize;
@@ -138,7 +138,7 @@ struct memoryData
    size_t TempSize;
   };
 
-#define MemoryData(theEnv) ((struct memoryData *) GetEnvironmentData(theEnv,execStatus,MEMORY_DATA))
+#define MemoryData(theEnv,execStatus) ((struct memoryData *) GetEnvironmentData(theEnv,execStatus,MEMORY_DATA))
 
 #define GetConserveMemory() EnvGetConserveMemory(GetCurrentEnvironment())
 #define MemRequests() EnvMemRequests(GetCurrentEnvironment())
@@ -147,30 +147,30 @@ struct memoryData
 #define SetConserveMemory(a) EnvSetConserveMemory(GetCurrentEnvironment(),a)
 #define SetOutOfMemoryFunction(a) EnvSetOutOfMemoryFunction(GetCurrentEnvironment(),a)
 
-   LOCALE void                           InitializeMemory(void *);
-   LOCALE void                          *genalloc(void *,size_t);
-   LOCALE int                            DefaultOutOfMemoryFunction(void *,size_t);
-   LOCALE int                          (*EnvSetOutOfMemoryFunction(void *,int (*)(void *,size_t)))(void *,size_t);
-   LOCALE int                            genfree(void *,void *,size_t);
-   LOCALE void                          *genrealloc(void *,void *,size_t,size_t);
-   LOCALE long                           EnvMemUsed(void *);
-   LOCALE long                           EnvMemRequests(void *);
-   LOCALE long                           UpdateMemoryUsed(void *,long int);
-   LOCALE long                           UpdateMemoryRequests(void *,long int);
-   LOCALE long                           EnvReleaseMem(void *,long,int);
-   LOCALE void                          *gm1(void *,size_t);
-   LOCALE void                          *gm2(void *,size_t);
-   LOCALE void                          *gm3(void *,size_t);
-   LOCALE int                            rm(void *,void *,size_t);
-   LOCALE int                            rm3(void *,void *,size_t);
-   LOCALE unsigned long                  PoolSize(void *);
-   LOCALE unsigned long                  ActualPoolSize(void *);
-   LOCALE void                          *RequestChunk(void *,size_t);
-   LOCALE int                            ReturnChunk(void *,void *,size_t);
-   LOCALE intBool                        EnvSetConserveMemory(void *,intBool);
-   LOCALE intBool                        EnvGetConserveMemory(void *);
+   LOCALE void                           InitializeMemory(void *,EXEC_STATUS);
+   LOCALE void                          *genalloc(void *,EXEC_STATUS,size_t);
+   LOCALE int                            DefaultOutOfMemoryFunction(void *,EXEC_STATUS,size_t);
+   LOCALE int                          (*EnvSetOutOfMemoryFunction(void *,EXEC_STATUS,int (*)(void *,EXEC_STATUS,size_t)))(void *,EXEC_STATUS,size_t);
+   LOCALE int                            genfree(void *,EXEC_STATUS,void *,size_t);
+   LOCALE void                          *genrealloc(void *,EXEC_STATUS,void *,size_t,size_t);
+   LOCALE long                           EnvMemUsed(void *,EXEC_STATUS);
+   LOCALE long                           EnvMemRequests(void *,EXEC_STATUS);
+   LOCALE long                           UpdateMemoryUsed(void *,EXEC_STATUS,long int);
+   LOCALE long                           UpdateMemoryRequests(void *,EXEC_STATUS,long int);
+   LOCALE long                           EnvReleaseMem(void *,EXEC_STATUS,long,int);
+   LOCALE void                          *gm1(void *,EXEC_STATUS,size_t);
+   LOCALE void                          *gm2(void *,EXEC_STATUS,size_t);
+   LOCALE void                          *gm3(void *,EXEC_STATUS,size_t);
+   LOCALE int                            rm(void *,EXEC_STATUS,void *,size_t);
+   LOCALE int                            rm3(void *,EXEC_STATUS,void *,size_t);
+   LOCALE unsigned long                  PoolSize(void *,EXEC_STATUS);
+   LOCALE unsigned long                  ActualPoolSize(void *,EXEC_STATUS);
+   LOCALE void                          *RequestChunk(void *,EXEC_STATUS,size_t);
+   LOCALE int                            ReturnChunk(void *,EXEC_STATUS,void *,size_t);
+   LOCALE intBool                        EnvSetConserveMemory(void *,EXEC_STATUS,intBool);
+   LOCALE intBool                        EnvGetConserveMemory(void *,EXEC_STATUS);
    LOCALE void                           genmemcpy(char *,char *,unsigned long);
-   LOCALE void                           ReturnAllBlocks(void *);
+   LOCALE void                           ReturnAllBlocks(void *,EXEC_STATUS);
 
 #endif
 

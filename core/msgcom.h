@@ -51,7 +51,7 @@ struct messageHandlerData
    HANDLER_LINK *OldCore;
   };
 
-#define MessageHandlerData(theEnv) ((struct messageHandlerData *) GetEnvironmentData(theEnv,execStatus,MESSAGE_HANDLER_DATA))
+#define MessageHandlerData(theEnv,execStatus) ((struct messageHandlerData *) GetEnvironmentData(theEnv,execStatus,MESSAGE_HANDLER_DATA))
 
 
 #ifdef LOCALE
@@ -81,28 +81,28 @@ struct messageHandlerData
 #define SetDefmessageHandlerWatch(a,b,c) EnvSetDefmessageHandlerWatch(GetCurrentEnvironment(),a,b,c)
 #define UndefmessageHandler(a,b) EnvUndefmessageHandler(GetCurrentEnvironment(),a,b)
    
-   LOCALE void             SetupMessageHandlers(void *);
-   LOCALE char            *EnvGetDefmessageHandlerName(void *,void *,int);
-   LOCALE char            *EnvGetDefmessageHandlerType(void *,void *,int);
-   LOCALE int              EnvGetNextDefmessageHandler(void *,void *,int);
-   LOCALE HANDLER         *GetDefmessageHandlerPointer(void *,int);
+   LOCALE void             SetupMessageHandlers(void *,EXEC_STATUS);
+   LOCALE char            *EnvGetDefmessageHandlerName(void *,EXEC_STATUS,void *,int);
+   LOCALE char            *EnvGetDefmessageHandlerType(void *,EXEC_STATUS,void *,int);
+   LOCALE int              EnvGetNextDefmessageHandler(void *,EXEC_STATUS,void *,int);
+   LOCALE HANDLER         *GetDefmessageHandlerPointer(void *,EXEC_STATUS,int);
 #if DEBUGGING_FUNCTIONS
-   LOCALE unsigned         EnvGetDefmessageHandlerWatch(void *,void *,int);
-   LOCALE void             EnvSetDefmessageHandlerWatch(void *,int,void *,int);
+   LOCALE unsigned         EnvGetDefmessageHandlerWatch(void *,EXEC_STATUS,void *,int);
+   LOCALE void             EnvSetDefmessageHandlerWatch(void *,EXEC_STATUS,int,void *,int);
 #endif
-   LOCALE unsigned         EnvFindDefmessageHandler(void *,void *,char *,char *); 
-   LOCALE int              EnvIsDefmessageHandlerDeletable(void *,void *,int);
-   LOCALE void             UndefmessageHandlerCommand(void *);
-   LOCALE int              EnvUndefmessageHandler(void *,void *,int);
+   LOCALE unsigned         EnvFindDefmessageHandler(void *,EXEC_STATUS,void *,char *,char *); 
+   LOCALE int              EnvIsDefmessageHandlerDeletable(void *,EXEC_STATUS,void *,int);
+   LOCALE void             UndefmessageHandlerCommand(void *,EXEC_STATUS);
+   LOCALE int              EnvUndefmessageHandler(void *,EXEC_STATUS,void *,int);
 
 #if DEBUGGING_FUNCTIONS
-   LOCALE void             PPDefmessageHandlerCommand(void *);
-   LOCALE void             ListDefmessageHandlersCommand(void *);
-   LOCALE void             PreviewSendCommand(void *); 
-   LOCALE char            *EnvGetDefmessageHandlerPPForm(void *,void *,int);
-   LOCALE void             EnvListDefmessageHandlers(void *,char *,void *,int);
-   LOCALE void             EnvPreviewSend(void *,char *,void *,char *);
-   LOCALE long             DisplayHandlersInLinks(void *,char *,PACKED_CLASS_LINKS *,int);
+   LOCALE void             PPDefmessageHandlerCommand(void *,EXEC_STATUS);
+   LOCALE void             ListDefmessageHandlersCommand(void *,EXEC_STATUS);
+   LOCALE void             PreviewSendCommand(void *,EXEC_STATUS); 
+   LOCALE char            *EnvGetDefmessageHandlerPPForm(void *,EXEC_STATUS,void *,int);
+   LOCALE void             EnvListDefmessageHandlers(void *,EXEC_STATUS,char *,void *,int);
+   LOCALE void             EnvPreviewSend(void *,EXEC_STATUS,char *,void *,char *);
+   LOCALE long             DisplayHandlersInLinks(void *,EXEC_STATUS,char *,PACKED_CLASS_LINKS *,int);
 #endif
 
 #endif

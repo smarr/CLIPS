@@ -44,13 +44,13 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static int                     FindString(void *,char *);
-   static int                     PrintString(void *,char *,char *);
-   static int                     GetcString(void *,char *);
-   static int                     UngetcString(void *,int,char *);
-   static struct stringRouter    *FindStringRouter(void *,char *);
-   static int                     CreateReadStringSource(void *,char *,char *,size_t,size_t);
-   static void                    DeallocateStringRouterData(void *);
+   static int                     FindString(void *,EXEC_STATUS,char *);
+   static int                     PrintString(void *,EXEC_STATUS,char *,char *);
+   static int                     GetcString(void *,EXEC_STATUS,char *);
+   static int                     UngetcString(void *,EXEC_STATUS,int,char *);
+   static struct stringRouter    *FindStringRouter(void *,EXEC_STATUS,char *);
+   static int                     CreateReadStringSource(void *,EXEC_STATUS,char *,char *,size_t,size_t);
+   static void                    DeallocateStringRouterData(void *,EXEC_STATUS);
 
 /**********************************************************/
 /* InitializeStringRouter: Initializes string I/O router. */
@@ -74,7 +74,7 @@ static void DeallocateStringRouterData(
   {
    struct stringRouter *tmpPtr, *nextPtr;
    
-   tmpPtr = StringRouterData(theEnv)->ListOfStringRouters;
+   tmpPtr = StringRouterData(theEnv,execStatus)->ListOfStringRouters;
    while (tmpPtr != NULL)
      {
       nextPtr = tmpPtr->next;
@@ -94,7 +94,7 @@ static int FindString(
   {
    struct stringRouter *head;
 
-   head = StringRouterData(theEnv)->ListOfStringRouters;
+   head = StringRouterData(theEnv,execStatus)->ListOfStringRouters;
    while (head != NULL)
      {
       if (strcmp(head->name,fileid) == 0)
@@ -266,8 +266,8 @@ static int CreateReadStringSource(
    newStringRouter->currentPosition = currentPosition;
    newStringRouter->readWriteType = READ_STRING;
    newStringRouter->maximumPosition = maximumPosition;
-   newStringRouter->next = StringRouterData(theEnv)->ListOfStringRouters;
-   StringRouterData(theEnv)->ListOfStringRouters = newStringRouter;
+   newStringRouter->next = StringRouterData(theEnv,execStatus)->ListOfStringRouters;
+   StringRouterData(theEnv,execStatus)->ListOfStringRouters = newStringRouter;
 
    return(1);
   }
@@ -283,14 +283,14 @@ globle int CloseStringSource(
    struct stringRouter *head, *last;
 
    last = NULL;
-   head = StringRouterData(theEnv)->ListOfStringRouters;
+   head = StringRouterData(theEnv,execStatus)->ListOfStringRouters;
    while (head != NULL)
      {
       if (strcmp(head->name,name) == 0)
         {
          if (last == NULL)
            {
-            StringRouterData(theEnv)->ListOfStringRouters = head->next;
+            StringRouterData(theEnv,execStatus)->ListOfStringRouters = head->next;
             rm(theEnv,execStatus,head->name,strlen(head->name) + 1);
             rtn_struct(theEnv,execStatus,stringRouter,head);
             return(1);
@@ -331,8 +331,8 @@ globle int OpenStringDestination(
    newStringRouter->currentPosition = 0;
    newStringRouter->readWriteType = WRITE_STRING;
    newStringRouter->maximumPosition = maximumPosition;
-   newStringRouter->next = StringRouterData(theEnv)->ListOfStringRouters;
-   StringRouterData(theEnv)->ListOfStringRouters = newStringRouter;
+   newStringRouter->next = StringRouterData(theEnv,execStatus)->ListOfStringRouters;
+   StringRouterData(theEnv,execStatus)->ListOfStringRouters = newStringRouter;
 
    return(1);
   }
@@ -358,7 +358,7 @@ static struct stringRouter *FindStringRouter(
   {
    struct stringRouter *head;
 
-   head = StringRouterData(theEnv)->ListOfStringRouters;
+   head = StringRouterData(theEnv,execStatus)->ListOfStringRouters;
    while (head != NULL)
      {
       if (strcmp(head->name,name) == 0)

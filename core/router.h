@@ -52,11 +52,11 @@ struct router
    int priority;
    short int environmentAware;
    void *context;
-   int (*query)(void *,char *);
-   int (*printer)(void *,char *,char *);
-   int (*exiter)(void *,int);
-   int (*charget)(void *,char *);
-   int (*charunget)(void *,int,char *);
+   int (*query)(void *,EXEC_STATUS,char *);
+   int (*printer)(void *,EXEC_STATUS,char *,char *);
+   int (*exiter)(void *,EXEC_STATUS,int);
+   int (*charget)(void *,EXEC_STATUS,char *);
+   int (*charunget)(void *,EXEC_STATUS,int,char *);
    struct router *next;
   };
 
@@ -74,7 +74,7 @@ struct routerData
    int Abort;
   };
 
-#define RouterData(theEnv) ((struct routerData *) GetEnvironmentData(theEnv,execStatus,ROUTER_DATA))
+#define RouterData(theEnv,execStatus) ((struct routerData *) GetEnvironmentData(theEnv,execStatus,ROUTER_DATA))
 
 #ifdef LOCALE
 #undef LOCALE
@@ -94,44 +94,44 @@ struct routerData
 #define DeactivateRouter(a) EnvDeactivateRouter(GetCurrentEnvironment(),a)
 #define DeleteRouter(a) EnvDeleteRouter(GetCurrentEnvironment(),a)
 
-   LOCALE void                           InitializeDefaultRouters(void *);
-   LOCALE int                            EnvPrintRouter(void *,char *,char *);
-   LOCALE int                            EnvGetcRouter(void *,char *);
-   LOCALE int                            EnvUngetcRouter(void *,int,char *);
-   LOCALE void                           EnvExitRouter(void *,int);
-   LOCALE void                           AbortExit(void *);
-   LOCALE intBool                        EnvAddRouterWithContext(void *,
+   LOCALE void                           InitializeDefaultRouters(void *,EXEC_STATUS);
+   LOCALE int                            EnvPrintRouter(void *,EXEC_STATUS,char *,char *);
+   LOCALE int                            EnvGetcRouter(void *,EXEC_STATUS,char *);
+   LOCALE int                            EnvUngetcRouter(void *,EXEC_STATUS,int,char *);
+   LOCALE void                           EnvExitRouter(void *,EXEC_STATUS,int);
+   LOCALE void                           AbortExit(void *,EXEC_STATUS);
+   LOCALE intBool                        EnvAddRouterWithContext(void *,EXEC_STATUS,
                                                    char *,int,
-                                                   int (*)(void *,char *),
-                                                   int (*)(void *,char *,char *),
-                                                   int (*)(void *,char *),
-                                                   int (*)(void *,int,char *),
-                                                   int (*)(void *,int),
+                                                   int (*)(void *,EXEC_STATUS,char *),
+                                                   int (*)(void *,EXEC_STATUS,char *,char *),
+                                                   int (*)(void *,EXEC_STATUS,char *),
+                                                   int (*)(void *,EXEC_STATUS,int,char *),
+                                                   int (*)(void *,EXEC_STATUS,int),
                                                    void *);
-   LOCALE intBool                        EnvAddRouter(void *,
+   LOCALE intBool                        EnvAddRouter(void *,EXEC_STATUS,
                                                    char *,int,
-                                                   int (*)(void *,char *),
-                                                   int (*)(void *,char *,char *),
-                                                   int (*)(void *,char *),
-                                                   int (*)(void *,int,char *),
-                                                   int (*)(void *,int));
+                                                   int (*)(void *,EXEC_STATUS,char *),
+                                                   int (*)(void *,EXEC_STATUS,char *,char *),
+                                                   int (*)(void *,EXEC_STATUS,char *),
+                                                   int (*)(void *,EXEC_STATUS,int,char *),
+                                                   int (*)(void *,EXEC_STATUS,int));
    LOCALE intBool                        AddRouter(char *,int,
                                                    int (*)(char *),
                                                    int (*)(char *,char *),
                                                    int (*)(char *),
                                                    int (*)(int,char *),
                                                    int (*)(int));
-   LOCALE int                            EnvDeleteRouter(void *,char *);
-   LOCALE int                            QueryRouters(void *,char *);
-   LOCALE int                            EnvDeactivateRouter(void *,char *);
-   LOCALE int                            EnvActivateRouter(void *,char *);
-   LOCALE void                           SetFastLoad(void *,FILE *);
-   LOCALE void                           SetFastSave(void *,FILE *);
-   LOCALE FILE                          *GetFastLoad(void *);
-   LOCALE FILE                          *GetFastSave(void *);
-   LOCALE void                           UnrecognizedRouterMessage(void *,char *);
-   LOCALE void                           ExitCommand(void *);
-   LOCALE int                            PrintNRouter(void *,char *,char *,unsigned long);
+   LOCALE int                            EnvDeleteRouter(void *,EXEC_STATUS,char *);
+   LOCALE int                            QueryRouters(void *,EXEC_STATUS,char *);
+   LOCALE int                            EnvDeactivateRouter(void *,EXEC_STATUS,char *);
+   LOCALE int                            EnvActivateRouter(void *,EXEC_STATUS,char *);
+   LOCALE void                           SetFastLoad(void *,EXEC_STATUS,FILE *);
+   LOCALE void                           SetFastSave(void *,EXEC_STATUS,FILE *);
+   LOCALE FILE                          *GetFastLoad(void *,EXEC_STATUS);
+   LOCALE FILE                          *GetFastSave(void *,EXEC_STATUS);
+   LOCALE void                           UnrecognizedRouterMessage(void *,EXEC_STATUS,char *);
+   LOCALE void                           ExitCommand(void *,EXEC_STATUS);
+   LOCALE int                            PrintNRouter(void *,EXEC_STATUS,char *,char *,unsigned long);
 
 #endif
 

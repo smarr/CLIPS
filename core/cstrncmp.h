@@ -44,9 +44,9 @@
 #include <stdio.h>
 #endif
 
-   LOCALE void                           PrintConstraintReference(void *,FILE *,CONSTRAINT_RECORD *,int,int);
+   LOCALE void                           PrintConstraintReference(void *,EXEC_STATUS,FILE *,CONSTRAINT_RECORD *,int,int);
    LOCALE void                           ConstraintRecordToCode(FILE *,CONSTRAINT_RECORD *);
-   LOCALE int                            ConstraintsToCode(void *,char *,char *,char *,int,FILE *,int,int);
+   LOCALE int                            ConstraintsToCode(void *,EXEC_STATUS,char *,char *,char *,int,FILE *,int,int);
 
 #endif
 

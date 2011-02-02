@@ -86,47 +86,47 @@
 #define SetDefmethodWatch(a,b,c) EnvSetDefmethodWatch(GetCurrentEnvironment(),a,b,c)
 #define Undefmethod(a,b) EnvUndefmethod(GetCurrentEnvironment(),a,b)
 
-LOCALE void SetupGenericFunctions(void *);
-LOCALE void *EnvFindDefgeneric(void *,char *);
-LOCALE DEFGENERIC *LookupDefgenericByMdlOrScope(void *,char *);
-LOCALE DEFGENERIC *LookupDefgenericInScope(void *,char *);
-LOCALE void *EnvGetNextDefgeneric(void *,void *);
-LOCALE long EnvGetNextDefmethod(void *,void *,long);
-LOCALE int EnvIsDefgenericDeletable(void *,void *);
-LOCALE int EnvIsDefmethodDeletable(void *,void *,long);
-LOCALE void UndefgenericCommand(void *);
-LOCALE void *GetDefgenericModuleCommand(void *);
-LOCALE void UndefmethodCommand(void *);
-LOCALE DEFMETHOD *GetDefmethodPointer(void *,long);
+LOCALE void SetupGenericFunctions(void *,EXEC_STATUS);
+LOCALE void *EnvFindDefgeneric(void *,EXEC_STATUS,char *);
+LOCALE DEFGENERIC *LookupDefgenericByMdlOrScope(void *,EXEC_STATUS,char *);
+LOCALE DEFGENERIC *LookupDefgenericInScope(void *,EXEC_STATUS,char *);
+LOCALE void *EnvGetNextDefgeneric(void *,EXEC_STATUS,void *);
+LOCALE long EnvGetNextDefmethod(void *,EXEC_STATUS,void *,long);
+LOCALE int EnvIsDefgenericDeletable(void *,EXEC_STATUS,void *);
+LOCALE int EnvIsDefmethodDeletable(void *,EXEC_STATUS,void *,long);
+LOCALE void UndefgenericCommand(void *,EXEC_STATUS);
+LOCALE void *GetDefgenericModuleCommand(void *,EXEC_STATUS);
+LOCALE void UndefmethodCommand(void *,EXEC_STATUS);
+LOCALE DEFMETHOD *GetDefmethodPointer(void *,EXEC_STATUS,long);
 
-LOCALE intBool EnvUndefgeneric(void *,void *);
-LOCALE intBool EnvUndefmethod(void *,void *,long);
+LOCALE intBool EnvUndefgeneric(void *,EXEC_STATUS,void *);
+LOCALE intBool EnvUndefmethod(void *,EXEC_STATUS,void *,long);
 
 #if ! OBJECT_SYSTEM
-LOCALE void TypeCommand(void *,DATA_OBJECT *);
+LOCALE void TypeCommand(void *,EXEC_STATUS,DATA_OBJECT *);
 #endif
 
 #if DEBUGGING_FUNCTIONS
-LOCALE void EnvGetDefmethodDescription(void *,char *,int,void *,long);
-LOCALE unsigned EnvGetDefgenericWatch(void *,void *);
-LOCALE void EnvSetDefgenericWatch(void *,unsigned,void *);
-LOCALE unsigned EnvGetDefmethodWatch(void *,void *,long);
-LOCALE void EnvSetDefmethodWatch(void *,unsigned,void *,long);
-LOCALE void PPDefgenericCommand(void *);
-LOCALE void PPDefmethodCommand(void *);
-LOCALE void ListDefmethodsCommand(void *);
-LOCALE char *EnvGetDefmethodPPForm(void *,void *,long);
-LOCALE void ListDefgenericsCommand(void *);
-LOCALE void EnvListDefgenerics(void *,char *,struct defmodule *);
-LOCALE void EnvListDefmethods(void *,char *,void *);
+LOCALE void EnvGetDefmethodDescription(void *,EXEC_STATUS,char *,int,void *,long);
+LOCALE unsigned EnvGetDefgenericWatch(void *,EXEC_STATUS,void *);
+LOCALE void EnvSetDefgenericWatch(void *,EXEC_STATUS,unsigned,void *);
+LOCALE unsigned EnvGetDefmethodWatch(void *,EXEC_STATUS,void *,long);
+LOCALE void EnvSetDefmethodWatch(void *,EXEC_STATUS,unsigned,void *,long);
+LOCALE void PPDefgenericCommand(void *,EXEC_STATUS);
+LOCALE void PPDefmethodCommand(void *,EXEC_STATUS);
+LOCALE void ListDefmethodsCommand(void *,EXEC_STATUS);
+LOCALE char *EnvGetDefmethodPPForm(void *,EXEC_STATUS,void *,long);
+LOCALE void ListDefgenericsCommand(void *,EXEC_STATUS);
+LOCALE void EnvListDefgenerics(void *,EXEC_STATUS,char *,struct defmodule *);
+LOCALE void EnvListDefmethods(void *,EXEC_STATUS,char *,void *);
 #endif
 
-LOCALE void GetDefgenericListFunction(void *,DATA_OBJECT *);
-globle void EnvGetDefgenericList(void *,DATA_OBJECT *,struct defmodule *);
-LOCALE void GetDefmethodListCommand(void *,DATA_OBJECT *);
-LOCALE void EnvGetDefmethodList(void *,void *,DATA_OBJECT *);
-LOCALE void GetMethodRestrictionsCommand(void *,DATA_OBJECT *);
-LOCALE void EnvGetMethodRestrictions(void *,void *,long,DATA_OBJECT *);
+LOCALE void GetDefgenericListFunction(void *,EXEC_STATUS,DATA_OBJECT *);
+globle void EnvGetDefgenericList(void *,EXEC_STATUS,DATA_OBJECT *,struct defmodule *);
+LOCALE void GetDefmethodListCommand(void *,EXEC_STATUS,DATA_OBJECT *);
+LOCALE void EnvGetDefmethodList(void *,EXEC_STATUS,void *,DATA_OBJECT *);
+LOCALE void GetMethodRestrictionsCommand(void *,EXEC_STATUS,DATA_OBJECT *);
+LOCALE void EnvGetMethodRestrictions(void *,EXEC_STATUS,void *,long,DATA_OBJECT *);
 
 #endif
 

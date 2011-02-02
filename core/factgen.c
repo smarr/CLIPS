@@ -71,19 +71,19 @@ struct factgenData
    globle struct entityRecord   FactPNConstant2Info;
   };
   
-#define FactgenData(theEnv) ((struct factgenData *) GetEnvironmentData(theEnv,execStatus,FACTGEN_DATA))
+#define FactgenData(theEnv,execStatus) ((struct factgenData *) GetEnvironmentData(theEnv,execStatus,FACTGEN_DATA))
 
 /***************************************/
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
 #if (! RUN_TIME) && (! BLOAD_ONLY)
-   static void                      *FactGetVarJN1(void *,struct lhsParseNode *,int);
-   static void                      *FactGetVarJN2(void *,struct lhsParseNode *,int);
-   static void                      *FactGetVarJN3(void *,struct lhsParseNode *,int);
-   static void                      *FactGetVarPN1(void *,struct lhsParseNode *);
-   static void                      *FactGetVarPN2(void *,struct lhsParseNode *);
-   static void                      *FactGetVarPN3(void *,struct lhsParseNode *);
+   static void                      *FactGetVarJN1(void *,EXEC_STATUS,struct lhsParseNode *,int);
+   static void                      *FactGetVarJN2(void *,EXEC_STATUS,struct lhsParseNode *,int);
+   static void                      *FactGetVarJN3(void *,EXEC_STATUS,struct lhsParseNode *,int);
+   static void                      *FactGetVarPN1(void *,EXEC_STATUS,struct lhsParseNode *);
+   static void                      *FactGetVarPN2(void *,EXEC_STATUS,struct lhsParseNode *);
+   static void                      *FactGetVarPN3(void *,EXEC_STATUS,struct lhsParseNode *);
 #endif
 
 /*******************************************************************/
@@ -178,34 +178,34 @@ globle void InitializeFactReteFunctions(
 
    AllocateEnvironmentData(theEnv,execStatus,FACTGEN_DATA,sizeof(struct factgenData),NULL);
    
-   memcpy(&FactgenData(theEnv)->FactJNGV1Info,&factJNGV1Info,sizeof(struct entityRecord));   
-   memcpy(&FactgenData(theEnv)->FactJNGV2Info,&factJNGV2Info,sizeof(struct entityRecord));   
-   memcpy(&FactgenData(theEnv)->FactJNGV3Info,&factJNGV3Info,sizeof(struct entityRecord));   
-   memcpy(&FactgenData(theEnv)->FactPNGV1Info,&factPNGV1Info,sizeof(struct entityRecord));   
-   memcpy(&FactgenData(theEnv)->FactPNGV2Info,&factPNGV2Info,sizeof(struct entityRecord));   
-   memcpy(&FactgenData(theEnv)->FactPNGV3Info,&factPNGV3Info,sizeof(struct entityRecord));   
-   memcpy(&FactgenData(theEnv)->FactJNCV1Info,&factJNCV1Info,sizeof(struct entityRecord));   
-   memcpy(&FactgenData(theEnv)->FactJNCV2Info,&factJNCV2Info,sizeof(struct entityRecord));   
-   memcpy(&FactgenData(theEnv)->FactPNCV1Info,&factPNCV1Info,sizeof(struct entityRecord)); 
-   memcpy(&FactgenData(theEnv)->FactStoreMFInfo,&factStoreMFInfo,sizeof(struct entityRecord));   
-   memcpy(&FactgenData(theEnv)->FactSlotLengthInfo,&factSlotLengthInfo,sizeof(struct entityRecord));   
-   memcpy(&FactgenData(theEnv)->FactPNConstant1Info,&factPNConstant1Info,sizeof(struct entityRecord));   
-   memcpy(&FactgenData(theEnv)->FactPNConstant2Info,&factPNConstant2Info,sizeof(struct entityRecord));   
+   memcpy(&FactgenData(theEnv,execStatus)->FactJNGV1Info,&factJNGV1Info,sizeof(struct entityRecord));   
+   memcpy(&FactgenData(theEnv,execStatus)->FactJNGV2Info,&factJNGV2Info,sizeof(struct entityRecord));   
+   memcpy(&FactgenData(theEnv,execStatus)->FactJNGV3Info,&factJNGV3Info,sizeof(struct entityRecord));   
+   memcpy(&FactgenData(theEnv,execStatus)->FactPNGV1Info,&factPNGV1Info,sizeof(struct entityRecord));   
+   memcpy(&FactgenData(theEnv,execStatus)->FactPNGV2Info,&factPNGV2Info,sizeof(struct entityRecord));   
+   memcpy(&FactgenData(theEnv,execStatus)->FactPNGV3Info,&factPNGV3Info,sizeof(struct entityRecord));   
+   memcpy(&FactgenData(theEnv,execStatus)->FactJNCV1Info,&factJNCV1Info,sizeof(struct entityRecord));   
+   memcpy(&FactgenData(theEnv,execStatus)->FactJNCV2Info,&factJNCV2Info,sizeof(struct entityRecord));   
+   memcpy(&FactgenData(theEnv,execStatus)->FactPNCV1Info,&factPNCV1Info,sizeof(struct entityRecord)); 
+   memcpy(&FactgenData(theEnv,execStatus)->FactStoreMFInfo,&factStoreMFInfo,sizeof(struct entityRecord));   
+   memcpy(&FactgenData(theEnv,execStatus)->FactSlotLengthInfo,&factSlotLengthInfo,sizeof(struct entityRecord));   
+   memcpy(&FactgenData(theEnv,execStatus)->FactPNConstant1Info,&factPNConstant1Info,sizeof(struct entityRecord));   
+   memcpy(&FactgenData(theEnv,execStatus)->FactPNConstant2Info,&factPNConstant2Info,sizeof(struct entityRecord));   
                                                         
-   InstallPrimitive(theEnv,execStatus,(ENTITY_RECORD_PTR) &FactData(theEnv)->FactInfo,FACT_ADDRESS);
-   InstallPrimitive(theEnv,execStatus,&FactgenData(theEnv)->FactJNGV1Info,FACT_JN_VAR1);
-   InstallPrimitive(theEnv,execStatus,&FactgenData(theEnv)->FactJNGV2Info,FACT_JN_VAR2);
-   InstallPrimitive(theEnv,execStatus,&FactgenData(theEnv)->FactJNGV3Info,FACT_JN_VAR3);
-   InstallPrimitive(theEnv,execStatus,&FactgenData(theEnv)->FactPNGV1Info,FACT_PN_VAR1);
-   InstallPrimitive(theEnv,execStatus,&FactgenData(theEnv)->FactPNGV2Info,FACT_PN_VAR2);
-   InstallPrimitive(theEnv,execStatus,&FactgenData(theEnv)->FactPNGV3Info,FACT_PN_VAR3);
-   InstallPrimitive(theEnv,execStatus,&FactgenData(theEnv)->FactJNCV1Info,FACT_JN_CMP1);
-   InstallPrimitive(theEnv,execStatus,&FactgenData(theEnv)->FactJNCV2Info,FACT_JN_CMP2);
-   InstallPrimitive(theEnv,execStatus,&FactgenData(theEnv)->FactPNCV1Info,FACT_PN_CMP1);
-   InstallPrimitive(theEnv,execStatus,&FactgenData(theEnv)->FactStoreMFInfo,FACT_STORE_MULTIFIELD);
-   InstallPrimitive(theEnv,execStatus,&FactgenData(theEnv)->FactSlotLengthInfo,FACT_SLOT_LENGTH);
-   InstallPrimitive(theEnv,execStatus,&FactgenData(theEnv)->FactPNConstant1Info,FACT_PN_CONSTANT1);
-   InstallPrimitive(theEnv,execStatus,&FactgenData(theEnv)->FactPNConstant2Info,FACT_PN_CONSTANT2);
+   InstallPrimitive(theEnv,execStatus,(ENTITY_RECORD_PTR) &FactData(theEnv,execStatus)->FactInfo,FACT_ADDRESS);
+   InstallPrimitive(theEnv,execStatus,&FactgenData(theEnv,execStatus)->FactJNGV1Info,FACT_JN_VAR1);
+   InstallPrimitive(theEnv,execStatus,&FactgenData(theEnv,execStatus)->FactJNGV2Info,FACT_JN_VAR2);
+   InstallPrimitive(theEnv,execStatus,&FactgenData(theEnv,execStatus)->FactJNGV3Info,FACT_JN_VAR3);
+   InstallPrimitive(theEnv,execStatus,&FactgenData(theEnv,execStatus)->FactPNGV1Info,FACT_PN_VAR1);
+   InstallPrimitive(theEnv,execStatus,&FactgenData(theEnv,execStatus)->FactPNGV2Info,FACT_PN_VAR2);
+   InstallPrimitive(theEnv,execStatus,&FactgenData(theEnv,execStatus)->FactPNGV3Info,FACT_PN_VAR3);
+   InstallPrimitive(theEnv,execStatus,&FactgenData(theEnv,execStatus)->FactJNCV1Info,FACT_JN_CMP1);
+   InstallPrimitive(theEnv,execStatus,&FactgenData(theEnv,execStatus)->FactJNCV2Info,FACT_JN_CMP2);
+   InstallPrimitive(theEnv,execStatus,&FactgenData(theEnv,execStatus)->FactPNCV1Info,FACT_PN_CMP1);
+   InstallPrimitive(theEnv,execStatus,&FactgenData(theEnv,execStatus)->FactStoreMFInfo,FACT_STORE_MULTIFIELD);
+   InstallPrimitive(theEnv,execStatus,&FactgenData(theEnv,execStatus)->FactSlotLengthInfo,FACT_SLOT_LENGTH);
+   InstallPrimitive(theEnv,execStatus,&FactgenData(theEnv,execStatus)->FactPNConstant1Info,FACT_PN_CONSTANT1);
+   InstallPrimitive(theEnv,execStatus,&FactgenData(theEnv,execStatus)->FactPNConstant2Info,FACT_PN_CONSTANT2);
 #endif
   }
 
@@ -292,9 +292,9 @@ globle struct expr *FactGenPNConstant(
    else
      {
       if (theField->negated)
-        { top = GenConstant(theEnv,execStatus,FCALL,ExpressionData(theEnv)->PTR_NEQ); }
+        { top = GenConstant(theEnv,execStatus,FCALL,ExpressionData(theEnv,execStatus)->PTR_NEQ); }
       else
-        { top = GenConstant(theEnv,execStatus,FCALL,ExpressionData(theEnv)->PTR_EQ); }
+        { top = GenConstant(theEnv,execStatus,FCALL,ExpressionData(theEnv,execStatus)->PTR_EQ); }
 
       tempValue = theField->type;
       theField->type = SF_VARIABLE;
@@ -1101,8 +1101,8 @@ globle struct expr *FactPNVariableComparison(
 
    else
      {
-      if (selfNode->negated) top = GenConstant(theEnv,execStatus,FCALL,ExpressionData(theEnv)->PTR_NEQ);
-      else top = GenConstant(theEnv,execStatus,FCALL,ExpressionData(theEnv)->PTR_EQ);
+      if (selfNode->negated) top = GenConstant(theEnv,execStatus,FCALL,ExpressionData(theEnv,execStatus)->PTR_NEQ);
+      else top = GenConstant(theEnv,execStatus,FCALL,ExpressionData(theEnv,execStatus)->PTR_EQ);
 
       top->argList = FactGenGetfield(theEnv,execStatus,selfNode);
       top->argList->nextArg = FactGenGetfield(theEnv,execStatus,referringNode);
@@ -1243,9 +1243,9 @@ globle struct expr *FactJNVariableComparison(
    else
      {
       if (selfNode->negated)
-        { top = GenConstant(theEnv,execStatus,FCALL,ExpressionData(theEnv)->PTR_NEQ); }
+        { top = GenConstant(theEnv,execStatus,FCALL,ExpressionData(theEnv,execStatus)->PTR_NEQ); }
       else
-        { top = GenConstant(theEnv,execStatus,FCALL,ExpressionData(theEnv)->PTR_EQ); }
+        { top = GenConstant(theEnv,execStatus,FCALL,ExpressionData(theEnv,execStatus)->PTR_EQ); }
 
       if (nandJoin)
         { top->argList = FactGenGetvar(theEnv,execStatus,selfNode,NESTED_RHS); }

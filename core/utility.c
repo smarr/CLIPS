@@ -58,7 +58,7 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static void                    DeallocateUtilityData(void *);
+   static void                    DeallocateUtilityData(void *,EXEC_STATUS);
 
 /************************************************/
 /* InitializeUtilityData: Allocates environment */
@@ -70,14 +70,14 @@ globle void InitializeUtilityData(
   {
    AllocateEnvironmentData(theEnv,execStatus,UTILITY_DATA,sizeof(struct utilityData),DeallocateUtilityData);
    
-   UtilityData(theEnv)->GarbageCollectionLocks = 0;
-   UtilityData(theEnv)->GarbageCollectionHeuristicsEnabled = TRUE;
-   UtilityData(theEnv)->PeriodicFunctionsEnabled = TRUE;
-   UtilityData(theEnv)->YieldFunctionEnabled = TRUE;
+   UtilityData(theEnv,execStatus)->GarbageCollectionLocks = 0;
+   UtilityData(theEnv,execStatus)->GarbageCollectionHeuristicsEnabled = TRUE;
+   UtilityData(theEnv,execStatus)->PeriodicFunctionsEnabled = TRUE;
+   UtilityData(theEnv,execStatus)->YieldFunctionEnabled = TRUE;
 
-   UtilityData(theEnv)->CurrentEphemeralCountMax = MAX_EPHEMERAL_COUNT;
-   UtilityData(theEnv)->CurrentEphemeralSizeMax = MAX_EPHEMERAL_SIZE;
-   UtilityData(theEnv)->LastEvaluationDepth = -1;
+   UtilityData(theEnv,execStatus)->CurrentEphemeralCountMax = MAX_EPHEMERAL_COUNT;
+   UtilityData(theEnv,execStatus)->CurrentEphemeralSizeMax = MAX_EPHEMERAL_SIZE;
+   UtilityData(theEnv,execStatus)->LastEvaluationDepth = -1;
   }
   
 /**************************************************/
@@ -91,7 +91,7 @@ static void DeallocateUtilityData(
    struct callFunctionItem *tmpPtr, *nextPtr;
    struct trackedMemory *tmpTM, *nextTM;
 
-   tmpTM = UtilityData(theEnv)->trackList;
+   tmpTM = UtilityData(theEnv,execStatus)->trackList;
    while (tmpTM != NULL)
      {
       nextTM = tmpTM->next;
@@ -100,7 +100,7 @@ static void DeallocateUtilityData(
       tmpTM = nextTM;
      }
    
-   tmpPtr = UtilityData(theEnv)->ListOfPeriodicFunctions;
+   tmpPtr = UtilityData(theEnv,execStatus)->ListOfPeriodicFunctions;
    while (tmpPtr != NULL)
      {
       nextPtr = tmpPtr->next;
@@ -108,7 +108,7 @@ static void DeallocateUtilityData(
       tmpPtr = nextPtr;
      }
 
-   tmpPtr = UtilityData(theEnv)->ListOfCleanupFunctions;
+   tmpPtr = UtilityData(theEnv,execStatus)->ListOfCleanupFunctions;
    while (tmpPtr != NULL)
      {
       nextPtr = tmpPtr->next;
@@ -138,21 +138,21 @@ globle void PeriodicCleanup(
    /* Don't use heuristics if disabled. */
    /*===================================*/
    
-   if (! UtilityData(theEnv)->GarbageCollectionHeuristicsEnabled) 
+   if (! UtilityData(theEnv,execStatus)->GarbageCollectionHeuristicsEnabled) 
      { useHeuristics = FALSE; }
      
    /*=============================================*/
    /* Call functions for handling periodic tasks. */
    /*=============================================*/
 
-   if (UtilityData(theEnv)->PeriodicFunctionsEnabled)
+   if (UtilityData(theEnv,execStatus)->PeriodicFunctionsEnabled)
      {
-      for (periodPtr = UtilityData(theEnv)->ListOfPeriodicFunctions;
+      for (periodPtr = UtilityData(theEnv,execStatus)->ListOfPeriodicFunctions;
            periodPtr != NULL;
            periodPtr = periodPtr->next)
         { 
          if (periodPtr->environmentAware)
-           { (*periodPtr->func)(theEnv); }
+           { (*periodPtr->func)(theEnv,execStatus); }
          else            
            { (* (void (*)(void)) periodPtr->func)(); }
         }
@@ -169,11 +169,11 @@ globle void PeriodicCleanup(
    /* them when we go back to a lower evaluation depth. */
    /*===================================================*/
 
-   if (UtilityData(theEnv)->LastEvaluationDepth > execStatus->CurrentEvaluationDepth)
+   if (UtilityData(theEnv,execStatus)->LastEvaluationDepth > execStatus->CurrentEvaluationDepth)
      {
-      UtilityData(theEnv)->LastEvaluationDepth = execStatus->CurrentEvaluationDepth;
-      UtilityData(theEnv)->CurrentEphemeralCountMax = MAX_EPHEMERAL_COUNT;
-      UtilityData(theEnv)->CurrentEphemeralSizeMax = MAX_EPHEMERAL_SIZE;
+      UtilityData(theEnv,execStatus)->LastEvaluationDepth = execStatus->CurrentEvaluationDepth;
+      UtilityData(theEnv,execStatus)->CurrentEphemeralCountMax = MAX_EPHEMERAL_COUNT;
+      UtilityData(theEnv,execStatus)->CurrentEphemeralSizeMax = MAX_EPHEMERAL_SIZE;
      }
 
    /*======================================================*/
@@ -182,11 +182,11 @@ globle void PeriodicCleanup(
    /* garbage has been created to make cleanup worthwhile. */
    /*======================================================*/
 
-   if (UtilityData(theEnv)->GarbageCollectionLocks > 0)  return;
+   if (UtilityData(theEnv,execStatus)->GarbageCollectionLocks > 0)  return;
    
    if (useHeuristics &&
-       (UtilityData(theEnv)->EphemeralItemCount < UtilityData(theEnv)->CurrentEphemeralCountMax) &&
-       (UtilityData(theEnv)->EphemeralItemSize < UtilityData(theEnv)->CurrentEphemeralSizeMax))
+       (UtilityData(theEnv,execStatus)->EphemeralItemCount < UtilityData(theEnv,execStatus)->CurrentEphemeralCountMax) &&
+       (UtilityData(theEnv,execStatus)->EphemeralItemSize < UtilityData(theEnv,execStatus)->CurrentEphemeralSizeMax))
      { return; }
 
    /*==========================================================*/
@@ -206,18 +206,18 @@ globle void PeriodicCleanup(
    /* Free up multifield values no longer in use. */
    /*=============================================*/
 
-   FlushMultifields(theEnv);
+   FlushMultifields(theEnv,execStatus);
 
    /*=====================================*/
    /* Call the list of cleanup functions. */
    /*=====================================*/
 
-   for (cleanupPtr = UtilityData(theEnv)->ListOfCleanupFunctions;
+   for (cleanupPtr = UtilityData(theEnv,execStatus)->ListOfCleanupFunctions;
         cleanupPtr != NULL;
         cleanupPtr = cleanupPtr->next)
      {
       if (cleanupPtr->environmentAware)
-        { (*cleanupPtr->func)(theEnv); }
+        { (*cleanupPtr->func)(theEnv,execStatus); }
       else            
         { (* (void (*)(void)) cleanupPtr->func)(); }
     }
@@ -226,7 +226,7 @@ globle void PeriodicCleanup(
    /* Free up atomic values that are no longer used. */
    /*================================================*/
 
-   RemoveEphemeralAtoms(theEnv);
+   RemoveEphemeralAtoms(theEnv,execStatus);
 
    /*=========================================*/
    /* Restore the evaluation depth if cleanup */
@@ -241,11 +241,11 @@ globle void PeriodicCleanup(
    /* try to free up memory that isn't being released.           */
    /*============================================================*/
 
-   if ((UtilityData(theEnv)->EphemeralItemCount + COUNT_INCREMENT) > UtilityData(theEnv)->CurrentEphemeralCountMax)
-     { UtilityData(theEnv)->CurrentEphemeralCountMax = UtilityData(theEnv)->EphemeralItemCount + COUNT_INCREMENT; }
+   if ((UtilityData(theEnv,execStatus)->EphemeralItemCount + COUNT_INCREMENT) > UtilityData(theEnv,execStatus)->CurrentEphemeralCountMax)
+     { UtilityData(theEnv,execStatus)->CurrentEphemeralCountMax = UtilityData(theEnv,execStatus)->EphemeralItemCount + COUNT_INCREMENT; }
 
-   if ((UtilityData(theEnv)->EphemeralItemSize + SIZE_INCREMENT) > UtilityData(theEnv)->CurrentEphemeralSizeMax)
-     { UtilityData(theEnv)->CurrentEphemeralSizeMax = UtilityData(theEnv)->EphemeralItemSize + SIZE_INCREMENT; }
+   if ((UtilityData(theEnv,execStatus)->EphemeralItemSize + SIZE_INCREMENT) > UtilityData(theEnv,execStatus)->CurrentEphemeralSizeMax)
+     { UtilityData(theEnv,execStatus)->CurrentEphemeralSizeMax = UtilityData(theEnv,execStatus)->EphemeralItemSize + SIZE_INCREMENT; }
 
    /*===============================================================*/
    /* Remember the evaluation depth at which garbage collection was */
@@ -253,7 +253,7 @@ globle void PeriodicCleanup(
    /* ephemeral count and size numbers used by the heuristics.      */
    /*===============================================================*/
 
-   UtilityData(theEnv)->LastEvaluationDepth = execStatus->CurrentEvaluationDepth;
+   UtilityData(theEnv,execStatus)->LastEvaluationDepth = execStatus->CurrentEvaluationDepth;
   }
 
 /***************************************************/
@@ -268,10 +268,10 @@ globle intBool AddCleanupFunction(
   void (*theFunction)(void *),
   int priority)
   {
-   UtilityData(theEnv)->ListOfCleanupFunctions =
+   UtilityData(theEnv,execStatus)->ListOfCleanupFunctions =
      AddFunctionToCallList(theEnv,execStatus,name,priority,
                            (void (*)(void *)) theFunction,
-                           UtilityData(theEnv)->ListOfCleanupFunctions,TRUE);
+                           UtilityData(theEnv,execStatus)->ListOfCleanupFunctions,TRUE);
    return(1);
   }
 
@@ -289,10 +289,10 @@ globle intBool AddPeriodicFunction(
    
    theEnv = GetCurrentEnvironment();
    
-   UtilityData(theEnv)->ListOfPeriodicFunctions =
+   UtilityData(theEnv,execStatus)->ListOfPeriodicFunctions =
      AddFunctionToCallList(theEnv,execStatus,name,priority,
                            (void (*)(void *)) theFunction,
-                           UtilityData(theEnv)->ListOfPeriodicFunctions,FALSE);
+                           UtilityData(theEnv,execStatus)->ListOfPeriodicFunctions,FALSE);
 
    return(1);
   }
@@ -309,10 +309,10 @@ globle intBool EnvAddPeriodicFunction(
   void (*theFunction)(void *),
   int priority)
   {
-   UtilityData(theEnv)->ListOfPeriodicFunctions =
+   UtilityData(theEnv,execStatus)->ListOfPeriodicFunctions =
      AddFunctionToCallList(theEnv,execStatus,name,priority,
                            (void (*)(void *)) theFunction,
-                           UtilityData(theEnv)->ListOfPeriodicFunctions,TRUE);
+                           UtilityData(theEnv,execStatus)->ListOfPeriodicFunctions,TRUE);
    return(1);
   }
 
@@ -328,8 +328,8 @@ globle intBool RemoveCleanupFunction(
   {
    intBool found;
    
-   UtilityData(theEnv)->ListOfCleanupFunctions =
-      RemoveFunctionFromCallList(theEnv,execStatus,name,UtilityData(theEnv)->ListOfCleanupFunctions,&found);
+   UtilityData(theEnv,execStatus)->ListOfCleanupFunctions =
+      RemoveFunctionFromCallList(theEnv,execStatus,name,UtilityData(theEnv,execStatus)->ListOfCleanupFunctions,&found);
   
    return found;
   }
@@ -345,8 +345,8 @@ globle intBool EnvRemovePeriodicFunction(
   {
    intBool found;
    
-   UtilityData(theEnv)->ListOfPeriodicFunctions =
-      RemoveFunctionFromCallList(theEnv,execStatus,name,UtilityData(theEnv)->ListOfPeriodicFunctions,&found);
+   UtilityData(theEnv,execStatus)->ListOfPeriodicFunctions =
+      RemoveFunctionFromCallList(theEnv,execStatus,name,UtilityData(theEnv,execStatus)->ListOfPeriodicFunctions,&found);
   
    return found;
   }
@@ -831,8 +831,8 @@ globle void YieldTime(
   void *theEnv,
   EXEC_STATUS)
   {
-   if ((UtilityData(theEnv)->YieldTimeFunction != NULL) && UtilityData(theEnv)->YieldFunctionEnabled)
-     { (*UtilityData(theEnv)->YieldTimeFunction)(); }
+   if ((UtilityData(theEnv,execStatus)->YieldTimeFunction != NULL) && UtilityData(theEnv,execStatus)->YieldFunctionEnabled)
+     { (*UtilityData(theEnv,execStatus)->YieldTimeFunction)(); }
   }
   
 /********************************************/
@@ -845,9 +845,9 @@ globle short SetGarbageCollectionHeuristics(
   {
    short oldValue;
 
-   oldValue = UtilityData(theEnv)->GarbageCollectionHeuristicsEnabled;
+   oldValue = UtilityData(theEnv,execStatus)->GarbageCollectionHeuristicsEnabled;
    
-   UtilityData(theEnv)->GarbageCollectionHeuristicsEnabled = newValue;
+   UtilityData(theEnv,execStatus)->GarbageCollectionHeuristicsEnabled = newValue;
    
    return(oldValue);
   }
@@ -860,7 +860,7 @@ globle void EnvIncrementGCLocks(
   void *theEnv,
   EXEC_STATUS)
   {
-   UtilityData(theEnv)->GarbageCollectionLocks++;
+   UtilityData(theEnv,execStatus)->GarbageCollectionLocks++;
   }
 
 /**********************************************/
@@ -871,8 +871,8 @@ globle void EnvDecrementGCLocks(
   void *theEnv,
   EXEC_STATUS)
   {
-   if (UtilityData(theEnv)->GarbageCollectionLocks > 0)
-     { UtilityData(theEnv)->GarbageCollectionLocks--; }
+   if (UtilityData(theEnv,execStatus)->GarbageCollectionLocks > 0)
+     { UtilityData(theEnv,execStatus)->GarbageCollectionLocks--; }
   }
  
 /********************************************/
@@ -885,9 +885,9 @@ globle short EnablePeriodicFunctions(
   {
    short oldValue;
    
-   oldValue = UtilityData(theEnv)->PeriodicFunctionsEnabled;
+   oldValue = UtilityData(theEnv,execStatus)->PeriodicFunctionsEnabled;
    
-   UtilityData(theEnv)->PeriodicFunctionsEnabled = value;
+   UtilityData(theEnv,execStatus)->PeriodicFunctionsEnabled = value;
    
    return(oldValue);
   }
@@ -902,9 +902,9 @@ globle short EnableYieldFunction(
   {
    short oldValue;
    
-   oldValue = UtilityData(theEnv)->YieldFunctionEnabled;
+   oldValue = UtilityData(theEnv,execStatus)->YieldFunctionEnabled;
    
-   UtilityData(theEnv)->YieldFunctionEnabled = value;
+   UtilityData(theEnv,execStatus)->YieldFunctionEnabled = value;
    
    return(oldValue);
   }
@@ -925,8 +925,8 @@ globle struct trackedMemory *AddTrackedMemory(
    newPtr->prev = NULL;
    newPtr->theMemory = theMemory;
    newPtr->memSize = theSize;
-   newPtr->next = UtilityData(theEnv)->trackList;
-   UtilityData(theEnv)->trackList = newPtr;
+   newPtr->next = UtilityData(theEnv,execStatus)->trackList;
+   UtilityData(theEnv,execStatus)->trackList = newPtr;
    
    return newPtr;
   }
@@ -940,7 +940,7 @@ globle void RemoveTrackedMemory(
   struct trackedMemory *theTracker)
   {   
    if (theTracker->prev == NULL)
-     { UtilityData(theEnv)->trackList = theTracker->next; }
+     { UtilityData(theEnv,execStatus)->trackList = theTracker->next; }
    else
      { theTracker->prev->next = theTracker->next; }
      

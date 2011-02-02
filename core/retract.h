@@ -55,13 +55,13 @@ struct rdriveinfo
    struct rdriveinfo *next;
   };
 
-LOCALE void                           NetworkRetract(void *,struct patternMatch *);
-LOCALE void                           ReturnPartialMatch(void *,struct partialMatch *);
-LOCALE void                           DestroyPartialMatch(void *,struct partialMatch *);
-LOCALE void                           FlushGarbagePartialMatches(void *);
-LOCALE void                           DeletePartialMatches(void *,struct partialMatch *);
-LOCALE void                           PosEntryRetractBeta(void *,struct partialMatch *,struct partialMatch *);
-LOCALE void                           PosEntryRetractAlpha(void *,struct partialMatch *);
+LOCALE void                           NetworkRetract(void *,EXEC_STATUS,struct patternMatch *);
+LOCALE void                           ReturnPartialMatch(void *,EXEC_STATUS,struct partialMatch *);
+LOCALE void                           DestroyPartialMatch(void *,EXEC_STATUS,struct partialMatch *);
+LOCALE void                           FlushGarbagePartialMatches(void *,EXEC_STATUS);
+LOCALE void                           DeletePartialMatches(void *,EXEC_STATUS,struct partialMatch *);
+LOCALE void                           PosEntryRetractBeta(void *,EXEC_STATUS,struct partialMatch *,struct partialMatch *);
+LOCALE void                           PosEntryRetractAlpha(void *,EXEC_STATUS,struct partialMatch *);
 
 #endif
 

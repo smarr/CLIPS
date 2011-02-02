@@ -68,10 +68,10 @@
    =========================================
    ***************************************** */
 
-static void SlotInfoSupportFunction(void *,EXEC_STATUS,DATA_OBJECT *,char *,void (*)(void *,void *,char *,DATA_OBJECT *));
+static void SlotInfoSupportFunction(void *,EXEC_STATUS,DATA_OBJECT *,char *,void (*)(void *,EXEC_STATUS,void *,char *,DATA_OBJECT *));
 static unsigned CountSubclasses(DEFCLASS *,int,int);
-static unsigned StoreSubclasses(void *,unsigned,DEFCLASS *,int,int,short);
-static SLOT_DESC *SlotInfoSlot(void *,DATA_OBJECT *,DEFCLASS *,char *,char *);
+static unsigned StoreSubclasses(void *,EXEC_STATUS,unsigned,DEFCLASS *,int,int,short);
+static SLOT_DESC *SlotInfoSlot(void *,EXEC_STATUS,DATA_OBJECT *,DEFCLASS *,char *,char *);
 
 /*********************************************************************
   NAME         : ClassAbstractPCommand
@@ -360,7 +360,7 @@ globle intBool EnvClassAbstractP(
   void *clsptr)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 
    return(((DEFCLASS *) clsptr)->abstract);
@@ -385,7 +385,7 @@ globle intBool EnvClassReactiveP(
   void *clsptr)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 
    return(((DEFCLASS *) clsptr)->reactive);
@@ -511,7 +511,7 @@ globle void EnvGetDefmessageHandlerList(
             SetMFType(result->value,i,SYMBOL);
             SetMFValue(result->value,i++,supcls->handlers[j].name);
             SetMFType(result->value,i,SYMBOL);
-            SetMFValue(result->value,i++,EnvAddSymbol(theEnv,execStatus,MessageHandlerData(theEnv)->hndquals[supcls->handlers[j].type]));
+            SetMFValue(result->value,i++,EnvAddSymbol(theEnv,execStatus,MessageHandlerData(theEnv,execStatus)->hndquals[supcls->handlers[j].type]));
            }
          sublen += supcls->handlerCount * 3;
         }
@@ -588,20 +588,20 @@ globle void EnvClassSubclasses(
    register unsigned i;
    register int id;
 
-   if ((id = GetTraversalID(theEnv)) == -1)
+   if ((id = GetTraversalID(theEnv,execStatus)) == -1)
      return;
    i = CountSubclasses((DEFCLASS *) clsptr,inhp,id);
-   ReleaseTraversalID(theEnv);
+   ReleaseTraversalID(theEnv,execStatus);
    result->type = MULTIFIELD;
    result->begin = 0;
    SetpDOEnd(result,i);
    result->value = (void *) EnvCreateMultifield(theEnv,execStatus,i);
    if (i == 0)
      return;
-   if ((id = GetTraversalID(theEnv)) == -1)
+   if ((id = GetTraversalID(theEnv,execStatus)) == -1)
      return;
    StoreSubclasses(result->value,1,(DEFCLASS *) clsptr,inhp,id,TRUE);
-   ReleaseTraversalID(theEnv);
+   ReleaseTraversalID(theEnv,execStatus);
   }
 
 /**************************************************************************
@@ -626,20 +626,20 @@ globle void ClassSubclassAddresses(
    register unsigned i;
    register int id;
 
-   if ((id = GetTraversalID(theEnv)) == -1)
+   if ((id = GetTraversalID(theEnv,execStatus)) == -1)
      return;
    i = CountSubclasses((DEFCLASS *) clsptr,inhp,id);
-   ReleaseTraversalID(theEnv);
+   ReleaseTraversalID(theEnv,execStatus);
    result->type = MULTIFIELD;
    result->begin = 0;
    SetpDOEnd(result,i);
    result->value = (void *) EnvCreateMultifield(theEnv,execStatus,i);
    if (i == 0)
      return;
-   if ((id = GetTraversalID(theEnv)) == -1)
+   if ((id = GetTraversalID(theEnv,execStatus)) == -1)
      return;
    StoreSubclasses(result->value,1,(DEFCLASS *) clsptr,inhp,id,FALSE);
-   ReleaseTraversalID(theEnv);
+   ReleaseTraversalID(theEnv,execStatus);
   }
 /**************************************************************************
   NAME         : Slot...  Slot information access functions
@@ -867,7 +867,7 @@ globle void EnvSlotTypes(
         SetMFType(result->value,i,SYMBOL);
         SetMFValue(result->value,i,
                    (void *) GetDefclassNamePointer((void *)
-DefclassData(theEnv)->PrimitiveClassMap[j]));
+DefclassData(theEnv,execStatus)->PrimitiveClassMap[j]));
         i++;
        }
       j++;
@@ -890,7 +890,7 @@ globle void EnvSlotAllowedValues(
    if ((sp->constraint != NULL) ? (sp->constraint->restrictionList == NULL) : TRUE)
      {
       result->type = SYMBOL;
-      result->value = EnvFalseSymbol(theEnv);
+      result->value = EnvFalseSymbol(theEnv,execStatus);
       return;
      }
    result->end = ExpressionSize(sp->constraint->restrictionList) - 1;
@@ -922,7 +922,7 @@ globle void EnvSlotAllowedClasses(
    if ((sp->constraint != NULL) ? (sp->constraint->classList == NULL) : TRUE)
      {
       result->type = SYMBOL;
-      result->value = EnvFalseSymbol(theEnv);
+      result->value = EnvFalseSymbol(theEnv,execStatus);
       return;
      }
    result->end = ExpressionSize(sp->constraint->classList) - 1;
@@ -963,7 +963,7 @@ globle void EnvSlotRange(
    else
      {
       result->type = SYMBOL;
-      result->value = EnvFalseSymbol(theEnv);
+      result->value = EnvFalseSymbol(theEnv,execStatus);
       return;
      }
   }
@@ -996,9 +996,9 @@ globle void EnvSlotCardinality(
    else
      {
       SetMFType(result->value,1,INTEGER);
-      SetMFValue(result->value,1,SymbolData(theEnv)->Zero);
+      SetMFValue(result->value,1,SymbolData(theEnv,execStatus)->Zero);
       SetMFType(result->value,2,SYMBOL);
-      SetMFValue(result->value,2,SymbolData(theEnv)->PositiveInfinity);
+      SetMFValue(result->value,2,SymbolData(theEnv,execStatus)->PositiveInfinity);
      }
   }
 
@@ -1024,7 +1024,7 @@ static void SlotInfoSupportFunction(
   void *theEnv,EXEC_STATUS,
   DATA_OBJECT *result,
   char *fnxname,
-  void (*fnx)(void *,void *,char *,DATA_OBJECT *))
+  void (*fnx)(void *,EXEC_STATUS,void *,char *,DATA_OBJECT *))
   {
    SYMBOL_HN *ssym;
    DEFCLASS *cls;

@@ -37,7 +37,7 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static void                      *SearchImportedConstructModules(void *,struct symbolHashNode *,
+   static void                      *SearchImportedConstructModules(void *,EXEC_STATUS,struct symbolHashNode *,
                                               struct defmodule *,
                                               struct moduleItem *,struct symbolHashNode *,
                                               int *,int,struct defmodule *);
@@ -285,7 +285,7 @@ globle void *FindImportedConstruct(
    /* to restore it once the search is completed. */
    /*=============================================*/
 
-   SaveCurrentModule(theEnv);
+   SaveCurrentModule(theEnv,execStatus);
 
    /*==========================================*/
    /* Find the module related access functions */
@@ -294,7 +294,7 @@ globle void *FindImportedConstruct(
 
    if ((theModuleItem = FindModuleItem(theEnv,execStatus,constructName)) == NULL)
      {
-      RestoreCurrentModule(theEnv);
+      RestoreCurrentModule(theEnv,execStatus);
       return(NULL);
      }
 
@@ -305,7 +305,7 @@ globle void *FindImportedConstruct(
 
    if (theModuleItem->findFunction == NULL)
      {
-      RestoreCurrentModule(theEnv);
+      RestoreCurrentModule(theEnv,execStatus);
       return(NULL);
      }
 
@@ -314,7 +314,7 @@ globle void *FindImportedConstruct(
    /* all modules as unvisited.        */
    /*==================================*/
 
-   MarkModulesAsUnvisited(theEnv);
+   MarkModulesAsUnvisited(theEnv,execStatus);
 
    /*===========================*/
    /* Search for the construct. */
@@ -329,7 +329,7 @@ globle void *FindImportedConstruct(
    /* Restore the current module. */
    /*=============================*/
 
-   RestoreCurrentModule(theEnv);
+   RestoreCurrentModule(theEnv,execStatus);
 
    /*====================================*/
    /* Return a pointer to the construct. */
@@ -367,7 +367,7 @@ globle void MarkModulesAsUnvisited(
   {
    struct defmodule *theModule;
 
-   DefmoduleData(theEnv)->CurrentModule->visitedFlag = FALSE;
+   DefmoduleData(theEnv,execStatus)->CurrentModule->visitedFlag = FALSE;
    for (theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,NULL);
         theModule != NULL;
         theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,theModule))
@@ -402,7 +402,7 @@ static void *SearchImportedConstructModules(
    /* visited, then return.                   */
    /*=========================================*/
 
-   currentModule = ((struct defmodule *) EnvGetCurrentModule(theEnv));
+   currentModule = ((struct defmodule *) EnvGetCurrentModule(theEnv,execStatus));
    if (currentModule->visitedFlag) return(NULL);
 
    /*=======================================================*/
@@ -462,7 +462,7 @@ static void *SearchImportedConstructModules(
    /* imported by the current module.   */
    /*===================================*/
 
-   theModule = ((struct defmodule *) EnvGetCurrentModule(theEnv));
+   theModule = ((struct defmodule *) EnvGetCurrentModule(theEnv,execStatus));
    theImportList = theModule->importList;
 
    while (theImportList != NULL)
@@ -599,10 +599,10 @@ globle void ListItemsDriver(
   struct defmodule *theModule,
   char *singleName,
   char *pluralName,
-  void *(*nextFunction)(void *,void *),
+  void *(*nextFunction)(void *,EXEC_STATUS,void *),
   char *(*nameFunction)(void *),
-  void (*printFunction)(void *,char *,void *),
-  int (*doItFunction)(void *,void *))
+  void (*printFunction)(void *,EXEC_STATUS,char *,void *),
+  int (*doItFunction)(void *,EXEC_STATUS,void *))
   {
    void *constructPtr;
    char *constructName;
@@ -614,7 +614,7 @@ globle void ListItemsDriver(
    /* Save the current module. */
    /*==========================*/
 
-   SaveCurrentModule(theEnv);
+   SaveCurrentModule(theEnv,execStatus);
 
    /*======================*/
    /* Print out the items. */
@@ -675,7 +675,7 @@ globle void ListItemsDriver(
 
    if (singleName != NULL) PrintTally(theEnv,execStatus,logicalName,count,singleName,pluralName);
 
-   RestoreCurrentModule(theEnv);
+   RestoreCurrentModule(theEnv,execStatus);
   }
 
 /********************************************************/
@@ -695,7 +695,7 @@ globle long DoForAllModules(
    /* Save the current module. */
    /*==========================*/
 
-   SaveCurrentModule(theEnv);
+   SaveCurrentModule(theEnv,execStatus);
 
    /*==================================*/
    /* Loop through all of the modules. */
@@ -707,9 +707,9 @@ globle long DoForAllModules(
      {
       EnvSetCurrentModule(theEnv,execStatus,(void *) theModule);
 
-      if ((interruptable) && GetHaltExecution(theEnv))
+      if ((interruptable) && GetHaltExecution(theEnv,execStatus))
         {
-         RestoreCurrentModule(theEnv);
+         RestoreCurrentModule(theEnv,execStatus);
          return(-1L);
         }
 
@@ -720,7 +720,7 @@ globle long DoForAllModules(
    /* Restore the current module. */
    /*=============================*/
 
-   RestoreCurrentModule(theEnv);
+   RestoreCurrentModule(theEnv,execStatus);
 
    /*=========================================*/
    /* Return the number of modules traversed. */

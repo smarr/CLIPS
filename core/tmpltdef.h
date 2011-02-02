@@ -112,7 +112,7 @@ struct deftemplateData
 #define EnvGetDeftemplateName(theEnv,execStatus,x) GetConstructNameString((struct constructHeader *) x)
 #define EnvGetDeftemplatePPForm(theEnv,execStatus,x) GetConstructPPForm(theEnv,execStatus,(struct constructHeader *) x)
 #define EnvDeftemplateModule(theEnv,execStatus,x) GetConstructModuleName((struct constructHeader *) x)
-#define DeftemplateData(theEnv) ((struct deftemplateData *) GetEnvironmentData(theEnv,execStatus,DEFTEMPLATE_DATA))
+#define DeftemplateData(theEnv,execStatus) ((struct deftemplateData *) GetEnvironmentData(theEnv,execStatus,DEFTEMPLATE_DATA))
 
 #ifdef LOCALE
 #undef LOCALE
@@ -132,19 +132,19 @@ struct deftemplateData
 #define GetNextFactInTemplate(a,b) EnvGetNextFactInTemplate(GetCurrentEnvironment(),a,b)
 #define DeftemplateModule(x) GetConstructModuleName((struct constructHeader *) x)
 
-   LOCALE void                           InitializeDeftemplates(void *);
-   LOCALE void                          *EnvFindDeftemplate(void *,char *);
-   LOCALE void                          *EnvGetNextDeftemplate(void *,void *);
-   LOCALE intBool                        EnvIsDeftemplateDeletable(void *,void *);
-   LOCALE void                          *EnvGetNextFactInTemplate(void *,void *,void *);
-   LOCALE struct deftemplateModule      *GetDeftemplateModuleItem(void *,struct defmodule *);
-   LOCALE void                           ReturnSlots(void *,struct templateSlot *);
-   LOCALE void                           IncrementDeftemplateBusyCount(void *,void *);
-   LOCALE void                           DecrementDeftemplateBusyCount(void *,void *);
-   LOCALE void                          *CreateDeftemplateScopeMap(void *,struct deftemplate *);
+   LOCALE void                           InitializeDeftemplates(void *,EXEC_STATUS);
+   LOCALE void                          *EnvFindDeftemplate(void *,EXEC_STATUS,char *);
+   LOCALE void                          *EnvGetNextDeftemplate(void *,EXEC_STATUS,void *);
+   LOCALE intBool                        EnvIsDeftemplateDeletable(void *,EXEC_STATUS,void *);
+   LOCALE void                          *EnvGetNextFactInTemplate(void *,EXEC_STATUS,void *,void *);
+   LOCALE struct deftemplateModule      *GetDeftemplateModuleItem(void *,EXEC_STATUS,struct defmodule *);
+   LOCALE void                           ReturnSlots(void *,EXEC_STATUS,struct templateSlot *);
+   LOCALE void                           IncrementDeftemplateBusyCount(void *,EXEC_STATUS,void *);
+   LOCALE void                           DecrementDeftemplateBusyCount(void *,EXEC_STATUS,void *);
+   LOCALE void                          *CreateDeftemplateScopeMap(void *,EXEC_STATUS,struct deftemplate *);
 
 #if RUN_TIME
-   LOCALE void                           DeftemplateRunTimeInitialize(void *);
+   LOCALE void                           DeftemplateRunTimeInitialize(void *,EXEC_STATUS);
 #endif
    
 #endif

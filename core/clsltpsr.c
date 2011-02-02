@@ -110,14 +110,14 @@
    =========================================
    ***************************************** */
 
-static SLOT_DESC *NewSlot(void *,SYMBOL_HN *);
-static TEMP_SLOT_LINK *InsertSlot(void *,TEMP_SLOT_LINK *,SLOT_DESC *);
-static int ParseSimpleFacet(void *,char *,char*,char *,int,char *,char *,char *,char *,SYMBOL_HN **);
-static intBool ParseDefaultFacet(void *,char *,char *,SLOT_DESC *);
-static void BuildCompositeFacets(void *,SLOT_DESC *,PACKED_CLASS_LINKS *,char *,
+static SLOT_DESC *NewSlot(void *,EXEC_STATUS,SYMBOL_HN *);
+static TEMP_SLOT_LINK *InsertSlot(void *,EXEC_STATUS,TEMP_SLOT_LINK *,SLOT_DESC *);
+static int ParseSimpleFacet(void *,EXEC_STATUS,char *,char*,char *,int,char *,char *,char *,char *,SYMBOL_HN **);
+static intBool ParseDefaultFacet(void *,EXEC_STATUS,char *,char *,SLOT_DESC *);
+static void BuildCompositeFacets(void *,EXEC_STATUS,SLOT_DESC *,PACKED_CLASS_LINKS *,char *,
                                  CONSTRAINT_PARSE_RECORD *);
-static intBool CheckForFacetConflicts(void *,SLOT_DESC *,CONSTRAINT_PARSE_RECORD *);
-static intBool EvaluateSlotDefaultValue(void *,SLOT_DESC *,char *);
+static intBool CheckForFacetConflicts(void *,EXEC_STATUS,SLOT_DESC *,CONSTRAINT_PARSE_RECORD *);
+static intBool EvaluateSlotDefaultValue(void *,EXEC_STATUS,SLOT_DESC *,char *);
 
 /* =========================================
    *****************************************
@@ -176,21 +176,21 @@ globle TEMP_SLOT_LINK *ParseSlot(
       =============================================================== */
    SavePPBuffer(theEnv,execStatus," ");
    specbits[0] = specbits[1] = '\0';
-   GetToken(theEnv,execStatus,readSource,&DefclassData(theEnv)->ObjectParseToken);
-   if (GetType(DefclassData(theEnv)->ObjectParseToken) != SYMBOL)
+   GetToken(theEnv,execStatus,readSource,&DefclassData(theEnv,execStatus)->ObjectParseToken);
+   if (GetType(DefclassData(theEnv,execStatus)->ObjectParseToken) != SYMBOL)
      {
       DeleteSlots(theEnv,execStatus,slist);
       SyntaxErrorMessage(theEnv,execStatus,"defclass slot");
       return(NULL);
      }
-   if ((DefclassData(theEnv)->ObjectParseToken.value == (void *) DefclassData(theEnv)->ISA_SYMBOL) ||
-       (DefclassData(theEnv)->ObjectParseToken.value == (void *) DefclassData(theEnv)->NAME_SYMBOL))
+   if ((DefclassData(theEnv,execStatus)->ObjectParseToken.value == (void *) DefclassData(theEnv,execStatus)->ISA_SYMBOL) ||
+       (DefclassData(theEnv,execStatus)->ObjectParseToken.value == (void *) DefclassData(theEnv,execStatus)->NAME_SYMBOL))
      {
       DeleteSlots(theEnv,execStatus,slist);
       SyntaxErrorMessage(theEnv,execStatus,"defclass slot");
       return(NULL);
      }
-   slot = NewSlot(theEnv,execStatus,(SYMBOL_HN *) GetValue(DefclassData(theEnv)->ObjectParseToken));
+   slot = NewSlot(theEnv,execStatus,(SYMBOL_HN *) GetValue(DefclassData(theEnv,execStatus)->ObjectParseToken));
    slist = InsertSlot(theEnv,execStatus,slist,slot);
    if (slist == NULL)
      return(NULL);
@@ -198,32 +198,32 @@ globle TEMP_SLOT_LINK *ParseSlot(
      slot->multiple = TRUE;
    if (fieldSpecified)
      SetBitMap(specbits,FIELD_BIT);
-   GetToken(theEnv,execStatus,readSource,&DefclassData(theEnv)->ObjectParseToken);
+   GetToken(theEnv,execStatus,readSource,&DefclassData(theEnv,execStatus)->ObjectParseToken);
    IncrementIndentDepth(theEnv,execStatus,3);
    InitializeConstraintParseRecord(&parsedConstraint);
-   while (GetType(DefclassData(theEnv)->ObjectParseToken) == LPAREN)
+   while (GetType(DefclassData(theEnv,execStatus)->ObjectParseToken) == LPAREN)
      {
-      PPBackup(theEnv);
-      PPCRAndIndent(theEnv);
+      PPBackup(theEnv,execStatus);
+      PPCRAndIndent(theEnv,execStatus);
       SavePPBuffer(theEnv,execStatus,"(");
-      GetToken(theEnv,execStatus,readSource,&DefclassData(theEnv)->ObjectParseToken);
-      if (GetType(DefclassData(theEnv)->ObjectParseToken) != SYMBOL)
+      GetToken(theEnv,execStatus,readSource,&DefclassData(theEnv,execStatus)->ObjectParseToken);
+      if (GetType(DefclassData(theEnv,execStatus)->ObjectParseToken) != SYMBOL)
         {
          SyntaxErrorMessage(theEnv,execStatus,"defclass slot");
          goto ParseSlotError;
         }
-      else if (strcmp(DOToString(DefclassData(theEnv)->ObjectParseToken),DEFAULT_FACET) == 0)
+      else if (strcmp(DOToString(DefclassData(theEnv,execStatus)->ObjectParseToken),DEFAULT_FACET) == 0)
         {
          if (ParseDefaultFacet(theEnv,execStatus,readSource,specbits,slot) == FALSE)
            goto ParseSlotError;
         }
-      else if (strcmp(DOToString(DefclassData(theEnv)->ObjectParseToken),DYNAMIC_FACET) == 0)
+      else if (strcmp(DOToString(DefclassData(theEnv,execStatus)->ObjectParseToken),DYNAMIC_FACET) == 0)
         {
          SetBitMap(specbits,DEFAULT_DYNAMIC_BIT);
          if (ParseDefaultFacet(theEnv,execStatus,readSource,specbits,slot) == FALSE)
            goto ParseSlotError;
         }
-      else if (strcmp(DOToString(DefclassData(theEnv)->ObjectParseToken),ACCESS_FACET) == 0)
+      else if (strcmp(DOToString(DefclassData(theEnv,execStatus)->ObjectParseToken),ACCESS_FACET) == 0)
         {
          rtnCode = ParseSimpleFacet(theEnv,execStatus,readSource,specbits,ACCESS_FACET,ACCESS_BIT,
                                     SLOT_RDWRT_RLN,SLOT_RDONLY_RLN,SLOT_INIT_RLN,
@@ -235,7 +235,7 @@ globle TEMP_SLOT_LINK *ParseSlot(
          else if (rtnCode == 2)
            slot->initializeOnly = 1;
         }
-      else if (strcmp(DOToString(DefclassData(theEnv)->ObjectParseToken),STORAGE_FACET) == 0)
+      else if (strcmp(DOToString(DefclassData(theEnv,execStatus)->ObjectParseToken),STORAGE_FACET) == 0)
         {
          rtnCode = ParseSimpleFacet(theEnv,execStatus,readSource,specbits,STORAGE_FACET,STORAGE_BIT,
                                     SLOT_LOCAL_RLN,SLOT_SHARE_RLN,NULL,NULL,NULL);
@@ -243,7 +243,7 @@ globle TEMP_SLOT_LINK *ParseSlot(
            goto ParseSlotError;
          slot->shared = rtnCode;
         }
-      else if (strcmp(DOToString(DefclassData(theEnv)->ObjectParseToken),PROPAGATION_FACET) == 0)
+      else if (strcmp(DOToString(DefclassData(theEnv,execStatus)->ObjectParseToken),PROPAGATION_FACET) == 0)
         {
          rtnCode = ParseSimpleFacet(theEnv,execStatus,readSource,specbits,PROPAGATION_FACET,PROPAGATION_BIT,
                                     SLOT_INH_RLN,SLOT_NO_INH_RLN,NULL,NULL,NULL);
@@ -251,7 +251,7 @@ globle TEMP_SLOT_LINK *ParseSlot(
            goto ParseSlotError;
          slot->noInherit = rtnCode;
         }
-      else if (strcmp(DOToString(DefclassData(theEnv)->ObjectParseToken),SOURCE_FACET) == 0)
+      else if (strcmp(DOToString(DefclassData(theEnv,execStatus)->ObjectParseToken),SOURCE_FACET) == 0)
         {
          rtnCode = ParseSimpleFacet(theEnv,execStatus,readSource,specbits,SOURCE_FACET,SOURCE_BIT,
                                     SLOT_EXCLUSIVE_RLN,SLOT_COMPOSITE_RLN,NULL,NULL,NULL);
@@ -260,7 +260,7 @@ globle TEMP_SLOT_LINK *ParseSlot(
          slot->composite = rtnCode;
         }
 #if DEFRULE_CONSTRUCT
-      else if (strcmp(DOToString(DefclassData(theEnv)->ObjectParseToken),MATCH_FACET) == 0)
+      else if (strcmp(DOToString(DefclassData(theEnv,execStatus)->ObjectParseToken),MATCH_FACET) == 0)
         {
          rtnCode = ParseSimpleFacet(theEnv,execStatus,readSource,specbits,MATCH_FACET,MATCH_BIT,
                                     SLOT_NONREACTIVE_RLN,SLOT_REACTIVE_RLN,NULL,NULL,NULL);
@@ -269,7 +269,7 @@ globle TEMP_SLOT_LINK *ParseSlot(
          slot->reactive = rtnCode;
         }
 #endif
-      else if (strcmp(DOToString(DefclassData(theEnv)->ObjectParseToken),VISIBILITY_FACET) == 0)
+      else if (strcmp(DOToString(DefclassData(theEnv,execStatus)->ObjectParseToken),VISIBILITY_FACET) == 0)
         {
          rtnCode = ParseSimpleFacet(theEnv,execStatus,readSource,specbits,VISIBILITY_FACET,VISIBILITY_BIT,
                                     SLOT_PRIVATE_RLN,SLOT_PUBLIC_RLN,NULL,NULL,NULL);
@@ -277,7 +277,7 @@ globle TEMP_SLOT_LINK *ParseSlot(
            goto ParseSlotError;
          slot->publicVisibility = rtnCode;
         }
-      else if (strcmp(DOToString(DefclassData(theEnv)->ObjectParseToken),CREATE_ACCESSOR_FACET) == 0)
+      else if (strcmp(DOToString(DefclassData(theEnv,execStatus)->ObjectParseToken),CREATE_ACCESSOR_FACET) == 0)
         {
          rtnCode = ParseSimpleFacet(theEnv,execStatus,readSource,specbits,CREATE_ACCESSOR_FACET,
                                     CREATE_ACCESSOR_BIT,
@@ -290,7 +290,7 @@ globle TEMP_SLOT_LINK *ParseSlot(
          if ((rtnCode == 1) || (rtnCode == 2))
            slot->createWriteAccessor = TRUE;
         }
-      else if (strcmp(DOToString(DefclassData(theEnv)->ObjectParseToken),OVERRIDE_MSG_FACET) == 0)
+      else if (strcmp(DOToString(DefclassData(theEnv,execStatus)->ObjectParseToken),OVERRIDE_MSG_FACET) == 0)
         {
          rtnCode = ParseSimpleFacet(theEnv,execStatus,readSource,specbits,OVERRIDE_MSG_FACET,OVERRIDE_MSG_BIT,
                                     NULL,NULL,NULL,SLOT_DEFAULT_RLN,&newOverrideMsg);
@@ -304,9 +304,9 @@ globle TEMP_SLOT_LINK *ParseSlot(
            }
          slot->overrideMessageSpecified = TRUE;
         }
-      else if (StandardConstraint(DOToString(DefclassData(theEnv)->ObjectParseToken)))
+      else if (StandardConstraint(DOToString(DefclassData(theEnv,execStatus)->ObjectParseToken)))
         {
-         if (ParseStandardConstraint(theEnv,execStatus,readSource,DOToString(DefclassData(theEnv)->ObjectParseToken),
+         if (ParseStandardConstraint(theEnv,execStatus,readSource,DOToString(DefclassData(theEnv,execStatus)->ObjectParseToken),
                 slot->constraint,&parsedConstraint,TRUE) == FALSE)
            goto ParseSlotError;
         }
@@ -315,15 +315,15 @@ globle TEMP_SLOT_LINK *ParseSlot(
          SyntaxErrorMessage(theEnv,execStatus,"defclass slot");
          goto ParseSlotError;
         }
-      GetToken(theEnv,execStatus,readSource,&DefclassData(theEnv)->ObjectParseToken);
+      GetToken(theEnv,execStatus,readSource,&DefclassData(theEnv,execStatus)->ObjectParseToken);
      }
-   if (GetType(DefclassData(theEnv)->ObjectParseToken) != RPAREN)
+   if (GetType(DefclassData(theEnv,execStatus)->ObjectParseToken) != RPAREN)
      {
       SyntaxErrorMessage(theEnv,execStatus,"defclass slot");
       goto ParseSlotError;
      }
      
-   if (DefclassData(theEnv)->ClassDefaultsMode == CONVENIENCE_MODE)
+   if (DefclassData(theEnv,execStatus)->ClassDefaultsMode == CONVENIENCE_MODE)
      {
       if (! TestBitMap(specbits,CREATE_ACCESSOR_BIT))
         {
@@ -435,7 +435,7 @@ static SLOT_DESC *NewSlot(
    slot->overrideMessageSpecified = 0;
    slot->cls = NULL;
    slot->defaultValue = NULL;
-   slot->constraint = GetConstraintRecord(theEnv);
+   slot->constraint = GetConstraintRecord(theEnv,execStatus);
    slot->slotName = AddSlotName(theEnv,execStatus,name,0,FALSE);
    slot->overrideMessage = slot->slotName->putHandlerName;
    IncrementSymbolCount(slot->overrideMessage);
@@ -545,22 +545,22 @@ static int ParseSimpleFacet(
      }
    SetBitMap(specbits,testBit);
    SavePPBuffer(theEnv,execStatus," ");
-   GetToken(theEnv,execStatus,readSource,&DefclassData(theEnv)->ObjectParseToken);
+   GetToken(theEnv,execStatus,readSource,&DefclassData(theEnv,execStatus)->ObjectParseToken);
 
    /* ===============================
       Check for the variable relation
       =============================== */
-   if (DefclassData(theEnv)->ObjectParseToken.type == SF_VARIABLE)
+   if (DefclassData(theEnv,execStatus)->ObjectParseToken.type == SF_VARIABLE)
      {
       if ((varRelation == NULL) ? FALSE :
-          (strcmp(DOToString(DefclassData(theEnv)->ObjectParseToken),varRelation) == 0))
+          (strcmp(DOToString(DefclassData(theEnv,execStatus)->ObjectParseToken),varRelation) == 0))
         rtnCode = 3;
       else
         goto ParseSimpleFacetError;
      }
    else
      {
-      if (DefclassData(theEnv)->ObjectParseToken.type != SYMBOL)
+      if (DefclassData(theEnv,execStatus)->ObjectParseToken.type != SYMBOL)
         goto ParseSimpleFacetError;
 
       /* ===================================================
@@ -569,12 +569,12 @@ static int ParseSimpleFacet(
          =================================================== */
       if (facetSymbolicValue == NULL)
         {
-         if (strcmp(DOToString(DefclassData(theEnv)->ObjectParseToken),clearRelation) == 0)
+         if (strcmp(DOToString(DefclassData(theEnv,execStatus)->ObjectParseToken),clearRelation) == 0)
            rtnCode = 0;
-         else if (strcmp(DOToString(DefclassData(theEnv)->ObjectParseToken),setRelation) == 0)
+         else if (strcmp(DOToString(DefclassData(theEnv,execStatus)->ObjectParseToken),setRelation) == 0)
            rtnCode = 1;
          else if ((alternateRelation == NULL) ? FALSE :
-                  (strcmp(DOToString(DefclassData(theEnv)->ObjectParseToken),alternateRelation) == 0))
+                  (strcmp(DOToString(DefclassData(theEnv,execStatus)->ObjectParseToken),alternateRelation) == 0))
            rtnCode = 2;
          else
            goto ParseSimpleFacetError;
@@ -582,11 +582,11 @@ static int ParseSimpleFacet(
       else
         {
          rtnCode = 4;
-         *facetSymbolicValue = (SYMBOL_HN *) DefclassData(theEnv)->ObjectParseToken.value;
+         *facetSymbolicValue = (SYMBOL_HN *) DefclassData(theEnv,execStatus)->ObjectParseToken.value;
         }
      }
-   GetToken(theEnv,execStatus,readSource,&DefclassData(theEnv)->ObjectParseToken);
-   if (DefclassData(theEnv)->ObjectParseToken.type != RPAREN)
+   GetToken(theEnv,execStatus,readSource,&DefclassData(theEnv,execStatus)->ObjectParseToken);
+   if (DefclassData(theEnv,execStatus)->ObjectParseToken.type != RPAREN)
      goto ParseSimpleFacetError;
    return(rtnCode);
 
@@ -841,9 +841,9 @@ static intBool EvaluateSlotDefaultValue(
      {
       if (TestBitMap(specbits,DEFAULT_BIT))
         {
-         oldce = ExecutingConstruct(theEnv);
+         oldce = ExecutingConstruct(theEnv,execStatus);
          SetExecutingConstruct(theEnv,execStatus,TRUE);
-         olddcc = EnvSetDynamicConstraintChecking(theEnv,execStatus,EnvGetStaticConstraintChecking(theEnv));
+         olddcc = EnvSetDynamicConstraintChecking(theEnv,execStatus,EnvGetStaticConstraintChecking(theEnv,execStatus));
          vCode = EvaluateAndStoreInDataObject(theEnv,execStatus,(int) sd->multiple,
                   (EXPRESSION *) sd->defaultValue,&temp,TRUE);
          if (vCode != FALSE)
@@ -872,7 +872,7 @@ static intBool EvaluateSlotDefaultValue(
          ValueInstall(theEnv,execStatus,(DATA_OBJECT *) sd->defaultValue);
         }
      }
-   else if (EnvGetStaticConstraintChecking(theEnv))
+   else if (EnvGetStaticConstraintChecking(theEnv,execStatus))
      {
       vCode = ConstraintCheckExpressionChain(theEnv,execStatus,(EXPRESSION *) sd->defaultValue,sd->constraint);
       if (vCode != NO_VIOLATION)

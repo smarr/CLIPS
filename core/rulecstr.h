@@ -34,16 +34,16 @@
 #define LOCALE extern
 #endif
 
-   LOCALE struct lhsParseNode           *GetExpressionVarConstraints(void *,struct lhsParseNode *);
-   LOCALE struct lhsParseNode           *DeriveVariableConstraints(void *,struct lhsParseNode *);
-   LOCALE intBool                        ProcessConnectedConstraints(void *,struct lhsParseNode *,struct lhsParseNode *,struct lhsParseNode *);
-   LOCALE void                           ConstraintReferenceErrorMessage(void *,
+   LOCALE struct lhsParseNode           *GetExpressionVarConstraints(void *,EXEC_STATUS,struct lhsParseNode *);
+   LOCALE struct lhsParseNode           *DeriveVariableConstraints(void *,EXEC_STATUS,struct lhsParseNode *);
+   LOCALE intBool                        ProcessConnectedConstraints(void *,EXEC_STATUS,struct lhsParseNode *,struct lhsParseNode *,struct lhsParseNode *);
+   LOCALE void                           ConstraintReferenceErrorMessage(void *,EXEC_STATUS,
                                                                 struct symbolHashNode *,
                                                                 struct lhsParseNode *,
                                                                 int,int,
                                                                 struct symbolHashNode *,
                                                                 int);
-   LOCALE intBool                        CheckRHSForConstraintErrors(void *,struct expr *,struct lhsParseNode *);
+   LOCALE intBool                        CheckRHSForConstraintErrors(void *,EXEC_STATUS,struct expr *,struct lhsParseNode *);
 
 #endif
 

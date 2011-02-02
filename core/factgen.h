@@ -209,17 +209,17 @@ struct factCheckLengthPNCall
 /* GLOBAL EXTERNAL FUNCTION DEFINITIONS */
 /****************************************/
 
-   LOCALE void                       InitializeFactReteFunctions(void *);
-   LOCALE struct expr               *FactPNVariableComparison(void *,struct lhsParseNode *,
+   LOCALE void                       InitializeFactReteFunctions(void *,EXEC_STATUS);
+   LOCALE struct expr               *FactPNVariableComparison(void *,EXEC_STATUS,struct lhsParseNode *,
                                                               struct lhsParseNode *);
-   LOCALE struct expr               *FactJNVariableComparison(void *,struct lhsParseNode *,
+   LOCALE struct expr               *FactJNVariableComparison(void *,EXEC_STATUS,struct lhsParseNode *,
                                                               struct lhsParseNode *,int);
-   LOCALE void                       FactReplaceGetvar(void *,struct expr *,struct lhsParseNode *,int);
-   LOCALE void                       FactReplaceGetfield(void *,struct expr *,struct lhsParseNode *);
-   LOCALE struct expr               *FactGenPNConstant(void *,struct lhsParseNode *);
-   LOCALE struct expr               *FactGenGetfield(void *,struct lhsParseNode *);
-   LOCALE struct expr               *FactGenGetvar(void *,struct lhsParseNode *,int);
-   LOCALE struct expr               *FactGenCheckLength(void *,struct lhsParseNode *);
-   LOCALE struct expr               *FactGenCheckZeroLength(void *,unsigned);
+   LOCALE void                       FactReplaceGetvar(void *,EXEC_STATUS,struct expr *,struct lhsParseNode *,int);
+   LOCALE void                       FactReplaceGetfield(void *,EXEC_STATUS,struct expr *,struct lhsParseNode *);
+   LOCALE struct expr               *FactGenPNConstant(void *,EXEC_STATUS,struct lhsParseNode *);
+   LOCALE struct expr               *FactGenGetfield(void *,EXEC_STATUS,struct lhsParseNode *);
+   LOCALE struct expr               *FactGenGetvar(void *,EXEC_STATUS,struct lhsParseNode *,int);
+   LOCALE struct expr               *FactGenCheckLength(void *,EXEC_STATUS,struct lhsParseNode *);
+   LOCALE struct expr               *FactGenCheckZeroLength(void *,EXEC_STATUS,unsigned);
 
 #endif

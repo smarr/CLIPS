@@ -81,13 +81,13 @@
    ***************************************** */
 
 #if DEBUGGING_FUNCTIONS
-static long ListInstancesInModule(void *,int,char *,char *,intBool,intBool);
-static long TabulateInstances(void *,int,char *,DEFCLASS *,intBool,intBool);
+static long ListInstancesInModule(void *,EXEC_STATUS,int,char *,char *,intBool,intBool);
+static long TabulateInstances(void *,EXEC_STATUS,int,char *,DEFCLASS *,intBool,intBool);
 #endif
 
-static void PrintInstance(void *,char *,INSTANCE_TYPE *,char *);
-static INSTANCE_SLOT *FindISlotByName(void *,INSTANCE_TYPE *,char *);
-static void DeallocateInstanceData(void *);
+static void PrintInstance(void *,EXEC_STATUS,char *,INSTANCE_TYPE *,char *);
+static INSTANCE_SLOT *FindISlotByName(void *,EXEC_STATUS,INSTANCE_TYPE *,char *);
+static void DeallocateInstanceData(void *,EXEC_STATUS);
 
 /* =========================================
    *****************************************
@@ -136,13 +136,13 @@ globle void SetupInstances(
 
    AllocateEnvironmentData(theEnv,execStatus,INSTANCE_DATA,sizeof(struct instanceData),DeallocateInstanceData);
    
-   InstanceData(theEnv)->MkInsMsgPass = TRUE;
-   memcpy(&InstanceData(theEnv)->InstanceInfo,&instanceInfo,sizeof(struct patternEntityRecord)); 
-   dummyInstance.header.theInfo = &InstanceData(theEnv)->InstanceInfo;    
-   memcpy(&InstanceData(theEnv)->DummyInstance,&dummyInstance,sizeof(INSTANCE_TYPE));  
+   InstanceData(theEnv,execStatus)->MkInsMsgPass = TRUE;
+   memcpy(&InstanceData(theEnv,execStatus)->InstanceInfo,&instanceInfo,sizeof(struct patternEntityRecord)); 
+   dummyInstance.header.theInfo = &InstanceData(theEnv,execStatus)->InstanceInfo;    
+   memcpy(&InstanceData(theEnv,execStatus)->DummyInstance,&dummyInstance,sizeof(INSTANCE_TYPE));  
 
-   InitializeInstanceTable(theEnv);
-   InstallPrimitive(theEnv,execStatus,(struct entityRecord *) &InstanceData(theEnv)->InstanceInfo,INSTANCE_ADDRESS);
+   InitializeInstanceTable(theEnv,execStatus);
+   InstallPrimitive(theEnv,execStatus,(struct entityRecord *) &InstanceData(theEnv,execStatus)->InstanceInfo,INSTANCE_ADDRESS);
 
 #if ! RUN_TIME
 
@@ -196,13 +196,13 @@ globle void SetupInstances(
                    "InstanceExistPCommand","11e");
    EnvDefineFunction2(theEnv,execStatus,"class",'u',PTIEF ClassCommand,"ClassCommand","11");
 
-   SetupInstanceModDupCommands(theEnv);
-   /* SetupInstanceFileCommands(theEnv); DR0866 */
-   SetupInstanceMultifieldCommands(theEnv);
+   SetupInstanceModDupCommands(theEnv,execStatus);
+   /* SetupInstanceFileCommands(theEnv,execStatus); DR0866 */
+   SetupInstanceMultifieldCommands(theEnv,execStatus);
 
 #endif
 
-   SetupInstanceFileCommands(theEnv); /* DR0866 */
+   SetupInstanceFileCommands(theEnv,execStatus); /* DR0866 */
 
    AddCleanupFunction(theEnv,execStatus,"instances",CleanupInstances,0);
    EnvAddResetFunction(theEnv,execStatus,"instances",DestroyAllInstances,60);
@@ -226,14 +226,14 @@ static void DeallocateInstanceData(
    /* Remove the instance hash table. */
    /*=================================*/
    
-   rm(theEnv,execStatus,InstanceData(theEnv)->InstanceTable,
+   rm(theEnv,execStatus,InstanceData(theEnv,execStatus)->InstanceTable,
       (int) (sizeof(INSTANCE_TYPE *) * INSTANCE_TABLE_HASH_SIZE));
       
    /*=======================*/
    /* Return all instances. */
    /*=======================*/
    
-   tmpIPtr = InstanceData(theEnv)->InstanceList;
+   tmpIPtr = InstanceData(theEnv,execStatus)->InstanceList;
    while (tmpIPtr != NULL)
      {
       nextIPtr = tmpIPtr->nxtList;
@@ -281,7 +281,7 @@ static void DeallocateInstanceData(
    /* Get rid of garbage instances. */
    /*===============================*/
    
-   tmpGPtr = InstanceData(theEnv)->InstanceGarbageList;
+   tmpGPtr = InstanceData(theEnv,execStatus)->InstanceGarbageList;
    while (tmpGPtr != NULL)
      {
       nextGPtr = tmpGPtr->nxt;
@@ -311,7 +311,7 @@ globle intBool EnvDeleteInstance(
 
    if (iptr != NULL)
      return(QuashInstance(theEnv,execStatus,(INSTANCE_TYPE *) iptr));
-   ins = InstanceData(theEnv)->InstanceList;
+   ins = InstanceData(theEnv,execStatus)->InstanceList;
    while (ins != NULL)
      {
       itmp = ins;
@@ -320,7 +320,7 @@ globle intBool EnvDeleteInstance(
         success = 0;
      }
 
-   if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
+   if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv,execStatus)->EvaluatingTopLevelCommand) &&
        (execStatus->CurrentExpression == NULL))
      { PeriodicCleanup(theEnv,execStatus,TRUE,FALSE); }
 
@@ -343,8 +343,8 @@ globle intBool EnvUnmakeInstance(
    INSTANCE_TYPE *ins;
    int success = 1,svmaintain;
 
-   svmaintain = InstanceData(theEnv)->MaintainGarbageInstances;
-   InstanceData(theEnv)->MaintainGarbageInstances = TRUE;
+   svmaintain = InstanceData(theEnv,execStatus)->MaintainGarbageInstances;
+   InstanceData(theEnv,execStatus)->MaintainGarbageInstances = TRUE;
    ins = (INSTANCE_TYPE *) iptr;
    if (ins != NULL)
      {
@@ -352,17 +352,17 @@ globle intBool EnvUnmakeInstance(
         success = 0;
       else
         {
-         DirectMessage(theEnv,execStatus,MessageHandlerData(theEnv)->DELETE_SYMBOL,ins,NULL,NULL);
+         DirectMessage(theEnv,execStatus,MessageHandlerData(theEnv,execStatus)->DELETE_SYMBOL,ins,NULL,NULL);
          if (ins->garbage == 0)
            success = 0;
         }
      }
    else
      {
-      ins = InstanceData(theEnv)->InstanceList;
+      ins = InstanceData(theEnv,execStatus)->InstanceList;
       while (ins != NULL)
         {
-         DirectMessage(theEnv,execStatus,MessageHandlerData(theEnv)->DELETE_SYMBOL,ins,NULL,NULL);
+         DirectMessage(theEnv,execStatus,MessageHandlerData(theEnv,execStatus)->DELETE_SYMBOL,ins,NULL,NULL);
          if (ins->garbage == 0)
            success = 0;
          ins = ins->nxtList;
@@ -370,10 +370,10 @@ globle intBool EnvUnmakeInstance(
            ins = ins->nxtList;
         }
      }
-   InstanceData(theEnv)->MaintainGarbageInstances = svmaintain;
-   CleanupInstances(theEnv);
+   InstanceData(theEnv,execStatus)->MaintainGarbageInstances = svmaintain;
+   CleanupInstances(theEnv,execStatus);
 
-   if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
+   if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv,execStatus)->EvaluatingTopLevelCommand) &&
        (execStatus->CurrentExpression == NULL))
      { PeriodicCleanup(theEnv,execStatus,TRUE,FALSE); }
 
@@ -400,7 +400,7 @@ globle void InstancesCommand(
    char *className = NULL;
    DATA_OBJECT temp;
 
-   theDefmodule = (void *) EnvGetCurrentModule(theEnv);
+   theDefmodule = (void *) EnvGetCurrentModule(theEnv,execStatus);
 
    argno = EnvRtnArgCount(theEnv,execStatus,execStatus);
    if (argno > 0)
@@ -464,7 +464,7 @@ globle void PPInstanceCommand(
 
    if (CheckCurrentMessage(theEnv,execStatus,"ppinstance",TRUE) == FALSE)
      return;
-   ins = GetActiveInstance(theEnv);
+   ins = GetActiveInstance(theEnv,execStatus);
    if (ins->garbage == 1)
      return;
    PrintInstance(theEnv,execStatus,WDISPLAY,ins,"\n");
@@ -500,9 +500,9 @@ globle void EnvInstances(
       Grab a traversal id to avoid printing out
       instances twice due to multiple inheritance
       =========================================== */
-  if ((id = GetTraversalID(theEnv)) == -1)
+  if ((id = GetTraversalID(theEnv,execStatus)) == -1)
     return;
-  SaveCurrentModule(theEnv);
+  SaveCurrentModule(theEnv,execStatus);
 
    /* ====================================
       For all modules, print out instances
@@ -513,10 +513,10 @@ globle void EnvInstances(
       theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,NULL);
       while (theModule != NULL)
         {
-         if (GetHaltExecution(theEnv) == TRUE)
+         if (GetHaltExecution(theEnv,execStatus) == TRUE)
            {
-            RestoreCurrentModule(theEnv);
-            ReleaseTraversalID(theEnv);
+            RestoreCurrentModule(theEnv,execStatus);
+            ReleaseTraversalID(theEnv,execStatus);
             return;
            }
 
@@ -538,8 +538,8 @@ globle void EnvInstances(
       count = ListInstancesInModule(theEnv,execStatus,id,logicalName,className,inheritFlag,FALSE);
      }
 
-   RestoreCurrentModule(theEnv);
-   ReleaseTraversalID(theEnv);
+   RestoreCurrentModule(theEnv,execStatus);
+   ReleaseTraversalID(theEnv,execStatus);
    if (execStatus->HaltExecution == FALSE)
      PrintTally(theEnv,execStatus,logicalName,count,"instance","instances");
   }
@@ -569,7 +569,7 @@ globle void *EnvMakeInstance(
    DATA_OBJECT result;
 
    result.type = SYMBOL;
-   result.value = EnvFalseSymbol(theEnv);
+   result.value = EnvFalseSymbol(theEnv,execStatus);
    if (OpenStringSource(theEnv,execStatus,router,mkstr,0) == 0)
      return(NULL);
    GetToken(theEnv,execStatus,router,&tkn);
@@ -594,11 +594,11 @@ globle void *EnvMakeInstance(
      SyntaxErrorMessage(theEnv,execStatus,"instance definition");
    CloseStringSource(theEnv,execStatus,router);
 
-   if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
+   if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv,execStatus)->EvaluatingTopLevelCommand) &&
        (execStatus->CurrentExpression == NULL))
      { PeriodicCleanup(theEnv,execStatus,TRUE,FALSE); }
 
-   if ((result.type == SYMBOL) && (result.value == EnvFalseSymbol(theEnv)))
+   if ((result.type == SYMBOL) && (result.value == EnvFalseSymbol(theEnv,execStatus)))
      return(NULL);
 
    return((void *) FindInstanceBySymbol(theEnv,execStatus,(SYMBOL_HN *) result.value));
@@ -646,9 +646,9 @@ globle void *EnvFindInstance(
    if (isym == NULL)
      return(NULL);
    if (theModule == NULL)
-     theModule = (void *) EnvGetCurrentModule(theEnv);
+     theModule = (void *) EnvGetCurrentModule(theEnv,execStatus);
    return((void *) FindInstanceInModule(theEnv,execStatus,isym,(struct defmodule *) theModule,
-                                        ((struct defmodule *) EnvGetCurrentModule(theEnv)),searchImports));
+                                        ((struct defmodule *) EnvGetCurrentModule(theEnv,execStatus)),searchImports));
   }
 
 /***************************************************************************
@@ -668,7 +668,7 @@ globle int EnvValidInstanceAddress(
   void *iptr)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 
    return((((INSTANCE_TYPE *) iptr)->garbage == 0) ? 1 : 0);
@@ -697,7 +697,7 @@ globle void EnvDirectGetSlot(
      {
       SetEvaluationError(theEnv,execStatus,TRUE);
       result->type = SYMBOL;
-      result->value = EnvFalseSymbol(theEnv);
+      result->value = EnvFalseSymbol(theEnv,execStatus);
       return;
      }
    sp = FindISlotByName(theEnv,execStatus,(INSTANCE_TYPE *) ins,sname);
@@ -705,7 +705,7 @@ globle void EnvDirectGetSlot(
      {
       SetEvaluationError(theEnv,execStatus,TRUE);
       result->type = SYMBOL;
-      result->value = EnvFalseSymbol(theEnv);
+      result->value = EnvFalseSymbol(theEnv,execStatus);
       return;
      }
    result->type = (unsigned short) sp->type;
@@ -752,7 +752,7 @@ globle int EnvDirectPutSlot(
 
    if (PutSlotValue(theEnv,execStatus,(INSTANCE_TYPE *) ins,sp,val,&junk,"external put"))
      {
-      if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
+      if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv,execStatus)->EvaluatingTopLevelCommand) &&
           (execStatus->CurrentExpression == NULL))
         { PeriodicCleanup(theEnv,execStatus,TRUE,FALSE); }
       return(TRUE);
@@ -777,7 +777,7 @@ globle char *EnvGetInstanceName(
   void *iptr)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 
    if (((INSTANCE_TYPE *) iptr)->garbage == 1)
@@ -818,7 +818,7 @@ globle void *EnvGetInstanceClass(
   void *iptr)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 
    if (((INSTANCE_TYPE *) iptr)->garbage == 1)
@@ -839,7 +839,7 @@ globle unsigned long GetGlobalNumberOfInstances(
   void *theEnv,
   EXEC_STATUS)
   {
-   return(InstanceData(theEnv)->GlobalNumberOfInstances);
+   return(InstanceData(theEnv,execStatus)->GlobalNumberOfInstances);
   }
 
 /***************************************************
@@ -858,7 +858,7 @@ globle void *EnvGetNextInstance(
   void *iptr)
   {
    if (iptr == NULL)
-     return((void *) InstanceData(theEnv)->InstanceList);
+     return((void *) InstanceData(theEnv,execStatus)->InstanceList);
    if (((INSTANCE_TYPE *) iptr)->garbage == 1)
      return(NULL);
    return((void *) ((INSTANCE_TYPE *) iptr)->nxtList);
@@ -885,7 +885,7 @@ globle void *GetNextInstanceInScope(
    INSTANCE_TYPE *ins = (INSTANCE_TYPE *) iptr;
 
    if (ins == NULL)
-     ins = InstanceData(theEnv)->InstanceList;
+     ins = InstanceData(theEnv,execStatus)->InstanceList;
    else if (ins->garbage)
      return(NULL);
    else
@@ -920,7 +920,7 @@ globle void *EnvGetNextInstanceInClass(
   void *iptr)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 
    if (iptr == NULL)
@@ -1028,7 +1028,7 @@ globle void ClassCommand(
    func = ValueToString(((struct FunctionDefinition *)
                        execStatus->CurrentExpression->value)->callFunctionName);
    result->type = SYMBOL;
-   result->value = EnvFalseSymbol(theEnv);
+   result->value = EnvFalseSymbol(theEnv,execStatus);
    EvaluateExpression(theEnv,execStatus,GetFirstArgument(),&temp);
    if (temp.type == INSTANCE_ADDRESS)
      {
@@ -1064,7 +1064,7 @@ globle void ClassCommand(
          case FACT_ADDRESS     :
                           result->value = (void *)
                                            GetDefclassNamePointer((void *)
-                                            DefclassData(theEnv)->PrimitiveClassMap[temp.type]);
+                                            DefclassData(theEnv,execStatus)->PrimitiveClassMap[temp.type]);
                          return;
 
          default       : PrintErrorID(theEnv,execStatus,"INSCOM",1,FALSE);
@@ -1093,7 +1093,7 @@ globle intBool CreateInstanceHandler(
   EXEC_STATUS)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 
    return(TRUE);
@@ -1116,7 +1116,7 @@ globle intBool DeleteInstanceCommand(
   EXEC_STATUS)
   {
    if (CheckCurrentMessage(theEnv,execStatus,"delete-instance",TRUE))
-     return(QuashInstance(theEnv,execStatus,GetActiveInstance(theEnv)));
+     return(QuashInstance(theEnv,execStatus,GetActiveInstance(theEnv,execStatus)));
    return(FALSE);
   }
 
@@ -1194,7 +1194,7 @@ globle void SymbolToInstanceName(
    if (EnvArgTypeCheck(theEnv,execStatus,"symbol-to-instance-name",1,SYMBOL,result) == FALSE)
      {
       SetpType(result,SYMBOL);
-      SetpValue(result,EnvFalseSymbol(theEnv));
+      SetpValue(result,EnvFalseSymbol(theEnv,execStatus));
       return;
      }
    SetpType(result,INSTANCE_NAME);
@@ -1216,7 +1216,7 @@ globle void *InstanceNameToSymbol(
    DATA_OBJECT result;
 
    if (EnvArgTypeCheck(theEnv,execStatus,"instance-name-to-symbol",1,INSTANCE_NAME,&result) == FALSE)
-     return((SYMBOL_HN *) EnvFalseSymbol(theEnv));
+     return((SYMBOL_HN *) EnvFalseSymbol(theEnv,execStatus));
    return((SYMBOL_HN *) result.value);
   }
 
@@ -1239,7 +1239,7 @@ globle void InstanceAddressCommand(
    unsigned searchImports;
 
    result->type = SYMBOL;
-   result->value = EnvFalseSymbol(theEnv);
+   result->value = EnvFalseSymbol(theEnv,execStatus);
    if (EnvRtnArgCount(theEnv,execStatus,execStatus) > 1)
      {
       if (EnvArgTypeCheck(theEnv,execStatus,"instance-address",1,SYMBOL,&temp) == FALSE)
@@ -1254,7 +1254,7 @@ globle void InstanceAddressCommand(
       if (theModule == NULL)
         {
          searchImports = TRUE;
-         theModule = ((struct defmodule *) EnvGetCurrentModule(theEnv));
+         theModule = ((struct defmodule *) EnvGetCurrentModule(theEnv,execStatus));
         }
       else
         searchImports = FALSE;
@@ -1262,7 +1262,7 @@ globle void InstanceAddressCommand(
              == FALSE)
         return;
       ins = FindInstanceInModule(theEnv,execStatus,(SYMBOL_HN *) temp.value,theModule,
-                                 ((struct defmodule *) EnvGetCurrentModule(theEnv)),searchImports);
+                                 ((struct defmodule *) EnvGetCurrentModule(theEnv,execStatus)),searchImports);
       if (ins != NULL)
         {
          result->type = INSTANCE_ADDRESS;
@@ -1318,7 +1318,7 @@ globle void InstanceNameCommand(
    DATA_OBJECT temp;
 
    result->type = SYMBOL;
-   result->value = EnvFalseSymbol(theEnv);
+   result->value = EnvFalseSymbol(theEnv,execStatus);
    if (EnvArgTypeCheck(theEnv,execStatus,"instance-name",1,INSTANCE_OR_INSTANCE_NAME,&temp) == FALSE)
      return;
    if (temp.type == INSTANCE_ADDRESS)
@@ -1495,7 +1495,7 @@ static long ListInstancesInModule(
          theInstance = GetNextInstanceInScope(theEnv,execStatus,NULL);
          while (theInstance != NULL)
            {
-            if (GetHaltExecution(theEnv) == TRUE)
+            if (GetHaltExecution(theEnv,execStatus) == TRUE)
               { return(count); }
 
             count++;
@@ -1511,7 +1511,7 @@ static long ListInstancesInModule(
       =================================== */
    else
      {
-      theDefclass = (void *) LookupDefclassAnywhere(theEnv,execStatus,((struct defmodule *) EnvGetCurrentModule(theEnv)),className);
+      theDefclass = (void *) LookupDefclassAnywhere(theEnv,execStatus,((struct defmodule *) EnvGetCurrentModule(theEnv,execStatus)),className);
       if (theDefclass != NULL)
         {
          count += TabulateInstances(theEnv,execStatus,id,logicalName,

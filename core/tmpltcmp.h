@@ -32,8 +32,8 @@
 #define LOCALE extern
 #endif
 
-   LOCALE void                           DeftemplateCompilerSetup(void *);
-   LOCALE void                           DeftemplateCModuleReference(void *,FILE *,int,int,int);
-   LOCALE void                           DeftemplateCConstructReference(void *,FILE *,void *,int,int);
+   LOCALE void                           DeftemplateCompilerSetup(void *,EXEC_STATUS);
+   LOCALE void                           DeftemplateCModuleReference(void *,EXEC_STATUS,FILE *,int,int,int);
+   LOCALE void                           DeftemplateCConstructReference(void *,EXEC_STATUS,FILE *,void *,int,int);
 
 #endif

@@ -47,17 +47,17 @@ struct dependency
 #define LOCALE extern
 #endif
 
-   LOCALE intBool                        AddLogicalDependencies(void *,struct patternEntity *,int);
-   LOCALE void                           RemoveEntityDependencies(void *,struct patternEntity *);
-   LOCALE void                           RemovePMDependencies(void *,struct partialMatch *);
-   LOCALE void                           DestroyPMDependencies(void *,struct partialMatch *);
-   LOCALE void                           RemoveLogicalSupport(void *,struct partialMatch *);
-   LOCALE void                           ForceLogicalRetractions(void *);
-   LOCALE void                           Dependencies(void *,struct patternEntity *);
-   LOCALE void                           Dependents(void *,struct patternEntity *);
-   LOCALE void                           DependenciesCommand(void *);
-   LOCALE void                           DependentsCommand(void *);
-   LOCALE void                           ReturnEntityDependencies(void *,struct patternEntity *);
+   LOCALE intBool                        AddLogicalDependencies(void *,EXEC_STATUS,struct patternEntity *,int);
+   LOCALE void                           RemoveEntityDependencies(void *,EXEC_STATUS,struct patternEntity *);
+   LOCALE void                           RemovePMDependencies(void *,EXEC_STATUS,struct partialMatch *);
+   LOCALE void                           DestroyPMDependencies(void *,EXEC_STATUS,struct partialMatch *);
+   LOCALE void                           RemoveLogicalSupport(void *,EXEC_STATUS,struct partialMatch *);
+   LOCALE void                           ForceLogicalRetractions(void *,EXEC_STATUS);
+   LOCALE void                           Dependencies(void *,EXEC_STATUS,struct patternEntity *);
+   LOCALE void                           Dependents(void *,EXEC_STATUS,struct patternEntity *);
+   LOCALE void                           DependenciesCommand(void *,EXEC_STATUS);
+   LOCALE void                           DependentsCommand(void *,EXEC_STATUS);
+   LOCALE void                           ReturnEntityDependencies(void *,EXEC_STATUS,struct patternEntity *);
    LOCALE struct partialMatch           *FindLogicalBind(struct joinNode *,struct partialMatch *);
 
 #endif

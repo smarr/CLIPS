@@ -58,7 +58,7 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static void                    DeallocateProceduralFunctionData(void *);
+   static void                    DeallocateProceduralFunctionData(void *,EXEC_STATUS);
 
 /**********************************************/
 /* ProceduralFunctionDefinitions: Initializes */
@@ -81,7 +81,7 @@ globle void ProceduralFunctionDefinitions(
    EnvDefineFunction2(theEnv,execStatus,"break", 'v', PTIEF BreakFunction, "BreakFunction",NULL);
    EnvDefineFunction2(theEnv,execStatus,"switch", 'u', PTIEF SwitchFunction, "SwitchFunction",NULL);
 
-   ProceduralFunctionParsers(theEnv);
+   ProceduralFunctionParsers(theEnv,execStatus);
 
    FuncSeqOvlFlags(theEnv,execStatus,"progn",FALSE,FALSE);
    FuncSeqOvlFlags(theEnv,execStatus,"if",FALSE,FALSE);
@@ -105,7 +105,7 @@ static void DeallocateProceduralFunctionData(
   {
    DATA_OBJECT_PTR nextPtr, garbagePtr;
 
-   garbagePtr = ProcedureFunctionData(theEnv)->BindList;
+   garbagePtr = ProcedureFunctionData(theEnv,execStatus)->BindList;
 
    while (garbagePtr != NULL)
      {
@@ -133,19 +133,19 @@ globle void WhileFunction(
 
    execStatus->CurrentEvaluationDepth++;
    EnvRtnUnknown(theEnv,execStatus,1,&theResult);
-   while (((theResult.value != EnvFalseSymbol(theEnv)) ||
+   while (((theResult.value != EnvFalseSymbol(theEnv,execStatus)) ||
            (theResult.type != SYMBOL)) &&
            (execStatus->HaltExecution != TRUE))
      {
-      if ((ProcedureFunctionData(theEnv)->BreakFlag == TRUE) || (ProcedureFunctionData(theEnv)->ReturnFlag == TRUE))
+      if ((ProcedureFunctionData(theEnv,execStatus)->BreakFlag == TRUE) || (ProcedureFunctionData(theEnv,execStatus)->ReturnFlag == TRUE))
         break;
       EnvRtnUnknown(theEnv,execStatus,2,&theResult);
       execStatus->CurrentEvaluationDepth--;
-      if (ProcedureFunctionData(theEnv)->ReturnFlag == TRUE)
+      if (ProcedureFunctionData(theEnv,execStatus)->ReturnFlag == TRUE)
         { PropagateReturnValue(theEnv,execStatus,&theResult); }
       PeriodicCleanup(theEnv,execStatus,FALSE,TRUE);
       execStatus->CurrentEvaluationDepth++;
-      if ((ProcedureFunctionData(theEnv)->BreakFlag == TRUE) || (ProcedureFunctionData(theEnv)->ReturnFlag == TRUE))
+      if ((ProcedureFunctionData(theEnv,execStatus)->BreakFlag == TRUE) || (ProcedureFunctionData(theEnv,execStatus)->ReturnFlag == TRUE))
         break;
       EnvRtnUnknown(theEnv,execStatus,1,&theResult);
      }
@@ -158,14 +158,14 @@ globle void WhileFunction(
    /* returned from as well.                              */
    /*=====================================================*/
 
-   ProcedureFunctionData(theEnv)->BreakFlag = FALSE;
+   ProcedureFunctionData(theEnv,execStatus)->BreakFlag = FALSE;
 
    /*====================================================*/
    /* If the return command was issued, then return that */
    /* value, otherwise return the symbol FALSE.          */
    /*====================================================*/
 
-   if (ProcedureFunctionData(theEnv)->ReturnFlag == TRUE)
+   if (ProcedureFunctionData(theEnv,execStatus)->ReturnFlag == TRUE)
      {
       returnValue->type = theResult.type;
       returnValue->value = theResult.value;
@@ -175,7 +175,7 @@ globle void WhileFunction(
    else
      {
       returnValue->type = SYMBOL;
-      returnValue->value = EnvFalseSymbol(theEnv);
+      returnValue->value = EnvFalseSymbol(theEnv,execStatus);
      }
   }
 
@@ -194,13 +194,13 @@ globle void LoopForCountFunction(
 
    tmpCounter = get_struct(theEnv,execStatus,loopCounterStack);
    tmpCounter->loopCounter = 0L;
-   tmpCounter->nxt = ProcedureFunctionData(theEnv)->LoopCounterStack;
-   ProcedureFunctionData(theEnv)->LoopCounterStack = tmpCounter;
+   tmpCounter->nxt = ProcedureFunctionData(theEnv,execStatus)->LoopCounterStack;
+   ProcedureFunctionData(theEnv,execStatus)->LoopCounterStack = tmpCounter;
    if (EnvArgTypeCheck(theEnv,execStatus,"loop-for-count",1,INTEGER,&arg_ptr) == FALSE)
      {
       loopResult->type = SYMBOL;
-      loopResult->value = EnvFalseSymbol(theEnv);
-      ProcedureFunctionData(theEnv)->LoopCounterStack = tmpCounter->nxt;
+      loopResult->value = EnvFalseSymbol(theEnv,execStatus);
+      ProcedureFunctionData(theEnv,execStatus)->LoopCounterStack = tmpCounter->nxt;
       rtn_struct(theEnv,execStatus,loopCounterStack,tmpCounter);
       return;
      }
@@ -208,8 +208,8 @@ globle void LoopForCountFunction(
    if (EnvArgTypeCheck(theEnv,execStatus,"loop-for-count",2,INTEGER,&arg_ptr) == FALSE)
      {
       loopResult->type = SYMBOL;
-      loopResult->value = EnvFalseSymbol(theEnv);
-      ProcedureFunctionData(theEnv)->LoopCounterStack = tmpCounter->nxt;
+      loopResult->value = EnvFalseSymbol(theEnv,execStatus);
+      ProcedureFunctionData(theEnv,execStatus)->LoopCounterStack = tmpCounter->nxt;
       rtn_struct(theEnv,execStatus,loopCounterStack,tmpCounter);
       return;
      }
@@ -217,21 +217,21 @@ globle void LoopForCountFunction(
    while ((tmpCounter->loopCounter <= iterationEnd) &&
           (execStatus->HaltExecution != TRUE))
      {
-      if ((ProcedureFunctionData(theEnv)->BreakFlag == TRUE) || (ProcedureFunctionData(theEnv)->ReturnFlag == TRUE))
+      if ((ProcedureFunctionData(theEnv,execStatus)->BreakFlag == TRUE) || (ProcedureFunctionData(theEnv,execStatus)->ReturnFlag == TRUE))
         break;
       execStatus->CurrentEvaluationDepth++;
       EnvRtnUnknown(theEnv,execStatus,3,&arg_ptr);
       execStatus->CurrentEvaluationDepth--;
-      if (ProcedureFunctionData(theEnv)->ReturnFlag == TRUE)
+      if (ProcedureFunctionData(theEnv,execStatus)->ReturnFlag == TRUE)
         { PropagateReturnValue(theEnv,execStatus,&arg_ptr); }
       PeriodicCleanup(theEnv,execStatus,FALSE,TRUE);
-      if ((ProcedureFunctionData(theEnv)->BreakFlag == TRUE) || (ProcedureFunctionData(theEnv)->ReturnFlag == TRUE))
+      if ((ProcedureFunctionData(theEnv,execStatus)->BreakFlag == TRUE) || (ProcedureFunctionData(theEnv,execStatus)->ReturnFlag == TRUE))
         break;
       tmpCounter->loopCounter++;
      }
 
-   ProcedureFunctionData(theEnv)->BreakFlag = FALSE;
-   if (ProcedureFunctionData(theEnv)->ReturnFlag == TRUE)
+   ProcedureFunctionData(theEnv,execStatus)->BreakFlag = FALSE;
+   if (ProcedureFunctionData(theEnv,execStatus)->ReturnFlag == TRUE)
      {
       loopResult->type = arg_ptr.type;
       loopResult->value = arg_ptr.value;
@@ -241,9 +241,9 @@ globle void LoopForCountFunction(
    else
      {
       loopResult->type = SYMBOL;
-      loopResult->value = EnvFalseSymbol(theEnv);
+      loopResult->value = EnvFalseSymbol(theEnv,execStatus);
      }
-   ProcedureFunctionData(theEnv)->LoopCounterStack = tmpCounter->nxt;
+   ProcedureFunctionData(theEnv,execStatus)->LoopCounterStack = tmpCounter->nxt;
    rtn_struct(theEnv,execStatus,loopCounterStack,tmpCounter);
   }
 
@@ -258,7 +258,7 @@ globle long long GetLoopCount(
    LOOP_COUNTER_STACK *tmpCounter;
 
    depth = ValueToInteger(GetFirstArgument()->value);
-   tmpCounter = ProcedureFunctionData(theEnv)->LoopCounterStack;
+   tmpCounter = ProcedureFunctionData(theEnv,execStatus)->LoopCounterStack;
    while (depth > 0)
      {
       tmpCounter = tmpCounter->nxt;
@@ -289,7 +289,7 @@ globle void IfFunction(
      {
       EnvArgRangeCheck(theEnv,execStatus,"if",2,3);
       returnValue->type = SYMBOL;
-      returnValue->value = EnvFalseSymbol(theEnv);
+      returnValue->value = EnvFalseSymbol(theEnv,execStatus);
       return;
      }
 
@@ -301,7 +301,7 @@ globle void IfFunction(
      {
       EnvArgRangeCheck(theEnv,execStatus,"if",2,3);
       returnValue->type = SYMBOL;
-      returnValue->value = EnvFalseSymbol(theEnv);
+      returnValue->value = EnvFalseSymbol(theEnv,execStatus);
       return;
      }
 
@@ -311,10 +311,10 @@ globle void IfFunction(
 
    EvaluateExpression(theEnv,execStatus,execStatus->CurrentExpression->>argList,returnValue);
 
-   if ((ProcedureFunctionData(theEnv)->BreakFlag == TRUE) || (ProcedureFunctionData(theEnv)->ReturnFlag == TRUE))
+   if ((ProcedureFunctionData(theEnv,execStatus)->BreakFlag == TRUE) || (ProcedureFunctionData(theEnv,execStatus)->ReturnFlag == TRUE))
      {
       returnValue->type = SYMBOL;
-      returnValue->value = EnvFalseSymbol(theEnv);
+      returnValue->value = EnvFalseSymbol(theEnv,execStatus);
       return;
      }
 
@@ -324,7 +324,7 @@ globle void IfFunction(
    /* and return the value.                   */
    /*=========================================*/
 
-   if ((returnValue->value == EnvFalseSymbol(theEnv)) &&
+   if ((returnValue->value == EnvFalseSymbol(theEnv,execStatus)) &&
        (returnValue->type == SYMBOL) &&
        (numArgs == 3))
      {
@@ -356,7 +356,7 @@ globle void IfFunction(
    /* value, evaluate the "then" portion and return it. */
    /*===================================================*/
 
-   else if ((returnValue->value != EnvFalseSymbol(theEnv)) ||
+   else if ((returnValue->value != EnvFalseSymbol(theEnv,execStatus)) ||
             (returnValue->type != SYMBOL))
      {
       theExpr = execStatus->CurrentExpression->>argList->nextArg;
@@ -389,7 +389,7 @@ globle void IfFunction(
    /*=========================================*/
 
    returnValue->type = SYMBOL;
-   returnValue->value = EnvFalseSymbol(theEnv);
+   returnValue->value = EnvFalseSymbol(theEnv,execStatus);
    return;
   }
 
@@ -451,7 +451,7 @@ globle void BindFunction(
    /* Search for the variable in the list of binds. */
    /*===============================================*/
 
-   theBind = ProcedureFunctionData(theEnv)->BindList;
+   theBind = ProcedureFunctionData(theEnv,execStatus)->BindList;
    lastBind = NULL;
 
    while ((theBind != NULL) && (found == FALSE))
@@ -480,14 +480,14 @@ globle void BindFunction(
          IncrementSymbolCount(variableName);
          theBind->next = NULL;
          if (lastBind == NULL)
-           { ProcedureFunctionData(theEnv)->BindList = theBind; }
+           { ProcedureFunctionData(theEnv,execStatus)->BindList = theBind; }
          else
            { lastBind->next = theBind; }
         }
       else
         {
          returnValue->type = SYMBOL;
-         returnValue->value = EnvFalseSymbol(theEnv);
+         returnValue->value = EnvFalseSymbol(theEnv,execStatus);
          return;
         }
      }
@@ -508,12 +508,12 @@ globle void BindFunction(
      }
    else
      {
-      if (lastBind == NULL) ProcedureFunctionData(theEnv)->BindList = theBind->next;
+      if (lastBind == NULL) ProcedureFunctionData(theEnv,execStatus)->BindList = theBind->next;
       else lastBind->next = theBind->next;
       DecrementSymbolCount(theEnv,execStatus,(struct symbolHashNode *) theBind->supplementalInfo);
       rtn_struct(theEnv,execStatus,dataObject,theBind);
       returnValue->type = SYMBOL;
-      returnValue->value = EnvFalseSymbol(theEnv);
+      returnValue->value = EnvFalseSymbol(theEnv,execStatus);
      }
   }
 
@@ -529,7 +529,7 @@ globle intBool GetBoundVariable(
   {
    DATA_OBJECT_PTR bindPtr;
    
-   for (bindPtr = ProcedureFunctionData(theEnv)->BindList; bindPtr != NULL; bindPtr = bindPtr->next)
+   for (bindPtr = ProcedureFunctionData(theEnv,execStatus)->BindList; bindPtr != NULL; bindPtr = bindPtr->next)
      {
       if (bindPtr->supplementalInfo == (void *) varName)
         {
@@ -552,8 +552,8 @@ globle void FlushBindList(
   void *theEnv,
   EXEC_STATUS)
   {
-   ReturnValues(theEnv,execStatus,ProcedureFunctionData(theEnv)->BindList,TRUE);
-   ProcedureFunctionData(theEnv)->BindList = NULL;
+   ReturnValues(theEnv,execStatus,ProcedureFunctionData(theEnv,execStatus)->BindList,TRUE);
+   ProcedureFunctionData(theEnv,execStatus)->BindList = NULL;
   }
 
 /***************************************/
@@ -572,23 +572,23 @@ globle void PrognFunction(
    if (argPtr == NULL)
      {
       returnValue->type = SYMBOL;
-      returnValue->value = EnvFalseSymbol(theEnv);
+      returnValue->value = EnvFalseSymbol(theEnv,execStatus);
       return;
      }
 
-   while ((argPtr != NULL) && (GetHaltExecution(theEnv) != TRUE))
+   while ((argPtr != NULL) && (GetHaltExecution(theEnv,execStatus) != TRUE))
      {
       EvaluateExpression(theEnv,execStatus,argPtr,returnValue);
 
-      if ((ProcedureFunctionData(theEnv)->BreakFlag == TRUE) || (ProcedureFunctionData(theEnv)->ReturnFlag == TRUE))
+      if ((ProcedureFunctionData(theEnv,execStatus)->BreakFlag == TRUE) || (ProcedureFunctionData(theEnv,execStatus)->ReturnFlag == TRUE))
         break;
       argPtr = argPtr->nextArg;
      }
 
-   if (GetHaltExecution(theEnv) == TRUE)
+   if (GetHaltExecution(theEnv,execStatus) == TRUE)
      {
       returnValue->type = SYMBOL;
-      returnValue->value = EnvFalseSymbol(theEnv);
+      returnValue->value = EnvFalseSymbol(theEnv,execStatus);
       return;
      }
 
@@ -603,14 +603,14 @@ globle void ReturnFunction(
   EXEC_STATUS,
   DATA_OBJECT_PTR result)
   {
-   if (EnvRtnArgCount(theEnv) == 0)
+   if (EnvRtnArgCount(theEnv,execStatus) == 0)
      {
       result->type = RVOID;
-      result->value = EnvFalseSymbol(theEnv);
+      result->value = EnvFalseSymbol(theEnv,execStatus);
      }
    else
      EnvRtnUnknown(theEnv,execStatus,1,result);
-   ProcedureFunctionData(theEnv)->ReturnFlag = TRUE;
+   ProcedureFunctionData(theEnv,execStatus)->ReturnFlag = TRUE;
   }
 
 /***************************************************************/
@@ -620,7 +620,7 @@ globle void BreakFunction(
   void *theEnv,
   EXEC_STATUS)
   {
-   ProcedureFunctionData(theEnv)->BreakFlag = TRUE;
+   ProcedureFunctionData(theEnv,execStatus)->BreakFlag = TRUE;
   }
 
 /*****************************************************************/
@@ -635,7 +635,7 @@ globle void SwitchFunction(
    EXPRESSION *theExp;
 
    result->type = SYMBOL;
-   result->value = EnvFalseSymbol(theEnv);
+   result->value = EnvFalseSymbol(theEnv,execStatus);
 
    /* ==========================
       Get the value to switch on

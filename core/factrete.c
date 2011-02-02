@@ -73,8 +73,8 @@ globle intBool FactPNGetVar1(
    /* Get the pointer to the fact from the partial match. */
    /*=====================================================*/
 
-   factPtr = FactData(theEnv)->CurrentPatternFact;
-   marks = FactData(theEnv)->CurrentPatternMarks;
+   factPtr = FactData(theEnv,execStatus)->CurrentPatternFact;
+   marks = FactData(theEnv,execStatus)->CurrentPatternMarks;
 
    /*==========================================================*/
    /* Determine if we want to retrieve the fact address of the */
@@ -181,7 +181,7 @@ globle intBool FactPNGetVar2(
    /* Get the pointer to the fact. */
    /*==============================*/
 
-   factPtr = FactData(theEnv)->CurrentPatternFact;
+   factPtr = FactData(theEnv,execStatus)->CurrentPatternFact;
 
    /*============================================*/
    /* Extract the value from the specified slot. */
@@ -221,7 +221,7 @@ globle intBool FactPNGetVar3(
    /* Get the pointer to the fact. */
    /*==============================*/
 
-   factPtr = FactData(theEnv)->CurrentPatternFact;
+   factPtr = FactData(theEnv,execStatus)->CurrentPatternFact;
 
    /*============================================================*/
    /* Get the multifield value from which the data is retrieved. */
@@ -289,7 +289,7 @@ globle intBool FactPNConstant1(
    /* Extract the value from the specified slot. */
    /*============================================*/
 
-   fieldPtr = &FactData(theEnv)->CurrentPatternFact->theProposition.theFields[hack->whichSlot];
+   fieldPtr = &FactData(theEnv,execStatus)->CurrentPatternFact->theProposition.theFields[hack->whichSlot];
 
    /*====================================*/
    /* Compare the value to the constant. */
@@ -338,7 +338,7 @@ globle intBool FactPNConstant2(
    /* multifield slots.                                        */
    /*==========================================================*/
 
-   fieldPtr = &FactData(theEnv)->CurrentPatternFact->theProposition.theFields[hack->whichSlot];
+   fieldPtr = &FactData(theEnv,execStatus)->CurrentPatternFact->theProposition.theFields[hack->whichSlot];
 
    if (fieldPtr->type == MULTIFIELD)
      {
@@ -393,28 +393,28 @@ globle intBool FactJNGetVar1(
 
    if (hack->lhs)
      {
-      factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv)->GlobalLHSBinds,hack->whichPattern)->matchingItem;
-      marks = get_nth_pm_match(EngineData(theEnv)->GlobalLHSBinds,hack->whichPattern)->markers;
+      factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalLHSBinds,hack->whichPattern)->matchingItem;
+      marks = get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalLHSBinds,hack->whichPattern)->markers;
      }
    else if (hack->rhs)
      {
-      factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv)->GlobalRHSBinds,hack->whichPattern)->matchingItem;
-      marks = get_nth_pm_match(EngineData(theEnv)->GlobalRHSBinds,hack->whichPattern)->markers;
+      factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalRHSBinds,hack->whichPattern)->matchingItem;
+      marks = get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalRHSBinds,hack->whichPattern)->markers;
      }
-   else if (EngineData(theEnv)->GlobalRHSBinds == NULL)
+   else if (EngineData(theEnv,execStatus)->GlobalRHSBinds == NULL)
      {
-      factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv)->GlobalLHSBinds,hack->whichPattern)->matchingItem;
-      marks = get_nth_pm_match(EngineData(theEnv)->GlobalLHSBinds,hack->whichPattern)->markers;
+      factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalLHSBinds,hack->whichPattern)->matchingItem;
+      marks = get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalLHSBinds,hack->whichPattern)->markers;
      }
-   else if ((((unsigned short) (EngineData(theEnv)->GlobalJoin->depth - 1))) == hack->whichPattern)
+   else if ((((unsigned short) (EngineData(theEnv,execStatus)->GlobalJoin->depth - 1))) == hack->whichPattern)
      {
-      factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv)->GlobalRHSBinds,0)->matchingItem;
-      marks = get_nth_pm_match(EngineData(theEnv)->GlobalRHSBinds,0)->markers;
+      factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalRHSBinds,0)->matchingItem;
+      marks = get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalRHSBinds,0)->markers;
      }
    else
      {
-      factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv)->GlobalLHSBinds,hack->whichPattern)->matchingItem;
-      marks = get_nth_pm_match(EngineData(theEnv)->GlobalLHSBinds,hack->whichPattern)->markers;
+      factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalLHSBinds,hack->whichPattern)->matchingItem;
+      marks = get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalLHSBinds,hack->whichPattern)->markers;
      }
 
    /*==========================================================*/
@@ -530,15 +530,15 @@ globle intBool FactJNGetVar2(
    /*=====================================================*/
 
    if (hack->lhs)
-     { factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv)->GlobalLHSBinds,hack->whichPattern)->matchingItem; }
+     { factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalLHSBinds,hack->whichPattern)->matchingItem; }
    else if (hack->rhs)
-     { factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv)->GlobalRHSBinds,hack->whichPattern)->matchingItem; }
-   else if (EngineData(theEnv)->GlobalRHSBinds == NULL)
-     { factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv)->GlobalLHSBinds,hack->whichPattern)->matchingItem; }
-   else if (((unsigned short) (EngineData(theEnv)->GlobalJoin->depth - 1)) == hack->whichPattern)
-	 { factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv)->GlobalRHSBinds,0)->matchingItem; }
+     { factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalRHSBinds,hack->whichPattern)->matchingItem; }
+   else if (EngineData(theEnv,execStatus)->GlobalRHSBinds == NULL)
+     { factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalLHSBinds,hack->whichPattern)->matchingItem; }
+   else if (((unsigned short) (EngineData(theEnv,execStatus)->GlobalJoin->depth - 1)) == hack->whichPattern)
+	 { factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalRHSBinds,0)->matchingItem; }
    else
-     { factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv)->GlobalLHSBinds,hack->whichPattern)->matchingItem; }
+     { factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalLHSBinds,hack->whichPattern)->matchingItem; }
 
    /*============================================*/
    /* Extract the value from the specified slot. */
@@ -579,15 +579,15 @@ globle intBool FactJNGetVar3(
    /*=====================================================*/
 
    if (hack->lhs)
-     { factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv)->GlobalLHSBinds,hack->whichPattern)->matchingItem; }
+     { factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalLHSBinds,hack->whichPattern)->matchingItem; }
    else if (hack->rhs)
-     { factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv)->GlobalRHSBinds,hack->whichPattern)->matchingItem; }
-   else if (EngineData(theEnv)->GlobalRHSBinds == NULL)
-     { factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv)->GlobalLHSBinds,hack->whichPattern)->matchingItem; }
-   else if (((unsigned short) (EngineData(theEnv)->GlobalJoin->depth - 1)) == hack->whichPattern)
-     { factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv)->GlobalRHSBinds,0)->matchingItem; }
+     { factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalRHSBinds,hack->whichPattern)->matchingItem; }
+   else if (EngineData(theEnv,execStatus)->GlobalRHSBinds == NULL)
+     { factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalLHSBinds,hack->whichPattern)->matchingItem; }
+   else if (((unsigned short) (EngineData(theEnv,execStatus)->GlobalJoin->depth - 1)) == hack->whichPattern)
+     { factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalRHSBinds,0)->matchingItem; }
    else
-     { factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv)->GlobalLHSBinds,hack->whichPattern)->matchingItem; }
+     { factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalLHSBinds,hack->whichPattern)->matchingItem; }
 
    /*============================================================*/
    /* Get the multifield value from which the data is retrieved. */
@@ -640,11 +640,11 @@ globle intBool FactSlotLength(
    struct multifieldMarker *tempMark;
 
    returnValue->type = SYMBOL;
-   returnValue->value = EnvFalseSymbol(theEnv);
+   returnValue->value = EnvFalseSymbol(theEnv,execStatus);
 
    hack = (struct factCheckLengthPNCall *) ValueToBitMap(theValue);
 
-   for (tempMark = FactData(theEnv)->CurrentPatternMarks;
+   for (tempMark = FactData(theEnv,execStatus)->CurrentPatternMarks;
         tempMark != NULL;
         tempMark = tempMark->next)
      {
@@ -652,7 +652,7 @@ globle intBool FactSlotLength(
       extraOffset += ((tempMark->endPosition - tempMark->startPosition) + 1);
      }
 
-   segmentPtr = (struct multifield *) FactData(theEnv)->CurrentPatternFact->theProposition.theFields[hack->whichSlot].value;
+   segmentPtr = (struct multifield *) FactData(theEnv,execStatus)->CurrentPatternFact->theProposition.theFields[hack->whichSlot].value;
 
    if (segmentPtr->multifieldLength < (hack->minLength + extraOffset))
      { return(FALSE); }
@@ -660,7 +660,7 @@ globle intBool FactSlotLength(
    if (hack->exactly && (segmentPtr->multifieldLength > (hack->minLength + extraOffset)))
      { return(FALSE); }
 
-   returnValue->value = EnvTrueSymbol(theEnv);
+   returnValue->value = EnvTrueSymbol(theEnv,execStatus);
    return(TRUE);
   }
 
@@ -697,12 +697,12 @@ globle int FactJNCompVars1(
    p1 = (int) hack->pattern1;
    p2 = (int) hack->pattern2;
 
-   fact1 = (struct fact *) EngineData(theEnv)->GlobalRHSBinds->binds[p1].gm.theMatch->matchingItem;
+   fact1 = (struct fact *) EngineData(theEnv,execStatus)->GlobalRHSBinds->binds[p1].gm.theMatch->matchingItem;
 
    if (hack->p2rhs)
-     { fact2 = (struct fact *) EngineData(theEnv)->GlobalRHSBinds->binds[p2].gm.theMatch->matchingItem; }
+     { fact2 = (struct fact *) EngineData(theEnv,execStatus)->GlobalRHSBinds->binds[p2].gm.theMatch->matchingItem; }
    else 
-     { fact2 = (struct fact *) EngineData(theEnv)->GlobalLHSBinds->binds[p2].gm.theMatch->matchingItem; }
+     { fact2 = (struct fact *) EngineData(theEnv,execStatus)->GlobalLHSBinds->binds[p2].gm.theMatch->matchingItem; }
 
    /*=====================*/
    /* Compare the values. */
@@ -762,12 +762,12 @@ globle int FactJNCompVars2(
    s1 = (int) hack->slot1;
    s2 = (int) hack->slot2;
 
-   fact1 = (struct fact *) EngineData(theEnv)->GlobalRHSBinds->binds[p1].gm.theMatch->matchingItem;
+   fact1 = (struct fact *) EngineData(theEnv,execStatus)->GlobalRHSBinds->binds[p1].gm.theMatch->matchingItem;
      
    if (hack->p2rhs)
-     { fact2 = (struct fact *) EngineData(theEnv)->GlobalRHSBinds->binds[p2].gm.theMatch->matchingItem; }
+     { fact2 = (struct fact *) EngineData(theEnv,execStatus)->GlobalRHSBinds->binds[p2].gm.theMatch->matchingItem; }
    else 
-     { fact2 = (struct fact *) EngineData(theEnv)->GlobalLHSBinds->binds[p2].gm.theMatch->matchingItem; }
+     { fact2 = (struct fact *) EngineData(theEnv,execStatus)->GlobalLHSBinds->binds[p2].gm.theMatch->matchingItem; }
 
    /*======================*/
    /* Retrieve the values. */
@@ -829,8 +829,8 @@ globle int FactPNCompVars1(
    /*========================================*/
 
    hack = (struct factCompVarsPN1Call *) ValueToBitMap(theValue);
-   fieldPtr1 = &FactData(theEnv)->CurrentPatternFact->theProposition.theFields[hack->field1];
-   fieldPtr2 = &FactData(theEnv)->CurrentPatternFact->theProposition.theFields[hack->field2];
+   fieldPtr1 = &FactData(theEnv,execStatus)->CurrentPatternFact->theProposition.theFields[hack->field1];
+   fieldPtr2 = &FactData(theEnv,execStatus)->CurrentPatternFact->theProposition.theFields[hack->field2];
 
    /*=====================*/
    /* Compare the values. */
@@ -841,8 +841,8 @@ globle int FactPNCompVars1(
    else rv = (int) hack->pass;
 
    theResult->type = SYMBOL;
-   if (rv) theResult->value = EnvTrueSymbol(theEnv);
-   else theResult->value = EnvFalseSymbol(theEnv);
+   if (rv) theResult->value = EnvTrueSymbol(theEnv,execStatus);
+   else theResult->value = EnvFalseSymbol(theEnv,execStatus);
 
    return(rv);
   }
@@ -876,7 +876,7 @@ globle unsigned short AdjustFieldPosition(
   {
    unsigned short actualIndex;
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 
    actualIndex = whichField;

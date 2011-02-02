@@ -85,19 +85,19 @@ struct IOFunctionData
    intBool useFullCRLF;
   };
 
-#define IOFunctionData(theEnv) ((struct IOFunctionData *) GetEnvironmentData(theEnv,execStatus,IO_FUNCTION_DATA))
+#define IOFunctionData(theEnv,execStatus) ((struct IOFunctionData *) GetEnvironmentData(theEnv,execStatus,IO_FUNCTION_DATA))
 
 /****************************************/
 /* LOCAL INTERNAL FUNCTION DEFINITIONS  */
 /****************************************/
 
 #if IO_FUNCTIONS
-   static void             ReadTokenFromStdin(void *,struct token *);
-   static char            *ControlStringCheck(void *,int);
+   static void             ReadTokenFromStdin(void *,EXEC_STATUS,struct token *);
+   static char            *ControlStringCheck(void *,EXEC_STATUS,int);
    static char             FindFormatFlag(char *,size_t *,char *,size_t);
-   static char            *PrintFormatFlag(void *,char *,int,int);
-   static char            *FillBuffer(void *,char *,size_t *,size_t *);
-   static void             ReadNumber(void *,char *,struct token *,int);
+   static char            *PrintFormatFlag(void *,EXEC_STATUS,char *,int,int);
+   static char            *FillBuffer(void *,EXEC_STATUS,char *,size_t *,size_t *);
+   static void             ReadNumber(void *,EXEC_STATUS,char *,struct token *,int);
 #endif
 
 /**************************************/
@@ -111,9 +111,9 @@ globle void IOFunctionDefinitions(
    AllocateEnvironmentData(theEnv,execStatus,IO_FUNCTION_DATA,sizeof(struct IOFunctionData),NULL);
 
 #if IO_FUNCTIONS
-   IOFunctionData(theEnv)->useFullCRLF = FALSE;
-   IOFunctionData(theEnv)->locale = (SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,setlocale(LC_ALL,NULL));
-   IncrementSymbolCount(IOFunctionData(theEnv)->locale);
+   IOFunctionData(theEnv,execStatus)->useFullCRLF = FALSE;
+   IOFunctionData(theEnv,execStatus)->locale = (SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,setlocale(LC_ALL,NULL));
+   IncrementSymbolCount(IOFunctionData(theEnv,execStatus)->locale);
 #endif
 
 #if ! RUN_TIME
@@ -133,7 +133,7 @@ globle void IOFunctionDefinitions(
 #endif
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 #endif
   }
@@ -197,7 +197,7 @@ globle void PrintoutFunction(
          case SYMBOL:
            if (strcmp(DOToString(theArgument),"crlf") == 0)
              {    
-              if (IOFunctionData(theEnv)->useFullCRLF)
+              if (IOFunctionData(theEnv,execStatus)->useFullCRLF)
                 { EnvPrintRouter(theEnv,execStatus,dummyid,"\r\n"); }
               else
                 { EnvPrintRouter(theEnv,execStatus,dummyid,"\n"); }
@@ -211,7 +211,7 @@ globle void PrintoutFunction(
              /*
            else if (strcmp(DOToString(theArgument),"t") == 0)
              { 
-              if (IOFunctionData(theEnv)->useFullCRLF)
+              if (IOFunctionData(theEnv,execStatus)->useFullCRLF)
                 { EnvPrintRouter(theEnv,execStatus,dummyid,"\r\n"); }
               else
                 { EnvPrintRouter(theEnv,execStatus,dummyid,"\n"); }
@@ -241,9 +241,9 @@ globle intBool SetFullCRLF(
   EXEC_STATUS,
   intBool value)
   {
-   intBool oldValue = IOFunctionData(theEnv)->useFullCRLF;
+   intBool oldValue = IOFunctionData(theEnv,execStatus)->useFullCRLF;
    
-   IOFunctionData(theEnv)->useFullCRLF = value;
+   IOFunctionData(theEnv,execStatus)->useFullCRLF = value;
    
    return(oldValue);
   }
@@ -315,8 +315,8 @@ globle void ReadFunction(
    else
      { GetToken(theEnv,execStatus,logicalName,&theToken); }
 
-   RouterData(theEnv)->CommandBufferInputCount = 0;
-   RouterData(theEnv)->AwaitingInput = FALSE;
+   RouterData(theEnv,execStatus)->CommandBufferInputCount = 0;
+   RouterData(theEnv,execStatus)->AwaitingInput = FALSE;
 
    /*====================================================*/
    /* Copy the token to the return value data structure. */
@@ -374,8 +374,8 @@ static void ReadTokenFromStdin(
       /*===========================================*/
 
       inputString = NULL;
-      RouterData(theEnv)->CommandBufferInputCount = 0;
-      RouterData(theEnv)->AwaitingInput = TRUE;
+      RouterData(theEnv,execStatus)->CommandBufferInputCount = 0;
+      RouterData(theEnv,execStatus)->AwaitingInput = TRUE;
       inputStringSize = 0;
       inchar = EnvGetcRouter(theEnv,execStatus,"stdin");
 
@@ -388,9 +388,9 @@ static void ReadTokenFromStdin(
       /*========================================================*/
 
       while ((inchar != '\n') && (inchar != '\r') && (inchar != EOF) &&
-             (! GetHaltExecution(theEnv)))
+             (! GetHaltExecution(theEnv,execStatus)))
         {
-         inputString = ExpandStringWithChar(theEnv,execStatus,inchar,inputString,&RouterData(theEnv)->CommandBufferInputCount,
+         inputString = ExpandStringWithChar(theEnv,execStatus,inchar,inputString,&RouterData(theEnv,execStatus)->CommandBufferInputCount,
                                             &inputStringSize,inputStringSize + 80);
          inchar = EnvGetcRouter(theEnv,execStatus,"stdin");
         }
@@ -411,7 +411,7 @@ static void ReadTokenFromStdin(
       /* aborts the read function.                 */
       /*===========================================*/
 
-      if (GetHaltExecution(theEnv))
+      if (GetHaltExecution(theEnv,execStatus))
         {
          theToken->type = STRING;
          theToken->value = (void *) EnvAddSymbol(theEnv,execStatus,"*** READ ERROR ***");
@@ -551,7 +551,7 @@ globle int CloseFunction(
    /* files were closed successfully, otherwise FALSE.    */
    /*=====================================================*/
 
-   if (numberOfArguments == 0) return(CloseAllFiles(theEnv));
+   if (numberOfArguments == 0) return(CloseAllFiles(theEnv,execStatus));
 
    /*================================*/
    /* Get the logical name argument. */
@@ -1084,7 +1084,7 @@ static char *PrintFormatFlag(
         printBuffer = (char *) gm2(theEnv,execStatus,(sizeof(char) * theLength));
         
         oldLocale = EnvAddSymbol(theEnv,execStatus,setlocale(LC_NUMERIC,NULL));
-        setlocale(LC_NUMERIC,ValueToString(IOFunctionData(theEnv)->locale));
+        setlocale(LC_NUMERIC,ValueToString(IOFunctionData(theEnv,execStatus)->locale));
 
         if (GetType(theResult) == FLOAT)
           { gensprintf(printBuffer,formatString,(long long) ValueToDouble(theResult.value)); }
@@ -1103,7 +1103,7 @@ static char *PrintFormatFlag(
 
         oldLocale = EnvAddSymbol(theEnv,execStatus,setlocale(LC_NUMERIC,NULL));
         
-        setlocale(LC_NUMERIC,ValueToString(IOFunctionData(theEnv)->locale));
+        setlocale(LC_NUMERIC,ValueToString(IOFunctionData(theEnv,execStatus)->locale));
 
         if (GetType(theResult) == FLOAT)
           { gensprintf(printBuffer,formatString,ValueToDouble(theResult.value)); }
@@ -1171,13 +1171,13 @@ globle void ReadlineFunction(
       return;
      }
 
-   RouterData(theEnv)->CommandBufferInputCount = 0;
-   RouterData(theEnv)->AwaitingInput = TRUE;
-   buffer = FillBuffer(theEnv,execStatus,logicalName,&RouterData(theEnv)->CommandBufferInputCount,&line_max);
-   RouterData(theEnv)->CommandBufferInputCount = 0;
-   RouterData(theEnv)->AwaitingInput = FALSE;
+   RouterData(theEnv,execStatus)->CommandBufferInputCount = 0;
+   RouterData(theEnv,execStatus)->AwaitingInput = TRUE;
+   buffer = FillBuffer(theEnv,execStatus,logicalName,&RouterData(theEnv,execStatus)->CommandBufferInputCount,&line_max);
+   RouterData(theEnv,execStatus)->CommandBufferInputCount = 0;
+   RouterData(theEnv,execStatus)->AwaitingInput = FALSE;
 
-   if (GetHaltExecution(theEnv))
+   if (GetHaltExecution(theEnv,execStatus))
      {
       returnValue->value = (void *) EnvAddSymbol(theEnv,execStatus,"*** READ ERROR ***");
       if (buffer != NULL) rm(theEnv,execStatus,buffer,(int) sizeof (char) * line_max);
@@ -1225,7 +1225,7 @@ static char *FillBuffer(
    /*==================================*/
 
    while ((c != '\n') && (c != '\r') && (c != EOF) &&
-          (! GetHaltExecution(theEnv)))
+          (! GetHaltExecution(theEnv,execStatus)))
      {
       buf = ExpandStringWithChar(theEnv,execStatus,c,buf,currentPosition,maximumSize,*maximumSize+80);
       c = EnvGetcRouter(theEnv,execStatus,logicalName);
@@ -1258,7 +1258,7 @@ globle void SetLocaleFunction(
    if ((numArgs = EnvArgCountCheck(theEnv,execStatus,"set-locale",NO_MORE_THAN,1)) == -1)
      {
       returnValue->type = SYMBOL;
-      returnValue->value = EnvFalseSymbol(theEnv);
+      returnValue->value = EnvFalseSymbol(theEnv,execStatus);
       return;
      }
      
@@ -1270,7 +1270,7 @@ globle void SetLocaleFunction(
    if (numArgs == 0)
      {
       returnValue->type = STRING;
-      returnValue->value = IOFunctionData(theEnv)->locale;
+      returnValue->value = IOFunctionData(theEnv,execStatus)->locale;
       return;
      }
 
@@ -1281,7 +1281,7 @@ globle void SetLocaleFunction(
    if (EnvArgTypeCheck(theEnv,execStatus,"set-locale",1,STRING,&theResult) == FALSE)
      {
       returnValue->type = SYMBOL;
-      returnValue->value = EnvFalseSymbol(theEnv);
+      returnValue->value = EnvFalseSymbol(theEnv,execStatus);
       return;
      }
      
@@ -1290,15 +1290,15 @@ globle void SetLocaleFunction(
    /*=====================================*/
    
    returnValue->type = STRING;
-   returnValue->value = IOFunctionData(theEnv)->locale;
+   returnValue->value = IOFunctionData(theEnv,execStatus)->locale;
    
    /*======================================================*/
    /* Change the value of the locale to the one specified. */
    /*======================================================*/
    
-   DecrementSymbolCount(theEnv,execStatus,(struct symbolHashNode *) IOFunctionData(theEnv)->locale);
-   IOFunctionData(theEnv)->locale = DOToPointer(theResult);
-   IncrementSymbolCount(IOFunctionData(theEnv)->locale);
+   DecrementSymbolCount(theEnv,execStatus,(struct symbolHashNode *) IOFunctionData(theEnv,execStatus)->locale);
+   IOFunctionData(theEnv,execStatus)->locale = DOToPointer(theResult);
+   IncrementSymbolCount(IOFunctionData(theEnv,execStatus)->locale);
   }
 
 /******************************************/
@@ -1369,8 +1369,8 @@ globle void ReadNumberFunction(
    else
      { ReadNumber(theEnv,execStatus,logicalName,&theToken,FALSE); }
 
-   RouterData(theEnv)->CommandBufferInputCount = 0;
-   RouterData(theEnv)->AwaitingInput = FALSE;
+   RouterData(theEnv,execStatus)->CommandBufferInputCount = 0;
+   RouterData(theEnv,execStatus)->AwaitingInput = FALSE;
 
    /*====================================================*/
    /* Copy the token to the return value data structure. */
@@ -1429,8 +1429,8 @@ static void ReadNumber(
    /*===========================================*/
 
    inputString = NULL;
-   RouterData(theEnv)->CommandBufferInputCount = 0;
-   RouterData(theEnv)->AwaitingInput = TRUE;
+   RouterData(theEnv,execStatus)->CommandBufferInputCount = 0;
+   RouterData(theEnv,execStatus)->AwaitingInput = TRUE;
    inputStringSize = 0;
    inchar = EnvGetcRouter(theEnv,execStatus,logicalName);
             
@@ -1439,7 +1439,7 @@ static void ReadNumber(
    /*====================================*/
       
    while (isspace(inchar) && (inchar != EOF) && 
-          (! GetHaltExecution(theEnv)))
+          (! GetHaltExecution(theEnv,execStatus)))
      { inchar = EnvGetcRouter(theEnv,execStatus,logicalName); }
 
    /*=============================================================*/
@@ -1450,9 +1450,9 @@ static void ReadNumber(
    while ((((! isStdin) && (! isspace(inchar))) || 
           (isStdin && (inchar != '\n') && (inchar != '\r'))) &&
           (inchar != EOF) &&
-          (! GetHaltExecution(theEnv)))
+          (! GetHaltExecution(theEnv,execStatus)))
      {
-      inputString = ExpandStringWithChar(theEnv,execStatus,inchar,inputString,&RouterData(theEnv)->CommandBufferInputCount,
+      inputString = ExpandStringWithChar(theEnv,execStatus,inchar,inputString,&RouterData(theEnv,execStatus)->CommandBufferInputCount,
                                          &inputStringSize,inputStringSize + 80);
       inchar = EnvGetcRouter(theEnv,execStatus,logicalName);
      }
@@ -1462,7 +1462,7 @@ static void ReadNumber(
    /* aborts the read-number function.          */
    /*===========================================*/
 
-   if (GetHaltExecution(theEnv))
+   if (GetHaltExecution(theEnv,execStatus))
      {
       theToken->type = STRING;
       theToken->value = (void *) EnvAddSymbol(theEnv,execStatus,"*** READ ERROR ***");
@@ -1497,7 +1497,7 @@ static void ReadNumber(
    /*=======================================*/
    
    oldLocale = EnvAddSymbol(theEnv,execStatus,setlocale(LC_NUMERIC,NULL));
-   setlocale(LC_NUMERIC,ValueToString(IOFunctionData(theEnv)->locale));
+   setlocale(LC_NUMERIC,ValueToString(IOFunctionData(theEnv,execStatus)->locale));
 
    /*========================================*/
    /* Try to parse the number as a long. The */

@@ -67,7 +67,7 @@ struct utilityData
    struct trackedMemory *trackList;
   };
 
-#define UtilityData(theEnv) ((struct utilityData *) GetEnvironmentData(theEnv,execStatus,UTILITY_DATA))
+#define UtilityData(theEnv,execStatus) ((struct utilityData *) GetEnvironmentData(theEnv,UTILITY_DATA))
 
   /* Is c the start of a utf8 sequence? */
 #define IsUTF8Start(ch) (((ch) & 0xC0) != 0x80)
@@ -84,7 +84,7 @@ struct utilityData
 #define IncrementGCLocks() EnvIncrementGCLocks(GetCurrentEnvironment())
 #define RemovePeriodicFunction(a) EnvRemovePeriodicFunction(GetCurrentEnvironment(),a)
 
-   LOCALE void                           InitializeUtilityData(void *);
+   LOCALE void                           InitializeUtilityData(void *,EXEC_STATUS);
    LOCALE void                           PeriodicCleanup(void *, EXEC_STATUS, intBool,intBool);
    LOCALE intBool                        AddCleanupFunction(void *,char *,void (*)(void *),int);
    LOCALE intBool                        EnvAddPeriodicFunction(void *,char *,void (*)(void *),int);
@@ -107,10 +107,10 @@ struct utilityData
                                                              int *);
    LOCALE void                           DeallocateCallList(void *,struct callFunctionItem *);
    LOCALE unsigned long                  ItemHashValue(void *,unsigned short,void *,unsigned long);
-   LOCALE void                           YieldTime(void *);
+   LOCALE void                           YieldTime(void *,EXEC_STATUS);
    LOCALE short                          SetGarbageCollectionHeuristics(void *,short);
-   LOCALE void                           EnvIncrementGCLocks(void *);
-   LOCALE void                           EnvDecrementGCLocks(void *);
+   LOCALE void                           EnvIncrementGCLocks(void *,EXEC_STATUS);
+   LOCALE void                           EnvDecrementGCLocks(void *,EXEC_STATUS);
    LOCALE short                          EnablePeriodicFunctions(void *,short);
    LOCALE short                          EnableYieldFunction(void *,short);
    LOCALE struct trackedMemory          *AddTrackedMemory(void *,void *,size_t);

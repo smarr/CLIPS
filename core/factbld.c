@@ -57,13 +57,13 @@
 #if (! RUN_TIME) && (! BLOAD_ONLY)
    static struct factPatternNode    *FindPatternNode(struct factPatternNode *,struct lhsParseNode *,
                                                   struct factPatternNode **,unsigned,unsigned);
-   static struct factPatternNode    *CreateNewPatternNode(void *,struct lhsParseNode *,struct factPatternNode *,
+   static struct factPatternNode    *CreateNewPatternNode(void *,EXEC_STATUS,struct lhsParseNode *,struct factPatternNode *,
                                                        struct factPatternNode *,unsigned,unsigned);
-   static void                       ClearPatternMatches(void *,struct factPatternNode *);
-   static void                       DetachFactPattern(void *,struct patternNodeHeader *);
-   static struct patternNodeHeader  *PlaceFactPattern(void *,struct lhsParseNode *);
-   static struct lhsParseNode       *RemoveUnneededSlots(void *,struct lhsParseNode *);
-   static void                       FindAndSetDeftemplatePatternNetwork(void *,struct factPatternNode *,struct factPatternNode *);
+   static void                       ClearPatternMatches(void *,EXEC_STATUS,struct factPatternNode *);
+   static void                       DetachFactPattern(void *,EXEC_STATUS,struct patternNodeHeader *);
+   static struct patternNodeHeader  *PlaceFactPattern(void *,EXEC_STATUS,struct lhsParseNode *);
+   static struct lhsParseNode       *RemoveUnneededSlots(void *,EXEC_STATUS,struct lhsParseNode *);
+   static void                       FindAndSetDeftemplatePatternNetwork(void *,EXEC_STATUS,struct factPatternNode *,struct factPatternNode *);
 #endif
 
 /*********************************************************/
@@ -78,13 +78,13 @@ globle void InitializeFactPatterns(
 #if DEFRULE_CONSTRUCT
    struct patternParser *newPtr;
 
-   InitializeFactReteFunctions(theEnv);
+   InitializeFactReteFunctions(theEnv,execStatus);
 
    newPtr = get_struct(theEnv,execStatus,patternParser);
 
    newPtr->name = "facts";
    newPtr->priority = 0;
-   newPtr->entityType = &FactData(theEnv)->FactInfo;
+   newPtr->entityType = &FactData(theEnv,execStatus)->FactInfo;
    
 #if (! RUN_TIME) && (! BLOAD_ONLY)
    newPtr->recognizeFunction = FactPatternParserFind;
@@ -225,7 +225,7 @@ static struct patternNodeHeader *PlaceFactPattern(
    /* the first field of the pattern).                           */
    /*============================================================*/
 
-   FactData(theEnv)->CurrentDeftemplate = (struct deftemplate *)
+   FactData(theEnv,execStatus)->CurrentDeftemplate = (struct deftemplate *)
                         FindImportedConstruct(theEnv,execStatus,"deftemplate",NULL,
                                               deftemplateName,&count,
                                               TRUE,NULL);
@@ -235,7 +235,7 @@ static struct patternNodeHeader *PlaceFactPattern(
    /* pattern is being added to the pattern network. */
    /*================================================*/
 
-   currentLevel = FactData(theEnv)->CurrentDeftemplate->patternNetwork;
+   currentLevel = FactData(theEnv,execStatus)->CurrentDeftemplate->patternNetwork;
    lastLevel = NULL;
    thePattern = thePattern->right;
 
@@ -668,7 +668,7 @@ static struct factPatternNode *CreateNewPatternNode(
 
    if (nodeBeforeMatch == NULL)
      {
-      if (upperLevel == NULL) FactData(theEnv)->CurrentDeftemplate->patternNetwork = newNode;
+      if (upperLevel == NULL) FactData(theEnv,execStatus)->CurrentDeftemplate->patternNetwork = newNode;
       else upperLevel->nextLevel = newNode;
       return(newNode);
      }
@@ -695,11 +695,11 @@ static struct factPatternNode *CreateNewPatternNode(
    /* the first node visited in the pattern network.      */
    /*=====================================================*/
 
-   newNode->rightNode = FactData(theEnv)->CurrentDeftemplate->patternNetwork;
-   if (FactData(theEnv)->CurrentDeftemplate->patternNetwork != NULL)
-     { FactData(theEnv)->CurrentDeftemplate->patternNetwork->leftNode = newNode; }
+   newNode->rightNode = FactData(theEnv,execStatus)->CurrentDeftemplate->patternNetwork;
+   if (FactData(theEnv,execStatus)->CurrentDeftemplate->patternNetwork != NULL)
+     { FactData(theEnv,execStatus)->CurrentDeftemplate->patternNetwork->leftNode = newNode; }
 
-   FactData(theEnv)->CurrentDeftemplate->patternNetwork = newNode;
+   FactData(theEnv,execStatus)->CurrentDeftemplate->patternNetwork = newNode;
    return(newNode);
   }
 
@@ -900,7 +900,7 @@ static void FindAndSetDeftemplatePatternNetwork(
    /* Save the current module since we will be changing it. */
    /*=======================================================*/
 
-   SaveCurrentModule(theEnv);
+   SaveCurrentModule(theEnv,execStatus);
 
    /*=======================================================*/
    /* Loop through every module looking for the deftemplate */
@@ -935,7 +935,7 @@ static void FindAndSetDeftemplatePatternNetwork(
 
          if (theDeftemplate->patternNetwork == rootNode)
            {
-            RestoreCurrentModule(theEnv);
+            RestoreCurrentModule(theEnv,execStatus);
             theDeftemplate->patternNetwork = newRootNode;
             return;
            }
@@ -949,7 +949,7 @@ static void FindAndSetDeftemplatePatternNetwork(
    /* the links to the fact pattern network.                 */
    /*========================================================*/
 
-   RestoreCurrentModule(theEnv);
+   RestoreCurrentModule(theEnv,execStatus);
   }
 
 /***************************************************************/

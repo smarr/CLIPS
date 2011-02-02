@@ -45,11 +45,11 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static int                     ExitFile(void *,int);
-   static int                     PrintFile(void *,char *,char *);
-   static int                     GetcFile(void *,char *);
-   static int                     UngetcFile(void *,int,char *);
-   static void                    DeallocateFileRouterData(void *);
+   static int                     ExitFile(void *,EXEC_STATUS,int);
+   static int                     PrintFile(void *,EXEC_STATUS,char *,char *);
+   static int                     GetcFile(void *,EXEC_STATUS,char *);
+   static int                     UngetcFile(void *,EXEC_STATUS,int,char *);
+   static void                    DeallocateFileRouterData(void *,EXEC_STATUS);
 
 /***************************************************************/
 /* InitializeFileRouter: Initializes file input/output router. */
@@ -75,7 +75,7 @@ static void DeallocateFileRouterData(
   {
    struct fileRouter *tmpPtr, *nextPtr;
 
-   tmpPtr = FileRouterData(theEnv)->ListOfFileRouters;
+   tmpPtr = FileRouterData(theEnv,execStatus)->ListOfFileRouters;
    while (tmpPtr != NULL)
      {
       nextPtr = tmpPtr->next;
@@ -122,7 +122,7 @@ globle FILE *FindFptr(
    /* Otherwise, look up the logical name on the global file list. */
    /*==============================================================*/
 
-   fptr = FileRouterData(theEnv)->ListOfFileRouters;
+   fptr = FileRouterData(theEnv,execStatus)->ListOfFileRouters;
    while ((fptr != NULL) ? (strcmp(logicalName,fptr->logicalName) != 0) : FALSE)
      { fptr = fptr->next; }
 
@@ -163,10 +163,10 @@ static int ExitFile(
 #pragma unused(num)
 #endif
 #if IO_FUNCTIONS
-   CloseAllFiles(theEnv);
+   CloseAllFiles(theEnv,execStatus);
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 #endif
    return(1);
@@ -204,7 +204,7 @@ static int GetcFile(
    fptr = FindFptr(theEnv,execStatus,logicalName);
 
    if (fptr == stdin)
-     { theChar = gengetchar(theEnv); }
+     { theChar = gengetchar(theEnv,execStatus); }
    else
      { theChar = getc(fptr); }
 
@@ -275,8 +275,8 @@ globle int OpenAFile(
    /* files associated with logical names.     */
    /*==========================================*/
 
-   newRouter->next = FileRouterData(theEnv)->ListOfFileRouters;
-   FileRouterData(theEnv)->ListOfFileRouters = newRouter;
+   newRouter->next = FileRouterData(theEnv,execStatus)->ListOfFileRouters;
+   FileRouterData(theEnv,execStatus)->ListOfFileRouters = newRouter;
 
    /*==================================*/
    /* Return TRUE to indicate the file */
@@ -298,7 +298,7 @@ globle int CloseFile(
   {
    struct fileRouter *fptr, *prev;
 
-   for (fptr = FileRouterData(theEnv)->ListOfFileRouters, prev = NULL;
+   for (fptr = FileRouterData(theEnv,execStatus)->ListOfFileRouters, prev = NULL;
         fptr != NULL;
         fptr = fptr->next)
      {
@@ -307,7 +307,7 @@ globle int CloseFile(
          GenClose(theEnv,execStatus,fptr->stream);
          rm(theEnv,execStatus,fptr->logicalName,strlen(fptr->logicalName) + 1);
          if (prev == NULL)
-           { FileRouterData(theEnv)->ListOfFileRouters = fptr->next; }
+           { FileRouterData(theEnv,execStatus)->ListOfFileRouters = fptr->next; }
          else
            { prev->next = fptr->next; }
          rm(theEnv,execStatus,fptr,(int) sizeof(struct fileRouter));
@@ -332,9 +332,9 @@ globle int CloseAllFiles(
   {
    struct fileRouter *fptr, *prev;
 
-   if (FileRouterData(theEnv)->ListOfFileRouters == NULL) return(FALSE);
+   if (FileRouterData(theEnv,execStatus)->ListOfFileRouters == NULL) return(FALSE);
 
-   fptr = FileRouterData(theEnv)->ListOfFileRouters;
+   fptr = FileRouterData(theEnv,execStatus)->ListOfFileRouters;
 
    while (fptr != NULL)
      {
@@ -345,7 +345,7 @@ globle int CloseAllFiles(
       rm(theEnv,execStatus,prev,(int) sizeof(struct fileRouter));
      }
 
-   FileRouterData(theEnv)->ListOfFileRouters = NULL;
+   FileRouterData(theEnv,execStatus)->ListOfFileRouters = NULL;
 
    return(TRUE);
   }

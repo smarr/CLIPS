@@ -43,7 +43,7 @@ struct userDataRecord
   {
    unsigned char dataID;
    void *(*createUserData)(void *);
-   void (*deleteUserData)(void *,void *);
+   void (*deleteUserData)(void *,EXEC_STATUS,void *);
   };
   
 typedef struct userDataRecord USER_DATA_RECORD;
@@ -59,14 +59,14 @@ struct userDataData
    unsigned char UserDataRecordCount;
   };
 
-#define UserDataData(theEnv) ((struct userDataData *) GetEnvironmentData(theEnv,execStatus,USER_DATA_DATA))
+#define UserDataData(theEnv,execStatus) ((struct userDataData *) GetEnvironmentData(theEnv,execStatus,USER_DATA_DATA))
 
-   LOCALE void                           InitializeUserDataData(void *);
-   LOCALE unsigned char                  InstallUserDataRecord(void *,struct userDataRecord *);
-   LOCALE struct userData               *FetchUserData(void *,unsigned char,struct userData **);
+   LOCALE void                           InitializeUserDataData(void *,EXEC_STATUS);
+   LOCALE unsigned char                  InstallUserDataRecord(void *,EXEC_STATUS,struct userDataRecord *);
+   LOCALE struct userData               *FetchUserData(void *,EXEC_STATUS,unsigned char,struct userData **);
    LOCALE struct userData               *TestUserData(unsigned char,struct userData *);
-   LOCALE void                           ClearUserDataList(void *,struct userData *);
-   LOCALE struct userData               *DeleteUserData(void *,unsigned char,struct userData *);
+   LOCALE void                           ClearUserDataList(void *,EXEC_STATUS,struct userData *);
+   LOCALE struct userData               *DeleteUserData(void *,EXEC_STATUS,unsigned char,struct userData *);
 
 #endif
 

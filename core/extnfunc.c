@@ -45,11 +45,11 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static void                    AddHashFunction(void *,struct FunctionDefinition *);
-   static void                    InitializeFunctionHashTable(void *);
-   static void                    DeallocateExternalFunctionData(void *);
+   static void                    AddHashFunction(void *,EXEC_STATUS,struct FunctionDefinition *);
+   static void                    InitializeFunctionHashTable(void *,EXEC_STATUS);
+   static void                    DeallocateExternalFunctionData(void *,EXEC_STATUS);
 #if (! RUN_TIME)
-   static int                     RemoveHashFunction(void *,struct FunctionDefinition *);
+   static int                     RemoveHashFunction(void *,EXEC_STATUS,struct FunctionDefinition *);
 #endif
 
 /*********************************************************/
@@ -77,7 +77,7 @@ static void DeallocateExternalFunctionData(
 #if ! RUN_TIME
    struct FunctionDefinition *tmpPtr, *nextPtr;
 
-   tmpPtr = ExternalFunctionData(theEnv)->ListOfFunctions;
+   tmpPtr = ExternalFunctionData(theEnv,execStatus)->ListOfFunctions;
    while (tmpPtr != NULL)
      {
       nextPtr = tmpPtr->next;
@@ -86,12 +86,12 @@ static void DeallocateExternalFunctionData(
      }
 #endif
 
-   if (ExternalFunctionData(theEnv)->FunctionHashtable == NULL)
+   if (ExternalFunctionData(theEnv,execStatus)->FunctionHashtable == NULL)
      { return; }
      
    for (i = 0; i < SIZE_FUNCTION_HASH; i++)
      {
-      fhPtr = ExternalFunctionData(theEnv)->FunctionHashtable[i];
+      fhPtr = ExternalFunctionData(theEnv,execStatus)->FunctionHashtable[i];
       while (fhPtr != NULL)
         {
          nextFHPtr = fhPtr->next;
@@ -100,7 +100,7 @@ static void DeallocateExternalFunctionData(
         }
      }
    
-   genfree(theEnv,execStatus,ExternalFunctionData(theEnv)->FunctionHashtable,
+   genfree(theEnv,execStatus,ExternalFunctionData(theEnv,execStatus)->FunctionHashtable,
            (int) sizeof (struct FunctionHash *) * SIZE_FUNCTION_HASH);
   }
 
@@ -283,8 +283,8 @@ globle int DefineFunction3(
       newFunction = get_struct(theEnv,execStatus,FunctionDefinition);
       newFunction->callFunctionName = (SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,name);
       IncrementSymbolCount(newFunction->callFunctionName);
-      newFunction->next = GetFunctionList(theEnv);
-      ExternalFunctionData(theEnv)->ListOfFunctions = newFunction;
+      newFunction->next = GetFunctionList(theEnv,execStatus);
+      ExternalFunctionData(theEnv,execStatus)->ListOfFunctions = newFunction;
       AddHashFunction(theEnv,execStatus,newFunction);
      }
      
@@ -323,7 +323,7 @@ globle int UndefineFunction(
 
    findValue = (SYMBOL_HN *) FindSymbolHN(theEnv,execStatus,functionName);
 
-   for (fPtr = ExternalFunctionData(theEnv)->ListOfFunctions;
+   for (fPtr = ExternalFunctionData(theEnv,execStatus)->ListOfFunctions;
         fPtr != NULL;
         fPtr = fPtr->next)
      {
@@ -333,7 +333,7 @@ globle int UndefineFunction(
          RemoveHashFunction(theEnv,execStatus,fPtr);
 
          if (lastPtr == NULL)
-           { ExternalFunctionData(theEnv)->ListOfFunctions = fPtr->next; }
+           { ExternalFunctionData(theEnv,execStatus)->ListOfFunctions = fPtr->next; }
          else
            { lastPtr->next = fPtr->next; }
            
@@ -362,14 +362,14 @@ static int RemoveHashFunction(
 
    hashValue = HashSymbol(ValueToString(fdPtr->callFunctionName),SIZE_FUNCTION_HASH);
 
-   for (fhPtr = ExternalFunctionData(theEnv)->FunctionHashtable[hashValue];
+   for (fhPtr = ExternalFunctionData(theEnv,execStatus)->FunctionHashtable[hashValue];
         fhPtr != NULL;
         fhPtr = fhPtr->next)
      {
       if (fhPtr->fdPtr == fdPtr)
         {
          if (lastPtr == NULL)
-           { ExternalFunctionData(theEnv)->FunctionHashtable[hashValue] = fhPtr->next; }
+           { ExternalFunctionData(theEnv,execStatus)->FunctionHashtable[hashValue] = fhPtr->next; }
          else
            { lastPtr->next = fhPtr->next; }
 
@@ -396,7 +396,7 @@ globle int AddFunctionParser(
   void *theEnv,
   EXEC_STATUS,
   char *functionName,
-  struct expr *(*fpPtr)(void *,struct expr *,char *))
+  struct expr *(*fpPtr)(void *,EXEC_STATUS,struct expr *,char *))
   {
    struct FunctionDefinition *fdPtr;
 
@@ -595,7 +595,7 @@ globle struct FunctionDefinition *GetFunctionList(
   void *theEnv,
   EXEC_STATUS)
   {
-   return(ExternalFunctionData(theEnv)->ListOfFunctions);
+   return(ExternalFunctionData(theEnv,execStatus)->ListOfFunctions);
   }
 
 /**************************************************************/
@@ -610,22 +610,22 @@ globle void InstallFunctionList(
    int i;
    struct FunctionHash *fhPtr, *nextPtr;
 
-   if (ExternalFunctionData(theEnv)->FunctionHashtable != NULL)
+   if (ExternalFunctionData(theEnv,execStatus)->FunctionHashtable != NULL)
      {
       for (i = 0; i < SIZE_FUNCTION_HASH; i++)
         {
-         fhPtr = ExternalFunctionData(theEnv)->FunctionHashtable[i];
+         fhPtr = ExternalFunctionData(theEnv,execStatus)->FunctionHashtable[i];
          while (fhPtr != NULL)
            {
             nextPtr = fhPtr->next;
             rtn_struct(theEnv,execStatus,FunctionHash,fhPtr);
             fhPtr = nextPtr;
            }
-         ExternalFunctionData(theEnv)->FunctionHashtable[i] = NULL;
+         ExternalFunctionData(theEnv,execStatus)->FunctionHashtable[i] = NULL;
         }
      }
 
-   ExternalFunctionData(theEnv)->ListOfFunctions = value;
+   ExternalFunctionData(theEnv,execStatus)->ListOfFunctions = value;
 
    while (value != NULL)
      {
@@ -648,13 +648,13 @@ globle struct FunctionDefinition *FindFunction(
    unsigned hashValue;
    SYMBOL_HN *findValue;
 
-   if (ExternalFunctionData(theEnv)->FunctionHashtable == NULL) return(NULL);
+   if (ExternalFunctionData(theEnv,execStatus)->FunctionHashtable == NULL) return(NULL);
    
    hashValue = HashSymbol(functionName,SIZE_FUNCTION_HASH);
 
    findValue = (SYMBOL_HN *) FindSymbolHN(theEnv,execStatus,functionName);
 
-   for (fhPtr = ExternalFunctionData(theEnv)->FunctionHashtable[hashValue];
+   for (fhPtr = ExternalFunctionData(theEnv,execStatus)->FunctionHashtable[hashValue];
         fhPtr != NULL;
         fhPtr = fhPtr->next)
      {
@@ -675,11 +675,11 @@ static void InitializeFunctionHashTable(
   {
    int i;
 
-   ExternalFunctionData(theEnv)->FunctionHashtable = (struct FunctionHash **)
+   ExternalFunctionData(theEnv,execStatus)->FunctionHashtable = (struct FunctionHash **)
                        gm2(theEnv,execStatus,(int) sizeof (struct FunctionHash *) *
                            SIZE_FUNCTION_HASH);
 
-   for (i = 0; i < SIZE_FUNCTION_HASH; i++) ExternalFunctionData(theEnv)->FunctionHashtable[i] = NULL;
+   for (i = 0; i < SIZE_FUNCTION_HASH; i++) ExternalFunctionData(theEnv,execStatus)->FunctionHashtable[i] = NULL;
   }
 
 /****************************************************************/
@@ -693,15 +693,15 @@ static void AddHashFunction(
    struct FunctionHash *newhash, *temp;
    unsigned hashValue;
 
-   if (ExternalFunctionData(theEnv)->FunctionHashtable == NULL) InitializeFunctionHashTable(theEnv);
+   if (ExternalFunctionData(theEnv,execStatus)->FunctionHashtable == NULL) InitializeFunctionHashTable(theEnv,execStatus);
 
    newhash = get_struct(theEnv,execStatus,FunctionHash);
    newhash->fdPtr = fdPtr;
 
    hashValue = HashSymbol(fdPtr->callFunctionName->contents,SIZE_FUNCTION_HASH);
 
-   temp = ExternalFunctionData(theEnv)->FunctionHashtable[hashValue];
-   ExternalFunctionData(theEnv)->FunctionHashtable[hashValue] = newhash;
+   temp = ExternalFunctionData(theEnv,execStatus)->FunctionHashtable[hashValue];
+   ExternalFunctionData(theEnv,execStatus)->FunctionHashtable[hashValue] = newhash;
    newhash->next = temp;
   }
 

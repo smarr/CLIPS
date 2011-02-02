@@ -39,7 +39,7 @@
 #define LOCALE extern
 #endif
 
-   LOCALE void                           FactPatternsCompilerSetup(void *);
-   LOCALE void                           FactPatternNodeReference(void *,void *,FILE *,int,int);
+   LOCALE void                           FactPatternsCompilerSetup(void *,EXEC_STATUS);
+   LOCALE void                           FactPatternNodeReference(void *,EXEC_STATUS,void *,FILE *,int,int);
 
 #endif

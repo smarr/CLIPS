@@ -42,12 +42,12 @@
 #define LOCALE extern
 #endif
 
-   LOCALE void                           FactPatternMatch(void *,struct fact *,
+   LOCALE void                           FactPatternMatch(void *,EXEC_STATUS,struct fact *,
                                                struct factPatternNode *,int,
                                                struct multifieldMarker *,
                                                struct multifieldMarker *);
-   LOCALE void                           MarkFactPatternForIncrementalReset(void *,struct patternNodeHeader *,int);
-   LOCALE void                           FactsIncrementalReset(void *);
+   LOCALE void                           MarkFactPatternForIncrementalReset(void *,EXEC_STATUS,struct patternNodeHeader *,int);
+   LOCALE void                           FactsIncrementalReset(void *,EXEC_STATUS);
 
 #endif
 

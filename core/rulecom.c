@@ -73,12 +73,12 @@
 /***************************************/
 
 #if DEVELOPER
-   static void                    ShowJoins(void *,void *);
+   static void                    ShowJoins(void *,EXEC_STATUS,void *);
 #endif
-   static int                     ListAlphaMatches(void *,struct joinNode *,int);
-   static int                     ListBetaMatches(void *,struct joinNode *,int);
-   static int                     ListBetaJoinActivity(void *,struct joinNode *,int,long long *,int);
-   static void                    PrintMatchesMemory(void *,struct joinNode *,struct betaMemory *,int,int);
+   static int                     ListAlphaMatches(void *,EXEC_STATUS,struct joinNode *,int);
+   static int                     ListBetaMatches(void *,EXEC_STATUS,struct joinNode *,int);
+   static int                     ListBetaJoinActivity(void *,EXEC_STATUS,struct joinNode *,int,long long *,int);
+   static void                    PrintMatchesMemory(void *,EXEC_STATUS,struct joinNode *,struct betaMemory *,int,int);
    
 /****************************************************************/
 /* DefruleCommands: Initializes defrule commands and functions. */
@@ -137,13 +137,13 @@ globle void DefruleCommands(
    EnvDefineFunction2(theEnv,execStatus,"show-joins",   'v', PTIEF ShowJoinsCommand,    "ShowJoinsCommand", "11w");
    EnvDefineFunction2(theEnv,execStatus,"show-aht",   'v', PTIEF ShowAlphaHashTable,    "ShowAlphaHashTable", "00");
 #if DEBUGGING_FUNCTIONS
-   AddWatchItem(theEnv,execStatus,"rule-analysis",0,&DefruleData(theEnv)->WatchRuleAnalysis,0,NULL,NULL);
+   AddWatchItem(theEnv,execStatus,"rule-analysis",0,&DefruleData(theEnv,execStatus)->WatchRuleAnalysis,0,NULL,NULL);
 #endif
 #endif /* DEVELOPER && (! BLOAD_ONLY) */
 
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 #endif /* ! RUN_TIME */
   }
@@ -156,7 +156,7 @@ globle intBool EnvGetBetaMemoryResizing(
   void *theEnv,
   EXEC_STATUS)
   {   
-   return(DefruleData(theEnv)->BetaMemoryResizingFlag);
+   return(DefruleData(theEnv,execStatus)->BetaMemoryResizingFlag);
   }
 
 /***********************************************/
@@ -170,9 +170,9 @@ globle intBool EnvSetBetaMemoryResizing(
   {
    int ov;
 
-   ov = DefruleData(theEnv)->BetaMemoryResizingFlag;
+   ov = DefruleData(theEnv,execStatus)->BetaMemoryResizingFlag;
 
-   DefruleData(theEnv)->BetaMemoryResizingFlag = value;
+   DefruleData(theEnv,execStatus)->BetaMemoryResizingFlag = value;
 
    return(ov);
   }
@@ -188,7 +188,7 @@ globle int SetBetaMemoryResizingCommand(
    int oldValue;
    DATA_OBJECT argPtr;
 
-   oldValue = EnvGetBetaMemoryResizing(theEnv);
+   oldValue = EnvGetBetaMemoryResizing(theEnv,execStatus);
 
    /*============================================*/
    /* Check for the correct number of arguments. */
@@ -204,7 +204,7 @@ globle int SetBetaMemoryResizingCommand(
 
    EnvRtnUnknown(theEnv,execStatus,1,&argPtr);
 
-   if ((argPtr.value == EnvFalseSymbol(theEnv)) && (argPtr.type == SYMBOL))
+   if ((argPtr.value == EnvFalseSymbol(theEnv,execStatus)) && (argPtr.type == SYMBOL))
      { EnvSetBetaMemoryResizing(theEnv,execStatus,FALSE); }
    else
      { EnvSetBetaMemoryResizing(theEnv,execStatus,TRUE); }
@@ -226,7 +226,7 @@ globle int GetBetaMemoryResizingCommand(
   {
    int oldValue;
 
-   oldValue = EnvGetBetaMemoryResizing(theEnv);
+   oldValue = EnvGetBetaMemoryResizing(theEnv,execStatus);
 
    if (EnvArgCountCheck(theEnv,execStatus,"get-beta-memory-resizing",EXACTLY,0) == -1)
      { return(oldValue); }
@@ -312,7 +312,7 @@ globle intBool EnvMatches(
         agendaPtr != NULL;
         agendaPtr = (struct activation *) EnvGetNextActivation(theEnv,execStatus,agendaPtr))
      {
-      if (GetHaltExecution(theEnv) == TRUE) return(TRUE);
+      if (GetHaltExecution(theEnv,execStatus) == TRUE) return(TRUE);
 
       if (((struct activation *) agendaPtr)->theRule->header.name == rulePtr->header.name)
         {
@@ -369,7 +369,7 @@ static int ListAlphaMatches(
 
    priorPatterns++;
    
-   if (GetHaltExecution(theEnv) == TRUE)
+   if (GetHaltExecution(theEnv,execStatus) == TRUE)
      { return(priorPatterns); }
    
    EnvPrintRouter(theEnv,execStatus,WDISPLAY,"Matches for Pattern ");
@@ -384,7 +384,7 @@ static int ListAlphaMatches(
 
       while (listOfMatches != NULL)
         {
-         if (GetHaltExecution(theEnv) == TRUE)
+         if (GetHaltExecution(theEnv,execStatus) == TRUE)
            { return(priorPatterns); }
                  
          flag = 0;
@@ -410,7 +410,7 @@ static int ListBetaMatches(
   {
    int patternsFound = 0, startPatterns;
 
-   if (GetHaltExecution(theEnv) == TRUE)
+   if (GetHaltExecution(theEnv,execStatus) == TRUE)
      { return(0); }   
 
    if (theJoin == NULL) 
@@ -469,7 +469,7 @@ static void PrintMatchesMemory(
    unsigned long b;
    int matchesDisplayed;
 
-   if (GetHaltExecution(theEnv) == TRUE)
+   if (GetHaltExecution(theEnv,execStatus) == TRUE)
      { return; }
      
    matchesDisplayed = 0;
@@ -486,7 +486,7 @@ static void PrintMatchesMemory(
 
       while (listOfMatches != NULL)
         {
-         if (GetHaltExecution(theEnv) == TRUE)
+         if (GetHaltExecution(theEnv,execStatus) == TRUE)
            { return; }
 
          matchesDisplayed++;
@@ -721,7 +721,7 @@ globle intBool EnvMatchesCount(
 
       for (i = 0; i < depth; i++)
         {
-         if (GetHaltExecution(theEnv) == TRUE)
+         if (GetHaltExecution(theEnv,execStatus) == TRUE)
            {
             genfree(theEnv,execStatus,theAlphaStorage,(unsigned) (depth * sizeof(struct alphaMemoryHash *)));
             return(TRUE);
@@ -740,7 +740,7 @@ globle intBool EnvMatchesCount(
 
             while (listOfMatches != NULL)
               {
-               if (GetHaltExecution(theEnv) == TRUE)
+               if (GetHaltExecution(theEnv,execStatus) == TRUE)
                  {
                   genfree(theEnv,execStatus,theAlphaStorage,(unsigned) (depth * sizeof(struct alphaMemoryHash *)));
                   return(TRUE);
@@ -778,7 +778,7 @@ globle intBool EnvMatchesCount(
 
       for (i = 1; i < depth; i++)
         {
-         if (GetHaltExecution(theEnv) == TRUE)
+         if (GetHaltExecution(theEnv,execStatus) == TRUE)
            {
             genfree(theEnv,execStatus,theStorage,(unsigned) (depth * sizeof(struct betaMemory *)));
             return(TRUE);
@@ -797,7 +797,7 @@ globle intBool EnvMatchesCount(
 
 			while (listOfMatches != NULL)
 			  {
-			   if (GetHaltExecution(theEnv) == TRUE)
+			   if (GetHaltExecution(theEnv,execStatus) == TRUE)
 				 {
 				  genfree(theEnv,execStatus,theStorage,(unsigned) (depth * sizeof(struct betaMemory *)));
 				  return(TRUE);
@@ -828,7 +828,7 @@ globle intBool EnvMatchesCount(
         agendaPtr != NULL;
         agendaPtr = (struct activation *) EnvGetNextActivation(theEnv,execStatus,agendaPtr))
      {
-      if (GetHaltExecution(theEnv) == TRUE) return(TRUE);
+      if (GetHaltExecution(theEnv,execStatus) == TRUE) return(TRUE);
 
       if (((struct activation *) agendaPtr)->theRule->header.name == rulePtr->header.name)
         { count++; }
@@ -1011,7 +1011,7 @@ globle void ShowAlphaHashTable(
 
     for (i = 0; i < ALPHA_MEMORY_HASH_SIZE; i++)
       {
-       for (theEntry =  DefruleData(theEnv)->AlphaMemoryTable[i], count = 0;
+       for (theEntry =  DefruleData(theEnv,execStatus)->AlphaMemoryTable[i], count = 0;
             theEntry != NULL;
             theEntry = theEntry->next)
          { count++; }
@@ -1022,7 +1022,7 @@ globle void ShowAlphaHashTable(
           gensprintf(buffer,"%4d: %4d ->",i,count);
           EnvPrintRouter(theEnv,execStatus,WDISPLAY,buffer);
           
-          for (theEntry =  DefruleData(theEnv)->AlphaMemoryTable[i], count = 0;
+          for (theEntry =  DefruleData(theEnv,execStatus)->AlphaMemoryTable[i], count = 0;
                theEntry != NULL;
                theEntry = theEntry->next)
             {

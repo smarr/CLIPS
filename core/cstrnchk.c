@@ -53,11 +53,11 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static intBool                 CheckRangeAgainstCardinalityConstraint(void *,int,int,CONSTRAINT_RECORD *);
+   static intBool                 CheckRangeAgainstCardinalityConstraint(void *,EXEC_STATUS,int,int,CONSTRAINT_RECORD *);
    static int                     CheckFunctionReturnType(int,CONSTRAINT_RECORD *);
    static intBool                 CheckTypeConstraint(int,CONSTRAINT_RECORD *);
-   static intBool                 CheckRangeConstraint(void *,int,void *,CONSTRAINT_RECORD *);
-   static void                    PrintRange(void *,char *,CONSTRAINT_RECORD *);
+   static intBool                 CheckRangeConstraint(void *,EXEC_STATUS,int,void *,CONSTRAINT_RECORD *);
+   static void                    PrintRange(void *,EXEC_STATUS,char *,CONSTRAINT_RECORD *);
 
 /******************************************************/
 /* CheckFunctionReturnType: Checks a functions return */
@@ -207,7 +207,7 @@ globle intBool CheckCardinalityConstraint(
 
    if (constraints->minFields != NULL)
      {
-      if (constraints->minFields->value != SymbolData(theEnv)->NegativeInfinity)
+      if (constraints->minFields->value != SymbolData(theEnv,execStatus)->NegativeInfinity)
         {
          if (number < ValueToLong(constraints->minFields->value))
            { return(FALSE); }
@@ -221,7 +221,7 @@ globle intBool CheckCardinalityConstraint(
 
    if (constraints->maxFields != NULL)
      {
-      if (constraints->maxFields->value != SymbolData(theEnv)->PositiveInfinity)
+      if (constraints->maxFields->value != SymbolData(theEnv,execStatus)->PositiveInfinity)
         {
          if (number > ValueToLong(constraints->maxFields->value))
            { return(FALSE); }
@@ -265,7 +265,7 @@ static intBool CheckRangeAgainstCardinalityConstraint(
 
    if (constraints->maxFields != NULL)
      {
-      if (constraints->maxFields->value != SymbolData(theEnv)->PositiveInfinity)
+      if (constraints->maxFields->value != SymbolData(theEnv,execStatus)->PositiveInfinity)
         {
          if (min > ValueToLong(constraints->maxFields->value))
            { return(FALSE); }
@@ -282,7 +282,7 @@ static intBool CheckRangeAgainstCardinalityConstraint(
 
    if ((constraints->minFields != NULL) && (max != -1))
      {
-      if (constraints->minFields->value != SymbolData(theEnv)->NegativeInfinity)
+      if (constraints->minFields->value != SymbolData(theEnv,execStatus)->NegativeInfinity)
         {
          if (max < ValueToLong(constraints->minFields->value))
            { return(FALSE); }
@@ -459,7 +459,7 @@ globle intBool CheckAllowedClassesConstraint(
 #else
 
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #pragma unused(type)
 #pragma unused(vPtr)
 #pragma unused(constraints)
@@ -644,12 +644,12 @@ static void PrintRange(
   char *logicalName,
   CONSTRAINT_RECORD *theConstraint)
   {
-   if (theConstraint->minValue->value == SymbolData(theEnv)->NegativeInfinity)
-     { EnvPrintRouter(theEnv,execStatus,logicalName,ValueToString(SymbolData(theEnv)->NegativeInfinity)); }
+   if (theConstraint->minValue->value == SymbolData(theEnv,execStatus)->NegativeInfinity)
+     { EnvPrintRouter(theEnv,execStatus,logicalName,ValueToString(SymbolData(theEnv,execStatus)->NegativeInfinity)); }
    else PrintExpression(theEnv,execStatus,logicalName,theConstraint->minValue);
    EnvPrintRouter(theEnv,execStatus,logicalName," to ");
-   if (theConstraint->maxValue->value == SymbolData(theEnv)->PositiveInfinity)
-     { EnvPrintRouter(theEnv,execStatus,logicalName,ValueToString(SymbolData(theEnv)->PositiveInfinity)); }
+   if (theConstraint->maxValue->value == SymbolData(theEnv,execStatus)->PositiveInfinity)
+     { EnvPrintRouter(theEnv,execStatus,logicalName,ValueToString(SymbolData(theEnv,execStatus)->PositiveInfinity)); }
    else PrintExpression(theEnv,execStatus,logicalName,theConstraint->maxValue);
   }
 

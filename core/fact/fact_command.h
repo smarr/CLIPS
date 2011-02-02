@@ -40,21 +40,21 @@
 #define SaveFacts(a,b,c) EnvSaveFacts(GetCurrentEnvironment(),a,b,c)
 #define LoadFactsFromString(a,b) EnvLoadFactsFromString(GetCurrentEnvironment(),a,b)
 
-   LOCALE void                           FactCommandDefinitions(void *);
-   LOCALE void                           AssertCommand(void *,DATA_OBJECT_PTR);
-   LOCALE void                           RetractCommand(void *);
-   LOCALE void                           ProcessEventCommand(void *);
-   LOCALE void                           AssertStringFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                           FactsCommand(void *);
-   LOCALE void                           EnvFacts(void *,char *,void *,long long,long long,long long);
-   LOCALE int                            SetFactDuplicationCommand(void *);
-   LOCALE int                            GetFactDuplicationCommand(void *);
-   LOCALE int                            SaveFactsCommand(void *);
-   LOCALE int                            LoadFactsCommand(void *);
-   LOCALE int                            EnvSaveFacts(void *,char *,int,struct expr *);
-   LOCALE int                            EnvLoadFacts(void *,char *);
-   LOCALE int                            EnvLoadFactsFromString(void *,char *,int);
-   LOCALE long long                      FactIndexFunction(void *);
+   LOCALE void                           FactCommandDefinitions(void *, EXEC_STATUS);
+   LOCALE void                           AssertCommand(void *,EXEC_STATUS,DATA_OBJECT_PTR);
+   LOCALE void                           RetractCommand(void *, EXEC_STATUS);
+   LOCALE void                           ProcessEventCommand(void *, EXEC_STATUS);
+   LOCALE void                           AssertStringFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
+   LOCALE void                           FactsCommand(void *, EXEC_STATUS);
+   LOCALE void                           EnvFacts(void *,EXEC_STATUS,char *,void *,long long,long long,long long);
+   LOCALE int                            SetFactDuplicationCommand(void *, EXEC_STATUS);
+   LOCALE int                            GetFactDuplicationCommand(void *, EXEC_STATUS);
+   LOCALE int                            SaveFactsCommand(void *, EXEC_STATUS);
+   LOCALE int                            LoadFactsCommand(void *, EXEC_STATUS);
+   LOCALE int                            EnvSaveFacts(void *,EXEC_STATUS,char *,int,struct expr *);
+   LOCALE int                            EnvLoadFacts(void *,EXEC_STATUS,char *);
+   LOCALE int                            EnvLoadFactsFromString(void *,EXEC_STATUS,char *,int);
+   LOCALE long long                      FactIndexFunction(void *, EXEC_STATUS);
 
 #endif
 

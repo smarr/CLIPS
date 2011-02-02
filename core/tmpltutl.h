@@ -56,17 +56,17 @@
 #define LOCALE extern
 #endif
 
-   LOCALE void                           InvalidDeftemplateSlotMessage(void *,char *,char *,int);
-   LOCALE void                           SingleFieldSlotCardinalityError(void *,char *);
-   LOCALE void                           MultiIntoSingleFieldSlotError(void *,struct templateSlot *,struct deftemplate *);
-   LOCALE void                           CheckTemplateFact(void *,struct fact *);
-   LOCALE intBool                        CheckRHSSlotTypes(void *,struct expr *,struct templateSlot *,char *);
+   LOCALE void                           InvalidDeftemplateSlotMessage(void *,EXEC_STATUS,char *,char *,int);
+   LOCALE void                           SingleFieldSlotCardinalityError(void *,EXEC_STATUS,char *);
+   LOCALE void                           MultiIntoSingleFieldSlotError(void *,EXEC_STATUS,struct templateSlot *,struct deftemplate *);
+   LOCALE void                           CheckTemplateFact(void *,EXEC_STATUS,struct fact *);
+   LOCALE intBool                        CheckRHSSlotTypes(void *,EXEC_STATUS,struct expr *,struct templateSlot *,char *);
    LOCALE struct templateSlot           *GetNthSlot(struct deftemplate *,int);
    LOCALE int                            FindSlotPosition(struct deftemplate *,struct symbolHashNode *);
-   LOCALE void                           PrintTemplateFact(void *,char *,struct fact *,int,int);
-   LOCALE void                           UpdateDeftemplateScope(void *);
+   LOCALE void                           PrintTemplateFact(void *,EXEC_STATUS,char *,struct fact *,int,int);
+   LOCALE void                           UpdateDeftemplateScope(void *,EXEC_STATUS);
    LOCALE struct templateSlot           *FindSlot(struct deftemplate *,struct symbolHashNode *,short *);
-   LOCALE struct deftemplate            *CreateImpliedDeftemplate(void *,SYMBOL_HN *,int);
+   LOCALE struct deftemplate            *CreateImpliedDeftemplate(void *,EXEC_STATUS,SYMBOL_HN *,int);
 
 #endif
 

@@ -36,7 +36,7 @@ struct objectReteBinaryData
    OBJECT_PATTERN_NODE *PatternArray;
   };
 
-#define ObjectReteBinaryData(theEnv) ((struct objectReteBinaryData *) GetEnvironmentData(theEnv,execStatus,OBJECTRETEBIN_DATA))
+#define ObjectReteBinaryData(theEnv,execStatus) ((struct objectReteBinaryData *) GetEnvironmentData(theEnv,execStatus,OBJECTRETEBIN_DATA))
 
 
 #ifdef LOCALE
@@ -49,7 +49,7 @@ struct objectReteBinaryData
 #define LOCALE extern
 #endif
 
-LOCALE void SetupObjectPatternsBload(void *);
+LOCALE void SetupObjectPatternsBload(void *,EXEC_STATUS);
 
 #endif
 

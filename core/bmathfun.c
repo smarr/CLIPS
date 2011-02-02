@@ -45,7 +45,7 @@ struct basicMathFunctionData
    intBool AutoFloatDividend;
   };
 
-#define BasicMathFunctionData(theEnv) ((struct basicMathFunctionData *) GetEnvironmentData(theEnv,execStatus,BMATHFUN_DATA))
+#define BasicMathFunctionData(theEnv,execStatus) ((struct basicMathFunctionData *) GetEnvironmentData(theEnv,execStatus,BMATHFUN_DATA))
 
 /***************************************************************/
 /* BasicMathFunctionDefinitions: Defines basic math functions. */
@@ -56,7 +56,7 @@ globle void BasicMathFunctionDefinitions(
   {   
    AllocateEnvironmentData(theEnv,execStatus,BMATHFUN_DATA,sizeof(struct basicMathFunctionData),NULL);
    
-   BasicMathFunctionData(theEnv)->AutoFloatDividend = TRUE;
+   BasicMathFunctionData(theEnv,execStatus)->AutoFloatDividend = TRUE;
 
 #if ! RUN_TIME
    EnvDefineFunction2(theEnv,execStatus,"+", 'n',PTIEF AdditionFunction, "AdditionFunction", "2*n");
@@ -301,7 +301,7 @@ globle void DivisionFunction(
    DATA_OBJECT theArgument;
    int pos = 1;
 
-   useFloatTotal = BasicMathFunctionData(theEnv)->AutoFloatDividend;
+   useFloatTotal = BasicMathFunctionData(theEnv,execStatus)->AutoFloatDividend;
    
    /*===================================================*/
    /* Get the first argument. This number which will be */
@@ -470,7 +470,7 @@ globle int SetAutoFloatDividendCommand(
    /* Remember the present setting. */
    /*===============================*/
 
-   oldValue = BasicMathFunctionData(theEnv)->AutoFloatDividend;
+   oldValue = BasicMathFunctionData(theEnv,execStatus)->AutoFloatDividend;
 
    /*============================================*/
    /* Check for the correct number of arguments. */
@@ -485,10 +485,10 @@ globle int SetAutoFloatDividendCommand(
    /* The symbol FALSE disables the auto float dividend feature. */
    /*============================================================*/
 
-   if ((theArgument.value == EnvFalseSymbol(theEnv)) && (theArgument.type == SYMBOL))
-     { BasicMathFunctionData(theEnv)->AutoFloatDividend = FALSE; }
+   if ((theArgument.value == EnvFalseSymbol(theEnv,execStatus)) && (theArgument.type == SYMBOL))
+     { BasicMathFunctionData(theEnv,execStatus)->AutoFloatDividend = FALSE; }
    else
-     { BasicMathFunctionData(theEnv)->AutoFloatDividend = TRUE; }
+     { BasicMathFunctionData(theEnv,execStatus)->AutoFloatDividend = TRUE; }
 
    /*======================================*/
    /* Return the old value of the feature. */
@@ -515,7 +515,7 @@ globle int GetAutoFloatDividendCommand(
    /* Return the current setting. */
    /*=============================*/
 
-   return(BasicMathFunctionData(theEnv)->AutoFloatDividend);
+   return(BasicMathFunctionData(theEnv,execStatus)->AutoFloatDividend);
   }
 
 /*************************************************/
@@ -526,7 +526,7 @@ globle intBool EnvGetAutoFloatDividend(
   void *theEnv,
   EXEC_STATUS)
   {
-   return(BasicMathFunctionData(theEnv)->AutoFloatDividend);
+   return(BasicMathFunctionData(theEnv,execStatus)->AutoFloatDividend);
   }
 
 /*************************************************/
@@ -540,8 +540,8 @@ globle intBool EnvSetAutoFloatDividend(
   {
    int ov;
 
-   ov = BasicMathFunctionData(theEnv)->AutoFloatDividend;
-   BasicMathFunctionData(theEnv)->AutoFloatDividend = value;
+   ov = BasicMathFunctionData(theEnv,execStatus)->AutoFloatDividend;
+   BasicMathFunctionData(theEnv,execStatus)->AutoFloatDividend = value;
    return(ov);
   }
 

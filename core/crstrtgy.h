@@ -61,9 +61,9 @@
 #define GetStrategy() EnvGetStrategy(GetCurrentEnvironment())
 #define SetStrategy(a) EnvSetStrategy(GetCurrentEnvironment(),a)
 
-   LOCALE void                           PlaceActivation(void *,ACTIVATION **,ACTIVATION *,struct salienceGroup *);
-   LOCALE int                            EnvSetStrategy(void *,int);
-   LOCALE int                            EnvGetStrategy(void *);
+   LOCALE void                           PlaceActivation(void *,EXEC_STATUS,ACTIVATION **,ACTIVATION *,struct salienceGroup *);
+   LOCALE int                            EnvSetStrategy(void *,EXEC_STATUS,int);
+   LOCALE int                            EnvGetStrategy(void *,EXEC_STATUS);
    LOCALE void                          *SetStrategyCommand(void *,EXEC_STATUS);
    LOCALE void                          *GetStrategyCommand(void *,EXEC_STATUS);
 

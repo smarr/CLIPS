@@ -119,15 +119,15 @@ typedef struct objectMatchAction
 #define LOCALE extern
 #endif
 
-   LOCALE void                  ObjectMatchDelay(void *,DATA_OBJECT *);
-   LOCALE intBool               SetDelayObjectPatternMatching(void *,int);
-   LOCALE intBool               GetDelayObjectPatternMatching(void *);
-   LOCALE OBJECT_PATTERN_NODE  *ObjectNetworkPointer(void *);
-   LOCALE OBJECT_ALPHA_NODE    *ObjectNetworkTerminalPointer(void *);
-   LOCALE void                  SetObjectNetworkPointer(void *,OBJECT_PATTERN_NODE *);
-   LOCALE void                  SetObjectNetworkTerminalPointer(void *,OBJECT_ALPHA_NODE *);
-   LOCALE void                  ObjectNetworkAction(void *,int,INSTANCE_TYPE *,int);
-   LOCALE void                  ResetObjectMatchTimeTags(void *);
+   LOCALE void                  ObjectMatchDelay(void *,EXEC_STATUS,DATA_OBJECT *);
+   LOCALE intBool               SetDelayObjectPatternMatching(void *,EXEC_STATUS,int);
+   LOCALE intBool               GetDelayObjectPatternMatching(void *,EXEC_STATUS);
+   LOCALE OBJECT_PATTERN_NODE  *ObjectNetworkPointer(void *,EXEC_STATUS);
+   LOCALE OBJECT_ALPHA_NODE    *ObjectNetworkTerminalPointer(void *,EXEC_STATUS);
+   LOCALE void                  SetObjectNetworkPointer(void *,EXEC_STATUS,OBJECT_PATTERN_NODE *);
+   LOCALE void                  SetObjectNetworkTerminalPointer(void *,EXEC_STATUS,OBJECT_ALPHA_NODE *);
+   LOCALE void                  ObjectNetworkAction(void *,EXEC_STATUS,int,INSTANCE_TYPE *,int);
+   LOCALE void                  ResetObjectMatchTimeTags(void *,EXEC_STATUS);
 
 #endif
 

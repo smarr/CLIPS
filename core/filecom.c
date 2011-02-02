@@ -87,7 +87,7 @@ struct fileCommandData
    char *DribbleBuffer;
    size_t DribbleCurrentPosition;
    size_t DribbleMaximumPosition;
-   int (*DribbleStatusFunction)(void *,int);
+   int (*DribbleStatusFunction)(void *,EXEC_STATUS,int);
 #endif
    int BatchType;
    void *BatchSource;
@@ -98,26 +98,26 @@ struct fileCommandData
    struct batchEntry *BottomOfBatchList;
   };
 
-#define FileCommandData(theEnv) ((struct fileCommandData *) GetEnvironmentData(theEnv,execStatus,FILECOM_DATA))
+#define FileCommandData(theEnv,execStatus) ((struct fileCommandData *) GetEnvironmentData(theEnv,execStatus,FILECOM_DATA))
 
 /***************************************/
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
 #if DEBUGGING_FUNCTIONS
-   static int                     FindDribble(void *,char *);
-   static int                     GetcDribble(void *,char *);
-   static int                     UngetcDribble(void *,int,char *);
-   static int                     ExitDribble(void *,int);
-   static int                     PrintDribble(void *,char *,char *);
-   static void                    PutcDribbleBuffer(void *,int);
+   static int                     FindDribble(void *,EXEC_STATUS,char *);
+   static int                     GetcDribble(void *,EXEC_STATUS,char *);
+   static int                     UngetcDribble(void *,EXEC_STATUS,int,char *);
+   static int                     ExitDribble(void *,EXEC_STATUS,int);
+   static int                     PrintDribble(void *,EXEC_STATUS,char *,char *);
+   static void                    PutcDribbleBuffer(void *,EXEC_STATUS,int);
 #endif
-   static int                     FindBatch(void *,char *);
-   static int                     GetcBatch(void *,char *);
-   static int                     UngetcBatch(void *,int,char *);
-   static int                     ExitBatch(void *,int);
-   static void                    AddBatch(void *,int,void *,int,char *);
-   static void                    DeallocateFileCommandData(void *);
+   static int                     FindBatch(void *,EXEC_STATUS,char *);
+   static int                     GetcBatch(void *,EXEC_STATUS,char *);
+   static int                     UngetcBatch(void *,EXEC_STATUS,int,char *);
+   static int                     ExitBatch(void *,EXEC_STATUS,int);
+   static void                    AddBatch(void *,EXEC_STATUS,int,void *,int,char *);
+   static void                    DeallocateFileCommandData(void *,EXEC_STATUS);
 
 /***************************************/
 /* FileCommandDefinitions: Initializes */
@@ -140,11 +140,11 @@ globle void FileCommandDefinitions(
    EnvDefineFunction2(theEnv,execStatus,"load",'b',PTIEF LoadCommand,"LoadCommand","11k");
    EnvDefineFunction2(theEnv,execStatus,"load*",'b',PTIEF LoadStarCommand,"LoadStarCommand","11k");
 #if BLOAD_AND_BSAVE
-   InitializeBsaveData(theEnv);
+   InitializeBsaveData(theEnv,execStatus);
    EnvDefineFunction2(theEnv,execStatus,"bsave",'b', PTIEF BsaveCommand,"BsaveCommand","11k");
 #endif
 #if BLOAD || BLOAD_ONLY || BLOAD_AND_BSAVE
-   InitializeBloadData(theEnv);
+   InitializeBloadData(theEnv,execStatus);
    EnvDefineFunction2(theEnv,execStatus,"bload",'b',PTIEF BloadCommand,"BloadCommand","11k");
 #endif
 #endif
@@ -160,13 +160,13 @@ static void DeallocateFileCommandData(
   {
    struct batchEntry *theEntry, *nextEntry;
    
-   theEntry = FileCommandData(theEnv)->TopOfBatchList;
+   theEntry = FileCommandData(theEnv,execStatus)->TopOfBatchList;
    while (theEntry != NULL)
      {
       nextEntry = theEntry->next;
 
       if (theEntry->batchType == FILE_BATCH)
-        { GenClose(theEnv,execStatus,(FILE *) FileCommandData(theEnv)->TopOfBatchList->inputSource); }
+        { GenClose(theEnv,execStatus,(FILE *) FileCommandData(theEnv,execStatus)->TopOfBatchList->inputSource); }
       else
         { rm(theEnv,execStatus,theEntry->theString,strlen(theEntry->theString) + 1); }
 
@@ -175,15 +175,15 @@ static void DeallocateFileCommandData(
       theEntry = nextEntry;
      }
      
-   if (FileCommandData(theEnv)->BatchBuffer != NULL)
-     { rm(theEnv,execStatus,FileCommandData(theEnv)->BatchBuffer,FileCommandData(theEnv)->BatchMaximumPosition); }
+   if (FileCommandData(theEnv,execStatus)->BatchBuffer != NULL)
+     { rm(theEnv,execStatus,FileCommandData(theEnv,execStatus)->BatchBuffer,FileCommandData(theEnv,execStatus)->BatchMaximumPosition); }
 
 #if DEBUGGING_FUNCTIONS
-   if (FileCommandData(theEnv)->DribbleBuffer != NULL)
-     { rm(theEnv,execStatus,FileCommandData(theEnv)->DribbleBuffer,FileCommandData(theEnv)->DribbleMaximumPosition); }
+   if (FileCommandData(theEnv,execStatus)->DribbleBuffer != NULL)
+     { rm(theEnv,execStatus,FileCommandData(theEnv,execStatus)->DribbleBuffer,FileCommandData(theEnv,execStatus)->DribbleMaximumPosition); }
      
-   if (FileCommandData(theEnv)->DribbleFP != NULL) 
-     { GenClose(theEnv,execStatus,FileCommandData(theEnv)->DribbleFP); }
+   if (FileCommandData(theEnv,execStatus)->DribbleFP != NULL) 
+     { GenClose(theEnv,execStatus,FileCommandData(theEnv,execStatus)->DribbleFP); }
 #endif
   }
   
@@ -200,7 +200,7 @@ static int FindDribble(
   char *logicalName)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 
    if ( (strcmp(logicalName,"stdout") == 0) ||
@@ -293,11 +293,11 @@ static void PutcDribbleBuffer(
 
    if (rv == EOF)
      {
-      if (FileCommandData(theEnv)->DribbleCurrentPosition > 0)
+      if (FileCommandData(theEnv,execStatus)->DribbleCurrentPosition > 0)
         {
-         fprintf(FileCommandData(theEnv)->DribbleFP,"%s",FileCommandData(theEnv)->DribbleBuffer);
-         FileCommandData(theEnv)->DribbleCurrentPosition = 0;
-         FileCommandData(theEnv)->DribbleBuffer[0] = EOS;
+         fprintf(FileCommandData(theEnv,execStatus)->DribbleFP,"%s",FileCommandData(theEnv,execStatus)->DribbleBuffer);
+         FileCommandData(theEnv,execStatus)->DribbleCurrentPosition = 0;
+         FileCommandData(theEnv,execStatus)->DribbleBuffer[0] = EOS;
         }
      }
 
@@ -311,16 +311,16 @@ static void PutcDribbleBuffer(
    /* the character to the file, the dribble buffer is flushed. */
    /*===========================================================*/
 
-   else if (RouterData(theEnv)->AwaitingInput == FALSE)
+   else if (RouterData(theEnv,execStatus)->AwaitingInput == FALSE)
      {
-      if (FileCommandData(theEnv)->DribbleCurrentPosition > 0)
+      if (FileCommandData(theEnv,execStatus)->DribbleCurrentPosition > 0)
         {
-         fprintf(FileCommandData(theEnv)->DribbleFP,"%s",FileCommandData(theEnv)->DribbleBuffer);
-         FileCommandData(theEnv)->DribbleCurrentPosition = 0;
-         FileCommandData(theEnv)->DribbleBuffer[0] = EOS;
+         fprintf(FileCommandData(theEnv,execStatus)->DribbleFP,"%s",FileCommandData(theEnv,execStatus)->DribbleBuffer);
+         FileCommandData(theEnv,execStatus)->DribbleCurrentPosition = 0;
+         FileCommandData(theEnv,execStatus)->DribbleBuffer[0] = EOS;
         }
 
-      fputc(rv,FileCommandData(theEnv)->DribbleFP);
+      fputc(rv,FileCommandData(theEnv,execStatus)->DribbleFP);
      }
 
    /*=====================================================*/
@@ -329,10 +329,10 @@ static void PutcDribbleBuffer(
 
    else
      {
-      FileCommandData(theEnv)->DribbleBuffer = ExpandStringWithChar(theEnv,execStatus,rv,FileCommandData(theEnv)->DribbleBuffer,
-                                           &FileCommandData(theEnv)->DribbleCurrentPosition,
-                                           &FileCommandData(theEnv)->DribbleMaximumPosition,
-                                           FileCommandData(theEnv)->DribbleMaximumPosition+BUFFER_SIZE);
+      FileCommandData(theEnv,execStatus)->DribbleBuffer = ExpandStringWithChar(theEnv,execStatus,rv,FileCommandData(theEnv,execStatus)->DribbleBuffer,
+                                           &FileCommandData(theEnv,execStatus)->DribbleCurrentPosition,
+                                           &FileCommandData(theEnv,execStatus)->DribbleMaximumPosition,
+                                           FileCommandData(theEnv,execStatus)->DribbleMaximumPosition+BUFFER_SIZE);
      }
   }
 
@@ -351,8 +351,8 @@ static int UngetcDribble(
    /* Remove the character from the dribble buffer. */
    /*===============================================*/
 
-   if (FileCommandData(theEnv)->DribbleCurrentPosition > 0) FileCommandData(theEnv)->DribbleCurrentPosition--;
-   FileCommandData(theEnv)->DribbleBuffer[FileCommandData(theEnv)->DribbleCurrentPosition] = EOS;
+   if (FileCommandData(theEnv,execStatus)->DribbleCurrentPosition > 0) FileCommandData(theEnv,execStatus)->DribbleCurrentPosition--;
+   FileCommandData(theEnv,execStatus)->DribbleBuffer[FileCommandData(theEnv,execStatus)->DribbleCurrentPosition] = EOS;
 
    /*=============================================*/
    /* Deactivate the dribble router and pass the  */
@@ -385,10 +385,10 @@ static int ExitDribble(
 #pragma unused(num)
 #endif
 
-   if (FileCommandData(theEnv)->DribbleCurrentPosition > 0)
-     { fprintf(FileCommandData(theEnv)->DribbleFP,"%s",FileCommandData(theEnv)->DribbleBuffer); }
+   if (FileCommandData(theEnv,execStatus)->DribbleCurrentPosition > 0)
+     { fprintf(FileCommandData(theEnv,execStatus)->DribbleFP,"%s",FileCommandData(theEnv,execStatus)->DribbleBuffer); }
  
-   if (FileCommandData(theEnv)->DribbleFP != NULL) GenClose(theEnv,execStatus,FileCommandData(theEnv)->DribbleFP);
+   if (FileCommandData(theEnv,execStatus)->DribbleFP != NULL) GenClose(theEnv,execStatus,FileCommandData(theEnv,execStatus)->DribbleFP);
    return(1);
   }
 
@@ -422,15 +422,15 @@ globle intBool EnvDribbleOn(
    /* open, then close it.         */
    /*==============================*/
 
-   if (FileCommandData(theEnv)->DribbleFP != NULL)
-     { EnvDribbleOff(theEnv); }
+   if (FileCommandData(theEnv,execStatus)->DribbleFP != NULL)
+     { EnvDribbleOff(theEnv,execStatus); }
 
    /*========================*/
    /* Open the dribble file. */
    /*========================*/
 
-   FileCommandData(theEnv)->DribbleFP = GenOpen(theEnv,execStatus,fileName,"w");
-   if (FileCommandData(theEnv)->DribbleFP == NULL)
+   FileCommandData(theEnv,execStatus)->DribbleFP = GenOpen(theEnv,execStatus,fileName,"w");
+   if (FileCommandData(theEnv,execStatus)->DribbleFP == NULL)
      {
       OpenErrorMessage(theEnv,execStatus,"dribble-on",fileName);
       return(0);
@@ -445,7 +445,7 @@ globle intBool EnvDribbleOn(
              GetcDribble, UngetcDribble,
              ExitDribble);
 
-   FileCommandData(theEnv)->DribbleCurrentPosition = 0;
+   FileCommandData(theEnv,execStatus)->DribbleCurrentPosition = 0;
 
    /*================================================*/
    /* Call the dribble status function. This is used */
@@ -455,8 +455,8 @@ globle intBool EnvDribbleOn(
    /* "Turn Dribble Off..."                          */
    /*================================================*/
 
-   if (FileCommandData(theEnv)->DribbleStatusFunction != NULL)
-     { (*FileCommandData(theEnv)->DribbleStatusFunction)(theEnv,execStatus,TRUE); }
+   if (FileCommandData(theEnv,execStatus)->DribbleStatusFunction != NULL)
+     { (*FileCommandData(theEnv,execStatus)->DribbleStatusFunction)(theEnv,execStatus,TRUE); }
 
    /*=====================================*/
    /* Return TRUE to indicate the dribble */
@@ -474,7 +474,7 @@ globle intBool EnvDribbleActive(
   void *theEnv,
   EXEC_STATUS)
   {
-   if (FileCommandData(theEnv)->DribbleFP != NULL) return(TRUE);
+   if (FileCommandData(theEnv,execStatus)->DribbleFP != NULL) return(TRUE);
 
    return(FALSE);
   }
@@ -488,7 +488,7 @@ globle int DribbleOffCommand(
   EXEC_STATUS)
   {
    if (EnvArgCountCheck(theEnv,execStatus,"dribble-off",EXACTLY,0) == -1) return(FALSE);
-   return(EnvDribbleOff(theEnv));
+   return(EnvDribbleOff(theEnv,execStatus));
   }
 
 /***********************************/
@@ -509,38 +509,38 @@ globle intBool EnvDribbleOff(
    /* "Turn Dribble Off..."                          */
    /*================================================*/
 
-   if (FileCommandData(theEnv)->DribbleStatusFunction != NULL)
-     { (*FileCommandData(theEnv)->DribbleStatusFunction)(theEnv,execStatus,FALSE); }
+   if (FileCommandData(theEnv,execStatus)->DribbleStatusFunction != NULL)
+     { (*FileCommandData(theEnv,execStatus)->DribbleStatusFunction)(theEnv,execStatus,FALSE); }
 
    /*=======================================*/
    /* Close the dribble file and deactivate */
    /* the dribble router.                   */
    /*=======================================*/
 
-   if (FileCommandData(theEnv)->DribbleFP != NULL)
+   if (FileCommandData(theEnv,execStatus)->DribbleFP != NULL)
      {
-      if (FileCommandData(theEnv)->DribbleCurrentPosition > 0)
-        { fprintf(FileCommandData(theEnv)->DribbleFP,"%s",FileCommandData(theEnv)->DribbleBuffer); }
+      if (FileCommandData(theEnv,execStatus)->DribbleCurrentPosition > 0)
+        { fprintf(FileCommandData(theEnv,execStatus)->DribbleFP,"%s",FileCommandData(theEnv,execStatus)->DribbleBuffer); }
       EnvDeleteRouter(theEnv,execStatus,"dribble");
-      if (GenClose(theEnv,execStatus,FileCommandData(theEnv)->DribbleFP) == 0) rv = 1;
+      if (GenClose(theEnv,execStatus,FileCommandData(theEnv,execStatus)->DribbleFP) == 0) rv = 1;
      }
    else
      { rv = 1; }
 
-   FileCommandData(theEnv)->DribbleFP = NULL;
+   FileCommandData(theEnv,execStatus)->DribbleFP = NULL;
 
    /*============================================*/
    /* Free the space used by the dribble buffer. */
    /*============================================*/
 
-   if (FileCommandData(theEnv)->DribbleBuffer != NULL)
+   if (FileCommandData(theEnv,execStatus)->DribbleBuffer != NULL)
      {
-      rm(theEnv,execStatus,FileCommandData(theEnv)->DribbleBuffer,FileCommandData(theEnv)->DribbleMaximumPosition);
-      FileCommandData(theEnv)->DribbleBuffer = NULL;
+      rm(theEnv,execStatus,FileCommandData(theEnv,execStatus)->DribbleBuffer,FileCommandData(theEnv,execStatus)->DribbleMaximumPosition);
+      FileCommandData(theEnv,execStatus)->DribbleBuffer = NULL;
      }
 
-   FileCommandData(theEnv)->DribbleCurrentPosition = 0;
-   FileCommandData(theEnv)->DribbleMaximumPosition = 0;
+   FileCommandData(theEnv,execStatus)->DribbleCurrentPosition = 0;
+   FileCommandData(theEnv,execStatus)->DribbleMaximumPosition = 0;
 
    /*============================================*/
    /* Return TRUE if the dribble file was closed */
@@ -558,9 +558,9 @@ globle intBool EnvDribbleOff(
 globle void SetDribbleStatusFunction(
   void *theEnv,
   EXEC_STATUS,
-  int (*fnptr)(void *,int))
+  int (*fnptr)(void *,EXEC_STATUS,int))
   {
-   FileCommandData(theEnv)->DribbleStatusFunction = fnptr;
+   FileCommandData(theEnv,execStatus)->DribbleStatusFunction = fnptr;
   }
 #endif
 
@@ -576,7 +576,7 @@ static int FindBatch(
   char *logicalName)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 
    if (strcmp(logicalName,"stdin") == 0)
@@ -615,15 +615,15 @@ globle int LLGetcBatch(
 
    while ((rv == EOF) && (flag == 1))
      {
-      if (FileCommandData(theEnv)->BatchType == FILE_BATCH)
-        { rv = getc((FILE *) FileCommandData(theEnv)->BatchSource); } 
+      if (FileCommandData(theEnv,execStatus)->BatchType == FILE_BATCH)
+        { rv = getc((FILE *) FileCommandData(theEnv,execStatus)->BatchSource); } 
       else
-        { rv = EnvGetcRouter(theEnv,execStatus,(char *) FileCommandData(theEnv)->BatchSource); }
+        { rv = EnvGetcRouter(theEnv,execStatus,(char *) FileCommandData(theEnv,execStatus)->BatchSource); }
 
       if (rv == EOF)
         {
-         if (FileCommandData(theEnv)->BatchCurrentPosition > 0) EnvPrintRouter(theEnv,execStatus,"stdout",(char *) FileCommandData(theEnv)->BatchBuffer);
-         flag = RemoveBatch(theEnv);
+         if (FileCommandData(theEnv,execStatus)->BatchCurrentPosition > 0) EnvPrintRouter(theEnv,execStatus,"stdout",(char *) FileCommandData(theEnv,execStatus)->BatchBuffer);
+         flag = RemoveBatch(theEnv,execStatus);
         }
      }
 
@@ -635,9 +635,9 @@ globle int LLGetcBatch(
 
    if (rv == EOF)
      {
-      if (FileCommandData(theEnv)->BatchCurrentPosition > 0) EnvPrintRouter(theEnv,execStatus,"stdout",(char *) FileCommandData(theEnv)->BatchBuffer);
+      if (FileCommandData(theEnv,execStatus)->BatchCurrentPosition > 0) EnvPrintRouter(theEnv,execStatus,"stdout",(char *) FileCommandData(theEnv,execStatus)->BatchBuffer);
       EnvDeleteRouter(theEnv,execStatus,"batch");
-      RemoveBatch(theEnv);
+      RemoveBatch(theEnv,execStatus);
       if (returnOnEOF == TRUE)
         { return (EOF); }
       else
@@ -648,8 +648,8 @@ globle int LLGetcBatch(
    /* Add the character to the batch buffer. */
    /*========================================*/
 
-   FileCommandData(theEnv)->BatchBuffer = ExpandStringWithChar(theEnv,execStatus,(char) rv,FileCommandData(theEnv)->BatchBuffer,&FileCommandData(theEnv)->BatchCurrentPosition,
-                                      &FileCommandData(theEnv)->BatchMaximumPosition,FileCommandData(theEnv)->BatchMaximumPosition+BUFFER_SIZE);
+   FileCommandData(theEnv,execStatus)->BatchBuffer = ExpandStringWithChar(theEnv,execStatus,(char) rv,FileCommandData(theEnv,execStatus)->BatchBuffer,&FileCommandData(theEnv,execStatus)->BatchCurrentPosition,
+                                      &FileCommandData(theEnv,execStatus)->BatchMaximumPosition,FileCommandData(theEnv,execStatus)->BatchMaximumPosition+BUFFER_SIZE);
 
    /*======================================*/
    /* If a carriage return is encountered, */
@@ -658,13 +658,13 @@ globle int LLGetcBatch(
 
    if ((char) rv == '\n')
      {
-      EnvPrintRouter(theEnv,execStatus,"stdout",(char *) FileCommandData(theEnv)->BatchBuffer);
-      FileCommandData(theEnv)->BatchCurrentPosition = 0;
-      if ((FileCommandData(theEnv)->BatchBuffer != NULL) && (FileCommandData(theEnv)->BatchMaximumPosition > BUFFER_SIZE))
+      EnvPrintRouter(theEnv,execStatus,"stdout",(char *) FileCommandData(theEnv,execStatus)->BatchBuffer);
+      FileCommandData(theEnv,execStatus)->BatchCurrentPosition = 0;
+      if ((FileCommandData(theEnv,execStatus)->BatchBuffer != NULL) && (FileCommandData(theEnv,execStatus)->BatchMaximumPosition > BUFFER_SIZE))
         {
-         rm(theEnv,execStatus,FileCommandData(theEnv)->BatchBuffer,FileCommandData(theEnv)->BatchMaximumPosition);
-         FileCommandData(theEnv)->BatchMaximumPosition = 0;
-         FileCommandData(theEnv)->BatchBuffer = NULL;
+         rm(theEnv,execStatus,FileCommandData(theEnv,execStatus)->BatchBuffer,FileCommandData(theEnv,execStatus)->BatchMaximumPosition);
+         FileCommandData(theEnv,execStatus)->BatchMaximumPosition = 0;
+         FileCommandData(theEnv,execStatus)->BatchBuffer = NULL;
         }
      }
 
@@ -691,12 +691,12 @@ static int UngetcBatch(
 #pragma unused(logicalName)
 #endif
 
-   if (FileCommandData(theEnv)->BatchCurrentPosition > 0) FileCommandData(theEnv)->BatchCurrentPosition--;
-   if (FileCommandData(theEnv)->BatchBuffer != NULL) FileCommandData(theEnv)->BatchBuffer[FileCommandData(theEnv)->BatchCurrentPosition] = EOS;
-   if (FileCommandData(theEnv)->BatchType == FILE_BATCH)
-     { return(ungetc(ch,(FILE *) FileCommandData(theEnv)->BatchSource)); }
+   if (FileCommandData(theEnv,execStatus)->BatchCurrentPosition > 0) FileCommandData(theEnv,execStatus)->BatchCurrentPosition--;
+   if (FileCommandData(theEnv,execStatus)->BatchBuffer != NULL) FileCommandData(theEnv,execStatus)->BatchBuffer[FileCommandData(theEnv,execStatus)->BatchCurrentPosition] = EOS;
+   if (FileCommandData(theEnv,execStatus)->BatchType == FILE_BATCH)
+     { return(ungetc(ch,(FILE *) FileCommandData(theEnv,execStatus)->BatchSource)); }
 
-   return(EnvUngetcRouter(theEnv,execStatus,ch,(char *) FileCommandData(theEnv)->BatchSource));
+   return(EnvUngetcRouter(theEnv,execStatus,ch,(char *) FileCommandData(theEnv,execStatus)->BatchSource));
   }
 
 /*************************************************/
@@ -713,7 +713,7 @@ static int ExitBatch(
 #if MAC_MCW || WIN_MCW || MAC_XCD
 #pragma unused(num)
 #endif
-   CloseAllBatchSources(theEnv);
+   CloseAllBatchSources(theEnv,execStatus);
    return(1);
   }
 
@@ -771,7 +771,7 @@ globle int OpenBatch(
    /* it doesn't already exist.  */
    /*============================*/
 
-   if (FileCommandData(theEnv)->TopOfBatchList == NULL)
+   if (FileCommandData(theEnv,execStatus)->TopOfBatchList == NULL)
      {
       EnvAddRouter(theEnv,execStatus,"batch", 20,
                  FindBatch, NULL,
@@ -811,7 +811,7 @@ globle int OpenStringBatch(
    if (OpenStringSource(theEnv,execStatus,stringName,theString,0) == 0)
      { return(0); }
 
-   if (FileCommandData(theEnv)->TopOfBatchList == NULL)
+   if (FileCommandData(theEnv,execStatus)->TopOfBatchList == NULL)
      {
       EnvAddRouter(theEnv,execStatus,"batch", 20,
                  FindBatch, NULL,
@@ -852,26 +852,26 @@ static void AddBatch(
    /* Add the entry to the list. */
    /*============================*/
 
-   if (FileCommandData(theEnv)->TopOfBatchList == NULL)
+   if (FileCommandData(theEnv,execStatus)->TopOfBatchList == NULL)
      {
-      FileCommandData(theEnv)->TopOfBatchList = bptr;
-      FileCommandData(theEnv)->BottomOfBatchList = bptr;
-      FileCommandData(theEnv)->BatchType = type;
-      FileCommandData(theEnv)->BatchSource = theSource;
-      FileCommandData(theEnv)->BatchCurrentPosition = 0;
+      FileCommandData(theEnv,execStatus)->TopOfBatchList = bptr;
+      FileCommandData(theEnv,execStatus)->BottomOfBatchList = bptr;
+      FileCommandData(theEnv,execStatus)->BatchType = type;
+      FileCommandData(theEnv,execStatus)->BatchSource = theSource;
+      FileCommandData(theEnv,execStatus)->BatchCurrentPosition = 0;
      }
    else if (placeAtEnd == FALSE)
      {
-      bptr->next = FileCommandData(theEnv)->TopOfBatchList;
-      FileCommandData(theEnv)->TopOfBatchList = bptr;
-      FileCommandData(theEnv)->BatchType = type;
-      FileCommandData(theEnv)->BatchSource = theSource;
-      FileCommandData(theEnv)->BatchCurrentPosition = 0;
+      bptr->next = FileCommandData(theEnv,execStatus)->TopOfBatchList;
+      FileCommandData(theEnv,execStatus)->TopOfBatchList = bptr;
+      FileCommandData(theEnv,execStatus)->BatchType = type;
+      FileCommandData(theEnv,execStatus)->BatchSource = theSource;
+      FileCommandData(theEnv,execStatus)->BatchCurrentPosition = 0;
      }
    else
      {
-      FileCommandData(theEnv)->BottomOfBatchList->next = bptr;
-      FileCommandData(theEnv)->BottomOfBatchList = bptr;
+      FileCommandData(theEnv,execStatus)->BottomOfBatchList->next = bptr;
+      FileCommandData(theEnv,execStatus)->BottomOfBatchList = bptr;
      }
   }
 
@@ -885,26 +885,26 @@ globle int RemoveBatch(
    struct batchEntry *bptr;
    int rv;
 
-   if (FileCommandData(theEnv)->TopOfBatchList == NULL) return(FALSE);
+   if (FileCommandData(theEnv,execStatus)->TopOfBatchList == NULL) return(FALSE);
 
    /*==================================================*/
    /* Close the source from which batch input is read. */
    /*==================================================*/
 
-   if (FileCommandData(theEnv)->TopOfBatchList->batchType == FILE_BATCH)
-     { GenClose(theEnv,execStatus,(FILE *) FileCommandData(theEnv)->TopOfBatchList->inputSource); }
+   if (FileCommandData(theEnv,execStatus)->TopOfBatchList->batchType == FILE_BATCH)
+     { GenClose(theEnv,execStatus,(FILE *) FileCommandData(theEnv,execStatus)->TopOfBatchList->inputSource); }
    else
      {
-      CloseStringSource(theEnv,execStatus,(char *) FileCommandData(theEnv)->TopOfBatchList->inputSource);
-      rm(theEnv,execStatus,FileCommandData(theEnv)->TopOfBatchList->theString,strlen(FileCommandData(theEnv)->TopOfBatchList->theString) + 1);
+      CloseStringSource(theEnv,execStatus,(char *) FileCommandData(theEnv,execStatus)->TopOfBatchList->inputSource);
+      rm(theEnv,execStatus,FileCommandData(theEnv,execStatus)->TopOfBatchList->theString,strlen(FileCommandData(theEnv,execStatus)->TopOfBatchList->theString) + 1);
      }
 
    /*=================================*/
    /* Remove the entry from the list. */
    /*=================================*/
 
-   bptr = FileCommandData(theEnv)->TopOfBatchList;
-   FileCommandData(theEnv)->TopOfBatchList = FileCommandData(theEnv)->TopOfBatchList->next;
+   bptr = FileCommandData(theEnv,execStatus)->TopOfBatchList;
+   FileCommandData(theEnv,execStatus)->TopOfBatchList = FileCommandData(theEnv,execStatus)->TopOfBatchList->next;
 
    rtn_struct(theEnv,execStatus,batchEntry,bptr);
 
@@ -913,17 +913,17 @@ globle int RemoveBatch(
    /* then free the space used by the batch buffer.          */
    /*========================================================*/
 
-   if (FileCommandData(theEnv)->TopOfBatchList == NULL)
+   if (FileCommandData(theEnv,execStatus)->TopOfBatchList == NULL)
      {
-      FileCommandData(theEnv)->BottomOfBatchList = NULL;
-      FileCommandData(theEnv)->BatchSource = NULL;
-      if (FileCommandData(theEnv)->BatchBuffer != NULL)
+      FileCommandData(theEnv,execStatus)->BottomOfBatchList = NULL;
+      FileCommandData(theEnv,execStatus)->BatchSource = NULL;
+      if (FileCommandData(theEnv,execStatus)->BatchBuffer != NULL)
         {
-         rm(theEnv,execStatus,FileCommandData(theEnv)->BatchBuffer,FileCommandData(theEnv)->BatchMaximumPosition);
-         FileCommandData(theEnv)->BatchBuffer = NULL;
+         rm(theEnv,execStatus,FileCommandData(theEnv,execStatus)->BatchBuffer,FileCommandData(theEnv,execStatus)->BatchMaximumPosition);
+         FileCommandData(theEnv,execStatus)->BatchBuffer = NULL;
         }
-      FileCommandData(theEnv)->BatchCurrentPosition = 0;
-      FileCommandData(theEnv)->BatchMaximumPosition = 0;
+      FileCommandData(theEnv,execStatus)->BatchCurrentPosition = 0;
+      FileCommandData(theEnv,execStatus)->BatchMaximumPosition = 0;
       rv = 0;
      }
 
@@ -933,9 +933,9 @@ globle int RemoveBatch(
 
    else
      {
-      FileCommandData(theEnv)->BatchType = FileCommandData(theEnv)->TopOfBatchList->batchType;
-      FileCommandData(theEnv)->BatchSource = FileCommandData(theEnv)->TopOfBatchList->inputSource;
-      FileCommandData(theEnv)->BatchCurrentPosition = 0;
+      FileCommandData(theEnv,execStatus)->BatchType = FileCommandData(theEnv,execStatus)->TopOfBatchList->batchType;
+      FileCommandData(theEnv,execStatus)->BatchSource = FileCommandData(theEnv,execStatus)->TopOfBatchList->inputSource;
+      FileCommandData(theEnv,execStatus)->BatchCurrentPosition = 0;
       rv = 1;
      }
 
@@ -955,7 +955,7 @@ globle intBool BatchActive(
   void *theEnv,
   EXEC_STATUS)
   {
-   if (FileCommandData(theEnv)->TopOfBatchList != NULL) return(TRUE);
+   if (FileCommandData(theEnv,execStatus)->TopOfBatchList != NULL) return(TRUE);
 
    return(FALSE);
   }
@@ -971,13 +971,13 @@ globle void CloseAllBatchSources(
    /* Free the batch buffer if it contains anything. */
    /*================================================*/
 
-   if (FileCommandData(theEnv)->BatchBuffer != NULL)
+   if (FileCommandData(theEnv,execStatus)->BatchBuffer != NULL)
      {
-      if (FileCommandData(theEnv)->BatchCurrentPosition > 0) EnvPrintRouter(theEnv,execStatus,"stdout",(char *) FileCommandData(theEnv)->BatchBuffer);
-      rm(theEnv,execStatus,FileCommandData(theEnv)->BatchBuffer,FileCommandData(theEnv)->BatchMaximumPosition);
-      FileCommandData(theEnv)->BatchBuffer = NULL;
-      FileCommandData(theEnv)->BatchCurrentPosition = 0;
-      FileCommandData(theEnv)->BatchMaximumPosition = 0;
+      if (FileCommandData(theEnv,execStatus)->BatchCurrentPosition > 0) EnvPrintRouter(theEnv,execStatus,"stdout",(char *) FileCommandData(theEnv,execStatus)->BatchBuffer);
+      rm(theEnv,execStatus,FileCommandData(theEnv,execStatus)->BatchBuffer,FileCommandData(theEnv,execStatus)->BatchMaximumPosition);
+      FileCommandData(theEnv,execStatus)->BatchBuffer = NULL;
+      FileCommandData(theEnv,execStatus)->BatchCurrentPosition = 0;
+      FileCommandData(theEnv,execStatus)->BatchMaximumPosition = 0;
      }
 
    /*==========================*/
@@ -990,7 +990,7 @@ globle void CloseAllBatchSources(
    /* Close each of the open batch files. */
    /*=====================================*/
 
-   while (RemoveBatch(theEnv))
+   while (RemoveBatch(theEnv,execStatus))
      { /* Do Nothing */ }
   }
 
@@ -1056,13 +1056,13 @@ globle int EnvBatchStar(
 
       if (CompleteCommand(theString) != 0)
         {
-         FlushPPBuffer(theEnv);
+         FlushPPBuffer(theEnv,execStatus);
          SetPPBufferStatus(theEnv,execStatus,OFF);
          RouteCommand(theEnv,execStatus,theString,FALSE);
-         FlushPPBuffer(theEnv);
+         FlushPPBuffer(theEnv,execStatus);
          SetHaltExecution(theEnv,execStatus,FALSE);
          SetEvaluationError(theEnv,execStatus,FALSE);
-         FlushBindList(theEnv);      
+         FlushBindList(theEnv,execStatus);      
          genfree(theEnv,execStatus,theString,(unsigned) maxChars);
          theString = NULL;
          maxChars = 0;

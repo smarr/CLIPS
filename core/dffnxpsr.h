@@ -35,7 +35,7 @@
 #define LOCALE extern
 #endif
 
-LOCALE intBool ParseDeffunction(void *,char *);
+LOCALE intBool ParseDeffunction(void *,EXEC_STATUS,char *);
 
 #ifndef _DFFNXPSR_SOURCE_
 #endif

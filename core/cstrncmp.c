@@ -70,7 +70,7 @@ globle int ConstraintsToCode(
 
    for (i = 0 ; i < SIZE_CONSTRAINT_HASH; i++)
      {
-      for (tmpPtr = ConstraintData(theEnv)->ConstraintHashtable[i];
+      for (tmpPtr = ConstraintData(theEnv,execStatus)->ConstraintHashtable[i];
            tmpPtr != NULL;
            tmpPtr = tmpPtr->next)
         { tmpPtr->bsaveIndex = numberOfConstraints++; }
@@ -82,7 +82,7 @@ globle int ConstraintsToCode(
    /* which could be saved, then issue a warning message. */
    /*=====================================================*/
 
-   if ((! EnvGetDynamicConstraintChecking(theEnv)) && (numberOfConstraints != 0))
+   if ((! EnvGetDynamicConstraintChecking(theEnv,execStatus)) && (numberOfConstraints != 0))
      {
       numberOfConstraints = 0;
       PrintWarningID(theEnv,execStatus,"CSTRNCMP",1,FALSE);
@@ -114,7 +114,7 @@ globle int ConstraintsToCode(
 
    for (i = 0; i < SIZE_CONSTRAINT_HASH; i++)
      {
-      for (tmpPtr = ConstraintData(theEnv)->ConstraintHashtable[i];
+      for (tmpPtr = ConstraintData(theEnv,execStatus)->ConstraintHashtable[i];
            tmpPtr != NULL;
            tmpPtr = tmpPtr->next)
         {
@@ -213,7 +213,7 @@ globle void PrintConstraintReference(
   int imageID,
   int maxIndices)
   {
-   if ((cPtr == NULL) || (! EnvGetDynamicConstraintChecking(theEnv)))
+   if ((cPtr == NULL) || (! EnvGetDynamicConstraintChecking(theEnv,execStatus)))
      { fprintf(fp,"NULL"); }
    else fprintf(fp,"&C%d_%d[%d]",imageID,
                                  (int) (cPtr->bsaveIndex / maxIndices) + 1,

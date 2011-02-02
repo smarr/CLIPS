@@ -70,15 +70,15 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static void                    RemoveHashNode(void *,GENERIC_HN *,GENERIC_HN **,int,int);
-   static void                    AddEphemeralHashNode(void *,GENERIC_HN *,struct ephemeron **,
+   static void                    RemoveHashNode(void *,EXEC_STATUS,GENERIC_HN *,GENERIC_HN **,int,int);
+   static void                    AddEphemeralHashNode(void *,EXEC_STATUS,GENERIC_HN *,struct ephemeron **,
                                                        int,int);
-   static void                    RemoveEphemeralHashNodes(void *,struct ephemeron **,
+   static void                    RemoveEphemeralHashNodes(void *,EXEC_STATUS,struct ephemeron **,
                                                            GENERIC_HN **,
                                                            int,int,int);
    static char                   *StringWithinString(char *,char *);
    static size_t                  CommonPrefixLength(char *,char *);
-   static void                    DeallocateSymbolData(void *);
+   static void                    DeallocateSymbolData(void *,EXEC_STATUS);
 
 /*******************************************************/
 /* InitializeAtomTables: Initializes the SymbolTable,  */
@@ -113,55 +113,55 @@ globle void InitializeAtomTables(
    /* Create the hash tables. */
    /*=========================*/
 
-   SymbolData(theEnv)->SymbolTable = (SYMBOL_HN **)
+   SymbolData(theEnv,execStatus)->SymbolTable = (SYMBOL_HN **)
                   gm3(theEnv,execStatus,sizeof (SYMBOL_HN *) * SYMBOL_HASH_SIZE);
 
-   SymbolData(theEnv)->FloatTable = (FLOAT_HN **)
+   SymbolData(theEnv,execStatus)->FloatTable = (FLOAT_HN **)
                   gm2(theEnv,execStatus,(int) sizeof (FLOAT_HN *) * FLOAT_HASH_SIZE);
 
-   SymbolData(theEnv)->IntegerTable = (INTEGER_HN **)
+   SymbolData(theEnv,execStatus)->IntegerTable = (INTEGER_HN **)
                    gm2(theEnv,execStatus,(int) sizeof (INTEGER_HN *) * INTEGER_HASH_SIZE);
 
-   SymbolData(theEnv)->BitMapTable = (BITMAP_HN **)
+   SymbolData(theEnv,execStatus)->BitMapTable = (BITMAP_HN **)
                    gm2(theEnv,execStatus,(int) sizeof (BITMAP_HN *) * BITMAP_HASH_SIZE);
 
-   SymbolData(theEnv)->ExternalAddressTable = (EXTERNAL_ADDRESS_HN **)
+   SymbolData(theEnv,execStatus)->ExternalAddressTable = (EXTERNAL_ADDRESS_HN **)
                    gm2(theEnv,execStatus,(int) sizeof (EXTERNAL_ADDRESS_HN *) * EXTERNAL_ADDRESS_HASH_SIZE);
 
    /*===================================================*/
    /* Initialize all of the hash table entries to NULL. */
    /*===================================================*/
 
-   for (i = 0; i < SYMBOL_HASH_SIZE; i++) SymbolData(theEnv)->SymbolTable[i] = NULL;
-   for (i = 0; i < FLOAT_HASH_SIZE; i++) SymbolData(theEnv)->FloatTable[i] = NULL;
-   for (i = 0; i < INTEGER_HASH_SIZE; i++) SymbolData(theEnv)->IntegerTable[i] = NULL;
-   for (i = 0; i < BITMAP_HASH_SIZE; i++) SymbolData(theEnv)->BitMapTable[i] = NULL;
-   for (i = 0; i < EXTERNAL_ADDRESS_HASH_SIZE; i++) SymbolData(theEnv)->ExternalAddressTable[i] = NULL;
+   for (i = 0; i < SYMBOL_HASH_SIZE; i++) SymbolData(theEnv,execStatus)->SymbolTable[i] = NULL;
+   for (i = 0; i < FLOAT_HASH_SIZE; i++) SymbolData(theEnv,execStatus)->FloatTable[i] = NULL;
+   for (i = 0; i < INTEGER_HASH_SIZE; i++) SymbolData(theEnv,execStatus)->IntegerTable[i] = NULL;
+   for (i = 0; i < BITMAP_HASH_SIZE; i++) SymbolData(theEnv,execStatus)->BitMapTable[i] = NULL;
+   for (i = 0; i < EXTERNAL_ADDRESS_HASH_SIZE; i++) SymbolData(theEnv,execStatus)->ExternalAddressTable[i] = NULL;
 
    /*========================*/
    /* Predefine some values. */
    /*========================*/
 
-   SymbolData(theEnv)->TrueSymbolHN = EnvAddSymbol(theEnv,execStatus,TRUE_STRING);
-   IncrementSymbolCount(SymbolData(theEnv)->TrueSymbolHN);
-   SymbolData(theEnv)->FalseSymbolHN = EnvAddSymbol(theEnv,execStatus,FALSE_STRING);
-   IncrementSymbolCount(SymbolData(theEnv)->FalseSymbolHN);
-   SymbolData(theEnv)->PositiveInfinity = EnvAddSymbol(theEnv,execStatus,POSITIVE_INFINITY_STRING);
-   IncrementSymbolCount(SymbolData(theEnv)->PositiveInfinity);
-   SymbolData(theEnv)->NegativeInfinity = EnvAddSymbol(theEnv,execStatus,NEGATIVE_INFINITY_STRING);
-   IncrementSymbolCount(SymbolData(theEnv)->NegativeInfinity);
-   SymbolData(theEnv)->Zero = EnvAddLong(theEnv,execStatus,0LL);
-   IncrementIntegerCount(SymbolData(theEnv)->Zero);
+   SymbolData(theEnv,execStatus)->TrueSymbolHN = EnvAddSymbol(theEnv,execStatus,TRUE_STRING);
+   IncrementSymbolCount(SymbolData(theEnv,execStatus)->TrueSymbolHN);
+   SymbolData(theEnv,execStatus)->FalseSymbolHN = EnvAddSymbol(theEnv,execStatus,FALSE_STRING);
+   IncrementSymbolCount(SymbolData(theEnv,execStatus)->FalseSymbolHN);
+   SymbolData(theEnv,execStatus)->PositiveInfinity = EnvAddSymbol(theEnv,execStatus,POSITIVE_INFINITY_STRING);
+   IncrementSymbolCount(SymbolData(theEnv,execStatus)->PositiveInfinity);
+   SymbolData(theEnv,execStatus)->NegativeInfinity = EnvAddSymbol(theEnv,execStatus,NEGATIVE_INFINITY_STRING);
+   IncrementSymbolCount(SymbolData(theEnv,execStatus)->NegativeInfinity);
+   SymbolData(theEnv,execStatus)->Zero = EnvAddLong(theEnv,execStatus,0LL);
+   IncrementIntegerCount(SymbolData(theEnv,execStatus)->Zero);
 #else
    SetSymbolTable(theEnv,execStatus,symbolTable);
    SetFloatTable(theEnv,execStatus,floatTable);
    SetIntegerTable(theEnv,execStatus,integerTable);
    SetBitMapTable(theEnv,execStatus,bitmapTable);
    
-   SymbolData(theEnv)->ExternalAddressTable = (EXTERNAL_ADDRESS_HN **)
+   SymbolData(theEnv,execStatus)->ExternalAddressTable = (EXTERNAL_ADDRESS_HN **)
                 gm2(theEnv,execStatus,(int) sizeof (EXTERNAL_ADDRESS_HN *) * EXTERNAL_ADDRESS_HASH_SIZE);
 
-   for (i = 0; i < EXTERNAL_ADDRESS_HASH_SIZE; i++) SymbolData(theEnv)->ExternalAddressTable[i] = NULL;
+   for (i = 0; i < EXTERNAL_ADDRESS_HASH_SIZE; i++) SymbolData(theEnv,execStatus)->ExternalAddressTable[i] = NULL;
 #endif
   }
 
@@ -181,16 +181,16 @@ static void DeallocateSymbolData(
    EXTERNAL_ADDRESS_HN *eahPtr, *nextEAHPtr;
    struct ephemeron *edPtr, *nextEDPtr;
 
-   if ((SymbolData(theEnv)->SymbolTable == NULL) ||
-       (SymbolData(theEnv)->FloatTable == NULL) ||
-       (SymbolData(theEnv)->IntegerTable == NULL) ||
-       (SymbolData(theEnv)->BitMapTable == NULL) ||
-       (SymbolData(theEnv)->ExternalAddressTable == NULL))
+   if ((SymbolData(theEnv,execStatus)->SymbolTable == NULL) ||
+       (SymbolData(theEnv,execStatus)->FloatTable == NULL) ||
+       (SymbolData(theEnv,execStatus)->IntegerTable == NULL) ||
+       (SymbolData(theEnv,execStatus)->BitMapTable == NULL) ||
+       (SymbolData(theEnv,execStatus)->ExternalAddressTable == NULL))
      { return; }
      
    for (i = 0; i < SYMBOL_HASH_SIZE; i++) 
      {
-      shPtr = SymbolData(theEnv)->SymbolTable[i];
+      shPtr = SymbolData(theEnv,execStatus)->SymbolTable[i];
       
       while (shPtr != NULL)
         {
@@ -206,7 +206,7 @@ static void DeallocateSymbolData(
       
    for (i = 0; i < FLOAT_HASH_SIZE; i++) 
      {
-      fhPtr = SymbolData(theEnv)->FloatTable[i];
+      fhPtr = SymbolData(theEnv,execStatus)->FloatTable[i];
 
       while (fhPtr != NULL)
         {
@@ -219,7 +219,7 @@ static void DeallocateSymbolData(
      
    for (i = 0; i < INTEGER_HASH_SIZE; i++) 
      {
-      ihPtr = SymbolData(theEnv)->IntegerTable[i];
+      ihPtr = SymbolData(theEnv,execStatus)->IntegerTable[i];
 
       while (ihPtr != NULL)
         {
@@ -232,7 +232,7 @@ static void DeallocateSymbolData(
      
    for (i = 0; i < BITMAP_HASH_SIZE; i++) 
      {
-      bmhPtr = SymbolData(theEnv)->BitMapTable[i];
+      bmhPtr = SymbolData(theEnv,execStatus)->BitMapTable[i];
 
       while (bmhPtr != NULL)
         {
@@ -248,7 +248,7 @@ static void DeallocateSymbolData(
 
    for (i = 0; i < EXTERNAL_ADDRESS_HASH_SIZE; i++) 
      {
-      eahPtr = SymbolData(theEnv)->ExternalAddressTable[i];
+      eahPtr = SymbolData(theEnv,execStatus)->ExternalAddressTable[i];
 
       while (eahPtr != NULL)
         {
@@ -265,7 +265,7 @@ static void DeallocateSymbolData(
    /* Remove the ephemeral symbol structures. */
    /*=========================================*/
    
-   edPtr = SymbolData(theEnv)->EphemeralSymbolList;
+   edPtr = SymbolData(theEnv,execStatus)->EphemeralSymbolList;
 
    while (edPtr != NULL)
      {
@@ -274,7 +274,7 @@ static void DeallocateSymbolData(
       edPtr = nextEDPtr;
      }
 
-   edPtr = SymbolData(theEnv)->EphemeralFloatList;
+   edPtr = SymbolData(theEnv,execStatus)->EphemeralFloatList;
 
    while (edPtr != NULL)
      {
@@ -283,7 +283,7 @@ static void DeallocateSymbolData(
       edPtr = nextEDPtr;
      }
 
-   edPtr = SymbolData(theEnv)->EphemeralIntegerList;
+   edPtr = SymbolData(theEnv,execStatus)->EphemeralIntegerList;
 
    while (edPtr != NULL)
      {
@@ -292,7 +292,7 @@ static void DeallocateSymbolData(
       edPtr = nextEDPtr;
      }
 
-   edPtr = SymbolData(theEnv)->EphemeralBitMapList;
+   edPtr = SymbolData(theEnv,execStatus)->EphemeralBitMapList;
 
    while (edPtr != NULL)
      {
@@ -301,7 +301,7 @@ static void DeallocateSymbolData(
       edPtr = nextEDPtr;
      }
 
-   edPtr = SymbolData(theEnv)->EphemeralExternalAddressList;
+   edPtr = SymbolData(theEnv,execStatus)->EphemeralExternalAddressList;
 
    while (edPtr != NULL)
      {
@@ -315,30 +315,30 @@ static void DeallocateSymbolData(
    /*================================*/
    
  #if ! RUN_TIME  
-   rm3(theEnv,execStatus,SymbolData(theEnv)->SymbolTable,sizeof (SYMBOL_HN *) * SYMBOL_HASH_SIZE);
+   rm3(theEnv,execStatus,SymbolData(theEnv,execStatus)->SymbolTable,sizeof (SYMBOL_HN *) * SYMBOL_HASH_SIZE);
 
-   genfree(theEnv,execStatus,SymbolData(theEnv)->FloatTable,(int) sizeof (FLOAT_HN *) * FLOAT_HASH_SIZE);
+   genfree(theEnv,execStatus,SymbolData(theEnv,execStatus)->FloatTable,(int) sizeof (FLOAT_HN *) * FLOAT_HASH_SIZE);
 
-   genfree(theEnv,execStatus,SymbolData(theEnv)->IntegerTable,(int) sizeof (INTEGER_HN *) * INTEGER_HASH_SIZE);
+   genfree(theEnv,execStatus,SymbolData(theEnv,execStatus)->IntegerTable,(int) sizeof (INTEGER_HN *) * INTEGER_HASH_SIZE);
 
-   genfree(theEnv,execStatus,SymbolData(theEnv)->BitMapTable,(int) sizeof (BITMAP_HN *) * BITMAP_HASH_SIZE);
+   genfree(theEnv,execStatus,SymbolData(theEnv,execStatus)->BitMapTable,(int) sizeof (BITMAP_HN *) * BITMAP_HASH_SIZE);
 #endif
    
-   genfree(theEnv,execStatus,SymbolData(theEnv)->ExternalAddressTable,(int) sizeof (EXTERNAL_ADDRESS_HN *) * EXTERNAL_ADDRESS_HASH_SIZE);
+   genfree(theEnv,execStatus,SymbolData(theEnv,execStatus)->ExternalAddressTable,(int) sizeof (EXTERNAL_ADDRESS_HN *) * EXTERNAL_ADDRESS_HASH_SIZE);
 
    /*==============================*/
    /* Remove binary symbol tables. */
    /*==============================*/
    
 #if BLOAD || BLOAD_ONLY || BLOAD_AND_BSAVE || BLOAD_INSTANCES || BSAVE_INSTANCES
-   if (SymbolData(theEnv)->SymbolArray != NULL)
-     rm3(theEnv,execStatus,(void *) SymbolData(theEnv)->SymbolArray,(long) sizeof(SYMBOL_HN *) * SymbolData(theEnv)->NumberOfSymbols);
-   if (SymbolData(theEnv)->FloatArray != NULL)
-     rm3(theEnv,execStatus,(void *) SymbolData(theEnv)->FloatArray,(long) sizeof(FLOAT_HN *) * SymbolData(theEnv)->NumberOfFloats);
-   if (SymbolData(theEnv)->IntegerArray != NULL)
-     rm3(theEnv,execStatus,(void *) SymbolData(theEnv)->IntegerArray,(long) sizeof(INTEGER_HN *) * SymbolData(theEnv)->NumberOfIntegers);
-   if (SymbolData(theEnv)->BitMapArray != NULL)
-     rm3(theEnv,execStatus,(void *) SymbolData(theEnv)->BitMapArray,(long) sizeof(BITMAP_HN *) * SymbolData(theEnv)->NumberOfBitMaps);
+   if (SymbolData(theEnv,execStatus)->SymbolArray != NULL)
+     rm3(theEnv,execStatus,(void *) SymbolData(theEnv,execStatus)->SymbolArray,(long) sizeof(SYMBOL_HN *) * SymbolData(theEnv,execStatus)->NumberOfSymbols);
+   if (SymbolData(theEnv,execStatus)->FloatArray != NULL)
+     rm3(theEnv,execStatus,(void *) SymbolData(theEnv,execStatus)->FloatArray,(long) sizeof(FLOAT_HN *) * SymbolData(theEnv,execStatus)->NumberOfFloats);
+   if (SymbolData(theEnv,execStatus)->IntegerArray != NULL)
+     rm3(theEnv,execStatus,(void *) SymbolData(theEnv,execStatus)->IntegerArray,(long) sizeof(INTEGER_HN *) * SymbolData(theEnv,execStatus)->NumberOfIntegers);
+   if (SymbolData(theEnv,execStatus)->BitMapArray != NULL)
+     rm3(theEnv,execStatus,(void *) SymbolData(theEnv,execStatus)->BitMapArray,(long) sizeof(BITMAP_HN *) * SymbolData(theEnv,execStatus)->NumberOfBitMaps);
 #endif
   }
 
@@ -369,7 +369,7 @@ globle void *EnvAddSymbol(
       }
 
     tally = HashSymbol(str,SYMBOL_HASH_SIZE);
-    peek = SymbolData(theEnv)->SymbolTable[tally];
+    peek = SymbolData(theEnv,execStatus)->SymbolTable[tally];
 
     /*==================================================*/
     /* Search for the string in the list of entries for */
@@ -392,7 +392,7 @@ globle void *EnvAddSymbol(
 
     peek = get_struct(theEnv,execStatus,symbolHashNode);
 
-    if (past == NULL) SymbolData(theEnv)->SymbolTable[tally] = peek;
+    if (past == NULL) SymbolData(theEnv,execStatus)->SymbolTable[tally] = peek;
     else past->next = peek;
 
     length = strlen(str) + 1;
@@ -407,7 +407,7 @@ globle void *EnvAddSymbol(
     /* Add the string to the list of ephemeral items. */
     /*================================================*/
 
-    AddEphemeralHashNode(theEnv,execStatus,(GENERIC_HN *) peek,&SymbolData(theEnv)->EphemeralSymbolList,
+    AddEphemeralHashNode(theEnv,execStatus,(GENERIC_HN *) peek,&SymbolData(theEnv,execStatus)->EphemeralSymbolList,
                          sizeof(SYMBOL_HN),AVERAGE_STRING_SIZE);
     peek->depth = execStatus->CurrentEvaluationDepth;
 
@@ -432,7 +432,7 @@ globle SYMBOL_HN *FindSymbolHN(
 
     tally = HashSymbol(str,SYMBOL_HASH_SIZE);
 
-    for (peek = SymbolData(theEnv)->SymbolTable[tally];
+    for (peek = SymbolData(theEnv,execStatus)->SymbolTable[tally];
          peek != NULL;
          peek = peek->next)
       { 
@@ -462,7 +462,7 @@ globle void *EnvAddDouble(
     /*====================================*/
 
     tally = HashFloat(number,FLOAT_HASH_SIZE);
-    peek = SymbolData(theEnv)->FloatTable[tally];
+    peek = SymbolData(theEnv,execStatus)->FloatTable[tally];
 
     /*==================================================*/
     /* Search for the double in the list of entries for */
@@ -485,7 +485,7 @@ globle void *EnvAddDouble(
 
     peek = get_struct(theEnv,execStatus,floatHashNode);
 
-    if (past == NULL) SymbolData(theEnv)->FloatTable[tally] = peek;
+    if (past == NULL) SymbolData(theEnv,execStatus)->FloatTable[tally] = peek;
     else past->next = peek;
 
     peek->contents = number;
@@ -498,7 +498,7 @@ globle void *EnvAddDouble(
     /* Add the float to the list of ephemeral items. */
     /*===============================================*/
 
-    AddEphemeralHashNode(theEnv,execStatus,(GENERIC_HN *) peek,&SymbolData(theEnv)->EphemeralFloatList,
+    AddEphemeralHashNode(theEnv,execStatus,(GENERIC_HN *) peek,&SymbolData(theEnv,execStatus)->EphemeralFloatList,
                          sizeof(FLOAT_HN),0);
     peek->depth = execStatus->CurrentEvaluationDepth;
 
@@ -528,7 +528,7 @@ globle void *EnvAddLong(
     /*==================================*/
 
     tally = HashInteger(number,INTEGER_HASH_SIZE);
-    peek = SymbolData(theEnv)->IntegerTable[tally];
+    peek = SymbolData(theEnv,execStatus)->IntegerTable[tally];
 
     /*================================================*/
     /* Search for the long in the list of entries for */
@@ -550,7 +550,7 @@ globle void *EnvAddLong(
     /*================================================*/
 
     peek = get_struct(theEnv,execStatus,integerHashNode);
-    if (past == NULL) SymbolData(theEnv)->IntegerTable[tally] = peek;
+    if (past == NULL) SymbolData(theEnv,execStatus)->IntegerTable[tally] = peek;
     else past->next = peek;
 
     peek->contents = number;
@@ -563,7 +563,7 @@ globle void *EnvAddLong(
     /* Add the integer to the list of ephemeral items. */
     /*=================================================*/
 
-    AddEphemeralHashNode(theEnv,execStatus,(GENERIC_HN *) peek,&SymbolData(theEnv)->EphemeralIntegerList,
+    AddEphemeralHashNode(theEnv,execStatus,(GENERIC_HN *) peek,&SymbolData(theEnv,execStatus)->EphemeralIntegerList,
                          sizeof(INTEGER_HN),0);
     peek->depth = execStatus->CurrentEvaluationDepth;
 
@@ -588,7 +588,7 @@ globle INTEGER_HN *FindLongHN(
 
    tally = HashInteger(theLong,INTEGER_HASH_SIZE);
 
-   for (peek = SymbolData(theEnv)->IntegerTable[tally];
+   for (peek = SymbolData(theEnv,execStatus)->IntegerTable[tally];
         peek != NULL;
         peek = peek->next)
      { if (peek->contents == theLong) return(peek); }
@@ -624,7 +624,7 @@ globle void *EnvAddBitMap(
       }
 
     tally = HashBitMap(theBitMap,BITMAP_HASH_SIZE,size);
-    peek = SymbolData(theEnv)->BitMapTable[tally];
+    peek = SymbolData(theEnv,execStatus)->BitMapTable[tally];
 
     /*==================================================*/
     /* Search for the bitmap in the list of entries for */
@@ -652,7 +652,7 @@ globle void *EnvAddBitMap(
     /*==================================================*/
 
     peek = get_struct(theEnv,execStatus,bitMapHashNode);
-    if (past == NULL) SymbolData(theEnv)->BitMapTable[tally] = peek;
+    if (past == NULL) SymbolData(theEnv,execStatus)->BitMapTable[tally] = peek;
     else past->next = peek;
 
     peek->contents = (char *) gm2(theEnv,execStatus,size);
@@ -668,7 +668,7 @@ globle void *EnvAddBitMap(
     /* Add the bitmap to the list of ephemeral items. */
     /*================================================*/
 
-    AddEphemeralHashNode(theEnv,execStatus,(GENERIC_HN *) peek,&SymbolData(theEnv)->EphemeralBitMapList,
+    AddEphemeralHashNode(theEnv,execStatus,(GENERIC_HN *) peek,&SymbolData(theEnv,execStatus)->EphemeralBitMapList,
                          sizeof(BITMAP_HN),sizeof(long));
     peek->depth = execStatus->CurrentEvaluationDepth;
 
@@ -701,7 +701,7 @@ globle void *EnvAddExternalAddress(
 
     tally = HashExternalAddress(theExternalAddress,EXTERNAL_ADDRESS_HASH_SIZE);
 
-    peek = SymbolData(theEnv)->ExternalAddressTable[tally];
+    peek = SymbolData(theEnv,execStatus)->ExternalAddressTable[tally];
 
     /*=============================================================*/
     /* Search for the external address in the list of entries for  */
@@ -725,7 +725,7 @@ globle void *EnvAddExternalAddress(
     /*=================================================*/
 
     peek = get_struct(theEnv,execStatus,externalAddressHashNode);
-    if (past == NULL) SymbolData(theEnv)->ExternalAddressTable[tally] = peek;
+    if (past == NULL) SymbolData(theEnv,execStatus)->ExternalAddressTable[tally] = peek;
     else past->next = peek;
 
     peek->externalAddress = theExternalAddress;
@@ -739,7 +739,7 @@ globle void *EnvAddExternalAddress(
     /* Add the bitmap to the list of ephemeral items. */
     /*================================================*/
 
-    AddEphemeralHashNode(theEnv,execStatus,(GENERIC_HN *) peek,&SymbolData(theEnv)->EphemeralExternalAddressList,
+    AddEphemeralHashNode(theEnv,execStatus,(GENERIC_HN *) peek,&SymbolData(theEnv,execStatus)->EphemeralExternalAddressList,
                          sizeof(EXTERNAL_ADDRESS_HN),sizeof(long));
     peek->depth = execStatus->CurrentEvaluationDepth;
 
@@ -913,7 +913,7 @@ globle void DecrementSymbolCount(
 
    if (theValue->markedEphemeral == FALSE)
      {
-      AddEphemeralHashNode(theEnv,execStatus,(GENERIC_HN *) theValue,&SymbolData(theEnv)->EphemeralSymbolList,
+      AddEphemeralHashNode(theEnv,execStatus,(GENERIC_HN *) theValue,&SymbolData(theEnv,execStatus)->EphemeralSymbolList,
                            sizeof(SYMBOL_HN),AVERAGE_STRING_SIZE);
      }
 
@@ -942,7 +942,7 @@ globle void DecrementFloatCount(
 
    if (theValue->markedEphemeral == FALSE)
      {
-      AddEphemeralHashNode(theEnv,execStatus,(GENERIC_HN *) theValue,&SymbolData(theEnv)->EphemeralFloatList,
+      AddEphemeralHashNode(theEnv,execStatus,(GENERIC_HN *) theValue,&SymbolData(theEnv,execStatus)->EphemeralFloatList,
                            sizeof(FLOAT_HN),0);
      }
 
@@ -971,7 +971,7 @@ globle void DecrementIntegerCount(
 
    if (theValue->markedEphemeral == FALSE)
      {
-      AddEphemeralHashNode(theEnv,execStatus,(GENERIC_HN *) theValue,&SymbolData(theEnv)->EphemeralIntegerList,
+      AddEphemeralHashNode(theEnv,execStatus,(GENERIC_HN *) theValue,&SymbolData(theEnv,execStatus)->EphemeralIntegerList,
                            sizeof(INTEGER_HN),0);
      }
 
@@ -1006,7 +1006,7 @@ globle void DecrementBitMapCount(
 
    if (theValue->markedEphemeral == FALSE)
      {
-      AddEphemeralHashNode(theEnv,execStatus,(GENERIC_HN *) theValue,&SymbolData(theEnv)->EphemeralBitMapList,
+      AddEphemeralHashNode(theEnv,execStatus,(GENERIC_HN *) theValue,&SymbolData(theEnv,execStatus)->EphemeralBitMapList,
                            sizeof(BITMAP_HN),sizeof(long));
      }
 
@@ -1041,7 +1041,7 @@ globle void DecrementExternalAddressCount(
 
    if (theValue->markedEphemeral == FALSE)
      {
-      AddEphemeralHashNode(theEnv,execStatus,(GENERIC_HN *) theValue,&SymbolData(theEnv)->EphemeralExternalAddressList,
+      AddEphemeralHashNode(theEnv,execStatus,(GENERIC_HN *) theValue,&SymbolData(theEnv,execStatus)->EphemeralExternalAddressList,
                            sizeof(EXTERNAL_ADDRESS_HN),sizeof(long));
      }
 
@@ -1112,9 +1112,9 @@ static void RemoveHashNode(
      {       
       theAddress = (struct externalAddressHashNode *) theValue;
 
-      if ((EvaluationData(theEnv)->ExternalAddressTypes[theAddress->type] != NULL) &&
-          (EvaluationData(theEnv)->ExternalAddressTypes[theAddress->type]->discardFunction != NULL))
-        { (*EvaluationData(theEnv)->ExternalAddressTypes[theAddress->type]->discardFunction)(theEnv,execStatus,theAddress->externalAddress); }
+      if ((EvaluationData(theEnv,execStatus)->ExternalAddressTypes[theAddress->type] != NULL) &&
+          (EvaluationData(theEnv,execStatus)->ExternalAddressTypes[theAddress->type]->discardFunction != NULL))
+        { (*EvaluationData(theEnv,execStatus)->ExternalAddressTypes[theAddress->type]->discardFunction)(theEnv,execStatus,theAddress->externalAddress); }
      }
 
    /*===========================*/
@@ -1174,8 +1174,8 @@ static void AddEphemeralHashNode(
    /* to determine when garbage collection should occur.      */
    /*=========================================================*/
 
-   UtilityData(theEnv)->EphemeralItemCount++;
-   UtilityData(theEnv)->EphemeralItemSize += sizeof(struct ephemeron) + hashNodeSize +
+   UtilityData(theEnv,execStatus)->EphemeralItemCount++;
+   UtilityData(theEnv,execStatus)->EphemeralItemSize += sizeof(struct ephemeron) + hashNodeSize +
                         averageContentsSize;
   }
 
@@ -1189,15 +1189,15 @@ globle void RemoveEphemeralAtoms(
   void *theEnv,
   EXEC_STATUS)
   {
-   RemoveEphemeralHashNodes(theEnv,execStatus,&SymbolData(theEnv)->EphemeralSymbolList,(GENERIC_HN **) SymbolData(theEnv)->SymbolTable,
+   RemoveEphemeralHashNodes(theEnv,execStatus,&SymbolData(theEnv,execStatus)->EphemeralSymbolList,(GENERIC_HN **) SymbolData(theEnv,execStatus)->SymbolTable,
                             sizeof(SYMBOL_HN),SYMBOL,AVERAGE_STRING_SIZE);
-   RemoveEphemeralHashNodes(theEnv,execStatus,&SymbolData(theEnv)->EphemeralFloatList,(GENERIC_HN **) SymbolData(theEnv)->FloatTable,
+   RemoveEphemeralHashNodes(theEnv,execStatus,&SymbolData(theEnv,execStatus)->EphemeralFloatList,(GENERIC_HN **) SymbolData(theEnv,execStatus)->FloatTable,
                             sizeof(FLOAT_HN),FLOAT,0);
-   RemoveEphemeralHashNodes(theEnv,execStatus,&SymbolData(theEnv)->EphemeralIntegerList,(GENERIC_HN **) SymbolData(theEnv)->IntegerTable,
+   RemoveEphemeralHashNodes(theEnv,execStatus,&SymbolData(theEnv,execStatus)->EphemeralIntegerList,(GENERIC_HN **) SymbolData(theEnv,execStatus)->IntegerTable,
                             sizeof(INTEGER_HN),INTEGER,0);
-   RemoveEphemeralHashNodes(theEnv,execStatus,&SymbolData(theEnv)->EphemeralBitMapList,(GENERIC_HN **) SymbolData(theEnv)->BitMapTable,
+   RemoveEphemeralHashNodes(theEnv,execStatus,&SymbolData(theEnv,execStatus)->EphemeralBitMapList,(GENERIC_HN **) SymbolData(theEnv,execStatus)->BitMapTable,
                             sizeof(BITMAP_HN),BITMAPARRAY,AVERAGE_BITMAP_SIZE);
-   RemoveEphemeralHashNodes(theEnv,execStatus,&SymbolData(theEnv)->EphemeralExternalAddressList,(GENERIC_HN **) SymbolData(theEnv)->ExternalAddressTable,
+   RemoveEphemeralHashNodes(theEnv,execStatus,&SymbolData(theEnv,execStatus)->EphemeralExternalAddressList,(GENERIC_HN **) SymbolData(theEnv,execStatus)->ExternalAddressTable,
                             sizeof(EXTERNAL_ADDRESS_HN),EXTERNAL_ADDRESS,0);
   }
 
@@ -1248,8 +1248,8 @@ static void RemoveEphemeralHashNodes(
          rtn_struct(theEnv,execStatus,ephemeron,edPtr);
          if (lastPtr == NULL) *theEphemeralList = nextPtr;
          else lastPtr->next = nextPtr;
-         UtilityData(theEnv)->EphemeralItemCount--;
-         UtilityData(theEnv)->EphemeralItemSize -= sizeof(struct ephemeron) + hashNodeSize +
+         UtilityData(theEnv,execStatus)->EphemeralItemCount--;
+         UtilityData(theEnv,execStatus)->EphemeralItemSize -= sizeof(struct ephemeron) + hashNodeSize +
                               averageContentsSize;
         }
 
@@ -1266,8 +1266,8 @@ static void RemoveEphemeralHashNodes(
 
          if (lastPtr == NULL) *theEphemeralList = nextPtr;
          else lastPtr->next = nextPtr;
-         UtilityData(theEnv)->EphemeralItemCount--;
-         UtilityData(theEnv)->EphemeralItemSize -= sizeof(struct ephemeron) + hashNodeSize +
+         UtilityData(theEnv,execStatus)->EphemeralItemCount--;
+         UtilityData(theEnv,execStatus)->EphemeralItemSize -= sizeof(struct ephemeron) + hashNodeSize +
                               averageContentsSize;
         }
 
@@ -1289,7 +1289,7 @@ globle SYMBOL_HN **GetSymbolTable(
   void *theEnv,
   EXEC_STATUS)
   {
-   return(SymbolData(theEnv)->SymbolTable);
+   return(SymbolData(theEnv,execStatus)->SymbolTable);
   }
 
 /******************************************************/
@@ -1300,7 +1300,7 @@ globle void SetSymbolTable(
   EXEC_STATUS,
   SYMBOL_HN **value)
   {
-   SymbolData(theEnv)->SymbolTable = value;
+   SymbolData(theEnv,execStatus)->SymbolTable = value;
   }
 
 /*******************************************************/
@@ -1310,7 +1310,7 @@ globle FLOAT_HN **GetFloatTable(
   void *theEnv,
   EXEC_STATUS)
   {
-   return(SymbolData(theEnv)->FloatTable);
+   return(SymbolData(theEnv,execStatus)->FloatTable);
   }
 
 /****************************************************/
@@ -1321,7 +1321,7 @@ globle void SetFloatTable(
   EXEC_STATUS,
   FLOAT_HN **value)
   {
-   SymbolData(theEnv)->FloatTable = value;
+   SymbolData(theEnv,execStatus)->FloatTable = value;
   }
 
 /***********************************************************/
@@ -1331,7 +1331,7 @@ globle INTEGER_HN **GetIntegerTable(
   void *theEnv,
   EXEC_STATUS)
   {
-   return(SymbolData(theEnv)->IntegerTable);
+   return(SymbolData(theEnv,execStatus)->IntegerTable);
   }
 
 /********************************************************/
@@ -1342,7 +1342,7 @@ globle void SetIntegerTable(
   EXEC_STATUS,
   INTEGER_HN **value)
   {
-   SymbolData(theEnv)->IntegerTable = value;
+   SymbolData(theEnv,execStatus)->IntegerTable = value;
   }
 
 /*********************************************************/
@@ -1352,7 +1352,7 @@ globle BITMAP_HN **GetBitMapTable(
   void *theEnv,
   EXEC_STATUS)
   {
-   return(SymbolData(theEnv)->BitMapTable);
+   return(SymbolData(theEnv,execStatus)->BitMapTable);
   }
 
 /******************************************************/
@@ -1363,7 +1363,7 @@ globle void SetBitMapTable(
   EXEC_STATUS,
   BITMAP_HN **value)
   {
-   SymbolData(theEnv)->BitMapTable = value;
+   SymbolData(theEnv,execStatus)->BitMapTable = value;
   }
 
 /***************************************************************************/
@@ -1373,7 +1373,7 @@ globle EXTERNAL_ADDRESS_HN **GetExternalAddressTable(
   void *theEnv,
   EXEC_STATUS)
   {
-   return(SymbolData(theEnv)->ExternalAddressTable);
+   return(SymbolData(theEnv,execStatus)->ExternalAddressTable);
   }
 
 /************************************************************************/
@@ -1384,7 +1384,7 @@ globle void SetExternalAddressTable(
   EXEC_STATUS,
   EXTERNAL_ADDRESS_HN **value)
   {
-   SymbolData(theEnv)->ExternalAddressTable = value;
+   SymbolData(theEnv,execStatus)->ExternalAddressTable = value;
   }
 
 /******************************************************/
@@ -1396,11 +1396,11 @@ globle void RefreshSpecialSymbols(
   void *theEnv,
   EXEC_STATUS)
   {
-   SymbolData(theEnv)->TrueSymbolHN = (void *) FindSymbolHN(theEnv,execStatus,TRUE_STRING);
-   SymbolData(theEnv)->FalseSymbolHN = (void *) FindSymbolHN(theEnv,execStatus,FALSE_STRING);
-   SymbolData(theEnv)->PositiveInfinity = (void *) FindSymbolHN(theEnv,execStatus,POSITIVE_INFINITY_STRING);
-   SymbolData(theEnv)->NegativeInfinity = (void *) FindSymbolHN(theEnv,execStatus,NEGATIVE_INFINITY_STRING);
-   SymbolData(theEnv)->Zero = (void *) FindLongHN(theEnv,execStatus,0L);
+   SymbolData(theEnv,execStatus)->TrueSymbolHN = (void *) FindSymbolHN(theEnv,execStatus,TRUE_STRING);
+   SymbolData(theEnv,execStatus)->FalseSymbolHN = (void *) FindSymbolHN(theEnv,execStatus,FALSE_STRING);
+   SymbolData(theEnv,execStatus)->PositiveInfinity = (void *) FindSymbolHN(theEnv,execStatus,POSITIVE_INFINITY_STRING);
+   SymbolData(theEnv,execStatus)->NegativeInfinity = (void *) FindSymbolHN(theEnv,execStatus,NEGATIVE_INFINITY_STRING);
+   SymbolData(theEnv,execStatus)->Zero = (void *) FindLongHN(theEnv,execStatus,0L);
   }
 
 /***********************************************************/
@@ -1503,7 +1503,7 @@ globle SYMBOL_HN *GetNextSymbolMatch(
    if (prevSymbol == NULL)
      {
       i = 0;
-      hashPtr = SymbolData(theEnv)->SymbolTable[0];
+      hashPtr = SymbolData(theEnv,execStatus)->SymbolTable[0];
      }
 
    /*==========================================*/
@@ -1595,7 +1595,7 @@ globle SYMBOL_HN *GetNextSymbolMatch(
       /*=================================================*/
 
       if (++i >= SYMBOL_HASH_SIZE) flag = FALSE;
-      else hashPtr = SymbolData(theEnv)->SymbolTable[i];
+      else hashPtr = SymbolData(theEnv,execStatus)->SymbolTable[i];
      }
 
    /*=====================================*/
@@ -1665,7 +1665,7 @@ globle void SetAtomicValueIndices(
    /*===================================*/
 
    count = 0;
-   symbolArray = GetSymbolTable(theEnv);
+   symbolArray = GetSymbolTable(theEnv,execStatus);
 
    for (i = 0; i < SYMBOL_HASH_SIZE; i++)
      {
@@ -1687,7 +1687,7 @@ globle void SetAtomicValueIndices(
    /*==================================*/
 
    count = 0;
-   floatArray = GetFloatTable(theEnv);
+   floatArray = GetFloatTable(theEnv,execStatus);
 
    for (i = 0; i < FLOAT_HASH_SIZE; i++)
      {
@@ -1709,7 +1709,7 @@ globle void SetAtomicValueIndices(
    /*====================================*/
 
    count = 0;
-   integerArray = GetIntegerTable(theEnv);
+   integerArray = GetIntegerTable(theEnv,execStatus);
 
    for (i = 0; i < INTEGER_HASH_SIZE; i++)
      {
@@ -1731,7 +1731,7 @@ globle void SetAtomicValueIndices(
    /*===================================*/
 
    count = 0;
-   bitMapArray = GetBitMapTable(theEnv);
+   bitMapArray = GetBitMapTable(theEnv,execStatus);
 
    for (i = 0; i < BITMAP_HASH_SIZE; i++)
      {
@@ -1768,7 +1768,7 @@ globle void RestoreAtomicValueBuckets(
    /* Restore the bucket values in the symbol table. */
    /*================================================*/
 
-   symbolArray = GetSymbolTable(theEnv);
+   symbolArray = GetSymbolTable(theEnv,execStatus);
 
    for (i = 0; i < SYMBOL_HASH_SIZE; i++)
      {
@@ -1782,7 +1782,7 @@ globle void RestoreAtomicValueBuckets(
    /* Restore the bucket values in the float table. */
    /*===============================================*/
 
-   floatArray = GetFloatTable(theEnv);
+   floatArray = GetFloatTable(theEnv,execStatus);
 
    for (i = 0; i < FLOAT_HASH_SIZE; i++)
      {
@@ -1796,7 +1796,7 @@ globle void RestoreAtomicValueBuckets(
    /* Restore the bucket values in the integer table. */
    /*=================================================*/
 
-   integerArray = GetIntegerTable(theEnv);
+   integerArray = GetIntegerTable(theEnv,execStatus);
 
    for (i = 0; i < INTEGER_HASH_SIZE; i++)
      {
@@ -1810,7 +1810,7 @@ globle void RestoreAtomicValueBuckets(
    /* Restore the bucket values in the bitmap table. */
    /*================================================*/
 
-   bitMapArray = GetBitMapTable(theEnv);
+   bitMapArray = GetBitMapTable(theEnv,execStatus);
 
    for (i = 0; i < BITMAP_HASH_SIZE; i++)
      {

@@ -35,7 +35,7 @@
 #define LOCALE extern
 #endif
 
-LOCALE void AddImplicitMethods(void *,DEFGENERIC *);
+LOCALE void AddImplicitMethods(void *,EXEC_STATUS,DEFGENERIC *);
 
 #ifndef _IMMTHPSR_SOURCE_
 #endif

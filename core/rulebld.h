@@ -45,7 +45,7 @@
 #define LOCALE extern
 #endif
 
-   LOCALE struct joinNode               *ConstructJoins(void *,int,struct lhsParseNode *,int);
+   LOCALE struct joinNode               *ConstructJoins(void *,EXEC_STATUS,int,struct lhsParseNode *,int);
 
 #endif
 

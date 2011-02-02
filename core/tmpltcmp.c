@@ -28,7 +28,7 @@
 
 #if DEFTEMPLATE_CONSTRUCT && CONSTRUCT_COMPILER && (! RUN_TIME)
 
-#define SlotPrefix() ArbitraryPrefix(DeftemplateData(theEnv)->DeftemplateCodeItem,2)
+#define SlotPrefix() ArbitraryPrefix(DeftemplateData(theEnv,execStatus)->DeftemplateCodeItem,2)
 
 #include <stdio.h>
 #define _STDIO_INCLUDED_
@@ -45,13 +45,13 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static int                     ConstructToCode(void *,char *,char *,char *,int,FILE *,int,int);
-   static void                    SlotToCode(void *,FILE *,struct templateSlot *,int,int,int);
-   static void                    DeftemplateModuleToCode(void *,FILE *,struct defmodule *,int,int,int);
-   static void                    DeftemplateToCode(void *,FILE *,struct deftemplate *,
+   static int                     ConstructToCode(void *,EXEC_STATUS,char *,char *,char *,int,FILE *,int,int);
+   static void                    SlotToCode(void *,EXEC_STATUS,FILE *,struct templateSlot *,int,int,int);
+   static void                    DeftemplateModuleToCode(void *,EXEC_STATUS,FILE *,struct defmodule *,int,int,int);
+   static void                    DeftemplateToCode(void *,EXEC_STATUS,FILE *,struct deftemplate *,
                                                  int,int,int,int);
-   static void                    CloseDeftemplateFiles(void *,FILE *,FILE *,FILE *,int);
-   static void                    InitDeftemplateCode(void *,FILE *,int,int);
+   static void                    CloseDeftemplateFiles(void *,EXEC_STATUS,FILE *,FILE *,FILE *,int);
+   static void                    InitDeftemplateCode(void *,EXEC_STATUS,FILE *,int,int);
 
 /*********************************************************/
 /* DeftemplateCompilerSetup: Initializes the deftemplate */
@@ -61,7 +61,7 @@ globle void DeftemplateCompilerSetup(
   void *theEnv,
   EXEC_STATUS)
   {
-   DeftemplateData(theEnv)->DeftemplateCodeItem = AddCodeGeneratorItem(theEnv,execStatus,"deftemplate",0,NULL,InitDeftemplateCode,ConstructToCode,3);
+   DeftemplateData(theEnv,execStatus)->DeftemplateCodeItem = AddCodeGeneratorItem(theEnv,execStatus,"deftemplate",0,NULL,InitDeftemplateCode,ConstructToCode,3);
   }
 
 /*************************************************************/
@@ -108,7 +108,7 @@ static int ConstructToCode(
 
       moduleFile = OpenFileIfNeeded(theEnv,execStatus,moduleFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
                                     moduleArrayVersion,headerFP,
-                                    "struct deftemplateModule",ModulePrefix(DeftemplateData(theEnv)->DeftemplateCodeItem),
+                                    "struct deftemplateModule",ModulePrefix(DeftemplateData(theEnv,execStatus)->DeftemplateCodeItem),
                                     FALSE,NULL);
 
       if (moduleFile == NULL)
@@ -131,7 +131,7 @@ static int ConstructToCode(
         {
          templateFile = OpenFileIfNeeded(theEnv,execStatus,templateFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
                                          templateArrayVersion,headerFP,
-                                         "struct deftemplate",ConstructPrefix(DeftemplateData(theEnv)->DeftemplateCodeItem),
+                                         "struct deftemplate",ConstructPrefix(DeftemplateData(theEnv,execStatus)->DeftemplateCodeItem),
                                          FALSE,NULL);
          if (templateFile == NULL)
            {
@@ -241,7 +241,7 @@ static void DeftemplateModuleToCode(
    fprintf(theFile,"{");
 
    ConstructModuleToCode(theEnv,execStatus,theFile,theModule,imageID,maxIndices,
-                         DeftemplateData(theEnv)->DeftemplateModuleIndex,ConstructPrefix(DeftemplateData(theEnv)->DeftemplateCodeItem));
+                         DeftemplateData(theEnv,execStatus)->DeftemplateModuleIndex,ConstructPrefix(DeftemplateData(theEnv,execStatus)->DeftemplateCodeItem));
 
    fprintf(theFile,"}");
   }
@@ -267,8 +267,8 @@ static void DeftemplateToCode(
    fprintf(theFile,"{");
 
    ConstructHeaderToCode(theEnv,execStatus,theFile,&theTemplate->header,imageID,maxIndices,
-                                  moduleCount,ModulePrefix(DeftemplateData(theEnv)->DeftemplateCodeItem),
-                                  ConstructPrefix(DeftemplateData(theEnv)->DeftemplateCodeItem));
+                                  moduleCount,ModulePrefix(DeftemplateData(theEnv,execStatus)->DeftemplateCodeItem),
+                                  ConstructPrefix(DeftemplateData(theEnv,execStatus)->DeftemplateCodeItem));
    fprintf(theFile,",");
 
    /*===========*/
@@ -383,7 +383,7 @@ globle void DeftemplateCModuleReference(
   int imageID,
   int maxIndices)
   {
-   fprintf(theFile,"MIHS &%s%d_%d[%d]",ModulePrefix(DeftemplateData(theEnv)->DeftemplateCodeItem),
+   fprintf(theFile,"MIHS &%s%d_%d[%d]",ModulePrefix(DeftemplateData(theEnv,execStatus)->DeftemplateCodeItem),
                       imageID,
                       (count / maxIndices) + 1,
                       (count % maxIndices));
@@ -407,7 +407,7 @@ globle void DeftemplateCConstructReference(
      { fprintf(theFile,"NULL"); }
    else
      {
-      fprintf(theFile,"&%s%d_%ld[%ld]",ConstructPrefix(DeftemplateData(theEnv)->DeftemplateCodeItem),
+      fprintf(theFile,"&%s%d_%ld[%ld]",ConstructPrefix(DeftemplateData(theEnv,execStatus)->DeftemplateCodeItem),
                       imageID,
                       (theTemplate->header.bsaveID / maxIndices) + 1,
                       theTemplate->header.bsaveID % maxIndices);
@@ -430,12 +430,12 @@ static void InitDeftemplateCode(
   int maxIndices)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #pragma unused(imageID)
 #pragma unused(maxIndices)
 #endif
 
-   fprintf(initFP,"   DeftemplateRunTimeInitialize(theEnv);\n");
+   fprintf(initFP,"   DeftemplateRunTimeInitialize(theEnv,execStatus);\n");
   }
 
 #endif /* DEFTEMPLATE_CONSTRUCT && CONSTRUCT_COMPILER && (! RUN_TIME) */

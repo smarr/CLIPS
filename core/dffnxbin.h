@@ -35,8 +35,8 @@
 #define LOCALE extern
 #endif
 
-LOCALE void SetupDeffunctionsBload(void *);
-LOCALE void *BloadDeffunctionModuleReference(void *,int);
+LOCALE void SetupDeffunctionsBload(void *,EXEC_STATUS);
+LOCALE void *BloadDeffunctionModuleReference(void *,EXEC_STATUS,int);
 
 #define DFFNXBIN_DATA 24
 
@@ -48,9 +48,9 @@ struct deffunctionBinaryData
    DEFFUNCTION_MODULE *ModuleArray;
   };
   
-#define DeffunctionBinaryData(theEnv) ((struct deffunctionBinaryData *) GetEnvironmentData(theEnv,execStatus,DFFNXBIN_DATA))
+#define DeffunctionBinaryData(theEnv,execStatus) ((struct deffunctionBinaryData *) GetEnvironmentData(theEnv,execStatus,DFFNXBIN_DATA))
 
-#define DeffunctionPointer(i) (((i) == -1L) ? NULL : (DEFFUNCTION *) &DeffunctionBinaryData(theEnv)->DeffunctionArray[i])
+#define DeffunctionPointer(i) (((i) == -1L) ? NULL : (DEFFUNCTION *) &DeffunctionBinaryData(theEnv,execStatus)->DeffunctionArray[i])
 
 #endif
 

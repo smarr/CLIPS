@@ -55,13 +55,13 @@
 /***************************************/
 
 #if (! RUN_TIME) && (! BLOAD_ONLY)
-   static struct lhsParseNode            *ConjuctiveRestrictionParse(void *,char *,struct token *,int *);
-   static struct lhsParseNode            *LiteralRestrictionParse(void *,char *,struct token *,int *);
-   static int                             CheckForVariableMixing(void *,struct lhsParseNode *);
+   static struct lhsParseNode            *ConjuctiveRestrictionParse(void *,EXEC_STATUS,char *,struct token *,int *);
+   static struct lhsParseNode            *LiteralRestrictionParse(void *,EXEC_STATUS,char *,struct token *,int *);
+   static int                             CheckForVariableMixing(void *,EXEC_STATUS,struct lhsParseNode *);
    static void                            TallyFieldTypes(struct lhsParseNode *);
 #endif
-   static void                            DeallocatePatternData(void *);
-   static struct patternNodeHashEntry   **CreatePatternHashTable(void *,unsigned long);
+   static void                            DeallocatePatternData(void *,EXEC_STATUS);
+   static struct patternNodeHashEntry   **CreatePatternHashTable(void *,EXEC_STATUS,unsigned long);
    
 /*****************************************************************************/
 /* InitializePatterns: Initializes the global data associated with patterns. */
@@ -71,9 +71,9 @@ globle void InitializePatterns(
   EXEC_STATUS)
   {   
    AllocateEnvironmentData(theEnv,execStatus,PATTERN_DATA,sizeof(struct patternData),DeallocatePatternData);
-   PatternData(theEnv)->NextPosition = 1;
-   PatternData(theEnv)->PatternHashTable = CreatePatternHashTable(theEnv,execStatus,SIZE_PATTERN_HASH);
-   PatternData(theEnv)->PatternHashTableSize = SIZE_PATTERN_HASH;
+   PatternData(theEnv,execStatus)->NextPosition = 1;
+   PatternData(theEnv,execStatus)->PatternHashTable = CreatePatternHashTable(theEnv,execStatus,SIZE_PATTERN_HASH);
+   PatternData(theEnv,execStatus)->PatternHashTableSize = SIZE_PATTERN_HASH;
   }
 
 /*******************************************************************/
@@ -110,7 +110,7 @@ static void DeallocatePatternData(
    struct patternNodeHashEntry *tmpPNEPtr, *nextPNEPtr;
    unsigned long i;
 
-   tmpRSPtr = PatternData(theEnv)->ListOfReservedPatternSymbols;
+   tmpRSPtr = PatternData(theEnv,execStatus)->ListOfReservedPatternSymbols;
    while (tmpRSPtr != NULL)
      {
       nextRSPtr = tmpRSPtr->next;
@@ -118,7 +118,7 @@ static void DeallocatePatternData(
       tmpRSPtr = nextRSPtr;
      }
      
-   tmpPPPtr = PatternData(theEnv)->ListOfPatternParsers;
+   tmpPPPtr = PatternData(theEnv,execStatus)->ListOfPatternParsers;
    while (tmpPPPtr != NULL)
      {
       nextPPPtr = tmpPPPtr->next;
@@ -126,9 +126,9 @@ static void DeallocatePatternData(
       tmpPPPtr = nextPPPtr;
      }
    
-   for (i = 0; i < PatternData(theEnv)->PatternHashTableSize; i++) 
+   for (i = 0; i < PatternData(theEnv,execStatus)->PatternHashTableSize; i++) 
      {
-      tmpPNEPtr = PatternData(theEnv)->PatternHashTable[i];
+      tmpPNEPtr = PatternData(theEnv,execStatus)->PatternHashTable[i];
       
       while (tmpPNEPtr != NULL)
         {
@@ -138,8 +138,8 @@ static void DeallocatePatternData(
         }
      }
   
-   rm3(theEnv,execStatus,PatternData(theEnv)->PatternHashTable,
-       sizeof(struct patternNodeHashEntry *) * PatternData(theEnv)->PatternHashTableSize);
+   rm3(theEnv,execStatus,PatternData(theEnv,execStatus)->PatternHashTable,
+       sizeof(struct patternNodeHashEntry *) * PatternData(theEnv,execStatus)->PatternHashTableSize);
   }
 
 /******************************************************************************/
@@ -164,10 +164,10 @@ globle void AddHashedPatternNode(
    newhash->type = keyType;
    newhash->value = keyValue;
 
-   hashValue = (hashValue % PatternData(theEnv)->PatternHashTableSize);
+   hashValue = (hashValue % PatternData(theEnv,execStatus)->PatternHashTableSize);
    
-   temp = PatternData(theEnv)->PatternHashTable[hashValue];
-   PatternData(theEnv)->PatternHashTable[hashValue] = newhash;
+   temp = PatternData(theEnv,execStatus)->PatternHashTable[hashValue];
+   PatternData(theEnv,execStatus)->PatternHashTable[hashValue] = newhash;
    newhash->next = temp;
   }
 
@@ -187,9 +187,9 @@ globle intBool RemoveHashedPatternNode(
    struct patternNodeHashEntry *hptr, *prev;
 
    hashValue = GetAtomicHashValue(keyType,keyValue,1) + HashExternalAddress(parent,0); /* TBD mult * 30 */
-   hashValue = (hashValue % PatternData(theEnv)->PatternHashTableSize);
+   hashValue = (hashValue % PatternData(theEnv,execStatus)->PatternHashTableSize);
 
-   for (hptr = PatternData(theEnv)->PatternHashTable[hashValue], prev = NULL;
+   for (hptr = PatternData(theEnv,execStatus)->PatternHashTable[hashValue], prev = NULL;
         hptr != NULL;
         hptr = hptr->next)
      {
@@ -197,7 +197,7 @@ globle intBool RemoveHashedPatternNode(
         {
          if (prev == NULL)
            {
-            PatternData(theEnv)->PatternHashTable[hashValue] = hptr->next;
+            PatternData(theEnv,execStatus)->PatternHashTable[hashValue] = hptr->next;
             rtn_struct(theEnv,execStatus,patternNodeHashEntry,hptr);
             return(1);
            }
@@ -229,9 +229,9 @@ globle void *FindHashedPatternNode(
    struct patternNodeHashEntry *hptr;
 
    hashValue = GetAtomicHashValue(keyType,keyValue,1) + HashExternalAddress(parent,0); /* TBD mult * 30 */
-   hashValue = (hashValue % PatternData(theEnv)->PatternHashTableSize);
+   hashValue = (hashValue % PatternData(theEnv,execStatus)->PatternHashTableSize);
 
-   for (hptr = PatternData(theEnv)->PatternHashTable[hashValue];
+   for (hptr = PatternData(theEnv,execStatus)->PatternHashTable[hashValue];
         hptr != NULL;
         hptr = hptr->next)
      {
@@ -263,8 +263,8 @@ void AddReservedPatternSymbol(
    newSymbol = get_struct(theEnv,execStatus,reservedSymbol);
    newSymbol->theSymbol = theSymbol;
    newSymbol->reservedBy = reservedBy;
-   newSymbol->next = PatternData(theEnv)->ListOfReservedPatternSymbols;
-   PatternData(theEnv)->ListOfReservedPatternSymbols = newSymbol;
+   newSymbol->next = PatternData(theEnv,execStatus)->ListOfReservedPatternSymbols;
+   PatternData(theEnv,execStatus)->ListOfReservedPatternSymbols = newSymbol;
   }
 
 /******************************************************************/
@@ -281,7 +281,7 @@ intBool ReservedPatternSymbol(
   {
    struct reservedSymbol *currentSymbol;
 
-   for (currentSymbol = PatternData(theEnv)->ListOfReservedPatternSymbols;
+   for (currentSymbol = PatternData(theEnv,execStatus)->ListOfReservedPatternSymbols;
         currentSymbol != NULL;
         currentSymbol = currentSymbol->next)
      {
@@ -341,7 +341,7 @@ globle void GetNextPatternEntity(
 
    if (*theParser == NULL)
      {
-      *theParser = PatternData(theEnv)->ListOfPatternParsers;
+      *theParser = PatternData(theEnv,execStatus)->ListOfPatternParsers;
       *theEntity = NULL;
      }
 
@@ -405,10 +405,10 @@ void DetachPattern(
   {
    if (rhsType == 0) return;
    
-   if (PatternData(theEnv)->PatternParserArray[rhsType-1] != NULL)
+   if (PatternData(theEnv,execStatus)->PatternParserArray[rhsType-1] != NULL)
      {
       FlushAlphaMemory(theEnv,execStatus,theHeader);
-      (*PatternData(theEnv)->PatternParserArray[rhsType-1]->removePatternFunction)(theEnv,execStatus,theHeader);
+      (*PatternData(theEnv,execStatus)->PatternParserArray[rhsType-1]->removePatternFunction)(theEnv,execStatus,theHeader);
      }
   }
 
@@ -429,29 +429,29 @@ globle intBool AddPatternParser(
    /* of pattern parsers has not been exceeded.  */
    /*============================================*/
 
-   if (PatternData(theEnv)->NextPosition >= MAX_POSITIONS) return(FALSE);
+   if (PatternData(theEnv,execStatus)->NextPosition >= MAX_POSITIONS) return(FALSE);
 
    /*================================*/
    /* Create the new pattern parser. */
    /*================================*/
 
-   newPtr->positionInArray = PatternData(theEnv)->NextPosition;
-   PatternData(theEnv)->PatternParserArray[PatternData(theEnv)->NextPosition-1] = newPtr;
-   PatternData(theEnv)->NextPosition++;
+   newPtr->positionInArray = PatternData(theEnv,execStatus)->NextPosition;
+   PatternData(theEnv,execStatus)->PatternParserArray[PatternData(theEnv,execStatus)->NextPosition-1] = newPtr;
+   PatternData(theEnv,execStatus)->NextPosition++;
 
    /*================================*/
    /* Add the parser to the list of  */
    /* parsers based on its priority. */
    /*================================*/
 
-   if (PatternData(theEnv)->ListOfPatternParsers == NULL)
+   if (PatternData(theEnv,execStatus)->ListOfPatternParsers == NULL)
      {
       newPtr->next = NULL;
-      PatternData(theEnv)->ListOfPatternParsers = newPtr;
+      PatternData(theEnv,execStatus)->ListOfPatternParsers = newPtr;
       return(TRUE);
      }
 
-   currentPtr = PatternData(theEnv)->ListOfPatternParsers;
+   currentPtr = PatternData(theEnv,execStatus)->ListOfPatternParsers;
    while ((currentPtr != NULL) ? (newPtr->priority < currentPtr->priority) : FALSE)
      {
       lastPtr = currentPtr;
@@ -460,8 +460,8 @@ globle intBool AddPatternParser(
 
    if (lastPtr == NULL)
      {
-      newPtr->next = PatternData(theEnv)->ListOfPatternParsers;
-      PatternData(theEnv)->ListOfPatternParsers = newPtr;
+      newPtr->next = PatternData(theEnv,execStatus)->ListOfPatternParsers;
+      PatternData(theEnv,execStatus)->ListOfPatternParsers = newPtr;
      }
    else
      {
@@ -484,7 +484,7 @@ globle struct patternParser *FindPatternParser(
   {
    struct patternParser *tempParser;
 
-   for (tempParser = PatternData(theEnv)->ListOfPatternParsers;
+   for (tempParser = PatternData(theEnv,execStatus)->ListOfPatternParsers;
         tempParser != NULL;
         tempParser = tempParser->next)
      { if (strcmp(tempParser->name,name) == 0) return(tempParser); }
@@ -503,7 +503,7 @@ struct patternParser *GetPatternParser(
   {
    if (rhsType == 0) return(NULL);
    
-   return(PatternData(theEnv)->PatternParserArray[rhsType-1]);
+   return(PatternData(theEnv,execStatus)->PatternParserArray[rhsType-1]);
   }
 
 #if CONSTRUCT_COMPILER && (! RUN_TIME)
@@ -618,7 +618,7 @@ struct lhsParseNode *RestrictionParse(
       if ((theToken->type == SF_WILDCARD) ||
           (theToken->type == MF_WILDCARD))
         {
-         nextNode = GetLHSParseNode(theEnv);
+         nextNode = GetLHSParseNode(theEnv,execStatus);
          nextNode->type = theToken->type;
          nextNode->negated = FALSE;
          nextNode->exists = FALSE;
@@ -641,7 +641,7 @@ struct lhsParseNode *RestrictionParse(
 
       if ((theToken->type != RPAREN) && (multifieldSlot == TRUE))
         {
-         PPBackup(theEnv);
+         PPBackup(theEnv,execStatus);
          SavePPBuffer(theEnv,execStatus," ");
          SavePPBuffer(theEnv,execStatus,theToken->printForm);
         }
@@ -675,7 +675,7 @@ struct lhsParseNode *RestrictionParse(
          if (theConstraints == NULL)
            {
             if (nextNode->type == SF_VARIABLE)
-              { nextNode->constraints = GetConstraintRecord(theEnv); }
+              { nextNode->constraints = GetConstraintRecord(theEnv,execStatus); }
             else nextNode->constraints = NULL;
            }
          else nextNode->constraints = theConstraints;
@@ -725,7 +725,7 @@ struct lhsParseNode *RestrictionParse(
       if (theConstraints == NULL)
         {
          if (nextNode->type == SF_VARIABLE)
-           { nextNode->constraints = GetConstraintRecord(theEnv); }
+           { nextNode->constraints = GetConstraintRecord(theEnv,execStatus); }
          else
            { continue; }
         }
@@ -740,8 +740,8 @@ struct lhsParseNode *RestrictionParse(
 
       ReturnExpression(theEnv,execStatus,nextNode->constraints->minFields);
       ReturnExpression(theEnv,execStatus,nextNode->constraints->maxFields);
-      nextNode->constraints->minFields = GenConstant(theEnv,execStatus,SYMBOL,SymbolData(theEnv)->NegativeInfinity);
-      nextNode->constraints->maxFields = GenConstant(theEnv,execStatus,SYMBOL,SymbolData(theEnv)->PositiveInfinity);
+      nextNode->constraints->minFields = GenConstant(theEnv,execStatus,SYMBOL,SymbolData(theEnv,execStatus)->NegativeInfinity);
+      nextNode->constraints->maxFields = GenConstant(theEnv,execStatus,SYMBOL,SymbolData(theEnv,execStatus)->PositiveInfinity);
       nextNode->derivedConstraints = TRUE;
 
       /*====================================================*/
@@ -758,7 +758,7 @@ struct lhsParseNode *RestrictionParse(
       /* cardinality information for this multifield constraint.  */
       /*==========================================================*/
 
-      tempConstraints = GetConstraintRecord(theEnv);
+      tempConstraints = GetConstraintRecord(theEnv,execStatus);
       SetConstraintType(MULTIFIELD,tempConstraints);
       tempConstraints->singlefieldsAllowed = FALSE;
       tempConstraints->multifield = nextNode->constraints;
@@ -771,13 +771,13 @@ struct lhsParseNode *RestrictionParse(
       /* field values contained in the slot.                 */
       /*=====================================================*/
 
-      if (theConstraints->maxFields->value != SymbolData(theEnv)->PositiveInfinity)
+      if (theConstraints->maxFields->value != SymbolData(theEnv,execStatus)->PositiveInfinity)
         {
          ReturnExpression(theEnv,execStatus,tempConstraints->maxFields);
          tempConstraints->maxFields = GenConstant(theEnv,execStatus,INTEGER,EnvAddLong(theEnv,execStatus,ValueToLong(theConstraints->maxFields->value) - numberOfSingleFields));
         }
 
-      if ((numberOfMultifields == 1) && (theConstraints->minFields->value != SymbolData(theEnv)->NegativeInfinity))
+      if ((numberOfMultifields == 1) && (theConstraints->minFields->value != SymbolData(theEnv,execStatus)->NegativeInfinity))
         {
          ReturnExpression(theEnv,execStatus,tempConstraints->minFields);
          tempConstraints->minFields = GenConstant(theEnv,execStatus,INTEGER,EnvAddLong(theEnv,execStatus,ValueToLong(theConstraints->minFields->value) - numberOfSingleFields));
@@ -791,7 +791,7 @@ struct lhsParseNode *RestrictionParse(
 
    if (multifieldSlot)
      {
-      nextNode = GetLHSParseNode(theEnv);
+      nextNode = GetLHSParseNode(theEnv,execStatus);
       nextNode->type = MF_WILDCARD;
       nextNode->multifieldSlot = TRUE;
       nextNode->bottom = topNode;
@@ -937,7 +937,7 @@ static struct lhsParseNode *ConjuctiveRestrictionParse(
      }
    else
      {
-      bindNode = GetLHSParseNode(theEnv);
+      bindNode = GetLHSParseNode(theEnv,execStatus);
       if (theNode->type == MF_VARIABLE) bindNode->type = MF_WILDCARD;
       else bindNode->type = SF_WILDCARD;
       bindNode->negated = FALSE;
@@ -1147,7 +1147,7 @@ static struct lhsParseNode *LiteralRestrictionParse(
    /* Create a node to represent the constraint. */
    /*============================================*/
 
-   topNode = GetLHSParseNode(theEnv);
+   topNode = GetLHSParseNode(theEnv,execStatus);
 
    /*=================================================*/
    /* Determine if the constraint has a '~' preceding */

@@ -40,9 +40,9 @@
 #define LOCALE extern
 #endif
 
-LOCALE void SetupDeffunctionCompiler(void *);
-LOCALE void PrintDeffunctionReference(void *,FILE *,DEFFUNCTION *,int,int);
-LOCALE void DeffunctionCModuleReference(void *,FILE *,int,int,int);
+LOCALE void SetupDeffunctionCompiler(void *,EXEC_STATUS);
+LOCALE void PrintDeffunctionReference(void *,EXEC_STATUS,FILE *,DEFFUNCTION *,int,int);
+LOCALE void DeffunctionCModuleReference(void *,EXEC_STATUS,FILE *,int,int,int);
 
 #endif
 

@@ -51,7 +51,7 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static void                    *FindDefaultValue(void *,int,CONSTRAINT_RECORD *,void *);
+   static void                    *FindDefaultValue(void *,EXEC_STATUS,int,CONSTRAINT_RECORD *,void *);
 
 /********************************************************/
 /* DeriveDefaultFromConstraints: Returns an appropriate */
@@ -131,14 +131,14 @@ globle void DeriveDefaultFromConstraints(
    else if (constraints->instanceAddressesAllowed)
      {
       theType = INSTANCE_ADDRESS;
-      theValue = (void *) &InstanceData(theEnv)->DummyInstance;
+      theValue = (void *) &InstanceData(theEnv,execStatus)->DummyInstance;
      }
 #endif
 #if DEFTEMPLATE_CONSTRUCT
    else if (constraints->factAddressesAllowed)
      {
       theType = FACT_ADDRESS;
-      theValue = (void *) &FactData(theEnv)->DummyFact;
+      theValue = (void *) &FactData(theEnv,execStatus)->DummyFact;
      }
 #endif
    else if (constraints->externalAddressesAllowed)
@@ -163,7 +163,7 @@ globle void DeriveDefaultFromConstraints(
    if (multifield)
      {
       if (constraints->minFields == NULL) minFields = 0;
-      else if (constraints->minFields->value == SymbolData(theEnv)->NegativeInfinity) minFields = 0;
+      else if (constraints->minFields->value == SymbolData(theEnv,execStatus)->NegativeInfinity) minFields = 0;
       else minFields = (unsigned long) ValueToLong(constraints->minFields->value);
 
       SetpType(theDefault,MULTIFIELD);
@@ -343,7 +343,7 @@ globle struct expr *ParseDefault(
            {
             if (dynamic) SyntaxErrorMessage(theEnv,execStatus,"default-dynamic attribute");
             else SyntaxErrorMessage(theEnv,execStatus,"default attribute");
-            PPBackup(theEnv);
+            PPBackup(theEnv,execStatus);
             SavePPBuffer(theEnv,execStatus," ");
             SavePPBuffer(theEnv,execStatus,theToken.printForm);
             *error = TRUE;
@@ -393,8 +393,8 @@ globle struct expr *ParseDefault(
    /* Fix up pretty print representation. */
    /*=====================================*/
 
-   PPBackup(theEnv);
-   PPBackup(theEnv);
+   PPBackup(theEnv,execStatus);
+   PPBackup(theEnv,execStatus);
    SavePPBuffer(theEnv,execStatus,")");
 
    /*=========================================*/

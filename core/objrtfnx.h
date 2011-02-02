@@ -191,7 +191,7 @@ struct objectReteData
 #endif
   };
 
-#define ObjectReteData(theEnv) ((struct objectReteData *) GetEnvironmentData(theEnv,execStatus,OBJECT_RETE_DATA))
+#define ObjectReteData(theEnv,execStatus) ((struct objectReteData *) GetEnvironmentData(theEnv,execStatus,OBJECT_RETE_DATA))
 
 
 #ifdef LOCALE
@@ -204,8 +204,8 @@ struct objectReteData
 #define LOCALE extern
 #endif
 
-LOCALE void InstallObjectPrimitives(void *);
-LOCALE intBool ObjectCmpConstantFunction(void *,void *,DATA_OBJECT *);
+LOCALE void InstallObjectPrimitives(void *,EXEC_STATUS);
+LOCALE intBool ObjectCmpConstantFunction(void *,EXEC_STATUS,void *,DATA_OBJECT *);
 
 #endif
 

@@ -51,14 +51,14 @@
 /***************************************/
 
 #if (! RUN_TIME) && (! BLOAD_ONLY)
-   static intBool                 ParseRangeCardinalityAttribute(void *,
+   static intBool                 ParseRangeCardinalityAttribute(void *,EXEC_STATUS,
                                                                  char *,CONSTRAINT_RECORD *,
                                                                  CONSTRAINT_PARSE_RECORD *,
                                                                  char *,int);
-   static intBool                 ParseTypeAttribute(void *,char *,CONSTRAINT_RECORD *);
-   static void                    AddToRestrictionList(void *,int,CONSTRAINT_RECORD *,
+   static intBool                 ParseTypeAttribute(void *,EXEC_STATUS,char *,CONSTRAINT_RECORD *);
+   static void                    AddToRestrictionList(void *,EXEC_STATUS,int,CONSTRAINT_RECORD *,
                                                        CONSTRAINT_RECORD *);
-   static intBool                 ParseAllowedValuesAttribute(void *,char *,char *,
+   static intBool                 ParseAllowedValuesAttribute(void *,EXEC_STATUS,char *,char *,
                                                               CONSTRAINT_RECORD *,
                                                               CONSTRAINT_PARSE_RECORD *);
    static int                     GetConstraintTypeFromAllowedName(char *);
@@ -66,7 +66,7 @@
    static int                     GetAttributeParseValue(char *,CONSTRAINT_PARSE_RECORD *);
    static void                    SetRestrictionFlag(int,CONSTRAINT_RECORD *,int);
    static void                    SetParseFlag(CONSTRAINT_PARSE_RECORD *,char *);
-   static void                    NoConjunctiveUseError(void *,char *,char *);
+   static void                    NoConjunctiveUseError(void *,EXEC_STATUS,char *,char *);
 #endif
 
 /********************************************************************/
@@ -839,8 +839,8 @@ static intBool ParseAllowedValuesAttribute(
    /* Fix up pretty print representation. */
    /*=====================================*/
 
-   PPBackup(theEnv);
-   PPBackup(theEnv);
+   PPBackup(theEnv,execStatus);
+   PPBackup(theEnv,execStatus);
    SavePPBuffer(theEnv,execStatus,")");
 
    /*=======================================*/
@@ -995,8 +995,8 @@ static intBool ParseTypeAttribute(
    /* Fix up pretty print representation. */
    /*=====================================*/
 
-   PPBackup(theEnv);
-   PPBackup(theEnv);
+   PPBackup(theEnv,execStatus);
+   PPBackup(theEnv,execStatus);
    SavePPBuffer(theEnv,execStatus,")");
 
    /*=======================================*/

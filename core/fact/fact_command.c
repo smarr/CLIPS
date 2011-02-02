@@ -75,13 +75,13 @@
 /***************************************/
 
 #if (! RUN_TIME)
-   static struct expr            *AssertParse(void *,struct expr *,char *);
+   static struct expr            *AssertParse(void *,EXEC_STATUS,struct expr *,char *);
 #endif
 #if DEBUGGING_FUNCTIONS
-   static long long               GetFactsArgument(void *,int,int);
+   static long long               GetFactsArgument(void *,EXEC_STATUS,int,int);
 #endif
-   static struct expr            *StandardLoadFact(void *,char *,struct token *);
-   static DATA_OBJECT_PTR         GetSaveFactsDeftemplateNames(void *,struct expr *,int,int *,int *);
+   static struct expr            *StandardLoadFact(void *,EXEC_STATUS,char *,struct token *);
+   static DATA_OBJECT_PTR         GetSaveFactsDeftemplateNames(void *,EXEC_STATUS,struct expr *,int,int *,int *);
 
 /***************************************/
 /* FactCommandDefinitions: Initializes */
@@ -113,7 +113,7 @@ globle void FactCommandDefinitions(
    FuncSeqOvlFlags(theEnv,execStatus,"assert",FALSE,FALSE);
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 #endif
   }
@@ -139,7 +139,7 @@ static void AssertOrProcessEvent(
    /*===================================================*/
 
    SetpType(rv,SYMBOL);
-   SetpValue(rv,EnvFalseSymbol(theEnv));
+   SetpValue(rv,EnvFalseSymbol(theEnv,execStatus));
 
    /*================================*/
    /* Get the deftemplate associated */
@@ -200,7 +200,7 @@ static void AssertOrProcessEvent(
         {
          MultiIntoSingleFieldSlotError(theEnv,execStatus,slotPtr,theDeftemplate);
          theValue.type = SYMBOL;
-         theValue.value = EnvFalseSymbol(theEnv);
+         theValue.value = EnvFalseSymbol(theEnv,execStatus);
          error = TRUE;
         }
 
@@ -298,7 +298,7 @@ globle void ProcessEventCommand(
        parameters->theEnv = theEnv;
        
        apr_status_t apr_rv;
-       apr_rv = apr_thread_pool_push(Env(theEnv)->factThreadPool,
+       apr_rv = apr_thread_pool_push(Env(theEnv,execStatus)->factThreadPool,
                                  ProcessEventOnFactThread,
                                  parameters,
                                  0, NULL);
@@ -307,12 +307,12 @@ globle void ProcessEventCommand(
        }
      }
      
-     while ((apr_thread_pool_tasks_count(Env(theEnv)->factThreadPool) > 0)
-            || ((apr_thread_pool_busy_count(Env(theEnv)->factThreadPool)) > 0)) {
+     while ((apr_thread_pool_tasks_count(Env(theEnv,execStatus)->factThreadPool) > 0)
+            || ((apr_thread_pool_busy_count(Env(theEnv,execStatus)->factThreadPool)) > 0)) {
        usleep(100);
      }
      
-     assert(apr_thread_pool_idle_count(Env(theEnv)->factThreadPool) == 1);
+     assert(apr_thread_pool_idle_count(Env(theEnv,execStatus)->factThreadPool) == 1);
    }
 
 /****************************************/
@@ -429,7 +429,7 @@ globle int SetFactDuplicationCommand(
    /* Get the old value of the fact duplication behavior. */
    /*=====================================================*/
 
-   oldValue = EnvGetFactDuplication(theEnv);
+   oldValue = EnvGetFactDuplication(theEnv,execStatus);
 
    /*============================================*/
    /* Check for the correct number of arguments. */
@@ -449,7 +449,7 @@ globle int SetFactDuplicationCommand(
    /* behavior is disabled, otherwise it is enabled.                */
    /*===============================================================*/
 
-   if ((theValue.value == EnvFalseSymbol(theEnv)) && (theValue.type == SYMBOL))
+   if ((theValue.value == EnvFalseSymbol(theEnv,execStatus)) && (theValue.type == SYMBOL))
      { EnvSetFactDuplication(theEnv,execStatus,FALSE); }
    else
      { EnvSetFactDuplication(theEnv,execStatus,TRUE); }
@@ -474,7 +474,7 @@ globle int GetFactDuplicationCommand(
    /* Get the current value of the fact duplication behavior. */
    /*=========================================================*/
 
-   currentValue = EnvGetFactDuplication(theEnv);
+   currentValue = EnvGetFactDuplication(theEnv,execStatus);
 
    /*============================================*/
    /* Check for the correct number of arguments. */
@@ -558,7 +558,7 @@ globle void FactsCommand(
    /* command is the current module.   */
    /*==================================*/
 
-   theModule = ((struct defmodule *) EnvGetCurrentModule(theEnv));
+   theModule = ((struct defmodule *) EnvGetCurrentModule(theEnv,execStatus));
 
    /*==========================================*/
    /* If no arguments were specified, then use */
@@ -662,7 +662,7 @@ globle void EnvFacts(
    /* Save the current module. */
    /*==========================*/
 
-   oldModule = ((struct defmodule *) EnvGetCurrentModule(theEnv));
+   oldModule = ((struct defmodule *) EnvGetCurrentModule(theEnv,execStatus));
 
    /*=========================================================*/
    /* Determine if facts from all modules are to be displayed */
@@ -691,7 +691,7 @@ globle void EnvFacts(
       /* flag has been set (normally by user action).     */
       /*==================================================*/
 
-      if (GetHaltExecution(theEnv) == TRUE)
+      if (GetHaltExecution(theEnv,execStatus) == TRUE)
         {
          EnvSetCurrentModule(theEnv,execStatus,(void *) oldModule);
          return;
@@ -806,7 +806,7 @@ globle void AssertStringFunction(
    /*===================================================*/
 
    SetpType(returnValue,SYMBOL);
-   SetpValue(returnValue,EnvFalseSymbol(theEnv));
+   SetpValue(returnValue,EnvFalseSymbol(theEnv,execStatus));
 
    /*=====================================================*/
    /* Check for the correct number and type of arguments. */
@@ -962,12 +962,12 @@ globle intBool EnvSaveFacts(
    /* strings are printed properly to the file. */
    /*===========================================*/
 
-   tempValue1 = PrintUtilityData(theEnv)->PreserveEscapedCharacters;
-   PrintUtilityData(theEnv)->PreserveEscapedCharacters = TRUE;
-   tempValue2 = PrintUtilityData(theEnv)->AddressesToStrings;
-   PrintUtilityData(theEnv)->AddressesToStrings = TRUE;
-   tempValue3 = PrintUtilityData(theEnv)->InstanceAddressesToNames;
-   PrintUtilityData(theEnv)->InstanceAddressesToNames = TRUE;
+   tempValue1 = PrintUtilityData(theEnv,execStatus)->PreserveEscapedCharacters;
+   PrintUtilityData(theEnv,execStatus)->PreserveEscapedCharacters = TRUE;
+   tempValue2 = PrintUtilityData(theEnv,execStatus)->AddressesToStrings;
+   PrintUtilityData(theEnv,execStatus)->AddressesToStrings = TRUE;
+   tempValue3 = PrintUtilityData(theEnv,execStatus)->InstanceAddressesToNames;
+   PrintUtilityData(theEnv,execStatus)->InstanceAddressesToNames = TRUE;
 
    /*===================================================*/
    /* Determine the list of specific facts to be saved. */
@@ -977,9 +977,9 @@ globle intBool EnvSaveFacts(
 
    if (error)
      {
-      PrintUtilityData(theEnv)->PreserveEscapedCharacters = tempValue1;
-      PrintUtilityData(theEnv)->AddressesToStrings = tempValue2;
-      PrintUtilityData(theEnv)->InstanceAddressesToNames = tempValue3;
+      PrintUtilityData(theEnv,execStatus)->PreserveEscapedCharacters = tempValue1;
+      PrintUtilityData(theEnv,execStatus)->AddressesToStrings = tempValue2;
+      PrintUtilityData(theEnv,execStatus)->InstanceAddressesToNames = tempValue3;
       GenClose(theEnv,execStatus,filePtr);
       SetFastSave(theEnv,execStatus,NULL);
       return(FALSE);
@@ -989,7 +989,7 @@ globle intBool EnvSaveFacts(
    /* Save the facts. */
    /*=================*/
 
-   theModule = ((struct defmodule *) EnvGetCurrentModule(theEnv));
+   theModule = ((struct defmodule *) EnvGetCurrentModule(theEnv,execStatus));
 
    for (theFact = (struct fact *) GetNextFactInScope(theEnv,execStatus,NULL);
         theFact != NULL;
@@ -1049,9 +1049,9 @@ globle intBool EnvSaveFacts(
    /* Restore the print flags. */
    /*==========================*/
 
-   PrintUtilityData(theEnv)->PreserveEscapedCharacters = tempValue1;
-   PrintUtilityData(theEnv)->AddressesToStrings = tempValue2;
-   PrintUtilityData(theEnv)->InstanceAddressesToNames = tempValue3;
+   PrintUtilityData(theEnv,execStatus)->PreserveEscapedCharacters = tempValue1;
+   PrintUtilityData(theEnv,execStatus)->AddressesToStrings = tempValue2;
+   PrintUtilityData(theEnv,execStatus)->InstanceAddressesToNames = tempValue3;
 
    /*=================*/
    /* Close the file. */

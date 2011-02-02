@@ -55,34 +55,34 @@
 #define SlotDefaultValue(a,b,c) EnvSlotDefaultValue(GetCurrentEnvironment(),a,b,c)
 
 #if DEBUGGING_FUNCTIONS
-LOCALE void BrowseClassesCommand(void *, EXEC_STATUS);
-LOCALE void EnvBrowseClasses(void *,char *,void *);
+LOCALE void BrowseClassesCommand(void *,EXEC_STATUS);
+LOCALE void EnvBrowseClasses(void *,EXEC_STATUS,char *,void *);
 LOCALE void DescribeClassCommand(void *,EXEC_STATUS);
-LOCALE void EnvDescribeClass(void *,char *,void *);
+LOCALE void EnvDescribeClass(void *,EXEC_STATUS,char *,void *);
 #endif
 
-LOCALE char *GetCreateAccessorString(void *);
+LOCALE char *GetCreateAccessorString(void *,EXEC_STATUS);
 
 LOCALE void *GetDefclassModuleCommand(void *,EXEC_STATUS);
 LOCALE intBool SuperclassPCommand(void *,EXEC_STATUS);
-LOCALE intBool EnvSuperclassP(void *,void *,void *);
+LOCALE intBool EnvSuperclassP(void *,EXEC_STATUS,void *,void *);
 LOCALE intBool SubclassPCommand(void *,EXEC_STATUS);
-LOCALE intBool EnvSubclassP(void *,void *,void *);
-LOCALE int SlotExistPCommand(void *, EXEC_STATUS);
-LOCALE intBool EnvSlotExistP(void *,void *,char *,intBool);
-LOCALE int MessageHandlerExistPCommand(void *, EXEC_STATUS);
+LOCALE intBool EnvSubclassP(void *,EXEC_STATUS,void *,void *);
+LOCALE int SlotExistPCommand(void *,EXEC_STATUS);
+LOCALE intBool EnvSlotExistP(void *,EXEC_STATUS,void *,char *,intBool);
+LOCALE int MessageHandlerExistPCommand(void *,EXEC_STATUS);
 LOCALE intBool SlotWritablePCommand(void *,EXEC_STATUS);
-LOCALE intBool EnvSlotWritableP(void *,void *,char *);
+LOCALE intBool EnvSlotWritableP(void *,EXEC_STATUS,void *,char *);
 LOCALE intBool SlotInitablePCommand(void *,EXEC_STATUS);
-LOCALE intBool EnvSlotInitableP(void *,void *,char *);
+LOCALE intBool EnvSlotInitableP(void *,EXEC_STATUS,void *,char *);
 LOCALE intBool SlotPublicPCommand(void *,EXEC_STATUS);
-LOCALE intBool EnvSlotPublicP(void *,void *,char *);
+LOCALE intBool EnvSlotPublicP(void *,EXEC_STATUS,void *,char *);
 LOCALE intBool SlotDirectAccessPCommand(void *,EXEC_STATUS);
-LOCALE intBool EnvSlotDirectAccessP(void *,void *,char *);
+LOCALE intBool EnvSlotDirectAccessP(void *,EXEC_STATUS,void *,char *);
 LOCALE void SlotDefaultValueCommand(void *,EXEC_STATUS,DATA_OBJECT_PTR);
-LOCALE intBool EnvSlotDefaultValue(void *,void *,char *,DATA_OBJECT_PTR);
-LOCALE int ClassExistPCommand(void *, EXEC_STATUS);
-LOCALE int EnvSlotDefaultP(void *,void *,char *);
+LOCALE intBool EnvSlotDefaultValue(void *,EXEC_STATUS,void *,char *,DATA_OBJECT_PTR);
+LOCALE int ClassExistPCommand(void *,EXEC_STATUS);
+LOCALE int EnvSlotDefaultP(void *,EXEC_STATUS,void *,char *);
   
 #ifndef _CLASSEXM_SOURCE_
 #endif

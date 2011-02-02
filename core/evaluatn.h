@@ -65,28 +65,28 @@ struct entityRecord
    unsigned int copyToEvaluate : 1;
    unsigned int bitMap : 1;
    unsigned int addsToRuleComplexity : 1;
-   void (*shortPrintFunction)(void *,char *,void *);
-   void (*longPrintFunction)(void *,char *,void *);
-   intBool (*deleteFunction)(void *,void *);
-   intBool (*evaluateFunction)(void *,void *,DATA_OBJECT *);
-   void *(*getNextFunction)(void *,void *);
-   void (*decrementBusyCount)(void *,void *);
-   void (*incrementBusyCount)(void *,void *);
-   void (*propagateDepth)(void *,void *);
-   void (*markNeeded)(void *,void *);
-   void (*install)(void *,void *);
-   void (*deinstall)(void *,void *);
+   void (*shortPrintFunction)(void *,EXEC_STATUS,char *,void *);
+   void (*longPrintFunction)(void *,EXEC_STATUS,char *,void *);
+   intBool (*deleteFunction)(void *,EXEC_STATUS,void *);
+   intBool (*evaluateFunction)(void *,EXEC_STATUS,void *,DATA_OBJECT *);
+   void *(*getNextFunction)(void *,EXEC_STATUS,void *);
+   void (*decrementBusyCount)(void *,EXEC_STATUS,void *);
+   void (*incrementBusyCount)(void *,EXEC_STATUS,void *);
+   void (*propagateDepth)(void *,EXEC_STATUS,void *);
+   void (*markNeeded)(void *,EXEC_STATUS,void *);
+   void (*install)(void *,EXEC_STATUS,void *);
+   void (*deinstall)(void *,EXEC_STATUS,void *);
    struct userData *usrData;
   };
 
 struct externalAddressType
   {
    char *name;
-   void (*shortPrintFunction)(void *,char *,void *);
-   void (*longPrintFunction)(void *,char *,void *);
-   intBool (*discardFunction)(void *,void *);
-   void (*newFunction)(void *,DATA_OBJECT *);
-   intBool (*callFunction)(void *,DATA_OBJECT *,DATA_OBJECT *);
+   void (*shortPrintFunction)(void *,EXEC_STATUS,char *,void *);
+   void (*longPrintFunction)(void *,EXEC_STATUS,char *,void *);
+   intBool (*discardFunction)(void *,EXEC_STATUS,void *);
+   void (*newFunction)(void *,EXEC_STATUS,DATA_OBJECT *);
+   intBool (*callFunction)(void *,EXEC_STATUS,DATA_OBJECT *,DATA_OBJECT *);
   };
 
 typedef struct entityRecord ENTITY_RECORD;
@@ -188,7 +188,7 @@ struct evaluationData
    struct externalAddressType *ExternalAddressTypes[MAXIMUM_EXTERNAL_ADDRESS_TYPES];
   };
 
-#define EvaluationData(theEnv) ((struct evaluationData *) GetEnvironmentData(theEnv,execStatus,EVALUATION_DATA))
+#define EvaluationData(theEnv,execStatus) ((struct evaluationData *) GetEnvironmentData(theEnv,execStatus,EVALUATION_DATA))
 
 #ifdef LOCALE
 #undef LOCALE
@@ -203,34 +203,34 @@ struct evaluationData
 #define SetMultifieldErrorValue(a) EnvSetMultifieldErrorValue(GetCurrentEnvironment(),a)
 #define FunctionCall(a,b,c) EnvFunctionCall(GetCurrentEnvironment(),a,b,c)
 
-   LOCALE void                           InitializeEvaluationData(void *);
+   LOCALE void                           InitializeEvaluationData(void *,EXEC_STATUS);
    LOCALE int                            EvaluateExpression(void *,EXEC_STATUS,struct expr *,struct dataObject *);
    LOCALE void                           SetEvaluationError(void *,EXEC_STATUS,intBool);
    LOCALE int                            GetEvaluationError(void *,EXEC_STATUS);
-   LOCALE void                           SetHaltExecution(void *,int);
-   LOCALE int                            GetHaltExecution(void *);
-   LOCALE void                           ReturnValues(void *,struct dataObject *,intBool);
-   LOCALE void                           PrintDataObject(void *,char *,struct dataObject *);
-   LOCALE void                           EnvSetMultifieldErrorValue(void *,struct dataObject *);
-   LOCALE void                           ValueInstall(void *,struct dataObject *);
-   LOCALE void                           ValueDeinstall(void *,struct dataObject *);
+   LOCALE void                           SetHaltExecution(void *,EXEC_STATUS,int);
+   LOCALE int                            GetHaltExecution(void *,EXEC_STATUS);
+   LOCALE void                           ReturnValues(void *,EXEC_STATUS,struct dataObject *,intBool);
+   LOCALE void                           PrintDataObject(void *,EXEC_STATUS,char *,struct dataObject *);
+   LOCALE void                           EnvSetMultifieldErrorValue(void *,EXEC_STATUS,struct dataObject *);
+   LOCALE void                           ValueInstall(void *,EXEC_STATUS,struct dataObject *);
+   LOCALE void                           ValueDeinstall(void *,EXEC_STATUS,struct dataObject *);
    LOCALE void                           PropagateReturnValue(void *,EXEC_STATUS,struct dataObject *);
 #if DEFFUNCTION_CONSTRUCT || DEFGENERIC_CONSTRUCT
-   LOCALE int                            EnvFunctionCall(void *,char *,char *,DATA_OBJECT *);
-   LOCALE int                            FunctionCall2(void *,FUNCTION_REFERENCE *,char *,DATA_OBJECT *);
+   LOCALE int                            EnvFunctionCall(void *,EXEC_STATUS,char *,char *,DATA_OBJECT *);
+   LOCALE int                            FunctionCall2(void *,EXEC_STATUS,FUNCTION_REFERENCE *,char *,DATA_OBJECT *);
 #endif
-   LOCALE void                           CopyDataObject(void *,DATA_OBJECT *,DATA_OBJECT *,int);
-   LOCALE void                           AtomInstall(void *,int,void *);
-   LOCALE void                           AtomDeinstall(void *,int,void *);
-   LOCALE struct expr                   *ConvertValueToExpression(void *,DATA_OBJECT *);
+   LOCALE void                           CopyDataObject(void *,EXEC_STATUS,DATA_OBJECT *,DATA_OBJECT *,int);
+   LOCALE void                           AtomInstall(void *,EXEC_STATUS,int,void *);
+   LOCALE void                           AtomDeinstall(void *,EXEC_STATUS,int,void *);
+   LOCALE struct expr                   *ConvertValueToExpression(void *,EXEC_STATUS,DATA_OBJECT *);
    LOCALE unsigned long                  GetAtomicHashValue(unsigned short,void *,int);
-   LOCALE void                           InstallPrimitive(void *,struct entityRecord *,int);
-   LOCALE int                            InstallExternalAddressType(void *,struct externalAddressType *);
+   LOCALE void                           InstallPrimitive(void *,EXEC_STATUS,struct entityRecord *,int);
+   LOCALE int                            InstallExternalAddressType(void *,EXEC_STATUS,struct externalAddressType *);
    LOCALE void                           TransferDataObjectValues(DATA_OBJECT *,DATA_OBJECT *);
-   LOCALE struct expr                   *FunctionReferenceExpression(void *,char *);
-   LOCALE intBool                        GetFunctionReference(void *,char *,FUNCTION_REFERENCE *);
+   LOCALE struct expr                   *FunctionReferenceExpression(void *,EXEC_STATUS,char *);
+   LOCALE intBool                        GetFunctionReference(void *,EXEC_STATUS,char *,FUNCTION_REFERENCE *);
    LOCALE intBool                        DOsEqual(DATA_OBJECT_PTR,DATA_OBJECT_PTR);
-   LOCALE int                            EvaluateAndStoreInDataObject(void *,int,EXPRESSION *,DATA_OBJECT *,int);
+   LOCALE int                            EvaluateAndStoreInDataObject(void *,EXEC_STATUS,int,EXPRESSION *,DATA_OBJECT *,int);
 
 #endif
 

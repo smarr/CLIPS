@@ -42,24 +42,24 @@
 #endif
 
    LOCALE unsigned                       FindModuleSeparator(char *);
-   LOCALE SYMBOL_HN                     *ExtractModuleName(void *,unsigned,char *);
-   LOCALE SYMBOL_HN                     *ExtractConstructName(void *,unsigned,char *);
-   LOCALE char                          *ExtractModuleAndConstructName(void *,char *);
-   LOCALE void                          *FindImportedConstruct(void *,char *,struct defmodule *,
+   LOCALE SYMBOL_HN                     *ExtractModuleName(void *,EXEC_STATUS,unsigned,char *);
+   LOCALE SYMBOL_HN                     *ExtractConstructName(void *,EXEC_STATUS,unsigned,char *);
+   LOCALE char                          *ExtractModuleAndConstructName(void *,EXEC_STATUS,char *);
+   LOCALE void                          *FindImportedConstruct(void *,EXEC_STATUS,char *,struct defmodule *,
                                                                char *,int *,int,struct defmodule *);
-   LOCALE void                           AmbiguousReferenceErrorMessage(void *,char *,char *);
-   LOCALE void                           MarkModulesAsUnvisited(void *);
-   LOCALE void                           ListItemsDriver(void *,
+   LOCALE void                           AmbiguousReferenceErrorMessage(void *,EXEC_STATUS,char *,char *);
+   LOCALE void                           MarkModulesAsUnvisited(void *,EXEC_STATUS);
+   LOCALE void                           ListItemsDriver(void *,EXEC_STATUS,
                                                          char *,struct defmodule *,
                                                          char *,char *,
-                                                          void *(*)(void *,void *),
+                                                          void *(*)(void *,EXEC_STATUS,void *),
                                                           char *(*)(void *),
-                                                          void (*)(void *,char *,void *),
-                                                          int (*)(void *,void *));
-   LOCALE long                           DoForAllModules(void *,
+                                                          void (*)(void *,EXEC_STATUS,char *,void *),
+                                                          int (*)(void *,EXEC_STATUS,void *));
+   LOCALE long                           DoForAllModules(void *,EXEC_STATUS,
                                                          void (*)(struct defmodule *,void *),
                                                          int,void *);
-   LOCALE intBool                        ConstructExported(void *,char *,struct symbolHashNode *,struct symbolHashNode *);
+   LOCALE intBool                        ConstructExported(void *,EXEC_STATUS,char *,struct symbolHashNode *,struct symbolHashNode *);
    
 #endif
 

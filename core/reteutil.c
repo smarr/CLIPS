@@ -54,18 +54,18 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static void                        TraceErrorToRuleDriver(void *,struct joinNode *,char *,int,int);
-   static struct alphaMemoryHash     *FindAlphaMemory(void *,struct patternNodeHeader *,unsigned long);
+   static void                        TraceErrorToRuleDriver(void *,EXEC_STATUS,struct joinNode *,char *,int,int);
+   static struct alphaMemoryHash     *FindAlphaMemory(void *,EXEC_STATUS,struct patternNodeHeader *,unsigned long);
    static unsigned long               AlphaMemoryHashValue(struct patternNodeHeader *,unsigned long);
-   static void                        UnlinkAlphaMemory(void *,struct patternNodeHeader *,struct alphaMemoryHash *);
-   static void                        UnlinkAlphaMemoryBucketSiblings(void *,struct alphaMemoryHash *);
+   static void                        UnlinkAlphaMemory(void *,EXEC_STATUS,struct patternNodeHeader *,struct alphaMemoryHash *);
+   static void                        UnlinkAlphaMemoryBucketSiblings(void *,EXEC_STATUS,struct alphaMemoryHash *);
    static void                        InitializePMLinks(struct partialMatch *);
    static void                        UnlinkBetaPartialMatchfromAlphaAndBetaLineage(struct partialMatch *);
    static int                         CountPriorPatterns(struct joinNode *);
-   static void                        ResizeBetaMemory(void *,struct betaMemory *);
-   static void                        ResetBetaMemory(void *,struct betaMemory *);
+   static void                        ResizeBetaMemory(void *,EXEC_STATUS,struct betaMemory *);
+   static void                        ResetBetaMemory(void *,EXEC_STATUS,struct betaMemory *);
 #if (CONSTRUCT_COMPILER || BLOAD_AND_BSAVE) && (! RUN_TIME)
-   static void                        TagNetworkTraverseJoins(void *,long int *,long int *,struct joinNode *);
+   static void                        TagNetworkTraverseJoins(void *,EXEC_STATUS,long int *,long int *,struct joinNode *);
 #endif
    
 /***********************************************************/
@@ -253,7 +253,7 @@ globle void UpdateBetaPMLinks(
       thePM->leftParent = lhsBinds;
      }
 
-   if (! DefruleData(theEnv)->BetaMemoryResizingFlag)
+   if (! DefruleData(theEnv,execStatus)->BetaMemoryResizingFlag)
      { return; }
 
    if ((theMemory->size > 1) &&
@@ -354,7 +354,7 @@ globle void UnlinkBetaPMFromNodeAndLineage(
    
    UnlinkBetaPartialMatchfromAlphaAndBetaLineage(thePM);
 
-   if (! DefruleData(theEnv)->BetaMemoryResizingFlag)
+   if (! DefruleData(theEnv,execStatus)->BetaMemoryResizingFlag)
      { return; }
 
    if ((theMemory->count == 0) && (theMemory->size > 1))
@@ -443,7 +443,7 @@ globle void UnlinkNonLeftLineage(
    if (thePM->nextBlocked != NULL)
      { thePM->nextBlocked->prevBlocked = thePM->prevBlocked; }
 
-   if (! DefruleData(theEnv)->BetaMemoryResizingFlag)
+   if (! DefruleData(theEnv,execStatus)->BetaMemoryResizingFlag)
      { return; }
 
    if ((theMemory->count == 0) && (theMemory->size > 1))
@@ -598,7 +598,7 @@ globle void InitializePatternHeader(
   struct patternNodeHeader *theHeader)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
    theHeader->firstHash = NULL;
    theHeader->lastHash = NULL;
@@ -608,7 +608,7 @@ globle void InitializePatternHeader(
    theHeader->multifieldNode = FALSE;
    theHeader->stopNode = FALSE;
 #if (! RUN_TIME)
-   theHeader->initialize = EnvGetIncrementalReset(theEnv);
+   theHeader->initialize = EnvGetIncrementalReset(theEnv,execStatus);
 #else
    theHeader->initialize = FALSE;
 #endif
@@ -682,12 +682,12 @@ globle struct partialMatch *CreateAlphaMatch(
       theAlphaMemory->endOfQueue = NULL;
       theAlphaMemory->nextHash = NULL;
 
-      theAlphaMemory->next = DefruleData(theEnv)->AlphaMemoryTable[hashValue];
+      theAlphaMemory->next = DefruleData(theEnv,execStatus)->AlphaMemoryTable[hashValue];
       if (theAlphaMemory->next != NULL)
         { theAlphaMemory->next->prev = theAlphaMemory; }
 
       theAlphaMemory->prev = NULL; 
-      DefruleData(theEnv)->AlphaMemoryTable[hashValue] = theAlphaMemory;
+      DefruleData(theEnv,execStatus)->AlphaMemoryTable[hashValue] = theAlphaMemory;
       
       if (theHeader->firstHash == NULL)
         {
@@ -957,7 +957,7 @@ globle void MarkRuleNetwork(
    /* Loop through each module. */
    /*===========================*/
 
-   SaveCurrentModule(theEnv);
+   SaveCurrentModule(theEnv,execStatus);
    for (modulePtr = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,NULL);
         modulePtr != NULL;
         modulePtr = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,modulePtr))
@@ -990,7 +990,7 @@ globle void MarkRuleNetwork(
 
      }
 
-   RestoreCurrentModule(theEnv);
+   RestoreCurrentModule(theEnv,execStatus);
   }
 
 /*****************************************/
@@ -1211,8 +1211,8 @@ globle void RemoveAlphaMemoryMatches(
    /* Add the match to the garbage list. */
    /*====================================*/
 
-   theMatch->nextInMemory = EngineData(theEnv)->GarbagePartialMatches;
-   EngineData(theEnv)->GarbagePartialMatches = theMatch;
+   theMatch->nextInMemory = EngineData(theEnv,execStatus)->GarbagePartialMatches;
+   EngineData(theEnv,execStatus)->GarbagePartialMatches = theMatch;
 
    if ((theAlphaMemory != NULL) && (theAlphaMemory->alphaMemory == NULL))
      { UnlinkAlphaMemory(theEnv,execStatus,theHeader,theAlphaMemory); }
@@ -1281,7 +1281,7 @@ static struct alphaMemoryHash *FindAlphaMemory(
   {
    struct alphaMemoryHash *theAlphaMemory;
       
-   theAlphaMemory = DefruleData(theEnv)->AlphaMemoryTable[hashValue];
+   theAlphaMemory = DefruleData(theEnv,execStatus)->AlphaMemoryTable[hashValue];
 
    if (theAlphaMemory != NULL)
      {
@@ -1362,7 +1362,7 @@ static void UnlinkAlphaMemoryBucketSiblings(
   struct alphaMemoryHash *theAlphaMemory)
   {
    if (theAlphaMemory->prev == NULL)
-     { DefruleData(theEnv)->AlphaMemoryTable[theAlphaMemory->bucket] = theAlphaMemory->next; }
+     { DefruleData(theEnv,execStatus)->AlphaMemoryTable[theAlphaMemory->bucket] = theAlphaMemory->next; }
    else
      { theAlphaMemory->prev->next = theAlphaMemory->next; }
         
@@ -1394,7 +1394,7 @@ unsigned long ComputeRightHashValue(
         
        oldArgument = execStatus->CurrentExpression;
        execStatus->CurrentExpression = tempExpr;
-       (*EvaluationData(theEnv)->PrimitivesArray[tempExpr->type]->evaluateFunction)(theEnv,execStatus,tempExpr->value,&theResult);
+       (*EvaluationData(theEnv,execStatus)->PrimitivesArray[tempExpr->type]->evaluateFunction)(theEnv,execStatus,tempExpr->value,&theResult);
        execStatus->CurrentExpression = oldArgument;
         
        switch (theResult.type)
@@ -1532,7 +1532,7 @@ globle void TagRuleNetwork(
 
    MarkRuleNetwork(theEnv,execStatus,0);
 
-   for (theLink = DefruleData(theEnv)->LeftPrimeJoins;
+   for (theLink = DefruleData(theEnv,execStatus)->LeftPrimeJoins;
         theLink != NULL;
         theLink = theLink->next)
      { 
@@ -1540,7 +1540,7 @@ globle void TagRuleNetwork(
       (*linkCount)++; 
      }
 
-   for (theLink = DefruleData(theEnv)->RightPrimeJoins;
+   for (theLink = DefruleData(theEnv,execStatus)->RightPrimeJoins;
         theLink != NULL;
         theLink = theLink->next)
      {

@@ -74,38 +74,38 @@
    =========================================
    ***************************************** */
 
-static void PrintObjectGetVarJN1(void *,char *,void *);
-static intBool ObjectGetVarJNFunction1(void *,void *,DATA_OBJECT *);
-static void PrintObjectGetVarJN2(void *,char *,void *);
-static intBool ObjectGetVarJNFunction2(void *,void *,DATA_OBJECT *);
-static void PrintObjectGetVarPN1(void *,char *,void *);
-static intBool ObjectGetVarPNFunction1(void *,void *,DATA_OBJECT *);
-static void PrintObjectGetVarPN2(void *,char *,void *);
-static intBool ObjectGetVarPNFunction2(void *,void *,DATA_OBJECT *);
-static void PrintObjectCmpConstant(void *,char *,void *);
-static void PrintSlotLengthTest(void *,char *,void *);
-static intBool SlotLengthTestFunction(void *,void *,DATA_OBJECT *);
-static void PrintPNSimpleCompareFunction1(void *,char *,void *);
-static intBool PNSimpleCompareFunction1(void *,void *,DATA_OBJECT *);
-static void PrintPNSimpleCompareFunction2(void *,char *,void *);
-static intBool PNSimpleCompareFunction2(void *,void *,DATA_OBJECT *);
-static void PrintPNSimpleCompareFunction3(void *,char *,void *);
-static intBool PNSimpleCompareFunction3(void *,void *,DATA_OBJECT *);
-static void PrintJNSimpleCompareFunction1(void *,char *,void *);
-static intBool JNSimpleCompareFunction1(void *,void *,DATA_OBJECT *);
-static void PrintJNSimpleCompareFunction2(void *,char *,void *);
-static intBool JNSimpleCompareFunction2(void *,void *,DATA_OBJECT *);
-static void PrintJNSimpleCompareFunction3(void *,char *,void *);
-static intBool JNSimpleCompareFunction3(void *,void *,DATA_OBJECT *);
-static void GetPatternObjectAndMarks(void *,int,int,int,INSTANCE_TYPE **,struct multifieldMarker **);
-static void GetObjectValueGeneral(void *,DATA_OBJECT *,INSTANCE_TYPE *,
+static void PrintObjectGetVarJN1(void *,EXEC_STATUS,char *,void *);
+static intBool ObjectGetVarJNFunction1(void *,EXEC_STATUS,void *,DATA_OBJECT *);
+static void PrintObjectGetVarJN2(void *,EXEC_STATUS,char *,void *);
+static intBool ObjectGetVarJNFunction2(void *,EXEC_STATUS,void *,DATA_OBJECT *);
+static void PrintObjectGetVarPN1(void *,EXEC_STATUS,char *,void *);
+static intBool ObjectGetVarPNFunction1(void *,EXEC_STATUS,void *,DATA_OBJECT *);
+static void PrintObjectGetVarPN2(void *,EXEC_STATUS,char *,void *);
+static intBool ObjectGetVarPNFunction2(void *,EXEC_STATUS,void *,DATA_OBJECT *);
+static void PrintObjectCmpConstant(void *,EXEC_STATUS,char *,void *);
+static void PrintSlotLengthTest(void *,EXEC_STATUS,char *,void *);
+static intBool SlotLengthTestFunction(void *,EXEC_STATUS,void *,DATA_OBJECT *);
+static void PrintPNSimpleCompareFunction1(void *,EXEC_STATUS,char *,void *);
+static intBool PNSimpleCompareFunction1(void *,EXEC_STATUS,void *,DATA_OBJECT *);
+static void PrintPNSimpleCompareFunction2(void *,EXEC_STATUS,char *,void *);
+static intBool PNSimpleCompareFunction2(void *,EXEC_STATUS,void *,DATA_OBJECT *);
+static void PrintPNSimpleCompareFunction3(void *,EXEC_STATUS,char *,void *);
+static intBool PNSimpleCompareFunction3(void *,EXEC_STATUS,void *,DATA_OBJECT *);
+static void PrintJNSimpleCompareFunction1(void *,EXEC_STATUS,char *,void *);
+static intBool JNSimpleCompareFunction1(void *,EXEC_STATUS,void *,DATA_OBJECT *);
+static void PrintJNSimpleCompareFunction2(void *,EXEC_STATUS,char *,void *);
+static intBool JNSimpleCompareFunction2(void *,EXEC_STATUS,void *,DATA_OBJECT *);
+static void PrintJNSimpleCompareFunction3(void *,EXEC_STATUS,char *,void *);
+static intBool JNSimpleCompareFunction3(void *,EXEC_STATUS,void *,DATA_OBJECT *);
+static void GetPatternObjectAndMarks(void *,EXEC_STATUS,int,int,int,INSTANCE_TYPE **,struct multifieldMarker **);
+static void GetObjectValueGeneral(void *,EXEC_STATUS,DATA_OBJECT *,INSTANCE_TYPE *,
                                  struct multifieldMarker *,struct ObjectMatchVar1 *);
-static void GetObjectValueSimple(void *,DATA_OBJECT *,INSTANCE_TYPE *,struct ObjectMatchVar2 *);
+static void GetObjectValueSimple(void *,EXEC_STATUS,DATA_OBJECT *,INSTANCE_TYPE *,struct ObjectMatchVar2 *);
 static long CalculateSlotField(struct multifieldMarker *,INSTANCE_SLOT *,long,long *); /* 6.04 Bug Fix */
 static void GetInsMultiSlotField(FIELD *,INSTANCE_TYPE *,unsigned,unsigned,unsigned);
-static void DeallocateObjectReteData(void *);
-static void DestroyObjectPatternNetwork(void *,OBJECT_PATTERN_NODE *);
-static void DestroyObjectAlphaNodes(void *,OBJECT_ALPHA_NODE *);
+static void DeallocateObjectReteData(void *,EXEC_STATUS);
+static void DestroyObjectPatternNetwork(void *,EXEC_STATUS,OBJECT_PATTERN_NODE *);
+static void DestroyObjectAlphaNodes(void *,EXEC_STATUS,OBJECT_ALPHA_NODE *);
 
 /* =========================================
    *****************************************
@@ -200,33 +200,33 @@ globle void InstallObjectPrimitives(
                                                     NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL };
 
    AllocateEnvironmentData(theEnv,execStatus,OBJECT_RETE_DATA,sizeof(struct objectReteData),DeallocateObjectReteData);
-   ObjectReteData(theEnv)->CurrentObjectSlotLength = 1;
+   ObjectReteData(theEnv,execStatus)->CurrentObjectSlotLength = 1;
 
-   memcpy(&ObjectReteData(theEnv)->ObjectGVInfo1,&objectGVInfo1,sizeof(struct entityRecord));  
-   memcpy(&ObjectReteData(theEnv)->ObjectGVInfo2,&objectGVInfo2,sizeof(struct entityRecord));
-   memcpy(&ObjectReteData(theEnv)->ObjectGVPNInfo1,&objectGVPNInfo1,sizeof(struct entityRecord));
-   memcpy(&ObjectReteData(theEnv)->ObjectGVPNInfo2,&objectGVPNInfo2,sizeof(struct entityRecord));
-   memcpy(&ObjectReteData(theEnv)->ObjectCmpConstantInfo,&objectCmpConstantInfo,sizeof(struct entityRecord)); 
-   memcpy(&ObjectReteData(theEnv)->LengthTestInfo,&lengthTestInfo,sizeof(struct entityRecord)); 
-   memcpy(&ObjectReteData(theEnv)->PNSimpleCompareInfo1,&pNSimpleCompareInfo1,sizeof(struct entityRecord)); 
-   memcpy(&ObjectReteData(theEnv)->PNSimpleCompareInfo2,&pNSimpleCompareInfo2,sizeof(struct entityRecord)); 
-   memcpy(&ObjectReteData(theEnv)->PNSimpleCompareInfo3,&pNSimpleCompareInfo3,sizeof(struct entityRecord)); 
-   memcpy(&ObjectReteData(theEnv)->JNSimpleCompareInfo1,&jNSimpleCompareInfo1,sizeof(struct entityRecord)); 
-   memcpy(&ObjectReteData(theEnv)->JNSimpleCompareInfo2,&jNSimpleCompareInfo2,sizeof(struct entityRecord)); 
-   memcpy(&ObjectReteData(theEnv)->JNSimpleCompareInfo3,&jNSimpleCompareInfo3,sizeof(struct entityRecord)); 
+   memcpy(&ObjectReteData(theEnv,execStatus)->ObjectGVInfo1,&objectGVInfo1,sizeof(struct entityRecord));  
+   memcpy(&ObjectReteData(theEnv,execStatus)->ObjectGVInfo2,&objectGVInfo2,sizeof(struct entityRecord));
+   memcpy(&ObjectReteData(theEnv,execStatus)->ObjectGVPNInfo1,&objectGVPNInfo1,sizeof(struct entityRecord));
+   memcpy(&ObjectReteData(theEnv,execStatus)->ObjectGVPNInfo2,&objectGVPNInfo2,sizeof(struct entityRecord));
+   memcpy(&ObjectReteData(theEnv,execStatus)->ObjectCmpConstantInfo,&objectCmpConstantInfo,sizeof(struct entityRecord)); 
+   memcpy(&ObjectReteData(theEnv,execStatus)->LengthTestInfo,&lengthTestInfo,sizeof(struct entityRecord)); 
+   memcpy(&ObjectReteData(theEnv,execStatus)->PNSimpleCompareInfo1,&pNSimpleCompareInfo1,sizeof(struct entityRecord)); 
+   memcpy(&ObjectReteData(theEnv,execStatus)->PNSimpleCompareInfo2,&pNSimpleCompareInfo2,sizeof(struct entityRecord)); 
+   memcpy(&ObjectReteData(theEnv,execStatus)->PNSimpleCompareInfo3,&pNSimpleCompareInfo3,sizeof(struct entityRecord)); 
+   memcpy(&ObjectReteData(theEnv,execStatus)->JNSimpleCompareInfo1,&jNSimpleCompareInfo1,sizeof(struct entityRecord)); 
+   memcpy(&ObjectReteData(theEnv,execStatus)->JNSimpleCompareInfo2,&jNSimpleCompareInfo2,sizeof(struct entityRecord)); 
+   memcpy(&ObjectReteData(theEnv,execStatus)->JNSimpleCompareInfo3,&jNSimpleCompareInfo3,sizeof(struct entityRecord)); 
 
-   InstallPrimitive(theEnv,execStatus,&ObjectReteData(theEnv)->ObjectGVInfo1,OBJ_GET_SLOT_JNVAR1);
-   InstallPrimitive(theEnv,execStatus,&ObjectReteData(theEnv)->ObjectGVInfo2,OBJ_GET_SLOT_JNVAR2);
-   InstallPrimitive(theEnv,execStatus,&ObjectReteData(theEnv)->ObjectGVPNInfo1,OBJ_GET_SLOT_PNVAR1);
-   InstallPrimitive(theEnv,execStatus,&ObjectReteData(theEnv)->ObjectGVPNInfo2,OBJ_GET_SLOT_PNVAR2);
-   InstallPrimitive(theEnv,execStatus,&ObjectReteData(theEnv)->ObjectCmpConstantInfo,OBJ_PN_CONSTANT);
-   InstallPrimitive(theEnv,execStatus,&ObjectReteData(theEnv)->LengthTestInfo,OBJ_SLOT_LENGTH);
-   InstallPrimitive(theEnv,execStatus,&ObjectReteData(theEnv)->PNSimpleCompareInfo1,OBJ_PN_CMP1);
-   InstallPrimitive(theEnv,execStatus,&ObjectReteData(theEnv)->PNSimpleCompareInfo2,OBJ_PN_CMP2);
-   InstallPrimitive(theEnv,execStatus,&ObjectReteData(theEnv)->PNSimpleCompareInfo3,OBJ_PN_CMP3);
-   InstallPrimitive(theEnv,execStatus,&ObjectReteData(theEnv)->JNSimpleCompareInfo1,OBJ_JN_CMP1);
-   InstallPrimitive(theEnv,execStatus,&ObjectReteData(theEnv)->JNSimpleCompareInfo2,OBJ_JN_CMP2);
-   InstallPrimitive(theEnv,execStatus,&ObjectReteData(theEnv)->JNSimpleCompareInfo3,OBJ_JN_CMP3);
+   InstallPrimitive(theEnv,execStatus,&ObjectReteData(theEnv,execStatus)->ObjectGVInfo1,OBJ_GET_SLOT_JNVAR1);
+   InstallPrimitive(theEnv,execStatus,&ObjectReteData(theEnv,execStatus)->ObjectGVInfo2,OBJ_GET_SLOT_JNVAR2);
+   InstallPrimitive(theEnv,execStatus,&ObjectReteData(theEnv,execStatus)->ObjectGVPNInfo1,OBJ_GET_SLOT_PNVAR1);
+   InstallPrimitive(theEnv,execStatus,&ObjectReteData(theEnv,execStatus)->ObjectGVPNInfo2,OBJ_GET_SLOT_PNVAR2);
+   InstallPrimitive(theEnv,execStatus,&ObjectReteData(theEnv,execStatus)->ObjectCmpConstantInfo,OBJ_PN_CONSTANT);
+   InstallPrimitive(theEnv,execStatus,&ObjectReteData(theEnv,execStatus)->LengthTestInfo,OBJ_SLOT_LENGTH);
+   InstallPrimitive(theEnv,execStatus,&ObjectReteData(theEnv,execStatus)->PNSimpleCompareInfo1,OBJ_PN_CMP1);
+   InstallPrimitive(theEnv,execStatus,&ObjectReteData(theEnv,execStatus)->PNSimpleCompareInfo2,OBJ_PN_CMP2);
+   InstallPrimitive(theEnv,execStatus,&ObjectReteData(theEnv,execStatus)->PNSimpleCompareInfo3,OBJ_PN_CMP3);
+   InstallPrimitive(theEnv,execStatus,&ObjectReteData(theEnv,execStatus)->JNSimpleCompareInfo1,OBJ_JN_CMP1);
+   InstallPrimitive(theEnv,execStatus,&ObjectReteData(theEnv,execStatus)->JNSimpleCompareInfo2,OBJ_JN_CMP2);
+   InstallPrimitive(theEnv,execStatus,&ObjectReteData(theEnv,execStatus)->JNSimpleCompareInfo3,OBJ_JN_CMP3);
   }
   
 /*****************************************************/
@@ -240,10 +240,10 @@ static void DeallocateObjectReteData(
    OBJECT_PATTERN_NODE *theNetwork;
    
 #if BLOAD || BLOAD_AND_BSAVE
-   if (Bloaded(theEnv)) return;
+   if (Bloaded(theEnv,execStatus)) return;
 #endif
    
-   theNetwork = ObjectReteData(theEnv)->ObjectPatternNetworkPointer;
+   theNetwork = ObjectReteData(theEnv,execStatus)->ObjectPatternNetworkPointer;
    DestroyObjectPatternNetwork(theEnv,execStatus,theNetwork);
   }
   
@@ -334,9 +334,9 @@ globle intBool ObjectCmpConstantFunction(
    else
      {
       constantExp = GetFirstArgument();
-      if (ObjectReteData(theEnv)->CurrentPatternObjectSlot->type == MULTIFIELD)
+      if (ObjectReteData(theEnv,execStatus)->CurrentPatternObjectSlot->type == MULTIFIELD)
         {
-         theSegment = (struct multifield *) ObjectReteData(theEnv)->CurrentPatternObjectSlot->value;
+         theSegment = (struct multifield *) ObjectReteData(theEnv,execStatus)->CurrentPatternObjectSlot->value;
          if (hack->fromBeginning)
            {
             theVar.type = theSegment->theFields[hack->offset].type;
@@ -352,8 +352,8 @@ globle intBool ObjectCmpConstantFunction(
         }
       else
         {
-         theVar.type = (unsigned short) ObjectReteData(theEnv)->CurrentPatternObjectSlot->type;
-         theVar.value = ObjectReteData(theEnv)->CurrentPatternObjectSlot->value;
+         theVar.type = (unsigned short) ObjectReteData(theEnv,execStatus)->CurrentPatternObjectSlot->type;
+         theVar.value = ObjectReteData(theEnv,execStatus)->CurrentPatternObjectSlot->value;
         }
      }
    if (theVar.type != constantExp->type)
@@ -363,7 +363,7 @@ globle intBool ObjectCmpConstantFunction(
    else
      rv = hack->pass;
    theResult->type = SYMBOL;
-   theResult->value = rv ? EnvTrueSymbol(theEnv) : EnvFalseSymbol(theEnv);
+   theResult->value = rv ? EnvTrueSymbol(theEnv,execStatus) : EnvFalseSymbol(theEnv,execStatus);
    return(rv);
   }
 
@@ -411,7 +411,7 @@ static void PrintObjectGetVarJN1(
    EnvPrintRouter(theEnv,execStatus,logicalName,")");
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #pragma unused(logicalName)
 #pragma unused(theValue)
 #endif
@@ -464,7 +464,7 @@ static void PrintObjectGetVarJN2(
    EnvPrintRouter(theEnv,execStatus,logicalName,")");
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #pragma unused(logicalName)
 #pragma unused(theValue)
 #endif
@@ -518,7 +518,7 @@ static void PrintObjectGetVarPN1(
    EnvPrintRouter(theEnv,execStatus,logicalName,")");
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #pragma unused(logicalName)
 #pragma unused(theValue)
 #endif
@@ -534,7 +534,7 @@ static intBool ObjectGetVarPNFunction1(
    struct ObjectMatchVar1 *hack;
 
    hack = (struct ObjectMatchVar1 *) ValueToBitMap(theValue);
-   GetObjectValueGeneral(theEnv,execStatus,theResult,ObjectReteData(theEnv)->CurrentPatternObject,ObjectReteData(theEnv)->CurrentPatternObjectMarks,hack);
+   GetObjectValueGeneral(theEnv,execStatus,theResult,ObjectReteData(theEnv,execStatus)->CurrentPatternObject,ObjectReteData(theEnv,execStatus)->CurrentPatternObjectMarks,hack);
    return(TRUE);
   }
 
@@ -566,7 +566,7 @@ static void PrintObjectGetVarPN2(
    EnvPrintRouter(theEnv,execStatus,logicalName,")");
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #pragma unused(logicalName)
 #pragma unused(theValue)
 #endif
@@ -582,7 +582,7 @@ static intBool ObjectGetVarPNFunction2(
    struct ObjectMatchVar2 *hack;
 
    hack = (struct ObjectMatchVar2 *) ValueToBitMap(theValue);
-   GetObjectValueSimple(theEnv,execStatus,theResult,ObjectReteData(theEnv)->CurrentPatternObject,hack);
+   GetObjectValueSimple(theEnv,execStatus,theResult,ObjectReteData(theEnv,execStatus)->CurrentPatternObject,hack);
    return(TRUE);
   }
 
@@ -614,7 +614,7 @@ static void PrintObjectCmpConstant(
    EnvPrintRouter(theEnv,execStatus,logicalName,")");
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #pragma unused(logicalName)
 #pragma unused(theValue)
 #endif
@@ -644,7 +644,7 @@ static void PrintSlotLengthTest(
    EnvPrintRouter(theEnv,execStatus,logicalName,")");
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #pragma unused(logicalName)
 #pragma unused(theValue)
 #endif
@@ -660,13 +660,13 @@ static intBool SlotLengthTestFunction(
    struct ObjectMatchLength *hack;
 
    theResult->type = SYMBOL;
-   theResult->value = EnvFalseSymbol(theEnv);
+   theResult->value = EnvFalseSymbol(theEnv,execStatus);
    hack = (struct ObjectMatchLength *) ValueToBitMap(theValue);
-   if (ObjectReteData(theEnv)->CurrentObjectSlotLength < hack->minLength)
+   if (ObjectReteData(theEnv,execStatus)->CurrentObjectSlotLength < hack->minLength)
      return(FALSE);
-   if (hack->exactly && (ObjectReteData(theEnv)->CurrentObjectSlotLength > hack->minLength))
+   if (hack->exactly && (ObjectReteData(theEnv,execStatus)->CurrentObjectSlotLength > hack->minLength))
      return(FALSE);
-   theResult->value = EnvTrueSymbol(theEnv);
+   theResult->value = EnvTrueSymbol(theEnv,execStatus);
    return(TRUE);
   }
 
@@ -692,7 +692,7 @@ static void PrintPNSimpleCompareFunction1(
    EnvPrintRouter(theEnv,execStatus,logicalName,")");
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #pragma unused(logicalName)
 #pragma unused(theValue)
 #endif
@@ -710,8 +710,8 @@ static intBool PNSimpleCompareFunction1(
    int rv;
 
    hack = (struct ObjectCmpPNSingleSlotVars1 *) ValueToBitMap(theValue);
-   is1 = GetInsSlot(ObjectReteData(theEnv)->CurrentPatternObject,hack->firstSlot);
-   is2 = GetInsSlot(ObjectReteData(theEnv)->CurrentPatternObject,hack->secondSlot);
+   is1 = GetInsSlot(ObjectReteData(theEnv,execStatus)->CurrentPatternObject,hack->firstSlot);
+   is2 = GetInsSlot(ObjectReteData(theEnv,execStatus)->CurrentPatternObject,hack->secondSlot);
    if (is1->type != is2->type)
      rv = hack->fail;
    else if (is1->value != is2->value)
@@ -719,7 +719,7 @@ static intBool PNSimpleCompareFunction1(
    else
      rv = hack->pass;
    theResult->type = SYMBOL;
-   theResult->value = rv ? EnvTrueSymbol(theEnv) : EnvFalseSymbol(theEnv);
+   theResult->value = rv ? EnvTrueSymbol(theEnv,execStatus) : EnvFalseSymbol(theEnv,execStatus);
    return(rv);
   }
 
@@ -747,7 +747,7 @@ static void PrintPNSimpleCompareFunction2(
    EnvPrintRouter(theEnv,execStatus,logicalName,")");
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #pragma unused(logicalName)
 #pragma unused(theValue)
 #endif
@@ -766,9 +766,9 @@ static intBool PNSimpleCompareFunction2(
    INSTANCE_SLOT *is2;
 
    hack = (struct ObjectCmpPNSingleSlotVars2 *) ValueToBitMap(theValue);
-   GetInsMultiSlotField(&f1,ObjectReteData(theEnv)->CurrentPatternObject,(unsigned) hack->firstSlot,
+   GetInsMultiSlotField(&f1,ObjectReteData(theEnv,execStatus)->CurrentPatternObject,(unsigned) hack->firstSlot,
                              (unsigned) hack->fromBeginning,(unsigned) hack->offset);
-   is2 = GetInsSlot(ObjectReteData(theEnv)->CurrentPatternObject,hack->secondSlot);
+   is2 = GetInsSlot(ObjectReteData(theEnv,execStatus)->CurrentPatternObject,hack->secondSlot);
    if (f1.type != is2->type)
      rv = hack->fail;
    else if (f1.value != is2->value)
@@ -776,7 +776,7 @@ static intBool PNSimpleCompareFunction2(
    else
      rv = hack->pass;
    theResult->type = SYMBOL;
-   theResult->value = rv ? EnvTrueSymbol(theEnv) : EnvFalseSymbol(theEnv);
+   theResult->value = rv ? EnvTrueSymbol(theEnv,execStatus) : EnvFalseSymbol(theEnv,execStatus);
    return(rv);
   }
 
@@ -806,7 +806,7 @@ static void PrintPNSimpleCompareFunction3(
    EnvPrintRouter(theEnv,execStatus,logicalName,")");
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #pragma unused(logicalName)
 #pragma unused(theValue)
 #endif
@@ -824,9 +824,9 @@ static intBool PNSimpleCompareFunction3(
    FIELD f1,f2;
 
    hack = (struct ObjectCmpPNSingleSlotVars3 *) ValueToBitMap(theValue);
-   GetInsMultiSlotField(&f1,ObjectReteData(theEnv)->CurrentPatternObject,(unsigned) hack->firstSlot,
+   GetInsMultiSlotField(&f1,ObjectReteData(theEnv,execStatus)->CurrentPatternObject,(unsigned) hack->firstSlot,
                         (unsigned) hack->firstFromBeginning,(unsigned) hack->firstOffset);
-   GetInsMultiSlotField(&f2,ObjectReteData(theEnv)->CurrentPatternObject,(unsigned) hack->secondSlot,
+   GetInsMultiSlotField(&f2,ObjectReteData(theEnv,execStatus)->CurrentPatternObject,(unsigned) hack->secondSlot,
                         (unsigned) hack->secondFromBeginning,(unsigned) hack->secondOffset);
    if (f1.type != f2.type)
      rv = hack->fail;
@@ -835,7 +835,7 @@ static intBool PNSimpleCompareFunction3(
    else
      rv = hack->pass;
    theResult->type = SYMBOL;
-   theResult->value = rv ? EnvTrueSymbol(theEnv) : EnvFalseSymbol(theEnv);
+   theResult->value = rv ? EnvTrueSymbol(theEnv,execStatus) : EnvFalseSymbol(theEnv,execStatus);
    return(rv);
   }
 
@@ -865,7 +865,7 @@ static void PrintJNSimpleCompareFunction1(
    EnvPrintRouter(theEnv,execStatus,logicalName,")");
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #pragma unused(logicalName)
 #pragma unused(theValue)
 #endif
@@ -896,7 +896,7 @@ static intBool JNSimpleCompareFunction1(
    else
      rv = hack->pass;
    theResult->type = SYMBOL;
-   theResult->value = rv ? EnvTrueSymbol(theEnv) : EnvFalseSymbol(theEnv);
+   theResult->value = rv ? EnvTrueSymbol(theEnv,execStatus) : EnvFalseSymbol(theEnv,execStatus);
    return(rv);
   }
 
@@ -928,7 +928,7 @@ static void PrintJNSimpleCompareFunction2(
    EnvPrintRouter(theEnv,execStatus,logicalName,")");
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #pragma unused(logicalName)
 #pragma unused(theValue)
 #endif
@@ -961,7 +961,7 @@ static intBool JNSimpleCompareFunction2(
    else
      rv = hack->pass;
    theResult->type = SYMBOL;
-   theResult->value = rv ? EnvTrueSymbol(theEnv) : EnvFalseSymbol(theEnv);
+   theResult->value = rv ? EnvTrueSymbol(theEnv,execStatus) : EnvFalseSymbol(theEnv,execStatus);
    return(rv);
   }
 
@@ -995,7 +995,7 @@ static void PrintJNSimpleCompareFunction3(
    EnvPrintRouter(theEnv,execStatus,logicalName,")");
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #pragma unused(logicalName)
 #pragma unused(theValue)
 #endif
@@ -1030,7 +1030,7 @@ static intBool JNSimpleCompareFunction3(
    else
      rv = hack->pass;
    theResult->type = SYMBOL;
-   theResult->value = rv ? EnvTrueSymbol(theEnv) : EnvFalseSymbol(theEnv);
+   theResult->value = rv ? EnvTrueSymbol(theEnv,execStatus) : EnvFalseSymbol(theEnv,execStatus);
    return(rv);
   }
 
@@ -1060,36 +1060,36 @@ static void GetPatternObjectAndMarks(
    if (lhs)
      {
       *theInstance = (INSTANCE_TYPE *)
-        get_nth_pm_match(EngineData(theEnv)->GlobalLHSBinds,pattern)->matchingItem;
+        get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalLHSBinds,pattern)->matchingItem;
       *theMarkers =
-        get_nth_pm_match(EngineData(theEnv)->GlobalLHSBinds,pattern)->markers;
+        get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalLHSBinds,pattern)->markers;
      }
    else if (rhs)
      {
       *theInstance = (INSTANCE_TYPE *)
-        get_nth_pm_match(EngineData(theEnv)->GlobalRHSBinds,pattern)->matchingItem;
+        get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalRHSBinds,pattern)->matchingItem;
       *theMarkers =
-        get_nth_pm_match(EngineData(theEnv)->GlobalRHSBinds,pattern)->markers;
+        get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalRHSBinds,pattern)->markers;
      }
-   else if (EngineData(theEnv)->GlobalRHSBinds == NULL)
+   else if (EngineData(theEnv,execStatus)->GlobalRHSBinds == NULL)
      {
       *theInstance = (INSTANCE_TYPE *)
-        get_nth_pm_match(EngineData(theEnv)->GlobalLHSBinds,pattern)->matchingItem;
+        get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalLHSBinds,pattern)->matchingItem;
       *theMarkers =
-        get_nth_pm_match(EngineData(theEnv)->GlobalLHSBinds,pattern)->markers;
+        get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalLHSBinds,pattern)->markers;
      }
-   else if ((((int) EngineData(theEnv)->GlobalJoin->depth) - 1) == pattern)
+   else if ((((int) EngineData(theEnv,execStatus)->GlobalJoin->depth) - 1) == pattern)
      {
       *theInstance = (INSTANCE_TYPE *) 
-        get_nth_pm_match(EngineData(theEnv)->GlobalRHSBinds,0)->matchingItem;
-      *theMarkers = get_nth_pm_match(EngineData(theEnv)->GlobalRHSBinds,0)->markers;
+        get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalRHSBinds,0)->matchingItem;
+      *theMarkers = get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalRHSBinds,0)->markers;
      }
    else
      {
       *theInstance = (INSTANCE_TYPE *)
-        get_nth_pm_match(EngineData(theEnv)->GlobalLHSBinds,pattern)->matchingItem;
+        get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalLHSBinds,pattern)->matchingItem;
       *theMarkers =
-        get_nth_pm_match(EngineData(theEnv)->GlobalLHSBinds,pattern)->markers;
+        get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalLHSBinds,pattern)->markers;
      }
   }
 
@@ -1152,7 +1152,7 @@ static void GetObjectValueGeneral(
       the real value of the slot
       ========================================= */
    if ((theInstance->basisSlots != NULL) &&
-       (! EngineData(theEnv)->JoinOperationInProgress))
+       (! EngineData(theEnv,execStatus)->JoinOperationInProgress))
      {
       basisSlot = theInstance->basisSlots + (insSlot - theInstance->slotAddresses);
       if (basisSlot->value != NULL)
@@ -1242,7 +1242,7 @@ static void GetObjectValueSimple(
       the real value of the slot
       ========================================= */
    if ((theInstance->basisSlots != NULL) &&
-       (! EngineData(theEnv)->JoinOperationInProgress))
+       (! EngineData(theEnv,execStatus)->JoinOperationInProgress))
      {
       basisSlot = theInstance->basisSlots + (insSlot - theInstance->slotAddresses);
       if (basisSlot->value != NULL)

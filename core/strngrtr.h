@@ -44,7 +44,7 @@ struct stringRouterData
    struct stringRouter *ListOfStringRouters;
   };
 
-#define StringRouterData(theEnv) ((struct stringRouterData *) GetEnvironmentData(theEnv,execStatus,STRING_ROUTER_DATA))
+#define StringRouterData(theEnv,execStatus) ((struct stringRouterData *) GetEnvironmentData(theEnv,execStatus,STRING_ROUTER_DATA))
 
 #ifdef LOCALE
 #undef LOCALE
@@ -60,12 +60,12 @@ struct stringRouterData
 /* I/O ROUTER DEFINITIONS */
 /**************************/
 
-   LOCALE void                           InitializeStringRouter(void *);
-   LOCALE int                            OpenStringSource(void *,char *,char *,size_t);
-   LOCALE int                            OpenTextSource(void *,char *,char *,size_t,size_t);
-   LOCALE int                            CloseStringSource(void *,char *);
-   LOCALE int                            OpenStringDestination(void *,char *,char *,size_t);
-   LOCALE int                            CloseStringDestination(void *,char *);
+   LOCALE void                           InitializeStringRouter(void *,EXEC_STATUS);
+   LOCALE int                            OpenStringSource(void *,EXEC_STATUS,char *,char *,size_t);
+   LOCALE int                            OpenTextSource(void *,EXEC_STATUS,char *,char *,size_t,size_t);
+   LOCALE int                            CloseStringSource(void *,EXEC_STATUS,char *);
+   LOCALE int                            OpenStringDestination(void *,EXEC_STATUS,char *,char *,size_t);
+   LOCALE int                            CloseStringDestination(void *,EXEC_STATUS,char *);
 
 #endif
 

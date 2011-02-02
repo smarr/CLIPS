@@ -43,7 +43,7 @@ struct FunctionDefinition
    char *actualFunctionName;
    char returnValueType;
    int (*functionPointer)(void);
-   struct expr *(*parser)(void *,struct expr *,char *);
+   struct expr *(*parser)(void *,EXEC_STATUS,struct expr *,char *);
    char *restrictions;
    short int overloadable;
    short int sequenceuseok;
@@ -75,7 +75,7 @@ struct externalFunctionData
    struct FunctionHash **FunctionHashtable;
   };
 
-#define ExternalFunctionData(theEnv) ((struct externalFunctionData *) GetEnvironmentData(theEnv,execStatus,EXTERNAL_FUNCTION_DATA))
+#define ExternalFunctionData(theEnv,execStatus) ((struct externalFunctionData *) GetEnvironmentData(theEnv,execStatus,EXTERNAL_FUNCTION_DATA))
 
 #ifdef LOCALE
 #undef LOCALE
@@ -100,27 +100,27 @@ struct FunctionHash
    LOCALE int                            DefineFunction(char *,int,int (*)(void),char *);
    LOCALE int                            DefineFunction2(char *,int,int (*)(void),char *,char *);
 
-   LOCALE void                           InitializeExternalFunctionData(void *);
-   LOCALE int                            EnvDefineFunction(void *,char *,int,
+   LOCALE void                           InitializeExternalFunctionData(void *,EXEC_STATUS);
+   LOCALE int                            EnvDefineFunction(void *,EXEC_STATUS,char *,int,
                                                            int (*)(void *),char *);
-   LOCALE int                            EnvDefineFunction2(void *,char *,int,
+   LOCALE int                            EnvDefineFunction2(void *,EXEC_STATUS,char *,int,
                                                             int (*)(void *),char *,char *);
-   LOCALE int                            EnvDefineFunctionWithContext(void *,char *,int,
+   LOCALE int                            EnvDefineFunctionWithContext(void *,EXEC_STATUS,char *,int,
                                                            int (*)(void *),char *,void *);
-   LOCALE int                            EnvDefineFunction2WithContext(void *,char *,int,
+   LOCALE int                            EnvDefineFunction2WithContext(void *,EXEC_STATUS,char *,int,
                                                             int (*)(void *),char *,char *,void *);
-   LOCALE int                            DefineFunction3(void *,char *,int,
+   LOCALE int                            DefineFunction3(void *,EXEC_STATUS,char *,int,
                                                          int (*)(void *),char *,char *,intBool,void *);
-   LOCALE int                            AddFunctionParser(void *,char *,
+   LOCALE int                            AddFunctionParser(void *,EXEC_STATUS,char *,
                                                            struct expr *(*)( void *,struct expr *,char *));
-   LOCALE int                            RemoveFunctionParser(void *,char *);
-   LOCALE int                            FuncSeqOvlFlags(void *,char *,int,int);
-   LOCALE struct FunctionDefinition     *GetFunctionList(void *);
-   LOCALE void                           InstallFunctionList(void *,struct FunctionDefinition *);
-   LOCALE struct FunctionDefinition     *FindFunction(void *,char *);
+   LOCALE int                            RemoveFunctionParser(void *,EXEC_STATUS,char *);
+   LOCALE int                            FuncSeqOvlFlags(void *,EXEC_STATUS,char *,int,int);
+   LOCALE struct FunctionDefinition     *GetFunctionList(void *,EXEC_STATUS);
+   LOCALE void                           InstallFunctionList(void *,EXEC_STATUS,struct FunctionDefinition *);
+   LOCALE struct FunctionDefinition     *FindFunction(void *,EXEC_STATUS,char *);
    LOCALE int                            GetNthRestriction(struct FunctionDefinition *,int);
    LOCALE char                          *GetArgumentTypeName(int);
-   LOCALE int                            UndefineFunction(void *,char *);
+   LOCALE int                            UndefineFunction(void *,EXEC_STATUS,char *);
    LOCALE int                            GetMinimumArgs(struct FunctionDefinition *);
    LOCALE int                            GetMaximumArgs(struct FunctionDefinition *);
 

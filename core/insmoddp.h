@@ -44,25 +44,25 @@
 #endif
 
 #if (! RUN_TIME)
-LOCALE void SetupInstanceModDupCommands(void *);
+LOCALE void SetupInstanceModDupCommands(void *,EXEC_STATUS);
 #endif
 
-LOCALE void ModifyInstance(void *,DATA_OBJECT *);
-LOCALE void MsgModifyInstance(void *,DATA_OBJECT *);
-LOCALE void DuplicateInstance(void *,DATA_OBJECT *);
-LOCALE void MsgDuplicateInstance(void *,DATA_OBJECT *);
+LOCALE void ModifyInstance(void *,EXEC_STATUS,DATA_OBJECT *);
+LOCALE void MsgModifyInstance(void *,EXEC_STATUS,DATA_OBJECT *);
+LOCALE void DuplicateInstance(void *,EXEC_STATUS,DATA_OBJECT *);
+LOCALE void MsgDuplicateInstance(void *,EXEC_STATUS,DATA_OBJECT *);
 
 #if DEFRULE_CONSTRUCT && OBJECT_SYSTEM
-LOCALE void InactiveModifyInstance(void *,DATA_OBJECT *);
-LOCALE void InactiveMsgModifyInstance(void *,DATA_OBJECT *);
-LOCALE void InactiveDuplicateInstance(void *,DATA_OBJECT *);
-LOCALE void InactiveMsgDuplicateInstance(void *,DATA_OBJECT *);
+LOCALE void InactiveModifyInstance(void *,EXEC_STATUS,DATA_OBJECT *);
+LOCALE void InactiveMsgModifyInstance(void *,EXEC_STATUS,DATA_OBJECT *);
+LOCALE void InactiveDuplicateInstance(void *,EXEC_STATUS,DATA_OBJECT *);
+LOCALE void InactiveMsgDuplicateInstance(void *,EXEC_STATUS,DATA_OBJECT *);
 #endif
 
-LOCALE void DirectModifyMsgHandler(void *,DATA_OBJECT *);
-LOCALE void MsgModifyMsgHandler(void *,DATA_OBJECT *);
-LOCALE void DirectDuplicateMsgHandler(void *,DATA_OBJECT *);
-LOCALE void MsgDuplicateMsgHandler(void *,DATA_OBJECT *);
+LOCALE void DirectModifyMsgHandler(void *,EXEC_STATUS,DATA_OBJECT *);
+LOCALE void MsgModifyMsgHandler(void *,EXEC_STATUS,DATA_OBJECT *);
+LOCALE void DirectDuplicateMsgHandler(void *,EXEC_STATUS,DATA_OBJECT *);
+LOCALE void MsgDuplicateMsgHandler(void *,EXEC_STATUS,DATA_OBJECT *);
 
 #ifndef _INSMODDP_SOURCE_
 #endif

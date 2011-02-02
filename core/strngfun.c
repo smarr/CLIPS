@@ -62,7 +62,7 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static void                    StrOrSymCatFunction(void *,DATA_OBJECT_PTR,unsigned short);
+   static void                    StrOrSymCatFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR,unsigned short);
 
 /******************************************/
 /* StringFunctionDefinitions: Initializes */
@@ -86,7 +86,7 @@ globle void StringFunctionDefinitions(
    EnvDefineFunction2(theEnv,execStatus,"string-to-field", 'u', PTIEF StringToFieldFunction, "StringToFieldFunction", "11j");
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 #endif
   }
@@ -562,7 +562,7 @@ globle void StrIndexFunction(
    size_t i, j;
 
    result->type = SYMBOL;
-   result->value = EnvFalseSymbol(theEnv);
+   result->value = EnvFalseSymbol(theEnv,execStatus);
 
    /*===================================*/
    /* Check and retrieve the arguments. */
@@ -714,7 +714,7 @@ globle void EvalFunction(
    if (EnvArgCountCheck(theEnv,execStatus,"eval",EXACTLY,1) == -1)
      {
       SetpType(returnValue,SYMBOL);
-      SetpValue(returnValue,EnvFalseSymbol(theEnv));
+      SetpValue(returnValue,EnvFalseSymbol(theEnv,execStatus));
       return;
      }
 
@@ -725,7 +725,7 @@ globle void EvalFunction(
    if (EnvArgTypeCheck(theEnv,execStatus,"eval",1,SYMBOL_OR_STRING,&theArg) == FALSE)
      {
       SetpType(returnValue,SYMBOL);
-      SetpValue(returnValue,EnvFalseSymbol(theEnv));
+      SetpValue(returnValue,EnvFalseSymbol(theEnv,execStatus));
       return;
      }
 
@@ -775,7 +775,7 @@ globle int EnvEval(
    if (OpenStringSource(theEnv,execStatus,logicalNameBuffer,theString,0) == 0)
      {
       SetpType(returnValue,SYMBOL);
-      SetpValue(returnValue,EnvFalseSymbol(theEnv));
+      SetpValue(returnValue,EnvFalseSymbol(theEnv,execStatus));
       depth--;
       return(FALSE);
      }
@@ -785,9 +785,9 @@ globle int EnvEval(
    /* are called to parse the eval string.           */
    /*================================================*/
 
-   ov = GetPPBufferStatus(theEnv);
+   ov = GetPPBufferStatus(theEnv,execStatus);
    SetPPBufferStatus(theEnv,execStatus,FALSE);
-   oldBinds = GetParsedBindNames(theEnv);
+   oldBinds = GetParsedBindNames(theEnv,execStatus);
    SetParsedBindNames(theEnv,execStatus,NULL);
 
    /*========================================================*/
@@ -801,7 +801,7 @@ globle int EnvEval(
    /*============================*/
 
    SetPPBufferStatus(theEnv,execStatus,ov);
-   ClearParsedBindNames(theEnv);
+   ClearParsedBindNames(theEnv,execStatus);
    SetParsedBindNames(theEnv,execStatus,oldBinds);
 
    /*===========================================*/
@@ -813,7 +813,7 @@ globle int EnvEval(
       SetEvaluationError(theEnv,execStatus,TRUE);
       CloseStringSource(theEnv,execStatus,logicalNameBuffer);
       SetpType(returnValue,SYMBOL);
-      SetpValue(returnValue,EnvFalseSymbol(theEnv));
+      SetpValue(returnValue,EnvFalseSymbol(theEnv,execStatus));
       depth--;
       return(FALSE);
      }
@@ -830,7 +830,7 @@ globle int EnvEval(
       SetEvaluationError(theEnv,execStatus,TRUE);
       CloseStringSource(theEnv,execStatus,logicalNameBuffer);
       SetpType(returnValue,SYMBOL);
-      SetpValue(returnValue,EnvFalseSymbol(theEnv));
+      SetpValue(returnValue,EnvFalseSymbol(theEnv,execStatus));
       ReturnExpression(theEnv,execStatus,top);
       depth--;
       return(FALSE);
@@ -848,7 +848,7 @@ globle int EnvEval(
       SetEvaluationError(theEnv,execStatus,TRUE);
       CloseStringSource(theEnv,execStatus,logicalNameBuffer);
       SetpType(returnValue,SYMBOL);
-      SetpValue(returnValue,EnvFalseSymbol(theEnv));
+      SetpValue(returnValue,EnvFalseSymbol(theEnv,execStatus));
       ReturnExpression(theEnv,execStatus,top);
       depth--;
       return(FALSE);
@@ -872,7 +872,7 @@ globle int EnvEval(
    /* issued from an embedded controller.      */
    /*==========================================*/
 
-   if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
+   if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv,execStatus)->EvaluatingTopLevelCommand) &&
        (execStatus->CurrentExpression == NULL))
      { 
       ValueInstall(theEnv,execStatus,returnValue);
@@ -880,7 +880,7 @@ globle int EnvEval(
       ValueDeinstall(theEnv,execStatus,returnValue);
      }
 
-   if (GetEvaluationError(theEnv)) return(FALSE);
+   if (GetEvaluationError(theEnv,execStatus)) return(FALSE);
    return(TRUE);
   }
 
@@ -898,7 +898,7 @@ globle void EvalFunction(
    PrintErrorID(theEnv,execStatus,"STRNGFUN",1,FALSE);
    EnvPrintRouter(theEnv,execStatus,WERROR,"Function eval does not work in run time modules.\n");
    SetpType(returnValue,SYMBOL);
-   SetpValue(returnValue,EnvFalseSymbol(theEnv));
+   SetpValue(returnValue,EnvFalseSymbol(theEnv,execStatus));
   }
 
 /*****************************************************/
@@ -918,7 +918,7 @@ globle int EnvEval(
    PrintErrorID(theEnv,execStatus,"STRNGFUN",1,FALSE);
    EnvPrintRouter(theEnv,execStatus,WERROR,"Function eval does not work in run time modules.\n");
    SetpType(returnValue,SYMBOL);
-   SetpValue(returnValue,EnvFalseSymbol(theEnv));
+   SetpValue(returnValue,EnvFalseSymbol(theEnv,execStatus));
    return(FALSE);
   }
 
@@ -985,7 +985,7 @@ globle int EnvBuild(
    /*====================================================*/
 
 #if DEFRULE_CONSTRUCT
-   if (EngineData(theEnv)->JoinOperationInProgress) return(FALSE);
+   if (EngineData(theEnv,execStatus)->JoinOperationInProgress) return(FALSE);
 #endif
 
    /*===========================================*/
@@ -1042,18 +1042,18 @@ globle int EnvBuild(
    if (errorFlag == 1)
      {
       EnvPrintRouter(theEnv,execStatus,WERROR,"\nERROR:\n");
-      PrintInChunks(theEnv,execStatus,WERROR,GetPPBuffer(theEnv));
+      PrintInChunks(theEnv,execStatus,WERROR,GetPPBuffer(theEnv,execStatus));
       EnvPrintRouter(theEnv,execStatus,WERROR,"\n");
      }
 
-   DestroyPPBuffer(theEnv);
+   DestroyPPBuffer(theEnv,execStatus);
 
    /*===========================================*/
    /* Perform periodic cleanup if the build was */
    /* issued from an embedded controller.       */
    /*===========================================*/
 
-   if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
+   if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv,execStatus)->EvaluatingTopLevelCommand) &&
        (execStatus->CurrentExpression == NULL))
      { PeriodicCleanup(theEnv,execStatus,TRUE,FALSE); }
 

@@ -99,7 +99,7 @@ struct deffunctionData
 #endif
   };
 
-#define DeffunctionData(theEnv) ((struct deffunctionData *) GetEnvironmentData(theEnv,execStatus,DEFFUNCTION_DATA))
+#define DeffunctionData(theEnv,execStatus) ((struct deffunctionData *) GetEnvironmentData(theEnv,execStatus,DEFFUNCTION_DATA))
 
 #define DeffunctionModule(x) GetConstructModuleName((struct constructHeader *) x)
 #define FindDeffunction(a) EnvFindDeffunction(GetCurrentEnvironment(),a)
@@ -113,32 +113,32 @@ struct deffunctionData
 #define SetDeffunctionWatch(a,b) EnvSetDeffunctionWatch(GetCurrentEnvironment(),a,b)
 #define Undeffunction(a) EnvUndeffunction(GetCurrentEnvironment(),a)
 
-LOCALE void SetupDeffunctions(void *);
-LOCALE void *EnvFindDeffunction(void *,char *);
-LOCALE DEFFUNCTION *LookupDeffunctionByMdlOrScope(void *,char *);
-LOCALE DEFFUNCTION *LookupDeffunctionInScope(void *,char *);
-LOCALE intBool EnvUndeffunction(void *,void *);
-LOCALE void *EnvGetNextDeffunction(void *,void *);
-LOCALE int EnvIsDeffunctionDeletable(void *,void *);
-LOCALE void UndeffunctionCommand(void *);
-LOCALE void *GetDeffunctionModuleCommand(void *);
+LOCALE void SetupDeffunctions(void *,EXEC_STATUS);
+LOCALE void *EnvFindDeffunction(void *,EXEC_STATUS,char *);
+LOCALE DEFFUNCTION *LookupDeffunctionByMdlOrScope(void *,EXEC_STATUS,char *);
+LOCALE DEFFUNCTION *LookupDeffunctionInScope(void *,EXEC_STATUS,char *);
+LOCALE intBool EnvUndeffunction(void *,EXEC_STATUS,void *);
+LOCALE void *EnvGetNextDeffunction(void *,EXEC_STATUS,void *);
+LOCALE int EnvIsDeffunctionDeletable(void *,EXEC_STATUS,void *);
+LOCALE void UndeffunctionCommand(void *,EXEC_STATUS);
+LOCALE void *GetDeffunctionModuleCommand(void *,EXEC_STATUS);
 LOCALE void DeffunctionGetBind(DATA_OBJECT *);
 LOCALE void DFRtnUnknown(DATA_OBJECT *);
 LOCALE void DFWildargs(DATA_OBJECT *);
-LOCALE int CheckDeffunctionCall(void *,void *,int);
+LOCALE int CheckDeffunctionCall(void *,EXEC_STATUS,void *,int);
 #if DEBUGGING_FUNCTIONS
-LOCALE void PPDeffunctionCommand(void *);
-LOCALE void ListDeffunctionsCommand(void *);
-LOCALE void EnvListDeffunctions(void *,char *,struct defmodule *);
-LOCALE void EnvSetDeffunctionWatch(void *,unsigned,void *);
-LOCALE unsigned EnvGetDeffunctionWatch(void *,void *);
+LOCALE void PPDeffunctionCommand(void *,EXEC_STATUS);
+LOCALE void ListDeffunctionsCommand(void *,EXEC_STATUS);
+LOCALE void EnvListDeffunctions(void *,EXEC_STATUS,char *,struct defmodule *);
+LOCALE void EnvSetDeffunctionWatch(void *,EXEC_STATUS,unsigned,void *);
+LOCALE unsigned EnvGetDeffunctionWatch(void *,EXEC_STATUS,void *);
 #endif
 #if (! BLOAD_ONLY) && (! RUN_TIME)
-LOCALE void RemoveDeffunction(void *,void *);
+LOCALE void RemoveDeffunction(void *,EXEC_STATUS,void *);
 #endif
 
-LOCALE void GetDeffunctionListFunction(void *,DATA_OBJECT *);
-globle void EnvGetDeffunctionList(void *,DATA_OBJECT *,struct defmodule *);
+LOCALE void GetDeffunctionListFunction(void *,EXEC_STATUS,DATA_OBJECT *);
+globle void EnvGetDeffunctionList(void *,EXEC_STATUS,DATA_OBJECT *,struct defmodule *);
 
 #endif
 

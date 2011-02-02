@@ -72,8 +72,8 @@
    =========================================
    ***************************************** */
 
-static intBool ValidDeffunctionName(void *,char *);
-static DEFFUNCTION *AddDeffunction(void *,SYMBOL_HN *,EXPRESSION *,int,int,int,int);
+static intBool ValidDeffunctionName(void *,EXEC_STATUS,char *);
+static DEFFUNCTION *AddDeffunction(void *,EXEC_STATUS,SYMBOL_HN *,EXPRESSION *,int,int,int,int);
 
 /* =========================================
    *****************************************
@@ -107,12 +107,12 @@ globle intBool ParseDeffunction(
 
    SetPPBufferStatus(theEnv,execStatus,ON);
 
-   FlushPPBuffer(theEnv);
+   FlushPPBuffer(theEnv,execStatus);
    SetIndentDepth(theEnv,execStatus,3);
    SavePPBuffer(theEnv,execStatus,"(deffunction ");
 
 #if BLOAD || BLOAD_AND_BSAVE
-   if ((Bloaded(theEnv) == TRUE) && (! ConstructData(theEnv)->CheckSyntaxMode))
+   if ((Bloaded(theEnv,execStatus) == TRUE) && (! ConstructData(theEnv,execStatus)->CheckSyntaxMode))
      {
       CannotLoadWithBloadMessage(theEnv,execStatus,"deffunctions");
       return(TRUE);
@@ -122,7 +122,7 @@ globle intBool ParseDeffunction(
    /* =====================================================
       Parse the name and comment fields of the deffunction.
       ===================================================== */
-   deffunctionName = GetConstructNameAndComment(theEnv,execStatus,readSource,&DeffunctionData(theEnv)->DFInputToken,"deffunction",
+   deffunctionName = GetConstructNameAndComment(theEnv,execStatus,readSource,&DeffunctionData(theEnv,execStatus)->DFInputToken,"deffunction",
                                                 EnvFindDeffunction,NULL,
                                                 "!",TRUE,TRUE,TRUE);
    if (deffunctionName == NULL)
@@ -134,7 +134,7 @@ globle intBool ParseDeffunction(
    /*==========================*/
    /* Parse the argument list. */
    /*==========================*/
-   parameterList = ParseProcParameters(theEnv,execStatus,readSource,&DeffunctionData(theEnv)->DFInputToken,NULL,&wildcard,
+   parameterList = ParseProcParameters(theEnv,execStatus,readSource,&DeffunctionData(theEnv,execStatus)->DFInputToken,NULL,&wildcard,
                                        &min,&max,&DeffunctionError,NULL);
    if (DeffunctionError)
      return(TRUE);
@@ -143,7 +143,7 @@ globle intBool ParseDeffunction(
    /* Go ahead and add the deffunction so it can be recursively called. */
    /*===================================================================*/
 
-   if (ConstructData(theEnv)->CheckSyntaxMode)
+   if (ConstructData(theEnv,execStatus)->CheckSyntaxMode)
      {
       dptr = (DEFFUNCTION *) EnvFindDeffunction(theEnv,execStatus,ValueToString(deffunctionName));
       if (dptr == NULL)
@@ -170,18 +170,18 @@ globle intBool ParseDeffunction(
    /* Parse the actions contained within the function. */
    /*==================================================*/
 
-   PPCRAndIndent(theEnv);
+   PPCRAndIndent(theEnv,execStatus);
 
-   ExpressionData(theEnv)->ReturnContext = TRUE;
+   ExpressionData(theEnv,execStatus)->ReturnContext = TRUE;
    actions = ParseProcActions(theEnv,execStatus,"deffunction",readSource,
-                              &DeffunctionData(theEnv)->DFInputToken,parameterList,wildcard,
+                              &DeffunctionData(theEnv,execStatus)->DFInputToken,parameterList,wildcard,
                               NULL,NULL,&lvars,NULL);
 
    /*=============================================================*/
    /* Check for the closing right parenthesis of the deffunction. */
    /*=============================================================*/
 
-   if ((DeffunctionData(theEnv)->DFInputToken.type != RPAREN) && /* DR0872 */
+   if ((DeffunctionData(theEnv,execStatus)->DFInputToken.type != RPAREN) && /* DR0872 */
        (actions != NULL))
      {
       SyntaxErrorMessage(theEnv,execStatus,"deffunction");
@@ -226,7 +226,7 @@ globle intBool ParseDeffunction(
    /* successfully parsed deffunction to the KB.   */
    /*==============================================*/
 
-   if (ConstructData(theEnv)->CheckSyntaxMode)
+   if (ConstructData(theEnv,execStatus)->CheckSyntaxMode)
      {
       ReturnExpression(theEnv,execStatus,parameterList);
       ReturnPackedExpression(theEnv,execStatus,actions);
@@ -247,9 +247,9 @@ globle intBool ParseDeffunction(
    /* Reformat the closing token. */
    /*=============================*/
 
-   PPBackup(theEnv);
-   PPBackup(theEnv);
-   SavePPBuffer(theEnv,execStatus,DeffunctionData(theEnv)->DFInputToken.printForm);
+   PPBackup(theEnv,execStatus);
+   PPBackup(theEnv,execStatus);
+   SavePPBuffer(theEnv,execStatus,DeffunctionData(theEnv,execStatus)->DFInputToken.printForm);
    SavePPBuffer(theEnv,execStatus,"\n");
 
    /*======================*/
@@ -326,7 +326,7 @@ static intBool ValidDeffunctionName(
    if (theDefgeneric != NULL)
      {
       theModule = GetConstructModuleItem(theDefgeneric)->theModule;
-      if (theModule != ((struct defmodule *) EnvGetCurrentModule(theEnv)))
+      if (theModule != ((struct defmodule *) EnvGetCurrentModule(theEnv,execStatus)))
         {
          PrintErrorID(theEnv,execStatus,"DFFNXPSR",5,FALSE);
          EnvPrintRouter(theEnv,execStatus,WERROR,"Defgeneric ");
@@ -471,9 +471,9 @@ static DEFFUNCTION *AddDeffunction(
       =============================================================== */
 
 #if DEBUGGING_FUNCTIONS
-   EnvSetDeffunctionWatch(theEnv,execStatus,DFHadWatch ? TRUE : DeffunctionData(theEnv)->WatchDeffunctions,(void *) dfuncPtr);
-   if ((EnvGetConserveMemory(theEnv) == FALSE) && (headerp == FALSE))
-     SetDeffunctionPPForm((void *) dfuncPtr,CopyPPBuffer(theEnv));
+   EnvSetDeffunctionWatch(theEnv,execStatus,DFHadWatch ? TRUE : DeffunctionData(theEnv,execStatus)->WatchDeffunctions,(void *) dfuncPtr);
+   if ((EnvGetConserveMemory(theEnv,execStatus) == FALSE) && (headerp == FALSE))
+     SetDeffunctionPPForm((void *) dfuncPtr,CopyPPBuffer(theEnv,execStatus));
 #endif
    return(dfuncPtr);
   }

@@ -39,8 +39,8 @@
 #define LOCALE extern
 #endif
 
-   LOCALE int                            ParseDeftemplate(void *,char *);
-   LOCALE void                           InstallDeftemplate(void *,struct deftemplate *);
+   LOCALE int                            ParseDeftemplate(void *,EXEC_STATUS,char *);
+   LOCALE void                           InstallDeftemplate(void *,EXEC_STATUS,struct deftemplate *);
 
 #endif
 

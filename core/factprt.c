@@ -79,7 +79,7 @@ globle void PrintFactJNCompVars1(
    EnvPrintRouter(theEnv,execStatus,logicalName,")");
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #pragma unused(logicalName)
 #pragma unused(theValue)
 #endif
@@ -143,7 +143,7 @@ globle void PrintFactJNCompVars2(
    EnvPrintRouter(theEnv,execStatus,logicalName,")");
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #pragma unused(logicalName)
 #pragma unused(theValue)
 #endif
@@ -176,7 +176,7 @@ globle void PrintFactPNCompVars1(
    EnvPrintRouter(theEnv,execStatus,logicalName,")");
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #pragma unused(logicalName)
 #pragma unused(theValue)
 #endif
@@ -210,7 +210,7 @@ globle void PrintFactSlotLength(
    EnvPrintRouter(theEnv,execStatus,logicalName,")");
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #pragma unused(logicalName)
 #pragma unused(theValue)
 #endif
@@ -254,7 +254,7 @@ globle void PrintFactJNGetVar1(
    EnvPrintRouter(theEnv,execStatus,logicalName,")");
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #pragma unused(logicalName)
 #pragma unused(theValue)
 #endif
@@ -291,7 +291,7 @@ globle void PrintFactJNGetVar2(
    EnvPrintRouter(theEnv,execStatus,logicalName,")");
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #pragma unused(logicalName)
 #pragma unused(theValue)
 #endif
@@ -338,7 +338,7 @@ globle void PrintFactJNGetVar3(
    EnvPrintRouter(theEnv,execStatus,logicalName,")");
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #pragma unused(logicalName)
 #pragma unused(theValue)
 #endif
@@ -374,7 +374,7 @@ globle void PrintFactPNGetVar1(
    EnvPrintRouter(theEnv,execStatus,logicalName,")");
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #pragma unused(logicalName)
 #pragma unused(theValue)
 #endif
@@ -403,7 +403,7 @@ globle void PrintFactPNGetVar2(
    EnvPrintRouter(theEnv,execStatus,logicalName,")");
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #pragma unused(logicalName)
 #pragma unused(theValue)
 #endif
@@ -442,7 +442,7 @@ globle void PrintFactPNGetVar3(
    EnvPrintRouter(theEnv,execStatus,logicalName,")");
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #pragma unused(logicalName)
 #pragma unused(theValue)
 #endif
@@ -478,7 +478,7 @@ globle void PrintFactPNConstant1(
    EnvPrintRouter(theEnv,execStatus,logicalName,")");
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #pragma unused(logicalName)
 #pragma unused(theValue)
 #endif
@@ -518,7 +518,7 @@ globle void PrintFactPNConstant2(
    EnvPrintRouter(theEnv,execStatus,logicalName,")");
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #pragma unused(logicalName)
 #pragma unused(theValue)
 #endif

@@ -63,9 +63,9 @@
                MACROS AND TYPES
    =========================================
    ***************************************** */
-#define MethodPrefix()      ArbitraryPrefix(DefgenericData(theEnv)->DefgenericCodeItem,2)
-#define RestrictionPrefix() ArbitraryPrefix(DefgenericData(theEnv)->DefgenericCodeItem,3)
-#define TypePrefix()        ArbitraryPrefix(DefgenericData(theEnv)->DefgenericCodeItem,4)
+#define MethodPrefix()      ArbitraryPrefix(DefgenericData(theEnv,execStatus)->DefgenericCodeItem,2)
+#define RestrictionPrefix() ArbitraryPrefix(DefgenericData(theEnv,execStatus)->DefgenericCodeItem,3)
+#define TypePrefix()        ArbitraryPrefix(DefgenericData(theEnv,execStatus)->DefgenericCodeItem,4)
 
 /* =========================================
    *****************************************
@@ -73,15 +73,15 @@
    =========================================
    ***************************************** */
 
-static void ReadyDefgenericsForCode(void *);
-static int DefgenericsToCode(void *,char *,char *,char *,int,FILE *,int,int);
-static void CloseDefgenericFiles(void *,FILE *[SAVE_ITEMS],int [SAVE_ITEMS],
+static void ReadyDefgenericsForCode(void *,EXEC_STATUS);
+static int DefgenericsToCode(void *,EXEC_STATUS,char *,char *,char *,int,FILE *,int,int);
+static void CloseDefgenericFiles(void *,EXEC_STATUS,FILE *[SAVE_ITEMS],int [SAVE_ITEMS],
                                  struct CodeGeneratorFile [SAVE_ITEMS],int);
-static void DefgenericModuleToCode(void *,FILE *,struct defmodule *,int,int);
-static void SingleDefgenericToCode(void *,FILE *,int,int,DEFGENERIC *,int,int,int);
-static void MethodToCode(void *,FILE *,int,DEFMETHOD *,int,int);
-static void RestrictionToCode(void *,FILE *,int,RESTRICTION *,int,int);
-static void TypeToCode(void *,FILE *,int,void *,int);
+static void DefgenericModuleToCode(void *,EXEC_STATUS,FILE *,struct defmodule *,int,int);
+static void SingleDefgenericToCode(void *,EXEC_STATUS,FILE *,int,int,DEFGENERIC *,int,int,int);
+static void MethodToCode(void *,EXEC_STATUS,FILE *,int,DEFMETHOD *,int,int);
+static void RestrictionToCode(void *,EXEC_STATUS,FILE *,int,RESTRICTION *,int,int);
+static void TypeToCode(void *,EXEC_STATUS,FILE *,int,void *,int);
 
 /* =========================================
    *****************************************
@@ -102,7 +102,7 @@ globle void SetupGenericsCompiler(
   void *theEnv,
   EXEC_STATUS)
   {
-   DefgenericData(theEnv)->DefgenericCodeItem = AddCodeGeneratorItem(theEnv,execStatus,"generics",0,ReadyDefgenericsForCode,
+   DefgenericData(theEnv,execStatus)->DefgenericCodeItem = AddCodeGeneratorItem(theEnv,execStatus,"generics",0,ReadyDefgenericsForCode,
                                              NULL,DefgenericsToCode,5);
   }
 
@@ -131,7 +131,7 @@ globle void PrintGenericFunctionReference(
    if (gfunc == NULL)
      fprintf(fp,"NULL");
    else
-     fprintf(fp,"&%s%d_%d[%d]",ConstructPrefix(DefgenericData(theEnv)->DefgenericCodeItem),imageID,
+     fprintf(fp,"&%s%d_%d[%d]",ConstructPrefix(DefgenericData(theEnv,execStatus)->DefgenericCodeItem),imageID,
                                 (int) ((gfunc->header.bsaveID / maxIndices) + 1),
                                 (int) (gfunc->header.bsaveID % maxIndices));
   }
@@ -158,7 +158,7 @@ globle void DefgenericCModuleReference(
   int maxIndices)
   {
    fprintf(theFile,"MIHS &%s%d_%d[%d]",
-                      ModulePrefix(DefgenericData(theEnv)->DefgenericCodeItem),
+                      ModulePrefix(DefgenericData(theEnv,execStatus)->DefgenericCodeItem),
                       imageID,
                       (count / maxIndices) + 1,
                       (count % maxIndices));
@@ -183,7 +183,7 @@ static void ReadyDefgenericsForCode(
   void *theEnv,
   EXEC_STATUS)
   {
-   MarkConstructBsaveIDs(theEnv,execStatus,DefgenericData(theEnv)->DefgenericModuleIndex);
+   MarkConstructBsaveIDs(theEnv,execStatus,DefgenericData(theEnv,execStatus)->DefgenericModuleIndex);
   }
 
 /*******************************************************
@@ -254,7 +254,7 @@ static int DefgenericsToCode(
       itemFiles[MODULEI] =
          OpenFileIfNeeded(theEnv,execStatus,itemFiles[MODULEI],fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
                           itemArrayVersions[MODULEI],headerFP,
-                          "DEFGENERIC_MODULE",ModulePrefix(DefgenericData(theEnv)->DefgenericCodeItem),
+                          "DEFGENERIC_MODULE",ModulePrefix(DefgenericData(theEnv,execStatus)->DefgenericCodeItem),
                           itemReopenFlags[MODULEI],&itemCodeFiles[MODULEI]);
       if (itemFiles[MODULEI] == NULL)
         goto GenericCodeError;
@@ -272,7 +272,7 @@ static int DefgenericsToCode(
          itemFiles[GENERICI] =
             OpenFileIfNeeded(theEnv,execStatus,itemFiles[GENERICI],fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
                              itemArrayVersions[GENERICI],headerFP,
-                             "DEFGENERIC",ConstructPrefix(DefgenericData(theEnv)->DefgenericCodeItem),
+                             "DEFGENERIC",ConstructPrefix(DefgenericData(theEnv,execStatus)->DefgenericCodeItem),
                              itemReopenFlags[GENERICI],&itemCodeFiles[GENERICI]);
          if (itemFiles[GENERICI] == NULL)
            goto GenericCodeError;
@@ -445,7 +445,7 @@ static void DefgenericModuleToCode(
   {
    fprintf(theFile,"{");
    ConstructModuleToCode(theEnv,execStatus,theFile,theModule,imageID,maxIndices,
-                         DefgenericData(theEnv)->DefgenericModuleIndex,ConstructPrefix(DefgenericData(theEnv)->DefgenericCodeItem));
+                         DefgenericData(theEnv,execStatus)->DefgenericModuleIndex,ConstructPrefix(DefgenericData(theEnv,execStatus)->DefgenericCodeItem));
    fprintf(theFile,"}");
   }
 
@@ -483,8 +483,8 @@ static void SingleDefgenericToCode(
       ================== */
    fprintf(theFile,"{");
    ConstructHeaderToCode(theEnv,execStatus,theFile,&theDefgeneric->header,imageID,maxIndices,moduleCount,
-                         ModulePrefix(DefgenericData(theEnv)->DefgenericCodeItem),
-                         ConstructPrefix(DefgenericData(theEnv)->DefgenericCodeItem));
+                         ModulePrefix(DefgenericData(theEnv,execStatus)->DefgenericCodeItem),
+                         ConstructPrefix(DefgenericData(theEnv,execStatus)->DefgenericCodeItem));
 
    /* =========================
       Defgeneric specific data

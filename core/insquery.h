@@ -69,7 +69,7 @@ struct instanceQueryData
    int AbortQuery;
   };
 
-#define InstanceQueryData(theEnv) ((struct instanceQueryData *) GetEnvironmentData(theEnv,execStatus,INSTANCE_QUERY_DATA))
+#define InstanceQueryData(theEnv,execStatus) ((struct instanceQueryData *) GetEnvironmentData(theEnv,execStatus,INSTANCE_QUERY_DATA))
 
 
 #ifdef LOCALE
@@ -84,15 +84,15 @@ struct instanceQueryData
 
 #define QUERY_DELIMETER_STRING     "(QDS)"
 
-LOCALE void SetupQuery(void *);
-LOCALE void *GetQueryInstance(void *);
-LOCALE void GetQueryInstanceSlot(void *,DATA_OBJECT *);
-LOCALE intBool AnyInstances(void *);
-LOCALE void QueryFindInstance(void *,DATA_OBJECT *);
-LOCALE void QueryFindAllInstances(void *,DATA_OBJECT *);
-LOCALE void QueryDoForInstance(void *,DATA_OBJECT *);
-LOCALE void QueryDoForAllInstances(void *,DATA_OBJECT *);
-LOCALE void DelayedQueryDoForAllInstances(void *,DATA_OBJECT *);
+LOCALE void SetupQuery(void *,EXEC_STATUS);
+LOCALE void *GetQueryInstance(void *,EXEC_STATUS);
+LOCALE void GetQueryInstanceSlot(void *,EXEC_STATUS,DATA_OBJECT *);
+LOCALE intBool AnyInstances(void *,EXEC_STATUS);
+LOCALE void QueryFindInstance(void *,EXEC_STATUS,DATA_OBJECT *);
+LOCALE void QueryFindAllInstances(void *,EXEC_STATUS,DATA_OBJECT *);
+LOCALE void QueryDoForInstance(void *,EXEC_STATUS,DATA_OBJECT *);
+LOCALE void QueryDoForAllInstances(void *,EXEC_STATUS,DATA_OBJECT *);
+LOCALE void DelayedQueryDoForAllInstances(void *,EXEC_STATUS,DATA_OBJECT *);
 
 #endif
 

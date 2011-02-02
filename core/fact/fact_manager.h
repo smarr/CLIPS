@@ -92,7 +92,7 @@ struct factsData
    long LastModuleIndex;
   };
   
-#define FactData(theEnv) ((struct factsData *) GetEnvironmentData(theEnv,execStatus,FACTS_DATA))
+#define FactData(theEnv,execStatus) ((struct factsData *) GetEnvironmentData(theEnv,execStatus,FACTS_DATA))
 
 #ifdef LOCALE
 #undef LOCALE
@@ -117,42 +117,42 @@ struct factsData
 #define SetFactListChanged(a) EnvSetFactListChanged(GetCurrentEnvironment(),a)
 
 #if ALLOW_ENVIRONMENT_GLOBALS
-   LOCALE intBool                        GetFactSlot(void *,char *,DATA_OBJECT *);
-   LOCALE long long                      FactIndex(void *);
+   LOCALE intBool                        GetFactSlot(void *,EXEC_STATUS,char *,DATA_OBJECT *);
+   LOCALE long long                      FactIndex(void *,EXEC_STATUS);
 #endif
 
    LOCALE void                          *EnvAssert(void *,EXEC_STATUS,void *, int);
    LOCALE void                          *EnvAssertString(void *,EXEC_STATUS,char *);
    LOCALE struct fact                   *EnvCreateFact(void *,EXEC_STATUS,void *);
-   LOCALE void                           EnvDecrementFactCount(void *,void *);
-   LOCALE long long                      EnvFactIndex(void *,void *);
-   LOCALE intBool                        EnvGetFactSlot(void *,void *,char *,DATA_OBJECT *);
-   LOCALE void                           PrintFactWithIdentifier(void *,char *,struct fact *);
-   LOCALE void                           PrintFact(void *,char *,struct fact *,int,int);
-   LOCALE void                           PrintFactIdentifierInLongForm(void *,char *,void *);
+   LOCALE void                           EnvDecrementFactCount(void *,EXEC_STATUS,void *);
+   LOCALE long long                      EnvFactIndex(void *,EXEC_STATUS,void *);
+   LOCALE intBool                        EnvGetFactSlot(void *,EXEC_STATUS,void *,char *,DATA_OBJECT *);
+   LOCALE void                           PrintFactWithIdentifier(void *,EXEC_STATUS,char *,struct fact *);
+   LOCALE void                           PrintFact(void *,EXEC_STATUS,char *,struct fact *,int,int);
+   LOCALE void                           PrintFactIdentifierInLongForm(void *,EXEC_STATUS,char *,void *);
    LOCALE intBool                        EnvRetract(void *,EXEC_STATUS,void *);
    LOCALE void                           RemoveAllFacts(void *,EXEC_STATUS);
    LOCALE struct fact                   *CreateFactBySize(void *,EXEC_STATUS,unsigned);
-   LOCALE void                           FactInstall(void *,struct fact *);
-   LOCALE void                           FactDeinstall(void *,struct fact *);
-   LOCALE void                          *EnvGetNextFact(void *,void *);
+   LOCALE void                           FactInstall(void *,EXEC_STATUS,struct fact *);
+   LOCALE void                           FactDeinstall(void *,EXEC_STATUS,struct fact *);
+   LOCALE void                          *EnvGetNextFact(void *,EXEC_STATUS,void *);
    LOCALE void                          *GetNextFactInScope(void *theEnv,void *);
-   LOCALE void                           EnvGetFactPPForm(void *,char *,unsigned,void *);
-   LOCALE int                            EnvGetFactListChanged(void *);
-   LOCALE void                           EnvSetFactListChanged(void *,int);
-   LOCALE unsigned long                  GetNumberOfFacts(void *);
-   LOCALE void                           InitializeFacts(void *);
-   LOCALE struct fact                   *FindIndexedFact(void *,long long);
-   LOCALE void                           EnvIncrementFactCount(void *,void *);
-   LOCALE void                           PrintFactIdentifier(void *,char *,void *);
-   LOCALE void                           DecrementFactBasisCount(void *,void *);
-   LOCALE void                           IncrementFactBasisCount(void *,void *);
-   LOCALE void                           ReturnFact(void *,struct fact *);
-   LOCALE void                           MatchFactFunction(void *,void *);
-   LOCALE intBool                        EnvPutFactSlot(void *,void *,char *,DATA_OBJECT *);
-   LOCALE intBool                        EnvAssignFactSlotDefaults(void *,void *);
-   LOCALE intBool                        CopyFactSlotValues(void *,void *,void *);
-   LOCALE intBool                        DeftemplateSlotDefault(void *,struct deftemplate *,
+   LOCALE void                           EnvGetFactPPForm(void *,EXEC_STATUS,char *,unsigned,void *);
+   LOCALE int                            EnvGetFactListChanged(void *,EXEC_STATUS);
+   LOCALE void                           EnvSetFactListChanged(void *,EXEC_STATUS,int);
+   LOCALE unsigned long                  GetNumberOfFacts(void *,EXEC_STATUS);
+   LOCALE void                           InitializeFacts(void *,EXEC_STATUS);
+   LOCALE struct fact                   *FindIndexedFact(void *,EXEC_STATUS,long long);
+   LOCALE void                           EnvIncrementFactCount(void *,EXEC_STATUS,void *);
+   LOCALE void                           PrintFactIdentifier(void *,EXEC_STATUS,char *,void *);
+   LOCALE void                           DecrementFactBasisCount(void *,EXEC_STATUS,void *);
+   LOCALE void                           IncrementFactBasisCount(void *,EXEC_STATUS,void *);
+   LOCALE void                           ReturnFact(void *,EXEC_STATUS,struct fact *);
+   LOCALE void                           MatchFactFunction(void *,EXEC_STATUS,void *);
+   LOCALE intBool                        EnvPutFactSlot(void *,EXEC_STATUS,void *,char *,DATA_OBJECT *);
+   LOCALE intBool                        EnvAssignFactSlotDefaults(void *,EXEC_STATUS,void *);
+   LOCALE intBool                        CopyFactSlotValues(void *,EXEC_STATUS,void *,void *);
+   LOCALE intBool                        DeftemplateSlotDefault(void *,EXEC_STATUS,struct deftemplate *,
                                                                 struct templateSlot *,DATA_OBJECT *,int);
 
 #ifndef _FACTMNGR_SOURCE_

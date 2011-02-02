@@ -83,13 +83,13 @@ typedef struct fieldVarStack
 #if MULTIFIELD_FUNCTIONS
    static intBool                 MVRangeCheck(long,long,long *,int);
 #if (! BLOAD_ONLY) && (! RUN_TIME)
-   static struct expr            *MultifieldPrognParser(void *,struct expr *,char *);
-   static struct expr            *ForeachParser(void *,struct expr *,char *);
-   static void                    ReplaceMvPrognFieldVars(void *,SYMBOL_HN *,struct expr *,int);
+   static struct expr            *MultifieldPrognParser(void *,EXEC_STATUS,struct expr *,char *);
+   static struct expr            *ForeachParser(void *,EXEC_STATUS,struct expr *,char *);
+   static void                    ReplaceMvPrognFieldVars(void *,EXEC_STATUS,SYMBOL_HN *,struct expr *,int);
 #endif
 #endif
-   static void                    MVRangeError(void *,long,long,long,char *);
-   static void                    MultifieldPrognDriver(void *,DATA_OBJECT_PTR,char *);
+   static void                    MVRangeError(void *,EXEC_STATUS,long,long,long,char *);
+   static void                    MultifieldPrognDriver(void *,EXEC_STATUS,DATA_OBJECT_PTR,char *);
 #endif
 
 /***************************************/
@@ -105,7 +105,7 @@ struct multiFunctionData
    FIELD_VAR_STACK *FieldVarStack;
   };
 
-#define MultiFunctionData(theEnv) ((struct multiFunctionData *) GetEnvironmentData(theEnv,execStatus,MULTIFUN_DATA))
+#define MultiFunctionData(theEnv,execStatus) ((struct multiFunctionData *) GetEnvironmentData(theEnv,execStatus,MULTIFUN_DATA))
 
 /**********************************************/
 /* MultifieldFunctionDefinitions: Initializes */
@@ -925,7 +925,7 @@ globle void MemberFunction(
    long j, k;
 
    result->type = SYMBOL;
-   result->value = EnvFalseSymbol(theEnv);
+   result->value = EnvFalseSymbol(theEnv,execStatus);
 
    if (EnvArgCountCheck(theEnv,execStatus,"member$",EXACTLY,2) == -1) return;
 
@@ -1090,8 +1090,8 @@ static struct expr *MultifieldPrognParser(
          GetToken(theEnv,execStatus,infile,&tkn);
          if (tkn.type != RPAREN)
            goto MvPrognParseError;
-         PPBackup(theEnv);
-         /* PPBackup(theEnv); */
+         PPBackup(theEnv,execStatus);
+         /* PPBackup(theEnv,execStatus); */
          SavePPBuffer(theEnv,execStatus,tkn.printForm);
          SavePPBuffer(theEnv,execStatus," ");
         }
@@ -1099,20 +1099,20 @@ static struct expr *MultifieldPrognParser(
 
    if (CheckArgumentAgainstRestriction(theEnv,execStatus,top->argList,(int) 'm'))
      goto MvPrognParseError;
-   oldBindList = GetParsedBindNames(theEnv);
+   oldBindList = GetParsedBindNames(theEnv,execStatus);
    SetParsedBindNames(theEnv,execStatus,NULL);
    IncrementIndentDepth(theEnv,execStatus,3);
-   ExpressionData(theEnv)->BreakContext = TRUE;
-   ExpressionData(theEnv)->ReturnContext = ExpressionData(theEnv)->svContexts->rtn;
-   PPCRAndIndent(theEnv);
+   ExpressionData(theEnv,execStatus)->BreakContext = TRUE;
+   ExpressionData(theEnv,execStatus)->ReturnContext = ExpressionData(theEnv,execStatus)->svContexts->rtn;
+   PPCRAndIndent(theEnv,execStatus);
    top->argList->nextArg = GroupActions(theEnv,execStatus,infile,&tkn,TRUE,NULL,FALSE);
    DecrementIndentDepth(theEnv,execStatus,3);
-   PPBackup(theEnv);
-   PPBackup(theEnv);
+   PPBackup(theEnv,execStatus);
+   PPBackup(theEnv,execStatus);
    SavePPBuffer(theEnv,execStatus,tkn.printForm);
    if (top->argList->nextArg == NULL)
      {
-      ClearParsedBindNames(theEnv);
+      ClearParsedBindNames(theEnv,execStatus);
       SetParsedBindNames(theEnv,execStatus,oldBindList);
       ReturnExpression(theEnv,execStatus,top);
       return(NULL);
@@ -1121,14 +1121,14 @@ static struct expr *MultifieldPrognParser(
    top->argList->nextArg = tmp->argList;
    tmp->argList = NULL;
    ReturnExpression(theEnv,execStatus,tmp);
-   newBindList = GetParsedBindNames(theEnv);
+   newBindList = GetParsedBindNames(theEnv,execStatus);
    prev = NULL;
    while (newBindList != NULL)
      {
       if ((fieldVar == NULL) ? FALSE :
           (strcmp(ValueToString(newBindList->name),ValueToString(fieldVar)) == 0))
         {
-         ClearParsedBindNames(theEnv);
+         ClearParsedBindNames(theEnv,execStatus);
          SetParsedBindNames(theEnv,execStatus,oldBindList);
          PrintErrorID(theEnv,execStatus,"MULTIFUN",2,FALSE);
          EnvPrintRouter(theEnv,execStatus,WERROR,"Cannot rebind field variable in function progn$.\n");
@@ -1183,20 +1183,20 @@ static struct expr *ForeachParser(
 
    if (CheckArgumentAgainstRestriction(theEnv,execStatus,top->argList,(int) 'm'))
      goto ForeachParseError;
-   oldBindList = GetParsedBindNames(theEnv);
+   oldBindList = GetParsedBindNames(theEnv,execStatus);
    SetParsedBindNames(theEnv,execStatus,NULL);
    IncrementIndentDepth(theEnv,execStatus,3);
-   ExpressionData(theEnv)->BreakContext = TRUE;
-   ExpressionData(theEnv)->ReturnContext = ExpressionData(theEnv)->svContexts->rtn;
-   PPCRAndIndent(theEnv);
+   ExpressionData(theEnv,execStatus)->BreakContext = TRUE;
+   ExpressionData(theEnv,execStatus)->ReturnContext = ExpressionData(theEnv,execStatus)->svContexts->rtn;
+   PPCRAndIndent(theEnv,execStatus);
    top->argList->nextArg = GroupActions(theEnv,execStatus,infile,&tkn,TRUE,NULL,FALSE);
    DecrementIndentDepth(theEnv,execStatus,3);
-   PPBackup(theEnv);
-   PPBackup(theEnv);
+   PPBackup(theEnv,execStatus);
+   PPBackup(theEnv,execStatus);
    SavePPBuffer(theEnv,execStatus,tkn.printForm);
    if (top->argList->nextArg == NULL)
      {
-      ClearParsedBindNames(theEnv);
+      ClearParsedBindNames(theEnv,execStatus);
       SetParsedBindNames(theEnv,execStatus,oldBindList);
       ReturnExpression(theEnv,execStatus,top);
       return(NULL);
@@ -1205,14 +1205,14 @@ static struct expr *ForeachParser(
    top->argList->nextArg = tmp->argList;
    tmp->argList = NULL;
    ReturnExpression(theEnv,execStatus,tmp);
-   newBindList = GetParsedBindNames(theEnv);
+   newBindList = GetParsedBindNames(theEnv,execStatus);
    prev = NULL;
    while (newBindList != NULL)
      {
       if ((fieldVar == NULL) ? FALSE :
           (strcmp(ValueToString(newBindList->name),ValueToString(fieldVar)) == 0))
         {
-         ClearParsedBindNames(theEnv);
+         ClearParsedBindNames(theEnv,execStatus);
          SetParsedBindNames(theEnv,execStatus,oldBindList);
          PrintErrorID(theEnv,execStatus,"MULTIFUN",2,FALSE);
          EnvPrintRouter(theEnv,execStatus,WERROR,"Cannot rebind field variable in function foreach.\n");
@@ -1324,14 +1324,14 @@ static void MultifieldPrognDriver(
 
    tmpField = get_struct(theEnv,execStatus,fieldVarStack);
    tmpField->type = SYMBOL;
-   tmpField->value = EnvFalseSymbol(theEnv);
-   tmpField->nxt = MultiFunctionData(theEnv)->FieldVarStack;
-   MultiFunctionData(theEnv)->FieldVarStack = tmpField;
+   tmpField->value = EnvFalseSymbol(theEnv,execStatus);
+   tmpField->nxt = MultiFunctionData(theEnv,execStatus)->FieldVarStack;
+   MultiFunctionData(theEnv,execStatus)->FieldVarStack = tmpField;
    result->type = SYMBOL;
-   result->value = EnvFalseSymbol(theEnv);
+   result->value = EnvFalseSymbol(theEnv,execStatus);
    if (EnvArgTypeCheck(theEnv,execStatus,functionName,1,MULTIFIELD,&argval) == FALSE)
      {
-      MultiFunctionData(theEnv)->FieldVarStack = tmpField->nxt;
+      MultiFunctionData(theEnv,execStatus)->FieldVarStack = tmpField->nxt;
       rtn_struct(theEnv,execStatus,fieldVarStack,tmpField);
       return;
      }
@@ -1348,28 +1348,28 @@ static void MultifieldPrognDriver(
          execStatus->CurrentEvaluationDepth++;
          EvaluateExpression(theEnv,execStatus,theExp,result);
          execStatus->CurrentEvaluationDepth--;
-         if (ProcedureFunctionData(theEnv)->ReturnFlag == TRUE)
+         if (ProcedureFunctionData(theEnv,execStatus)->ReturnFlag == TRUE)
            { PropagateReturnValue(theEnv,execStatus,result); }
          PeriodicCleanup(theEnv,execStatus,FALSE,TRUE);
 
-         if (execStatus->HaltExecution || ProcedureFunctionData(theEnv)->BreakFlag || ProcedureFunctionData(theEnv)->ReturnFlag)
+         if (execStatus->HaltExecution || ProcedureFunctionData(theEnv,execStatus)->BreakFlag || ProcedureFunctionData(theEnv,execStatus)->ReturnFlag)
            {
             ValueDeinstall(theEnv,execStatus,&argval);
-            ProcedureFunctionData(theEnv)->BreakFlag = FALSE;
+            ProcedureFunctionData(theEnv,execStatus)->BreakFlag = FALSE;
             if (execStatus->HaltExecution)
               {
                result->type = SYMBOL;
-               result->value = EnvFalseSymbol(theEnv);
+               result->value = EnvFalseSymbol(theEnv,execStatus);
               }
-            MultiFunctionData(theEnv)->FieldVarStack = tmpField->nxt;
+            MultiFunctionData(theEnv,execStatus)->FieldVarStack = tmpField->nxt;
             rtn_struct(theEnv,execStatus,fieldVarStack,tmpField);
             return;
            }
         }
      }
    ValueDeinstall(theEnv,execStatus,&argval);
-   ProcedureFunctionData(theEnv)->BreakFlag = FALSE;
-   MultiFunctionData(theEnv)->FieldVarStack = tmpField->nxt;
+   ProcedureFunctionData(theEnv,execStatus)->BreakFlag = FALSE;
+   MultiFunctionData(theEnv,execStatus)->FieldVarStack = tmpField->nxt;
    rtn_struct(theEnv,execStatus,fieldVarStack,tmpField);
   }
 
@@ -1385,7 +1385,7 @@ globle void GetMvPrognField(
    FIELD_VAR_STACK *tmpField;
 
    depth = ValueToInteger(GetFirstArgument()->value);
-   tmpField = MultiFunctionData(theEnv)->FieldVarStack;
+   tmpField = MultiFunctionData(theEnv,execStatus)->FieldVarStack;
    while (depth > 0)
      {
       tmpField = tmpField->nxt;
@@ -1406,7 +1406,7 @@ globle long GetMvPrognIndex(
    FIELD_VAR_STACK *tmpField;
 
    depth = ValueToInteger(GetFirstArgument()->value);
-   tmpField = MultiFunctionData(theEnv)->FieldVarStack;
+   tmpField = MultiFunctionData(theEnv,execStatus)->FieldVarStack;
    while (depth > 0)
      {
       tmpField = tmpField->nxt;

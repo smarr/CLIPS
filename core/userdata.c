@@ -48,9 +48,9 @@ globle unsigned char InstallUserDataRecord(
   EXEC_STATUS,
   struct userDataRecord *theRecord)
   {
-   theRecord->dataID = UserDataData(theEnv)->UserDataRecordCount;
-   UserDataData(theEnv)->UserDataRecordArray[UserDataData(theEnv)->UserDataRecordCount] = theRecord;
-   return(UserDataData(theEnv)->UserDataRecordCount++);
+   theRecord->dataID = UserDataData(theEnv,execStatus)->UserDataRecordCount;
+   UserDataData(theEnv,execStatus)->UserDataRecordArray[UserDataData(theEnv,execStatus)->UserDataRecordCount] = theRecord;
+   return(UserDataData(theEnv,execStatus)->UserDataRecordCount++);
   }
   
 /*****************************************************/
@@ -74,7 +74,7 @@ globle struct userData *FetchUserData(
         { return(theData); }
      }
      
-   theData = (struct userData *) (*UserDataData(theEnv)->UserDataRecordArray[userDataID]->createUserData)(theEnv);
+   theData = (struct userData *) (*UserDataData(theEnv,execStatus)->UserDataRecordArray[userDataID]->createUserData)(theEnv,execStatus);
    theData->dataID = userDataID;
    theData->next = *theList;
    *theList = theData;
@@ -118,7 +118,7 @@ globle void ClearUserDataList(
    while (theList != NULL)
      {
       nextData = theList->next;
-      (*UserDataData(theEnv)->UserDataRecordArray[theList->dataID]->deleteUserData)(theEnv,execStatus,theList);
+      (*UserDataData(theEnv,execStatus)->UserDataRecordArray[theList->dataID]->deleteUserData)(theEnv,execStatus,theList);
       theList = nextData;
      }
   }
@@ -146,7 +146,7 @@ globle struct userData *DeleteUserData(
          else
            { lastData->next = theData->next; }
             
-         (*UserDataData(theEnv)->UserDataRecordArray[userDataID]->deleteUserData)(theEnv,execStatus,theData);
+         (*UserDataData(theEnv,execStatus)->UserDataRecordArray[userDataID]->deleteUserData)(theEnv,execStatus,theData);
          return(theList);
         }
         

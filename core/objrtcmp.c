@@ -49,8 +49,8 @@
                  MACROS AND TYPES
    =========================================
    ***************************************** */
-#define ObjectPNPrefix() ArbitraryPrefix(ObjectReteData(theEnv)->ObjectPatternCodeItem,0)
-#define ObjectANPrefix() ArbitraryPrefix(ObjectReteData(theEnv)->ObjectPatternCodeItem,1)
+#define ObjectPNPrefix() ArbitraryPrefix(ObjectReteData(theEnv,execStatus)->ObjectPatternCodeItem,0)
+#define ObjectANPrefix() ArbitraryPrefix(ObjectReteData(theEnv,execStatus)->ObjectPatternCodeItem,1)
 
 /* =========================================
    *****************************************
@@ -58,13 +58,13 @@
    =========================================
    ***************************************** */
 
-static void BeforeObjectPatternsToCode(void *);
+static void BeforeObjectPatternsToCode(void *,EXEC_STATUS);
 static OBJECT_PATTERN_NODE *GetNextObjectPatternNode(OBJECT_PATTERN_NODE *);
-static void InitObjectPatternsCode(void *,FILE *,int,int);
-static int ObjectPatternsToCode(void *,char *,char *,char *,int,FILE *,int,int);
-static void IntermediatePatternNodeReference(void *,OBJECT_PATTERN_NODE *,FILE *,int,int);
-static int IntermediatePatternNodesToCode(void *,char *,char *,char *,int,FILE *,int,int,int);
-static int AlphaPatternNodesToCode(void *,char *,char *,char *,int,FILE *,int,int,int);
+static void InitObjectPatternsCode(void *,EXEC_STATUS,FILE *,int,int);
+static int ObjectPatternsToCode(void *,EXEC_STATUS,char *,char *,char *,int,FILE *,int,int);
+static void IntermediatePatternNodeReference(void *,EXEC_STATUS,OBJECT_PATTERN_NODE *,FILE *,int,int);
+static int IntermediatePatternNodesToCode(void *,EXEC_STATUS,char *,char *,char *,int,FILE *,int,int,int);
+static int AlphaPatternNodesToCode(void *,EXEC_STATUS,char *,char *,char *,int,FILE *,int,int,int);
 
 /* =========================================
    *****************************************
@@ -85,7 +85,7 @@ globle void ObjectPatternsCompilerSetup(
   void *theEnv,
   EXEC_STATUS)
   {
-   ObjectReteData(theEnv)->ObjectPatternCodeItem =
+   ObjectReteData(theEnv,execStatus)->ObjectPatternCodeItem =
          AddCodeGeneratorItem(theEnv,execStatus,"object-patterns",0,BeforeObjectPatternsToCode,
                               InitObjectPatternsCode,ObjectPatternsToCode,2);
   }
@@ -156,7 +156,7 @@ static void BeforeObjectPatternsToCode(
    OBJECT_ALPHA_NODE *alphaNode;
 
    whichPattern = 0L;
-   intermediateNode = ObjectNetworkPointer(theEnv);
+   intermediateNode = ObjectNetworkPointer(theEnv,execStatus);
    while (intermediateNode != NULL)
      {
       intermediateNode->bsaveID = whichPattern++;
@@ -164,7 +164,7 @@ static void BeforeObjectPatternsToCode(
      }
 
    whichPattern = 0L;
-   alphaNode = ObjectNetworkTerminalPointer(theEnv);
+   alphaNode = ObjectNetworkTerminalPointer(theEnv,execStatus);
    while (alphaNode != NULL)
      {
       alphaNode->bsaveID = whichPattern++;
@@ -218,10 +218,10 @@ static void InitObjectPatternsCode(
   {
    long firstIntermediateNode,firstAlphaNode;
 
-   if (ObjectNetworkPointer(theEnv) != NULL)
+   if (ObjectNetworkPointer(theEnv,execStatus) != NULL)
      {
-      firstIntermediateNode = ObjectNetworkPointer(theEnv)->bsaveID;
-      firstAlphaNode = ObjectNetworkTerminalPointer(theEnv)->bsaveID;
+      firstIntermediateNode = ObjectNetworkPointer(theEnv,execStatus)->bsaveID;
+      firstAlphaNode = ObjectNetworkTerminalPointer(theEnv,execStatus)->bsaveID;
       fprintf(initFP,"   SetObjectNetworkPointer(theEnv,execStatus,&%s%d_%d[%d]);\n",
                        ObjectPNPrefix(),imageID,
                        (int) ((firstIntermediateNode / maxIndices) + 1),
@@ -346,7 +346,7 @@ static int IntermediatePatternNodesToCode(
    /* ================
       Create the file.
       ================ */
-   if (ObjectNetworkPointer(theEnv) == NULL)
+   if (ObjectNetworkPointer(theEnv,execStatus) == NULL)
      return(1);
 
    fprintf(headerFP,"#include \"objrtmch.h\"\n");
@@ -361,7 +361,7 @@ static int IntermediatePatternNodesToCode(
    arrayVersion = 1;
    i = 1;
 
-   thePattern = ObjectNetworkPointer(theEnv);
+   thePattern = ObjectNetworkPointer(theEnv,execStatus);
    while (thePattern != NULL)
      {
       if (newHeader)
@@ -452,7 +452,7 @@ static int AlphaPatternNodesToCode(
    /* ================
       Create the file.
       ================ */
-   if (ObjectNetworkTerminalPointer(theEnv) == NULL)
+   if (ObjectNetworkTerminalPointer(theEnv,execStatus) == NULL)
      return(version);
 
    /* =================================
@@ -465,7 +465,7 @@ static int AlphaPatternNodesToCode(
    arrayVersion = 1;
    i = 1;
 
-   thePattern = ObjectNetworkTerminalPointer(theEnv);
+   thePattern = ObjectNetworkTerminalPointer(theEnv,execStatus);
    while (thePattern != NULL)
      {
       if (newHeader)

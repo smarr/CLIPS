@@ -50,13 +50,13 @@ struct factHashEntry
 #define GetFactDuplication() EnvGetFactDuplication(GetCurrentEnvironment())
 #define SetFactDuplication(a) EnvSetFactDuplication(GetCurrentEnvironment(),a)
 
-   LOCALE void                           AddHashedFact(void *,struct fact *,unsigned long);
-   LOCALE intBool                        RemoveHashedFact(void *,struct fact *);
-   LOCALE unsigned long                  HandleFactDuplication(void *,void *,intBool *);
-   LOCALE intBool                        EnvGetFactDuplication(void *);
-   LOCALE intBool                        EnvSetFactDuplication(void *,int);
-   LOCALE void                           InitializeFactHashTable(void *);
-   LOCALE void                           ShowFactHashTable(void *);
+   LOCALE void                           AddHashedFact(void *,EXEC_STATUS,struct fact *,unsigned long);
+   LOCALE intBool                        RemoveHashedFact(void *,EXEC_STATUS,struct fact *);
+   LOCALE unsigned long                  HandleFactDuplication(void *,EXEC_STATUS,void *,intBool *);
+   LOCALE intBool                        EnvGetFactDuplication(void *,EXEC_STATUS);
+   LOCALE intBool                        EnvSetFactDuplication(void *,EXEC_STATUS,int);
+   LOCALE void                           InitializeFactHashTable(void *,EXEC_STATUS);
+   LOCALE void                           ShowFactHashTable(void *,EXEC_STATUS);
    LOCALE unsigned long                  HashFact(struct fact *);
 
 #endif

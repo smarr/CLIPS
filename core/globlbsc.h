@@ -45,19 +45,19 @@
 #define SetDefglobalWatch(a,b) EnvSetDefglobalWatch(GetCurrentEnvironment(),a,b)
 #define Undefglobal(a) EnvUndefglobal(GetCurrentEnvironment(),a)
 
-   LOCALE void                           DefglobalBasicCommands(void *);
-   LOCALE void                           UndefglobalCommand(void *);
-   LOCALE intBool                        EnvUndefglobal(void *,void *);
-   LOCALE void                           GetDefglobalListFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                           EnvGetDefglobalList(void *,DATA_OBJECT_PTR,void *);
-   LOCALE void                          *DefglobalModuleFunction(void *);
-   LOCALE void                           PPDefglobalCommand(void *);
-   LOCALE int                            PPDefglobal(void *,char *,char *);
-   LOCALE void                           ListDefglobalsCommand(void *);
-   LOCALE void                           EnvListDefglobals(void *,char *,void *);
-   LOCALE unsigned                       EnvGetDefglobalWatch(void *,void *);
-   LOCALE void                           EnvSetDefglobalWatch(void *,unsigned,void *);
-   LOCALE void                           ResetDefglobals(void *);
+   LOCALE void                           DefglobalBasicCommands(void *,EXEC_STATUS);
+   LOCALE void                           UndefglobalCommand(void *,EXEC_STATUS);
+   LOCALE intBool                        EnvUndefglobal(void *,EXEC_STATUS,void *);
+   LOCALE void                           GetDefglobalListFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
+   LOCALE void                           EnvGetDefglobalList(void *,EXEC_STATUS,DATA_OBJECT_PTR,void *);
+   LOCALE void                          *DefglobalModuleFunction(void *,EXEC_STATUS);
+   LOCALE void                           PPDefglobalCommand(void *,EXEC_STATUS);
+   LOCALE int                            PPDefglobal(void *,EXEC_STATUS,char *,char *);
+   LOCALE void                           ListDefglobalsCommand(void *,EXEC_STATUS);
+   LOCALE void                           EnvListDefglobals(void *,EXEC_STATUS,char *,void *);
+   LOCALE unsigned                       EnvGetDefglobalWatch(void *,EXEC_STATUS,void *);
+   LOCALE void                           EnvSetDefglobalWatch(void *,EXEC_STATUS,unsigned,void *);
+   LOCALE void                           ResetDefglobals(void *,EXEC_STATUS);
 
 #ifndef _GLOBLBSC_SOURCE_
    extern unsigned                       WatchGlobals;

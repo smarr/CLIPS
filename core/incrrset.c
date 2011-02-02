@@ -54,12 +54,12 @@
 /***************************************/
 
 #if (! RUN_TIME) && (! BLOAD_ONLY)
-   static void                    MarkNetworkForIncrementalReset(void *,struct defrule *,int);
-   static void                    MarkJoinsForIncrementalReset(void *,struct joinNode *,int);
-   static void                    CheckForPrimableJoins(void *,struct defrule *,struct joinNode *);
-   static void                    PrimeJoinFromLeftMemory(void *,struct joinNode *);
-   static void                    PrimeJoinFromRightMemory(void *,struct joinNode *);
-   static void                    MarkPatternForIncrementalReset(void *,int,struct patternNodeHeader *,int);
+   static void                    MarkNetworkForIncrementalReset(void *,EXEC_STATUS,struct defrule *,int);
+   static void                    MarkJoinsForIncrementalReset(void *,EXEC_STATUS,struct joinNode *,int);
+   static void                    CheckForPrimableJoins(void *,EXEC_STATUS,struct defrule *,struct joinNode *);
+   static void                    PrimeJoinFromLeftMemory(void *,EXEC_STATUS,struct joinNode *);
+   static void                    PrimeJoinFromRightMemory(void *,EXEC_STATUS,struct joinNode *);
+   static void                    MarkPatternForIncrementalReset(void *,EXEC_STATUS,int,struct patternNodeHeader *,int);
 #endif
 
 /**************************************************************/
@@ -82,7 +82,7 @@ globle void IncrementalReset(
    /* If incremental reset is disabled, then return. */
    /*================================================*/
 
-   if (! EnvGetIncrementalReset(theEnv)) return;
+   if (! EnvGetIncrementalReset(theEnv,execStatus)) return;
 
    /*=====================================================*/
    /* Mark the pattern and join network data structures   */
@@ -95,7 +95,7 @@ globle void IncrementalReset(
    /* Begin incremental reset. */
    /*==========================*/
 
-   EngineData(theEnv)->IncrementalResetInProgress = TRUE;
+   EngineData(theEnv,execStatus)->IncrementalResetInProgress = TRUE;
 
    /*============================================================*/
    /* If the new rule shares patterns or joins with other rules, */
@@ -113,19 +113,19 @@ globle void IncrementalReset(
    /* portions of the pattern and join networks.    */
    /*===============================================*/
 
-   for (theParser = PatternData(theEnv)->ListOfPatternParsers;
+   for (theParser = PatternData(theEnv,execStatus)->ListOfPatternParsers;
         theParser != NULL;
         theParser = theParser->next)
      {
       if (theParser->incrementalResetFunction != NULL)
-        { (*theParser->incrementalResetFunction)(theEnv); }
+        { (*theParser->incrementalResetFunction)(theEnv,execStatus); }
      }
 
    /*========================*/
    /* End incremental reset. */
    /*========================*/
 
-   EngineData(theEnv)->IncrementalResetInProgress = FALSE;
+   EngineData(theEnv,execStatus)->IncrementalResetInProgress = FALSE;
 
    /*====================================================*/
    /* Remove the marks in the pattern and join networks. */
@@ -526,7 +526,7 @@ globle intBool EnvGetIncrementalReset(
   void *theEnv,
   EXEC_STATUS)
   {   
-   return(EngineData(theEnv)->IncrementalResetFlag);
+   return(EngineData(theEnv,execStatus)->IncrementalResetFlag);
   }
 
 /********************************************/
@@ -541,7 +541,7 @@ globle intBool EnvSetIncrementalReset(
    int ov;
    struct defmodule *theModule;
 
-   SaveCurrentModule(theEnv);
+   SaveCurrentModule(theEnv,execStatus);
 
    for (theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,NULL);
         theModule != NULL;
@@ -550,15 +550,15 @@ globle intBool EnvSetIncrementalReset(
       EnvSetCurrentModule(theEnv,execStatus,(void *) theModule);
       if (EnvGetNextDefrule(theEnv,execStatus,NULL) != NULL)
         {
-         RestoreCurrentModule(theEnv);
+         RestoreCurrentModule(theEnv,execStatus);
          return(-1);
         }
      }
      
-   RestoreCurrentModule(theEnv);
+   RestoreCurrentModule(theEnv,execStatus);
 
-   ov = EngineData(theEnv)->IncrementalResetFlag;
-   EngineData(theEnv)->IncrementalResetFlag = value;
+   ov = EngineData(theEnv,execStatus)->IncrementalResetFlag;
+   EngineData(theEnv,execStatus)->IncrementalResetFlag = value;
    return(ov);
   }
 
@@ -574,7 +574,7 @@ globle int SetIncrementalResetCommand(
    DATA_OBJECT argPtr;
    struct defmodule *theModule;
 
-   oldValue = EnvGetIncrementalReset(theEnv);
+   oldValue = EnvGetIncrementalReset(theEnv,execStatus);
 
    /*============================================*/
    /* Check for the correct number of arguments. */
@@ -588,7 +588,7 @@ globle int SetIncrementalResetCommand(
    /* changed when rules are loaded.          */
    /*=========================================*/
 
-   SaveCurrentModule(theEnv);
+   SaveCurrentModule(theEnv,execStatus);
 
    for (theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,NULL);
         theModule != NULL;
@@ -597,7 +597,7 @@ globle int SetIncrementalResetCommand(
       EnvSetCurrentModule(theEnv,execStatus,(void *) theModule);
       if (EnvGetNextDefrule(theEnv,execStatus,NULL) != NULL)
         {
-         RestoreCurrentModule(theEnv);
+         RestoreCurrentModule(theEnv,execStatus);
          PrintErrorID(theEnv,execStatus,"INCRRSET",1,FALSE);
          EnvPrintRouter(theEnv,execStatus,WERROR,"The incremental reset behavior cannot be changed with rules loaded.\n");
          SetEvaluationError(theEnv,execStatus,TRUE);
@@ -605,7 +605,7 @@ globle int SetIncrementalResetCommand(
         }
      }
      
-   RestoreCurrentModule(theEnv);
+   RestoreCurrentModule(theEnv,execStatus);
 
    /*==================================================*/
    /* The symbol FALSE disables incremental reset. Any */
@@ -614,7 +614,7 @@ globle int SetIncrementalResetCommand(
 
    EnvRtnUnknown(theEnv,execStatus,1,&argPtr);
 
-   if ((argPtr.value == EnvFalseSymbol(theEnv)) && (argPtr.type == SYMBOL))
+   if ((argPtr.value == EnvFalseSymbol(theEnv,execStatus)) && (argPtr.type == SYMBOL))
      { EnvSetIncrementalReset(theEnv,execStatus,FALSE); }
    else
      { EnvSetIncrementalReset(theEnv,execStatus,TRUE); }
@@ -636,7 +636,7 @@ globle int GetIncrementalResetCommand(
   {
    int oldValue;
 
-   oldValue = EnvGetIncrementalReset(theEnv);
+   oldValue = EnvGetIncrementalReset(theEnv,execStatus);
 
    if (EnvArgCountCheck(theEnv,execStatus,"get-incremental-reset",EXACTLY,0) == -1)
      { return(oldValue); }

@@ -38,8 +38,8 @@
 #define LOCALE extern
 #endif
 
-LOCALE void SetupDefinstancesCompiler(void *);
-LOCALE void DefinstancesCModuleReference(void *,FILE *,int,int,int);
+LOCALE void SetupDefinstancesCompiler(void *,EXEC_STATUS);
+LOCALE void DefinstancesCModuleReference(void *,EXEC_STATUS,FILE *,int,int,int);
 
 #endif
 

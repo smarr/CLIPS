@@ -431,8 +431,8 @@ globle struct expr *CombineExpressions(
    /* 2nd expression in the argument list of the 1st expression. */
    /*============================================================*/
 
-   if ((expr1->value == ExpressionData(theEnv)->PTR_AND) &&
-       (expr2->value != ExpressionData(theEnv)->PTR_AND))
+   if ((expr1->value == ExpressionData(theEnv,execStatus)->PTR_AND) &&
+       (expr2->value != ExpressionData(theEnv,execStatus)->PTR_AND))
      {
       tempPtr = expr1->argList;
       if (tempPtr == NULL)
@@ -454,8 +454,8 @@ globle struct expr *CombineExpressions(
    /* 1st expression in the argument list of the 2nd expression. */
    /*============================================================*/
 
-   if ((expr1->value != ExpressionData(theEnv)->PTR_AND) &&
-       (expr2->value == ExpressionData(theEnv)->PTR_AND))
+   if ((expr1->value != ExpressionData(theEnv,execStatus)->PTR_AND) &&
+       (expr2->value == ExpressionData(theEnv,execStatus)->PTR_AND))
      {
       tempPtr = expr2->argList;
       if (tempPtr == NULL)
@@ -476,8 +476,8 @@ globle struct expr *CombineExpressions(
    /* and throw away the extraneous "and" expression.           */
    /*===========================================================*/
 
-   if ((expr1->value == ExpressionData(theEnv)->PTR_AND) &&
-       (expr2->value == ExpressionData(theEnv)->PTR_AND))
+   if ((expr1->value == ExpressionData(theEnv,execStatus)->PTR_AND) &&
+       (expr2->value == ExpressionData(theEnv,execStatus)->PTR_AND))
      {
       tempPtr = expr1->argList;
       if (tempPtr == NULL)
@@ -501,7 +501,7 @@ globle struct expr *CombineExpressions(
    /* to the argument list of that "and" expression.      */
    /*=====================================================*/
 
-   tempPtr = GenConstant(theEnv,execStatus,FCALL,ExpressionData(theEnv)->PTR_AND);
+   tempPtr = GenConstant(theEnv,execStatus,FCALL,ExpressionData(theEnv,execStatus)->PTR_AND);
    tempPtr->argList = expr1;
    expr1->nextArg = expr2;
    return(tempPtr);

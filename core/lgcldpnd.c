@@ -57,7 +57,7 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static struct dependency      *DetachAssociatedDependencies(void *,struct dependency *,void *);
+   static struct dependency      *DetachAssociatedDependencies(void *,EXEC_STATUS,struct dependency *,void *);
 
 /***********************************************************************/
 /* AddLogicalDependencies: Adds the logical dependency links between a */
@@ -89,7 +89,7 @@ globle intBool AddLogicalDependencies(
    /* dependencies have to be established.         */
    /*==============================================*/
 
-   if (EngineData(theEnv)->TheLogicalJoin == NULL)
+   if (EngineData(theEnv,execStatus)->TheLogicalJoin == NULL)
      {
       if (existingEntity) RemoveEntityDependencies(theEnv,execStatus,theEntity);
       return(TRUE);
@@ -106,7 +106,7 @@ globle intBool AddLogicalDependencies(
    /* link should not be added.                                 */
    /*===========================================================*/
 
-   theBinds = EngineData(theEnv)->TheLogicalBind;
+   theBinds = EngineData(theEnv,execStatus)->TheLogicalBind;
    if (theBinds == NULL) return(FALSE);
    if ((theBinds->leftParent == NULL) && (theBinds->rightParent == NULL))
      { return(FALSE); }
@@ -411,8 +411,8 @@ globle void RemoveLogicalSupport(
       if (theEntity->dependents == NULL)
         {
          (*theEntity->theInfo->base.incrementBusyCount)(theEnv,execStatus,theEntity);
-         dlPtr->next = EngineData(theEnv)->UnsupportedDataEntities;
-         EngineData(theEnv)->UnsupportedDataEntities = dlPtr;
+         dlPtr->next = EngineData(theEnv,execStatus)->UnsupportedDataEntities;
+         EngineData(theEnv,execStatus)->UnsupportedDataEntities = dlPtr;
         }
       else
         { rtn_struct(theEnv,execStatus,dependency,dlPtr); }
@@ -454,8 +454,8 @@ globle void ForceLogicalRetractions(
    /* be handled properly.                              */
    /*===================================================*/
 
-   if (EngineData(theEnv)->alreadyEntered) return;
-   EngineData(theEnv)->alreadyEntered = TRUE;
+   if (EngineData(theEnv,execStatus)->alreadyEntered) return;
+   EngineData(theEnv,execStatus)->alreadyEntered = TRUE;
 
    /*=======================================================*/
    /* Continue to delete the first item on the list as long */
@@ -464,20 +464,20 @@ globle void ForceLogicalRetractions(
    /* entities are deleted.                                 */
    /*=======================================================*/
 
-   while (EngineData(theEnv)->UnsupportedDataEntities != NULL)
+   while (EngineData(theEnv,execStatus)->UnsupportedDataEntities != NULL)
      {
       /*==========================================*/
       /* Determine the data entity to be deleted. */
       /*==========================================*/
 
-      theEntity = (struct patternEntity *) EngineData(theEnv)->UnsupportedDataEntities->dPtr;
+      theEntity = (struct patternEntity *) EngineData(theEnv,execStatus)->UnsupportedDataEntities->dPtr;
 
       /*================================================*/
       /* Remove the dependency structure from the list. */
       /*================================================*/
 
-      tempPtr = EngineData(theEnv)->UnsupportedDataEntities;
-      EngineData(theEnv)->UnsupportedDataEntities = EngineData(theEnv)->UnsupportedDataEntities->next;
+      tempPtr = EngineData(theEnv,execStatus)->UnsupportedDataEntities;
+      EngineData(theEnv,execStatus)->UnsupportedDataEntities = EngineData(theEnv,execStatus)->UnsupportedDataEntities->next;
       rtn_struct(theEnv,execStatus,dependency,tempPtr);
 
       /*=========================*/
@@ -492,7 +492,7 @@ globle void ForceLogicalRetractions(
    /* Deletion of items on the list is complete. */
    /*============================================*/
 
-   EngineData(theEnv)->alreadyEntered = FALSE;
+   EngineData(theEnv,execStatus)->alreadyEntered = FALSE;
   }
 
 /****************************************************************/
@@ -525,7 +525,7 @@ globle void Dependencies(
         fdPtr != NULL;
         fdPtr = fdPtr->next)
      {
-      if (GetHaltExecution(theEnv) == TRUE) return;
+      if (GetHaltExecution(theEnv,execStatus) == TRUE) return;
       PrintPartialMatch(theEnv,execStatus,WDISPLAY,(struct partialMatch *) fdPtr->dPtr);
       EnvPrintRouter(theEnv,execStatus,WDISPLAY,"\n");
      }
@@ -553,7 +553,7 @@ globle void Dependents(
         entityPtr != NULL;
         GetNextPatternEntity(theEnv,execStatus,&theParser,&entityPtr))
      {
-      if (GetHaltExecution(theEnv) == TRUE) return;
+      if (GetHaltExecution(theEnv,execStatus) == TRUE) return;
 
       /*====================================*/
       /* Loop through every dependency link */
@@ -564,7 +564,7 @@ globle void Dependents(
            fdPtr != NULL;
            fdPtr = fdPtr->next)
         {
-         if (GetHaltExecution(theEnv) == TRUE) return;
+         if (GetHaltExecution(theEnv,execStatus) == TRUE) return;
 
          /*=====================================================*/
          /* If the data entity which was the argument passed to */

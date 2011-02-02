@@ -43,7 +43,7 @@
 #define LOCALE extern
 #endif
 
-   LOCALE intBool                        VariableAnalysis(void *,struct lhsParseNode *);
+   LOCALE intBool                        VariableAnalysis(void *,EXEC_STATUS,struct lhsParseNode *);
 
 #endif
 

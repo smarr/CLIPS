@@ -48,14 +48,14 @@
 #define LOCALE extern
 #endif
 
-   void                           NetworkAssert(void *,struct partialMatch *,struct joinNode *);
-   intBool                        EvaluateJoinExpression(void *,struct expr *,struct joinNode *);
-   void                           NetworkAssertLeft(void *,struct partialMatch *,struct joinNode *);
-   void                           NetworkAssertRight(void *,struct partialMatch *,struct joinNode *);
-   void                           PPDrive(void *,struct partialMatch *,struct partialMatch *,struct joinNode *);
-   unsigned long                  BetaMemoryHashValue(void *,struct expr *,struct partialMatch *,struct partialMatch *,struct joinNode *);
-   intBool                        EvaluateSecondaryNetworkTest(void *,struct partialMatch *,struct joinNode *);
-   void                           EPMDrive(void *,struct partialMatch *,struct joinNode *);
+   void                           NetworkAssert(void *,EXEC_STATUS,struct partialMatch *,struct joinNode *);
+   intBool                        EvaluateJoinExpression(void *,EXEC_STATUS,struct expr *,struct joinNode *);
+   void                           NetworkAssertLeft(void *,EXEC_STATUS,struct partialMatch *,struct joinNode *);
+   void                           NetworkAssertRight(void *,EXEC_STATUS,struct partialMatch *,struct joinNode *);
+   void                           PPDrive(void *,EXEC_STATUS,struct partialMatch *,struct partialMatch *,struct joinNode *);
+   unsigned long                  BetaMemoryHashValue(void *,EXEC_STATUS,struct expr *,struct partialMatch *,struct partialMatch *,struct joinNode *);
+   intBool                        EvaluateSecondaryNetworkTest(void *,EXEC_STATUS,struct partialMatch *,struct joinNode *);
+   void                           EPMDrive(void *,EXEC_STATUS,struct partialMatch *,struct joinNode *);
    
 #endif
 

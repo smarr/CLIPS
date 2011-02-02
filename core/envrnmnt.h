@@ -88,31 +88,31 @@ typedef struct environmentData * ENVIRONMENT_DATA_PTR;
 
 #define GetEnvironmentData(theEnv,execStatus,position) (((struct environmentData *) theEnv)->theData[position])
 #define SetEnvironmentData(theEnv,execStatus,position,value) (((struct environmentData *) theEnv)->theData[position] = value)
-#define Env(theEnv) ((struct environmentData *)theEnv)
+#define Env(theEnv,execStatus) ((struct environmentData *)theEnv)
 
-   LOCALE intBool                        AllocateEnvironmentData(void *,unsigned int,unsigned long,void (*)(void *));
+   LOCALE intBool                        AllocateEnvironmentData(void *,EXEC_STATUS,unsigned int,unsigned long,void (*)(void *));
    LOCALE intBool                        DeallocateEnvironmentData(void);
 #if ALLOW_ENVIRONMENT_GLOBALS
-   LOCALE void                           SetCurrentEnvironment(void *);
+   LOCALE void                           SetCurrentEnvironment(void *,EXEC_STATUS);
    LOCALE intBool                        SetCurrentEnvironmentByIndex(unsigned long);
    LOCALE void                          *GetEnvironmentByIndex(unsigned long);
    LOCALE void                          *GetCurrentEnvironment(void);
    LOCALE struct executionStatus        *GetCurrentExectionStatus(void);
-   LOCALE unsigned long                  GetEnvironmentIndex(void *);
+   LOCALE unsigned long                  GetEnvironmentIndex(void *,EXEC_STATUS);
 #endif
    LOCALE void                          *CreateEnvironment(void);
    LOCALE void                          *CreateRuntimeEnvironment(struct symbolHashNode **,struct floatHashNode **,
                                                                   struct integerHashNode **,struct bitMapHashNode **);
-   LOCALE intBool                        DestroyEnvironment(void *);
-   LOCALE intBool                        AddEnvironmentCleanupFunction(void *,char *,void (*)(void *),int);
-   LOCALE void                          *GetEnvironmentContext(void *);
-   LOCALE void                          *SetEnvironmentContext(void *,void *);
-   LOCALE void                          *GetEnvironmentRouterContext(void *);
-   LOCALE void                          *SetEnvironmentRouterContext(void *,void *);
-   LOCALE void                          *GetEnvironmentFunctionContext(void *);
-   LOCALE void                          *SetEnvironmentFunctionContext(void *,void *);
-   LOCALE void                          *GetEnvironmentCallbackContext(void *);
-   LOCALE void                          *SetEnvironmentCallbackContext(void *,void *);
+   LOCALE intBool                        DestroyEnvironment(void *,EXEC_STATUS);
+   LOCALE intBool                        AddEnvironmentCleanupFunction(void *,EXEC_STATUS,char *,void (*)(void *),int);
+   LOCALE void                          *GetEnvironmentContext(void *,EXEC_STATUS);
+   LOCALE void                          *SetEnvironmentContext(void *,EXEC_STATUS,void *);
+   LOCALE void                          *GetEnvironmentRouterContext(void *,EXEC_STATUS);
+   LOCALE void                          *SetEnvironmentRouterContext(void *,EXEC_STATUS,void *);
+   LOCALE void                          *GetEnvironmentFunctionContext(void *,EXEC_STATUS);
+   LOCALE void                          *SetEnvironmentFunctionContext(void *,EXEC_STATUS,void *);
+   LOCALE void                          *GetEnvironmentCallbackContext(void *,EXEC_STATUS);
+   LOCALE void                          *SetEnvironmentCallbackContext(void *,EXEC_STATUS,void *);
 
 #endif
 

@@ -79,25 +79,25 @@
    =========================================
    ***************************************** */
 
-static intBool ValidGenericName(void *,char *);
-static SYMBOL_HN *ParseMethodNameAndIndex(void *,char *,int *);
+static intBool ValidGenericName(void *,EXEC_STATUS,char *);
+static SYMBOL_HN *ParseMethodNameAndIndex(void *,EXEC_STATUS,char *,int *);
 
 #if DEBUGGING_FUNCTIONS
-static void CreateDefaultGenericPPForm(void *,DEFGENERIC *);
+static void CreateDefaultGenericPPForm(void *,EXEC_STATUS,DEFGENERIC *);
 #endif
 
-static int ParseMethodParameters(void *,char *,EXPRESSION **,SYMBOL_HN **);
-static RESTRICTION *ParseRestriction(void *,char *);
-static void ReplaceCurrentArgRefs(void *,EXPRESSION *);
-static int DuplicateParameters(void *,EXPRESSION *,EXPRESSION **,SYMBOL_HN *);
-static EXPRESSION *AddParameter(void *,EXPRESSION *,EXPRESSION *,SYMBOL_HN *,RESTRICTION *);
-static EXPRESSION *ValidType(void *,SYMBOL_HN *);
-static intBool RedundantClasses(void *,void *,void *);
-static DEFGENERIC *AddGeneric(void *,SYMBOL_HN *,int *);
-static DEFMETHOD *AddGenericMethod(void *,DEFGENERIC *,int,short);
+static int ParseMethodParameters(void *,EXEC_STATUS,char *,EXPRESSION **,SYMBOL_HN **);
+static RESTRICTION *ParseRestriction(void *,EXEC_STATUS,char *);
+static void ReplaceCurrentArgRefs(void *,EXEC_STATUS,EXPRESSION *);
+static int DuplicateParameters(void *,EXEC_STATUS,EXPRESSION *,EXPRESSION **,SYMBOL_HN *);
+static EXPRESSION *AddParameter(void *,EXEC_STATUS,EXPRESSION *,EXPRESSION *,SYMBOL_HN *,RESTRICTION *);
+static EXPRESSION *ValidType(void *,EXEC_STATUS,SYMBOL_HN *);
+static intBool RedundantClasses(void *,EXEC_STATUS,void *,void *);
+static DEFGENERIC *AddGeneric(void *,EXEC_STATUS,SYMBOL_HN *,int *);
+static DEFMETHOD *AddGenericMethod(void *,EXEC_STATUS,DEFGENERIC *,int,short);
 static int RestrictionsCompare(EXPRESSION *,int,int,int,DEFMETHOD *);
 static int TypeListCompare(RESTRICTION *,RESTRICTION *);
-static DEFGENERIC *NewGeneric(void *,SYMBOL_HN *);
+static DEFGENERIC *NewGeneric(void *,EXEC_STATUS,SYMBOL_HN *);
 
 /* =========================================
    *****************************************
@@ -124,19 +124,19 @@ globle intBool ParseDefgeneric(
    int newGeneric;
 
    SetPPBufferStatus(theEnv,execStatus,ON);
-   FlushPPBuffer(theEnv);
+   FlushPPBuffer(theEnv,execStatus);
    SavePPBuffer(theEnv,execStatus,"(defgeneric ");
    SetIndentDepth(theEnv,execStatus,3);
 
 #if BLOAD || BLOAD_AND_BSAVE
-   if ((Bloaded(theEnv) == TRUE) && (! ConstructData(theEnv)->CheckSyntaxMode))
+   if ((Bloaded(theEnv,execStatus) == TRUE) && (! ConstructData(theEnv,execStatus)->CheckSyntaxMode))
      {
       CannotLoadWithBloadMessage(theEnv,execStatus,"defgeneric");
       return(TRUE);
      }
 #endif
 
-   gname = GetConstructNameAndComment(theEnv,execStatus,readSource,&DefgenericData(theEnv)->GenericInputToken,"defgeneric",
+   gname = GetConstructNameAndComment(theEnv,execStatus,readSource,&DefgenericData(theEnv,execStatus)->GenericInputToken,"defgeneric",
                                       EnvFindDefgeneric,NULL,"^",TRUE,
                                       TRUE,TRUE);
    if (gname == NULL)
@@ -145,7 +145,7 @@ globle intBool ParseDefgeneric(
    if (ValidGenericName(theEnv,execStatus,ValueToString(gname)) == FALSE)
      return(TRUE);
 
-   if (DefgenericData(theEnv)->GenericInputToken.type != RPAREN)
+   if (DefgenericData(theEnv,execStatus)->GenericInputToken.type != RPAREN)
      {
       PrintErrorID(theEnv,execStatus,"GENRCPSR",1,FALSE);
       EnvPrintRouter(theEnv,execStatus,WERROR,"Expected ')' to complete defgeneric.\n");
@@ -158,13 +158,13 @@ globle intBool ParseDefgeneric(
       successfully parsed deffacts to the KB.
       ======================================================== */
 
-   if (ConstructData(theEnv)->CheckSyntaxMode)
+   if (ConstructData(theEnv,execStatus)->CheckSyntaxMode)
      { return(FALSE); }
 
    gfunc = AddGeneric(theEnv,execStatus,gname,&newGeneric);
 
 #if DEBUGGING_FUNCTIONS
-   SetDefgenericPPForm((void *) gfunc,EnvGetConserveMemory(theEnv) ? NULL : CopyPPBuffer(theEnv));
+   SetDefgenericPPForm((void *) gfunc,EnvGetConserveMemory(theEnv,execStatus) ? NULL : CopyPPBuffer(theEnv,execStatus));
 #endif
    return(FALSE);
   }
@@ -198,12 +198,12 @@ globle intBool ParseDefmethod(
    int theIndex;
 
    SetPPBufferStatus(theEnv,execStatus,ON);
-   FlushPPBuffer(theEnv);
+   FlushPPBuffer(theEnv,execStatus);
    SetIndentDepth(theEnv,execStatus,3);
    SavePPBuffer(theEnv,execStatus,"(defmethod ");
 
 #if BLOAD || BLOAD_AND_BSAVE
-   if ((Bloaded(theEnv) == TRUE) && (! ConstructData(theEnv)->CheckSyntaxMode))
+   if ((Bloaded(theEnv,execStatus) == TRUE) && (! ConstructData(theEnv,execStatus)->CheckSyntaxMode))
      {
       CannotLoadWithBloadMessage(theEnv,execStatus,"defmethod");
       return(TRUE);
@@ -224,7 +224,7 @@ globle intBool ParseDefmethod(
    gfunc = AddGeneric(theEnv,execStatus,gname,&newMethod);
 
 #if DEBUGGING_FUNCTIONS
-   if (newMethod && (! ConstructData(theEnv)->CheckSyntaxMode))
+   if (newMethod && (! ConstructData(theEnv,execStatus)->CheckSyntaxMode))
       CreateDefaultGenericPPForm(theEnv,execStatus,gfunc);
 #endif
 
@@ -233,7 +233,7 @@ globle intBool ParseDefmethod(
    DecrementIndentDepth(theEnv,execStatus,1);
    if (rcnt == -1)
      goto DefmethodParseError;
-   PPCRAndIndent(theEnv);
+   PPCRAndIndent(theEnv,execStatus);
    for (tmp = params ; tmp != NULL ; tmp = tmp->nextArg)
      {
       ReplaceCurrentArgRefs(theEnv,execStatus,((RESTRICTION *) tmp->argList)->query);
@@ -288,16 +288,16 @@ globle intBool ParseDefmethod(
       DeleteTempRestricts(theEnv,execStatus,params);
       goto DefmethodParseError;
      }
-   ExpressionData(theEnv)->ReturnContext = TRUE;
+   ExpressionData(theEnv,execStatus)->ReturnContext = TRUE;
    actions = ParseProcActions(theEnv,execStatus,"method",readSource,
-                              &DefgenericData(theEnv)->GenericInputToken,params,wildcard,
+                              &DefgenericData(theEnv,execStatus)->GenericInputToken,params,wildcard,
                               NULL,NULL,&lvars,NULL);
                               
    /*===========================================================*/
    /* Check for the closing right parenthesis of the defmethod. */
    /*===========================================================*/
 
-   if ((DefgenericData(theEnv)->GenericInputToken.type != RPAREN) &&  /* DR0872 */
+   if ((DefgenericData(theEnv,execStatus)->GenericInputToken.type != RPAREN) &&  /* DR0872 */
        (actions != NULL))
      {
       SyntaxErrorMessage(theEnv,execStatus,"defmethod");
@@ -317,7 +317,7 @@ globle intBool ParseDefmethod(
    /* successfully parsed deffunction to the KB.   */
    /*==============================================*/
 
-   if (ConstructData(theEnv)->CheckSyntaxMode)
+   if (ConstructData(theEnv,execStatus)->CheckSyntaxMode)
      {
       DeleteTempRestricts(theEnv,execStatus,params);
       ReturnPackedExpression(theEnv,execStatus,actions);
@@ -329,19 +329,19 @@ globle intBool ParseDefmethod(
       return(FALSE);
      }
 
-   PPBackup(theEnv);
-   PPBackup(theEnv);
-   SavePPBuffer(theEnv,execStatus,DefgenericData(theEnv)->GenericInputToken.printForm);
+   PPBackup(theEnv,execStatus);
+   PPBackup(theEnv,execStatus);
+   SavePPBuffer(theEnv,execStatus,DefgenericData(theEnv,execStatus)->GenericInputToken.printForm);
    SavePPBuffer(theEnv,execStatus,"\n");
 
 #if DEBUGGING_FUNCTIONS
    meth = AddMethod(theEnv,execStatus,gfunc,meth,mposn,(short) theIndex,params,rcnt,lvars,wildcard,actions,
-             EnvGetConserveMemory(theEnv) ? NULL : CopyPPBuffer(theEnv),FALSE);
+             EnvGetConserveMemory(theEnv,execStatus) ? NULL : CopyPPBuffer(theEnv,execStatus),FALSE);
 #else
    meth = AddMethod(theEnv,execStatus,gfunc,meth,mposn,theIndex,params,rcnt,lvars,wildcard,actions,NULL,FALSE);
 #endif
    DeleteTempRestricts(theEnv,execStatus,params);
-   if (GetPrintWhileLoading(theEnv) && GetCompilationsWatch(theEnv))
+   if (GetPrintWhileLoading(theEnv,execStatus) && GetCompilationsWatch(theEnv,execStatus))
      {
       EnvPrintRouter(theEnv,execStatus,WDIALOG,"   Method #");
       PrintLongInteger(theEnv,execStatus,WDIALOG,(long long) meth->index);
@@ -478,7 +478,7 @@ globle DEFMETHOD *AddMethod(
          if (rtmp->types != NULL)
            {
             rptr->types = (void **) gm2(theEnv,execStatus,(rptr->tcnt * sizeof(void *)));
-            GenCopyMemory(void *,rptr->tcnt,rptr->types,rtmp->types);
+            GenCopyMemory(void *,EXEC_STATUS,rptr->tcnt,rptr->types,rtmp->types);
            }
          else
            rptr->types = NULL;
@@ -674,7 +674,7 @@ static intBool ValidGenericName(
    if (theDeffunction != NULL)
      {
       theModule = GetConstructModuleItem(theDeffunction)->theModule;
-      if (theModule != ((struct defmodule *) EnvGetCurrentModule(theEnv)))
+      if (theModule != ((struct defmodule *) EnvGetCurrentModule(theEnv,execStatus)))
         {
          PrintErrorID(theEnv,execStatus,"GENRCPSR",4,FALSE);
          EnvPrintRouter(theEnv,execStatus,WERROR,"Deffunction ");
@@ -750,7 +750,7 @@ static void CreateDefaultGenericPPForm(
   {
    char *moduleName,*genericName,*buf;
 
-   moduleName = EnvGetDefmoduleName(theEnv,execStatus,(void *) ((struct defmodule *) EnvGetCurrentModule(theEnv)));
+   moduleName = EnvGetDefmoduleName(theEnv,execStatus,(void *) ((struct defmodule *) EnvGetCurrentModule(theEnv,execStatus)));
    genericName = EnvGetDefgenericName(theEnv,execStatus,(void *) gfunc);
    buf = (char *) gm2(theEnv,execStatus,(sizeof(char) * (strlen(moduleName) + strlen(genericName) + 17)));
    gensprintf(buf,"(defgeneric %s::%s)\n",moduleName,genericName);
@@ -779,19 +779,19 @@ static SYMBOL_HN *ParseMethodNameAndIndex(
    SYMBOL_HN *gname;
 
    *theIndex = 0;
-   gname = GetConstructNameAndComment(theEnv,execStatus,readSource,&DefgenericData(theEnv)->GenericInputToken,"defgeneric",
+   gname = GetConstructNameAndComment(theEnv,execStatus,readSource,&DefgenericData(theEnv,execStatus)->GenericInputToken,"defgeneric",
                                       EnvFindDefgeneric,NULL,"&",TRUE,FALSE,TRUE);
    if (gname == NULL)
      return(NULL);
-   if (GetType(DefgenericData(theEnv)->GenericInputToken) == INTEGER)
+   if (GetType(DefgenericData(theEnv,execStatus)->GenericInputToken) == INTEGER)
      {
       int tmp;
 
-      PPBackup(theEnv);
-      PPBackup(theEnv);
+      PPBackup(theEnv,execStatus);
+      PPBackup(theEnv,execStatus);
       SavePPBuffer(theEnv,execStatus," ");
-      SavePPBuffer(theEnv,execStatus,DefgenericData(theEnv)->GenericInputToken.printForm);
-      tmp = (int) ValueToLong(GetValue(DefgenericData(theEnv)->GenericInputToken));
+      SavePPBuffer(theEnv,execStatus,DefgenericData(theEnv,execStatus)->GenericInputToken.printForm);
+      tmp = (int) ValueToLong(GetValue(DefgenericData(theEnv,execStatus)->GenericInputToken));
       if (tmp < 1)
         {
          PrintErrorID(theEnv,execStatus,"GENRCPSR",6,FALSE);
@@ -799,17 +799,17 @@ static SYMBOL_HN *ParseMethodNameAndIndex(
          return(NULL);
         }
       *theIndex = tmp;
-      PPCRAndIndent(theEnv);
-      GetToken(theEnv,execStatus,readSource,&DefgenericData(theEnv)->GenericInputToken);
+      PPCRAndIndent(theEnv,execStatus);
+      GetToken(theEnv,execStatus,readSource,&DefgenericData(theEnv,execStatus)->GenericInputToken);
      }
-   if (GetType(DefgenericData(theEnv)->GenericInputToken) == STRING)
+   if (GetType(DefgenericData(theEnv,execStatus)->GenericInputToken) == STRING)
      {
-      PPBackup(theEnv);
-      PPBackup(theEnv);
+      PPBackup(theEnv,execStatus);
+      PPBackup(theEnv,execStatus);
       SavePPBuffer(theEnv,execStatus," ");
-      SavePPBuffer(theEnv,execStatus,DefgenericData(theEnv)->GenericInputToken.printForm);
-      PPCRAndIndent(theEnv);
-      GetToken(theEnv,execStatus,readSource,&DefgenericData(theEnv)->GenericInputToken);
+      SavePPBuffer(theEnv,execStatus,DefgenericData(theEnv,execStatus)->GenericInputToken.printForm);
+      PPCRAndIndent(theEnv,execStatus);
+      GetToken(theEnv,execStatus,readSource,&DefgenericData(theEnv,execStatus)->GenericInputToken);
      }
    return(gname);
   }
@@ -844,14 +844,14 @@ static int ParseMethodParameters(
 
    *wildcard = NULL;
    *params = NULL;
-   if (GetType(DefgenericData(theEnv)->GenericInputToken) != LPAREN)
+   if (GetType(DefgenericData(theEnv,execStatus)->GenericInputToken) != LPAREN)
      {
       PrintErrorID(theEnv,execStatus,"GENRCPSR",7,FALSE);
       EnvPrintRouter(theEnv,execStatus,WERROR,"Expected a '(' to begin method parameter restrictions.\n");
       return(-1);
      }
-   GetToken(theEnv,execStatus,readSource,&DefgenericData(theEnv)->GenericInputToken);
-   while (DefgenericData(theEnv)->GenericInputToken.type != RPAREN)
+   GetToken(theEnv,execStatus,readSource,&DefgenericData(theEnv,execStatus)->GenericInputToken);
+   while (DefgenericData(theEnv,execStatus)->GenericInputToken.type != RPAREN)
      {
       if (*wildcard != NULL)
         {
@@ -860,15 +860,15 @@ static int ParseMethodParameters(
          EnvPrintRouter(theEnv,execStatus,WERROR,"No parameters allowed after wildcard parameter.\n");
          return(-1);
         }
-      if ((DefgenericData(theEnv)->GenericInputToken.type == SF_VARIABLE) || (DefgenericData(theEnv)->GenericInputToken.type == MF_VARIABLE))
+      if ((DefgenericData(theEnv,execStatus)->GenericInputToken.type == SF_VARIABLE) || (DefgenericData(theEnv,execStatus)->GenericInputToken.type == MF_VARIABLE))
         {
-         pname = (SYMBOL_HN *) DefgenericData(theEnv)->GenericInputToken.value;
+         pname = (SYMBOL_HN *) DefgenericData(theEnv,execStatus)->GenericInputToken.value;
          if (DuplicateParameters(theEnv,execStatus,phead,&pprv,pname))
            {
             DeleteTempRestricts(theEnv,execStatus,phead);
             return(-1);
            }
-         if (DefgenericData(theEnv)->GenericInputToken.type == MF_VARIABLE)
+         if (DefgenericData(theEnv,execStatus)->GenericInputToken.type == MF_VARIABLE)
            *wildcard = pname;
          rtmp = get_struct(theEnv,execStatus,restriction);
          PackRestrictionTypes(theEnv,execStatus,rtmp,NULL);
@@ -876,24 +876,24 @@ static int ParseMethodParameters(
          phead = AddParameter(theEnv,execStatus,phead,pprv,pname,rtmp);
          rcnt++;
         }
-      else if (DefgenericData(theEnv)->GenericInputToken.type == LPAREN)
+      else if (DefgenericData(theEnv,execStatus)->GenericInputToken.type == LPAREN)
         {
-         GetToken(theEnv,execStatus,readSource,&DefgenericData(theEnv)->GenericInputToken);
-         if ((DefgenericData(theEnv)->GenericInputToken.type != SF_VARIABLE) &&
-             (DefgenericData(theEnv)->GenericInputToken.type != MF_VARIABLE))
+         GetToken(theEnv,execStatus,readSource,&DefgenericData(theEnv,execStatus)->GenericInputToken);
+         if ((DefgenericData(theEnv,execStatus)->GenericInputToken.type != SF_VARIABLE) &&
+             (DefgenericData(theEnv,execStatus)->GenericInputToken.type != MF_VARIABLE))
            {
             DeleteTempRestricts(theEnv,execStatus,phead);
             PrintErrorID(theEnv,execStatus,"GENRCPSR",8,FALSE);
             EnvPrintRouter(theEnv,execStatus,WERROR,"Expected a variable for parameter specification.\n");
             return(-1);
            }
-         pname = (SYMBOL_HN *) DefgenericData(theEnv)->GenericInputToken.value;
+         pname = (SYMBOL_HN *) DefgenericData(theEnv,execStatus)->GenericInputToken.value;
          if (DuplicateParameters(theEnv,execStatus,phead,&pprv,pname))
            {
             DeleteTempRestricts(theEnv,execStatus,phead);
             return(-1);
            }
-         if (DefgenericData(theEnv)->GenericInputToken.type == MF_VARIABLE)
+         if (DefgenericData(theEnv,execStatus)->GenericInputToken.type == MF_VARIABLE)
            *wildcard = pname;
          SavePPBuffer(theEnv,execStatus," ");
          rtmp = ParseRestriction(theEnv,execStatus,readSource);
@@ -912,13 +912,13 @@ static int ParseMethodParameters(
          EnvPrintRouter(theEnv,execStatus,WERROR,"Expected a variable or '(' for parameter specification.\n");
          return(-1);
         }
-      PPCRAndIndent(theEnv);
-      GetToken(theEnv,execStatus,readSource,&DefgenericData(theEnv)->GenericInputToken);
+      PPCRAndIndent(theEnv,execStatus);
+      GetToken(theEnv,execStatus,readSource,&DefgenericData(theEnv,execStatus)->GenericInputToken);
      }
    if (rcnt != 0)
      {
-      PPBackup(theEnv);
-      PPBackup(theEnv);
+      PPBackup(theEnv,execStatus);
+      PPBackup(theEnv,execStatus);
       SavePPBuffer(theEnv,execStatus,")");
      }
    *params = phead;
@@ -954,8 +954,8 @@ static RESTRICTION *ParseRestriction(
               *query = NULL;
    RESTRICTION *rptr;
 
-   GetToken(theEnv,execStatus,readSource,&DefgenericData(theEnv)->GenericInputToken);
-   while (DefgenericData(theEnv)->GenericInputToken.type != RPAREN)
+   GetToken(theEnv,execStatus,readSource,&DefgenericData(theEnv,execStatus)->GenericInputToken);
+   while (DefgenericData(theEnv,execStatus)->GenericInputToken.type != RPAREN)
      {
       if (query != NULL)
         {
@@ -965,9 +965,9 @@ static RESTRICTION *ParseRestriction(
          ReturnExpression(theEnv,execStatus,types);
          return(NULL);
         }
-      if (DefgenericData(theEnv)->GenericInputToken.type == SYMBOL)
+      if (DefgenericData(theEnv,execStatus)->GenericInputToken.type == SYMBOL)
         {
-         new_types = ValidType(theEnv,execStatus,(SYMBOL_HN *) DefgenericData(theEnv)->GenericInputToken.value);
+         new_types = ValidType(theEnv,execStatus,(SYMBOL_HN *) DefgenericData(theEnv,execStatus)->GenericInputToken.value);
          if (new_types == NULL)
            {
             ReturnExpression(theEnv,execStatus,types);
@@ -1008,7 +1008,7 @@ static RESTRICTION *ParseRestriction(
             typesbot->nextArg = new_types;
            }
         }
-      else if (DefgenericData(theEnv)->GenericInputToken.type == LPAREN)
+      else if (DefgenericData(theEnv,execStatus)->GenericInputToken.type == LPAREN)
         {
          query = Function1Parse(theEnv,execStatus,readSource);
          if (query == NULL)
@@ -1016,7 +1016,7 @@ static RESTRICTION *ParseRestriction(
             ReturnExpression(theEnv,execStatus,types);
             return(NULL);
            }
-         if (GetParsedBindNames(theEnv) != NULL)
+         if (GetParsedBindNames(theEnv,execStatus) != NULL)
            {
             PrintErrorID(theEnv,execStatus,"GENRCPSR",12,FALSE);
             EnvPrintRouter(theEnv,execStatus,WERROR,"Binds are not allowed in query expressions.\n");
@@ -1026,8 +1026,8 @@ static RESTRICTION *ParseRestriction(
            }
         }
 #if DEFGLOBAL_CONSTRUCT
-      else if (DefgenericData(theEnv)->GenericInputToken.type == GBL_VARIABLE)
-        query = GenConstant(theEnv,execStatus,GBL_VARIABLE,DefgenericData(theEnv)->GenericInputToken.value);
+      else if (DefgenericData(theEnv,execStatus)->GenericInputToken.type == GBL_VARIABLE)
+        query = GenConstant(theEnv,execStatus,GBL_VARIABLE,DefgenericData(theEnv,execStatus)->GenericInputToken.value);
 #endif
       else
         {
@@ -1042,10 +1042,10 @@ static RESTRICTION *ParseRestriction(
          return(NULL);
         }
       SavePPBuffer(theEnv,execStatus," ");
-      GetToken(theEnv,execStatus,readSource,&DefgenericData(theEnv)->GenericInputToken);
+      GetToken(theEnv,execStatus,readSource,&DefgenericData(theEnv,execStatus)->GenericInputToken);
      }
-   PPBackup(theEnv);
-   PPBackup(theEnv);
+   PPBackup(theEnv,execStatus);
+   PPBackup(theEnv,execStatus);
    SavePPBuffer(theEnv,execStatus,")");
    if ((types == NULL) && (query == NULL))
      {
@@ -1184,7 +1184,7 @@ static EXPRESSION *ValidType(
    DEFCLASS *cls;
 
    if (FindModuleSeparator(ValueToString(tname)))
-     IllegalModuleSpecifierMessage(theEnv);
+     IllegalModuleSpecifierMessage(theEnv,execStatus);
    else
      {
       cls = LookupDefclassInScope(theEnv,execStatus,ValueToString(tname));
@@ -1300,7 +1300,7 @@ static DEFGENERIC *AddGeneric(
      {
       *newGeneric = FALSE;
 
-      if (ConstructData(theEnv)->CheckSyntaxMode)
+      if (ConstructData(theEnv,execStatus)->CheckSyntaxMode)
         { return(gfunc); }
 
       /* ================================
@@ -1360,7 +1360,7 @@ static DEFMETHOD *AddGenericMethod(
      }
    narr[mposn].busy = 0;
 #if DEBUGGING_FUNCTIONS
-   narr[mposn].trace = DefgenericData(theEnv)->WatchMethods;
+   narr[mposn].trace = DefgenericData(theEnv,execStatus)->WatchMethods;
 #endif
    narr[mposn].minRestrictions = 0;
    narr[mposn].maxRestrictions = 0;
@@ -1545,7 +1545,7 @@ static DEFGENERIC *NewGeneric(
    ngen->methods = NULL;
    ngen->mcnt = 0;
 #if DEBUGGING_FUNCTIONS
-   ngen->trace = DefgenericData(theEnv)->WatchGenerics;
+   ngen->trace = DefgenericData(theEnv,execStatus)->WatchGenerics;
 #endif
    return(ngen);
   }

@@ -57,10 +57,10 @@
 /***************************************/
 
 #if (! RUN_TIME) && (! BLOAD_ONLY)
-   static void                    RemoveIntranetworkLink(void *,struct joinNode *);
+   static void                    RemoveIntranetworkLink(void *,EXEC_STATUS,struct joinNode *);
 #endif
-   static void                    DetachJoins(void *,struct joinNode *,intBool);
-   static void                    DetachJoinsDriver(void *,struct defrule *,intBool);
+   static void                    DetachJoins(void *,EXEC_STATUS,struct joinNode *,intBool);
+   static void                    DetachJoinsDriver(void *,EXEC_STATUS,struct defrule *,intBool);
 
 /**********************************************************************/
 /* ReturnDefrule: Returns a defrule data structure and its associated */
@@ -91,10 +91,10 @@ globle void ReturnDefrule(
    /*======================================*/
 
 #if DEBUGGING_FUNCTIONS
-   DefruleData(theEnv)->DeletedRuleDebugFlags = 0;
-   if (waste->afterBreakpoint) BitwiseSet(DefruleData(theEnv)->DeletedRuleDebugFlags,0);
-   if (waste->watchActivation) BitwiseSet(DefruleData(theEnv)->DeletedRuleDebugFlags,1);
-   if (waste->watchFiring) BitwiseSet(DefruleData(theEnv)->DeletedRuleDebugFlags,2);
+   DefruleData(theEnv,execStatus)->DeletedRuleDebugFlags = 0;
+   if (waste->afterBreakpoint) BitwiseSet(DefruleData(theEnv,execStatus)->DeletedRuleDebugFlags,0);
+   if (waste->watchActivation) BitwiseSet(DefruleData(theEnv,execStatus)->DeletedRuleDebugFlags,1);
+   if (waste->watchFiring) BitwiseSet(DefruleData(theEnv,execStatus)->DeletedRuleDebugFlags,2);
 #endif
 
    /*================================*/
@@ -182,7 +182,7 @@ globle void ReturnDefrule(
    /* Free up partial matches. */
    /*==========================*/
 
-   if (EngineData(theEnv)->ExecutingRule == NULL) FlushGarbagePartialMatches(theEnv);
+   if (EngineData(theEnv,execStatus)->ExecutingRule == NULL) FlushGarbagePartialMatches(theEnv,execStatus);
 #endif
   }
 
@@ -373,13 +373,13 @@ static void DetachJoins(
         {
          lastLink = NULL;
          
-         theLink = DefruleData(theEnv)->RightPrimeJoins;
+         theLink = DefruleData(theEnv,execStatus)->RightPrimeJoins;
          while (theLink != NULL)
            {
             if (theLink->join == join)
               {
                if (lastLink == NULL)
-                 { DefruleData(theEnv)->RightPrimeJoins = theLink->next; }
+                 { DefruleData(theEnv,execStatus)->RightPrimeJoins = theLink->next; }
                else
                  { lastLink->next = theLink->next; }
 
@@ -404,13 +404,13 @@ static void DetachJoins(
       if (join->firstJoin && (join->patternIsNegated || join->joinFromTheRight) && (! join->patternIsExists))
         {
          lastLink = NULL;
-         theLink = DefruleData(theEnv)->LeftPrimeJoins;
+         theLink = DefruleData(theEnv,execStatus)->LeftPrimeJoins;
          while (theLink != NULL)
            {
             if (theLink->join == join)
               {
                if (lastLink == NULL)
-                 { DefruleData(theEnv)->LeftPrimeJoins = theLink->next; }
+                 { DefruleData(theEnv,execStatus)->LeftPrimeJoins = theLink->next; }
                else
                  { lastLink->next = theLink->next; }
 

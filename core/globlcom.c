@@ -43,7 +43,7 @@
 /***************************************/
 
 #if DEBUGGING_FUNCTIONS
-   static void                       PrintDefglobalValueForm(void *,char *,void *);
+   static void                       PrintDefglobalValueForm(void *,EXEC_STATUS,char *,void *);
 #endif
 
 /************************************************************/
@@ -66,7 +66,7 @@ globle void DefglobalCommandDefinitions(
 
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 #endif
   }
@@ -86,7 +86,7 @@ globle int SetResetGlobalsCommand(
    /* Remember the old value of this attribute. */
    /*===========================================*/
 
-   oldValue = EnvGetResetGlobals(theEnv);
+   oldValue = EnvGetResetGlobals(theEnv,execStatus);
 
    /*============================================*/
    /* Check for the correct number of arguments. */
@@ -101,7 +101,7 @@ globle int SetResetGlobalsCommand(
 
    EnvRtnUnknown(theEnv,execStatus,1,&arg_ptr);
 
-   if ((arg_ptr.value == EnvFalseSymbol(theEnv)) && (arg_ptr.type == SYMBOL))
+   if ((arg_ptr.value == EnvFalseSymbol(theEnv,execStatus)) && (arg_ptr.type == SYMBOL))
      { EnvSetResetGlobals(theEnv,execStatus,FALSE); }
    else
      { EnvSetResetGlobals(theEnv,execStatus,TRUE); }
@@ -124,8 +124,8 @@ globle intBool EnvSetResetGlobals(
   {
    int ov;
 
-   ov = DefglobalData(theEnv)->ResetGlobals;
-   DefglobalData(theEnv)->ResetGlobals = value;
+   ov = DefglobalData(theEnv,execStatus)->ResetGlobals;
+   DefglobalData(theEnv,execStatus)->ResetGlobals = value;
    return(ov);
   }
 
@@ -139,7 +139,7 @@ globle int GetResetGlobalsCommand(
   {
    int oldValue;
 
-   oldValue = EnvGetResetGlobals(theEnv);
+   oldValue = EnvGetResetGlobals(theEnv,execStatus);
 
    if (EnvArgCountCheck(theEnv,execStatus,"get-reset-globals",EXACTLY,0) == -1)
      { return(oldValue); }
@@ -155,7 +155,7 @@ globle intBool EnvGetResetGlobals(
   void *theEnv,
   EXEC_STATUS)
   {   
-   return(DefglobalData(theEnv)->ResetGlobals); 
+   return(DefglobalData(theEnv,execStatus)->ResetGlobals); 
   }
 
 #if DEBUGGING_FUNCTIONS
@@ -179,7 +179,7 @@ globle void ShowDefglobalsCommand(
       if (error) return;
      }
    else
-     { theModule = ((struct defmodule *) EnvGetCurrentModule(theEnv)); }
+     { theModule = ((struct defmodule *) EnvGetCurrentModule(theEnv,execStatus)); }
 
    EnvShowDefglobals(theEnv,execStatus,WDISPLAY,theModule);
   }
@@ -235,7 +235,7 @@ globle void EnvShowDefglobals(
       /* currently being examined.           */
       /*=====================================*/
 
-      theModuleItem = (struct defmoduleItemHeader *) GetModuleItem(theEnv,execStatus,theModule,DefglobalData(theEnv)->DefglobalModuleIndex);
+      theModuleItem = (struct defmoduleItemHeader *) GetModuleItem(theEnv,execStatus,theModule,DefglobalData(theEnv,execStatus)->DefglobalModuleIndex);
 
       for (constructPtr = theModuleItem->firstItem;
            constructPtr != NULL;

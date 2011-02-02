@@ -93,7 +93,7 @@ globle BUFFER *CompileBufferp;          /* CLIPS Compile Output Buffer  */
 
 typedef struct  {
         short   k_code;                 /* Key code                     */
-        int     (*k_fp)(void *,int,int);       /* Routine to handle it         */
+        int     (*k_fp)(void *,EXEC_STATUS,int,int);       /* Routine to handle it         */
 }       KEYTAB;
 
 
@@ -186,7 +186,7 @@ globle KEYTAB keytab[] = {
 
 #define NKEYTAB (sizeof(keytab)/sizeof(keytab[0]))
 
-static void PerformEditCommand(void *);
+static void PerformEditCommand(void *,EXEC_STATUS);
 
 static void PerformEditCommand(
   void *theEnv,
@@ -224,13 +224,13 @@ static void PerformEditCommand(
         if (num_a > 0)                     /* the default buffer.  */
                 makename(bname,fileName);
         edinit(theEnv,execStatus,bname);                          /* Buffers, windows.    */
-        vtinit(theEnv);                               /* Displays.            */
+        vtinit(theEnv,execStatus);                               /* Displays.            */
         if (num_a > 0) {
                 update();                       /* You have to update   */
                 readin(theEnv,execStatus,fileName);             /* in case "[New file]" */
                 }
 
-	init_cmp_router(theEnv);			/* Prepare the compile  */
+	init_cmp_router(theEnv,execStatus);			/* Prepare the compile  */
         EnvDeactivateRouter(theEnv,execStatus,"cmp_router");		/* router.              */
         }
    else {
@@ -393,7 +393,7 @@ globle int execute(
          * negative, and we are now past fill column, perform word wrap.
          */
         if (c == ' ' && fillcol > 0 && n>=0 && getccol(FALSE) > fillcol)
-                wrapword(theEnv);
+                wrapword(theEnv,execStatus);
 
         if ((c>=0x20 && c<=0x7E)                /* Self inserting.      */
         ||  (c>=0xA0 && c<=0xFE)) {
@@ -514,7 +514,7 @@ globle int edquit(
                                                 /* User says it's OK.   */
         || (s=mlyesno(theEnv,execStatus,"Modified Buffers! Quit")) == TRUE) {
                 vttidy();
-                full_cleanup(theEnv);
+                full_cleanup(theEnv,execStatus);
                 return(EXIT);
         }
         return (s);
@@ -660,11 +660,11 @@ globle void full_cleanup(
 
    kill_all_buffers(theEnv,execStatus,&bheadp);     /* Clear all existing buffers   */
 
-   kill_all_windows(theEnv);           /* Clear all windows            */
+   kill_all_windows(theEnv,execStatus);           /* Clear all windows            */
 
-   kill_video_buffers(theEnv);	 /* Kill special video buffers   */
+   kill_video_buffers(theEnv,execStatus);	 /* Kill special video buffers   */
 
-   kill_cmp_router(theEnv);		 /* Get rid of special router    */
+   kill_cmp_router(theEnv,execStatus);		 /* Get rid of special router    */
 
 /*   Clear all global pointers */
 
@@ -753,16 +753,16 @@ globle void EditCommand(
   {
    void (*redrawScreenFunction)(void *);
    void (*pauseEnvFunction)(void *);
-   void (*continueEnvFunction)(void *,int);
+   void (*continueEnvFunction)(void *,EXEC_STATUS,int);
       
-   redrawScreenFunction = GetRedrawFunction(theEnv);
-   pauseEnvFunction = GetPauseEnvFunction(theEnv);
-   continueEnvFunction = GetContinueEnvFunction(theEnv);
+   redrawScreenFunction = GetRedrawFunction(theEnv,execStatus);
+   pauseEnvFunction = GetPauseEnvFunction(theEnv,execStatus);
+   continueEnvFunction = GetContinueEnvFunction(theEnv,execStatus);
    
-   if (pauseEnvFunction != NULL) (*pauseEnvFunction)(theEnv) ;
-   PerformEditCommand(theEnv);
+   if (pauseEnvFunction != NULL) (*pauseEnvFunction)(theEnv,execStatus) ;
+   PerformEditCommand(theEnv,execStatus);
    if (continueEnvFunction != NULL) (*continueEnvFunction)(theEnv,execStatus,0) ;
-   if (redrawScreenFunction != NULL) (*redrawScreenFunction)(theEnv) ;
+   if (redrawScreenFunction != NULL) (*redrawScreenFunction)(theEnv,execStatus) ;
   }
 
 /*******************************************/
@@ -777,8 +777,8 @@ globle void EditorFunctionDefinition(
 
 #else
 
-globle void EditCommand(void *);
-globle void EditorFunctionDefinition(void *);
+globle void EditCommand(void *,EXEC_STATUS);
+globle void EditorFunctionDefinition(void *,EXEC_STATUS);
 
 globle void EditCommand(
   void *theEnv,

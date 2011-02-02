@@ -55,13 +55,13 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static void                   *AllocateModule(void *);
-   static void                    ReturnModule(void *,void *);
-   static void                    ReturnDeffacts(void *,void *);
-   static void                    InitializeDeffactsModules(void *);
-   static void                    DeallocateDeffactsData(void *);
+   static void                   *AllocateModule(void *,EXEC_STATUS);
+   static void                    ReturnModule(void *,EXEC_STATUS,void *);
+   static void                    ReturnDeffacts(void *,EXEC_STATUS,void *);
+   static void                    InitializeDeffactsModules(void *,EXEC_STATUS);
+   static void                    DeallocateDeffactsData(void *,EXEC_STATUS);
 #if ! RUN_TIME
-   static void                    DestroyDeffactsAction(void *,struct constructHeader *,void *);
+   static void                    DestroyDeffactsAction(void *,EXEC_STATUS,struct constructHeader *,void *);
 #endif
 
 /***********************************************************/
@@ -73,11 +73,11 @@ globle void InitializeDeffacts(
   {
    AllocateEnvironmentData(theEnv,execStatus,DEFFACTS_DATA,sizeof(struct deffactsData),DeallocateDeffactsData);
   
-   InitializeDeffactsModules(theEnv);
+   InitializeDeffactsModules(theEnv,execStatus);
 
-   DeffactsBasicCommands(theEnv);
+   DeffactsBasicCommands(theEnv,execStatus);
 
-   DeffactsData(theEnv)->DeffactsConstruct =
+   DeffactsData(theEnv,execStatus)->DeffactsConstruct =
       AddConstruct(theEnv,execStatus,"deffacts","deffacts",ParseDeffacts,EnvFindDeffacts,
                    GetConstructNamePointer,GetConstructPPForm,
                    GetConstructModuleItem,EnvGetNextDeffacts,SetNextConstruct,
@@ -97,10 +97,10 @@ static void DeallocateDeffactsData(
    void *theModule;
 
 #if BLOAD || BLOAD_AND_BSAVE
-   if (Bloaded(theEnv)) return;
+   if (Bloaded(theEnv,execStatus)) return;
 #endif
 
-   DoForAllConstructs(theEnv,execStatus,DestroyDeffactsAction,DeffactsData(theEnv)->DeffactsModuleIndex,FALSE,NULL); 
+   DoForAllConstructs(theEnv,execStatus,DestroyDeffactsAction,DeffactsData(theEnv,execStatus)->DeffactsModuleIndex,FALSE,NULL); 
 
    for (theModule = EnvGetNextDefmodule(theEnv,execStatus,NULL);
         theModule != NULL;
@@ -108,12 +108,12 @@ static void DeallocateDeffactsData(
      {
       theModuleItem = (struct deffactsModule *)
                       GetModuleItem(theEnv,execStatus,(struct defmodule *) theModule,
-                                    DeffactsData(theEnv)->DeffactsModuleIndex);
+                                    DeffactsData(theEnv,execStatus)->DeffactsModuleIndex);
       rtn_struct(theEnv,execStatus,deffactsModule,theModuleItem);
      }
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 #endif
   }
@@ -161,7 +161,7 @@ static void InitializeDeffactsModules(
   void *theEnv,
   EXEC_STATUS)
   {
-   DeffactsData(theEnv)->DeffactsModuleIndex = 
+   DeffactsData(theEnv,execStatus)->DeffactsModuleIndex = 
       RegisterModuleItem(theEnv,execStatus,"deffacts",
                          AllocateModule,
                          ReturnModule,
@@ -196,7 +196,7 @@ static void ReturnModule(
   EXEC_STATUS,
   void *theItem)
   {
-   FreeConstructHeaderModule(theEnv,execStatus,(struct defmoduleItemHeader *) theItem,DeffactsData(theEnv)->DeffactsConstruct);
+   FreeConstructHeaderModule(theEnv,execStatus,(struct defmoduleItemHeader *) theItem,DeffactsData(theEnv,execStatus)->DeffactsConstruct);
    rtn_struct(theEnv,execStatus,deffactsModule,theItem);
   }
 
@@ -209,7 +209,7 @@ globle struct deffactsModule *GetDeffactsModuleItem(
   EXEC_STATUS,
   struct defmodule *theModule)
   { 
-   return((struct deffactsModule *) GetConstructModuleItemByIndex(theEnv,execStatus,theModule,DeffactsData(theEnv)->DeffactsModuleIndex)); 
+   return((struct deffactsModule *) GetConstructModuleItemByIndex(theEnv,execStatus,theModule,DeffactsData(theEnv,execStatus)->DeffactsModuleIndex)); 
   }
 
 /**************************************************/
@@ -222,7 +222,7 @@ globle void *EnvFindDeffacts(
   EXEC_STATUS,
   char *deffactsName)
   { 
-   return(FindNamedConstruct(theEnv,execStatus,deffactsName,DeffactsData(theEnv)->DeffactsConstruct)); 
+   return(FindNamedConstruct(theEnv,execStatus,deffactsName,DeffactsData(theEnv,execStatus)->DeffactsConstruct)); 
   }
 
 /*********************************************************/
@@ -236,7 +236,7 @@ globle void *EnvGetNextDeffacts(
   EXEC_STATUS,
   void *deffactsPtr)
   {
-   return((void *) GetNextConstructItem(theEnv,execStatus,(struct constructHeader *) deffactsPtr,DeffactsData(theEnv)->DeffactsModuleIndex)); 
+   return((void *) GetNextConstructItem(theEnv,execStatus,(struct constructHeader *) deffactsPtr,DeffactsData(theEnv,execStatus)->DeffactsModuleIndex)); 
   }
 
 /********************************************************/
@@ -254,10 +254,10 @@ globle intBool EnvIsDeffactsDeletable(
 #if MAC_MCW || WIN_MCW || MAC_XCD
 #pragma unused(ptr)
 #endif
-   if (! ConstructsDeletable(theEnv))
+   if (! ConstructsDeletable(theEnv,execStatus))
      { return FALSE; }
 
-   if (ConstructData(theEnv)->ResetInProgress) return(FALSE);
+   if (ConstructData(theEnv,execStatus)->ResetInProgress) return(FALSE);
 
    return(TRUE);
   }

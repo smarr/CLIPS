@@ -38,13 +38,13 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static int                     ConstructToCode(void *,char *,char *,char *,int,FILE *,int,int);
-   static void                    DefglobalToCode(void *,FILE *,struct defglobal *,
+   static int                     ConstructToCode(void *,EXEC_STATUS,char *,char *,char *,int,FILE *,int,int);
+   static void                    DefglobalToCode(void *,EXEC_STATUS,FILE *,struct defglobal *,
                                                  int,int,int);
-   static void                    DefglobalModuleToCode(void *,FILE *,struct defmodule *,int,int,int);
-   static void                    CloseDefglobalFiles(void *,FILE *,FILE *,int);
-   static void                    BeforeDefglobalsToCode(void *);
-   static void                    InitDefglobalsCode(void *,FILE *,int,int);
+   static void                    DefglobalModuleToCode(void *,EXEC_STATUS,FILE *,struct defmodule *,int,int,int);
+   static void                    CloseDefglobalFiles(void *,EXEC_STATUS,FILE *,FILE *,int);
+   static void                    BeforeDefglobalsToCode(void *,EXEC_STATUS);
+   static void                    InitDefglobalsCode(void *,EXEC_STATUS,FILE *,int,int);
 
 /***************************************************************/
 /* DefglobalCompilerSetup: Initializes the defglobal construct */
@@ -54,7 +54,7 @@ globle void DefglobalCompilerSetup(
   void *theEnv,
   EXEC_STATUS)
   {
-   DefglobalData(theEnv)->DefglobalCodeItem = 
+   DefglobalData(theEnv,execStatus)->DefglobalCodeItem = 
       AddCodeGeneratorItem(theEnv,execStatus,"defglobal",0,BeforeDefglobalsToCode,
                            InitDefglobalsCode,ConstructToCode,2);
   }
@@ -68,7 +68,7 @@ static void BeforeDefglobalsToCode(
   void *theEnv,
   EXEC_STATUS)
   {
-   MarkConstructBsaveIDs(theEnv,execStatus,DefglobalData(theEnv)->DefglobalModuleIndex);
+   MarkConstructBsaveIDs(theEnv,execStatus,DefglobalData(theEnv,execStatus)->DefglobalModuleIndex);
   }
 
 /*************************************************/
@@ -88,9 +88,9 @@ static void InitDefglobalsCode(
 #if MAC_MCW || WIN_MCW || MAC_XCD
 #pragma unused(maxIndices)
 #pragma unused(imageID)
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
-   fprintf(initFP,"   ResetDefglobals(theEnv);\n");
+   fprintf(initFP,"   ResetDefglobals(theEnv,execStatus);\n");
   }
 
 /***********************************************************/
@@ -134,7 +134,7 @@ static int ConstructToCode(
 
       moduleFile = OpenFileIfNeeded(theEnv,execStatus,moduleFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
                                     moduleArrayVersion,headerFP,
-                                    "struct defglobalModule",ModulePrefix(DefglobalData(theEnv)->DefglobalCodeItem),
+                                    "struct defglobalModule",ModulePrefix(DefglobalData(theEnv,execStatus)->DefglobalCodeItem),
                                     FALSE,NULL);
 
       if (moduleFile == NULL)
@@ -153,7 +153,7 @@ static int ConstructToCode(
         {
          defglobalFile = OpenFileIfNeeded(theEnv,execStatus,defglobalFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
                                          defglobalArrayVersion,headerFP,
-                                         "struct defglobal",ConstructPrefix(DefglobalData(theEnv)->DefglobalCodeItem),
+                                         "struct defglobal",ConstructPrefix(DefglobalData(theEnv,execStatus)->DefglobalCodeItem),
                                          FALSE,NULL);
          if (defglobalFile == NULL)
            {
@@ -227,7 +227,7 @@ static void DefglobalModuleToCode(
    fprintf(theFile,"{");
 
    ConstructModuleToCode(theEnv,execStatus,theFile,theModule,imageID,maxIndices,
-                                  DefglobalData(theEnv)->DefglobalModuleIndex,ConstructPrefix(DefglobalData(theEnv)->DefglobalCodeItem));
+                                  DefglobalData(theEnv,execStatus)->DefglobalModuleIndex,ConstructPrefix(DefglobalData(theEnv,execStatus)->DefglobalCodeItem));
 
    fprintf(theFile,"}");
   }
@@ -252,8 +252,8 @@ static void DefglobalToCode(
    fprintf(theFile,"{");
 
    ConstructHeaderToCode(theEnv,execStatus,theFile,&theDefglobal->header,imageID,maxIndices,
-                         moduleCount,ModulePrefix(DefglobalData(theEnv)->DefglobalCodeItem),
-                         ConstructPrefix(DefglobalData(theEnv)->DefglobalCodeItem));
+                         moduleCount,ModulePrefix(DefglobalData(theEnv,execStatus)->DefglobalCodeItem),
+                         ConstructPrefix(DefglobalData(theEnv,execStatus)->DefglobalCodeItem));
 
    fprintf(theFile,",");
 
@@ -292,7 +292,7 @@ globle void DefglobalCModuleReference(
   int maxIndices)
   {
    fprintf(theFile,"MIHS &%s%d_%d[%d]",
-                      ModulePrefix(DefglobalData(theEnv)->DefglobalCodeItem),
+                      ModulePrefix(DefglobalData(theEnv,execStatus)->DefglobalCodeItem),
                       imageID,
                       (count / maxIndices) + 1,
                       (count % maxIndices));
@@ -316,7 +316,7 @@ globle void DefglobalCConstructReference(
      { fprintf(theFile,"NULL"); }
    else
      {
-      fprintf(theFile,"&%s%d_%ld[%ld]",ConstructPrefix(DefglobalData(theEnv)->DefglobalCodeItem),
+      fprintf(theFile,"&%s%d_%ld[%ld]",ConstructPrefix(DefglobalData(theEnv,execStatus)->DefglobalCodeItem),
                       imageID,
                       (theGlobal->header.bsaveID / maxIndices) + 1,
                       theGlobal->header.bsaveID % maxIndices);

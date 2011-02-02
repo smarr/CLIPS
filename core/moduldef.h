@@ -142,10 +142,10 @@ struct moduleItem
    char *name;
    int moduleIndex;
    void *(*allocateFunction)(void *);
-   void  (*freeFunction)(void *,void *);
-   void *(*bloadModuleReference)(void *,int);
-   void  (*constructsToCModuleReference)(void *,FILE *,int,int,int);
-   void *(*findFunction)(void *,char *);
+   void  (*freeFunction)(void *,EXEC_STATUS,void *);
+   void *(*bloadModuleReference)(void *,EXEC_STATUS,int);
+   void  (*constructsToCModuleReference)(void *,EXEC_STATUS,FILE *,int,int,int);
+   void *(*findFunction)(void *,EXEC_STATUS,char *);
    struct moduleItem *next;
   };
 
@@ -187,7 +187,7 @@ struct defmoduleData
 #endif
   };
   
-#define DefmoduleData(theEnv) ((struct defmoduleData *) GetEnvironmentData(theEnv,execStatus,DEFMODULE_DATA))
+#define DefmoduleData(theEnv,execStatus) ((struct defmoduleData *) GetEnvironmentData(theEnv,execStatus,DEFMODULE_DATA))
 
 #ifdef LOCALE
 #undef LOCALE
@@ -206,35 +206,35 @@ struct defmoduleData
 #define GetNextDefmodule(a) EnvGetNextDefmodule(GetCurrentEnvironment(),a)
 #define SetCurrentModule(a) EnvSetCurrentModule(GetCurrentEnvironment(),a)
 
-   LOCALE void                           InitializeDefmodules(void *);
-   LOCALE void                          *EnvFindDefmodule(void *,char *);
-   LOCALE char                          *EnvGetDefmoduleName(void *,void *);
-   LOCALE char                          *EnvGetDefmodulePPForm(void *,void *);
-   LOCALE void                          *EnvGetNextDefmodule(void *,void *);
-   LOCALE void                           RemoveAllDefmodules(void *);
+   LOCALE void                           InitializeDefmodules(void *,EXEC_STATUS);
+   LOCALE void                          *EnvFindDefmodule(void *,EXEC_STATUS,char *);
+   LOCALE char                          *EnvGetDefmoduleName(void *,EXEC_STATUS,void *);
+   LOCALE char                          *EnvGetDefmodulePPForm(void *,EXEC_STATUS,void *);
+   LOCALE void                          *EnvGetNextDefmodule(void *,EXEC_STATUS,void *);
+   LOCALE void                           RemoveAllDefmodules(void *,EXEC_STATUS);
    LOCALE int                            AllocateModuleStorage(void);
-   LOCALE int                            RegisterModuleItem(void *,char *,
+   LOCALE int                            RegisterModuleItem(void *,EXEC_STATUS,char *,
                                                             void *(*)(void *),
-                                                            void (*)(void *,void *),
-                                                            void *(*)(void *,int),
-                                                            void (*)(void *,FILE *,int,int,int),
-                                                            void *(*)(void *,char *));
-   LOCALE void                          *GetModuleItem(void *,struct defmodule *,int);
-   LOCALE void                           SetModuleItem(void *,struct defmodule *,int,void *);
-   LOCALE void                          *EnvGetCurrentModule(void *);
-   LOCALE void                          *EnvSetCurrentModule(void *,void *);
-   LOCALE void                          *GetCurrentModuleCommand(void *);
-   LOCALE void                          *SetCurrentModuleCommand(void *);
-   LOCALE int                            GetNumberOfModuleItems(void *);
-   LOCALE void                           CreateMainModule(void *);
-   LOCALE void                           SetListOfDefmodules(void *,void *);
-   LOCALE struct moduleItem             *GetListOfModuleItems(void *);
-   LOCALE struct moduleItem             *FindModuleItem(void *,char *);
-   LOCALE void                           SaveCurrentModule(void *);
-   LOCALE void                           RestoreCurrentModule(void *);
-   LOCALE void                           AddAfterModuleChangeFunction(void *,char *,void (*)(void *),int);
-   LOCALE void                           IllegalModuleSpecifierMessage(void *);
-   LOCALE void                           AllocateDefmoduleGlobals(void *);
+                                                            void (*)(void *,EXEC_STATUS,void *),
+                                                            void *(*)(void *,EXEC_STATUS,int),
+                                                            void (*)(void *,EXEC_STATUS,FILE *,int,int,int),
+                                                            void *(*)(void *,EXEC_STATUS,char *));
+   LOCALE void                          *GetModuleItem(void *,EXEC_STATUS,struct defmodule *,int);
+   LOCALE void                           SetModuleItem(void *,EXEC_STATUS,struct defmodule *,int,void *);
+   LOCALE void                          *EnvGetCurrentModule(void *,EXEC_STATUS);
+   LOCALE void                          *EnvSetCurrentModule(void *,EXEC_STATUS,void *);
+   LOCALE void                          *GetCurrentModuleCommand(void *,EXEC_STATUS);
+   LOCALE void                          *SetCurrentModuleCommand(void *,EXEC_STATUS);
+   LOCALE int                            GetNumberOfModuleItems(void *,EXEC_STATUS);
+   LOCALE void                           CreateMainModule(void *,EXEC_STATUS);
+   LOCALE void                           SetListOfDefmodules(void *,EXEC_STATUS,void *);
+   LOCALE struct moduleItem             *GetListOfModuleItems(void *,EXEC_STATUS);
+   LOCALE struct moduleItem             *FindModuleItem(void *,EXEC_STATUS,char *);
+   LOCALE void                           SaveCurrentModule(void *,EXEC_STATUS);
+   LOCALE void                           RestoreCurrentModule(void *,EXEC_STATUS);
+   LOCALE void                           AddAfterModuleChangeFunction(void *,EXEC_STATUS,char *,void (*)(void *),int);
+   LOCALE void                           IllegalModuleSpecifierMessage(void *,EXEC_STATUS);
+   LOCALE void                           AllocateDefmoduleGlobals(void *,EXEC_STATUS);
 
 #endif
 

@@ -41,21 +41,21 @@
    LOCALE int                            Eval(char *,DATA_OBJECT_PTR);
 #endif
 
-   LOCALE int                            EnvBuild(void *,char *);
-   LOCALE int                            EnvEval(void *,char *,DATA_OBJECT_PTR);
-   LOCALE void                           StringFunctionDefinitions(void *);
-   LOCALE void                           StrCatFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                           SymCatFunction(void *,DATA_OBJECT_PTR);
-   LOCALE long long                      StrLengthFunction(void *);
-   LOCALE void                           UpcaseFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                           LowcaseFunction(void *,DATA_OBJECT_PTR);
-   LOCALE long long                      StrCompareFunction(void *);
-   LOCALE void                          *SubStringFunction(void *);
-   LOCALE void                           StrIndexFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                           EvalFunction(void *,DATA_OBJECT_PTR);
-   LOCALE int                            BuildFunction(void *);
-   LOCALE void                           StringToFieldFunction(void *,DATA_OBJECT *);
-   LOCALE void                           StringToField(void *,char *,DATA_OBJECT *);
+   LOCALE int                            EnvBuild(void *,EXEC_STATUS,char *);
+   LOCALE int                            EnvEval(void *,EXEC_STATUS,char *,DATA_OBJECT_PTR);
+   LOCALE void                           StringFunctionDefinitions(void *,EXEC_STATUS);
+   LOCALE void                           StrCatFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
+   LOCALE void                           SymCatFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
+   LOCALE long long                      StrLengthFunction(void *,EXEC_STATUS);
+   LOCALE void                           UpcaseFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
+   LOCALE void                           LowcaseFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
+   LOCALE long long                      StrCompareFunction(void *,EXEC_STATUS);
+   LOCALE void                          *SubStringFunction(void *,EXEC_STATUS);
+   LOCALE void                           StrIndexFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
+   LOCALE void                           EvalFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
+   LOCALE int                            BuildFunction(void *,EXEC_STATUS);
+   LOCALE void                           StringToFieldFunction(void *,EXEC_STATUS,DATA_OBJECT *);
+   LOCALE void                           StringToField(void *,EXEC_STATUS,char *,DATA_OBJECT *);
 
 #endif
 

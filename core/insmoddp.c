@@ -65,10 +65,10 @@
    =========================================
    ***************************************** */
 
-static DATA_OBJECT *EvaluateSlotOverrides(void *,EXPRESSION *,int *,int *);
-static void DeleteSlotOverrideEvaluations(void *,DATA_OBJECT *,int);
-static void ModifyMsgHandlerSupport(void *,DATA_OBJECT *,int);
-static void DuplicateMsgHandlerSupport(void *,DATA_OBJECT *,int);
+static DATA_OBJECT *EvaluateSlotOverrides(void *,EXEC_STATUS,EXPRESSION *,int *,int *);
+static void DeleteSlotOverrideEvaluations(void *,EXEC_STATUS,DATA_OBJECT *,int);
+static void ModifyMsgHandlerSupport(void *,EXEC_STATUS,DATA_OBJECT *,int);
+static void DuplicateMsgHandlerSupport(void *,EXEC_STATUS,DATA_OBJECT *,int);
 
 /* =========================================
    *****************************************
@@ -165,7 +165,7 @@ globle void ModifyInstance(
    if (error)
      {
       SetpType(result,SYMBOL);
-      SetpValue(result,EnvFalseSymbol(theEnv));
+      SetpValue(result,EnvFalseSymbol(theEnv,execStatus));
       return;
      }
 
@@ -177,7 +177,7 @@ globle void ModifyInstance(
    if (ins == NULL)
      {
       SetpType(result,SYMBOL);
-      SetpValue(result,EnvFalseSymbol(theEnv));
+      SetpValue(result,EnvFalseSymbol(theEnv,execStatus));
       DeleteSlotOverrideEvaluations(theEnv,execStatus,overrides,overrideCount);
       return;
      }
@@ -193,10 +193,10 @@ globle void ModifyInstance(
    theExp.argList = NULL;
    theExp.nextArg = NULL;
 
-   oldOMDMV = InstanceData(theEnv)->ObjectModDupMsgValid;
-   InstanceData(theEnv)->ObjectModDupMsgValid = TRUE;
+   oldOMDMV = InstanceData(theEnv,execStatus)->ObjectModDupMsgValid;
+   InstanceData(theEnv,execStatus)->ObjectModDupMsgValid = TRUE;
    DirectMessage(theEnv,execStatus,FindSymbolHN(theEnv,execStatus,DIRECT_MODIFY_STRING),ins,result,&theExp);
-   InstanceData(theEnv)->ObjectModDupMsgValid = oldOMDMV;
+   InstanceData(theEnv,execStatus)->ObjectModDupMsgValid = oldOMDMV;
 
    DeleteSlotOverrideEvaluations(theEnv,execStatus,overrides,overrideCount);
   }
@@ -233,7 +233,7 @@ globle void MsgModifyInstance(
    if (error)
      {
       SetpType(result,SYMBOL);
-      SetpValue(result,EnvFalseSymbol(theEnv));
+      SetpValue(result,EnvFalseSymbol(theEnv,execStatus));
       return;
      }
 
@@ -245,7 +245,7 @@ globle void MsgModifyInstance(
    if (ins == NULL)
      {
       SetpType(result,SYMBOL);
-      SetpValue(result,EnvFalseSymbol(theEnv));
+      SetpValue(result,EnvFalseSymbol(theEnv,execStatus));
       DeleteSlotOverrideEvaluations(theEnv,execStatus,overrides,overrideCount);
       return;
      }
@@ -261,10 +261,10 @@ globle void MsgModifyInstance(
    theExp.argList = NULL;
    theExp.nextArg = NULL;
 
-   oldOMDMV = InstanceData(theEnv)->ObjectModDupMsgValid;
-   InstanceData(theEnv)->ObjectModDupMsgValid = TRUE;
+   oldOMDMV = InstanceData(theEnv,execStatus)->ObjectModDupMsgValid;
+   InstanceData(theEnv,execStatus)->ObjectModDupMsgValid = TRUE;
    DirectMessage(theEnv,execStatus,FindSymbolHN(theEnv,execStatus,MSG_MODIFY_STRING),ins,result,&theExp);
-   InstanceData(theEnv)->ObjectModDupMsgValid = oldOMDMV;
+   InstanceData(theEnv,execStatus)->ObjectModDupMsgValid = oldOMDMV;
 
    DeleteSlotOverrideEvaluations(theEnv,execStatus,overrides,overrideCount);
   }
@@ -302,7 +302,7 @@ globle void DuplicateInstance(
    if (error)
      {
       SetpType(result,SYMBOL);
-      SetpValue(result,EnvFalseSymbol(theEnv));
+      SetpValue(result,EnvFalseSymbol(theEnv,execStatus));
       return;
      }
 
@@ -314,7 +314,7 @@ globle void DuplicateInstance(
    if (ins == NULL)
      {
       SetpType(result,SYMBOL);
-      SetpValue(result,EnvFalseSymbol(theEnv));
+      SetpValue(result,EnvFalseSymbol(theEnv,execStatus));
       DeleteSlotOverrideEvaluations(theEnv,execStatus,overrides,overrideCount);
       return;
      }
@@ -322,7 +322,7 @@ globle void DuplicateInstance(
                     2,INSTANCE_NAME,&newName) == FALSE)
      {
       SetpType(result,SYMBOL);
-      SetpValue(result,EnvFalseSymbol(theEnv));
+      SetpValue(result,EnvFalseSymbol(theEnv,execStatus));
       DeleteSlotOverrideEvaluations(theEnv,execStatus,overrides,overrideCount);
       return;
      }
@@ -342,10 +342,10 @@ globle void DuplicateInstance(
    theExp[1].argList = NULL;
    theExp[1].nextArg = NULL;
 
-   oldOMDMV = InstanceData(theEnv)->ObjectModDupMsgValid;
-   InstanceData(theEnv)->ObjectModDupMsgValid = TRUE;
+   oldOMDMV = InstanceData(theEnv,execStatus)->ObjectModDupMsgValid;
+   InstanceData(theEnv,execStatus)->ObjectModDupMsgValid = TRUE;
    DirectMessage(theEnv,execStatus,FindSymbolHN(theEnv,execStatus,DIRECT_DUPLICATE_STRING),ins,result,&theExp[0]);
-   InstanceData(theEnv)->ObjectModDupMsgValid = oldOMDMV;
+   InstanceData(theEnv,execStatus)->ObjectModDupMsgValid = oldOMDMV;
 
    DeleteSlotOverrideEvaluations(theEnv,execStatus,overrides,overrideCount);
   }
@@ -383,7 +383,7 @@ globle void MsgDuplicateInstance(
    if (error)
      {
       SetpType(result,SYMBOL);
-      SetpValue(result,EnvFalseSymbol(theEnv));
+      SetpValue(result,EnvFalseSymbol(theEnv,execStatus));
       return;
      }
 
@@ -395,7 +395,7 @@ globle void MsgDuplicateInstance(
    if (ins == NULL)
      {
       SetpType(result,SYMBOL);
-      SetpValue(result,EnvFalseSymbol(theEnv));
+      SetpValue(result,EnvFalseSymbol(theEnv,execStatus));
       DeleteSlotOverrideEvaluations(theEnv,execStatus,overrides,overrideCount);
       return;
      }
@@ -403,7 +403,7 @@ globle void MsgDuplicateInstance(
                     2,INSTANCE_NAME,&newName) == FALSE)
      {
       SetpType(result,SYMBOL);
-      SetpValue(result,EnvFalseSymbol(theEnv));
+      SetpValue(result,EnvFalseSymbol(theEnv,execStatus));
       DeleteSlotOverrideEvaluations(theEnv,execStatus,overrides,overrideCount);
       return;
      }
@@ -423,10 +423,10 @@ globle void MsgDuplicateInstance(
    theExp[1].argList = NULL;
    theExp[1].nextArg = NULL;
 
-   oldOMDMV = InstanceData(theEnv)->ObjectModDupMsgValid;
-   InstanceData(theEnv)->ObjectModDupMsgValid = TRUE;
+   oldOMDMV = InstanceData(theEnv,execStatus)->ObjectModDupMsgValid;
+   InstanceData(theEnv,execStatus)->ObjectModDupMsgValid = TRUE;
    DirectMessage(theEnv,execStatus,FindSymbolHN(theEnv,execStatus,MSG_DUPLICATE_STRING),ins,result,&theExp[0]);
-   InstanceData(theEnv)->ObjectModDupMsgValid = oldOMDMV;
+   InstanceData(theEnv,execStatus)->ObjectModDupMsgValid = oldOMDMV;
 
    DeleteSlotOverrideEvaluations(theEnv,execStatus,overrides,overrideCount);
   }
@@ -697,7 +697,7 @@ static DATA_OBJECT *EvaluateSlotOverrides(
          SetpDOBegin(&ovs[ovi],1);
          SetpDOEnd(&ovs[ovi],0);
          SetpType(&ovs[ovi],MULTIFIELD);
-         SetpValue(&ovs[ovi],ProceduralPrimitiveData(theEnv)->NoParamValue);
+         SetpValue(&ovs[ovi],ProceduralPrimitiveData(theEnv,execStatus)->NoParamValue);
         }
       ovs[ovi].supplementalInfo = slotName;
       ovExprs = ovExprs->nextArg->nextArg;
@@ -758,17 +758,17 @@ static void ModifyMsgHandlerSupport(
    INSTANCE_SLOT *insSlot;
 
    result->type = SYMBOL;
-   result->value = EnvFalseSymbol(theEnv);
-   if (InstanceData(theEnv)->ObjectModDupMsgValid == FALSE)
+   result->value = EnvFalseSymbol(theEnv,execStatus);
+   if (InstanceData(theEnv,execStatus)->ObjectModDupMsgValid == FALSE)
      {
       PrintErrorID(theEnv,execStatus,"INSMODDP",1,FALSE);
       EnvPrintRouter(theEnv,execStatus,WERROR,"Direct/message-modify message valid only in modify-instance.\n");
       SetEvaluationError(theEnv,execStatus,TRUE);
       return;
      }
-   InstanceData(theEnv)->ObjectModDupMsgValid = FALSE;
+   InstanceData(theEnv,execStatus)->ObjectModDupMsgValid = FALSE;
 
-   ins = GetActiveInstance(theEnv);
+   ins = GetActiveInstance(theEnv,execStatus);
    if (ins->garbage)
      {
       StaleInstanceAddress(theEnv,execStatus,"modify-instance",0);
@@ -808,7 +808,7 @@ static void ModifyMsgHandlerSupport(
          msgExp.nextArg = NULL;
          DirectMessage(theEnv,execStatus,insSlot->desc->overrideMessage,ins,&temp,&msgExp);
          if (execStatus->EvaluationError ||
-             ((temp.type == SYMBOL) && (temp.value == EnvFalseSymbol(theEnv))))
+             ((temp.type == SYMBOL) && (temp.value == EnvFalseSymbol(theEnv,execStatus))))
            return;
         }
       else
@@ -831,7 +831,7 @@ static void ModifyMsgHandlerSupport(
 
       slotOverrides = slotOverrides->next;
      }
-   result->value = EnvTrueSymbol(theEnv);
+   result->value = EnvTrueSymbol(theEnv,execStatus);
   }
 
 /*************************************************************
@@ -864,22 +864,22 @@ static void DuplicateMsgHandlerSupport(
    DATA_OBJECT temp,junk,*newval;
 
    result->type = SYMBOL;
-   result->value = EnvFalseSymbol(theEnv);
-   if (InstanceData(theEnv)->ObjectModDupMsgValid == FALSE)
+   result->value = EnvFalseSymbol(theEnv,execStatus);
+   if (InstanceData(theEnv,execStatus)->ObjectModDupMsgValid == FALSE)
      {
       PrintErrorID(theEnv,execStatus,"INSMODDP",2,FALSE);
       EnvPrintRouter(theEnv,execStatus,WERROR,"Direct/message-duplicate message valid only in duplicate-instance.\n");
       SetEvaluationError(theEnv,execStatus,TRUE);
       return;
      }
-   InstanceData(theEnv)->ObjectModDupMsgValid = FALSE;
+   InstanceData(theEnv,execStatus)->ObjectModDupMsgValid = FALSE;
 
    /* ==================================
       Grab the slot override expressions
       and determine the source instance
       and the name of the new instance
       ================================== */
-   srcins = GetActiveInstance(theEnv);
+   srcins = GetActiveInstance(theEnv,execStatus);
    newName = (SYMBOL_HN *) GetNthMessageArgument(theEnv,execStatus,1)->value;
    slotOverrides = (DATA_OBJECT *) GetNthMessageArgument(theEnv,execStatus,2)->value;
    if (srcins->garbage)
@@ -900,10 +900,10 @@ static void DuplicateMsgHandlerSupport(
       Create an uninitialized new instance of
       the new name (delete old version - if any)
       ========================================== */
-   oldMkInsMsgPass = InstanceData(theEnv)->MkInsMsgPass;
-   InstanceData(theEnv)->MkInsMsgPass = msgpass;
+   oldMkInsMsgPass = InstanceData(theEnv,execStatus)->MkInsMsgPass;
+   InstanceData(theEnv,execStatus)->MkInsMsgPass = msgpass;
    dstins = BuildInstance(theEnv,execStatus,newName,srcins->cls,TRUE);
-   InstanceData(theEnv)->MkInsMsgPass = oldMkInsMsgPass;
+   InstanceData(theEnv,execStatus)->MkInsMsgPass = oldMkInsMsgPass;
    if (dstins == NULL)
      return;
    dstins->busy++;
@@ -936,7 +936,7 @@ static void DuplicateMsgHandlerSupport(
          msgExp.nextArg = NULL;
          DirectMessage(theEnv,execStatus,dstInsSlot->desc->overrideMessage,dstins,&temp,&msgExp);
          if (execStatus->EvaluationError ||
-             ((temp.type == SYMBOL) && (temp.value == EnvFalseSymbol(theEnv))))
+             ((temp.type == SYMBOL) && (temp.value == EnvFalseSymbol(theEnv,execStatus))))
            goto DuplicateError;
         }
       else
@@ -982,7 +982,7 @@ static void DuplicateMsgHandlerSupport(
                           dstins,&temp,valArg);
             ReturnExpression(theEnv,execStatus,valArg);
             if (execStatus->EvaluationError ||
-                ((temp.type == SYMBOL) && (temp.value == EnvFalseSymbol(theEnv))))
+                ((temp.type == SYMBOL) && (temp.value == EnvFalseSymbol(theEnv,execStatus))))
               goto DuplicateError;
            }
          else
@@ -1009,13 +1009,13 @@ static void DuplicateMsgHandlerSupport(
       for (i = 0 ; i < dstins->cls->instanceSlotCount ; i++)
         dstins->slotAddresses[i]->override = TRUE;
       dstins->initializeInProgress = 1;
-      DirectMessage(theEnv,execStatus,MessageHandlerData(theEnv)->INIT_SYMBOL,dstins,result,NULL);
+      DirectMessage(theEnv,execStatus,MessageHandlerData(theEnv,execStatus)->INIT_SYMBOL,dstins,result,NULL);
      }
    dstins->busy--;
    if (dstins->garbage)
      {
       result->type = SYMBOL;
-      result->value = EnvFalseSymbol(theEnv);
+      result->value = EnvFalseSymbol(theEnv,execStatus);
       SetEvaluationError(theEnv,execStatus,TRUE);
      }
    else

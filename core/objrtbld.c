@@ -105,47 +105,47 @@
    ***************************************** */
 
 static intBool PatternParserFind(SYMBOL_HN *);
-static struct lhsParseNode *ObjectLHSParse(void *,char *,struct token *);
-static intBool ReorderAndAnalyzeObjectPattern(void *,struct lhsParseNode *);
-static struct patternNodeHeader *PlaceObjectPattern(void *,struct lhsParseNode *);
+static struct lhsParseNode *ObjectLHSParse(void *,EXEC_STATUS,char *,struct token *);
+static intBool ReorderAndAnalyzeObjectPattern(void *,EXEC_STATUS,struct lhsParseNode *);
+static struct patternNodeHeader *PlaceObjectPattern(void *,EXEC_STATUS,struct lhsParseNode *);
 static OBJECT_PATTERN_NODE *FindObjectPatternNode(OBJECT_PATTERN_NODE *,struct lhsParseNode *,
                                                   OBJECT_PATTERN_NODE **,unsigned,unsigned);
-static OBJECT_PATTERN_NODE *CreateNewObjectPatternNode(void *,struct lhsParseNode *,OBJECT_PATTERN_NODE *,
+static OBJECT_PATTERN_NODE *CreateNewObjectPatternNode(void *,EXEC_STATUS,struct lhsParseNode *,OBJECT_PATTERN_NODE *,
                                                        OBJECT_PATTERN_NODE *,unsigned,unsigned);
-static void DetachObjectPattern(void *,struct patternNodeHeader *);
-static void ClearObjectPatternMatches(void *,OBJECT_ALPHA_NODE *);
-static void RemoveObjectPartialMatches(void *,INSTANCE_TYPE *,struct patternNodeHeader *);
-static intBool CheckDuplicateSlots(void *,struct lhsParseNode *,SYMBOL_HN *);
-static struct lhsParseNode *ParseClassRestriction(void *,char *,struct token *);
-static struct lhsParseNode *ParseNameRestriction(void *,char *,struct token *);
-static struct lhsParseNode *ParseSlotRestriction(void *,char *,struct token *,CONSTRAINT_RECORD *,int);
-static CLASS_BITMAP *NewClassBitMap(void *,int,int);
-static void InitializeClassBitMap(void *,CLASS_BITMAP *,int);
-static void DeleteIntermediateClassBitMap(void *,CLASS_BITMAP *);
-static void *CopyClassBitMap(void *,void *);
-static void DeleteClassBitMap(void *,void *);
-static void MarkBitMapClassesBusy(void *,BITMAP_HN *,int);
+static void DetachObjectPattern(void *,EXEC_STATUS,struct patternNodeHeader *);
+static void ClearObjectPatternMatches(void *,EXEC_STATUS,OBJECT_ALPHA_NODE *);
+static void RemoveObjectPartialMatches(void *,EXEC_STATUS,INSTANCE_TYPE *,struct patternNodeHeader *);
+static intBool CheckDuplicateSlots(void *,EXEC_STATUS,struct lhsParseNode *,SYMBOL_HN *);
+static struct lhsParseNode *ParseClassRestriction(void *,EXEC_STATUS,char *,struct token *);
+static struct lhsParseNode *ParseNameRestriction(void *,EXEC_STATUS,char *,struct token *);
+static struct lhsParseNode *ParseSlotRestriction(void *,EXEC_STATUS,char *,struct token *,CONSTRAINT_RECORD *,int);
+static CLASS_BITMAP *NewClassBitMap(void *,EXEC_STATUS,int,int);
+static void InitializeClassBitMap(void *,EXEC_STATUS,CLASS_BITMAP *,int);
+static void DeleteIntermediateClassBitMap(void *,EXEC_STATUS,CLASS_BITMAP *);
+static void *CopyClassBitMap(void *,EXEC_STATUS,void *);
+static void DeleteClassBitMap(void *,EXEC_STATUS,void *);
+static void MarkBitMapClassesBusy(void *,EXEC_STATUS,BITMAP_HN *,int);
 static intBool EmptyClassBitMap(CLASS_BITMAP *);
 static intBool IdenticalClassBitMap(CLASS_BITMAP *,CLASS_BITMAP *);
-static intBool ProcessClassRestriction(void *,CLASS_BITMAP *,struct lhsParseNode **,int);
-static CONSTRAINT_RECORD *ProcessSlotRestriction(void *,CLASS_BITMAP *,SYMBOL_HN *,int *);
+static intBool ProcessClassRestriction(void *,EXEC_STATUS,CLASS_BITMAP *,struct lhsParseNode **,int);
+static CONSTRAINT_RECORD *ProcessSlotRestriction(void *,EXEC_STATUS,CLASS_BITMAP *,SYMBOL_HN *,int *);
 static void IntersectClassBitMaps(CLASS_BITMAP *,CLASS_BITMAP *);
 static void UnionClassBitMaps(CLASS_BITMAP *,CLASS_BITMAP *);
-static CLASS_BITMAP *PackClassBitMap(void *,CLASS_BITMAP *);
-static struct lhsParseNode *FilterObjectPattern(void *,struct patternParser *,
+static CLASS_BITMAP *PackClassBitMap(void *,EXEC_STATUS,CLASS_BITMAP *);
+static struct lhsParseNode *FilterObjectPattern(void *,EXEC_STATUS,struct patternParser *,
                                               struct lhsParseNode *,struct lhsParseNode **,
                                               struct lhsParseNode **,struct lhsParseNode **);
-static BITMAP_HN *FormSlotBitMap(void *,struct lhsParseNode *);
-static struct lhsParseNode *RemoveSlotExistenceTests(void *,struct lhsParseNode *,BITMAP_HN **);
-static struct lhsParseNode *CreateInitialObjectPattern(void *);
-static EXPRESSION *ObjectMatchDelayParse(void *,EXPRESSION *,char *);
-static void MarkObjectPtnIncrementalReset(void *,struct patternNodeHeader *,int);
-static void ObjectIncrementalReset(void *);
+static BITMAP_HN *FormSlotBitMap(void *,EXEC_STATUS,struct lhsParseNode *);
+static struct lhsParseNode *RemoveSlotExistenceTests(void *,EXEC_STATUS,struct lhsParseNode *,BITMAP_HN **);
+static struct lhsParseNode *CreateInitialObjectPattern(void *,EXEC_STATUS);
+static EXPRESSION *ObjectMatchDelayParse(void *,EXEC_STATUS,EXPRESSION *,char *);
+static void MarkObjectPtnIncrementalReset(void *,EXEC_STATUS,struct patternNodeHeader *,int);
+static void ObjectIncrementalReset(void *,EXEC_STATUS);
 
 #endif
 
 #if ! DEFINSTANCES_CONSTRUCT
-static void ResetInitialObject(void *);
+static void ResetInitialObject(void *,EXEC_STATUS);
 #endif
 
 /* =========================================
@@ -188,7 +188,7 @@ globle void SetupObjectPatternStuff(
    
    newPtr->name = "objects";
    newPtr->priority = 20;
-   newPtr->entityType = &InstanceData(theEnv)->InstanceInfo;
+   newPtr->entityType = &InstanceData(theEnv,execStatus)->InstanceInfo;
 
    newPtr->recognizeFunction = PatternParserFind;
    newPtr->parseFunction = ObjectLHSParse;
@@ -227,10 +227,10 @@ globle void SetupObjectPatternStuff(
 
 #endif
 
-   InstallObjectPrimitives(theEnv);
+   InstallObjectPrimitives(theEnv,execStatus);
 
 #if CONSTRUCT_COMPILER && (! RUN_TIME)
-   ObjectPatternsCompilerSetup(theEnv);
+   ObjectPatternsCompilerSetup(theEnv,execStatus);
 #endif
 
 #if ! DEFINSTANCES_CONSTRUCT
@@ -239,7 +239,7 @@ globle void SetupObjectPatternStuff(
 
 
 #if BLOAD_AND_BSAVE || BLOAD || BLOAD_ONLY
-   SetupObjectPatternsBload(theEnv);
+   SetupObjectPatternsBload(theEnv,execStatus);
 #endif
   }
 
@@ -259,7 +259,7 @@ static void ResetInitialObject(
    DATA_OBJECT rtn;
 
    tmp = GenConstant(theEnv,execStatus,FCALL,(void *) FindFunction(theEnv,execStatus,"make-instance"));
-   tmp->argList = GenConstant(theEnv,execStatus,INSTANCE_NAME,(void *) DefclassData(theEnv)->INITIAL_OBJECT_SYMBOL);
+   tmp->argList = GenConstant(theEnv,execStatus,INSTANCE_NAME,(void *) DefclassData(theEnv,execStatus)->INITIAL_OBJECT_SYMBOL);
    tmp->argList->nextArg =
        GenConstant(theEnv,execStatus,DEFCLASS_PTR,(void *) LookupDefclassInScope(theEnv,execStatus,INITIAL_OBJECT_CLASS_NAME));
    EvaluateExpression(theEnv,execStatus,tmp,&rtn);
@@ -329,7 +329,7 @@ static struct lhsParseNode *ObjectLHSParse(
       existing classes - and set all bits, since the initial
       set of applicable classes is everything.
       ======================================================== */
-   clsset = NewClassBitMap(theEnv,execStatus,((int) DefclassData(theEnv)->MaxClassID) - 1,1);
+   clsset = NewClassBitMap(theEnv,execStatus,((int) DefclassData(theEnv,execStatus)->MaxClassID) - 1,1);
    if (EmptyClassBitMap(clsset))
      {
       PrintErrorID(theEnv,execStatus,"OBJRTBLD",1,FALSE);
@@ -337,7 +337,7 @@ static struct lhsParseNode *ObjectLHSParse(
       DeleteIntermediateClassBitMap(theEnv,execStatus,clsset);
       return(NULL);
      }
-   tmpset = NewClassBitMap(theEnv,execStatus,((int) DefclassData(theEnv)->MaxClassID) - 1,1);
+   tmpset = NewClassBitMap(theEnv,execStatus,((int) DefclassData(theEnv,execStatus)->MaxClassID) - 1,1);
 
    IncrementIndentDepth(theEnv,execStatus,7);
 
@@ -348,7 +348,7 @@ static struct lhsParseNode *ObjectLHSParse(
    while (theToken.type != RPAREN)
      {
       ppbackupReqd = TRUE;
-      PPBackup(theEnv);
+      PPBackup(theEnv,execStatus);
       SavePPBuffer(theEnv,execStatus," ");
       SavePPBuffer(theEnv,execStatus,theToken.printForm);
       if (theToken.type != LPAREN)
@@ -364,7 +364,7 @@ static struct lhsParseNode *ObjectLHSParse(
         }
       if (CheckDuplicateSlots(theEnv,execStatus,firstNode,(SYMBOL_HN *) theToken.value))
         goto ObjectLHSParseERROR;
-      if (theToken.value == (void *) DefclassData(theEnv)->ISA_SYMBOL)
+      if (theToken.value == (void *) DefclassData(theEnv,execStatus)->ISA_SYMBOL)
         {
          tmpNode = ParseClassRestriction(theEnv,execStatus,readSource,&theToken);
          if (tmpNode == NULL)
@@ -377,7 +377,7 @@ static struct lhsParseNode *ObjectLHSParse(
            }
          IntersectClassBitMaps(clsset,tmpset);
         }
-      else if (theToken.value == (void *) DefclassData(theEnv)->NAME_SYMBOL)
+      else if (theToken.value == (void *) DefclassData(theEnv,execStatus)->NAME_SYMBOL)
         {
          tmpNode = ParseNameRestriction(theEnv,execStatus,readSource,&theToken);
          if (tmpNode == NULL)
@@ -397,7 +397,7 @@ static struct lhsParseNode *ObjectLHSParse(
          else
            {
             InitializeClassBitMap(theEnv,execStatus,tmpset,0);
-            tmpNode = GetLHSParseNode(theEnv);
+            tmpNode = GetLHSParseNode(theEnv,execStatus);
             tmpNode->slot = (SYMBOL_HN *) theToken.value;
            }
         }
@@ -425,7 +425,7 @@ static struct lhsParseNode *ObjectLHSParse(
            lastNode->right = tmpNode;
          lastNode = tmpNode;
         }
-      PPCRAndIndent(theEnv);
+      PPCRAndIndent(theEnv,execStatus);
       GetToken(theEnv,execStatus,readSource,&theToken);
      }
    if (firstNode == NULL)
@@ -436,16 +436,16 @@ static struct lhsParseNode *ObjectLHSParse(
          EnvPrintRouter(theEnv,execStatus,WERROR,"No objects of existing classes can satisfy pattern.\n");
          goto ObjectLHSParseERROR;
         }
-      firstNode = GetLHSParseNode(theEnv);
+      firstNode = GetLHSParseNode(theEnv,execStatus);
       firstNode->type = SF_WILDCARD;
-      firstNode->slot = DefclassData(theEnv)->ISA_SYMBOL;
+      firstNode->slot = DefclassData(theEnv,execStatus)->ISA_SYMBOL;
       firstNode->slotNumber = ISA_ID;
       firstNode->index = 1;
      }
    if (ppbackupReqd)
      {
-      PPBackup(theEnv);
-      PPBackup(theEnv);
+      PPBackup(theEnv,execStatus);
+      PPBackup(theEnv,execStatus);
       SavePPBuffer(theEnv,execStatus,theToken.printForm);
      }
    DeleteIntermediateClassBitMap(theEnv,execStatus,tmpset);
@@ -507,7 +507,7 @@ static intBool ReorderAndAnalyzeObjectPattern(
       ========================================================== */
    topNode->right = FilterObjectPattern(theEnv,execStatus,topNode->patternType,topNode->right,
                                         &bitmap_node,&isa_node,&name_node);
-   if (EnvGetStaticConstraintChecking(theEnv) == FALSE)
+   if (EnvGetStaticConstraintChecking(theEnv,execStatus) == FALSE)
      return(FALSE);
 
    /* ============================================
@@ -562,7 +562,7 @@ static intBool ReorderAndAnalyzeObjectPattern(
       for (i = 0 ; i <= tmpset->maxid ; i++)
         if (TestBitMap(tmpset->map,i))
           {
-           cls = DefclassData(theEnv)->ClassIDMap[i];
+           cls = DefclassData(theEnv,execStatus)->ClassIDMap[i];
            sd =  cls->instanceTemplate[FindInstanceTemplateSlot(theEnv,execStatus,cls,tmpNode->slot)];
 
            /* =========================================
@@ -669,7 +669,7 @@ static struct patternNodeHeader *PlaceObjectPattern(
    /* for the traversal to look for shareable pattern nodes. */
    /*========================================================*/
    
-   currentLevel = ObjectNetworkPointer(theEnv);
+   currentLevel = ObjectNetworkPointer(theEnv,execStatus);
    lastLevel = NULL;
 
    /*====================================================*/
@@ -779,7 +779,7 @@ static struct patternNodeHeader *PlaceObjectPattern(
    newAlphaNode->bsaveID = 0L;
    newAlphaNode->nxtInGroup = lastLevel->alphaNode;
    lastLevel->alphaNode = newAlphaNode;
-   newAlphaNode->nxtTerminal = ObjectNetworkTerminalPointer(theEnv);
+   newAlphaNode->nxtTerminal = ObjectNetworkTerminalPointer(theEnv,execStatus);
    SetObjectNetworkTerminalPointer(theEnv,execStatus,newAlphaNode);
    return((struct patternNodeHeader *) newAlphaNode);
   }
@@ -947,7 +947,7 @@ static OBJECT_PATTERN_NODE *CreateNewObjectPatternNode(
      {
       if (upperLevel == NULL)
         {
-         newNode->rightNode = ObjectNetworkPointer(theEnv);
+         newNode->rightNode = ObjectNetworkPointer(theEnv,execStatus);
          SetObjectNetworkPointer(theEnv,execStatus,newNode);
         }
       else
@@ -1069,7 +1069,7 @@ static void DetachObjectPattern(
    /*=========================================*/
    
    prv = NULL;
-   terminalPtr = ObjectNetworkTerminalPointer(theEnv);
+   terminalPtr = ObjectNetworkTerminalPointer(theEnv,execStatus);
    while (terminalPtr != alphaPtr)
      {
       prv = terminalPtr;
@@ -1221,7 +1221,7 @@ static void ClearObjectPatternMatches(
    /* =============================================
       Loop through every active and queued instance
       ============================================= */
-   ins = InstanceData(theEnv)->InstanceList;
+   ins = InstanceData(theEnv,execStatus)->InstanceList;
    while (ins != NULL)
      {
       RemoveObjectPartialMatches(theEnv,execStatus,(INSTANCE_TYPE *) ins,(struct patternNodeHeader *) alphaPtr);
@@ -1231,7 +1231,7 @@ static void ClearObjectPatternMatches(
    /* ============================
       Check for garbaged instances
       ============================ */
-   igrb = InstanceData(theEnv)->InstanceGarbageList;
+   igrb = InstanceData(theEnv,execStatus)->InstanceGarbageList;
    while (igrb != NULL)
      {
       RemoveObjectPartialMatches(theEnv,execStatus,(INSTANCE_TYPE *) igrb->ins,(struct patternNodeHeader *) alphaPtr);
@@ -1345,7 +1345,7 @@ static struct lhsParseNode *ParseClassRestriction(
    SYMBOL_HN *rln;
    CONSTRAINT_RECORD *rv;
    
-   rv = GetConstraintRecord(theEnv);
+   rv = GetConstraintRecord(theEnv,execStatus);
    rv->anyAllowed = 0;
    rv->symbolsAllowed = 1;
    rln = (SYMBOL_HN *) theToken->value;
@@ -1361,7 +1361,7 @@ static struct lhsParseNode *ParseClassRestriction(
        (tmpNode->type == MF_WILDCARD) ||
        (tmpNode->type == MF_VARIABLE))
      {
-      PPBackup(theEnv);
+      PPBackup(theEnv,execStatus);
       if (theToken->type != RPAREN)
         {
          SavePPBuffer(theEnv,execStatus," ");
@@ -1398,7 +1398,7 @@ static struct lhsParseNode *ParseNameRestriction(
    SYMBOL_HN *rln;
    CONSTRAINT_RECORD *rv;
    
-   rv = GetConstraintRecord(theEnv);
+   rv = GetConstraintRecord(theEnv,execStatus);
    rv->anyAllowed = 0;
    rv->instanceNamesAllowed = 1;
    rln = (SYMBOL_HN *) theToken->value;
@@ -1414,7 +1414,7 @@ static struct lhsParseNode *ParseNameRestriction(
        (tmpNode->type == MF_WILDCARD) ||
        (tmpNode->type == MF_VARIABLE))
      {
-      PPBackup(theEnv);
+      PPBackup(theEnv,execStatus);
       if (theToken->type != RPAREN)
         {
          SavePPBuffer(theEnv,execStatus," ");
@@ -1472,7 +1472,7 @@ static struct lhsParseNode *ParseSlotRestriction(
      }
    if (theToken->type != RPAREN)
      {
-      PPBackup(theEnv);
+      PPBackup(theEnv,execStatus);
       SavePPBuffer(theEnv,execStatus," ");
       SavePPBuffer(theEnv,execStatus,theToken->printForm);
       SyntaxErrorMessage(theEnv,execStatus,"object slot pattern");
@@ -1482,8 +1482,8 @@ static struct lhsParseNode *ParseSlotRestriction(
      }
    if ((tmpNode->bottom == NULL) && (tmpNode->multifieldSlot))
      {
-      PPBackup(theEnv);
-      PPBackup(theEnv);
+      PPBackup(theEnv,execStatus);
+      PPBackup(theEnv,execStatus);
       SavePPBuffer(theEnv,execStatus,")");
      }
    tmpNode->derivedConstraints = 1;
@@ -1552,10 +1552,10 @@ static void InitializeClassBitMap(
      }
    if (set)
      {
-      currentModule = ((struct defmodule *) EnvGetCurrentModule(theEnv));
+      currentModule = ((struct defmodule *) EnvGetCurrentModule(theEnv,execStatus));
       for (i = 0 ; i <= (int) bmp->maxid ; i++)
         {
-         cls = DefclassData(theEnv)->ClassIDMap[i];
+         cls = DefclassData(theEnv,execStatus)->ClassIDMap[i];
          if ((cls != NULL) ? DefclassInScope(theEnv,execStatus,cls,currentModule) : FALSE)
            {
             if (cls->reactive && (cls->abstract == 0))
@@ -1602,7 +1602,7 @@ static void *CopyClassBitMap(
   void *gset)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 
    if (gset != NULL)
@@ -1655,13 +1655,13 @@ static void MarkBitMapClassesBusy(
       If a clear is in progress, we do not
       have to worry about busy counts
       ==================================== */
-   if (ConstructData(theEnv)->ClearInProgress)
+   if (ConstructData(theEnv,execStatus)->ClearInProgress)
      return;
    bmp = (CLASS_BITMAP *) ValueToBitMap(bmphn);
    for (i = 0 ; i <= bmp->maxid ; i++)
      if (TestBitMap(bmp->map,i))
        {
-        cls =  DefclassData(theEnv)->ClassIDMap[i];
+        cls =  DefclassData(theEnv,execStatus)->ClassIDMap[i];
         cls->busy += (unsigned int) offset;
        }
   }
@@ -1754,8 +1754,8 @@ static intBool ProcessClassRestriction(
       restriction is comprised entirely of symbols,
       it can be removed
       =============================================== */
-   tmpset1 = NewClassBitMap(theEnv,execStatus,((int) DefclassData(theEnv)->MaxClassID) - 1,1);
-   tmpset2 = NewClassBitMap(theEnv,execStatus,((int) DefclassData(theEnv)->MaxClassID) - 1,0);
+   tmpset1 = NewClassBitMap(theEnv,execStatus,((int) DefclassData(theEnv,execStatus)->MaxClassID) - 1,1);
+   tmpset2 = NewClassBitMap(theEnv,execStatus,((int) DefclassData(theEnv,execStatus)->MaxClassID) - 1,0);
    for  (chk = *classRestrictions ; chk != NULL ; chk = chk->right)
      {
       if (chk->type == SYMBOL)
@@ -1842,7 +1842,7 @@ static CONSTRAINT_RECORD *ProcessSlotRestriction(
 
    *multip = FALSE;
    for (i = 0 ; i < CLASS_TABLE_HASH_SIZE ; i++)
-     for (cls = DefclassData(theEnv)->ClassTable[i] ; cls != NULL ; cls = cls->nxtHash)
+     for (cls = DefclassData(theEnv,execStatus)->ClassTable[i] ; cls != NULL ; cls = cls->nxtHash)
        {
         if (TestBitMap(clsset->map,cls->id))
           {
@@ -1982,9 +1982,9 @@ static struct lhsParseNode *FilterObjectPattern(
       Create a dummy node to attach to the end
       of the pattern which holds the class bitmap.
       ============================================ */
-   *bitmap_slot = GetLHSParseNode(theEnv);
+   *bitmap_slot = GetLHSParseNode(theEnv,execStatus);
    (*bitmap_slot)->type = SF_WILDCARD;
-   (*bitmap_slot)->slot = DefclassData(theEnv)->ISA_SYMBOL;
+   (*bitmap_slot)->slot = DefclassData(theEnv,execStatus)->ISA_SYMBOL;
    (*bitmap_slot)->slotNumber = ISA_ID;
    (*bitmap_slot)->index = 1;
    (*bitmap_slot)->patternType = selfPatternType;
@@ -1998,9 +1998,9 @@ static struct lhsParseNode *FilterObjectPattern(
    cur = unfilteredSlots;
    while (cur != NULL)
      {
-      if (cur->slot == DefclassData(theEnv)->ISA_SYMBOL)
+      if (cur->slot == DefclassData(theEnv,execStatus)->ISA_SYMBOL)
         *isa_slot = cur;
-      else if (cur->slot == DefclassData(theEnv)->NAME_SYMBOL)
+      else if (cur->slot == DefclassData(theEnv,execStatus)->NAME_SYMBOL)
         *name_slot = cur;
       prv = cur;
       cur = cur->right;
@@ -2275,18 +2275,18 @@ static struct lhsParseNode *CreateInitialObjectPattern(
    SetBitMap(clsset->map,initialObjectClassID);
    clsset = PackClassBitMap(theEnv,execStatus,clsset);
 
-   topNode = GetLHSParseNode(theEnv);
+   topNode = GetLHSParseNode(theEnv,execStatus);
    topNode->userData = EnvAddBitMap(theEnv,execStatus,(void *) clsset,ClassBitMapSize(clsset));
    IncrementBitMapCount(topNode->userData);
    DeleteIntermediateClassBitMap(theEnv,execStatus,clsset);
    topNode->type = SF_WILDCARD;
    topNode->index = 1;
-   topNode->slot = DefclassData(theEnv)->NAME_SYMBOL;
+   topNode->slot = DefclassData(theEnv,execStatus)->NAME_SYMBOL;
    topNode->slotNumber = NAME_ID;
 
-   topNode->bottom = GetLHSParseNode(theEnv);
+   topNode->bottom = GetLHSParseNode(theEnv,execStatus);
    topNode->bottom->type = INSTANCE_NAME;
-   topNode->bottom->value = (void *) DefclassData(theEnv)->INITIAL_OBJECT_SYMBOL;
+   topNode->bottom->value = (void *) DefclassData(theEnv,execStatus)->INITIAL_OBJECT_SYMBOL;
 
    return(topNode);
   }
@@ -2312,10 +2312,10 @@ static EXPRESSION *ObjectMatchDelayParse(
    struct token tkn;
 
    IncrementIndentDepth(theEnv,execStatus,3);
-   PPCRAndIndent(theEnv);
+   PPCRAndIndent(theEnv,execStatus);
    top->argList = GroupActions(theEnv,execStatus,infile,&tkn,TRUE,NULL,FALSE);
-   PPBackup(theEnv);
-   PPBackup(theEnv);
+   PPBackup(theEnv,execStatus);
+   PPBackup(theEnv,execStatus);
    SavePPBuffer(theEnv,execStatus,tkn.printForm);
    DecrementIndentDepth(theEnv,execStatus,3);
    if (top->argList == NULL)
@@ -2350,7 +2350,7 @@ static void MarkObjectPtnIncrementalReset(
   int value)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 
    if (thePattern->initialize == FALSE)
@@ -2376,7 +2376,7 @@ static void ObjectIncrementalReset(
   {
    INSTANCE_TYPE *ins;
    
-   for (ins = InstanceData(theEnv)->InstanceList ; ins != NULL ; ins = ins->nxtList)
+   for (ins = InstanceData(theEnv,execStatus)->InstanceList ; ins != NULL ; ins = ins->nxtList)
      ObjectNetworkAction(theEnv,execStatus,OBJECT_ASSERT,(INSTANCE_TYPE *) ins,-1);
   }
 

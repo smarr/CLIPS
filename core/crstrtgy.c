@@ -62,14 +62,14 @@
 
    static ACTIVATION             *PlaceDepthActivation(ACTIVATION *,struct salienceGroup *);
    static ACTIVATION             *PlaceBreadthActivation(ACTIVATION *,struct salienceGroup *);
-   static ACTIVATION             *PlaceLEXActivation(void *,ACTIVATION *,struct salienceGroup *);
-   static ACTIVATION             *PlaceMEAActivation(void *,ACTIVATION *,struct salienceGroup *);
+   static ACTIVATION             *PlaceLEXActivation(void *,EXEC_STATUS,ACTIVATION *,struct salienceGroup *);
+   static ACTIVATION             *PlaceMEAActivation(void *,EXEC_STATUS,ACTIVATION *,struct salienceGroup *);
    static ACTIVATION             *PlaceComplexityActivation(ACTIVATION *,struct salienceGroup *);
    static ACTIVATION             *PlaceSimplicityActivation(ACTIVATION *,struct salienceGroup *);
    static ACTIVATION             *PlaceRandomActivation(ACTIVATION *,struct salienceGroup *);
-   static int                     ComparePartialMatches(void *,ACTIVATION *,ACTIVATION *);
+   static int                     ComparePartialMatches(void *,EXEC_STATUS,ACTIVATION *,ACTIVATION *);
    static char                   *GetStrategyName(int);
-   static unsigned long long     *SortPartialMatch(void *,struct partialMatch *);
+   static unsigned long long     *SortPartialMatch(void *,EXEC_STATUS,struct partialMatch *);
    
 /******************************************************************/
 /* PlaceActivation: Coordinates placement of an activation on the */
@@ -99,7 +99,7 @@ globle void PlaceActivation(
 
    if (*whichAgenda != NULL) 
      {
-      switch (AgendaData(theEnv)->Strategy)
+      switch (AgendaData(theEnv,execStatus)->Strategy)
         {
          case DEPTH_STRATEGY:
            placeAfter = PlaceDepthActivation(newActivation,theGroup);
@@ -948,10 +948,10 @@ globle int EnvSetStrategy(
   {
    int oldStrategy;
    
-   oldStrategy = AgendaData(theEnv)->Strategy;
-   AgendaData(theEnv)->Strategy = value;
+   oldStrategy = AgendaData(theEnv,execStatus)->Strategy;
+   AgendaData(theEnv,execStatus)->Strategy = value;
 
-   if (oldStrategy != AgendaData(theEnv)->Strategy) EnvReorderAgenda(theEnv,execStatus,NULL);
+   if (oldStrategy != AgendaData(theEnv,execStatus)->Strategy) EnvReorderAgenda(theEnv,execStatus,NULL);
 
    return(oldStrategy);
   }
@@ -964,7 +964,7 @@ globle int EnvGetStrategy(
   void *theEnv,
   EXEC_STATUS)
   {
-   return(AgendaData(theEnv)->Strategy);
+   return(AgendaData(theEnv,execStatus)->Strategy);
   }
 
 /********************************************/
@@ -977,7 +977,7 @@ globle void *GetStrategyCommand(
   {
    EnvArgCountCheck(theEnv,execStatus,"get-strategy",EXACTLY,0);
 
-   return((SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,GetStrategyName(EnvGetStrategy(theEnv))));
+   return((SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,GetStrategyName(EnvGetStrategy(theEnv,execStatus))));
   }
 
 /********************************************/
@@ -992,17 +992,17 @@ globle void *SetStrategyCommand(
    char *argument;
    int oldStrategy;
    
-   oldStrategy = AgendaData(theEnv)->Strategy;
+   oldStrategy = AgendaData(theEnv,execStatus)->Strategy;
 
    /*=====================================================*/
    /* Check for the correct number and type of arguments. */
    /*=====================================================*/
 
    if (EnvArgCountCheck(theEnv,execStatus,"set-strategy",EXACTLY,1) == -1)
-     { return((SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,GetStrategyName(EnvGetStrategy(theEnv)))); }
+     { return((SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,GetStrategyName(EnvGetStrategy(theEnv,execStatus)))); }
 
    if (EnvArgTypeCheck(theEnv,execStatus,"set-strategy",1,SYMBOL,&argPtr) == FALSE)
-     { return((SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,GetStrategyName(EnvGetStrategy(theEnv)))); }
+     { return((SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,GetStrategyName(EnvGetStrategy(theEnv,execStatus)))); }
 
    argument = DOToString(argPtr);
 
@@ -1028,7 +1028,7 @@ globle void *SetStrategyCommand(
      {
       ExpectedTypeError1(theEnv,execStatus,"set-strategy",1,
       "symbol with value depth, breadth, lex, mea, complexity, simplicity, or random");
-      return((SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,GetStrategyName(EnvGetStrategy(theEnv))));
+      return((SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,GetStrategyName(EnvGetStrategy(theEnv,execStatus))));
      }
 
    /*=======================================*/

@@ -71,12 +71,12 @@
 /***************************************/
 
 #if DEBUGGING_FUNCTIONS
-   static void                    ConstructPrintWatch(void *,char *,struct construct *,void *,
-                                                      unsigned (*)(void *,void *));
+   static void                    ConstructPrintWatch(void *,EXEC_STATUS,char *,struct construct *,void *,
+                                                      unsigned (*)(void *,EXEC_STATUS,void *));
    static unsigned                ConstructWatchSupport(void *,EXEC_STATUS,struct construct *,char *,
                                                         char *,EXPRESSION *,intBool,
-                                                        unsigned,unsigned (*)(void *,void *),
-                                                        void (*)(void *,unsigned,void *));
+                                                        unsigned,unsigned (*)(void *,EXEC_STATUS,void *),
+                                                        void (*)(void *,EXEC_STATUS,unsigned,void *));
 #endif
 
 #if (! RUN_TIME)
@@ -118,7 +118,7 @@ globle intBool DeleteNamedConstruct(
    /*=============================*/
 
 #if BLOAD || BLOAD_ONLY || BLOAD_AND_BSAVE
-   if (Bloaded(theEnv) == TRUE) return(FALSE);
+   if (Bloaded(theEnv,execStatus) == TRUE) return(FALSE);
 #endif
 
    /*===============================*/
@@ -177,7 +177,7 @@ globle void *FindNamedConstruct(
    /* Save the current module. */
    /*==========================*/
 
-   SaveCurrentModule(theEnv);
+   SaveCurrentModule(theEnv,execStatus);
 
    /*=========================================================*/
    /* Extract the construct name. If a module was specified,  */
@@ -199,7 +199,7 @@ globle void *FindNamedConstruct(
        TRUE :
        ((findValue = (SYMBOL_HN *) FindSymbolHN(theEnv,execStatus,constructName)) == NULL))
      {
-      RestoreCurrentModule(theEnv);
+      RestoreCurrentModule(theEnv,execStatus);
       return(NULL);
      }
 
@@ -217,7 +217,7 @@ globle void *FindNamedConstruct(
      {
       if (findValue == (*constructClass->getConstructNameFunction)((struct constructHeader *) theConstruct))
         {
-         RestoreCurrentModule(theEnv);
+         RestoreCurrentModule(theEnv,execStatus);
          return (theConstruct);
         }
      }
@@ -226,7 +226,7 @@ globle void *FindNamedConstruct(
    /* Restore the current module. */
    /*=============================*/
    
-   RestoreCurrentModule(theEnv);
+   RestoreCurrentModule(theEnv,execStatus);
 
    /*====================================*/
    /* Return NULL to indicated the named */
@@ -393,7 +393,7 @@ globle SYMBOL_HN *GetConstructModuleCommand(
    gensprintf(buffer,"%s name",constructClass->constructName);
 
    constructName = GetConstructName(theEnv,execStatus,command,buffer);
-   if (constructName == NULL) return((SYMBOL_HN *) EnvFalseSymbol(theEnv));
+   if (constructName == NULL) return((SYMBOL_HN *) EnvFalseSymbol(theEnv,execStatus));
 
    /*==========================================*/
    /* Get a pointer to the construct's module. */
@@ -403,7 +403,7 @@ globle SYMBOL_HN *GetConstructModuleCommand(
    if (constructModule == NULL)
      {
       CantFindItemErrorMessage(theEnv,execStatus,constructClass->constructName,constructName);
-      return((SYMBOL_HN *) EnvFalseSymbol(theEnv));
+      return((SYMBOL_HN *) EnvFalseSymbol(theEnv,execStatus));
      }
 
    /*============================================*/
@@ -469,7 +469,7 @@ globle intBool Undefconstruct(
 #if MAC_MCW || WIN_MCW || MAC_XCD
 #pragma unused(theConstruct)
 #pragma unused(constructClass)
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
    return(FALSE);
 #else
@@ -525,7 +525,7 @@ globle intBool Undefconstruct(
       /* Perform periodic cleanup if embedded. */
       /*=======================================*/
 
-      if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
+      if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv,execStatus)->EvaluatingTopLevelCommand) &&
           (execStatus->CurrentExpression == NULL))
         { PeriodicCleanup(theEnv,execStatus,TRUE,FALSE); }
 
@@ -561,7 +561,7 @@ globle intBool Undefconstruct(
    /* Perform periodic cleanup if embedded. */
    /*=======================================*/
 
-   if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
+   if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv,execStatus)->EvaluatingTopLevelCommand) &&
        (execStatus->CurrentExpression == NULL))
      { PeriodicCleanup(theEnv,execStatus,TRUE,FALSE); }
 
@@ -592,7 +592,7 @@ globle void SaveConstruct(
    /* Save the current module. */
    /*==========================*/
 
-   SaveCurrentModule(theEnv);
+   SaveCurrentModule(theEnv,execStatus);
 
    /*===========================*/
    /* Set the current module to */
@@ -628,7 +628,7 @@ globle void SaveConstruct(
    /* Restore the current module. */
    /*=============================*/
 
-   RestoreCurrentModule(theEnv);
+   RestoreCurrentModule(theEnv,execStatus);
   }
 
 /*********************************************************/
@@ -660,7 +660,7 @@ globle char *EnvGetConstructNameString(
   struct constructHeader *theConstruct)
   { 
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 
    return(ValueToString(theConstruct->name)); 
@@ -743,7 +743,7 @@ globle void GetConstructListFunction(
    /*=====================================*/
 
    else
-     { theModule = ((struct defmodule *) EnvGetCurrentModule(theEnv)); }
+     { theModule = ((struct defmodule *) EnvGetCurrentModule(theEnv,execStatus)); }
 
    /*=============================*/
    /* Call the driver routine to  */
@@ -781,7 +781,7 @@ globle void GetConstructList(
    /* Save the current module. */
    /*==========================*/
 
-   SaveCurrentModule(theEnv);
+   SaveCurrentModule(theEnv,execStatus);
 
    /*=======================================*/
    /* If the module specified is NULL, then */
@@ -932,7 +932,7 @@ globle void GetConstructList(
    /* Restore the current module. */
    /*=============================*/
 
-   RestoreCurrentModule(theEnv);
+   RestoreCurrentModule(theEnv,execStatus);
   }
 
 /*********************************************/
@@ -997,7 +997,7 @@ globle void ListConstructCommand(
    /*=====================================*/
 
    else
-     { theModule = ((struct defmodule *) EnvGetCurrentModule(theEnv)); }
+     { theModule = ((struct defmodule *) EnvGetCurrentModule(theEnv,execStatus)); }
 
    /*=========================*/
    /* Call the driver routine */
@@ -1027,7 +1027,7 @@ globle void ListConstruct(
    /* Save the current module. */
    /*==========================*/
 
-   SaveCurrentModule(theEnv);
+   SaveCurrentModule(theEnv,execStatus);
 
    /*=======================================*/
    /* If the module specified is NULL, then */
@@ -1104,7 +1104,7 @@ globle void ListConstruct(
    PrintTally(theEnv,execStatus,WDISPLAY,count,constructClass->constructName,
                              constructClass->pluralName);
 
-   RestoreCurrentModule(theEnv);
+   RestoreCurrentModule(theEnv,execStatus);
   }
 
 /**********************************************************/
@@ -1139,7 +1139,7 @@ globle char *GetConstructPPForm(
   struct constructHeader *theConstruct)
   { 
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 
    return(theConstruct->ppForm); 
@@ -1189,7 +1189,7 @@ globle struct defmoduleItemHeader *GetConstructModuleItemByIndex(
      }
 
    return((struct defmoduleItemHeader *)
-          GetModuleItem(theEnv,execStatus,((struct defmodule *) EnvGetCurrentModule(theEnv)),moduleIndex));
+          GetModuleItem(theEnv,execStatus,((struct defmodule *) EnvGetCurrentModule(theEnv,execStatus)),moduleIndex));
   }
 
 /******************************************/
@@ -1222,7 +1222,7 @@ globle void FreeConstructHeaderModule(
 globle long DoForAllConstructs(
   void *theEnv,
   EXEC_STATUS,
-  void (*actionFunction)(void *,struct constructHeader *,void *),
+  void (*actionFunction)(void *,EXEC_STATUS,struct constructHeader *,void *),
   int moduleItemIndex,
   int interruptable,
   void *userBuffer)
@@ -1236,7 +1236,7 @@ globle long DoForAllConstructs(
    /* Save the current module. */
    /*==========================*/
 
-   SaveCurrentModule(theEnv);
+   SaveCurrentModule(theEnv,execStatus);
 
    /*==================================*/
    /* Loop through all of the modules. */
@@ -1266,9 +1266,9 @@ globle long DoForAllConstructs(
         {
          if (interruptable)
            {
-            if (GetHaltExecution(theEnv) == TRUE)
+            if (GetHaltExecution(theEnv,execStatus) == TRUE)
               {
-               RestoreCurrentModule(theEnv);
+               RestoreCurrentModule(theEnv,execStatus);
                return(-1L);
               }
            }
@@ -1281,7 +1281,7 @@ globle long DoForAllConstructs(
    /* Restore the current module. */
    /*=============================*/
 
-   RestoreCurrentModule(theEnv);
+   RestoreCurrentModule(theEnv,execStatus);
 
    /*=========================================*/
    /* Return the number of modules traversed. */
@@ -1298,7 +1298,7 @@ globle void DoForAllConstructsInModule(
   void *theEnv,
   EXEC_STATUS,
   void *theModule,
-  void (*actionFunction)(void *,struct constructHeader *,void *),
+  void (*actionFunction)(void *,EXEC_STATUS,struct constructHeader *,void *),
   int moduleItemIndex,
   int interruptable,
   void *userBuffer)
@@ -1310,7 +1310,7 @@ globle void DoForAllConstructsInModule(
    /* Save the current module. */
    /*==========================*/
 
-   SaveCurrentModule(theEnv);
+   SaveCurrentModule(theEnv,execStatus);
 
    /*=============================*/
    /* Set the current module to   */
@@ -1332,9 +1332,9 @@ globle void DoForAllConstructsInModule(
      {
       if (interruptable)
         {
-         if (GetHaltExecution(theEnv) == TRUE)
+         if (GetHaltExecution(theEnv,execStatus) == TRUE)
            {
-            RestoreCurrentModule(theEnv);
+            RestoreCurrentModule(theEnv,execStatus);
             return;
            }
         }
@@ -1346,7 +1346,7 @@ globle void DoForAllConstructsInModule(
    /* Restore the current module. */
    /*=============================*/
 
-   RestoreCurrentModule(theEnv);
+   RestoreCurrentModule(theEnv,execStatus);
   }
 
 /*****************************************************/
@@ -1406,8 +1406,8 @@ globle unsigned ConstructPrintWatchAccess(
   struct construct *constructClass,
   char *logName,
   EXPRESSION *argExprs,
-  unsigned (*getWatchFunc)(void *,void *),
-  void (*setWatchFunc)(void *,unsigned,void *))
+  unsigned (*getWatchFunc)(void *,EXEC_STATUS,void *),
+  void (*setWatchFunc)(void *,EXEC_STATUS,unsigned,void *))
   {
    return(ConstructWatchSupport(theEnv,execStatus,constructClass,"list-watch-items",logName,argExprs,
                                 FALSE,FALSE,getWatchFunc,setWatchFunc));
@@ -1423,8 +1423,8 @@ globle unsigned ConstructSetWatchAccess(
   struct construct *constructClass,
   unsigned newState,
   EXPRESSION *argExprs,
-  unsigned (*getWatchFunc)(void *,void *),
-  void (*setWatchFunc)(void *,unsigned,void *))
+  unsigned (*getWatchFunc)(void *,EXEC_STATUS,void *),
+  void (*setWatchFunc)(void *,EXEC_STATUS,unsigned,void *))
   {
    return(ConstructWatchSupport(theEnv,execStatus,constructClass,"watch",WERROR,argExprs,
                                 TRUE,newState,getWatchFunc,setWatchFunc));
@@ -1443,8 +1443,8 @@ static unsigned ConstructWatchSupport(
   EXPRESSION *argExprs,
   intBool setFlag,
   unsigned newState,
-  unsigned (*getWatchFunc)(void *,void *),
-  void (*setWatchFunc)(void *,unsigned,void *))
+  unsigned (*getWatchFunc)(void *,EXEC_STATUS,void *),
+  void (*setWatchFunc)(void *,EXEC_STATUS,unsigned,void *))
   {
    struct defmodule *theModule;
    void *theConstruct;
@@ -1462,7 +1462,7 @@ static unsigned ConstructWatchSupport(
       /* Save the current module. */
       /*==========================*/
 
-      SaveCurrentModule(theEnv);
+      SaveCurrentModule(theEnv,execStatus);
 
       /*===========================*/
       /* Loop through each module. */
@@ -1518,7 +1518,7 @@ static unsigned ConstructWatchSupport(
       /* Restore the current module. */
       /*=============================*/
 
-      RestoreCurrentModule(theEnv);
+      RestoreCurrentModule(theEnv,execStatus);
 
       /*====================================*/
       /* Return TRUE to indicate successful */
@@ -1591,7 +1591,7 @@ static void ConstructPrintWatch(
   char *logName,
   struct construct *constructClass,
   void *theConstruct,
-  unsigned (*getWatchFunc)(void *,void *))
+  unsigned (*getWatchFunc)(void *,EXEC_STATUS,void *))
   {
    EnvPrintRouter(theEnv,execStatus,logName,ValueToString((*constructClass->getConstructNameFunction)((struct constructHeader *) theConstruct)));
    if ((*getWatchFunc)(theEnv,execStatus,theConstruct))
@@ -1670,14 +1670,14 @@ globle intBool ConstructsDeletable(
   {
 #if BLOAD_ONLY || RUN_TIME || ((! BLOAD) && (! BLOAD_AND_BSAVE))
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 #endif
 
 #if BLOAD_ONLY || RUN_TIME
    return(FALSE);
 #elif BLOAD || BLOAD_AND_BSAVE
-   if (Bloaded(theEnv))
+   if (Bloaded(theEnv,execStatus))
      return(FALSE);
    return TRUE;
 #else

@@ -41,20 +41,20 @@
 /* DEFINITIONS */
 /***************/
 
-#define ItemPrefix()      ArbitraryPrefix(DefmoduleData(theEnv)->DefmoduleCodeItem,0)
-#define DefmodulePrefix() ArbitraryPrefix(DefmoduleData(theEnv)->DefmoduleCodeItem,1)
-#define PortPrefix()      ArbitraryPrefix(DefmoduleData(theEnv)->DefmoduleCodeItem,2)
+#define ItemPrefix()      ArbitraryPrefix(DefmoduleData(theEnv,execStatus)->DefmoduleCodeItem,0)
+#define DefmodulePrefix() ArbitraryPrefix(DefmoduleData(theEnv,execStatus)->DefmoduleCodeItem,1)
+#define PortPrefix()      ArbitraryPrefix(DefmoduleData(theEnv,execStatus)->DefmoduleCodeItem,2)
 
 /***************************************/
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static int                     ConstructToCode(void *,char *,char *,char *,int,FILE *,int,int);
-   static void                    InitDefmoduleCode(void *,FILE *,int,int);
-   static struct portItem        *GetNextPortItem(void *,struct defmodule **,struct portItem **,
+   static int                     ConstructToCode(void *,EXEC_STATUS,char *,char *,char *,int,FILE *,int,int);
+   static void                    InitDefmoduleCode(void *,EXEC_STATUS,FILE *,int,int);
+   static struct portItem        *GetNextPortItem(void *,EXEC_STATUS,struct defmodule **,struct portItem **,
                                                   int *,int *);
-   static int                     PortItemsToCode(void *,char *,char *,char *,int,FILE *,int,int,int *);
-   static void                    BeforeDefmodulesToCode(void *);
+   static int                     PortItemsToCode(void *,EXEC_STATUS,char *,char *,char *,int,FILE *,int,int,int *);
+   static void                    BeforeDefmodulesToCode(void *,EXEC_STATUS);
 
 /***************************************************************/
 /* DefmoduleCompilerSetup: Initializes the defmodule construct */
@@ -64,7 +64,7 @@ globle void DefmoduleCompilerSetup(
   void *theEnv,
   EXEC_STATUS)
   {
-   DefmoduleData(theEnv)->DefmoduleCodeItem = 
+   DefmoduleData(theEnv,execStatus)->DefmoduleCodeItem = 
       AddCodeGeneratorItem(theEnv,execStatus,"defmodule",200,BeforeDefmodulesToCode,
                            InitDefmoduleCode,ConstructToCode,3);
   }
@@ -98,9 +98,9 @@ globle void PrintDefmoduleReference(
   struct defmodule *theModule)
   {
    if (theModule == NULL) fprintf(theFile,"NULL");
-   else fprintf(theFile,"&%s%d_%ld[%ld]",DefmodulePrefix(),ConstructCompilerData(theEnv)->ImageID,
-                                    (long) ((theModule->bsaveID / ConstructCompilerData(theEnv)->MaxIndices) + 1),
-                                    (long) (theModule->bsaveID % ConstructCompilerData(theEnv)->MaxIndices));
+   else fprintf(theFile,"&%s%d_%ld[%ld]",DefmodulePrefix(),ConstructCompilerData(theEnv,execStatus)->ImageID,
+                                    (long) ((theModule->bsaveID / ConstructCompilerData(theEnv,execStatus)->MaxIndices) + 1),
+                                    (long) (theModule->bsaveID % ConstructCompilerData(theEnv,execStatus)->MaxIndices));
   }
 
 /************************************************/
@@ -211,8 +211,8 @@ static int ConstructToCode(
 
       fprintf(moduleFile,"&%s%d_1[%d],",ItemPrefix(),imageID,mihCount);
 
-      for (j = 0, theItem = GetListOfModuleItems(theEnv);
-           (j < GetNumberOfModuleItems(theEnv)) && (theItem != NULL) ;
+      for (j = 0, theItem = GetListOfModuleItems(theEnv,execStatus);
+           (j < GetNumberOfModuleItems(theEnv,execStatus)) && (theItem != NULL) ;
            j++, theItem = theItem->next)
         {
          mihCount++;
@@ -221,7 +221,7 @@ static int ConstructToCode(
          else
            { (*theItem->constructsToCModuleReference)(theEnv,execStatus,itemsFile,(int) theConstruct->bsaveID,imageID,maxIndices); }
 
-         if ((j + 1) < GetNumberOfModuleItems(theEnv)) fprintf(itemsFile,",");
+         if ((j + 1) < GetNumberOfModuleItems(theEnv,execStatus)) fprintf(itemsFile,",");
          else if (theConstruct->next != NULL) fprintf(itemsFile,",\n");
         }
 
@@ -279,7 +279,7 @@ static int ConstructToCode(
         { fprintf(moduleFile,"NULL}"); }
       else
         {
-         fprintf(moduleFile,"&%s%d_%d[%d]}",ConstructPrefix(DefmoduleData(theEnv)->DefmoduleCodeItem),imageID,
+         fprintf(moduleFile,"&%s%d_%d[%d]}",ConstructPrefix(DefmoduleData(theEnv,execStatus)->DefmoduleCodeItem),imageID,
                             (int) (theConstruct->next->bsaveID / maxIndices) + 1,
                             (int) theConstruct->next->bsaveID % maxIndices);
         }

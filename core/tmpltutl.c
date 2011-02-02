@@ -134,7 +134,7 @@ globle void CheckTemplateFact(
    char thePlace[20];
    int rv;
 
-   if (! EnvGetDynamicConstraintChecking(theEnv)) return;
+   if (! EnvGetDynamicConstraintChecking(theEnv,execStatus)) return;
 
    sublist = theFact->theProposition.theFields;
 
@@ -216,7 +216,7 @@ globle intBool CheckRHSSlotTypes(
    int rv;
    char *theName;
 
-   if (EnvGetStaticConstraintChecking(theEnv) == FALSE) return(TRUE);
+   if (EnvGetStaticConstraintChecking(theEnv,execStatus) == FALSE) return(TRUE);
       rv = ConstraintCheckExpressionChain(theEnv,execStatus,rhsSlots,slotPtr->constraints);
       if (rv != NO_VIOLATION)
         {
@@ -428,7 +428,7 @@ globle void UpdateDeftemplateScope(
       /*======================================================*/
 
       theItem = (struct defmoduleItemHeader *)
-                GetModuleItem(theEnv,execStatus,theModule,DeftemplateData(theEnv)->DeftemplateModuleIndex);
+                GetModuleItem(theEnv,execStatus,theModule,DeftemplateData(theEnv,execStatus)->DeftemplateModuleIndex);
 
       for (theDeftemplate = (struct deftemplate *) theItem->firstItem;
            theDeftemplate != NULL ;
@@ -508,7 +508,7 @@ globle struct deftemplate *CreateImpliedDeftemplate(
 #endif
 
    newDeftemplate->header.whichModule = (struct defmoduleItemHeader *)
-                                        GetModuleItem(theEnv,execStatus,NULL,DeftemplateData(theEnv)->DeftemplateModuleIndex);
+                                        GetModuleItem(theEnv,execStatus,NULL,DeftemplateData(theEnv,execStatus)->DeftemplateModuleIndex);
 
    AddConstructToModule(&newDeftemplate->header);
    InstallDeftemplate(theEnv,execStatus,newDeftemplate);

@@ -50,7 +50,7 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static void                    DeallocateMultifieldData(void *);
+   static void                    DeallocateMultifieldData(void *,EXEC_STATUS);
 
 /***************************************************/
 /* InitializeMultifieldData: Allocates environment */
@@ -73,7 +73,7 @@ static void DeallocateMultifieldData(
   {
    struct multifield *tmpPtr, *nextPtr; 
    
-   tmpPtr = MultifieldData(theEnv)->ListOfMultifields;
+   tmpPtr = MultifieldData(theEnv,execStatus)->ListOfMultifields;
    while (tmpPtr != NULL)
      {
       nextPtr = tmpPtr->next;
@@ -264,11 +264,11 @@ globle void *EnvCreateMultifield(
    theSegment->busyCount = 0;
    theSegment->next = NULL;
 
-   theSegment->next = MultifieldData(theEnv)->ListOfMultifields;
-   MultifieldData(theEnv)->ListOfMultifields = theSegment;
+   theSegment->next = MultifieldData(theEnv,execStatus)->ListOfMultifields;
+   MultifieldData(theEnv,execStatus)->ListOfMultifields = theSegment;
 
-   UtilityData(theEnv)->EphemeralItemCount++;
-   UtilityData(theEnv)->EphemeralItemSize += sizeof(struct multifield) + (sizeof(struct field) * newSize);
+   UtilityData(theEnv,execStatus)->EphemeralItemCount++;
+   UtilityData(theEnv,execStatus)->EphemeralItemSize += sizeof(struct multifield) + (sizeof(struct field) * newSize);
 
    return((void *) theSegment);
   }
@@ -303,11 +303,11 @@ globle void AddToMultifieldList(
   struct multifield *theSegment)
   {
    theSegment->depth = (short) execStatus->CurrentEvaluationDepth;
-   theSegment->next = MultifieldData(theEnv)->ListOfMultifields;
-   MultifieldData(theEnv)->ListOfMultifields = theSegment;
+   theSegment->next = MultifieldData(theEnv,execStatus)->ListOfMultifields;
+   MultifieldData(theEnv,execStatus)->ListOfMultifields = theSegment;
 
-   UtilityData(theEnv)->EphemeralItemCount++;
-   UtilityData(theEnv)->EphemeralItemSize += sizeof(struct multifield) + (sizeof(struct field) * theSegment->multifieldLength);
+   UtilityData(theEnv,execStatus)->EphemeralItemCount++;
+   UtilityData(theEnv,execStatus)->EphemeralItemSize += sizeof(struct multifield) + (sizeof(struct field) * theSegment->multifieldLength);
   }
 
 /***********************************************************/
@@ -320,19 +320,19 @@ globle void FlushMultifields(
    struct multifield *theSegment, *nextPtr, *lastPtr = NULL;
    unsigned long newSize;
 
-   theSegment = MultifieldData(theEnv)->ListOfMultifields;
+   theSegment = MultifieldData(theEnv,execStatus)->ListOfMultifields;
    while (theSegment != NULL)
      {
       nextPtr = theSegment->next;
       if ((theSegment->depth > execStatus->CurrentEvaluationDepth) && (theSegment->busyCount == 0))
         {
-         UtilityData(theEnv)->EphemeralItemCount--;
-         UtilityData(theEnv)->EphemeralItemSize -= sizeof(struct multifield) +
+         UtilityData(theEnv,execStatus)->EphemeralItemCount--;
+         UtilityData(theEnv,execStatus)->EphemeralItemSize -= sizeof(struct multifield) +
                               (sizeof(struct field) * theSegment->multifieldLength);
          if (theSegment->multifieldLength == 0) newSize = 1;
          else newSize = theSegment->multifieldLength;
          rtn_var_struct(theEnv,execStatus,multifield,sizeof(struct field) * (newSize - 1),theSegment);
-         if (lastPtr == NULL) MultifieldData(theEnv)->ListOfMultifields = nextPtr;
+         if (lastPtr == NULL) MultifieldData(theEnv,execStatus)->ListOfMultifields = nextPtr;
          else lastPtr->next = nextPtr;
         }
       else
@@ -700,7 +700,7 @@ globle struct multifield *GetMultifieldList(
   void *theEnv,
   EXEC_STATUS)
   {
-   return(MultifieldData(theEnv)->ListOfMultifields);
+   return(MultifieldData(theEnv,execStatus)->ListOfMultifields);
   }
 
 /***************************************/

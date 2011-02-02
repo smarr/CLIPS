@@ -81,7 +81,7 @@ struct proceduralPrimitiveData
    int Oldindex;
   };
 
-#define ProceduralPrimitiveData(theEnv) ((struct proceduralPrimitiveData *) GetEnvironmentData(theEnv,execStatus,PROCEDURAL_PRIMITIVE_DATA))
+#define ProceduralPrimitiveData(theEnv,execStatus) ((struct proceduralPrimitiveData *) GetEnvironmentData(theEnv,execStatus,PROCEDURAL_PRIMITIVE_DATA))
 
 #ifdef LOCALE
 #undef LOCALE
@@ -93,37 +93,37 @@ struct proceduralPrimitiveData
 #define LOCALE extern
 #endif
 
-LOCALE void InstallProcedurePrimitives(void *);
+LOCALE void InstallProcedurePrimitives(void *,EXEC_STATUS);
 
 #if (! BLOAD_ONLY) && (! RUN_TIME)
 
 #if DEFFUNCTION_CONSTRUCT || OBJECT_SYSTEM
-LOCALE EXPRESSION *ParseProcParameters(void *,char *,struct token *,EXPRESSION *,
+LOCALE EXPRESSION *ParseProcParameters(void *,EXEC_STATUS,char *,struct token *,EXPRESSION *,
                                        SYMBOL_HN **,int *,int *,int *,
-                                       int (*)(void *,char *));
+                                       int (*)(void *,EXEC_STATUS,char *));
 #endif
-LOCALE EXPRESSION *ParseProcActions(void *,char *,char *,struct token *,EXPRESSION *,SYMBOL_HN *,
-                                    int (*)(void *,EXPRESSION *,void *),
-                                    int (*)(void *,EXPRESSION *,void *),
+LOCALE EXPRESSION *ParseProcActions(void *,EXEC_STATUS,char *,char *,struct token *,EXPRESSION *,SYMBOL_HN *,
+                                    int (*)(void *,EXEC_STATUS,EXPRESSION *,void *),
+                                    int (*)(void *,EXEC_STATUS,EXPRESSION *,void *),
                                     int *,void *);
-LOCALE intBool ReplaceProcVars(void *,char *,EXPRESSION *,EXPRESSION *,SYMBOL_HN *,
-                                     int (*)(void *,EXPRESSION *,void *),void *);
+LOCALE intBool ReplaceProcVars(void *,EXEC_STATUS,char *,EXPRESSION *,EXPRESSION *,SYMBOL_HN *,
+                                     int (*)(void *,EXEC_STATUS,EXPRESSION *,void *),void *);
 #if DEFGENERIC_CONSTRUCT
-LOCALE EXPRESSION *GenProcWildcardReference(void *,int);
+LOCALE EXPRESSION *GenProcWildcardReference(void *,EXEC_STATUS,int);
 #endif
 #endif
 
-LOCALE void PushProcParameters(void *,EXPRESSION *,int,char *,char *,void (*)(void *));
-LOCALE void PopProcParameters(void *);
+LOCALE void PushProcParameters(void *,EXEC_STATUS,EXPRESSION *,int,char *,char *,void (*)(void *));
+LOCALE void PopProcParameters(void *,EXEC_STATUS);
 
 #if DEFGENERIC_CONSTRUCT
-LOCALE EXPRESSION *GetProcParamExpressions(void *);
+LOCALE EXPRESSION *GetProcParamExpressions(void *,EXEC_STATUS);
 #endif
 
-LOCALE void EvaluateProcActions(void *,struct defmodule *,EXPRESSION *,int,
+LOCALE void EvaluateProcActions(void *,EXEC_STATUS,struct defmodule *,EXPRESSION *,int,
                                 DATA_OBJECT *,void (*)(void *));
-LOCALE void PrintProcParamArray(void *,char *);
-LOCALE void GrabProcWildargs(void *,DATA_OBJECT *,int);
+LOCALE void PrintProcParamArray(void *,EXEC_STATUS,char *);
+LOCALE void GrabProcWildargs(void *,EXEC_STATUS,DATA_OBJECT *,int);
 
 #endif
 

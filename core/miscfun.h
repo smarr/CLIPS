@@ -36,33 +36,33 @@
 #define LOCALE extern
 #endif
 
-   LOCALE void                           MiscFunctionDefinitions(void *);
-   LOCALE void                           CreateFunction(void *,DATA_OBJECT_PTR);
-   LOCALE long long                      SetgenFunction(void *);
-   LOCALE void                          *GensymFunction(void *);
-   LOCALE void                          *GensymStarFunction(void *);
-   LOCALE long long                      RandomFunction(void *);
-   LOCALE void                           SeedFunction(void *);
-   LOCALE long long                      LengthFunction(void *);
-   LOCALE void                           ConserveMemCommand(void *);
-   LOCALE long long                      ReleaseMemCommand(void *);
-   LOCALE long long                      MemUsedCommand(void *);
-   LOCALE long long                      MemRequestsCommand(void *);
-   LOCALE void                           OptionsCommand(void *);
-   LOCALE void                          *OperatingSystemFunction(void *);
-   LOCALE void                           ExpandFuncCall(void *,DATA_OBJECT *);
-   LOCALE void                           DummyExpandFuncMultifield(void *,DATA_OBJECT *);
-   LOCALE void                          *CauseEvaluationError(void *);
-   LOCALE intBool                        SetSORCommand(void *);
-   LOCALE void                          *GetFunctionRestrictions(void *);
-   LOCALE void                           AproposCommand(void *);
-   LOCALE void                          *GensymStar(void *);
-   LOCALE void                           GetFunctionListFunction(void *,DATA_OBJECT *);
-   LOCALE void                           FuncallFunction(void *,DATA_OBJECT *);
-   LOCALE void                           NewFunction(void *,DATA_OBJECT *);
-   LOCALE void                           CallFunction(void *,DATA_OBJECT *);
-   LOCALE double                         TimerFunction(void *);
-   LOCALE double                         TimeFunction(void *);
+   LOCALE void                           MiscFunctionDefinitions(void *,EXEC_STATUS);
+   LOCALE void                           CreateFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
+   LOCALE long long                      SetgenFunction(void *,EXEC_STATUS);
+   LOCALE void                          *GensymFunction(void *,EXEC_STATUS);
+   LOCALE void                          *GensymStarFunction(void *,EXEC_STATUS);
+   LOCALE long long                      RandomFunction(void *,EXEC_STATUS);
+   LOCALE void                           SeedFunction(void *,EXEC_STATUS);
+   LOCALE long long                      LengthFunction(void *,EXEC_STATUS);
+   LOCALE void                           ConserveMemCommand(void *,EXEC_STATUS);
+   LOCALE long long                      ReleaseMemCommand(void *,EXEC_STATUS);
+   LOCALE long long                      MemUsedCommand(void *,EXEC_STATUS);
+   LOCALE long long                      MemRequestsCommand(void *,EXEC_STATUS);
+   LOCALE void                           OptionsCommand(void *,EXEC_STATUS);
+   LOCALE void                          *OperatingSystemFunction(void *,EXEC_STATUS);
+   LOCALE void                           ExpandFuncCall(void *,EXEC_STATUS,DATA_OBJECT *);
+   LOCALE void                           DummyExpandFuncMultifield(void *,EXEC_STATUS,DATA_OBJECT *);
+   LOCALE void                          *CauseEvaluationError(void *,EXEC_STATUS);
+   LOCALE intBool                        SetSORCommand(void *,EXEC_STATUS);
+   LOCALE void                          *GetFunctionRestrictions(void *,EXEC_STATUS);
+   LOCALE void                           AproposCommand(void *,EXEC_STATUS);
+   LOCALE void                          *GensymStar(void *,EXEC_STATUS);
+   LOCALE void                           GetFunctionListFunction(void *,EXEC_STATUS,DATA_OBJECT *);
+   LOCALE void                           FuncallFunction(void *,EXEC_STATUS,DATA_OBJECT *);
+   LOCALE void                           NewFunction(void *,EXEC_STATUS,DATA_OBJECT *);
+   LOCALE void                           CallFunction(void *,EXEC_STATUS,DATA_OBJECT *);
+   LOCALE double                         TimerFunction(void *,EXEC_STATUS);
+   LOCALE double                         TimeFunction(void *,EXEC_STATUS);
 
 #endif
 

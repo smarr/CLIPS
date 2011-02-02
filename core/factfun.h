@@ -45,21 +45,21 @@
 #define GetFactList(a,b) EnvGetFactList(GetCurrentEnvironment(),a,b)
 #define PPFact(a,b,c) EnvPPFact(GetCurrentEnvironment(),a,b,c)
 
-   LOCALE void                           FactFunctionDefinitions(void *);
-   LOCALE void                          *FactRelationFunction(void *);
-   LOCALE void                          *FactRelation(void *);
-   LOCALE void                          *EnvFactDeftemplate(void *,void *);
-   LOCALE int                            FactExistpFunction(void *);
-   LOCALE int                            EnvFactExistp(void *,void *);
-   LOCALE void                           FactSlotValueFunction(void *,DATA_OBJECT *);
-   LOCALE void                           FactSlotValue(void *,void *,char *,DATA_OBJECT *);
-   LOCALE void                           FactSlotNamesFunction(void *,DATA_OBJECT *);
-   LOCALE void                           EnvFactSlotNames(void *,void *,DATA_OBJECT *);
-   LOCALE void                           GetFactListFunction(void *,DATA_OBJECT *);
-   LOCALE void                           EnvGetFactList(void *,DATA_OBJECT *,void *);
-   LOCALE void                           PPFactFunction(void *);
-   LOCALE void                           EnvPPFact(void *,void *,char *,int);
-   LOCALE struct fact                   *GetFactAddressOrIndexArgument(void *,char *,int,int);
+   LOCALE void                           FactFunctionDefinitions(void *,EXEC_STATUS);
+   LOCALE void                          *FactRelationFunction(void *,EXEC_STATUS);
+   LOCALE void                          *FactRelation(void *,EXEC_STATUS);
+   LOCALE void                          *EnvFactDeftemplate(void *,EXEC_STATUS,void *);
+   LOCALE int                            FactExistpFunction(void *,EXEC_STATUS);
+   LOCALE int                            EnvFactExistp(void *,EXEC_STATUS,void *);
+   LOCALE void                           FactSlotValueFunction(void *,EXEC_STATUS,DATA_OBJECT *);
+   LOCALE void                           FactSlotValue(void *,EXEC_STATUS,void *,char *,DATA_OBJECT *);
+   LOCALE void                           FactSlotNamesFunction(void *,EXEC_STATUS,DATA_OBJECT *);
+   LOCALE void                           EnvFactSlotNames(void *,EXEC_STATUS,void *,DATA_OBJECT *);
+   LOCALE void                           GetFactListFunction(void *,EXEC_STATUS,DATA_OBJECT *);
+   LOCALE void                           EnvGetFactList(void *,EXEC_STATUS,DATA_OBJECT *,void *);
+   LOCALE void                           PPFactFunction(void *,EXEC_STATUS);
+   LOCALE void                           EnvPPFact(void *,EXEC_STATUS,void *,char *,int);
+   LOCALE struct fact                   *GetFactAddressOrIndexArgument(void *,EXEC_STATUS,char *,int,int);
 
 #endif
 

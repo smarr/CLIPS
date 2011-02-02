@@ -43,11 +43,11 @@
 #define LOCALE extern
 #endif
 
-   LOCALE void                     PrintSymbolReference(void *,FILE *,SYMBOL_HN *);
-   LOCALE void                     PrintFloatReference(void *,FILE *,FLOAT_HN *);
-   LOCALE void                     PrintIntegerReference(void *,FILE *,INTEGER_HN *);
-   LOCALE void                     PrintBitMapReference(void *,FILE *,BITMAP_HN *);
-   LOCALE void                     AtomicValuesToCode(void *,char *,char *,char *);
+   LOCALE void                     PrintSymbolReference(void *,EXEC_STATUS,FILE *,SYMBOL_HN *);
+   LOCALE void                     PrintFloatReference(void *,EXEC_STATUS,FILE *,FLOAT_HN *);
+   LOCALE void                     PrintIntegerReference(void *,EXEC_STATUS,FILE *,INTEGER_HN *);
+   LOCALE void                     PrintBitMapReference(void *,EXEC_STATUS,FILE *,BITMAP_HN *);
+   LOCALE void                     AtomicValuesToCode(void *,EXEC_STATUS,char *,char *,char *);
 
 #endif
 

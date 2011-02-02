@@ -52,9 +52,9 @@ struct BinaryItem
    void (*bloadStorageFunction)(void *);
    void (*bloadFunction)(void *);
    void (*clearFunction)(void *);
-   void (*expressionFunction)(void *,FILE *);
-   void (*bsaveStorageFunction)(void *,FILE *);
-   void (*bsaveFunction)(void *,FILE *);
+   void (*expressionFunction)(void *,EXEC_STATUS,FILE *);
+   void (*bsaveStorageFunction)(void *,EXEC_STATUS,FILE *);
+   void (*bsaveFunction)(void *,EXEC_STATUS,FILE *);
    int priority;
    struct BinaryItem *next;
   };
@@ -85,23 +85,23 @@ struct bsaveData
 #endif
   };
 
-#define BsaveData(theEnv) ((struct bsaveData *) GetEnvironmentData(theEnv,execStatus,BSAVE_DATA))
+#define BsaveData(theEnv,execStatus) ((struct bsaveData *) GetEnvironmentData(theEnv,execStatus,BSAVE_DATA))
 
 #define Bsave(a) EnvBsave(GetCurrentEnvironment(),a)
 
-   LOCALE void                    InitializeBsaveData(void *);
-   LOCALE int                     BsaveCommand(void *, EXEC_STATUS);
+   LOCALE void                    InitializeBsaveData(void *,EXEC_STATUS);
+   LOCALE int                     BsaveCommand(void *,EXEC_STATUS);
 #if BLOAD_AND_BSAVE
-   LOCALE intBool                 EnvBsave(void *,char *);
-   LOCALE void                    MarkNeededItems(void *,struct expr *);
-   LOCALE void                    SaveBloadCount(void *,long);
-   LOCALE void                    RestoreBloadCount(void *,long *);
+   LOCALE intBool                 EnvBsave(void *,EXEC_STATUS,char *);
+   LOCALE void                    MarkNeededItems(void *,EXEC_STATUS,struct expr *);
+   LOCALE void                    SaveBloadCount(void *,EXEC_STATUS,long);
+   LOCALE void                    RestoreBloadCount(void *,EXEC_STATUS,long *);
 #endif
-   LOCALE intBool                 AddBinaryItem(void *,char *,int,
+   LOCALE intBool                 AddBinaryItem(void *,EXEC_STATUS,char *,int,
                                                 void (*)(void *),
-                                                void (*)(void *,FILE *),
-                                                void (*)(void *,FILE *),
-                                                void (*)(void *,FILE *),
+                                                void (*)(void *,EXEC_STATUS,FILE *),
+                                                void (*)(void *,EXEC_STATUS,FILE *),
+                                                void (*)(void *,EXEC_STATUS,FILE *),
                                                 void (*)(void *),
                                                 void (*)(void *),
                                                 void (*)(void *));

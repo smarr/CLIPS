@@ -80,7 +80,7 @@ struct multifieldData
    struct multifield *ListOfMultifields;
   };
 
-#define MultifieldData(theEnv) ((struct multifieldData *) GetEnvironmentData(theEnv,execStatus,MULTIFIELD_DATA))
+#define MultifieldData(theEnv,execStatus) ((struct multifieldData *) GetEnvironmentData(theEnv,execStatus,MULTIFIELD_DATA))
 
 #ifdef LOCALE
 #undef LOCALE
@@ -93,25 +93,25 @@ struct multifieldData
    
 #define CreateMultifield(a) EnvCreateMultifield(GetCurrentEnvironment(),a)
 
-   LOCALE void                           InitializeMultifieldData(void *);
-   LOCALE void                          *CreateMultifield2(void *,long);
-   LOCALE void                           ReturnMultifield(void *,struct multifield *);
-   LOCALE void                           MultifieldInstall(void *,struct multifield *);
-   LOCALE void                           MultifieldDeinstall(void *,struct multifield *);
-   LOCALE struct multifield             *StringToMultifield(void *,char *);
-   LOCALE void                          *EnvCreateMultifield(void *,long);
-   LOCALE void                           AddToMultifieldList(void *,struct multifield *);
-   LOCALE void                           FlushMultifields(void *);
-   LOCALE void                           DuplicateMultifield(void *,struct dataObject *,struct dataObject *);
-   LOCALE void                           PrintMultifield(void *,char *,SEGMENT_PTR,long,long,int);
+   LOCALE void                           InitializeMultifieldData(void *,EXEC_STATUS);
+   LOCALE void                          *CreateMultifield2(void *,EXEC_STATUS,long);
+   LOCALE void                           ReturnMultifield(void *,EXEC_STATUS,struct multifield *);
+   LOCALE void                           MultifieldInstall(void *,EXEC_STATUS,struct multifield *);
+   LOCALE void                           MultifieldDeinstall(void *,EXEC_STATUS,struct multifield *);
+   LOCALE struct multifield             *StringToMultifield(void *,EXEC_STATUS,char *);
+   LOCALE void                          *EnvCreateMultifield(void *,EXEC_STATUS,long);
+   LOCALE void                           AddToMultifieldList(void *,EXEC_STATUS,struct multifield *);
+   LOCALE void                           FlushMultifields(void *,EXEC_STATUS);
+   LOCALE void                           DuplicateMultifield(void *,EXEC_STATUS,struct dataObject *,struct dataObject *);
+   LOCALE void                           PrintMultifield(void *,EXEC_STATUS,char *,SEGMENT_PTR,long,long,int);
    LOCALE intBool                        MultifieldDOsEqual(DATA_OBJECT_PTR,DATA_OBJECT_PTR);
-   LOCALE void                           StoreInMultifield(void *,DATA_OBJECT *,EXPRESSION *,int);
-   LOCALE void                          *CopyMultifield(void *,struct multifield *);
+   LOCALE void                           StoreInMultifield(void *,EXEC_STATUS,DATA_OBJECT *,EXPRESSION *,int);
+   LOCALE void                          *CopyMultifield(void *,EXEC_STATUS,struct multifield *);
    LOCALE intBool                        MultifieldsEqual(struct multifield *,struct multifield *);
-   LOCALE void                          *DOToMultifield(void *,DATA_OBJECT *);
+   LOCALE void                          *DOToMultifield(void *,EXEC_STATUS,DATA_OBJECT *);
    LOCALE unsigned long                  HashMultifield(struct multifield *,unsigned long);
-   LOCALE struct multifield             *GetMultifieldList(void *);
-   LOCALE void                          *ImplodeMultifield(void *,DATA_OBJECT *);
+   LOCALE struct multifield             *GetMultifieldList(void *,EXEC_STATUS);
+   LOCALE void                          *ImplodeMultifield(void *,EXEC_STATUS,DATA_OBJECT *);
 
 #endif
 

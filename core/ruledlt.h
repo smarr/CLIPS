@@ -34,8 +34,8 @@
 #define LOCALE extern
 #endif
 
-   LOCALE void                           ReturnDefrule(void *,void *);
-   LOCALE void                           DestroyDefrule(void *,void *);
+   LOCALE void                           ReturnDefrule(void *,EXEC_STATUS,void *);
+   LOCALE void                           DestroyDefrule(void *,EXEC_STATUS,void *);
 
 #endif
 

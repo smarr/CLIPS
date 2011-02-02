@@ -27,8 +27,8 @@
 #include "extnfunc.h"
 #endif
 
-#define JoinPrefix() ArbitraryPrefix(DefruleData(theEnv)->DefruleCodeItem,2)
-#define LinkPrefix() ArbitraryPrefix(DefruleData(theEnv)->DefruleCodeItem,3)
+#define JoinPrefix() ArbitraryPrefix(DefruleData(theEnv,execStatus)->DefruleCodeItem,2)
+#define LinkPrefix() ArbitraryPrefix(DefruleData(theEnv,execStatus)->DefruleCodeItem,3)
 
 #ifdef LOCALE
 #undef LOCALE
@@ -40,8 +40,8 @@
 #define LOCALE extern
 #endif
 
-   LOCALE void                     DefruleCompilerSetup(void *);
-   LOCALE void                     DefruleCModuleReference(void *,FILE *,int,int,int);
+   LOCALE void                     DefruleCompilerSetup(void *,EXEC_STATUS);
+   LOCALE void                     DefruleCModuleReference(void *,EXEC_STATUS,FILE *,int,int,int);
 
 #ifndef _RULECMP_SOURCE_
 extern struct CodeGeneratorItem *DefruleCodeItem;

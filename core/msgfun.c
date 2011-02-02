@@ -55,8 +55,8 @@
    ***************************************** */
 
 #if DEBUGGING_FUNCTIONS
-static HANDLER_LINK *DisplayPrimaryCore(void *,char *,HANDLER_LINK *,int);
-static void PrintPreviewHandler(void *,char *,HANDLER_LINK *,int,char *);
+static HANDLER_LINK *DisplayPrimaryCore(void *,EXEC_STATUS,char *,HANDLER_LINK *,int);
+static void PrintPreviewHandler(void *,EXEC_STATUS,char *,HANDLER_LINK *,int,char *);
 #endif
 
 /* =========================================
@@ -80,7 +80,7 @@ globle void UnboundHandlerErr(
   EXEC_STATUS)
   {
    EnvPrintRouter(theEnv,execStatus,WERROR,"message-handler ");
-   PrintHandler(theEnv,execStatus,WERROR,MessageHandlerData(theEnv)->CurrentCore->hnd,TRUE);
+   PrintHandler(theEnv,execStatus,WERROR,MessageHandlerData(theEnv,execStatus)->CurrentCore->hnd,TRUE);
   }
 
 /*****************************************************************
@@ -118,16 +118,16 @@ globle int CheckHandlerArgCount(
   {
    HANDLER *hnd;
 
-   hnd = MessageHandlerData(theEnv)->CurrentCore->hnd;
-   if ((hnd->maxParams == -1) ? (ProceduralPrimitiveData(theEnv)->ProcParamArraySize < hnd->minParams) :
-       (ProceduralPrimitiveData(theEnv)->ProcParamArraySize != hnd->minParams))
+   hnd = MessageHandlerData(theEnv,execStatus)->CurrentCore->hnd;
+   if ((hnd->maxParams == -1) ? (ProceduralPrimitiveData(theEnv,execStatus)->ProcParamArraySize < hnd->minParams) :
+       (ProceduralPrimitiveData(theEnv,execStatus)->ProcParamArraySize != hnd->minParams))
      {
       SetEvaluationError(theEnv,execStatus,TRUE);
       PrintErrorID(theEnv,execStatus,"MSGFUN",2,FALSE);
       EnvPrintRouter(theEnv,execStatus,WERROR,"Message-handler ");
       EnvPrintRouter(theEnv,execStatus,WERROR,ValueToString(hnd->name));
       EnvPrintRouter(theEnv,execStatus,WERROR," ");
-      EnvPrintRouter(theEnv,execStatus,WERROR,MessageHandlerData(theEnv)->hndquals[hnd->type]);
+      EnvPrintRouter(theEnv,execStatus,WERROR,MessageHandlerData(theEnv,execStatus)->hndquals[hnd->type]);
       EnvPrintRouter(theEnv,execStatus,WERROR," in class ");
       EnvPrintRouter(theEnv,execStatus,WERROR,EnvGetDefclassName(theEnv,execStatus,(void *) hnd->cls));
       EnvPrintRouter(theEnv,execStatus,WERROR," expected ");
@@ -301,7 +301,7 @@ globle HANDLER *InsertHandlerHeader(
    nhnd[cls->handlerCount].busy = 0;
    nhnd[cls->handlerCount].mark = 0;
 #if DEBUGGING_FUNCTIONS
-   nhnd[cls->handlerCount].trace = MessageHandlerData(theEnv)->WatchHandlers;
+   nhnd[cls->handlerCount].trace = MessageHandlerData(theEnv,execStatus)->WatchHandlers;
 #endif
    nhnd[cls->handlerCount].name = mname;
    nhnd[cls->handlerCount].cls = cls;
@@ -568,7 +568,7 @@ globle unsigned HandlerType(
    register unsigned i;
 
    for (i = MAROUND ; i <= MAFTER ; i++)
-     if (strcmp(str,MessageHandlerData(theEnv)->hndquals[i]) == 0)
+     if (strcmp(str,MessageHandlerData(theEnv,execStatus)->hndquals[i]) == 0)
        {
         return(i);
        }
@@ -600,7 +600,7 @@ globle int CheckCurrentMessage(
   {
    register DATA_OBJECT *activeMsgArg;
 
-   if (!MessageHandlerData(theEnv)->CurrentCore || (MessageHandlerData(theEnv)->CurrentCore->hnd->actions != ProceduralPrimitiveData(theEnv)->CurrentProcActions))
+   if (!MessageHandlerData(theEnv,execStatus)->CurrentCore || (MessageHandlerData(theEnv,execStatus)->CurrentCore->hnd->actions != ProceduralPrimitiveData(theEnv,execStatus)->CurrentProcActions))
      {
       PrintErrorID(theEnv,execStatus,"MSGFUN",4,FALSE);
       EnvPrintRouter(theEnv,execStatus,WERROR,func);
@@ -647,7 +647,7 @@ globle void PrintHandler(
   {
    EnvPrintRouter(theEnv,execStatus,logName,ValueToString(theHandler->name));
    EnvPrintRouter(theEnv,execStatus,logName," ");
-   EnvPrintRouter(theEnv,execStatus,logName,MessageHandlerData(theEnv)->hndquals[theHandler->type]);
+   EnvPrintRouter(theEnv,execStatus,logName,MessageHandlerData(theEnv,execStatus)->hndquals[theHandler->type]);
    EnvPrintRouter(theEnv,execStatus,logName," in class ");
    PrintClassName(theEnv,execStatus,logName,theHandler->cls,crtn);
   }
@@ -913,7 +913,7 @@ globle void WatchMessage(
    EnvPrintRouter(theEnv,execStatus,logName,"MSG ");
    EnvPrintRouter(theEnv,execStatus,logName,tstring);
    EnvPrintRouter(theEnv,execStatus,logName," ");
-   EnvPrintRouter(theEnv,execStatus,logName,ValueToString(MessageHandlerData(theEnv)->CurrentMessageName));
+   EnvPrintRouter(theEnv,execStatus,logName,ValueToString(MessageHandlerData(theEnv,execStatus)->CurrentMessageName));
    EnvPrintRouter(theEnv,execStatus,logName," ED:");
    PrintLongInteger(theEnv,execStatus,logName,(long long) execStatus->CurrentEvaluationDepth);
    PrintProcParamArray(theEnv,execStatus,logName);

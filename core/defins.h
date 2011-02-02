@@ -77,7 +77,7 @@ struct definstancesData
 #endif
   };
 
-#define DefinstancesData(theEnv) ((struct definstancesData *) GetEnvironmentData(theEnv,execStatus,DEFINSTANCES_DATA))
+#define DefinstancesData(theEnv,execStatus) ((struct definstancesData *) GetEnvironmentData(theEnv,execStatus,DEFINSTANCES_DATA))
 
 
 #ifdef LOCALE
@@ -100,22 +100,22 @@ struct definstancesData
 #define ListDefinstances(a,b) EnvListDefinstances(GetCurrentEnvironment(),a,b)
 #define Undefinstances(a) EnvUndefinstances(GetCurrentEnvironment(),a)
 
-LOCALE void SetupDefinstances(void *);
-LOCALE void *EnvGetNextDefinstances(void *,void *);
-LOCALE void *EnvFindDefinstances(void *,char *);
-LOCALE int EnvIsDefinstancesDeletable(void *,void *);
-LOCALE void UndefinstancesCommand(void *);
-LOCALE void *GetDefinstancesModuleCommand(void *);
-LOCALE intBool EnvUndefinstances(void *,void *);
+LOCALE void SetupDefinstances(void *,EXEC_STATUS);
+LOCALE void *EnvGetNextDefinstances(void *,EXEC_STATUS,void *);
+LOCALE void *EnvFindDefinstances(void *,EXEC_STATUS,char *);
+LOCALE int EnvIsDefinstancesDeletable(void *,EXEC_STATUS,void *);
+LOCALE void UndefinstancesCommand(void *,EXEC_STATUS);
+LOCALE void *GetDefinstancesModuleCommand(void *,EXEC_STATUS);
+LOCALE intBool EnvUndefinstances(void *,EXEC_STATUS,void *);
 
 #if DEBUGGING_FUNCTIONS
-LOCALE void PPDefinstancesCommand(void *);
-LOCALE void ListDefinstancesCommand(void *);
-LOCALE void EnvListDefinstances(void *,char *,struct defmodule *);
+LOCALE void PPDefinstancesCommand(void *,EXEC_STATUS);
+LOCALE void ListDefinstancesCommand(void *,EXEC_STATUS);
+LOCALE void EnvListDefinstances(void *,EXEC_STATUS,char *,struct defmodule *);
 #endif
 
-LOCALE void GetDefinstancesListFunction(void *,DATA_OBJECT *);
-LOCALE void EnvGetDefinstancesList(void *,DATA_OBJECT *,struct defmodule *);
+LOCALE void GetDefinstancesListFunction(void *,EXEC_STATUS,DATA_OBJECT *);
+LOCALE void EnvGetDefinstancesList(void *,EXEC_STATUS,DATA_OBJECT *,struct defmodule *);
 
 #endif
 

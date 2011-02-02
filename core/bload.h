@@ -57,7 +57,7 @@ struct bloadData
    struct callFunctionItem *AbortBloadFunctions;
   };
 
-#define BloadData(theEnv) ((struct bloadData *) GetEnvironmentData(theEnv,execStatus,BLOAD_DATA))
+#define BloadData(theEnv,execStatus) ((struct bloadData *) GetEnvironmentData(theEnv,execStatus,BLOAD_DATA))
 
 #ifdef LOCALE
 #undef LOCALE
@@ -68,21 +68,21 @@ struct bloadData
 #define LOCALE extern
 #endif
 
-#define FunctionPointer(i) ((struct FunctionDefinition *) (((i) == -1L) ? NULL : BloadData(theEnv)->FunctionArray[i]))
+#define FunctionPointer(i) ((struct FunctionDefinition *) (((i) == -1L) ? NULL : BloadData(theEnv,execStatus)->FunctionArray[i]))
 
 #define Bload(a) EnvBload(GetCurrentEnvironment(),a)
 
-   LOCALE void                    InitializeBloadData(void *);
+   LOCALE void                    InitializeBloadData(void *,EXEC_STATUS);
    LOCALE int                     BloadCommand(void *,EXEC_STATUS);
-   LOCALE intBool                 EnvBload(void *,char *);
-   LOCALE void                    BloadandRefresh(void *,long,size_t,void (*)(void *,void *,long));
-   LOCALE intBool                 Bloaded(void *);
-   LOCALE void                    AddBeforeBloadFunction(void *,char *,void (*)(void *),int);
-   LOCALE void                    AddAfterBloadFunction(void *,char *,void (*)(void *),int);
-   LOCALE void                    AddBloadReadyFunction(void *,char *,int (*)(void),int);
-   LOCALE void                    AddClearBloadReadyFunction(void *,char *,int (*)(void *),int);
-   LOCALE void                    AddAbortBloadFunction(void *,char *,void (*)(void *),int);
-   LOCALE void                    CannotLoadWithBloadMessage(void *,char *);
+   LOCALE intBool                 EnvBload(void *,EXEC_STATUS,char *);
+   LOCALE void                    BloadandRefresh(void *,EXEC_STATUS,long,size_t,void (*)(void *,EXEC_STATUS,void *,long));
+   LOCALE intBool                 Bloaded(void *,EXEC_STATUS);
+   LOCALE void                    AddBeforeBloadFunction(void *,EXEC_STATUS,char *,void (*)(void *),int);
+   LOCALE void                    AddAfterBloadFunction(void *,EXEC_STATUS,char *,void (*)(void *),int);
+   LOCALE void                    AddBloadReadyFunction(void *,EXEC_STATUS,char *,int (*)(void),int);
+   LOCALE void                    AddClearBloadReadyFunction(void *,EXEC_STATUS,char *,int (*)(void *),int);
+   LOCALE void                    AddAbortBloadFunction(void *,EXEC_STATUS,char *,void (*)(void *),int);
+   LOCALE void                    CannotLoadWithBloadMessage(void *,EXEC_STATUS,char *);
 
 #endif
 

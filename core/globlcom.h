@@ -38,13 +38,13 @@
 #define SetResetGlobals(a) EnvSetResetGlobals(GetCurrentEnvironment(),a)
 #define ShowDefglobals(a,b) EnvShowDefglobals(GetCurrentEnvironment(),a,b)
 
-   LOCALE void                           DefglobalCommandDefinitions(void *);
-   LOCALE int                            SetResetGlobalsCommand(void *);
-   LOCALE intBool                        EnvSetResetGlobals(void *,int);
-   LOCALE int                            GetResetGlobalsCommand(void *);
-   LOCALE intBool                        EnvGetResetGlobals(void *);
-   LOCALE void                           ShowDefglobalsCommand(void *);
-   LOCALE void                           EnvShowDefglobals(void *,char *,void *);
+   LOCALE void                           DefglobalCommandDefinitions(void *,EXEC_STATUS);
+   LOCALE int                            SetResetGlobalsCommand(void *,EXEC_STATUS);
+   LOCALE intBool                        EnvSetResetGlobals(void *,EXEC_STATUS,int);
+   LOCALE int                            GetResetGlobalsCommand(void *,EXEC_STATUS);
+   LOCALE intBool                        EnvGetResetGlobals(void *,EXEC_STATUS);
+   LOCALE void                           ShowDefglobalsCommand(void *,EXEC_STATUS);
+   LOCALE void                           EnvShowDefglobals(void *,EXEC_STATUS,char *,void *);
 
 #endif
 

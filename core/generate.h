@@ -41,8 +41,8 @@
 #define LOCALE extern
 #endif
 
-   LOCALE void                           FieldConversion(void *,struct lhsParseNode *,struct lhsParseNode *);
-   LOCALE struct expr                   *GetvarReplace(void *,struct lhsParseNode *,int);
+   LOCALE void                           FieldConversion(void *,EXEC_STATUS,struct lhsParseNode *,struct lhsParseNode *);
+   LOCALE struct expr                   *GetvarReplace(void *,EXEC_STATUS,struct lhsParseNode *,int);
    LOCALE intBool                        IsNandTest(struct lhsParseNode *);
 
 #endif

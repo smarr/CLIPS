@@ -47,7 +47,7 @@
 
 int main(int,char *[]);
 void UserFunctions(void);
-void EnvUserFunctions(void *);
+void EnvUserFunctions(void *,EXEC_STATUS);
 
 /****************************************/
 /* main: Starts execution of the expert */
@@ -61,7 +61,7 @@ int main(
    // Lode: TODO EXEC_STATUS ?
    theEnv = CreateEnvironment();
    RerouteStdin(theEnv,execStatus,argc,argv);
-   CommandLoop(theEnv);
+   CommandLoop(theEnv,execStatus);
 
    /*==================================================================*/
    /* Control does not normally return from the CommandLoop function.  */
@@ -80,7 +80,7 @@ int main(
    /*==================================================================*/
    
    /* DeallocateEnvironmentData(); */
-   /* DestroyEnvironment(theEnv); */
+   /* DestroyEnvironment(theEnv,execStatus); */
    
    return(-1);
   }
