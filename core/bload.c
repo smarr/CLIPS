@@ -349,7 +349,7 @@ globle int EnvBload(
    /*=======================================*/
 
    BloadData(theEnv,execStatus)->BloadActive = TRUE;
-   EnvAddClearFunction(theEnv,execStatus,"bload",(void (*)(void *)) ClearBload,10000);
+   EnvAddClearFunction(theEnv,execStatus,"bload",(void (*)(void *,EXEC_STATUS)) ClearBload,10000);
 
    /*=============================*/
    /* Return TRUE to indicate the */
@@ -601,7 +601,7 @@ static int ClearBload(
         bfPtr = bfPtr->next)
      {
       if (bfPtr->environmentAware)
-        { ready = (* ((int (*)(void *)) bfPtr->func))(theEnv,execStatus); }
+        { ready = (* ((int (*)(void *,EXEC_STATUS)) bfPtr->func))(theEnv,execStatus); }
       else            
         { ready = (* ((int (*)(void)) bfPtr->func))(); }
 

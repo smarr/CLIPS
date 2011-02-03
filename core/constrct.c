@@ -53,6 +53,9 @@
 #include "ruledef.h" /* TBD Remove */
 #include "constrct.h"
 
+# include "envrnmnt.h"
+# include "execution_status.h"
+
 /***************************************/
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
@@ -165,7 +168,7 @@ globle int RemoveConstruct(
 globle int Save(
   char *fileName)  
   {
-   return EnvSave(GetCurrentEnvironment(),getCurrentExecutionState(),fileName);
+   return EnvSave(GetCurrentEnvironment(),GetCurrentExecutionState(),fileName);
   }  
 #endif
 
@@ -352,7 +355,7 @@ globle void ResetCommand(
 #if ALLOW_ENVIRONMENT_GLOBALS
 globle void Reset(EXEC_STATUS)
   {
-   EnvReset(GetCurrentEnvironment(),getCurrentExecutionState(),execStatus);
+   EnvReset(GetCurrentEnvironment(),GetCurrentExecutionState());
   }  
 #endif
 
@@ -443,9 +446,9 @@ globle void EnvReset(
 globle int (*SetBeforeResetFunction(
 	void *theEnv,
   EXEC_STATUS,
-  int (*theFunction)(void *)))(void *)
+  int (*theFunction)(void *,EXEC_STATUS)))(void *,EXEC_STATUS)
   {
-   int (*tempFunction)(void *);
+   int (*tempFunction)(void *,EXEC_STATUS);
 
    tempFunction = ConstructData(theEnv,execStatus)->BeforeResetFunction;
    ConstructData(theEnv,execStatus)->BeforeResetFunction = theFunction;
@@ -462,13 +465,11 @@ globle intBool AddResetFunction(
   void (*functionPtr)(void),
   int priority)
   {
-   void *theEnv;
-   // Lode: TODO EXEC_STATUS?
-
-   theEnv = GetCurrentEnvironment();
+   void *theEnv = GetCurrentEnvironment();
+   EXEC_STATUS  = GetCurrentExectionStatus();
    
    ConstructData(theEnv,execStatus)->ListOfResetFunctions = 
-      AddFunctionToCallList(theEnv,execStatus,name,priority,(void (*)(void *)) functionPtr,
+      AddFunctionToCallList(theEnv,execStatus,name,priority,(void (*)(void *,EXEC_STATUS)) functionPtr,
                             ConstructData(theEnv,execStatus)->ListOfResetFunctions,FALSE);
    return(TRUE);
   }
@@ -482,7 +483,7 @@ globle intBool EnvAddResetFunction(
   void *theEnv,
   EXEC_STATUS,
   char *name,
-  void (*functionPtr)(void *),
+  void (*functionPtr)(void *,EXEC_STATUS),
   int priority)
   {
    ConstructData(theEnv,execStatus)->ListOfResetFunctions = AddFunctionToCallList(theEnv,execStatus,name,priority,
@@ -619,13 +620,13 @@ globle intBool ClearReady(
   EXEC_STATUS)
   {
    struct callFunctionItem *theFunction;
-   int (*tempFunction)(void *);
+   int (*tempFunction)(void *,EXEC_STATUS);
 
    for (theFunction = ConstructData(theEnv,execStatus)->ListOfClearReadyFunctions;
         theFunction != NULL;
         theFunction = theFunction->next)
      {
-      tempFunction = (int (*)(void *)) theFunction->func;
+      tempFunction = (int (*)(void *,EXEC_STATUS)) theFunction->func;
       if ((*tempFunction)(theEnv,execStatus) == FALSE)
         { return(FALSE); }
      }
@@ -641,12 +642,12 @@ globle intBool AddClearReadyFunction(
   void *theEnv,
   EXEC_STATUS,
   char *name,
-  int (*functionPtr)(void *),
+  int (*functionPtr)(void *,EXEC_STATUS),
   int priority)
   {
    ConstructData(theEnv,execStatus)->ListOfClearReadyFunctions =
      AddFunctionToCallList(theEnv,execStatus,name,priority,
-                           (void (*)(void *)) functionPtr,
+                           (void (*)(void *,EXEC_STATUS)) functionPtr,
                            ConstructData(theEnv,execStatus)->ListOfClearReadyFunctions,TRUE);
    return(1);
   }
@@ -680,14 +681,12 @@ globle intBool AddClearFunction(
   void (*functionPtr)(void),
   int priority)
   {
-   void *theEnv;
-   // Lode: TODO EXEC_STATUS
-
-   theEnv = GetCurrentEnvironment();
+   void *theEnv = GetCurrentEnvironment();
+   EXEC_STATUS = GetCurrentExectionStatus();
    
    ConstructData(theEnv,execStatus)->ListOfClearFunctions =
       AddFunctionToCallList(theEnv,execStatus,name,priority,
-                            (void (*)(void *)) functionPtr,
+                            (void (*)(void *,EXEC_STATUS)) functionPtr,
                             ConstructData(theEnv,execStatus)->ListOfClearFunctions,FALSE);
    return(1);
   }
@@ -701,12 +700,12 @@ globle intBool EnvAddClearFunction(
   void *theEnv,
   EXEC_STATUS,
   char *name,
-  void (*functionPtr)(void *),
+  void (*functionPtr)(void *,EXEC_STATUS),
   int priority)
   {
    ConstructData(theEnv,execStatus)->ListOfClearFunctions =
       AddFunctionToCallList(theEnv,execStatus,name,priority,
-                            (void (*)(void *)) functionPtr,
+                            (void (*)(void *,EXEC_STATUS)) functionPtr,
                             ConstructData(theEnv,execStatus)->ListOfClearFunctions,TRUE);
    return(1);
   }
@@ -935,7 +934,7 @@ globle intBool AddSaveFunction(
 #if (! RUN_TIME) && (! BLOAD_ONLY)
    ConstructData(theEnv,execStatus)->ListOfSaveFunctions =
      AddFunctionToCallList(theEnv,execStatus,name,priority,
-                           (void (*)(void *)) functionPtr,
+                           (void (*)(void *,EXEC_STATUS)) functionPtr,
                            ConstructData(theEnv,execStatus)->ListOfSaveFunctions,TRUE);
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD

@@ -191,9 +191,9 @@ globle void InitializeDefmodules(
 /******************************************************/
 globle int RegisterModuleItem(
    void *theEnv,
-  EXEC_STATUS,
+   EXEC_STATUS,
    char *theItem,
-   void *(*allocateFunction)(void *),
+   void *(*allocateFunction)(void *,EXEC_STATUS),
    void (*freeFunction)(void *,EXEC_STATUS,void *),
    void *(*bloadModuleReference)(void *,EXEC_STATUS,int),
    void  (*constructsToCModuleReference)(void *,EXEC_STATUS,FILE *,int,int,int),

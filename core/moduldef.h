@@ -141,7 +141,7 @@ struct moduleItem
   {
    char *name;
    int moduleIndex;
-   void *(*allocateFunction)(void *);
+   void *(*allocateFunction)(void *,EXEC_STATUS);
    void  (*freeFunction)(void *,EXEC_STATUS,void *);
    void *(*bloadModuleReference)(void *,EXEC_STATUS,int);
    void  (*constructsToCModuleReference)(void *,EXEC_STATUS,FILE *,int,int,int);
@@ -214,7 +214,7 @@ struct defmoduleData
    LOCALE void                           RemoveAllDefmodules(void *,EXEC_STATUS);
    LOCALE int                            AllocateModuleStorage(void);
    LOCALE int                            RegisterModuleItem(void *,EXEC_STATUS,char *,
-                                                            void *(*)(void *),
+                                                            void *(*)(void *,EXEC_STATUS),
                                                             void (*)(void *,EXEC_STATUS,void *),
                                                             void *(*)(void *,EXEC_STATUS,int),
                                                             void (*)(void *,EXEC_STATUS,FILE *,int,int,int),

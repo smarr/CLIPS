@@ -1164,7 +1164,7 @@ globle struct CodeGeneratorItem *AddCodeGeneratorItem(
   EXEC_STATUS,
   char *name,
   int priority,
-  void (*beforeFunction)(void *),
+  void (*beforeFunction)(void *,EXEC_STATUS),
   void (*initFunction)(void *,EXEC_STATUS,FILE *,int,int),
   int (*generateFunction)(void *,EXEC_STATUS,char *,char *,char *,int,FILE *,int,int),
   int arrayCount)

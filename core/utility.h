@@ -35,7 +35,7 @@
 struct callFunctionItem
   {
    char *name;
-   void (*func)(void *);
+   void (*func)(void *,EXEC_STATUS);
    int priority;
    struct callFunctionItem *next;
    short int environmentAware;
@@ -88,8 +88,8 @@ struct utilityData
 
    LOCALE void                           InitializeUtilityData(void *,EXEC_STATUS);
    LOCALE void                           PeriodicCleanup(void *, EXEC_STATUS, intBool,intBool);
-   LOCALE intBool                        AddCleanupFunction(void *,EXEC_STATUS,char *,void (*)(void *),int);
-   LOCALE intBool                        EnvAddPeriodicFunction(void *,EXEC_STATUS,char *,void (*)(void *),int);
+   LOCALE intBool                        AddCleanupFunction(void *,EXEC_STATUS,char *,void (*)(void *,EXEC_STATUS),int);
+   LOCALE intBool                        EnvAddPeriodicFunction(void *,EXEC_STATUS,char *,void (*)(void *,EXEC_STATUS),int);
    LOCALE intBool                        AddPeriodicFunction(char *,void (*)(void),int);
    LOCALE intBool                        RemoveCleanupFunction(void *,EXEC_STATUS,char *);
    LOCALE intBool                        EnvRemovePeriodicFunction(void *,EXEC_STATUS,char *);
@@ -100,15 +100,15 @@ struct utilityData
    LOCALE char                          *AppendNToString(void *,EXEC_STATUS,char *,char *,size_t,size_t *,size_t *);
    LOCALE char                          *EnlargeString(void *,EXEC_STATUS,size_t,char *,size_t *,size_t *);
    LOCALE char                          *ExpandStringWithChar(void *,EXEC_STATUS,int,char *,size_t *,size_t *,size_t);
-   LOCALE struct callFunctionItem       *AddFunctionToCallList(void *,EXEC_STATUS,char *,int,void (*)(void *),
+   LOCALE struct callFunctionItem       *AddFunctionToCallList(void *,EXEC_STATUS,char *,int,void (*)(void *,EXEC_STATUS),
                                                                struct callFunctionItem *,intBool);
-   LOCALE struct callFunctionItem       *AddFunctionToCallListWithContext(void *,EXEC_STATUS,char *,int,void (*)(void *),
+   LOCALE struct callFunctionItem       *AddFunctionToCallListWithContext(void *,EXEC_STATUS,char *,int,void (*)(void *,EXEC_STATUS),
                                                                           struct callFunctionItem *,intBool,void *);
    LOCALE struct callFunctionItem       *RemoveFunctionFromCallList(void *,EXEC_STATUS,char *,
                                                              struct callFunctionItem *,
                                                              int *);
    LOCALE void                           DeallocateCallList(void *,EXEC_STATUS,struct callFunctionItem *);
-   LOCALE unsigned long                  ItemHashValue(void *,unsigned short,void *,unsigned long);
+   LOCALE unsigned long                  ItemHashValue(void *,EXEC_STATUS,unsigned short,void *,unsigned long);
    LOCALE void                           YieldTime(void *,EXEC_STATUS);
    LOCALE short                          SetGarbageCollectionHeuristics(void *,EXEC_STATUS,short);
    LOCALE void                           EnvIncrementGCLocks(void *,EXEC_STATUS);

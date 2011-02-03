@@ -724,7 +724,7 @@ globle void PrintBanner(
 globle void SetAfterPromptFunction(
   void *theEnv,
   EXEC_STATUS,
-  int (*funptr)(void *))
+  int (*funptr)(void *,EXEC_STATUS))
   {
    CommandLineData(theEnv,execStatus)->AfterPromptFunction = funptr;
   }
@@ -736,7 +736,7 @@ globle void SetAfterPromptFunction(
 globle void SetBeforeCommandExecutionFunction(
   void *theEnv,
   EXEC_STATUS,
-  int (*funptr)(void *))
+  int (*funptr)(void *,EXEC_STATUS))
   {
    CommandLineData(theEnv,execStatus)->BeforeCommandExecutionFunction = funptr;
   }
@@ -926,9 +926,9 @@ static int DefaultGetNextEvent(
 globle int (*SetEventFunction(
 	void *theEnv,
   EXEC_STATUS,
-	int (*theFunction)(void *)))(void *)
+	int (*theFunction)(void *,EXEC_STATUS)))(void *,EXEC_STATUS)
   {
-   int (*tmp_ptr)(void *);
+   int (*tmp_ptr)(void *,EXEC_STATUS);
 
    tmp_ptr = CommandLineData(theEnv,execStatus)->EventFunction;
    CommandLineData(theEnv,execStatus)->EventFunction = theFunction;

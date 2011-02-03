@@ -20,7 +20,7 @@ void ClearEnvironmentWindowCommand(
   void *theEnv, EXEC_STATUS)
   {
    if (EnvArgCountCheck(theEnv,execStatus,"clear-window",EXACTLY,0) == -1) return;
-   id theObject = GetEnvironmentContext(theEnv);
+   id theObject = GetEnvironmentContext(theEnv,execStatus);
    
    [theObject clearScrollbackFunction];
   }
@@ -61,9 +61,9 @@ int PrintInterfaceRouter(
   {
    FILE *fptr;
    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-   id theObject = GetEnvironmentRouterContext(theEnv);
+   id theObject = GetEnvironmentRouterContext(theEnv,execStatus);
 
-   fptr = FindFptr(theEnv,logicalName);
+   fptr = FindFptr(theEnv,execStatus,logicalName);
    if (fptr == stdout)
      { [theObject printC: str]; }
    else
@@ -85,7 +85,7 @@ int GetcInterfaceRouter(
   {
    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
    int theChar;
-   id theObject = GetEnvironmentRouterContext(theEnv);
+   id theObject = GetEnvironmentRouterContext(theEnv,execStatus);
 
    theChar = [theObject waitForChar];
 
@@ -103,7 +103,7 @@ int ExitInterfaceRouter(
   void *theEnv,
   int num)
   {   
-   CLIPSTerminalController *theController = GetEnvironmentRouterContext(theEnv);
+   CLIPSTerminalController *theController = GetEnvironmentRouterContext(theEnv,execStatus);
    [theController exit];
    /* AbortExit(theEnv); */
    return(TRUE);
@@ -115,7 +115,7 @@ int ExitInterfaceRouter(
 void MacPeriodicFunction(
   void *theEnv)
   {
-   CLIPSTerminalController *theController = GetEnvironmentContext(theEnv);
+   CLIPSTerminalController *theController = GetEnvironmentContext(theEnv,execStatus);
    NSConditionLock *theAgendaLock, *theFactsLock;
    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
    
@@ -187,7 +187,7 @@ void MacYieldTimeFunction()
 int MacBeforeOpenFunction(
   void *theEnv)
   {
-   CLIPSTerminalController *theController = GetEnvironmentRouterContext(theEnv);
+   CLIPSTerminalController *theController = GetEnvironmentRouterContext(theEnv,execStatus);
      
    NSLock *theLock = [[theController envController] fileOpenLock];
    
@@ -204,7 +204,7 @@ int MacBeforeOpenFunction(
 int MacAfterOpenFunction(
   void *theEnv)
   {
-   CLIPSTerminalController *theController = GetEnvironmentRouterContext(theEnv);
+   CLIPSTerminalController *theController = GetEnvironmentRouterContext(theEnv,execStatus);
    
    NSLock *theLock = [[theController envController] fileOpenLock];
    

@@ -75,7 +75,7 @@ struct commandLineData
    LOCALE void                           SetAfterPromptFunction(void *,EXEC_STATUS,int (*)(void *,EXEC_STATUS));
    LOCALE void                           SetBeforeCommandExecutionFunction(void *,EXEC_STATUS,int (*)(void *,EXEC_STATUS));
    LOCALE intBool                        RouteCommand(void *,EXEC_STATUS,char *,int);
-   LOCALE int                          (*SetEventFunction(void *,EXEC_STATUS,int (*)(void *)))(void *);
+   LOCALE int                          (*SetEventFunction(void *,EXEC_STATUS,int (*)(void *,EXEC_STATUS)))(void *,EXEC_STATUS);
    LOCALE intBool                        TopLevelCommand(void *,EXEC_STATUS);
    LOCALE void                           AppendNCommandString(void *,EXEC_STATUS,char *,unsigned);
    LOCALE void                           SetNCommandString(void *,EXEC_STATUS,char *,unsigned);

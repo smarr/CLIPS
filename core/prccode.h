@@ -113,7 +113,7 @@ LOCALE EXPRESSION *GenProcWildcardReference(void *,EXEC_STATUS,int);
 #endif
 #endif
 
-LOCALE void PushProcParameters(void *,EXEC_STATUS,EXPRESSION *,int,char *,char *,void (*)(void *));
+LOCALE void PushProcParameters(void *,EXEC_STATUS,EXPRESSION *,int,char *,char *,void (*)(void *,EXEC_STATUS));
 LOCALE void PopProcParameters(void *,EXEC_STATUS);
 
 #if DEFGENERIC_CONSTRUCT
@@ -121,7 +121,7 @@ LOCALE EXPRESSION *GetProcParamExpressions(void *,EXEC_STATUS);
 #endif
 
 LOCALE void EvaluateProcActions(void *,EXEC_STATUS,struct defmodule *,EXPRESSION *,int,
-                                DATA_OBJECT *,void (*)(void *));
+                                DATA_OBJECT *,void (*)(void *,EXEC_STATUS));
 LOCALE void PrintProcParamArray(void *,EXEC_STATUS,char *);
 LOCALE void GrabProcWildargs(void *,EXEC_STATUS,DATA_OBJECT *,int);
 

@@ -193,7 +193,7 @@ globle void SetupDefinstances(
                    "GetDefinstancesModuleCommand","11w");
 
 #endif
-   EnvAddResetFunction(theEnv,execStatus,"definstances",(void (*)(void *)) ResetDefinstances,0);
+   EnvAddResetFunction(theEnv,execStatus,"definstances",(void (*)(void *,EXEC_STATUS)) ResetDefinstances,0);
 
 #if BLOAD || BLOAD_ONLY || BLOAD_AND_BSAVE
    SetupDefinstancesBload(theEnv,execStatus);

@@ -46,7 +46,7 @@
 struct CodeGeneratorItem
   {
    char *name;
-   void (*beforeFunction)(void *);
+   void (*beforeFunction)(void *,EXEC_STATUS);
    void (*initFunction)(void *,EXEC_STATUS,FILE *,int,int);
    int (*generateFunction)(void *,EXEC_STATUS,char *,char *,char *,int,FILE *,int,int);
    int priority;
@@ -103,7 +103,7 @@ struct CodeGeneratorFile
    LOCALE int                       ExpressionToCode(void *,EXEC_STATUS,FILE *,struct expr *);
    LOCALE void                      PrintFunctionReference(void *,EXEC_STATUS,FILE *,struct FunctionDefinition *);
    LOCALE struct CodeGeneratorItem *AddCodeGeneratorItem(void *,EXEC_STATUS,char *,int,
-                                                         void (*)(void *),
+                                                         void (*)(void *,EXEC_STATUS),
                                                          void (*)(void *,EXEC_STATUS,FILE *,int,int),
                                                          int (*)(void *,EXEC_STATUS,char *,char *,char *,int,FILE *,int,int),int);
    LOCALE FILE                     *CloseFileIfNeeded(void *,EXEC_STATUS,FILE *,int *,int *,int,int *,struct CodeGeneratorFile *);

@@ -50,7 +50,7 @@ struct portConstructItem
 
    LOCALE long                           GetNumberOfDefmodules(void *,EXEC_STATUS);
    LOCALE void                           SetNumberOfDefmodules(void *,EXEC_STATUS,long);
-   LOCALE void                           AddAfterModuleDefinedFunction(void *,EXEC_STATUS,char *,void (*)(void *),int);
+   LOCALE void                           AddAfterModuleDefinedFunction(void *,EXEC_STATUS,char *,void (*)(void *,EXEC_STATUS),int);
    LOCALE int                            ParseDefmodule(void *,EXEC_STATUS,char *);
    LOCALE void                           AddPortConstructItem(void *,EXEC_STATUS,char *,int);
    LOCALE struct portConstructItem      *ValidPortConstructItem(void *,EXEC_STATUS,char *);

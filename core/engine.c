@@ -126,7 +126,7 @@ static void DeallocateEngineData(
 globle long long Run(
   long long runLimit)
   {
-   return EnvRun(GetCurrentEnvironment(),getCurrentExecutionState(),runLimit);
+   return EnvRun(GetCurrentEnvironment(),GetCurrentExecutionState(),runLimit);
   }
 #endif
   
@@ -869,13 +869,11 @@ globle intBool AddRunFunction(
   void (*functionPtr)(void),
   int priority)
   {
-   void *theEnv;
-	  
-   // Lode: TODO: add exec_status??
-   theEnv = GetCurrentEnvironment();
+   void *theEnv = GetCurrentEnvironment();
+   EXEC_STATUS = GetCurrentExectionStatus();
 
    EngineData(theEnv,execStatus)->ListOfRunFunctions = 
-       AddFunctionToCallList(theEnv,execStatus,name,priority,(void (*)(void *)) functionPtr,
+       AddFunctionToCallList(theEnv,execStatus,name,priority,(void (*)(void *,EXEC_STATUS)) functionPtr,
                              EngineData(theEnv,execStatus)->ListOfRunFunctions,TRUE);
    return(1);
   }
@@ -889,7 +887,7 @@ globle intBool EnvAddRunFunction(
   void *theEnv,
   EXEC_STATUS,
   char *name,
-  void (*functionPtr)(void *),
+  void (*functionPtr)(void *,EXEC_STATUS),
   int priority)
   {
    EngineData(theEnv,execStatus)->ListOfRunFunctions = AddFunctionToCallList(theEnv,execStatus,name,priority,
@@ -906,7 +904,7 @@ globle intBool EnvAddRunFunctionWithContext(
   void *theEnv,
   EXEC_STATUS,
   char *name,
-  void (*functionPtr)(void *),
+  void (*functionPtr)(void *,EXEC_STATUS),
   int priority,
   void *context)
   {
@@ -1071,7 +1069,7 @@ globle void EnvShowBreaks(
   {
    ListItemsDriver(theEnv,execStatus,logicalName,(struct defmodule *) vTheModule,
                    NULL,NULL,
-                   EnvGetNextDefrule,(char *(*)(void *)) GetConstructNameString,
+                   EnvGetNextDefrule,(char *(*)(void *,EXEC_STATUS)) GetConstructNameString,
                    NULL,EnvDefruleHasBreakpoint);
    }
 

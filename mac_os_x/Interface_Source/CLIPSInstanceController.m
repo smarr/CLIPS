@@ -309,7 +309,7 @@
       
       theInstanceName = (char *) [[theInstance name] UTF8String];
       if (theInstanceName != NULL)
-        { clipsInstance = EnvFindInstance(theEnvironment,NULL,theInstanceName,TRUE); }
+        { clipsInstance = EnvFindInstance(theEnvironment,execStatus,NULL,theInstanceName,TRUE); }
       
       /*===========================================================*/
       /* If we were able to find the corresponding CLIPS instance, */
@@ -318,8 +318,8 @@
       /*===========================================================*/
       
       if ((clipsInstance != NULL) && 
-          EnvGetDefclassPPForm(theEnvironment,EnvGetInstanceClass(theEnvironment,clipsInstance)) != NULL)
-        { thePPForm = [NSString stringWithUTF8String: EnvGetDefclassPPForm(theEnvironment,EnvGetInstanceClass(theEnvironment,clipsInstance))]; }
+          EnvGetDefclassPPForm(theEnvironment,execStatus,EnvGetInstanceClass(theEnvironment,execStatus,clipsInstance)) != NULL)
+        { thePPForm = [NSString stringWithUTF8String: EnvGetDefclassPPForm(theEnvironment,execStatus,EnvGetInstanceClass(theEnvironment,clipsInstance))]; }
      }
      
    [environmentController setValue: thePPForm forKey: @"constructInspectorText"];

@@ -531,13 +531,13 @@ globle intBool AddBinaryItem(
   EXEC_STATUS,
   char *name,
   int priority,
-  void (*findFunction)(void *),
+  void (*findFunction)(void *,EXEC_STATUS),
   void (*expressionFunction)(void *,EXEC_STATUS,FILE *),
   void (*bsaveStorageFunction)(void *,EXEC_STATUS,FILE *),
   void (*bsaveFunction)(void *,EXEC_STATUS,FILE *),
-  void (*bloadStorageFunction)(void *),
-  void (*bloadFunction)(void *),
-  void (*clearFunction)(void *))
+  void (*bloadStorageFunction)(void *,EXEC_STATUS),
+  void (*bloadFunction)(void *,EXEC_STATUS),
+  void (*clearFunction)(void *,EXEC_STATUS))
   {
    struct BinaryItem *newPtr, *currentPtr, *lastPtr = NULL;
 

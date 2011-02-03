@@ -654,7 +654,7 @@ globle void PushProcParameters(
   int numberOfParameters,
   char *pname,
   char *bodytype,
-  void (*UnboundErrFunc)(void *))
+  void (*UnboundErrFunc)(void *,EXEC_STATUS))
   {
    register PROC_PARAM_STACK *ptmp;
 

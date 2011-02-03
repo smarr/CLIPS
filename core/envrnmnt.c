@@ -52,6 +52,8 @@
 
 #include "envrnmnt.h"
 
+# include "execution_status.h"
+
 #define SIZE_ENVIRONMENT_HASH  131
 
 /***************************************/
@@ -88,7 +90,7 @@ globle intBool AllocateEnvironmentData(
   EXEC_STATUS,
   unsigned int position,
   unsigned long size,
-  void (*cleanupFunction)(void *))
+  void (*cleanupFunction)(void *,EXEC_STATUS))
   {      
    struct environmentData *theEnvironment = (struct environmentData *) vtheEnvironment;
 
@@ -413,7 +415,7 @@ globle void *CreateEnvironmentDriver(
      }
 
    memset(theData,0,sizeof(void (*)(struct environmentData *)) * MAXIMUM_ENVIRONMENT_POSITIONS);
-   theEnvironment->cleanupFunctions = (void (**)(void *))theData;
+   theEnvironment->cleanupFunctions = (void (**)(void *,EXEC_STATUS))theData;
 
 #if ALLOW_ENVIRONMENT_GLOBALS
    AddHashedEnvironment(theEnvironment,execStatus); // Lode: TODO REF!
@@ -707,7 +709,7 @@ globle intBool AddEnvironmentCleanupFunction(
   void *vtheEnv,
   EXEC_STATUS,
   char *name,
-  void (*functionPtr)(void *),
+  void (*functionPtr)(void *,EXEC_STATUS),
   int priority)
   {
    struct environmentCleanupFunction *newPtr, *currentPtr, *lastPtr = NULL;

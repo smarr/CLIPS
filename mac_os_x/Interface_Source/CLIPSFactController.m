@@ -307,7 +307,7 @@
       /*============================================================*/
       
       theFactIndex = [[theFact index] longLongValue];
-      clipsFact = FindIndexedFact(theEnvironment,theFactIndex);
+      clipsFact = FindIndexedFact(theEnvironment,execStatus,theFactIndex);
       
       /*========================================================*/
       /* If we were able to find the corresponding CLIPS fact,  */
@@ -316,8 +316,8 @@
       /*========================================================*/
       
       if ((clipsFact != NULL) && 
-          EnvGetDeftemplatePPForm(theEnvironment,EnvFactDeftemplate(theEnvironment,clipsFact)) != NULL)
-        { thePPForm = [NSString stringWithUTF8String: EnvGetDeftemplatePPForm(theEnvironment,EnvFactDeftemplate(theEnvironment,clipsFact))]; }
+          EnvGetDeftemplatePPForm(theEnvironment,execStatus,EnvFactDeftemplate(theEnvironment,execStatus,clipsFact)) != NULL)
+        { thePPForm = [NSString stringWithUTF8String: EnvGetDeftemplatePPForm(theEnvironment,execStatus,EnvFactDeftemplate(theEnvironment,execStatus,clipsFact))]; }
      }
      
    [environmentController setValue: thePPForm forKey: @"constructInspectorText"];
