@@ -39,11 +39,11 @@
 #define LOCALE extern
 #endif
 
-#define FactDeftemplate(a) EnvFactDeftemplate(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define FactExistp(a) EnvFactExistp(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define FactSlotNames(a,b) EnvFactSlotNames(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
-#define GetFactList(a,b) EnvGetFactList(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
-#define PPFact(a,b,c) EnvPPFact(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b,c)
+#define FactDeftemplate(a) EnvFactDeftemplate(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define FactExistp(a) EnvFactExistp(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define FactSlotNames(a,b) EnvFactSlotNames(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b)
+#define GetFactList(a,b) EnvGetFactList(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b)
+#define PPFact(a,b,c) EnvPPFact(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b,c)
 
 # include "execution_status.h"
 

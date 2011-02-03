@@ -38,8 +38,8 @@
 #define LOCALE extern
 #endif
 
-#define GetAutoFloatDividend() EnvGetAutoFloatDividend(GetCurrentEnvironment(),getCurrentExecutionState())
-#define SetAutoFloatDividend(a) EnvSetAutoFloatDividend(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define GetAutoFloatDividend() EnvGetAutoFloatDividend(GetCurrentEnvironment(),GetCurrentExecutionStatus())
+#define SetAutoFloatDividend(a) EnvSetAutoFloatDividend(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
 
    LOCALE void                    BasicMathFunctionDefinitions(void *,EXEC_STATUS);
    LOCALE void                    AdditionFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);

@@ -69,17 +69,17 @@ struct messageHandlerData
 #define PRINT_STRING  "print"
 #define CREATE_STRING "create"
 
-#define FindDefmessageHandler(a,b,c) EnvFindDefmessageHandler(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b,c)
-#define GetDefmessageHandlerName(a,b) EnvGetDefmessageHandlerName(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
-#define GetDefmessageHandlerPPForm(a,b) EnvGetDefmessageHandlerPPForm(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
-#define GetDefmessageHandlerType(a,b) EnvGetDefmessageHandlerType(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
-#define GetDefmessageHandlerWatch(a,b) EnvGetDefmessageHandlerWatch(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
-#define GetNextDefmessageHandler(a,b) EnvGetNextDefmessageHandler(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
-#define IsDefmessageHandlerDeletable(a,b) EnvIsDefmessageHandlerDeletable(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
-#define ListDefmessageHandlers(a,b,c) EnvListDefmessageHandlers(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b,c)
-#define PreviewSend(a,b,c) EnvPreviewSend(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b,c)
-#define SetDefmessageHandlerWatch(a,b,c) EnvSetDefmessageHandlerWatch(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b,c)
-#define UndefmessageHandler(a,b) EnvUndefmessageHandler(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
+#define FindDefmessageHandler(a,b,c) EnvFindDefmessageHandler(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b,c)
+#define GetDefmessageHandlerName(a,b) EnvGetDefmessageHandlerName(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b)
+#define GetDefmessageHandlerPPForm(a,b) EnvGetDefmessageHandlerPPForm(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b)
+#define GetDefmessageHandlerType(a,b) EnvGetDefmessageHandlerType(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b)
+#define GetDefmessageHandlerWatch(a,b) EnvGetDefmessageHandlerWatch(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b)
+#define GetNextDefmessageHandler(a,b) EnvGetNextDefmessageHandler(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b)
+#define IsDefmessageHandlerDeletable(a,b) EnvIsDefmessageHandlerDeletable(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b)
+#define ListDefmessageHandlers(a,b,c) EnvListDefmessageHandlers(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b,c)
+#define PreviewSend(a,b,c) EnvPreviewSend(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b,c)
+#define SetDefmessageHandlerWatch(a,b,c) EnvSetDefmessageHandlerWatch(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b,c)
+#define UndefmessageHandler(a,b) EnvUndefmessageHandler(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b)
    
    LOCALE void             SetupMessageHandlers(void *,EXEC_STATUS);
    LOCALE char            *EnvGetDefmessageHandlerName(void *,EXEC_STATUS,void *,int);

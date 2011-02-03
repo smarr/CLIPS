@@ -199,12 +199,12 @@ struct defmoduleData
 #define LOCALE extern
 #endif
 
-#define FindDefmodule(a) EnvFindDefmodule(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define GetCurrentModule() EnvGetCurrentModule(GetCurrentEnvironment(),GetCurrentExecutionState())
-#define GetDefmoduleName(a) EnvGetDefmoduleName(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define GetDefmodulePPForm(a) EnvGetDefmodulePPForm(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define GetNextDefmodule(a) EnvGetNextDefmodule(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define SetCurrentModule(a) EnvSetCurrentModule(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define FindDefmodule(a) EnvFindDefmodule(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define GetCurrentModule() EnvGetCurrentModule(GetCurrentEnvironment(),GetCurrentExecutionStatus())
+#define GetDefmoduleName(a) EnvGetDefmoduleName(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define GetDefmodulePPForm(a) EnvGetDefmodulePPForm(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define GetNextDefmodule(a) EnvGetNextDefmodule(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define SetCurrentModule(a) EnvSetCurrentModule(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
 
    LOCALE void                           InitializeDefmodules(void *,EXEC_STATUS);
    LOCALE void                          *EnvFindDefmodule(void *,EXEC_STATUS,char *);
@@ -232,7 +232,7 @@ struct defmoduleData
    LOCALE struct moduleItem             *FindModuleItem(void *,EXEC_STATUS,char *);
    LOCALE void                           SaveCurrentModule(void *,EXEC_STATUS);
    LOCALE void                           RestoreCurrentModule(void *,EXEC_STATUS);
-   LOCALE void                           AddAfterModuleChangeFunction(void *,EXEC_STATUS,char *,void (*)(void *),int);
+   LOCALE void                           AddAfterModuleChangeFunction(void *,EXEC_STATUS,char *,void (*)(void *,EXEC_STATUS),int);
    LOCALE void                           IllegalModuleSpecifierMessage(void *,EXEC_STATUS);
    LOCALE void                           AllocateDefmoduleGlobals(void *,EXEC_STATUS);
 

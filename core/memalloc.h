@@ -140,12 +140,12 @@ struct memoryData
 
 #define MemoryData(theEnv,execStatus) ((struct memoryData *) GetEnvironmentData(theEnv,execStatus,MEMORY_DATA))
 
-#define GetConserveMemory() EnvGetConserveMemory(GetCurrentEnvironment(),GetCurrentExecutionState())
-#define MemRequests() EnvMemRequests(GetCurrentEnvironment(),GetCurrentExecutionState())
-#define MemUsed() EnvMemUsed(GetCurrentEnvironment(),GetCurrentExecutionState())
-#define ReleaseMem(a,b) EnvReleaseMem(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
-#define SetConserveMemory(a) EnvSetConserveMemory(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define SetOutOfMemoryFunction(a) EnvSetOutOfMemoryFunction(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define GetConserveMemory() EnvGetConserveMemory(GetCurrentEnvironment(),GetCurrentExecutionStatus())
+#define MemRequests() EnvMemRequests(GetCurrentEnvironment(),GetCurrentExecutionStatus())
+#define MemUsed() EnvMemUsed(GetCurrentEnvironment(),GetCurrentExecutionStatus())
+#define ReleaseMem(a,b) EnvReleaseMem(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b)
+#define SetConserveMemory(a) EnvSetConserveMemory(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define SetOutOfMemoryFunction(a) EnvSetOutOfMemoryFunction(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
 
 
    LOCALE void                           InitializeMemory(void *,EXEC_STATUS);

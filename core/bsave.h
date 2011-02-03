@@ -87,7 +87,7 @@ struct bsaveData
 
 #define BsaveData(theEnv,execStatus) ((struct bsaveData *) GetEnvironmentData(theEnv,execStatus,BSAVE_DATA))
 
-#define Bsave(a) EnvBsave(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define Bsave(a) EnvBsave(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
 
    LOCALE void                    InitializeBsaveData(void *,EXEC_STATUS);
    LOCALE int                     BsaveCommand(void *, EXEC_STATUS);

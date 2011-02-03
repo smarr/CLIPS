@@ -35,10 +35,10 @@
 #define LOCALE extern
 #endif
 
-#define Facts(a,b,c,d,e) EnvFacts(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b,c,d,e)
-#define LoadFacts(a) EnvLoadFacts(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define SaveFacts(a,b,c) EnvSaveFacts(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b,c)
-#define LoadFactsFromString(a,b) EnvLoadFactsFromString(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
+#define Facts(a,b,c,d,e) EnvFacts(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b,c,d,e)
+#define LoadFacts(a) EnvLoadFacts(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define SaveFacts(a,b,c) EnvSaveFacts(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b,c)
+#define LoadFactsFromString(a,b) EnvLoadFactsFromString(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b)
 
    LOCALE void                           FactCommandDefinitions(void *, EXEC_STATUS);
    LOCALE void                           AssertCommand(void *,EXEC_STATUS,DATA_OBJECT_PTR);

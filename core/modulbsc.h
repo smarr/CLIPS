@@ -38,8 +38,8 @@
 #define LOCALE extern
 #endif
 
-#define GetDefmoduleList(a) EnvGetDefmoduleList(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define ListDefmodules(a) EnvListDefmodules(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define GetDefmoduleList(a) EnvGetDefmoduleList(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define ListDefmodules(a) EnvListDefmodules(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
 
    LOCALE void                           DefmoduleBasicCommands(void *,EXEC_STATUS);
    LOCALE void                           EnvGetDefmoduleList(void *,EXEC_STATUS,DATA_OBJECT_PTR);

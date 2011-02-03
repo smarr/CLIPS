@@ -66,10 +66,10 @@ typedef struct igarbage
 #define LOCALE extern
 #endif
 
-#define DecrementInstanceCount(a) EnvDecrementInstanceCount(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define GetInstancesChanged() EnvGetInstancesChanged(GetCurrentEnvironment(),GetCurrentExecutionState())
-#define IncrementInstanceCount(a) EnvIncrementInstanceCount(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define SetInstancesChanged(a) EnvSetInstancesChanged(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define DecrementInstanceCount(a) EnvDecrementInstanceCount(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define GetInstancesChanged() EnvGetInstancesChanged(GetCurrentEnvironment(),GetCurrentExecutionStatus())
+#define IncrementInstanceCount(a) EnvIncrementInstanceCount(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define SetInstancesChanged(a) EnvSetInstancesChanged(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
 
 LOCALE void EnvIncrementInstanceCount(void *,EXEC_STATUS,void *);
 LOCALE void EnvDecrementInstanceCount(void *,EXEC_STATUS,void *);

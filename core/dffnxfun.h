@@ -102,16 +102,16 @@ struct deffunctionData
 #define DeffunctionData(theEnv,execStatus) ((struct deffunctionData *) GetEnvironmentData(theEnv,execStatus,DEFFUNCTION_DATA))
 
 #define DeffunctionModule(x) GetConstructModuleName((struct constructHeader *) x)
-#define FindDeffunction(a) EnvFindDeffunction(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define GetDeffunctionList(a,b) EnvGetDeffunctionList(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
+#define FindDeffunction(a) EnvFindDeffunction(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define GetDeffunctionList(a,b) EnvGetDeffunctionList(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b)
 #define GetDeffunctionName(x) GetConstructNameString((struct constructHeader *) x)
-#define GetDeffunctionPPForm(x) GetConstructPPForm(GetCurrentEnvironment(),GetCurrentExecutionState(),(struct constructHeader *) x)
-#define GetDeffunctionWatch(a) EnvGetDeffunctionWatch(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define GetNextDeffunction(a) EnvGetNextDeffunction(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define IsDeffunctionDeletable(a) EnvIsDeffunctionDeletable(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define ListDeffunctions(a,b) EnvListDeffunctions(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
-#define SetDeffunctionWatch(a,b) EnvSetDeffunctionWatch(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
-#define Undeffunction(a) EnvUndeffunction(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define GetDeffunctionPPForm(x) GetConstructPPForm(GetCurrentEnvironment(),GetCurrentExecutionStatus(),(struct constructHeader *) x)
+#define GetDeffunctionWatch(a) EnvGetDeffunctionWatch(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define GetNextDeffunction(a) EnvGetNextDeffunction(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define IsDeffunctionDeletable(a) EnvIsDeffunctionDeletable(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define ListDeffunctions(a,b) EnvListDeffunctions(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b)
+#define SetDeffunctionWatch(a,b) EnvSetDeffunctionWatch(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b)
+#define Undeffunction(a) EnvUndeffunction(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
 
 LOCALE void SetupDeffunctions(void *,EXEC_STATUS);
 LOCALE void *EnvFindDeffunction(void *,EXEC_STATUS,char *);

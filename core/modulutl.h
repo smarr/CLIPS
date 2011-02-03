@@ -53,7 +53,7 @@
                                                          char *,struct defmodule *,
                                                          char *,char *,
                                                           void *(*)(void *,EXEC_STATUS,void *),
-                                                          char *(*)(void *),
+                                                          char *(*)(void *,EXEC_STATUS),
                                                           void (*)(void *,EXEC_STATUS,char *,void *),
                                                           int (*)(void *,EXEC_STATUS,void *));
    LOCALE long                           DoForAllModules(void *,EXEC_STATUS,

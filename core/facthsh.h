@@ -47,8 +47,8 @@ struct factHashEntry
 #define LOCALE extern
 #endif
 
-#define GetFactDuplication() EnvGetFactDuplication(GetCurrentEnvironment(),getCurrentExecutionState())
-#define SetFactDuplication(a) EnvSetFactDuplication(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define GetFactDuplication() EnvGetFactDuplication(GetCurrentEnvironment(),GetCurrentExecutionStatus())
+#define SetFactDuplication(a) EnvSetFactDuplication(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
 
    LOCALE void                           AddHashedFact(void *,EXEC_STATUS,struct fact *,unsigned long);
    LOCALE intBool                        RemoveHashedFact(void *,EXEC_STATUS,struct fact *);

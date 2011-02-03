@@ -88,13 +88,13 @@ struct routerData
 #define LOCALE extern
 #endif
 
-#define ExitRouter(a) EnvExitRouter(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define GetcRouter(a) EnvGetcRouter(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define PrintRouter(a,b) EnvPrintRouter(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
-#define UngetcRouter(a,b) EnvUngetcRouter(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
-#define ActivateRouter(a) EnvActivateRouter(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define DeactivateRouter(a) EnvDeactivateRouter(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define DeleteRouter(a) EnvDeleteRouter(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define ExitRouter(a) EnvExitRouter(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define GetcRouter(a) EnvGetcRouter(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define PrintRouter(a,b) EnvPrintRouter(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b)
+#define UngetcRouter(a,b) EnvUngetcRouter(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b)
+#define ActivateRouter(a) EnvActivateRouter(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define DeactivateRouter(a) EnvDeactivateRouter(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define DeleteRouter(a) EnvDeleteRouter(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
 
    LOCALE void                           InitializeDefaultRouters(void *,EXEC_STATUS);
    LOCALE int                            EnvPrintRouter(void *,EXEC_STATUS,char *,char *);

@@ -40,8 +40,8 @@
 #define LOCALE extern
 #endif
 
-#define GetIncrementalReset() EnvGetIncrementalReset(GetCurrentEnvironment(),GetCurrentExecutionState())
-#define SetIncrementalReset(a) EnvSetIncrementalReset(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define GetIncrementalReset() EnvGetIncrementalReset(GetCurrentEnvironment(),GetCurrentExecutionStatus())
+#define SetIncrementalReset(a) EnvSetIncrementalReset(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
 
    LOCALE void                           IncrementalReset(void *,EXEC_STATUS,struct defrule *);
    LOCALE intBool                        EnvGetIncrementalReset(void *,EXEC_STATUS);

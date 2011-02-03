@@ -1057,7 +1057,7 @@ globle intBool GetFactSlot(
   char *slotName,
   DATA_OBJECT *theValue)
   {
-   return(EnvGetFactSlot(GetCurrentEnvironment(),GetCurrentExecutionState(),vTheFact,slotName,theValue));
+   return(EnvGetFactSlot(GetCurrentEnvironment(),GetCurrentExecutionStatus(),vTheFact,slotName,theValue));
   }
 #endif
 

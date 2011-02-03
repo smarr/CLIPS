@@ -113,20 +113,20 @@ struct agendaData
 /* GLOBAL EXTERNAL FUNCTION DEFINITIONS */
 /****************************************/
 
-#define Agenda(a,b) EnvAgenda(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
-#define DeleteActivation(a) EnvDeleteActivation(GetCurrentEnvironment(),getCurrentExecutionState(),a)
-#define GetActivationName(a) EnvGetActivationName(GetCurrentEnvironment(),getCurrentExecutionState(),a)
-#define GetActivationPPForm(a,b,c) EnvGetActivationPPForm(GetCurrentEnvironment(),getCurrentExecutionState(),a,b,c)
+#define Agenda(a,b) EnvAgenda(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b)
+#define DeleteActivation(a) EnvDeleteActivation(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define GetActivationName(a) EnvGetActivationName(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define GetActivationPPForm(a,b,c) EnvGetActivationPPForm(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b,c)
 #define GetActivationSalience(actPtr) (((struct activation *) actPtr)->salience)
-#define GetAgendaChanged() EnvGetAgendaChanged(GetCurrentEnvironment(),getCurrentExecutionState())
-#define GetNextActivation(a) EnvGetNextActivation(GetCurrentEnvironment(),getCurrentExecutionState(),a)
-#define GetSalienceEvaluation() EnvGetSalienceEvaluation(GetCurrentEnvironment(),getCurrentExecutionState())
-#define Refresh(a) EnvRefresh(GetCurrentEnvironment(),getCurrentExecutionState(),a)
-#define RefreshAgenda(a) EnvRefreshAgenda(GetCurrentEnvironment(),getCurrentExecutionState(),a)
-#define ReorderAgenda(a) EnvReorderAgenda(GetCurrentEnvironment(),getCurrentExecutionState(),a)
-#define SetActivationSalience(a,b) EnvSetActivationSalience(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
-#define SetAgendaChanged(a) EnvSetAgendaChanged(GetCurrentEnvironment(),getCurrentExecutionState(),a)
-#define SetSalienceEvaluation(a) EnvSetSalienceEvaluation(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define GetAgendaChanged() EnvGetAgendaChanged(GetCurrentEnvironment(),GetCurrentExecutionStatus())
+#define GetNextActivation(a) EnvGetNextActivation(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define GetSalienceEvaluation() EnvGetSalienceEvaluation(GetCurrentEnvironment(),GetCurrentExecutionStatus())
+#define Refresh(a) EnvRefresh(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define RefreshAgenda(a) EnvRefreshAgenda(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define ReorderAgenda(a) EnvReorderAgenda(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define SetActivationSalience(a,b) EnvSetActivationSalience(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b)
+#define SetAgendaChanged(a) EnvSetAgendaChanged(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define SetSalienceEvaluation(a) EnvSetSalienceEvaluation(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
 
    LOCALE void                    AddActivation               (void *,EXEC_STATUS,void *,void *);
    LOCALE void                    ClearRuleFromAgenda         (void *,EXEC_STATUS,void *);

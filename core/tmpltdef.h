@@ -124,12 +124,12 @@ struct deftemplateData
 #define LOCALE extern
 #endif
 
-#define FindDeftemplate(a) EnvFindDeftemplate(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define GetNextDeftemplate(a) EnvGetNextDeftemplate(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define IsDeftemplateDeletable(a) EnvIsDeftemplateDeletable(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define FindDeftemplate(a) EnvFindDeftemplate(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define GetNextDeftemplate(a) EnvGetNextDeftemplate(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define IsDeftemplateDeletable(a) EnvIsDeftemplateDeletable(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
 #define GetDeftemplateName(x) GetConstructNameString((struct constructHeader *) x)
-#define GetDeftemplatePPForm(x) GetConstructPPForm(GetCurrentEnvironment(),GetCurrentExecutionState(),(struct constructHeader *) x)
-#define GetNextFactInTemplate(a,b) EnvGetNextFactInTemplate(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
+#define GetDeftemplatePPForm(x) GetConstructPPForm(GetCurrentEnvironment(),GetCurrentExecutionStatus(),(struct constructHeader *) x)
+#define GetNextFactInTemplate(a,b) EnvGetNextFactInTemplate(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b)
 #define DeftemplateModule(x) GetConstructModuleName((struct constructHeader *) x)
 
    LOCALE void                           InitializeDeftemplates(void *,EXEC_STATUS);

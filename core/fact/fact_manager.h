@@ -103,18 +103,18 @@ struct factsData
 #define LOCALE extern
 #endif
 
-#define Assert(a) EnvAssert(GetCurrentEnvironment(),GetCurrentExecutionState(),a, FALSE)
-#define AssertString(a) EnvAssertString(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define AssignFactSlotDefaults(a) EnvAssignFactSlotDefaults(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define CreateFact(a) EnvCreateFact(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define DecrementFactCount(a) EnvDecrementFactCount(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define GetFactListChanged() EnvGetFactListChanged(GetCurrentEnvironment(),GetCurrentExecutionState())
-#define GetFactPPForm(a,b,c) EnvGetFactPPForm(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b,c)
-#define GetNextFact(a) EnvGetNextFact(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define IncrementFactCount(a) EnvIncrementFactCount(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define PutFactSlot(a,b,c) EnvPutFactSlot(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b,c)
-#define Retract(a) EnvRetract(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define SetFactListChanged(a) EnvSetFactListChanged(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define Assert(a) EnvAssert(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a, FALSE)
+#define AssertString(a) EnvAssertString(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define AssignFactSlotDefaults(a) EnvAssignFactSlotDefaults(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define CreateFact(a) EnvCreateFact(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define DecrementFactCount(a) EnvDecrementFactCount(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define GetFactListChanged() EnvGetFactListChanged(GetCurrentEnvironment(),GetCurrentExecutionStatus())
+#define GetFactPPForm(a,b,c) EnvGetFactPPForm(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b,c)
+#define GetNextFact(a) EnvGetNextFact(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define IncrementFactCount(a) EnvIncrementFactCount(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define PutFactSlot(a,b,c) EnvPutFactSlot(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b,c)
+#define Retract(a) EnvRetract(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define SetFactListChanged(a) EnvSetFactListChanged(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
 
 #if ALLOW_ENVIRONMENT_GLOBALS
    LOCALE intBool                        GetFactSlot(void *,char *,DATA_OBJECT *);

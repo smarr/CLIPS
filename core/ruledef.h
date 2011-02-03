@@ -153,11 +153,11 @@ struct defruleData
 #endif
 
 #define DefruleModule(x) GetConstructModuleName((struct constructHeader *) x)
-#define FindDefrule(a) EnvFindDefrule(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define FindDefrule(a) EnvFindDefrule(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
 #define GetDefruleName(x) GetConstructNameString((struct constructHeader *) x)
-#define GetDefrulePPForm(x) GetConstructPPForm(GetCurrentEnvironment(),GetCurrentExecutionState(),(struct constructHeader *) x)
-#define GetNextDefrule(a) EnvGetNextDefrule(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define IsDefruleDeletable(a) EnvIsDefruleDeletable(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define GetDefrulePPForm(x) GetConstructPPForm(GetCurrentEnvironment(),GetCurrentExecutionStatus(),(struct constructHeader *) x)
+#define GetNextDefrule(a) EnvGetNextDefrule(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define IsDefruleDeletable(a) EnvIsDefruleDeletable(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
 
    LOCALE void                           InitializeDefrules(void *,EXEC_STATUS);
    LOCALE void                          *EnvFindDefrule(void *,EXEC_STATUS,char *);

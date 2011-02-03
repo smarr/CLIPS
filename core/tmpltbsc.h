@@ -43,11 +43,11 @@
 #define LOCALE extern
 #endif
 
-#define GetDeftemplateList(a,b) EnvGetDeftemplateList(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
-#define ListDeftemplates(a,b) EnvListDeftemplates(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
-#define Undeftemplate(a) EnvUndeftemplate(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define GetDeftemplateWatch(a) EnvGetDeftemplateWatch(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define SetDeftemplateWatch(a,b) EnvSetDeftemplateWatch(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
+#define GetDeftemplateList(a,b) EnvGetDeftemplateList(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b)
+#define ListDeftemplates(a,b) EnvListDeftemplates(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b)
+#define Undeftemplate(a) EnvUndeftemplate(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define GetDeftemplateWatch(a) EnvGetDeftemplateWatch(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define SetDeftemplateWatch(a,b) EnvSetDeftemplateWatch(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b)
 
    LOCALE void                           DeftemplateBasicCommands(void *,EXEC_STATUS);
    LOCALE void                           UndeftemplateCommand(void *,EXEC_STATUS);

@@ -84,11 +84,11 @@ struct deffactsModule
 #endif
 
 #define DeffactsModule(x) GetConstructModuleName((struct constructHeader *) x)
-#define FindDeffacts(a) EnvFindDeffacts(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define FindDeffacts(a) EnvFindDeffacts(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
 #define GetDeffactsName(x) GetConstructNameString((struct constructHeader *) x)
-#define GetDeffactsPPForm(x) GetConstructPPForm(GetCurrentEnvironment(),getCurrentExecutionState(),(struct constructHeader *) x)
-#define GetNextDeffacts(a) EnvGetNextDeffacts(GetCurrentEnvironment(),getCurrentExecutionState(),a)
-#define IsDeffactsDeletable(a) EnvIsDeffactsDeletable(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define GetDeffactsPPForm(x) GetConstructPPForm(GetCurrentEnvironment(),GetCurrentExecutionStatus(),(struct constructHeader *) x)
+#define GetNextDeffacts(a) EnvGetNextDeffacts(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define IsDeffactsDeletable(a) EnvIsDeffactsDeletable(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
 
    LOCALE void                           InitializeDeffacts(void *,EXEC_STATUS);
    LOCALE void                          *EnvFindDeffacts(void *,EXEC_STATUS,char *);

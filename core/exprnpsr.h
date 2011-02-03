@@ -52,8 +52,8 @@ typedef struct saved_contexts
 #define LOCALE extern
 #endif
 
-#define GetSequenceOperatorRecognition() EnvGetSequenceOperatorRecognition(GetCurrentEnvironment(),GetCurrentExecutionState())
-#define SetSequenceOperatorRecognition(a) EnvSetSequenceOperatorRecognition(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define GetSequenceOperatorRecognition() EnvGetSequenceOperatorRecognition(GetCurrentEnvironment(),GetCurrentExecutionStatus())
+#define SetSequenceOperatorRecognition(a) EnvSetSequenceOperatorRecognition(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
 
    LOCALE struct expr                   *Function0Parse(void *,EXEC_STATUS,char *);
    LOCALE struct expr                   *Function1Parse(void *,EXEC_STATUS,char *);

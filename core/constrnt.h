@@ -96,10 +96,10 @@ struct constraintData
 
 #define ConstraintData(theEnv,execStatus) ((struct constraintData *) GetEnvironmentData(theEnv,execStatus,CONSTRAINT_DATA))
 
-#define GetDynamicConstraintChecking() EnvGetDynamicConstraintChecking(GetCurrentEnvironment(),getCurrentExecutionState())
-#define GetStaticConstraintChecking() EnvGetStaticConstraintChecking(GetCurrentEnvironment(),getCurrentExecutionState())
-#define SetDynamicConstraintChecking(a) EnvSetDynamicConstraintChecking(GetCurrentEnvironment(),getCurrentExecutionState(),a)
-#define SetStaticConstraintChecking(a) EnvSetStaticConstraintChecking(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define GetDynamicConstraintChecking() EnvGetDynamicConstraintChecking(GetCurrentEnvironment(),GetCurrentExecutionStatus())
+#define GetStaticConstraintChecking() EnvGetStaticConstraintChecking(GetCurrentEnvironment(),GetCurrentExecutionStatus())
+#define SetDynamicConstraintChecking(a) EnvSetDynamicConstraintChecking(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define SetStaticConstraintChecking(a) EnvSetStaticConstraintChecking(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
 
    LOCALE void                           InitializeConstraints(void *,EXEC_STATUS);
    LOCALE int                            GDCCommand(void *,EXEC_STATUS);

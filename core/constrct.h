@@ -107,8 +107,8 @@ struct constructData
 #define LOCALE extern
 #endif
 
-#define RemoveClearFunction(a) EnvRemoveClearFunction(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define RemoveResetFunction(a) EnvRemoveResetFunction(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define RemoveClearFunction(a) EnvRemoveClearFunction(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define RemoveResetFunction(a) EnvRemoveResetFunction(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
 
 #if ALLOW_ENVIRONMENT_GLOBALS
    LOCALE void                           Clear(EXEC_STATUS);

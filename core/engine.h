@@ -126,21 +126,21 @@ struct engineData
 */
 #define MAX_PATTERNS_CHECKED 64
 
-#define ClearFocusStack() EnvClearFocusStack(GetCurrentEnvironment(),GetCurrentExecutionState())
-#define DefruleHasBreakpoint(a) EnvDefruleHasBreakpoint(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define Focus(a) EnvFocus(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define GetFocus() EnvGetFocus(GetCurrentEnvironment(),GetCurrentExecutionState())
-#define GetFocusChanged() EnvGetFocusChanged(GetCurrentEnvironment(),GetCurrentExecutionState())
-#define GetFocusStack(a) EnvGetFocusStack(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define GetNextFocus(a) EnvGetNextFocus(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define Halt() EnvHalt(GetCurrentEnvironment(),GetCurrentExecutionState())
-#define ListFocusStack(a) EnvListFocusStack(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define PopFocus() EnvPopFocus(GetCurrentEnvironment(),GetCurrentExecutionState())
-#define RemoveBreak(a) EnvRemoveBreak(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define RemoveRunFunction(a) EnvRemoveRunFunction(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define SetBreak(a) EnvSetBreak(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define SetFocusChanged(a) EnvSetFocusChanged(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define ShowBreaks(a,b) EnvShowBreaks(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
+#define ClearFocusStack() EnvClearFocusStack(GetCurrentEnvironment(),GetCurrentExecutionStatus())
+#define DefruleHasBreakpoint(a) EnvDefruleHasBreakpoint(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define Focus(a) EnvFocus(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define GetFocus() EnvGetFocus(GetCurrentEnvironment(),GetCurrentExecutionStatus())
+#define GetFocusChanged() EnvGetFocusChanged(GetCurrentEnvironment(),GetCurrentExecutionStatus())
+#define GetFocusStack(a) EnvGetFocusStack(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define GetNextFocus(a) EnvGetNextFocus(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define Halt() EnvHalt(GetCurrentEnvironment(),GetCurrentExecutionStatus())
+#define ListFocusStack(a) EnvListFocusStack(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define PopFocus() EnvPopFocus(GetCurrentEnvironment(),GetCurrentExecutionStatus())
+#define RemoveBreak(a) EnvRemoveBreak(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define RemoveRunFunction(a) EnvRemoveRunFunction(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define SetBreak(a) EnvSetBreak(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define SetFocusChanged(a) EnvSetFocusChanged(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define ShowBreaks(a,b) EnvShowBreaks(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b)
 
 #if ALLOW_ENVIRONMENT_GLOBALS
    LOCALE long long               Run(long long);

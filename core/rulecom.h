@@ -48,11 +48,11 @@
 #define LOCALE extern
 #endif
 
-#define Matches(a) EnvMatches(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define JoinActivity(a,b) EnvJoinActivity(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
-#define MatchesCount(a) EnvMatchesCount(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define GetBetaMemoryResizing() EnvGetBetaMemoryResizing(GetCurrentEnvironment(),GetCurrentExecutionState())
-#define SetBetaMemoryResizing(a) EnvSetBetaMemoryResizing(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define Matches(a) EnvMatches(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define JoinActivity(a,b) EnvJoinActivity(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b)
+#define MatchesCount(a) EnvMatchesCount(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define GetBetaMemoryResizing() EnvGetBetaMemoryResizing(GetCurrentEnvironment(),GetCurrentExecutionStatus())
+#define SetBetaMemoryResizing(a) EnvSetBetaMemoryResizing(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
 
    LOCALE intBool                        EnvGetBetaMemoryResizing(void *,EXEC_STATUS);
    LOCALE intBool                        EnvSetBetaMemoryResizing(void *,EXEC_STATUS,intBool);

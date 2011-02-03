@@ -168,7 +168,7 @@ globle int RemoveConstruct(
 globle int Save(
   char *fileName)  
   {
-   return EnvSave(GetCurrentEnvironment(),GetCurrentExecutionState(),fileName);
+   return EnvSave(GetCurrentEnvironment(),GetCurrentExecutionStatus(),fileName);
   }  
 #endif
 
@@ -355,7 +355,7 @@ globle void ResetCommand(
 #if ALLOW_ENVIRONMENT_GLOBALS
 globle void Reset(EXEC_STATUS)
   {
-   EnvReset(GetCurrentEnvironment(),GetCurrentExecutionState());
+   EnvReset(GetCurrentEnvironment(),GetCurrentExecutionStatus());
   }  
 #endif
 

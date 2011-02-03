@@ -38,19 +38,19 @@
 #define LOCALE extern
 #endif
 
-#define ClassAbstractP(a) EnvClassAbstractP(GetCurrentEnvironment(),getCurrentExecutionState(),a)
-#define ClassReactiveP(a) EnvClassReactiveP(GetCurrentEnvironment(),getCurrentExecutionState(),a)
-#define ClassSlots(a,b,c) EnvClassSlots(GetCurrentEnvironment(),getCurrentExecutionState(),a,b,c)
-#define ClassSubclasses(a,b,c) EnvClassSubclasses(GetCurrentEnvironment(),getCurrentExecutionState(),a,b,c)
-#define ClassSuperclasses(a,b,c) EnvClassSuperclasses(GetCurrentEnvironment(),getCurrentExecutionState(),a,b,c)
-#define SlotAllowedValues(a,b,c) EnvSlotAllowedValues(GetCurrentEnvironment(),getCurrentExecutionState(),a,b,c)
-#define SlotAllowedClasses(a,b,c) EnvSlotAllowedClasses(GetCurrentEnvironment(),getCurrentExecutionState(),a,b,c)
-#define SlotCardinality(a,b,c) EnvSlotCardinality(GetCurrentEnvironment(),getCurrentExecutionState(),a,b,c)
-#define SlotFacets(a,b,c) EnvSlotFacets(GetCurrentEnvironment(),getCurrentExecutionState(),a,b,c)
-#define SlotRange(a,b,c) EnvSlotRange(GetCurrentEnvironment(),getCurrentExecutionState(),a,b,c)
-#define SlotSources(a,b,c) EnvSlotSources(GetCurrentEnvironment(),getCurrentExecutionState(),a,b,c)
-#define SlotTypes(a,b,c) EnvSlotTypes(GetCurrentEnvironment(),getCurrentExecutionState(),a,b,c)
-#define GetDefmessageHandlerList(a,b,c) EnvGetDefmessageHandlerList(GetCurrentEnvironment(),getCurrentExecutionState(),a,b,c)
+#define ClassAbstractP(a) EnvClassAbstractP(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define ClassReactiveP(a) EnvClassReactiveP(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define ClassSlots(a,b,c) EnvClassSlots(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b,c)
+#define ClassSubclasses(a,b,c) EnvClassSubclasses(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b,c)
+#define ClassSuperclasses(a,b,c) EnvClassSuperclasses(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b,c)
+#define SlotAllowedValues(a,b,c) EnvSlotAllowedValues(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b,c)
+#define SlotAllowedClasses(a,b,c) EnvSlotAllowedClasses(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b,c)
+#define SlotCardinality(a,b,c) EnvSlotCardinality(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b,c)
+#define SlotFacets(a,b,c) EnvSlotFacets(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b,c)
+#define SlotRange(a,b,c) EnvSlotRange(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b,c)
+#define SlotSources(a,b,c) EnvSlotSources(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b,c)
+#define SlotTypes(a,b,c) EnvSlotTypes(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b,c)
+#define GetDefmessageHandlerList(a,b,c) EnvGetDefmessageHandlerList(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b,c)
 
 LOCALE intBool ClassAbstractPCommand(void *,EXEC_STATUS);
 #if DEFRULE_CONSTRUCT

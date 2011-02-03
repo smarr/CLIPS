@@ -82,9 +82,9 @@ struct utilityData
 #define LOCALE extern
 #endif
 
-#define DecrementGCLocks() EnvDecrementGCLocks(GetCurrentEnvironment(),getCurrentExecutionState())
-#define IncrementGCLocks() EnvIncrementGCLocks(GetCurrentEnvironment(),getCurrentExecutionState())
-#define RemovePeriodicFunction(a) EnvRemovePeriodicFunction(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define DecrementGCLocks() EnvDecrementGCLocks(GetCurrentEnvironment(),GetCurrentExecutionStatus())
+#define IncrementGCLocks() EnvIncrementGCLocks(GetCurrentEnvironment(),GetCurrentExecutionStatus())
+#define RemovePeriodicFunction(a) EnvRemovePeriodicFunction(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
 
    LOCALE void                           InitializeUtilityData(void *,EXEC_STATUS);
    LOCALE void                           PeriodicCleanup(void *, EXEC_STATUS, intBool,intBool);

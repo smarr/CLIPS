@@ -70,7 +70,7 @@ struct bloadData
 
 #define FunctionPointer(i) ((struct FunctionDefinition *) (((i) == -1L) ? NULL : BloadData(theEnv,execStatus)->FunctionArray[i]))
 
-#define Bload(a) EnvBload(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define Bload(a) EnvBload(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
 
    LOCALE void                    InitializeBloadData(void *,EXEC_STATUS);
    LOCALE int                     BloadCommand(void *,EXEC_STATUS);

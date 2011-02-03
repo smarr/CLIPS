@@ -961,7 +961,7 @@ static void InitializeNonportableFeatures(
   void *theEnv)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv,execStatus)
+#pragma unused(theEnv)
 #endif
 #if ! WINDOW_INTERFACE
 
@@ -1013,8 +1013,8 @@ static void CatchCtrlC(
   int sgnl)
   {
 #if ALLOW_ENVIRONMENT_GLOBALS
-   SetHaltExecution(GetCurrentEnvironment(),GetCurrentExecutionState(),TRUE);
-   CloseAllBatchSources(GetCurrentEnvironment(),GetCurrentExecutionState());
+   SetHaltExecution(GetCurrentEnvironment(),GetCurrentExecutionStatus(),TRUE);
+   CloseAllBatchSources(GetCurrentEnvironment(),GetCurrentExecutionStatus());
 #endif
    signal(SIGINT,CatchCtrlC);
   }
@@ -1029,8 +1029,8 @@ static void CatchCtrlC(
 static void interrupt CatchCtrlC()
   {
 #if ALLOW_ENVIRONMENT_GLOBALS
-   SetHaltExecution(GetCurrentEnvironment(),GetCurrentExecutionState(),TRUE);
-   CloseAllBatchSources(GetCurrentEnvironment(),GetCurrentExecutionState());
+   SetHaltExecution(GetCurrentEnvironment(),GetCurrentExecutionStatus(),TRUE);
+   CloseAllBatchSources(GetCurrentEnvironment(),GetCurrentExecutionStatus());
 #endif
   }
 */

@@ -58,8 +58,8 @@
 #define LOCALE extern
 #endif
 
-#define GetStrategy() EnvGetStrategy(GetCurrentEnvironment(),getCurrentExecutionState())
-#define SetStrategy(a) EnvSetStrategy(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define GetStrategy() EnvGetStrategy(GetCurrentEnvironment(),GetCurrentExecutionStatus())
+#define SetStrategy(a) EnvSetStrategy(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
 
    LOCALE void                           PlaceActivation(void *,EXEC_STATUS,ACTIVATION **,ACTIVATION *,struct salienceGroup *);
    LOCALE int                            EnvSetStrategy(void *,EXEC_STATUS,int);

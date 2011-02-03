@@ -42,17 +42,17 @@
 #define LOCALE extern
 #endif
 
-#define BrowseClasses(a,b) EnvBrowseClasses(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
-#define DescribeClass(a,b) EnvDescribeClass(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
-#define SlotDirectAccessP(a,b) EnvSlotDirectAccessP(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
-#define SlotExistP(a,b,c) EnvSlotExistP(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b,c)
-#define SlotInitableP(a,b) EnvSlotInitableP(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
-#define SlotPublicP(a,b) EnvSlotPublicP(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
-#define SlotDefaultP(a,b) EnvSlotDefaultP(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
-#define SlotWritableP(a,b) EnvSlotWritableP(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
-#define SubclassP(a,b) EnvSubclassP(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
-#define SuperclassP(a,b) EnvSuperclassP(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
-#define SlotDefaultValue(a,b,c) EnvSlotDefaultValue(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b,c)
+#define BrowseClasses(a,b) EnvBrowseClasses(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b)
+#define DescribeClass(a,b) EnvDescribeClass(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b)
+#define SlotDirectAccessP(a,b) EnvSlotDirectAccessP(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b)
+#define SlotExistP(a,b,c) EnvSlotExistP(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b,c)
+#define SlotInitableP(a,b) EnvSlotInitableP(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b)
+#define SlotPublicP(a,b) EnvSlotPublicP(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b)
+#define SlotDefaultP(a,b) EnvSlotDefaultP(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b)
+#define SlotWritableP(a,b) EnvSlotWritableP(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b)
+#define SubclassP(a,b) EnvSubclassP(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b)
+#define SuperclassP(a,b) EnvSuperclassP(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b)
+#define SlotDefaultValue(a,b,c) EnvSlotDefaultValue(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b,c)
 
 #if DEBUGGING_FUNCTIONS
 LOCALE void BrowseClassesCommand(void *, EXEC_STATUS);

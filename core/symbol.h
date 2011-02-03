@@ -246,11 +246,11 @@ struct symbolData
 #define EnvFalseSymbol(theEnv,execStatus) SymbolData(theEnv,execStatus)->FalseSymbolHN
 #define EnvTrueSymbol(theEnv,execStatus) SymbolData(theEnv,execStatus)->TrueSymbolHN
 
-#define FalseSymbol() SymbolData(GetCurrentEnvironment(),GetCurrentExecutionState())->FalseSymbolHN
-#define TrueSymbol() SymbolData(GetCurrentEnvironment(),GetCurrentExecutionState())->TrueSymbolHN
-#define AddSymbol(a) EnvAddSymbol(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define AddLong(a) EnvAddLong(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define AddDouble(a) EnvAddDouble(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define FalseSymbol() SymbolData(GetCurrentEnvironment(),GetCurrentExecutionStatus())->FalseSymbolHN
+#define TrueSymbol() SymbolData(GetCurrentEnvironment(),GetCurrentExecutionStatus())->TrueSymbolHN
+#define AddSymbol(a) EnvAddSymbol(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define AddLong(a) EnvAddLong(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define AddDouble(a) EnvAddDouble(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
 
 # include "execution_status.h"
 

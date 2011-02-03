@@ -168,7 +168,7 @@ globle intBool EnvWatch(
 globle intBool Watch(
   char *itemName)
   {
-   return(EnvWatch(GetCurrentEnvironment(),getCurrentExecutionState(),itemName));
+   return(EnvWatch(GetCurrentEnvironment(),GetCurrentExecutionStatus(),itemName));
   }
 #endif
 

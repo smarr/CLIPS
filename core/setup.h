@@ -512,16 +512,16 @@
 /* Compatibilty Redefinitions */
 /******************************/
 
-#define PrintCLIPS(x,y) EnvPrintRouter(GetCurrentEnvironment(),getCurrentExecutionState(),x,y)
-#define GetcCLIPS(x,y) EnvGetcRouter(GetCurrentEnvironment(),getCurrentExecutionState(),x)
-#define UngetcCLIPS(x,y) EnvUngetcRouter(GetCurrentEnvironment(),getCurrentExecutionState(),x,y)
-#define ExitCLIPS(x) EnvExitRouter(GetCurrentEnvironment(),getCurrentExecutionState(),x)
+#define PrintCLIPS(x,y) EnvPrintRouter(GetCurrentEnvironment(),GetCurrentExecutionStatus(),x,y)
+#define GetcCLIPS(x,y) EnvGetcRouter(GetCurrentEnvironment(),GetCurrentExecutionStatus(),x)
+#define UngetcCLIPS(x,y) EnvUngetcRouter(GetCurrentEnvironment(),GetCurrentExecutionStatus(),x,y)
+#define ExitCLIPS(x) EnvExitRouter(GetCurrentEnvironment(),GetCurrentExecutionStatus(),x)
 #define CLIPSSystemError(x,y) SystemError(x,y)
 #define CLIPSFunctionCall(x,y,z) FunctionCall(x,y,z)
 #define InitializeCLIPS() InitializeEnvironment()
 #define WCLIPS WPROMPT
-#define CLIPSTrueSymbol EnvTrueSymbol(GetCurrentEnvironment(),getCurrentExecutionState())
-#define CLIPSFalseSymbol EnvFalseSymbol(GetCurrentEnvironment(),getCurrentExecutionState())
+#define CLIPSTrueSymbol EnvTrueSymbol(GetCurrentEnvironment(),GetCurrentExecutionStatus())
+#define CLIPSFalseSymbol EnvFalseSymbol(GetCurrentEnvironment(),GetCurrentExecutionStatus())
 #define EnvCLIPSTrueSymbol(theEnv,execStatus) EnvTrueSymbol(theEnv,execStatus)
 #define EnvCLIPSFalseSymbol(theEnv,execStatus) EnvFalseSymbol(theEnv,execStatus)
 #define CLIPS_FALSE 0

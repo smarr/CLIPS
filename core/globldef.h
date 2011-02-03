@@ -95,16 +95,16 @@ struct defglobalModule
 #endif
 
 #define DefglobalModule(x) GetConstructModuleName((struct constructHeader *) x)
-#define FindDefglobal(a) EnvFindDefglobal(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define FindDefglobal(a) EnvFindDefglobal(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
 #define GetDefglobalName(x) GetConstructNameString((struct constructHeader *) x)
-#define GetDefglobalPPForm(x) GetConstructPPForm(GetCurrentEnvironment(),GetCurrentExecutionState(),(struct constructHeader *) x)
-#define GetDefglobalValue(a,b) EnvGetDefglobalValue(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
-#define GetDefglobalValueForm(a,b,c) EnvGetDefglobalValueForm(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b,c)
-#define GetGlobalsChanged() EnvGetGlobalsChanged(GetCurrentEnvironment(),GetCurrentExecutionState())
-#define GetNextDefglobal(a) EnvGetNextDefglobal(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define IsDefglobalDeletable(a) EnvIsDefglobalDeletable(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
-#define SetDefglobalValue(a,b) EnvSetDefglobalValue(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
-#define SetGlobalsChanged(a) EnvSetGlobalsChanged(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define GetDefglobalPPForm(x) GetConstructPPForm(GetCurrentEnvironment(),GetCurrentExecutionStatus(),(struct constructHeader *) x)
+#define GetDefglobalValue(a,b) EnvGetDefglobalValue(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b)
+#define GetDefglobalValueForm(a,b,c) EnvGetDefglobalValueForm(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b,c)
+#define GetGlobalsChanged() EnvGetGlobalsChanged(GetCurrentEnvironment(),GetCurrentExecutionStatus())
+#define GetNextDefglobal(a) EnvGetNextDefglobal(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define IsDefglobalDeletable(a) EnvIsDefglobalDeletable(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
+#define SetDefglobalValue(a,b) EnvSetDefglobalValue(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a,b)
+#define SetGlobalsChanged(a) EnvSetGlobalsChanged(GetCurrentEnvironment(),GetCurrentExecutionStatus(),a)
 
    LOCALE void                           InitializeDefglobals(void *,EXEC_STATUS);
    LOCALE void                          *EnvFindDefglobal(void *,EXEC_STATUS,char *);
