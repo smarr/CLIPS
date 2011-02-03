@@ -466,7 +466,7 @@ globle intBool AddResetFunction(
   int priority)
   {
    void *theEnv = GetCurrentEnvironment();
-   EXEC_STATUS  = GetCurrentExectionStatus();
+   EXEC_STATUS  = GetCurrentExecutionStatus();
    
    ConstructData(theEnv,execStatus)->ListOfResetFunctions = 
       AddFunctionToCallList(theEnv,execStatus,name,priority,(void (*)(void *,EXEC_STATUS)) functionPtr,
@@ -682,7 +682,7 @@ globle intBool AddClearFunction(
   int priority)
   {
    void *theEnv = GetCurrentEnvironment();
-   EXEC_STATUS = GetCurrentExectionStatus();
+   EXEC_STATUS = GetCurrentExecutionStatus();
    
    ConstructData(theEnv,execStatus)->ListOfClearFunctions =
       AddFunctionToCallList(theEnv,execStatus,name,priority,

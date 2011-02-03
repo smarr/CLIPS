@@ -190,7 +190,7 @@ globle intBool EnvUnwatch(
 globle intBool Unwatch(
   char *itemName)
   {
-   return(EnvUnwatch(GetCurrentEnvironment(),GetCurrentExectionStatus(),itemName));
+   return(EnvUnwatch(GetCurrentEnvironment(),GetCurrentExecutionStatus(),itemName));
   }
 #endif
 

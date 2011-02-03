@@ -169,7 +169,8 @@ globle intBool DeallocateEnvironmentData()
         {
          nextEnvironment = theEnvironment->next;
          
-         if (! DestroyEnvironment(theEnvironment,execStatus))
+	     #warning Lode: Stefan wanted me to add this warning - passing NULL pointer!
+         if (! DestroyEnvironment(theEnvironment,NULL))
            { rv = FALSE; }
          
          theEnvironment = nextEnvironment;
@@ -300,6 +301,14 @@ globle void *CreateEnvironment()
    return CreateEnvironmentDriver(NULL,NULL,NULL,NULL,NULL);
   }
 
+/*********************************************************************/
+/* CreateExecutionStatus: Creates an execution status data structure */
+/*   and initializes its content to zero/null.                       */
+/*********************************************************************/
+globle struct executionStatus *CreateExecutionStatus()
+{
+	return (struct executionStatus *)malloc(sizeof(struct executionStatus));
+}
 /**********************************************************/
 /* CreateRuntimeEnvironment: Creates an environment data  */
 /*   structure and initializes its content to zero/null.  */
@@ -484,7 +493,7 @@ globle void *GetCurrentEnvironment()
    return(CurrentEnvironment);
   }  
 
-globle struct executionStatus *GetCurrentExectionStatus() 
+globle struct executionStatus *GetCurrentExecutionStatus() 
   {
    return(CurrentExecutionStatus);
   }

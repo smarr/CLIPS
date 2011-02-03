@@ -963,7 +963,7 @@ globle int BuildFunction(
 globle int Build(
   char *theString)
   {
-   return EnvBuild(GetCurrentEnvironment(),getCurrentExecutionState(),theString);
+   return EnvBuild(GetCurrentEnvironment(),GetCurrentExecutionState(),theString);
   }
 #endif
   

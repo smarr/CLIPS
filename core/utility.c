@@ -286,7 +286,7 @@ globle intBool AddPeriodicFunction(
   int priority)
   {
    void *theEnv = GetCurrentEnvironment();
-   EXEC_STATUS  = GetCurrentExectionStatus();
+   EXEC_STATUS  = GetCurrentExecutionStatus();
    
    UtilityData(theEnv,execStatus)->ListOfPeriodicFunctions =
      AddFunctionToCallList(theEnv,execStatus,name,priority,

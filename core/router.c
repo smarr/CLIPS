@@ -407,7 +407,7 @@ globle intBool AddRouter(
   {
    struct router *newPtr, *lastPtr, *currentPtr;
    void *theEnv = GetCurrentEnvironment();
-   EXEC_STATUS = GetCurrentExectionStatus();
+   EXEC_STATUS = GetCurrentExecutionStatus();
    char *nameCopy;
 
    newPtr = get_struct(theEnv,execStatus,router);
