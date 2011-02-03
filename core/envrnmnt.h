@@ -104,6 +104,7 @@ typedef struct environmentData * ENVIRONMENT_DATA_PTR;
    LOCALE unsigned long                  GetEnvironmentIndex(void *,EXEC_STATUS);
 #endif
    LOCALE void                          *CreateEnvironment(EXEC_STATUS);
+   LOCALE struct executionStatus        *CreateExecutionStatus(void);
    LOCALE void                          *CreateRuntimeEnvironment(EXEC_STATUS,struct symbolHashNode **,struct floatHashNode **,
                                                                   struct integerHashNode **,struct bitMapHashNode **);
    LOCALE intBool                        DestroyEnvironment(void *,EXEC_STATUS);
