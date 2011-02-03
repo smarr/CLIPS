@@ -65,7 +65,7 @@
    static void                    InitializeEnvironmentHashTable(void);
 #endif
    static void                    RemoveEnvironmentCleanupFunctions(struct environmentData *, EXEC_STATUS);
-   static void                   *CreateEnvironmentDriver(struct symbolHashNode **,struct floatHashNode **,
+   static void                   *CreateEnvironmentDriver(EXEC_STATUS,struct symbolHashNode **,struct floatHashNode **,
                                                           struct integerHashNode **,struct bitMapHashNode **,
                                                           struct externalAddressHashNode **);
 
@@ -296,9 +296,9 @@ static struct environmentData *FindEnvironment(
 /* CreateEnvironment: Creates an environment data structure */
 /*   and initializes its content to zero/null.              */
 /************************************************************/
-globle void *CreateEnvironment()
+globle void *CreateEnvironment(EXEC_STATUS)
   {
-   return CreateEnvironmentDriver(NULL,NULL,NULL,NULL,NULL);
+   return CreateEnvironmentDriver(execStatus,NULL,NULL,NULL,NULL,NULL);
   }
 
 /*********************************************************************/
@@ -314,12 +314,13 @@ globle struct executionStatus *CreateExecutionStatus()
 /*   structure and initializes its content to zero/null.  */
 /**********************************************************/
 globle void *CreateRuntimeEnvironment(
+  EXEC_STATUS,
   struct symbolHashNode **symbolTable,
   struct floatHashNode **floatTable,
   struct integerHashNode **integerTable,
   struct bitMapHashNode **bitmapTable)
   {
-   return CreateEnvironmentDriver(symbolTable,floatTable,integerTable,bitmapTable,NULL);
+   return CreateEnvironmentDriver(execStatus,symbolTable,floatTable,integerTable,bitmapTable,NULL);
   }
   
 /*********************************************************/
@@ -327,6 +328,7 @@ globle void *CreateRuntimeEnvironment(
 /*   structure and initializes its content to zero/null. */
 /*********************************************************/
 globle void *CreateEnvironmentDriver(
+  EXEC_STATUS,
   struct symbolHashNode **symbolTable,
   struct floatHashNode **floatTable,
   struct integerHashNode **integerTable,
@@ -334,7 +336,7 @@ globle void *CreateEnvironmentDriver(
   struct externalAddressHashNode **externalAddressTable)
   {
    struct environmentData *theEnvironment;
-	 // Lode: TODO add EXEC_STATUS?
+	  
    void *theData;
    
    theEnvironment = (struct environmentData *) malloc(sizeof(struct environmentData));
@@ -428,9 +430,6 @@ globle void *CreateEnvironmentDriver(
    AddHashedEnvironment(theEnvironment);
    CurrentEnvironment = theEnvironment;
 #endif
-    
-   // STEFAN: TODO init execStatus
-   EXEC_STATUS;
 
    EnvInitializeEnvironment(theEnvironment,execStatus,symbolTable,floatTable,integerTable,bitmapTable,externalAddressTable);
 

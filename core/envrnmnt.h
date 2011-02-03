@@ -103,8 +103,8 @@ typedef struct environmentData * ENVIRONMENT_DATA_PTR;
    LOCALE struct executionStatus        *GetCurrentExecutionStatus(void);
    LOCALE unsigned long                  GetEnvironmentIndex(void *,EXEC_STATUS);
 #endif
-   LOCALE void                          *CreateEnvironment(void);
-   LOCALE void                          *CreateRuntimeEnvironment(struct symbolHashNode **,struct floatHashNode **,
+   LOCALE void                          *CreateEnvironment(EXEC_STATUS);
+   LOCALE void                          *CreateRuntimeEnvironment(EXEC_STATUS,struct symbolHashNode **,struct floatHashNode **,
                                                                   struct integerHashNode **,struct bitMapHashNode **);
    LOCALE intBool                        DestroyEnvironment(void *,EXEC_STATUS);
    LOCALE intBool                        AddEnvironmentCleanupFunction(void *,EXEC_STATUS,char *,void (*)(void *,EXEC_STATUS),int);

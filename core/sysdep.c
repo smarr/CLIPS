@@ -268,10 +268,10 @@ static void InitializeSystemDependentData(
 /*   of the KB environment.                       */
 /**************************************************/
 #if ALLOW_ENVIRONMENT_GLOBALS
-globle void InitializeEnvironment()
+globle void InitializeEnvironment(EXEC_STATUS)
    {
     if (GetCurrentEnvironment() == NULL)
-      { CreateEnvironment(); }
+      { CreateEnvironment(execStatus); }
    }
 #endif
 

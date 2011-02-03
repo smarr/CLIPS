@@ -56,9 +56,9 @@ void EnvUserFunctions(void *,EXEC_STATUS);
 int main(
   int argc,
   char *argv[])
-  {
-   void *theEnv = CreateEnvironment();
+ {
    EXEC_STATUS  = CreateExecutionStatus();
+   void *theEnv = CreateEnvironment(execStatus);
     
    RerouteStdin(theEnv,execStatus,argc,argv);
    CommandLoop(theEnv,execStatus);

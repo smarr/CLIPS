@@ -55,7 +55,7 @@
 #define LOCALE extern
 #endif
 
-   LOCALE void                        InitializeEnvironment(void);
+   LOCALE void                        InitializeEnvironment(EXEC_STATUS);
    LOCALE void                        EnvInitializeEnvironment(void *,EXEC_STATUS,struct symbolHashNode **,struct floatHashNode **,
 															   struct integerHashNode **,struct bitMapHashNode **,
 															   struct externalAddressHashNode **);
