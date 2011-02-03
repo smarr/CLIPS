@@ -83,7 +83,7 @@
    LOCALE int                         genremove(char *);
    LOCALE int                         genrename(char *,char *);
    LOCALE char                       *gengetcwd(char *,int);
-   LOCALE void                        GenWrite(void *,EXEC_STATUS,size_t,FILE *);
+   LOCALE void                        GenWrite(void *,size_t,FILE *);
    LOCALE int                       (*EnvSetBeforeOpenFunction(void *,EXEC_STATUS,int (*)(void *)))(void *);
    LOCALE int                       (*EnvSetAfterOpenFunction(void *,EXEC_STATUS,int (*)(void *)))(void *);
    LOCALE int                         gensprintf(char *,const char *,...);

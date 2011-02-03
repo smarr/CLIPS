@@ -140,7 +140,7 @@ globle void SortFunction(
    /* The function expects at least one argument. */
    /*=============================================*/
 
-   if ((argumentCount = EnvArgCountCheck(theEnv,execStatus,execStatus,"sort",AT_LEAST,1)) == -1)
+   if ((argumentCount = EnvArgCountCheck(theEnv,execStatus,"sort",AT_LEAST,1)) == -1)
      { return; }
 
    /*=============================================*/

@@ -41,9 +41,9 @@ struct commandLineData
    size_t MaximumCharacters;
    int ParsingTopLevelCommand;
    char *BannerString;
-   int (*EventFunction)(void *);
-   int (*AfterPromptFunction)(void *);
-   int (*BeforeCommandExecutionFunction)(void *);
+   int (*EventFunction)(void *, EXEC_STATUS);
+   int (*AfterPromptFunction)(void *, EXEC_STATUS);
+   int (*BeforeCommandExecutionFunction)(void *, EXEC_STATUS);
 #endif
   };
 

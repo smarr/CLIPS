@@ -49,14 +49,14 @@
 #define LOCALE extern
 #endif
 
-#define RtnArgCount() EnvRtnArgCount(GetCurrentEnvironment())
-#define ArgCountCheck(a,b,c) EnvArgCountCheck(GetCurrentEnvironment(),a,b,c)
-#define ArgRangeCheck(a,b,c) EnvArgRangeCheck(GetCurrentEnvironment(),a,b,c)
-#define RtnLexeme(a) EnvRtnLexeme(GetCurrentEnvironment(),a)
-#define RtnDouble(a) EnvRtnDouble(GetCurrentEnvironment(),a)
-#define RtnLong(a) EnvRtnLong(GetCurrentEnvironment(),a)
-#define RtnUnknown(a,b) EnvRtnUnknown(GetCurrentEnvironment(),a,b)
-#define ArgTypeCheck(a,b,c,d) EnvArgTypeCheck(GetCurrentEnvironment(),a,b,c,d)
+#define RtnArgCount() EnvRtnArgCount(GetCurrentEnvironment(),getCurrentExecutionState())
+#define ArgCountCheck(a,b,c) EnvArgCountCheck(GetCurrentEnvironment(),getCurrentExecutionState(),a,b,c)
+#define ArgRangeCheck(a,b,c) EnvArgRangeCheck(GetCurrentEnvironment(),getCurrentExecutionState(),a,b,c)
+#define RtnLexeme(a) EnvRtnLexeme(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define RtnDouble(a) EnvRtnDouble(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define RtnLong(a) EnvRtnLong(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define RtnUnknown(a,b) EnvRtnUnknown(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
+#define ArgTypeCheck(a,b,c,d) EnvArgTypeCheck(GetCurrentEnvironment(),getCurrentExecutionState(),a,b,c,d)
 
    LOCALE int                            EnvRtnArgCount(void *,EXEC_STATUS);
    LOCALE int                            EnvArgCountCheck(void *,EXEC_STATUS,char *,int,int);

@@ -61,7 +61,8 @@
 /************************************************/
 #if ALLOW_ENVIRONMENT_GLOBALS
 globle int Load(
-  char *fileName,EXEC_STATUS)
+  char *fileName,
+  EXEC_STATUS)
   {
    return EnvLoad(GetCurrentEnvironment(),execStatus,fileName);
   }

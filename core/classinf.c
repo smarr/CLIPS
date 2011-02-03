@@ -70,7 +70,7 @@
 
 static void SlotInfoSupportFunction(void *,EXEC_STATUS,DATA_OBJECT *,char *,void (*)(void *,EXEC_STATUS,void *,char *,DATA_OBJECT *));
 static unsigned CountSubclasses(DEFCLASS *,int,int);
-static unsigned StoreSubclasses(void *,EXEC_STATUS,unsigned,DEFCLASS *,int,int,short);
+static unsigned StoreSubclasses(void *,unsigned,DEFCLASS *,int,int,short);
 static SLOT_DESC *SlotInfoSlot(void *,EXEC_STATUS,DATA_OBJECT *,DEFCLASS *,char *,char *);
 
 /*********************************************************************
@@ -152,7 +152,7 @@ globle void *ClassInfoFnxArgs(
    DATA_OBJECT tmp;
 
    *inhp = 0;
-   if (EnvRtnArgCount(theEnv,execStatus,execStatus) == 0)
+   if (EnvRtnArgCount(theEnv,execStatus) == 0)
      {
       ExpectedCountError(theEnv,execStatus,fnx,AT_LEAST,1);
       SetEvaluationError(theEnv,execStatus,TRUE);
@@ -166,7 +166,7 @@ globle void *ClassInfoFnxArgs(
       ClassExistError(theEnv,execStatus,fnx,ValueToString(tmp.value));
       return(NULL);
      }
-   if (EnvRtnArgCount(theEnv,execStatus,execStatus) == 2)
+   if (EnvRtnArgCount(theEnv,execStatus) == 2)
      {
       if (EnvArgTypeCheck(theEnv,execStatus,fnx,2,SYMBOL,&tmp) == FALSE)
         return(NULL);
@@ -277,7 +277,7 @@ globle void GetDefmessageHandlersListCmd(
    int inhp;
    void *clsptr;
    
-   if (EnvRtnArgCount(theEnv,execStatus,execStatus) == 0)
+   if (EnvRtnArgCount(theEnv,execStatus) == 0)
       EnvGetDefmessageHandlerList(theEnv,execStatus,NULL,result,0);
    else
      {

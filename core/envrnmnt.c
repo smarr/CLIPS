@@ -59,12 +59,12 @@
 /***************************************/
 
 #if ALLOW_ENVIRONMENT_GLOBALS
-   static void                    AddHashedEnvironment(struct environmentData *);
+   static void                    AddHashedEnvironment(struct environmentData *, EXEC_STATUS);
    static struct environmentData *FindEnvironment(unsigned long);
-   static intBool                 RemoveHashedEnvironment(struct environmentData *);
+   static intBool                 RemoveHashedEnvironment(struct environmentData *, EXEC_STATUS);
    static void                    InitializeEnvironmentHashTable(void);
 #endif
-   static void                    RemoveEnvironmentCleanupFunctions(struct environmentData *);
+   static void                    RemoveEnvironmentCleanupFunctions(struct environmentData *, EXEC_STATUS);
    static void                   *CreateEnvironmentDriver(struct symbolHashNode **,struct floatHashNode **,
                                                           struct integerHashNode **,struct bitMapHashNode **,
                                                           struct externalAddressHashNode **);
@@ -168,7 +168,7 @@ globle intBool DeallocateEnvironmentData()
         {
          nextEnvironment = theEnvironment->next;
          
-         if (! DestroyEnvironment(theEnvironment))
+         if (! DestroyEnvironment(theEnvironment,execStatus))
            { rv = FALSE; }
          
          theEnvironment = nextEnvironment;
@@ -416,7 +416,7 @@ globle void *CreateEnvironmentDriver(
    theEnvironment->cleanupFunctions = (void (**)(void *))theData;
 
 #if ALLOW_ENVIRONMENT_GLOBALS
-   AddHashedEnvironment(theEnvironment);
+   AddHashedEnvironment(theEnvironment,execStatus); // Lode: TODO REF!
    CurrentEnvironment = theEnvironment;
 #endif
 
@@ -639,7 +639,7 @@ globle intBool DestroyEnvironment(
      { return(FALSE); }
 #endif
 */
-   theMemData = MemoryData(theEnvironment);
+   theMemData = MemoryData(theEnvironment,execStatus);
 
    EnvReleaseMem(theEnvironment,execStatus,-1,FALSE);
 

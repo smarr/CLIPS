@@ -949,7 +949,7 @@ globle void ListDefmethodsCommand(
    DATA_OBJECT temp;
    DEFGENERIC *gfunc;
    
-   if (EnvRtnArgCount(theEnv,execStatus,execStatus) == 0)
+   if (EnvRtnArgCount(theEnv,execStatus) == 0)
      EnvListDefmethods(theEnv,execStatus,WDISPLAY,NULL);
    else
      {
@@ -1117,7 +1117,7 @@ globle void GetDefmethodListCommand(
    DATA_OBJECT temp;
    DEFGENERIC *gfunc;
    
-   if (EnvRtnArgCount(theEnv,execStatus,execStatus) == 0)
+   if (EnvRtnArgCount(theEnv,execStatus) == 0)
      EnvGetDefmethodList(theEnv,execStatus,NULL,returnValue);
    else
      {

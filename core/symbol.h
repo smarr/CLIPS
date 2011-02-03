@@ -246,11 +246,11 @@ struct symbolData
 #define EnvFalseSymbol(theEnv,execStatus) SymbolData(theEnv,execStatus)->FalseSymbolHN
 #define EnvTrueSymbol(theEnv,execStatus) SymbolData(theEnv,execStatus)->TrueSymbolHN
 
-#define FalseSymbol() SymbolData(GetCurrentEnvironment())->FalseSymbolHN
-#define TrueSymbol() SymbolData(GetCurrentEnvironment())->TrueSymbolHN
-#define AddSymbol(a) EnvAddSymbol(GetCurrentEnvironment(),a)
-#define AddLong(a) EnvAddLong(GetCurrentEnvironment(),a)
-#define AddDouble(a) EnvAddDouble(GetCurrentEnvironment(),a)
+#define FalseSymbol() SymbolData(GetCurrentEnvironment(),getCurrentExecutionState())->FalseSymbolHN
+#define TrueSymbol() SymbolData(GetCurrentEnvironment(),getCurrentExecutionState())->TrueSymbolHN
+#define AddSymbol(a) EnvAddSymbol(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define AddLong(a) EnvAddLong(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define AddDouble(a) EnvAddDouble(GetCurrentEnvironment(),getCurrentExecutionState(),a)
 
    LOCALE void                           InitializeAtomTables(void *,EXEC_STATUS,struct symbolHashNode **,struct floatHashNode **,
                                                               struct integerHashNode **,struct bitMapHashNode **,
@@ -266,7 +266,7 @@ struct symbolData
    LOCALE unsigned long                  HashFloat(double,unsigned long);
    LOCALE unsigned long                  HashInteger(long long,unsigned long);
    LOCALE unsigned long                  HashBitMap(char *,unsigned long,unsigned);
-   LOCALE unsigned long                  HashExternalAddress(void *,EXEC_STATUS,unsigned long);
+   LOCALE unsigned long                  HashExternalAddress(void *,unsigned long);
    LOCALE void                           DecrementSymbolCount(void *,EXEC_STATUS,struct symbolHashNode *);
    LOCALE void                           DecrementFloatCount(void *,EXEC_STATUS,struct floatHashNode *);
    LOCALE void                           DecrementIntegerCount(void *,EXEC_STATUS,struct integerHashNode *);
@@ -288,7 +288,7 @@ struct symbolData
    LOCALE struct symbolMatch            *FindSymbolMatches(void *,EXEC_STATUS,char *,unsigned *,size_t *);
    LOCALE void                           ReturnSymbolMatches(void *,EXEC_STATUS,struct symbolMatch *);
    LOCALE SYMBOL_HN                     *GetNextSymbolMatch(void *,EXEC_STATUS,char *,size_t,SYMBOL_HN *,int,size_t *);
-   LOCALE void                           ClearBitString(void *,EXEC_STATUS,unsigned);
+   LOCALE void                           ClearBitString(void *,unsigned);
    LOCALE void                           SetAtomicValueIndices(void *,EXEC_STATUS,int);
    LOCALE void                           RestoreAtomicValueBuckets(void *,EXEC_STATUS);
 

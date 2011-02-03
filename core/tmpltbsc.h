@@ -43,11 +43,11 @@
 #define LOCALE extern
 #endif
 
-#define GetDeftemplateList(a,b) EnvGetDeftemplateList(GetCurrentEnvironment(),a,b)
-#define ListDeftemplates(a,b) EnvListDeftemplates(GetCurrentEnvironment(),a,b)
-#define Undeftemplate(a) EnvUndeftemplate(GetCurrentEnvironment(),a)
-#define GetDeftemplateWatch(a) EnvGetDeftemplateWatch(GetCurrentEnvironment(),a)
-#define SetDeftemplateWatch(a,b) EnvSetDeftemplateWatch(GetCurrentEnvironment(),a,b)
+#define GetDeftemplateList(a,b) EnvGetDeftemplateList(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
+#define ListDeftemplates(a,b) EnvListDeftemplates(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
+#define Undeftemplate(a) EnvUndeftemplate(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define GetDeftemplateWatch(a) EnvGetDeftemplateWatch(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define SetDeftemplateWatch(a,b) EnvSetDeftemplateWatch(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
 
    LOCALE void                           DeftemplateBasicCommands(void *,EXEC_STATUS);
    LOCALE void                           UndeftemplateCommand(void *,EXEC_STATUS);

@@ -1220,7 +1220,7 @@ globle void HelpPathFunction(
    char *help_name;
    DATA_OBJECT arg_ptr;
 
-   if (EnvRtnArgCount(theEnv,execStatus,execStatus) == 0)
+   if (EnvRtnArgCount(theEnv,execStatus) == 0)
      {
       EnvPrintRouter(theEnv,execStatus,WDIALOG,"The current help entries file is ");
       if (TextProcessingData(theEnv,execStatus)->help_file != NULL)
@@ -1560,7 +1560,7 @@ static struct topics *GetCommandLineTopics(
    DATA_OBJECT val;       /*Unknown-type H/L data structure        */
 
    head = NULL;
-   topic_num = EnvRtnArgCount(theEnv,execStatus,execStatus);
+   topic_num = EnvRtnArgCount(theEnv,execStatus);
    for (theIndex = 1; theIndex <= topic_num; theIndex++)
      {
       tnode = (struct topics *) gm2(theEnv,execStatus,(int) sizeof(struct topics));

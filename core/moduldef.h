@@ -199,12 +199,12 @@ struct defmoduleData
 #define LOCALE extern
 #endif
 
-#define FindDefmodule(a) EnvFindDefmodule(GetCurrentEnvironment(),a)
-#define GetCurrentModule() EnvGetCurrentModule(GetCurrentEnvironment())
-#define GetDefmoduleName(a) EnvGetDefmoduleName(GetCurrentEnvironment(),a)
-#define GetDefmodulePPForm(a) EnvGetDefmodulePPForm(GetCurrentEnvironment(),a)
-#define GetNextDefmodule(a) EnvGetNextDefmodule(GetCurrentEnvironment(),a)
-#define SetCurrentModule(a) EnvSetCurrentModule(GetCurrentEnvironment(),a)
+#define FindDefmodule(a) EnvFindDefmodule(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define GetCurrentModule() EnvGetCurrentModule(GetCurrentEnvironment(),getCurrentExecutionState())
+#define GetDefmoduleName(a) EnvGetDefmoduleName(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define GetDefmodulePPForm(a) EnvGetDefmodulePPForm(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define GetNextDefmodule(a) EnvGetNextDefmodule(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define SetCurrentModule(a) EnvSetCurrentModule(GetCurrentEnvironment(),getCurrentExecutionState(),a)
 
    LOCALE void                           InitializeDefmodules(void *,EXEC_STATUS);
    LOCALE void                          *EnvFindDefmodule(void *,EXEC_STATUS,char *);

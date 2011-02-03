@@ -200,8 +200,8 @@ struct evaluationData
 #define LOCALE extern
 #endif
 
-#define SetMultifieldErrorValue(a) EnvSetMultifieldErrorValue(GetCurrentEnvironment(),a)
-#define FunctionCall(a,b,c) EnvFunctionCall(GetCurrentEnvironment(),a,b,c)
+#define SetMultifieldErrorValue(a) EnvSetMultifieldErrorValue(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define FunctionCall(a,b,c) EnvFunctionCall(GetCurrentEnvironment(),getCurrentExecutionState(),a,b,c)
 
    LOCALE void                           InitializeEvaluationData(void *,EXEC_STATUS);
    LOCALE int                            EvaluateExpression(void *,EXEC_STATUS,struct expr *,struct dataObject *);

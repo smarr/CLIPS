@@ -126,7 +126,7 @@ static void DeallocateEngineData(
 globle long long Run(
   long long runLimit)
   {
-   return EnvRun(GetCurrentEnvironment(),GetCurrentExecutionStatus(),runLimit);
+   return EnvRun(GetCurrentEnvironment(),getCurrentExecutionState(),runLimit);
   }
 #endif
   
@@ -869,9 +869,9 @@ globle intBool AddRunFunction(
   void (*functionPtr)(void),
   int priority)
   {
-   void *theEnv,
-  EXEC_STATUS;
-   
+   void *theEnv;
+	  
+   // Lode: TODO: add exec_status??
    theEnv = GetCurrentEnvironment();
 
    EngineData(theEnv,execStatus)->ListOfRunFunctions = 

@@ -138,7 +138,7 @@ globle void ModifyCommand(
   EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
-   DuplicateModifyCommand(theEnv,execStatus, execStatus, TRUE, returnValue);
+   DuplicateModifyCommand(theEnv,execStatus, TRUE, returnValue);
   }
 
 /***************************************************************************/
@@ -150,7 +150,7 @@ globle void DuplicateCommand(
   EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
-   DuplicateModifyCommand(theEnv,execStatus, execStatus, FALSE, returnValue);
+   DuplicateModifyCommand(theEnv,execStatus, FALSE, returnValue);
   }
 
 /***************************************************************/

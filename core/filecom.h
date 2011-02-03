@@ -36,10 +36,10 @@
 #define LOCALE extern
 #endif
 
-#define DribbleActive() EnvDribbleActive(GetCurrentEnvironment())
-#define DribbleOn(a) EnvDribbleOn(GetCurrentEnvironment(),a)
-#define DribbleOff() EnvDribbleOff(GetCurrentEnvironment())
-#define BatchStar(a) EnvBatchStar(GetCurrentEnvironment(),a)
+#define DribbleActive() EnvDribbleActive(GetCurrentEnvironment(),getCurrentExecutionState())
+#define DribbleOn(a) EnvDribbleOn(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define DribbleOff() EnvDribbleOff(GetCurrentEnvironment(),getCurrentExecutionState())
+#define BatchStar(a) EnvBatchStar(GetCurrentEnvironment(),getCurrentExecutionState(),a)
 
    LOCALE void                           FileCommandDefinitions(void *,EXEC_STATUS);
    LOCALE intBool                        EnvDribbleOn(void *,EXEC_STATUS,char *);

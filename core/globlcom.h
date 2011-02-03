@@ -34,9 +34,9 @@
 #define LOCALE extern
 #endif
 
-#define GetResetGlobals() EnvGetResetGlobals(GetCurrentEnvironment())
-#define SetResetGlobals(a) EnvSetResetGlobals(GetCurrentEnvironment(),a)
-#define ShowDefglobals(a,b) EnvShowDefglobals(GetCurrentEnvironment(),a,b)
+#define GetResetGlobals() EnvGetResetGlobals(GetCurrentEnvironment(),getCurrentExecutionState())
+#define SetResetGlobals(a) EnvSetResetGlobals(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define ShowDefglobals(a,b) EnvShowDefglobals(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
 
    LOCALE void                           DefglobalCommandDefinitions(void *,EXEC_STATUS);
    LOCALE int                            SetResetGlobalsCommand(void *,EXEC_STATUS);

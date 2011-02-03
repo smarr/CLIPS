@@ -67,7 +67,7 @@ struct proceduralPrimitiveData
    PROC_PARAM_STACK *pstack;
    DATA_OBJECT *WildcardValue;
    DATA_OBJECT *LocalVarArray;
-   void (*ProcUnboundErrFunc)(void *);
+   void (*ProcUnboundErrFunc)(void *,EXEC_STATUS);
    ENTITY_RECORD ProcParameterInfo; 
    ENTITY_RECORD ProcWildInfo;
    ENTITY_RECORD ProcGetInfo;     

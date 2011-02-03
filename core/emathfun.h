@@ -37,7 +37,7 @@
 #define LOCALE extern
 #endif
 
-   LOCALE void                           ExtendedMathFunctionDefinitions(void *theEnv,EXEC_STATUS);
+   LOCALE void                           ExtendedMathFunctionDefinitions(void *,EXEC_STATUS);
 #if EXTENDED_MATH_FUNCTIONS
    LOCALE double                         CosFunction(void *,EXEC_STATUS);
    LOCALE double                         SinFunction(void *,EXEC_STATUS);

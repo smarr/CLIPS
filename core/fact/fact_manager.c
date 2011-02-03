@@ -103,7 +103,8 @@
 /*   deftemplate constructs are available.                    */
 /**************************************************************/
 globle void InitializeFacts(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct patternEntityRecord factInfo = { { "FACT_ADDRESS", FACT_ADDRESS,1,0,0,
                                                      PrintFactIdentifier,
@@ -206,7 +207,8 @@ globle void InitializeFacts(
 /*   environment data for facts.   */
 /***********************************/
 static void DeallocateFactData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct factHashEntry *tmpFHEPtr, *nextFHEPtr;
    struct fact *tmpFactPtr, *nextFactPtr;
@@ -263,6 +265,7 @@ static void DeallocateFactData(
 /**********************************************/
 globle void PrintFactWithIdentifier(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   struct fact *factPtr)
   {
@@ -278,6 +281,7 @@ globle void PrintFactWithIdentifier(
 /****************************************************/
 globle void PrintFactIdentifier(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   void *factPtr)
   {
@@ -293,6 +297,7 @@ globle void PrintFactIdentifier(
 /********************************************/
 globle void PrintFactIdentifierInLongForm(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   void *factPtr)
   {
@@ -315,6 +320,7 @@ globle void PrintFactIdentifierInLongForm(
 /*******************************************/
 globle void DecrementFactBasisCount(
   void *theEnv,
+  EXEC_STATUS,
   void *vFactPtr)
   {
    struct fact *factPtr = (struct fact *) vFactPtr;
@@ -337,6 +343,7 @@ globle void DecrementFactBasisCount(
 /*******************************************/
 globle void IncrementFactBasisCount(
   void *theEnv,
+  EXEC_STATUS,
   void *vFactPtr)
   {
    struct fact *factPtr = (struct fact *) vFactPtr;
@@ -360,6 +367,7 @@ globle void IncrementFactBasisCount(
 /**************************************************/
 globle void PrintFact(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   struct fact *factPtr,
   int seperateLines,
@@ -441,7 +449,7 @@ globle intBool EnvRetract(
 
    if (theFact == NULL)
      {
-      RemoveAllFacts(theEnv,execStatus,execStatus);
+      RemoveAllFacts(theEnv,execStatus);
       return(TRUE);
      }
 
@@ -600,7 +608,8 @@ globle intBool EnvRetract(
 /*   and the facts may be in use in other data structures.         */
 /*******************************************************************/
 static void RemoveGarbageFacts(
-  void *theEnv, EXEC_STATUS)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct fact *factPtr, *nextPtr, *lastPtr = NULL;
 
@@ -912,7 +921,8 @@ globle void *EnvAssert(
 /*   fact-list and removes each fact. */
 /**************************************/
 globle void RemoveAllFacts(
-  void *theEnv, EXEC_STATUS)
+  void *theEnv,
+  EXEC_STATUS)
   {
    while (FactData(theEnv,execStatus)->FactList != NULL)
      { EnvRetract(theEnv,execStatus,(void *) FactData(theEnv,execStatus)->FactList); }
@@ -977,6 +987,7 @@ globle struct fact *EnvCreateFact(
 /******************************************/
 globle intBool EnvGetFactSlot(
   void *theEnv,
+  EXEC_STATUS,
   void *vTheFact,
   char *slotName,
   DATA_OBJECT *theValue)
@@ -1044,7 +1055,7 @@ globle intBool GetFactSlot(
   char *slotName,
   DATA_OBJECT *theValue)
   {
-   return(EnvGetFactSlot(GetCurrentEnvironment(),vTheFact,slotName,theValue));
+   return(EnvGetFactSlot(GetCurrentEnvironment(),getCurrentExecutionState(),vTheFact,slotName,theValue));
   }
 #endif
 
@@ -1054,6 +1065,7 @@ globle intBool GetFactSlot(
 /***************************************/
 globle intBool EnvPutFactSlot(
   void *theEnv,
+  EXEC_STATUS,
   void *vTheFact,
   char *slotName,
   DATA_OBJECT *theValue)
@@ -1130,6 +1142,7 @@ globle intBool EnvPutFactSlot(
 /********************************************************/
 globle intBool EnvAssignFactSlotDefaults(
   void *theEnv,
+  EXEC_STATUS,
   void *vTheFact)
   {
    struct fact *theFact = (struct fact *) vTheFact;
@@ -1192,6 +1205,7 @@ globle intBool EnvAssignFactSlotDefaults(
 /********************************************************/
 globle intBool DeftemplateSlotDefault(
   void *theEnv,
+  EXEC_STATUS,
   struct deftemplate *theDeftemplate,
   struct templateSlot *slotPtr,
   DATA_OBJECT *theResult,
@@ -1270,6 +1284,7 @@ globle intBool DeftemplateSlotDefault(
 /***************************************************************/
 globle intBool CopyFactSlotValues(
   void *theEnv,
+  EXEC_STATUS,
   void *vTheDestFact,
   void *vTheSourceFact)
   {
@@ -1361,6 +1376,7 @@ globle struct fact *CreateFactBySize(
 /*********************************************/
 globle void ReturnFact(
   void *theEnv,
+  EXEC_STATUS,
   struct fact *theFact)
   {
    struct multifield *theSegment, *subSegment;
@@ -1392,6 +1408,7 @@ globle void ReturnFact(
 /*************************************************************/
 globle void FactInstall(
   void *theEnv,
+  EXEC_STATUS,
   struct fact *newFact)
   {
    struct multifield *theSegment;
@@ -1415,6 +1432,7 @@ globle void FactInstall(
 /***************************************************************/
 globle void FactDeinstall(
   void *theEnv,
+  EXEC_STATUS,
   struct fact *newFact)
   {
    struct multifield *theSegment;
@@ -1441,6 +1459,7 @@ globle void FactDeinstall(
 #endif
 globle void EnvIncrementFactCount(
   void *theEnv,
+  EXEC_STATUS,		  
   void *factPtr)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
@@ -1459,6 +1478,7 @@ globle void EnvIncrementFactCount(
 #endif
 globle void EnvDecrementFactCount(
   void *theEnv,
+  EXEC_STATUS,
   void *factPtr)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
@@ -1475,6 +1495,7 @@ globle void EnvDecrementFactCount(
 /*********************************************************/
 globle void *EnvGetNextFact(
   void *theEnv,
+  EXEC_STATUS,
   void *factPtr)
   {
    if (factPtr == NULL)
@@ -1493,6 +1514,7 @@ globle void *EnvGetNextFact(
 /**************************************************/
 globle void *GetNextFactInScope(
   void *theEnv,
+  EXEC_STATUS,
   void *vTheFact)
   {
    struct fact *theFact = (struct fact *) vTheFact;
@@ -1556,6 +1578,7 @@ globle void *GetNextFactInScope(
 /****************************************/
 globle void EnvGetFactPPForm(
   void *theEnv,
+  EXEC_STATUS,
   char *buffer,
   unsigned bufferLength,
   void *theFact)
@@ -1591,7 +1614,7 @@ globle long long EnvFactIndex(
 globle long long FactIndex(
   void *factPtr)
   {
-   return(EnvFactIndex(GetCurrentEnvironment(),factPtr));
+   return(EnvFactIndex(GetCurrentEnvironment(),getCurrentExecutionState(),factPtr));
   }
 #endif
 
@@ -1659,7 +1682,7 @@ static void ResetFacts(
    /* Remove all facts from the fact list. */
    /*======================================*/
 
-   RemoveAllFacts(theEnv,execStatus,execStatus);
+   RemoveAllFacts(theEnv,execStatus);
   }
 
 /************************************************************/
@@ -1680,7 +1703,7 @@ static int ClearFactsReady(
    /* Remove all facts from the fact list. */
    /*======================================*/
 
-   RemoveAllFacts(theEnv,execStatus,execStatus);
+   RemoveAllFacts(theEnv,execStatus);
 
    /*==============================================*/
    /* If for some reason there are any facts still */
@@ -1703,6 +1726,7 @@ static int ClearFactsReady(
 /***************************************************/
 globle struct fact *FindIndexedFact(
   void *theEnv,
+  EXEC_STATUS,
   long long factIndexSought)
   {
    struct fact *theFact;

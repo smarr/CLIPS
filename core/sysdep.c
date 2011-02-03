@@ -196,8 +196,8 @@ extern int LIB$SPAWN();
 
 struct systemDependentData
   { 
-   void (*RedrawScreenFunction)(void *);
-   void (*PauseEnvFunction)(void *);
+   void (*RedrawScreenFunction)(void *,EXEC_STATUS);
+   void (*PauseEnvFunction)(void *,EXEC_STATUS);
    void (*ContinueEnvFunction)(void *,EXEC_STATUS,int);
 /*
 #if ! WINDOW_INTERFACE
@@ -220,8 +220,8 @@ struct systemDependentData
 #if (! WIN_BTC) && (! WIN_MVC)
    FILE *BinaryFP;
 #endif
-   int (*BeforeOpenFunction)(void *);
-   int (*AfterOpenFunction)(void *);
+   int (*BeforeOpenFunction)(void *,EXEC_STATUS);
+   int (*AfterOpenFunction)(void *,EXEC_STATUS);
    jmp_buf *jmpBuffer;
   };
 
@@ -281,6 +281,7 @@ globle void InitializeEnvironment()
 /*****************************************************/
 globle void EnvInitializeEnvironment(
   void *vtheEnvironment,
+  EXEC_STATUS,
   struct symbolHashNode **symbolTable,
   struct floatHashNode **floatTable,
   struct integerHashNode **integerTable,
@@ -299,28 +300,28 @@ globle void EnvInitializeEnvironment(
    /* Initialize the memory manager. */
    /*================================*/
 
-   InitializeMemory(theEnvironment);
+   InitializeMemory(theEnvironment, execStatus);
 
    /*===================================================*/
    /* Initialize environment data for various features. */
    /*===================================================*/
    
-   InitializeCommandLineData(theEnvironment);
+   InitializeCommandLineData(theEnvironment, execStatus);
 #if CONSTRUCT_COMPILER && (! RUN_TIME)
-   InitializeConstructCompilerData(theEnvironment);
+   InitializeConstructCompilerData(theEnvironment, execStatus);
 #endif
-   InitializeConstructData(theEnvironment);
-   InitializeEvaluationData(theEnvironment);
-   InitializeExternalFunctionData(theEnvironment);
-   InitializeMultifieldData(theEnvironment);
-   InitializePrettyPrintData(theEnvironment);
-   InitializePrintUtilityData(theEnvironment);
-   InitializeScannerData(theEnvironment);
-   InitializeSystemDependentData(theEnvironment);
-   InitializeUserDataData(theEnvironment);
-   InitializeUtilityData(theEnvironment);
+   InitializeConstructData(theEnvironment, execStatus);
+   InitializeEvaluationData(theEnvironment, execStatus);
+   InitializeExternalFunctionData(theEnvironment, execStatus);
+   InitializeMultifieldData(theEnvironment, execStatus);
+   InitializePrettyPrintData(theEnvironment, execStatus);
+   InitializePrintUtilityData(theEnvironment), execStatus;
+   InitializeScannerData(theEnvironment, execStatus);
+   InitializeSystemDependentData(theEnvironment, execStatus);
+   InitializeUserDataData(theEnvironment, execStatus);
+   InitializeUtilityData(theEnvironment, execStatus);
 #if DEBUGGING_FUNCTIONS
-   InitializeWatchData(theEnvironment);
+   InitializeWatchData(theEnvironment, execStatus);
 #endif
    
    /*===============================================*/
@@ -333,55 +334,55 @@ globle void EnvInitializeEnvironment(
    /* Initialize file and string I/O routers. */
    /*=========================================*/
 
-   InitializeDefaultRouters(theEnvironment);
+   InitializeDefaultRouters(theEnvironment, execStatus);
 
    /*=========================================================*/
    /* Initialize some system dependent features such as time. */
    /*=========================================================*/
 
-   InitializeNonportableFeatures(theEnvironment);
+   InitializeNonportableFeatures(theEnvironment, execStatus);
 
    /*=============================================*/
    /* Register system and user defined functions. */
    /*=============================================*/
 
-   SystemFunctionDefinitions(theEnvironment);
+   SystemFunctionDefinitions(theEnvironment, execStatus);
    UserFunctions();
-   EnvUserFunctions(theEnvironment);
+   EnvUserFunctions(theEnvironment, execStatus);
 
    /*====================================*/
    /* Initialize the constraint manager. */
    /*====================================*/
 
-   InitializeConstraints(theEnvironment);
+   InitializeConstraints(theEnvironment, execStatus);
 
    /*==========================================*/
    /* Initialize the expression hash table and */
    /* pointers to specific functions.          */
    /*==========================================*/
 
-   InitExpressionData(theEnvironment);
+   InitExpressionData(theEnvironment, execStatus);
 
    /*===================================*/
    /* Initialize the construct manager. */
    /*===================================*/
 
 #if ! RUN_TIME
-   InitializeConstructs(theEnvironment);
+   InitializeConstructs(theEnvironment, execStatus);
 #endif
 
    /*=====================================*/
    /* Initialize the defmodule construct. */
    /*=====================================*/
 
-   AllocateDefmoduleGlobals(theEnvironment);
+   AllocateDefmoduleGlobals(theEnvironment, execStatus);
 
    /*===================================*/
    /* Initialize the defrule construct. */
    /*===================================*/
 
 #if DEFRULE_CONSTRUCT
-   InitializeDefrules(theEnvironment);
+   InitializeDefrules(theEnvironment, execStatus);
 #endif
 
    /*====================================*/
@@ -389,7 +390,7 @@ globle void EnvInitializeEnvironment(
    /*====================================*/
 
 #if DEFFACTS_CONSTRUCT
-   InitializeDeffacts(theEnvironment);
+   InitializeDeffacts(theEnvironment, execStatus);
 #endif
 
    /*=====================================================*/
@@ -397,7 +398,7 @@ globle void EnvInitializeEnvironment(
    /*=====================================================*/
 
 #if DEFGENERIC_CONSTRUCT
-   SetupGenericFunctions(theEnvironment);
+   SetupGenericFunctions(theEnvironment, execStatus);
 #endif
 
    /*=======================================*/
@@ -405,7 +406,7 @@ globle void EnvInitializeEnvironment(
    /*=======================================*/
 
 #if DEFFUNCTION_CONSTRUCT
-   SetupDeffunctions(theEnvironment);
+   SetupDeffunctions(theEnvironment, execStatus);
 #endif
 
    /*=====================================*/
@@ -413,7 +414,7 @@ globle void EnvInitializeEnvironment(
    /*=====================================*/
 
 #if DEFGLOBAL_CONSTRUCT
-   InitializeDefglobals(theEnvironment);
+   InitializeDefglobals(theEnvironment, execStatus);
 #endif
 
    /*=======================================*/
@@ -421,7 +422,7 @@ globle void EnvInitializeEnvironment(
    /*=======================================*/
 
 #if DEFTEMPLATE_CONSTRUCT
-   InitializeDeftemplates(theEnvironment);
+   InitializeDeftemplates(theEnvironment, execStatus);
 #endif
 
    /*=============================*/
@@ -429,21 +430,21 @@ globle void EnvInitializeEnvironment(
    /*=============================*/
 
 #if OBJECT_SYSTEM
-   SetupObjectSystem(theEnvironment);
+   SetupObjectSystem(theEnvironment, execStatus);
 #endif
 
    /*=====================================*/
    /* Initialize the defmodule construct. */
    /*=====================================*/
 
-   InitializeDefmodules(theEnvironment);
+   InitializeDefmodules(theEnvironment, execStatus);
 
    /*======================================================*/
    /* Register commands and functions for development use. */
    /*======================================================*/
 
 #if DEVELOPER
-   DeveloperCommands(theEnvironment);
+   DeveloperCommands(theEnvironment, execStatus);
 #endif
 
    /*=========================================*/
@@ -451,20 +452,20 @@ globle void EnvInitializeEnvironment(
    /* used by procedural code in constructs.  */
    /*=========================================*/
 
-   InstallProcedurePrimitives(theEnvironment);
+   InstallProcedurePrimitives(theEnvironment, execStatus);
 
    /*==============================================*/
    /* Install keywords in the symbol table so that */
    /* they are available for command completion.   */
    /*==============================================*/
 
-   InitializeKeywords(theEnvironment);
+   InitializeKeywords(theEnvironment, execStatus);
 
    /*========================*/
    /* Issue a clear command. */
    /*========================*/
    
-   EnvClear(theEnvironment);
+   EnvClear(theEnvironment, execStatus);
 
    /*=============================*/
    /* Initialization is complete. */
@@ -639,7 +640,7 @@ static void SystemFunctionDefinitions(
 #endif
 
    PredicateFunctionDefinitions(theEnv,execStatus);
-   BasicMathFunctionDefinitions(theEnv,execStatus,execStatus);
+   BasicMathFunctionDefinitions(theEnv,execStatus);
    FileCommandDefinitions(theEnv,execStatus);
    SortFunctionDefinitions(theEnv,execStatus);
 
@@ -1012,8 +1013,8 @@ static void CatchCtrlC(
   int sgnl)
   {
 #if ALLOW_ENVIRONMENT_GLOBALS
-   SetHaltExecution(GetCurrentEnvironment(),TRUE);
-   CloseAllBatchSources(GetCurrentEnvironment());
+   SetHaltExecution(GetCurrentEnvironment(),getCurrentExecutionState(),TRUE);
+   CloseAllBatchSources(GetCurrentEnvironment(),getCurrentExecutionState());
 #endif
    signal(SIGINT,CatchCtrlC);
   }
@@ -1028,8 +1029,8 @@ static void CatchCtrlC(
 static void interrupt CatchCtrlC()
   {
 #if ALLOW_ENVIRONMENT_GLOBALS
-   SetHaltExecution(GetCurrentEnvironment(),TRUE);
-   CloseAllBatchSources(GetCurrentEnvironment());
+   SetHaltExecution(GetCurrentEnvironment(),getCurrentExecutionState(),TRUE);
+   CloseAllBatchSources(GetCurrentEnvironment(),getCurrentExecutionState());
 #endif
   }
 */

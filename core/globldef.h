@@ -95,16 +95,16 @@ struct defglobalModule
 #endif
 
 #define DefglobalModule(x) GetConstructModuleName((struct constructHeader *) x)
-#define FindDefglobal(a) EnvFindDefglobal(GetCurrentEnvironment(),a)
+#define FindDefglobal(a) EnvFindDefglobal(GetCurrentEnvironment(),getCurrentExecutionState(),a)
 #define GetDefglobalName(x) GetConstructNameString((struct constructHeader *) x)
-#define GetDefglobalPPForm(x) GetConstructPPForm(GetCurrentEnvironment(),(struct constructHeader *) x)
-#define GetDefglobalValue(a,b) EnvGetDefglobalValue(GetCurrentEnvironment(),a,b)
-#define GetDefglobalValueForm(a,b,c) EnvGetDefglobalValueForm(GetCurrentEnvironment(),a,b,c)
-#define GetGlobalsChanged() EnvGetGlobalsChanged(GetCurrentEnvironment())
-#define GetNextDefglobal(a) EnvGetNextDefglobal(GetCurrentEnvironment(),a)
-#define IsDefglobalDeletable(a) EnvIsDefglobalDeletable(GetCurrentEnvironment(),a)
-#define SetDefglobalValue(a,b) EnvSetDefglobalValue(GetCurrentEnvironment(),a,b)
-#define SetGlobalsChanged(a) EnvSetGlobalsChanged(GetCurrentEnvironment(),a)
+#define GetDefglobalPPForm(x) GetConstructPPForm(GetCurrentEnvironment(),getCurrentExecutionState(),(struct constructHeader *) x)
+#define GetDefglobalValue(a,b) EnvGetDefglobalValue(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
+#define GetDefglobalValueForm(a,b,c) EnvGetDefglobalValueForm(GetCurrentEnvironment(),getCurrentExecutionState(),a,b,c)
+#define GetGlobalsChanged() EnvGetGlobalsChanged(GetCurrentEnvironment(),getCurrentExecutionState())
+#define GetNextDefglobal(a) EnvGetNextDefglobal(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define IsDefglobalDeletable(a) EnvIsDefglobalDeletable(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define SetDefglobalValue(a,b) EnvSetDefglobalValue(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
+#define SetGlobalsChanged(a) EnvSetGlobalsChanged(GetCurrentEnvironment(),getCurrentExecutionState(),a)
 
    LOCALE void                           InitializeDefglobals(void *,EXEC_STATUS);
    LOCALE void                          *EnvFindDefglobal(void *,EXEC_STATUS,char *);

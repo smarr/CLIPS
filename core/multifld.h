@@ -91,7 +91,7 @@ struct multifieldData
 #define LOCALE extern
 #endif
    
-#define CreateMultifield(a) EnvCreateMultifield(GetCurrentEnvironment(),a)
+#define CreateMultifield(a) EnvCreateMultifield(GetCurrentEnvironment(),getCurrentExecutionState(),a)
 
    LOCALE void                           InitializeMultifieldData(void *,EXEC_STATUS);
    LOCALE void                          *CreateMultifield2(void *,EXEC_STATUS,long);

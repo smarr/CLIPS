@@ -170,7 +170,7 @@ globle int EvaluateExpression(
            {
             case 'v' :
               if (fptr->environmentAware)
-                { (* (void (*)(void *)) fptr->functionPointer)(theEnv,execStatus); }
+                { (* (void (*)(void *,EXEC_STATUS)) fptr->functionPointer)(theEnv,execStatus); }
               else
                 { (* (void (*)(void)) fptr->functionPointer)(); }
               returnValue->type = RVOID;
@@ -180,7 +180,7 @@ globle int EvaluateExpression(
               returnValue->type = SYMBOL;
               if (fptr->environmentAware)
                 {
-                 if ((* (int (*)(void *)) fptr->functionPointer)(theEnv,execStatus))
+                 if ((* (int (*)(void *,EXEC_STATUS)) fptr->functionPointer)(theEnv,execStatus))
                    returnValue->value = EnvTrueSymbol(theEnv,execStatus);
                  else
                    returnValue->value = EnvFalseSymbol(theEnv,execStatus);
@@ -198,7 +198,7 @@ globle int EvaluateExpression(
               if (fptr->environmentAware)
                 {
                  returnValue->value =
-                                (* (void *(*)(void *)) fptr->functionPointer)(theEnv,execStatus);
+                                (* (void *(*)(void *,EXEC_STATUS)) fptr->functionPointer)(theEnv,execStatus);
                 }
               else
                 {
@@ -211,7 +211,7 @@ globle int EvaluateExpression(
               if (fptr->environmentAware)
                 {
                  returnValue->value = (void *)
-                   EnvAddLong(theEnv,execStatus,(* (long long (*)(void *)) fptr->functionPointer)(theEnv,execStatus));
+                   EnvAddLong(theEnv,execStatus,(* (long long (*)(void *,EXEC_STATUS)) fptr->functionPointer)(theEnv,execStatus));
                 }
               else
                 {
@@ -224,7 +224,7 @@ globle int EvaluateExpression(
               if (fptr->environmentAware)
                 {
                  returnValue->value = (void *)
-                   EnvAddLong(theEnv,execStatus,(long long) (* (int (*)(void *)) fptr->functionPointer)(theEnv,execStatus));
+                   EnvAddLong(theEnv,execStatus,(long long) (* (int (*)(void *,EXEC_STATUS)) fptr->functionPointer)(theEnv,execStatus));
                 }
               else
                 {
@@ -237,7 +237,7 @@ globle int EvaluateExpression(
               if (fptr->environmentAware)
                 {
                  returnValue->value = (void *)
-                    EnvAddLong(theEnv,execStatus,(long long) (* (long int (*)(void *)) fptr->functionPointer)(theEnv,execStatus));
+                    EnvAddLong(theEnv,execStatus,(long long) (* (long int (*)(void *,EXEC_STATUS)) fptr->functionPointer)(theEnv,execStatus));
                 }
               else
                 {
@@ -250,7 +250,7 @@ globle int EvaluateExpression(
               if (fptr->environmentAware)
                 {
                  returnValue->value = (void *)
-                    EnvAddDouble(theEnv,execStatus,(double) (* (float (*)(void *)) fptr->functionPointer)(theEnv,execStatus));
+                    EnvAddDouble(theEnv,execStatus,(double) (* (float (*)(void *,EXEC_STATUS)) fptr->functionPointer)(theEnv,execStatus));
                 }
               else
                 {
@@ -263,7 +263,7 @@ globle int EvaluateExpression(
               if (fptr->environmentAware)
                 {
                  returnValue->value = (void *)
-                    EnvAddDouble(theEnv,execStatus,(* (double (*)(void *)) fptr->functionPointer)(theEnv,execStatus));
+                    EnvAddDouble(theEnv,execStatus,(* (double (*)(void *,EXEC_STATUS)) fptr->functionPointer)(theEnv,execStatus));
                 }
               else
                 {
@@ -276,7 +276,7 @@ globle int EvaluateExpression(
               if (fptr->environmentAware)
                 {
                  returnValue->value = (void *)
-                   (* (SYMBOL_HN *(*)(void *)) fptr->functionPointer)(theEnv,execStatus);
+                   (* (SYMBOL_HN *(*)(void *,EXEC_STATUS)) fptr->functionPointer)(theEnv,execStatus);
                 }
               else
                 {
@@ -289,7 +289,7 @@ globle int EvaluateExpression(
               if (fptr->environmentAware)
                 {
                  returnValue->value = (void *)
-                   (* (SYMBOL_HN *(*)(void *)) fptr->functionPointer)(theEnv,execStatus);
+                   (* (SYMBOL_HN *(*)(void *,EXEC_STATUS)) fptr->functionPointer)(theEnv,execStatus);
                 }
               else
                 {
@@ -303,7 +303,7 @@ globle int EvaluateExpression(
               if (fptr->environmentAware)
                 {
                  returnValue->value =
-                                (* (void *(*)(void *)) fptr->functionPointer)(theEnv,execStatus);
+                                (* (void *(*)(void *,EXEC_STATUS)) fptr->functionPointer)(theEnv,execStatus);
                 }
               else
                 {
@@ -316,7 +316,7 @@ globle int EvaluateExpression(
               if (fptr->environmentAware)
                 {
                  returnValue->value = (void *)
-                   (* (SYMBOL_HN *(*)(void *)) fptr->functionPointer)(theEnv,execStatus);
+                   (* (SYMBOL_HN *(*)(void *,EXEC_STATUS)) fptr->functionPointer)(theEnv,execStatus);
                 }
               else
                 {
@@ -330,7 +330,7 @@ globle int EvaluateExpression(
                char cbuff[2];
                if (fptr->environmentAware)
                  {
-                  cbuff[0] = (* (char (*)(void *)) fptr->functionPointer)(theEnv,execStatus);
+                  cbuff[0] = (* (char (*)(void *,EXEC_STATUS)) fptr->functionPointer)(theEnv,execStatus);
                  }
                else
                  {

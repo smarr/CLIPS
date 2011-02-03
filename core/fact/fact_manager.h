@@ -103,18 +103,18 @@ struct factsData
 #define LOCALE extern
 #endif
 
-#define Assert(a) EnvAssert(GetCurrentEnvironment(),a, FALSE)
-#define AssertString(a) EnvAssertString(GetCurrentEnvironment(),a)
-#define AssignFactSlotDefaults(a) EnvAssignFactSlotDefaults(GetCurrentEnvironment(),a)
-#define CreateFact(a) EnvCreateFact(GetCurrentEnvironment(),a)
-#define DecrementFactCount(a) EnvDecrementFactCount(GetCurrentEnvironment(),a)
-#define GetFactListChanged() EnvGetFactListChanged(GetCurrentEnvironment())
-#define GetFactPPForm(a,b,c) EnvGetFactPPForm(GetCurrentEnvironment(),a,b,c)
-#define GetNextFact(a) EnvGetNextFact(GetCurrentEnvironment(),a)
-#define IncrementFactCount(a) EnvIncrementFactCount(GetCurrentEnvironment(),a)
-#define PutFactSlot(a,b,c) EnvPutFactSlot(GetCurrentEnvironment(),a,b,c)
-#define Retract(a) EnvRetract(GetCurrentEnvironment(),a)
-#define SetFactListChanged(a) EnvSetFactListChanged(GetCurrentEnvironment(),a)
+#define Assert(a) EnvAssert(GetCurrentEnvironment(),getCurrentExecutionState(),a, FALSE)
+#define AssertString(a) EnvAssertString(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define AssignFactSlotDefaults(a) EnvAssignFactSlotDefaults(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define CreateFact(a) EnvCreateFact(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define DecrementFactCount(a) EnvDecrementFactCount(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define GetFactListChanged() EnvGetFactListChanged(GetCurrentEnvironment(),getCurrentExecutionState())
+#define GetFactPPForm(a,b,c) EnvGetFactPPForm(GetCurrentEnvironment(),getCurrentExecutionState(),a,b,c)
+#define GetNextFact(a) EnvGetNextFact(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define IncrementFactCount(a) EnvIncrementFactCount(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define PutFactSlot(a,b,c) EnvPutFactSlot(GetCurrentEnvironment(),getCurrentExecutionState(),a,b,c)
+#define Retract(a) EnvRetract(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define SetFactListChanged(a) EnvSetFactListChanged(GetCurrentEnvironment(),getCurrentExecutionState(),a)
 
 #if ALLOW_ENVIRONMENT_GLOBALS
    LOCALE intBool                        GetFactSlot(void *,EXEC_STATUS,char *,DATA_OBJECT *);
@@ -136,7 +136,7 @@ struct factsData
    LOCALE void                           FactInstall(void *,EXEC_STATUS,struct fact *);
    LOCALE void                           FactDeinstall(void *,EXEC_STATUS,struct fact *);
    LOCALE void                          *EnvGetNextFact(void *,EXEC_STATUS,void *);
-   LOCALE void                          *GetNextFactInScope(void *theEnv,void *);
+   LOCALE void                          *GetNextFactInScope(void *,EXEC_STATUS,void *);
    LOCALE void                           EnvGetFactPPForm(void *,EXEC_STATUS,char *,unsigned,void *);
    LOCALE int                            EnvGetFactListChanged(void *,EXEC_STATUS);
    LOCALE void                           EnvSetFactListChanged(void *,EXEC_STATUS,int);

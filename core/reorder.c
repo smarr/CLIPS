@@ -87,7 +87,7 @@ struct groupReference
    static intBool                 AddNandPatterns(void *,EXEC_STATUS,int,struct lhsParseNode *,struct lhsParseNode *,
                                                   struct lhsParseNode *,struct variableReference *,
                                                   struct groupReference *);
-   static int                     VariableDepth(void *,EXEC_STATUS,struct variableReference *);
+   static int                     VariableDepth(void *,struct variableReference *);
    static void                    InsertNandPatterns(void *,EXEC_STATUS,struct lhsParseNode *,struct lhsParseNode *,
                                                      struct lhsParseNode *,int);
    static void                    MarkExistsNands(struct lhsParseNode *);

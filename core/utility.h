@@ -67,7 +67,7 @@ struct utilityData
    struct trackedMemory *trackList;
   };
 
-#define UtilityData(theEnv,execStatus) ((struct utilityData *) GetEnvironmentData(theEnv,UTILITY_DATA))
+#define UtilityData(theEnv,execStatus) ((struct utilityData *) GetEnvironmentData(theEnv,execStatus,UTILITY_DATA))
 
   /* Is c the start of a utf8 sequence? */
 #define IsUTF8Start(ch) (((ch) & 0xC0) != 0x80)
@@ -80,41 +80,41 @@ struct utilityData
 #define LOCALE extern
 #endif
 
-#define DecrementGCLocks() EnvDecrementGCLocks(GetCurrentEnvironment())
-#define IncrementGCLocks() EnvIncrementGCLocks(GetCurrentEnvironment())
-#define RemovePeriodicFunction(a) EnvRemovePeriodicFunction(GetCurrentEnvironment(),a)
+#define DecrementGCLocks() EnvDecrementGCLocks(GetCurrentEnvironment(),getCurrentExecutionState())
+#define IncrementGCLocks() EnvIncrementGCLocks(GetCurrentEnvironment(),getCurrentExecutionState())
+#define RemovePeriodicFunction(a) EnvRemovePeriodicFunction(GetCurrentEnvironment(),getCurrentExecutionState(),a)
 
    LOCALE void                           InitializeUtilityData(void *,EXEC_STATUS);
    LOCALE void                           PeriodicCleanup(void *, EXEC_STATUS, intBool,intBool);
-   LOCALE intBool                        AddCleanupFunction(void *,char *,void (*)(void *),int);
-   LOCALE intBool                        EnvAddPeriodicFunction(void *,char *,void (*)(void *),int);
+   LOCALE intBool                        AddCleanupFunction(void *,EXEC_STATUS,char *,void (*)(void *),int);
+   LOCALE intBool                        EnvAddPeriodicFunction(void *,EXEC_STATUS,char *,void (*)(void *),int);
    LOCALE intBool                        AddPeriodicFunction(char *,void (*)(void),int);
-   LOCALE intBool                        RemoveCleanupFunction(void *,char *);
-   LOCALE intBool                        EnvRemovePeriodicFunction(void *,char *);
-   LOCALE char                          *AppendStrings(void *,char *,char *);
-   LOCALE char                          *StringPrintForm(void *,char *);
-   LOCALE char                          *AppendToString(void *,char *,char *,size_t *,size_t *);
-   LOCALE char                          *InsertInString(void *,char *,size_t,char *,size_t *,size_t *);
-   LOCALE char                          *AppendNToString(void *,char *,char *,size_t,size_t *,size_t *);
-   LOCALE char                          *EnlargeString(void *,size_t,char *,size_t *,size_t *);
-   LOCALE char                          *ExpandStringWithChar(void *,int,char *,size_t *,size_t *,size_t);
-   LOCALE struct callFunctionItem       *AddFunctionToCallList(void *,char *,int,void (*)(void *),
+   LOCALE intBool                        RemoveCleanupFunction(void *,EXEC_STATUS,char *);
+   LOCALE intBool                        EnvRemovePeriodicFunction(void *,EXEC_STATUS,char *);
+   LOCALE char                          *AppendStrings(void *,EXEC_STATUS,char *,char *);
+   LOCALE char                          *StringPrintForm(void *,EXEC_STATUS,char *);
+   LOCALE char                          *AppendToString(void *,EXEC_STATUS,char *,char *,size_t *,size_t *);
+   LOCALE char                          *InsertInString(void *,EXEC_STATUS,char *,size_t,char *,size_t *,size_t *);
+   LOCALE char                          *AppendNToString(void *,EXEC_STATUS,char *,char *,size_t,size_t *,size_t *);
+   LOCALE char                          *EnlargeString(void *,EXEC_STATUS,size_t,char *,size_t *,size_t *);
+   LOCALE char                          *ExpandStringWithChar(void *,EXEC_STATUS,int,char *,size_t *,size_t *,size_t);
+   LOCALE struct callFunctionItem       *AddFunctionToCallList(void *,EXEC_STATUS,char *,int,void (*)(void *),
                                                                struct callFunctionItem *,intBool);
-   LOCALE struct callFunctionItem       *AddFunctionToCallListWithContext(void *,char *,int,void (*)(void *),
+   LOCALE struct callFunctionItem       *AddFunctionToCallListWithContext(void *,EXEC_STATUS,char *,int,void (*)(void *),
                                                                           struct callFunctionItem *,intBool,void *);
-   LOCALE struct callFunctionItem       *RemoveFunctionFromCallList(void *,char *,
+   LOCALE struct callFunctionItem       *RemoveFunctionFromCallList(void *,EXEC_STATUS,char *,
                                                              struct callFunctionItem *,
                                                              int *);
-   LOCALE void                           DeallocateCallList(void *,struct callFunctionItem *);
+   LOCALE void                           DeallocateCallList(void *,EXEC_STATUS,struct callFunctionItem *);
    LOCALE unsigned long                  ItemHashValue(void *,unsigned short,void *,unsigned long);
    LOCALE void                           YieldTime(void *,EXEC_STATUS);
-   LOCALE short                          SetGarbageCollectionHeuristics(void *,short);
+   LOCALE short                          SetGarbageCollectionHeuristics(void *,EXEC_STATUS,short);
    LOCALE void                           EnvIncrementGCLocks(void *,EXEC_STATUS);
    LOCALE void                           EnvDecrementGCLocks(void *,EXEC_STATUS);
-   LOCALE short                          EnablePeriodicFunctions(void *,short);
-   LOCALE short                          EnableYieldFunction(void *,short);
-   LOCALE struct trackedMemory          *AddTrackedMemory(void *,void *,size_t);
-   LOCALE void                           RemoveTrackedMemory(void *,struct trackedMemory *);
+   LOCALE short                          EnablePeriodicFunctions(void *,EXEC_STATUS,short);
+   LOCALE short                          EnableYieldFunction(void *,EXEC_STATUS,short);
+   LOCALE struct trackedMemory          *AddTrackedMemory(void *,EXEC_STATUS,void *,size_t);
+   LOCALE void                           RemoveTrackedMemory(void *,EXEC_STATUS,struct trackedMemory *);
    LOCALE void                           UTF8Increment(char *,size_t *);
    LOCALE size_t                         UTF8Offset(char *,size_t);
    LOCALE size_t                         UTF8Length(char *);

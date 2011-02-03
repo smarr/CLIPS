@@ -43,13 +43,13 @@
 #define LOCALE extern
 #endif
 
-#define GetDefruleList(a,b) EnvGetDefruleList(GetCurrentEnvironment(),a,b)
-#define GetDefruleWatchActivations(a) EnvGetDefruleWatchActivations(GetCurrentEnvironment(),a)
-#define GetDefruleWatchFirings(a) EnvGetDefruleWatchFirings(GetCurrentEnvironment(),a)
-#define ListDefrules(a,b) EnvListDefrules(GetCurrentEnvironment(),a,b)
-#define SetDefruleWatchActivations(a,b) EnvSetDefruleWatchActivations(GetCurrentEnvironment(),a,b)
-#define SetDefruleWatchFirings(a,b) EnvSetDefruleWatchFirings(GetCurrentEnvironment(),a,b)
-#define Undefrule(a) EnvUndefrule(GetCurrentEnvironment(),a)
+#define GetDefruleList(a,b) EnvGetDefruleList(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
+#define GetDefruleWatchActivations(a) EnvGetDefruleWatchActivations(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define GetDefruleWatchFirings(a) EnvGetDefruleWatchFirings(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define ListDefrules(a,b) EnvListDefrules(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
+#define SetDefruleWatchActivations(a,b) EnvSetDefruleWatchActivations(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
+#define SetDefruleWatchFirings(a,b) EnvSetDefruleWatchFirings(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
+#define Undefrule(a) EnvUndefrule(GetCurrentEnvironment(),getCurrentExecutionState(),a)
 
    LOCALE void                           DefruleBasicCommands(void *, EXEC_STATUS);
    LOCALE void                           UndefruleCommand(void *, EXEC_STATUS);

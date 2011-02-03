@@ -117,9 +117,9 @@ globle int DefineFunction(
   int (*pointer)(void),
   char *actualName)
   {
-   void *theEnv,
-  EXEC_STATUS;
+   void *theEnv;
    
+   // Lode: TODO: add exec_status??
    theEnv = GetCurrentEnvironment();
 
    return(DefineFunction3(theEnv,execStatus,name,returnType,

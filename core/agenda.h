@@ -113,20 +113,20 @@ struct agendaData
 /* GLOBAL EXTERNAL FUNCTION DEFINITIONS */
 /****************************************/
 
-#define Agenda(a,b) EnvAgenda(GetCurrentEnvironment(),a,b)
-#define DeleteActivation(a) EnvDeleteActivation(GetCurrentEnvironment(),a)
-#define GetActivationName(a) EnvGetActivationName(GetCurrentEnvironment(),a)
-#define GetActivationPPForm(a,b,c) EnvGetActivationPPForm(GetCurrentEnvironment(),a,b,c)
+#define Agenda(a,b) EnvAgenda(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
+#define DeleteActivation(a) EnvDeleteActivation(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define GetActivationName(a) EnvGetActivationName(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define GetActivationPPForm(a,b,c) EnvGetActivationPPForm(GetCurrentEnvironment(),getCurrentExecutionState(),a,b,c)
 #define GetActivationSalience(actPtr) (((struct activation *) actPtr)->salience)
-#define GetAgendaChanged() EnvGetAgendaChanged(GetCurrentEnvironment())
-#define GetNextActivation(a) EnvGetNextActivation(GetCurrentEnvironment(),a)
-#define GetSalienceEvaluation() EnvGetSalienceEvaluation(GetCurrentEnvironment())
-#define Refresh(a) EnvRefresh(GetCurrentEnvironment(),a)
-#define RefreshAgenda(a) EnvRefreshAgenda(GetCurrentEnvironment(),a)
-#define ReorderAgenda(a) EnvReorderAgenda(GetCurrentEnvironment(),a)
-#define SetActivationSalience(a,b) EnvSetActivationSalience(GetCurrentEnvironment(),a,b)
-#define SetAgendaChanged(a) EnvSetAgendaChanged(GetCurrentEnvironment(),a)
-#define SetSalienceEvaluation(a) EnvSetSalienceEvaluation(GetCurrentEnvironment(),a)
+#define GetAgendaChanged() EnvGetAgendaChanged(GetCurrentEnvironment(),getCurrentExecutionState())
+#define GetNextActivation(a) EnvGetNextActivation(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define GetSalienceEvaluation() EnvGetSalienceEvaluation(GetCurrentEnvironment(),getCurrentExecutionState())
+#define Refresh(a) EnvRefresh(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define RefreshAgenda(a) EnvRefreshAgenda(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define ReorderAgenda(a) EnvReorderAgenda(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define SetActivationSalience(a,b) EnvSetActivationSalience(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
+#define SetAgendaChanged(a) EnvSetAgendaChanged(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define SetSalienceEvaluation(a) EnvSetSalienceEvaluation(GetCurrentEnvironment(),getCurrentExecutionState(),a)
 
    LOCALE void                    AddActivation(void *,EXEC_STATUS,void *,void *);
    LOCALE void                    ClearRuleFromAgenda(void *,EXEC_STATUS,void *);

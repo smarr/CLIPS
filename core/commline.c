@@ -546,7 +546,7 @@ globle void CommandLoop(
       /* buffer, then execute it.                */
       /*=========================================*/
 
-      ExecuteIfCommandComplete(theEnv,execStatus,execStatus);
+      ExecuteIfCommandComplete(theEnv,execStatus);
      }
   }
   
@@ -566,7 +566,7 @@ globle void CommandLoopBatch(
    RouterData(theEnv,execStatus)->CommandBufferInputCount = 0;
    RouterData(theEnv,execStatus)->AwaitingInput = TRUE;
 
-   CommandLoopBatchDriver(theEnv,execStatus,execStatus);
+   CommandLoopBatchDriver(theEnv,execStatus);
   }
 
 /************************************************************/
@@ -578,9 +578,9 @@ globle void CommandLoopOnceThenBatch(
   void *theEnv,
 	EXEC_STATUS)
   {
-   if (! ExecuteIfCommandComplete(theEnv,execStatus,execStatus)) return;
+   if (! ExecuteIfCommandComplete(theEnv,execStatus)) return;
 
-   CommandLoopBatchDriver(theEnv,execStatus,execStatus);
+   CommandLoopBatchDriver(theEnv,execStatus);
   }
   
 /*********************************************************/
@@ -641,7 +641,7 @@ globle void CommandLoopBatchDriver(
       /* buffer, then execute it.                */
       /*=========================================*/
 
-      ExecuteIfCommandComplete(theEnv,execStatus,execStatus);
+      ExecuteIfCommandComplete(theEnv,execStatus);
      }
   }
 

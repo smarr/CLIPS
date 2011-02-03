@@ -63,20 +63,20 @@ struct instanceData
 #define LOCALE extern
 #endif
 
-#define CreateRawInstance(a,b) EnvCreateRawInstance(GetCurrentEnvironment(),a,b)
-#define DeleteInstance(a) EnvDeleteInstance(GetCurrentEnvironment(),a)
-#define DirectGetSlot(a,b,c) EnvDirectGetSlot(GetCurrentEnvironment(),a,b,c)
-#define DirectPutSlot(a,b,c) EnvDirectPutSlot(GetCurrentEnvironment(),a,b,c)
-#define FindInstance(a,b,c) EnvFindInstance(GetCurrentEnvironment(),a,b,c)
-#define GetInstanceClass(a) EnvGetInstanceClass(GetCurrentEnvironment(),a)
-#define GetInstancePPForm(a,b,c) EnvGetInstancePPForm(GetCurrentEnvironment(),a,b,c)
-#define GetNextInstance(a) EnvGetNextInstance(GetCurrentEnvironment(),a)
-#define GetNextInstanceInClass(a,b) EnvGetNextInstanceInClass(GetCurrentEnvironment(),a,b)
-#define GetNextInstanceInClassAndSubclasses(a,b,c) EnvGetNextInstanceInClassAndSubclasses(GetCurrentEnvironment(),a,b,c)
-#define Instances(a,b,c,d) EnvInstances(GetCurrentEnvironment(),a,b,c,d)
-#define MakeInstance(a) EnvMakeInstance(GetCurrentEnvironment(),a)
-#define UnmakeInstance(a) EnvUnmakeInstance(GetCurrentEnvironment(),a)
-#define ValidInstanceAddress(a) EnvValidInstanceAddress(GetCurrentEnvironment(),a)
+#define CreateRawInstance(a,b) EnvCreateRawInstance(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
+#define DeleteInstance(a) EnvDeleteInstance(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define DirectGetSlot(a,b,c) EnvDirectGetSlot(GetCurrentEnvironment(),getCurrentExecutionState(),a,b,c)
+#define DirectPutSlot(a,b,c) EnvDirectPutSlot(GetCurrentEnvironment(),getCurrentExecutionState(),a,b,c)
+#define FindInstance(a,b,c) EnvFindInstance(GetCurrentEnvironment(),getCurrentExecutionState(),a,b,c)
+#define GetInstanceClass(a) EnvGetInstanceClass(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define GetInstancePPForm(a,b,c) EnvGetInstancePPForm(GetCurrentEnvironment(),getCurrentExecutionState(),a,b,c)
+#define GetNextInstance(a) EnvGetNextInstance(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define GetNextInstanceInClass(a,b) EnvGetNextInstanceInClass(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
+#define GetNextInstanceInClassAndSubclasses(a,b,c) EnvGetNextInstanceInClassAndSubclasses(GetCurrentEnvironment(),getCurrentExecutionState(),a,b,c)
+#define Instances(a,b,c,d) EnvInstances(GetCurrentEnvironment(),getCurrentExecutionState(),a,b,c,d)
+#define MakeInstance(a) EnvMakeInstance(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define UnmakeInstance(a) EnvUnmakeInstance(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define ValidInstanceAddress(a) EnvValidInstanceAddress(GetCurrentEnvironment(),getCurrentExecutionState(),a)
 
 #if ALLOW_ENVIRONMENT_GLOBALS
    LOCALE char                          *GetInstanceName(void *,EXEC_STATUS);

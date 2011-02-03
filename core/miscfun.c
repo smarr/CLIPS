@@ -277,7 +277,7 @@ globle long long RandomFunction(
    /* zero or two arguments.             */
    /*====================================*/
 
-   argCount = EnvRtnArgCount(theEnv,execStatus,execStatus);
+   argCount = EnvRtnArgCount(theEnv,execStatus);
    
    if ((argCount != 0) && (argCount != 2))
      {

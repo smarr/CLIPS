@@ -39,15 +39,15 @@
 #define LOCALE extern
 #endif
 
-#define FactDeftemplate(a) EnvFactDeftemplate(GetCurrentEnvironment(),a)
-#define FactExistp(a) EnvFactExistp(GetCurrentEnvironment(),a)
-#define FactSlotNames(a,b) EnvFactSlotNames(GetCurrentEnvironment(),a,b)
-#define GetFactList(a,b) EnvGetFactList(GetCurrentEnvironment(),a,b)
-#define PPFact(a,b,c) EnvPPFact(GetCurrentEnvironment(),a,b,c)
+#define FactDeftemplate(a) EnvFactDeftemplate(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define FactExistp(a) EnvFactExistp(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define FactSlotNames(a,b) EnvFactSlotNames(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
+#define GetFactList(a,b) EnvGetFactList(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
+#define PPFact(a,b,c) EnvPPFact(GetCurrentEnvironment(),getCurrentExecutionState(),a,b,c)
 
    LOCALE void                           FactFunctionDefinitions(void *,EXEC_STATUS);
    LOCALE void                          *FactRelationFunction(void *,EXEC_STATUS);
-   LOCALE void                          *FactRelation(void *,EXEC_STATUS);
+   LOCALE void                          *FactRelation(void *);
    LOCALE void                          *EnvFactDeftemplate(void *,EXEC_STATUS,void *);
    LOCALE int                            FactExistpFunction(void *,EXEC_STATUS);
    LOCALE int                            EnvFactExistp(void *,EXEC_STATUS,void *);

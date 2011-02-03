@@ -54,7 +54,7 @@
 
 LOCALE void IncrementDefclassBusyCount(void *,EXEC_STATUS,void *);
 LOCALE void DecrementDefclassBusyCount(void *,EXEC_STATUS,void *);
-LOCALE intBool InstancesPurge(void *theEnv,EXEC_STATUS);
+LOCALE intBool InstancesPurge(void *,EXEC_STATUS);
 
 #if ! RUN_TIME
 LOCALE void InitializeClasses(void *,EXEC_STATUS);

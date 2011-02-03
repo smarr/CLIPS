@@ -55,7 +55,7 @@
 struct environmentCleanupFunction
   {
    char *name;
-   void (*func)(void *);
+   void (*func)(void *,EXEC_STATUS);
    int priority;
    struct environmentCleanupFunction *next;
   };

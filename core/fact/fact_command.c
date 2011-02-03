@@ -88,7 +88,8 @@
 /*   fact commands and functions.      */
 /***************************************/
 globle void FactCommandDefinitions(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
 #if ! RUN_TIME
 #if DEBUGGING_FUNCTIONS
@@ -255,6 +256,7 @@ static void AssertOrProcessEvent(
 /***************************************/
 globle void AssertCommand(
    void *theEnv,
+   EXEC_STATUS,
    DATA_OBJECT_PTR rv)
    {
      AssertOrProcessEvent(theEnv,execStatus, rv, TRUE);
@@ -398,7 +400,7 @@ globle void RetractCommand(
       else if ((theResult.type == SYMBOL) ?
                (strcmp(ValueToString(theResult.value),"*") == 0) : FALSE)
         {
-         RemoveAllFacts(theEnv,execStatus,execStatus);
+         RemoveAllFacts(theEnv,execStatus);
          return;
         }
 

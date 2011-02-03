@@ -49,7 +49,7 @@ typedef struct messageHandlerLink
 #define LOCALE extern
 #endif
 
-#define Send(a,b,c,d) EnvSend(GetCurrentEnvironment(),a,b,c,d)
+#define Send(a,b,c,d) EnvSend(GetCurrentEnvironment(),getCurrentExecutionState(),a,b,c,d)
 
    LOCALE void             DirectMessage(void *,EXEC_STATUS,SYMBOL_HN *,INSTANCE_TYPE *,
                                          DATA_OBJECT *,EXPRESSION *);

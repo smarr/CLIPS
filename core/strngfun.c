@@ -156,7 +156,7 @@ static void StrOrSymCatFunction(
    /* the string representation of each argument.   */
    /*===============================================*/
 
-   numArgs = EnvRtnArgCount(theEnv,execStatus,execStatus);
+   numArgs = EnvRtnArgCount(theEnv,execStatus);
    arrayOfStrings = (SYMBOL_HN **) gm1(theEnv,execStatus,(int) sizeof(SYMBOL_HN *) * numArgs);
    for (i = 0; i < numArgs; i++)   
      { arrayOfStrings[i] = NULL; }
@@ -745,7 +745,7 @@ globle int Eval(
   char *theString,
   DATA_OBJECT_PTR returnValue)
   {
-   return EnvEval(GetCurrentEnvironment(),theString,returnValue);
+   return EnvEval(GetCurrentEnvironment(),getCurrentExecutionState(),theString,returnValue);
   }
 #endif
   
@@ -963,7 +963,7 @@ globle int BuildFunction(
 globle int Build(
   char *theString)
   {
-   return EnvBuild(GetCurrentEnvironment(),theString);
+   return EnvBuild(GetCurrentEnvironment(),getCurrentExecutionState(),theString);
   }
 #endif
   

@@ -91,14 +91,14 @@ struct definstancesData
 #endif
 
 #define DefinstancesModule(x) GetConstructModuleName((struct constructHeader *) x)
-#define FindDefinstances(a) EnvFindDefinstances(GetCurrentEnvironment(),a)
-#define GetDefinstancesList(a,b) EnvGetDefinstancesList(GetCurrentEnvironment(),a,b)
+#define FindDefinstances(a) EnvFindDefinstances(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define GetDefinstancesList(a,b) EnvGetDefinstancesList(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
 #define GetDefinstancesName(x) GetConstructNameString((struct constructHeader *) x)
-#define GetDefinstancesPPForm(x) GetConstructPPForm(GetCurrentEnvironment(),(struct constructHeader *) x)
-#define GetNextDefinstances(a) EnvGetNextDefinstances(GetCurrentEnvironment(),a)
-#define IsDefinstancesDeletable(a) EnvIsDefinstancesDeletable(GetCurrentEnvironment(),a)
-#define ListDefinstances(a,b) EnvListDefinstances(GetCurrentEnvironment(),a,b)
-#define Undefinstances(a) EnvUndefinstances(GetCurrentEnvironment(),a)
+#define GetDefinstancesPPForm(x) GetConstructPPForm(GetCurrentEnvironment(),getCurrentExecutionState(),(struct constructHeader *) x)
+#define GetNextDefinstances(a) EnvGetNextDefinstances(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define IsDefinstancesDeletable(a) EnvIsDefinstancesDeletable(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define ListDefinstances(a,b) EnvListDefinstances(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
+#define Undefinstances(a) EnvUndefinstances(GetCurrentEnvironment(),getCurrentExecutionState(),a)
 
 LOCALE void SetupDefinstances(void *,EXEC_STATUS);
 LOCALE void *EnvGetNextDefinstances(void *,EXEC_STATUS,void *);

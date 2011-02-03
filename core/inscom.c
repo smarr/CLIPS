@@ -402,7 +402,7 @@ globle void InstancesCommand(
 
    theDefmodule = (void *) EnvGetCurrentModule(theEnv,execStatus);
 
-   argno = EnvRtnArgCount(theEnv,execStatus,execStatus);
+   argno = EnvRtnArgCount(theEnv,execStatus);
    if (argno > 0)
      {
       if (EnvArgTypeCheck(theEnv,execStatus,"instances",1,SYMBOL,&temp) == FALSE)
@@ -797,7 +797,7 @@ globle char *EnvGetInstanceName(
 globle char *GetInstanceName(
   void *iptr)
   {
-   return EnvGetInstanceName(GetCurrentEnvironment(),iptr);
+   return EnvGetInstanceName(GetCurrentEnvironment(),getCurrentExecutionState(),iptr);
   }
 #endif
   
@@ -1240,7 +1240,7 @@ globle void InstanceAddressCommand(
 
    result->type = SYMBOL;
    result->value = EnvFalseSymbol(theEnv,execStatus);
-   if (EnvRtnArgCount(theEnv,execStatus,execStatus) > 1)
+   if (EnvRtnArgCount(theEnv,execStatus) > 1)
      {
       if (EnvArgTypeCheck(theEnv,execStatus,"instance-address",1,SYMBOL,&temp) == FALSE)
         return;

@@ -165,7 +165,7 @@ globle int RemoveConstruct(
 globle int Save(
   char *fileName)  
   {
-   return EnvSave(GetCurrentEnvironment(),fileName);
+   return EnvSave(GetCurrentEnvironment(),getCurrentExecutionState(),fileName);
   }  
 #endif
 
@@ -328,7 +328,7 @@ globle void ClearCommand(
   EXEC_STATUS)
   {
    if (EnvArgCountCheck(theEnv,execStatus,"clear",EXACTLY,0) == -1) return;
-   EnvClear(theEnv,execStatus,execStatus);
+   EnvClear(theEnv,execStatus);
    return;
   }
 
@@ -341,7 +341,7 @@ globle void ResetCommand(
   EXEC_STATUS)
   {
    if (EnvArgCountCheck(theEnv,execStatus,"reset",EXACTLY,0) == -1) return;
-   EnvReset(theEnv,execStatus,execStatus);
+   EnvReset(theEnv,execStatus);
    return;
   }
 
@@ -352,7 +352,7 @@ globle void ResetCommand(
 #if ALLOW_ENVIRONMENT_GLOBALS
 globle void Reset(EXEC_STATUS)
   {
-   EnvReset(GetCurrentEnvironment(),execStatus);
+   EnvReset(GetCurrentEnvironment(),getCurrentExecutionState(),execStatus);
   }  
 #endif
 
@@ -605,7 +605,7 @@ globle void EnvClear(
    /* Perform reset after clear. */
    /*============================*/
    
-   EnvReset(theEnv,execStatus,execStatus);
+   EnvReset(theEnv,execStatus);
   }
 
 /*********************************************************/

@@ -65,26 +65,26 @@
 #endif
 
 #define DefgenericModule(x) GetConstructModuleName((struct constructHeader *) x)
-#define FindDefgeneric(a) EnvFindDefgeneric(GetCurrentEnvironment(),a)
-#define GetDefgenericList(a,b) EnvGetDefgenericList(GetCurrentEnvironment(),a,b)
+#define FindDefgeneric(a) EnvFindDefgeneric(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define GetDefgenericList(a,b) EnvGetDefgenericList(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
 #define GetDefgenericName(x) GetConstructNameString((struct constructHeader *) x)
-#define GetDefgenericPPForm(x) GetConstructPPForm(GetCurrentEnvironment(),(struct constructHeader *) x)
-#define GetDefgenericWatch(a) EnvGetDefgenericWatch(GetCurrentEnvironment(),a)
-#define GetNextDefgeneric(a) EnvGetNextDefgeneric(GetCurrentEnvironment(),a)
-#define IsDefgenericDeletable(a) EnvIsDefgenericDeletable(GetCurrentEnvironment(),a)
-#define ListDefgenerics(a,b) EnvListDefgenerics(GetCurrentEnvironment(),a,b)
-#define SetDefgenericWatch(a,b) EnvSetDefgenericWatch(GetCurrentEnvironment(),a,b)
-#define Undefgeneric(a) EnvUndefgeneric(GetCurrentEnvironment(),a)
-#define GetDefmethodDescription(a,b,c,d) EnvGetDefmethodDescription(GetCurrentEnvironment(),a,b,c,d)
-#define GetDefmethodList(a,b) EnvGetDefmethodList(GetCurrentEnvironment(),a,b)
-#define GetDefmethodPPForm(a,b) EnvGetDefmethodPPForm(GetCurrentEnvironment(),a,b)
-#define GetDefmethodWatch(a,b) EnvGetDefmethodWatch(GetCurrentEnvironment(),a,b)
-#define GetMethodRestrictions(a,b,c) EnvGetMethodRestrictions(GetCurrentEnvironment(),a,b,c)
-#define GetNextDefmethod(a,b) EnvGetNextDefmethod(GetCurrentEnvironment(),a,b)
-#define IsDefmethodDeletable(a,b) EnvIsDefmethodDeletable(GetCurrentEnvironment(),a,b)
-#define ListDefmethods(a,b) EnvListDefmethods(GetCurrentEnvironment(),a,b)
-#define SetDefmethodWatch(a,b,c) EnvSetDefmethodWatch(GetCurrentEnvironment(),a,b,c)
-#define Undefmethod(a,b) EnvUndefmethod(GetCurrentEnvironment(),a,b)
+#define GetDefgenericPPForm(x) GetConstructPPForm(GetCurrentEnvironment(),getCurrentExecutionState(),(struct constructHeader *) x)
+#define GetDefgenericWatch(a) EnvGetDefgenericWatch(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define GetNextDefgeneric(a) EnvGetNextDefgeneric(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define IsDefgenericDeletable(a) EnvIsDefgenericDeletable(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define ListDefgenerics(a,b) EnvListDefgenerics(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
+#define SetDefgenericWatch(a,b) EnvSetDefgenericWatch(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
+#define Undefgeneric(a) EnvUndefgeneric(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define GetDefmethodDescription(a,b,c,d) EnvGetDefmethodDescription(GetCurrentEnvironment(),getCurrentExecutionState(),a,b,c,d)
+#define GetDefmethodList(a,b) EnvGetDefmethodList(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
+#define GetDefmethodPPForm(a,b) EnvGetDefmethodPPForm(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
+#define GetDefmethodWatch(a,b) EnvGetDefmethodWatch(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
+#define GetMethodRestrictions(a,b,c) EnvGetMethodRestrictions(GetCurrentEnvironment(),getCurrentExecutionState(),a,b,c)
+#define GetNextDefmethod(a,b) EnvGetNextDefmethod(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
+#define IsDefmethodDeletable(a,b) EnvIsDefmethodDeletable(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
+#define ListDefmethods(a,b) EnvListDefmethods(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
+#define SetDefmethodWatch(a,b,c) EnvSetDefmethodWatch(GetCurrentEnvironment(),getCurrentExecutionState(),a,b,c)
+#define Undefmethod(a,b) EnvUndefmethod(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
 
 LOCALE void SetupGenericFunctions(void *,EXEC_STATUS);
 LOCALE void *EnvFindDefgeneric(void *,EXEC_STATUS,char *);
@@ -97,7 +97,7 @@ LOCALE int EnvIsDefmethodDeletable(void *,EXEC_STATUS,void *,long);
 LOCALE void UndefgenericCommand(void *,EXEC_STATUS);
 LOCALE void *GetDefgenericModuleCommand(void *,EXEC_STATUS);
 LOCALE void UndefmethodCommand(void *,EXEC_STATUS);
-LOCALE DEFMETHOD *GetDefmethodPointer(void *,EXEC_STATUS,long);
+LOCALE DEFMETHOD *GetDefmethodPointer(void *,long);
 
 LOCALE intBool EnvUndefgeneric(void *,EXEC_STATUS,void *);
 LOCALE intBool EnvUndefmethod(void *,EXEC_STATUS,void *,long);

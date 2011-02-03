@@ -39,11 +39,11 @@
 #define LOCALE extern
 #endif
 
-#define GetDefglobalList(a,b) EnvGetDefglobalList(GetCurrentEnvironment(),a,b)
-#define GetDefglobalWatch(a) EnvGetDefglobalWatch(GetCurrentEnvironment(),a)
-#define ListDefglobals(a,b) EnvListDefglobals(GetCurrentEnvironment(),a,b)
-#define SetDefglobalWatch(a,b) EnvSetDefglobalWatch(GetCurrentEnvironment(),a,b)
-#define Undefglobal(a) EnvUndefglobal(GetCurrentEnvironment(),a)
+#define GetDefglobalList(a,b) EnvGetDefglobalList(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
+#define GetDefglobalWatch(a) EnvGetDefglobalWatch(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define ListDefglobals(a,b) EnvListDefglobals(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
+#define SetDefglobalWatch(a,b) EnvSetDefglobalWatch(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
+#define Undefglobal(a) EnvUndefglobal(GetCurrentEnvironment(),getCurrentExecutionState(),a)
 
    LOCALE void                           DefglobalBasicCommands(void *,EXEC_STATUS);
    LOCALE void                           UndefglobalCommand(void *,EXEC_STATUS);

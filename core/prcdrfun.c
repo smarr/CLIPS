@@ -274,7 +274,6 @@ globle long long GetLoopCount(
 globle void IfFunction(
   void *theEnv,
   EXEC_STATUS,
-  EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
    int numArgs;
@@ -293,9 +292,9 @@ globle void IfFunction(
       return;
      }
 
-   if (execStatus->CurrentExpression->>argList->nextArg->nextArg == NULL)
+   if (execStatus->CurrentExpression->argList->nextArg->nextArg == NULL)
      { numArgs = 2; }
-   else if (execStatus->CurrentExpression->>argList->nextArg->nextArg->nextArg == NULL)
+   else if (execStatus->CurrentExpression->argList->nextArg->nextArg->nextArg == NULL)
      { numArgs = 3; }
    else
      {
@@ -309,7 +308,7 @@ globle void IfFunction(
    /* Evaluate the condition. */
    /*=========================*/
 
-   EvaluateExpression(theEnv,execStatus,execStatus->CurrentExpression->>argList,returnValue);
+   EvaluateExpression(theEnv,execStatus->CurrentExpression->argList,returnValue);
 
    if ((ProcedureFunctionData(theEnv,execStatus)->BreakFlag == TRUE) || (ProcedureFunctionData(theEnv,execStatus)->ReturnFlag == TRUE))
      {
@@ -328,7 +327,7 @@ globle void IfFunction(
        (returnValue->type == SYMBOL) &&
        (numArgs == 3))
      {
-      theExpr = execStatus->CurrentExpression->>argList->nextArg->nextArg;
+      theExpr = execStatus->CurrentExpression->argList->nextArg->nextArg;
       switch (theExpr->type)
         {
          case INTEGER:
@@ -359,7 +358,7 @@ globle void IfFunction(
    else if ((returnValue->value != EnvFalseSymbol(theEnv,execStatus)) ||
             (returnValue->type != SYMBOL))
      {
-      theExpr = execStatus->CurrentExpression->>argList->nextArg;
+      theExpr = execStatus->CurrentExpression->argList->nextArg;
       switch (theExpr->type)
         {
          case INTEGER:
@@ -567,7 +566,7 @@ globle void PrognFunction(
   {
    struct expr *argPtr;
 
-   argPtr = execStatus->CurrentExpression->>argList;
+   argPtr = execStatus->CurrentExpression->argList;
 
    if (argPtr == NULL)
      {

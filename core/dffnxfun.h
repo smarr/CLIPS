@@ -102,16 +102,16 @@ struct deffunctionData
 #define DeffunctionData(theEnv,execStatus) ((struct deffunctionData *) GetEnvironmentData(theEnv,execStatus,DEFFUNCTION_DATA))
 
 #define DeffunctionModule(x) GetConstructModuleName((struct constructHeader *) x)
-#define FindDeffunction(a) EnvFindDeffunction(GetCurrentEnvironment(),a)
-#define GetDeffunctionList(a,b) EnvGetDeffunctionList(GetCurrentEnvironment(),a,b)
+#define FindDeffunction(a) EnvFindDeffunction(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define GetDeffunctionList(a,b) EnvGetDeffunctionList(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
 #define GetDeffunctionName(x) GetConstructNameString((struct constructHeader *) x)
-#define GetDeffunctionPPForm(x) GetConstructPPForm(GetCurrentEnvironment(),(struct constructHeader *) x)
-#define GetDeffunctionWatch(a) EnvGetDeffunctionWatch(GetCurrentEnvironment(),a)
-#define GetNextDeffunction(a) EnvGetNextDeffunction(GetCurrentEnvironment(),a)
-#define IsDeffunctionDeletable(a) EnvIsDeffunctionDeletable(GetCurrentEnvironment(),a)
-#define ListDeffunctions(a,b) EnvListDeffunctions(GetCurrentEnvironment(),a,b)
-#define SetDeffunctionWatch(a,b) EnvSetDeffunctionWatch(GetCurrentEnvironment(),a,b)
-#define Undeffunction(a) EnvUndeffunction(GetCurrentEnvironment(),a)
+#define GetDeffunctionPPForm(x) GetConstructPPForm(GetCurrentEnvironment(),getCurrentExecutionState(),(struct constructHeader *) x)
+#define GetDeffunctionWatch(a) EnvGetDeffunctionWatch(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define GetNextDeffunction(a) EnvGetNextDeffunction(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define IsDeffunctionDeletable(a) EnvIsDeffunctionDeletable(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define ListDeffunctions(a,b) EnvListDeffunctions(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
+#define SetDeffunctionWatch(a,b) EnvSetDeffunctionWatch(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
+#define Undeffunction(a) EnvUndeffunction(GetCurrentEnvironment(),getCurrentExecutionState(),a)
 
 LOCALE void SetupDeffunctions(void *,EXEC_STATUS);
 LOCALE void *EnvFindDeffunction(void *,EXEC_STATUS,char *);

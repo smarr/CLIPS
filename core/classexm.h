@@ -42,17 +42,17 @@
 #define LOCALE extern
 #endif
 
-#define BrowseClasses(a,b) EnvBrowseClasses(GetCurrentEnvironment(),a,b)
-#define DescribeClass(a,b) EnvDescribeClass(GetCurrentEnvironment(),a,b)
-#define SlotDirectAccessP(a,b) EnvSlotDirectAccessP(GetCurrentEnvironment(),a,b)
-#define SlotExistP(a,b,c) EnvSlotExistP(GetCurrentEnvironment(),a,b,c)
-#define SlotInitableP(a,b) EnvSlotInitableP(GetCurrentEnvironment(),a,b)
-#define SlotPublicP(a,b) EnvSlotPublicP(GetCurrentEnvironment(),a,b)
-#define SlotDefaultP(a,b) EnvSlotDefaultP(GetCurrentEnvironment(),a,b)
-#define SlotWritableP(a,b) EnvSlotWritableP(GetCurrentEnvironment(),a,b)
-#define SubclassP(a,b) EnvSubclassP(GetCurrentEnvironment(),a,b)
-#define SuperclassP(a,b) EnvSuperclassP(GetCurrentEnvironment(),a,b)
-#define SlotDefaultValue(a,b,c) EnvSlotDefaultValue(GetCurrentEnvironment(),a,b,c)
+#define BrowseClasses(a,b) EnvBrowseClasses(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
+#define DescribeClass(a,b) EnvDescribeClass(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
+#define SlotDirectAccessP(a,b) EnvSlotDirectAccessP(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
+#define SlotExistP(a,b,c) EnvSlotExistP(GetCurrentEnvironment(),getCurrentExecutionState(),a,b,c)
+#define SlotInitableP(a,b) EnvSlotInitableP(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
+#define SlotPublicP(a,b) EnvSlotPublicP(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
+#define SlotDefaultP(a,b) EnvSlotDefaultP(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
+#define SlotWritableP(a,b) EnvSlotWritableP(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
+#define SubclassP(a,b) EnvSubclassP(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
+#define SuperclassP(a,b) EnvSuperclassP(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
+#define SlotDefaultValue(a,b,c) EnvSlotDefaultValue(GetCurrentEnvironment(),getCurrentExecutionState(),a,b,c)
 
 #if DEBUGGING_FUNCTIONS
 LOCALE void BrowseClassesCommand(void *,EXEC_STATUS);
@@ -61,7 +61,7 @@ LOCALE void DescribeClassCommand(void *,EXEC_STATUS);
 LOCALE void EnvDescribeClass(void *,EXEC_STATUS,char *,void *);
 #endif
 
-LOCALE char *GetCreateAccessorString(void *,EXEC_STATUS);
+LOCALE char *GetCreateAccessorString(void *);
 
 LOCALE void *GetDefclassModuleCommand(void *,EXEC_STATUS);
 LOCALE intBool SuperclassPCommand(void *,EXEC_STATUS);

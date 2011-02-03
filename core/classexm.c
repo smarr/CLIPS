@@ -108,7 +108,7 @@ globle void BrowseClassesCommand(
   {
    register DEFCLASS *cls;
    
-   if (EnvRtnArgCount(theEnv,execStatus,execStatus) == 0)
+   if (EnvRtnArgCount(theEnv,execStatus) == 0)
       /* ================================================
          Find the OBJECT root class (has no superclasses)
          ================================================ */
@@ -438,7 +438,7 @@ globle int SlotExistPCommand(
    sd = CheckSlotExists(theEnv,execStatus,"slot-existp",&cls,FALSE,TRUE);
    if (sd == NULL)
      return(FALSE);
-   if (EnvRtnArgCount(theEnv,execStatus,execStatus) == 3)
+   if (EnvRtnArgCount(theEnv,execStatus) == 3)
      {
       if (EnvArgTypeCheck(theEnv,execStatus,"slot-existp",3,SYMBOL,&dobj) == FALSE)
         return(FALSE);
@@ -504,7 +504,7 @@ globle int MessageHandlerExistPCommand(
    if (EnvArgTypeCheck(theEnv,execStatus,"message-handler-existp",2,SYMBOL,&temp) == FALSE)
      return(FALSE);
    mname = (SYMBOL_HN *) GetValue(temp);
-   if (EnvRtnArgCount(theEnv,execStatus,execStatus) == 3)
+   if (EnvRtnArgCount(theEnv,execStatus) == 3)
      {
       if (EnvArgTypeCheck(theEnv,execStatus,"message-handler-existp",3,SYMBOL,&temp) == FALSE)
         return(FALSE);

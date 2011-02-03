@@ -598,7 +598,7 @@ static long InstancesSaveCommandParser(
      return(0L);
    fileFound = DOToString(temp);
 
-   argCount = EnvRtnArgCount(theEnv,execStatus,execStatus);
+   argCount = EnvRtnArgCount(theEnv,execStatus);
    if (argCount > 1)
      {
       if (EnvArgTypeCheck(theEnv,execStatus,functionName,2,SYMBOL,&temp) == FALSE)

@@ -61,13 +61,13 @@ struct instanceFileData
 #define LOCALE extern
 #endif
 
-#define BinaryLoadInstances(a) EnvBinaryLoadInstances(GetCurrentEnvironment(),a)
-#define BinarySaveInstances(a,b,c,d) EnvBinarySaveInstances(GetCurrentEnvironment(),a,b,c,d)
-#define LoadInstances(a) EnvLoadInstances(GetCurrentEnvironment(),a)
-#define LoadInstancesFromString(a,b) EnvLoadInstancesFromString(GetCurrentEnvironment(),a,b)
-#define RestoreInstances(a) EnvRestoreInstances(GetCurrentEnvironment(),a)
-#define RestoreInstancesFromString(a,b) EnvRestoreInstancesFromString(GetCurrentEnvironment(),a,b)
-#define SaveInstances(a,b,c,d) EnvSaveInstances(GetCurrentEnvironment(),a,b,c,d)
+#define BinaryLoadInstances(a) EnvBinaryLoadInstances(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define BinarySaveInstances(a,b,c,d) EnvBinarySaveInstances(GetCurrentEnvironment(),getCurrentExecutionState(),a,b,c,d)
+#define LoadInstances(a) EnvLoadInstances(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define LoadInstancesFromString(a,b) EnvLoadInstancesFromString(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
+#define RestoreInstances(a) EnvRestoreInstances(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define RestoreInstancesFromString(a,b) EnvRestoreInstancesFromString(GetCurrentEnvironment(),getCurrentExecutionState(),a,b)
+#define SaveInstances(a,b,c,d) EnvSaveInstances(GetCurrentEnvironment(),getCurrentExecutionState(),a,b,c,d)
 
 LOCALE void SetupInstanceFileCommands(void *,EXEC_STATUS);
 
