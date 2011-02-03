@@ -172,6 +172,7 @@ globle void ExpressionInstall(
      {
       AtomInstall(theEnv,execStatus,expression->type,expression->value);
       ExpressionInstall(theEnv,execStatus,expression->argList);
+      expression->refCount++;
       expression = expression->nextArg;
      }
   }
@@ -185,15 +186,18 @@ globle void ExpressionDeinstall(
   EXEC_STATUS,
   struct expr *expression)
   {
-   if (expression == NULL) return;
-
-   while (expression != NULL)
-     {
+    if (expression == NULL) return;
+    
+    while (expression != NULL)
+    {
       AtomDeinstall(theEnv,execStatus,expression->type,expression->value);
       ExpressionDeinstall(theEnv,execStatus,expression->argList);
+      expression->refCount--;
       expression = expression->nextArg;
-     }
+    }
+    
   }
+
 
 #if (! RUN_TIME)
 
@@ -291,7 +295,7 @@ globle void ReturnExpression(
   {
    register struct expr *tmp;
 
-   while (waste != NULL)
+   while (waste != NULL && waste->refCount < 1)
      {
       if (waste->argList != NULL) ReturnExpression(theEnv,execStatus,waste->argList);
       tmp = waste;

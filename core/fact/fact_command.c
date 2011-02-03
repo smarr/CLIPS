@@ -281,6 +281,9 @@ static void * APR_THREAD_FUNC ProcessEventOnFactThread(apr_thread_t *thread, voi
   DATA_OBJECT result;
   AssertOrProcessEvent(params->theEnv,params->execStatus, &result, FALSE);
   
+  ExpressionDeinstall(params->theEnv,params->execStatus,
+                      params->execStatus->CurrentExpression);
+  
   free(params->execStatus);
   free(params);
   
@@ -306,6 +309,10 @@ globle void ProcessEventCommand(
        
        parameters->execStatus = newExecStatus;
        
+       // increase the reference pointer, as all allocations will be released
+       // by the thread that is receiving the task/job
+       ExpressionInstall(theEnv,execStatus,parameters->execStatus->CurrentExpression);
+       
        apr_status_t apr_rv;
        apr_rv = apr_thread_pool_push(Env(theEnv,execStatus)->factThreadPool,
                                  ProcessEventOnFactThread,
@@ -316,12 +323,12 @@ globle void ProcessEventCommand(
        }
      }
      
-     while ((apr_thread_pool_tasks_count(Env(theEnv,execStatus)->factThreadPool) > 0)
+/*     while ((apr_thread_pool_tasks_count(Env(theEnv,execStatus)->factThreadPool) > 0)
             || ((apr_thread_pool_busy_count(Env(theEnv,execStatus)->factThreadPool)) > 0)) {
        usleep(100);
      }
      
-     assert(apr_thread_pool_idle_count(Env(theEnv,execStatus)->factThreadPool) == 1);
+     assert(apr_thread_pool_idle_count(Env(theEnv,execStatus)->factThreadPool) == 1);*/
    }
 
 /****************************************/
