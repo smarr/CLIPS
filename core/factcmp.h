@@ -39,7 +39,7 @@
 #define LOCALE extern
 #endif
 
-# include "evaluatn.h"
+# include "execution_status.h"
 
    LOCALE void                           FactPatternsCompilerSetup(void *,EXEC_STATUS);
    LOCALE void                           FactPatternNodeReference(void *,EXEC_STATUS,void *,FILE *,int,int);

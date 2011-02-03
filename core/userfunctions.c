@@ -46,7 +46,7 @@
 #include "factrhs.h"
 
 void UserFunctions(void);
-void EnvUserFunctions(void *);
+void EnvUserFunctions(void *,EXEC_STATUS);
 
 /*********************************************************/
 /* UserFunctions: Informs the expert system environment  */
@@ -106,7 +106,7 @@ void EnvUserFunctions(
 
     
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
   }
 

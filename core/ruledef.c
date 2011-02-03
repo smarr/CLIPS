@@ -74,13 +74,13 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static void                   *AllocateModule(void *);
-   static void                    ReturnModule(void *,void *);
-   static void                    InitializeDefruleModules(void *);
-   static void                    DeallocateDefruleData(void *);
-   static void                    DestroyDefruleAction(void *,struct constructHeader *,void *);
+   static void                   *AllocateModule(void *,EXEC_STATUS);
+   static void                    ReturnModule(void *,EXEC_STATUS,void *);
+   static void                    InitializeDefruleModules(void *,EXEC_STATUS);
+   static void                    DeallocateDefruleData(void *,EXEC_STATUS);
+   static void                    DestroyDefruleAction(void *,EXEC_STATUS,struct constructHeader *,void *);
 #if RUN_TIME   
-   static void                    AddBetaMemoriesToRule(void *,struct joinNode *);
+   static void                    AddBetaMemoriesToRule(void *,EXEC_STATUS,struct joinNode *);
 #endif
 
 /**********************************************************/
@@ -93,10 +93,10 @@ globle void InitializeDefrules(
    unsigned long i;
    AllocateEnvironmentData(theEnv,execStatus,DEFRULE_DATA,sizeof(struct defruleData),DeallocateDefruleData);
 
-   InitializeEngine(theEnv);
-   InitializeAgenda(theEnv);
-   InitializePatterns(theEnv);
-   InitializeDefruleModules(theEnv);
+   InitializeEngine(theEnv,execStatus);
+   InitializeAgenda(theEnv,execStatus);
+   InitializePatterns(theEnv,execStatus);
+   InitializeDefruleModules(theEnv,execStatus);
 
    AddReservedPatternSymbol(theEnv,execStatus,"and",NULL);
    AddReservedPatternSymbol(theEnv,execStatus,"not",NULL);
@@ -106,26 +106,26 @@ globle void InitializeDefrules(
    AddReservedPatternSymbol(theEnv,execStatus,"exists",NULL);
    AddReservedPatternSymbol(theEnv,execStatus,"forall",NULL);
 
-   DefruleBasicCommands(theEnv);
+   DefruleBasicCommands(theEnv,execStatus);
 
-   DefruleCommands(theEnv);
+   DefruleCommands(theEnv,execStatus);
 
-   DefruleData(theEnv)->DefruleConstruct =
+   DefruleData(theEnv,execStatus)->DefruleConstruct =
       AddConstruct(theEnv,execStatus,"defrule","defrules",
                    ParseDefrule,EnvFindDefrule,
                    GetConstructNamePointer,GetConstructPPForm,
                    GetConstructModuleItem,EnvGetNextDefrule,SetNextConstruct,
                    EnvIsDefruleDeletable,EnvUndefrule,ReturnDefrule);
 
-   DefruleData(theEnv)->AlphaMemoryTable = (ALPHA_MEMORY_HASH **)
+   DefruleData(theEnv,execStatus)->AlphaMemoryTable = (ALPHA_MEMORY_HASH **)
                   gm3(theEnv,execStatus,sizeof (ALPHA_MEMORY_HASH *) * ALPHA_MEMORY_HASH_SIZE);
 
-   for (i = 0; i < ALPHA_MEMORY_HASH_SIZE; i++) DefruleData(theEnv)->AlphaMemoryTable[i] = NULL;
+   for (i = 0; i < ALPHA_MEMORY_HASH_SIZE; i++) DefruleData(theEnv,execStatus)->AlphaMemoryTable[i] = NULL;
 
-   DefruleData(theEnv)->BetaMemoryResizingFlag = TRUE;
+   DefruleData(theEnv,execStatus)->BetaMemoryResizingFlag = TRUE;
    
-   DefruleData(theEnv)->RightPrimeJoins = NULL;
-   DefruleData(theEnv)->LeftPrimeJoins = NULL;   
+   DefruleData(theEnv,execStatus)->RightPrimeJoins = NULL;
+   DefruleData(theEnv,execStatus)->LeftPrimeJoins = NULL;   
   }
   
 /**************************************************/
@@ -142,11 +142,11 @@ static void DeallocateDefruleData(
    struct salienceGroup *theGroup, *tmpGroup;
 
 #if BLOAD || BLOAD_AND_BSAVE
-   if (Bloaded(theEnv))
+   if (Bloaded(theEnv,execStatus))
      { return; }
 #endif
    
-   DoForAllConstructs(theEnv,execStatus,DestroyDefruleAction,DefruleData(theEnv)->DefruleModuleIndex,FALSE,NULL);
+   DoForAllConstructs(theEnv,execStatus,DestroyDefruleAction,DefruleData(theEnv,execStatus)->DefruleModuleIndex,FALSE,NULL);
 
    for (theModule = EnvGetNextDefmodule(theEnv,execStatus,NULL);
         theModule != NULL;
@@ -154,7 +154,7 @@ static void DeallocateDefruleData(
      {
       theModuleItem = (struct defruleModule *)
                       GetModuleItem(theEnv,execStatus,(struct defmodule *) theModule,
-                                    DefruleData(theEnv)->DefruleModuleIndex);
+                                    DefruleData(theEnv,execStatus)->DefruleModuleIndex);
                                     
       theActivation = theModuleItem->agenda;
       while (theActivation != NULL)
@@ -181,7 +181,7 @@ static void DeallocateDefruleData(
 #endif
      }   
      
-   rm3(theEnv,execStatus,DefruleData(theEnv)->AlphaMemoryTable,sizeof (ALPHA_MEMORY_HASH *) * ALPHA_MEMORY_HASH_SIZE);
+   rm3(theEnv,execStatus,DefruleData(theEnv,execStatus)->AlphaMemoryTable,sizeof (ALPHA_MEMORY_HASH *) * ALPHA_MEMORY_HASH_SIZE);
   }
   
 /********************************************************/
@@ -213,7 +213,7 @@ static void InitializeDefruleModules(
   void *theEnv,
   EXEC_STATUS)
   {
-   DefruleData(theEnv)->DefruleModuleIndex = RegisterModuleItem(theEnv,execStatus,"defrule",
+   DefruleData(theEnv,execStatus)->DefruleModuleIndex = RegisterModuleItem(theEnv,execStatus,"defrule",
                                     AllocateModule,
                                     ReturnModule,
 #if BLOAD_AND_BSAVE || BLOAD || BLOAD_ONLY
@@ -252,7 +252,7 @@ static void ReturnModule(
   EXEC_STATUS,
   void *theItem)
   {
-   FreeConstructHeaderModule(theEnv,execStatus,(struct defmoduleItemHeader *) theItem,DefruleData(theEnv)->DefruleConstruct);
+   FreeConstructHeaderModule(theEnv,execStatus,(struct defmoduleItemHeader *) theItem,DefruleData(theEnv,execStatus)->DefruleConstruct);
    rtn_struct(theEnv,execStatus,defruleModule,theItem);
   }
 
@@ -265,7 +265,7 @@ globle struct defruleModule *GetDefruleModuleItem(
   EXEC_STATUS,
   struct defmodule *theModule)
   {   
-   return((struct defruleModule *) GetConstructModuleItemByIndex(theEnv,execStatus,theModule,DefruleData(theEnv)->DefruleModuleIndex)); 
+   return((struct defruleModule *) GetConstructModuleItemByIndex(theEnv,execStatus,theModule,DefruleData(theEnv,execStatus)->DefruleModuleIndex)); 
   }
 
 /*******************************************************************/
@@ -277,7 +277,7 @@ globle void *EnvFindDefrule(
   EXEC_STATUS,
   char *defruleName)
   {   
-   return(FindNamedConstruct(theEnv,execStatus,defruleName,DefruleData(theEnv)->DefruleConstruct)); 
+   return(FindNamedConstruct(theEnv,execStatus,defruleName,DefruleData(theEnv,execStatus)->DefruleConstruct)); 
   }
 
 /************************************************************/
@@ -291,7 +291,7 @@ globle void *EnvGetNextDefrule(
   EXEC_STATUS,
   void *defrulePtr)
   {   
-   return((void *) GetNextConstructItem(theEnv,execStatus,(struct constructHeader *) defrulePtr,DefruleData(theEnv)->DefruleModuleIndex)); 
+   return((void *) GetNextConstructItem(theEnv,execStatus,(struct constructHeader *) defrulePtr,DefruleData(theEnv,execStatus)->DefruleModuleIndex)); 
   }
 
 /*******************************************************/
@@ -305,7 +305,7 @@ globle intBool EnvIsDefruleDeletable(
   {
    struct defrule *theDefrule;
 
-   if (! ConstructsDeletable(theEnv))
+   if (! ConstructsDeletable(theEnv,execStatus))
      { return FALSE; }
 
    for (theDefrule = (struct defrule *) vTheDefrule;
@@ -313,7 +313,7 @@ globle intBool EnvIsDefruleDeletable(
         theDefrule = theDefrule->disjunct)
      { if (theDefrule->executing) return(FALSE); }
 
-   if (EngineData(theEnv)->JoinOperationInProgress) return(FALSE);
+   if (EngineData(theEnv,execStatus)->JoinOperationInProgress) return(FALSE);
 
    return(TRUE);
   }
@@ -333,10 +333,10 @@ globle void DefruleRunTimeInitialize(
    struct defmodule *theModule;
    struct defrule *theRule, *theDisjunct;
 
-   DefruleData(theEnv)->RightPrimeJoins = rightPrime;
-   DefruleData(theEnv)->LeftPrimeJoins = leftPrime;   
+   DefruleData(theEnv,execStatus)->RightPrimeJoins = rightPrime;
+   DefruleData(theEnv,execStatus)->LeftPrimeJoins = leftPrime;   
 
-   SaveCurrentModule(theEnv);
+   SaveCurrentModule(theEnv,execStatus);
 
    for (theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,NULL);
         theModule != NULL;
@@ -354,7 +354,7 @@ globle void DefruleRunTimeInitialize(
         }
      }
      
-   RestoreCurrentModule(theEnv);
+   RestoreCurrentModule(theEnv,execStatus);
   }
 
 
@@ -416,7 +416,7 @@ globle void AddBetaMemoriesToJoin(
  //     if (theNode->firstJoin && theNode->patternIsExists)
       if (theNode->firstJoin && (theNode->patternIsExists || theNode-> patternIsNegated || theNode->joinFromTheRight))
         {
-         theNode->leftMemory->beta[0] = CreateEmptyPartialMatch(theEnv); 
+         theNode->leftMemory->beta[0] = CreateEmptyPartialMatch(theEnv,execStatus); 
          theNode->leftMemory->beta[0]->owner = theNode;
         }
      }
@@ -452,7 +452,7 @@ globle void AddBetaMemoriesToJoin(
       theNode->rightMemory = get_struct(theEnv,execStatus,betaMemory); 
       theNode->rightMemory->beta = (struct partialMatch **) genalloc(theEnv,execStatus,sizeof(struct partialMatch *));
       theNode->rightMemory->last = (struct partialMatch **) genalloc(theEnv,execStatus,sizeof(struct partialMatch *));
-      theNode->rightMemory->beta[0] = CreateEmptyPartialMatch(theEnv);
+      theNode->rightMemory->beta[0] = CreateEmptyPartialMatch(theEnv,execStatus);
       theNode->rightMemory->beta[0]->owner = theNode;
       theNode->rightMemory->beta[0]->rhsMemory = TRUE;
       theNode->rightMemory->last[0] = theNode->rightMemory->beta[0];

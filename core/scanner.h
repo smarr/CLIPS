@@ -56,15 +56,15 @@ struct scannerData
    int IgnoreCompletionErrors;
   };
 
-#define ScannerData(theEnv) ((struct scannerData *) GetEnvironmentData(theEnv,execStatus,SCANNER_DATA))
+#define ScannerData(theEnv,execStatus) ((struct scannerData *) GetEnvironmentData(theEnv,execStatus,SCANNER_DATA))
 
-   LOCALE void                           InitializeScannerData(void *);
-   LOCALE void                           GetToken(void *,char *,struct token *);
+   LOCALE void                           InitializeScannerData(void *,EXEC_STATUS);
+   LOCALE void                           GetToken(void *,EXEC_STATUS,char *,struct token *);
    LOCALE void                           CopyToken(struct token *,struct token *);
-   LOCALE void                           ResetLineCount(void *);
-   LOCALE long                           GetLineCount(void *);
-   LOCALE void                           IncrementLineCount(void *);
-   LOCALE void                           DecrementLineCount(void *);
+   LOCALE void                           ResetLineCount(void *,EXEC_STATUS);
+   LOCALE long                           GetLineCount(void *,EXEC_STATUS);
+   LOCALE void                           IncrementLineCount(void *,EXEC_STATUS);
+   LOCALE void                           DecrementLineCount(void *,EXEC_STATUS);
 
 #endif
 

@@ -66,41 +66,41 @@ typedef struct igarbage
 #define LOCALE extern
 #endif
 
-#define DecrementInstanceCount(a) EnvDecrementInstanceCount(GetCurrentEnvironment(),a)
-#define GetInstancesChanged() EnvGetInstancesChanged(GetCurrentEnvironment())
-#define IncrementInstanceCount(a) EnvIncrementInstanceCount(GetCurrentEnvironment(),a)
-#define SetInstancesChanged(a) EnvSetInstancesChanged(GetCurrentEnvironment(),a)
+#define DecrementInstanceCount(a) EnvDecrementInstanceCount(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define GetInstancesChanged() EnvGetInstancesChanged(GetCurrentEnvironment(),GetCurrentExecutionState())
+#define IncrementInstanceCount(a) EnvIncrementInstanceCount(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define SetInstancesChanged(a) EnvSetInstancesChanged(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
 
-LOCALE void EnvIncrementInstanceCount(void *,void *);
-LOCALE void EnvDecrementInstanceCount(void *,void *);
-LOCALE void InitializeInstanceTable(void *);
-LOCALE void CleanupInstances(void *);
+LOCALE void EnvIncrementInstanceCount(void *,EXEC_STATUS,void *);
+LOCALE void EnvDecrementInstanceCount(void *,EXEC_STATUS,void *);
+LOCALE void InitializeInstanceTable(void *,EXEC_STATUS);
+LOCALE void CleanupInstances(void *,EXEC_STATUS);
 LOCALE unsigned HashInstance(SYMBOL_HN *);
-LOCALE void DestroyAllInstances(void *);
-LOCALE void RemoveInstanceData(void *,INSTANCE_TYPE *);
-LOCALE INSTANCE_TYPE *FindInstanceBySymbol(void *,SYMBOL_HN *);
-LOCALE INSTANCE_TYPE *FindInstanceInModule(void *,SYMBOL_HN *,struct defmodule *,
+LOCALE void DestroyAllInstances(void *,EXEC_STATUS);
+LOCALE void RemoveInstanceData(void *,EXEC_STATUS,INSTANCE_TYPE *);
+LOCALE INSTANCE_TYPE *FindInstanceBySymbol(void *,EXEC_STATUS,SYMBOL_HN *);
+LOCALE INSTANCE_TYPE *FindInstanceInModule(void *,EXEC_STATUS,SYMBOL_HN *,struct defmodule *,
                                            struct defmodule *,unsigned);
-LOCALE INSTANCE_SLOT *FindInstanceSlot(void *,INSTANCE_TYPE *,SYMBOL_HN *);
-LOCALE int FindInstanceTemplateSlot(void *,DEFCLASS *,SYMBOL_HN *);
-LOCALE int PutSlotValue(void *,INSTANCE_TYPE *,INSTANCE_SLOT *,DATA_OBJECT *,DATA_OBJECT *,char *);
-LOCALE int DirectPutSlotValue(void *,INSTANCE_TYPE *,INSTANCE_SLOT *,DATA_OBJECT *,DATA_OBJECT *);
-LOCALE intBool ValidSlotValue(void *,DATA_OBJECT *,SLOT_DESC *,INSTANCE_TYPE *,char *);
-LOCALE INSTANCE_TYPE *CheckInstance(void *,char *);
-LOCALE void NoInstanceError(void *,char *,char *);
-LOCALE void StaleInstanceAddress(void *,char *,int);
-LOCALE int EnvGetInstancesChanged(void *);
-LOCALE void EnvSetInstancesChanged(void *,int);
-LOCALE void PrintSlot(void *,char *,SLOT_DESC *,INSTANCE_TYPE *,char *);
-LOCALE void PrintInstanceNameAndClass(void *,char *,INSTANCE_TYPE *,intBool);
-LOCALE void PrintInstanceName(void *,char *,void *);
-LOCALE void PrintInstanceLongForm(void *,char *,void *);
+LOCALE INSTANCE_SLOT *FindInstanceSlot(void *,EXEC_STATUS,INSTANCE_TYPE *,SYMBOL_HN *);
+LOCALE int FindInstanceTemplateSlot(void *,EXEC_STATUS,DEFCLASS *,SYMBOL_HN *);
+LOCALE int PutSlotValue(void *,EXEC_STATUS,INSTANCE_TYPE *,INSTANCE_SLOT *,DATA_OBJECT *,DATA_OBJECT *,char *);
+LOCALE int DirectPutSlotValue(void *,EXEC_STATUS,INSTANCE_TYPE *,INSTANCE_SLOT *,DATA_OBJECT *,DATA_OBJECT *);
+LOCALE intBool ValidSlotValue(void *,EXEC_STATUS,DATA_OBJECT *,SLOT_DESC *,INSTANCE_TYPE *,char *);
+LOCALE INSTANCE_TYPE *CheckInstance(void *,EXEC_STATUS,char *);
+LOCALE void NoInstanceError(void *,EXEC_STATUS,char *,char *);
+LOCALE void StaleInstanceAddress(void *,EXEC_STATUS,char *,int);
+LOCALE int EnvGetInstancesChanged(void *,EXEC_STATUS);
+LOCALE void EnvSetInstancesChanged(void *,EXEC_STATUS,int);
+LOCALE void PrintSlot(void *,EXEC_STATUS,char *,SLOT_DESC *,INSTANCE_TYPE *,char *);
+LOCALE void PrintInstanceNameAndClass(void *,EXEC_STATUS,char *,INSTANCE_TYPE *,intBool);
+LOCALE void PrintInstanceName(void *,EXEC_STATUS,char *,void *);
+LOCALE void PrintInstanceLongForm(void *,EXEC_STATUS,char *,void *);
 
 #if DEFRULE_CONSTRUCT && OBJECT_SYSTEM
-LOCALE void DecrementObjectBasisCount(void *,void *);
-LOCALE void IncrementObjectBasisCount(void *,void *);
-LOCALE void MatchObjectFunction(void *,void *);
-LOCALE intBool NetworkSynchronized(void *,void *);
+LOCALE void DecrementObjectBasisCount(void *,EXEC_STATUS,void *);
+LOCALE void IncrementObjectBasisCount(void *,EXEC_STATUS,void *);
+LOCALE void MatchObjectFunction(void *,EXEC_STATUS,void *);
+LOCALE intBool NetworkSynchronized(void *,EXEC_STATUS,void *);
 #endif
 
 #endif

@@ -59,8 +59,8 @@
 /***************************************/
 
 #if (! RUN_TIME) && (! BLOAD_ONLY)
-   static intBool                 GetVariableDefinition(void *,char *,int *,int,struct token *);
-   static void                    AddDefglobal(void *,SYMBOL_HN *,DATA_OBJECT_PTR,struct expr *);
+   static intBool                 GetVariableDefinition(void *,EXEC_STATUS,char *,int *,int,struct token *);
+   static void                    AddDefglobal(void *,EXEC_STATUS,SYMBOL_HN *,DATA_OBJECT_PTR,struct expr *);
 #endif
 
 /*********************************************************************/
@@ -88,7 +88,7 @@ globle intBool ParseDefglobal(
    /*=====================================*/
 
    SetPPBufferStatus(theEnv,execStatus,ON);
-   FlushPPBuffer(theEnv);
+   FlushPPBuffer(theEnv,execStatus);
    SetIndentDepth(theEnv,execStatus,3);
    SavePPBuffer(theEnv,execStatus,"(defglobal ");
 
@@ -98,7 +98,7 @@ globle intBool ParseDefglobal(
    /*=================================================*/
 
 #if BLOAD || BLOAD_ONLY || BLOAD_AND_BSAVE
-   if ((Bloaded(theEnv) == TRUE) && (! ConstructData(theEnv)->CheckSyntaxMode))
+   if ((Bloaded(theEnv,execStatus) == TRUE) && (! ConstructData(theEnv,execStatus)->CheckSyntaxMode))
      {
       CannotLoadWithBloadMessage(theEnv,execStatus,"defglobal");
       return(TRUE);
@@ -154,8 +154,8 @@ globle intBool ParseDefglobal(
 
    else
      {
-      PPBackup(theEnv);
-      SavePPBuffer(theEnv,execStatus,EnvGetDefmoduleName(theEnv,execStatus,((struct defmodule *) EnvGetCurrentModule(theEnv))));
+      PPBackup(theEnv,execStatus);
+      SavePPBuffer(theEnv,execStatus,EnvGetDefmoduleName(theEnv,execStatus,((struct defmodule *) EnvGetCurrentModule(theEnv,execStatus))));
       SavePPBuffer(theEnv,execStatus," ");
       SavePPBuffer(theEnv,execStatus,theToken.printForm);
      }
@@ -168,9 +168,9 @@ globle intBool ParseDefglobal(
      {
       tokenRead = FALSE;
 
-      FlushPPBuffer(theEnv);
+      FlushPPBuffer(theEnv,execStatus);
       SavePPBuffer(theEnv,execStatus,"(defglobal ");
-      SavePPBuffer(theEnv,execStatus,EnvGetDefmoduleName(theEnv,execStatus,((struct defmodule *) EnvGetCurrentModule(theEnv))));
+      SavePPBuffer(theEnv,execStatus,EnvGetDefmoduleName(theEnv,execStatus,((struct defmodule *) EnvGetCurrentModule(theEnv,execStatus))));
       SavePPBuffer(theEnv,execStatus," ");
      }
 
@@ -235,7 +235,7 @@ static intBool GetVariableDefinition(
    /*================================*/
 
 #if DEBUGGING_FUNCTIONS
-   if ((EnvGetWatchItem(theEnv,execStatus,"compilations") == ON) && GetPrintWhileLoading(theEnv))
+   if ((EnvGetWatchItem(theEnv,execStatus,"compilations") == ON) && GetPrintWhileLoading(theEnv,execStatus))
      {
       if (QFindDefglobal(theEnv,execStatus,variableName) != NULL) 
         {
@@ -248,14 +248,14 @@ static intBool GetVariableDefinition(
      }
    else
 #endif
-     { if (GetPrintWhileLoading(theEnv)) EnvPrintRouter(theEnv,execStatus,WDIALOG,":"); }
+     { if (GetPrintWhileLoading(theEnv,execStatus)) EnvPrintRouter(theEnv,execStatus,WDIALOG,":"); }
 
    /*==================================================================*/
    /* Check for import/export conflicts from the construct definition. */
    /*==================================================================*/
 
 #if DEFMODULE_CONSTRUCT
-   if (FindImportExportConflict(theEnv,execStatus,"defglobal",((struct defmodule *) EnvGetCurrentModule(theEnv)),ValueToString(variableName)))
+   if (FindImportExportConflict(theEnv,execStatus,"defglobal",((struct defmodule *) EnvGetCurrentModule(theEnv,execStatus)),ValueToString(variableName)))
      {
       ImportExportConflictMessage(theEnv,execStatus,"defglobal",ValueToString(variableName),NULL,NULL);
       *defglobalError = TRUE;
@@ -292,7 +292,7 @@ static intBool GetVariableDefinition(
    /* Evaluate the expression. */
    /*==========================*/
 
-   if (! ConstructData(theEnv)->CheckSyntaxMode)
+   if (! ConstructData(theEnv,execStatus)->CheckSyntaxMode)
      {
       SetEvaluationError(theEnv,execStatus,FALSE);
       if (EvaluateExpression(theEnv,execStatus,assignPtr,&assignValue))
@@ -311,7 +311,7 @@ static intBool GetVariableDefinition(
    /* Add the variable to the global list. */
    /*======================================*/
 
-   if (! ConstructData(theEnv)->CheckSyntaxMode)
+   if (! ConstructData(theEnv,execStatus)->CheckSyntaxMode)
      { AddDefglobal(theEnv,execStatus,variableName,&assignValue,assignPtr); }
 
    /*==================================================*/
@@ -382,7 +382,7 @@ static void AddDefglobal(
 
    defglobalPtr->initial = AddHashedExpression(theEnv,execStatus,ePtr);
    ReturnExpression(theEnv,execStatus,ePtr);
-   DefglobalData(theEnv)->ChangeToGlobals = TRUE;
+   DefglobalData(theEnv,execStatus)->ChangeToGlobals = TRUE;
 
    /*=================================*/
    /* Restore the old watch value to  */
@@ -402,10 +402,10 @@ static void AddDefglobal(
    IncrementSymbolCount(name);
 
    SavePPBuffer(theEnv,execStatus,"\n");
-   if (EnvGetConserveMemory(theEnv) == TRUE)
+   if (EnvGetConserveMemory(theEnv,execStatus) == TRUE)
      { defglobalPtr->header.ppForm = NULL; }
    else
-     { defglobalPtr->header.ppForm = CopyPPBuffer(theEnv); }
+     { defglobalPtr->header.ppForm = CopyPPBuffer(theEnv,execStatus); }
 
    defglobalPtr->inScope = TRUE;
 

@@ -38,9 +38,9 @@
 
 #include "genrcfun.h"
 
-LOCALE void SetupGenericsCompiler(void *);
-LOCALE void PrintGenericFunctionReference(void *,FILE *,DEFGENERIC *,int,int);
-LOCALE void DefgenericCModuleReference(void *,FILE *,int,int,int);
+LOCALE void SetupGenericsCompiler(void *,EXEC_STATUS);
+LOCALE void PrintGenericFunctionReference(void *,EXEC_STATUS,FILE *,DEFGENERIC *,int,int);
+LOCALE void DefgenericCModuleReference(void *,EXEC_STATUS,FILE *,int,int,int);
 
 #endif
 

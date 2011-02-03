@@ -94,8 +94,8 @@
 
    static void                    ResetFacts(void *,EXEC_STATUS);
    static int                     ClearFactsReady(void *,EXEC_STATUS);
-   static void                    RemoveGarbageFacts(void *, EXEC_STATUS);
-   static void                    DeallocateFactData(void *);
+   static void                    RemoveGarbageFacts(void *,EXEC_STATUS);
+   static void                    DeallocateFactData(void *,EXEC_STATUS);
 
 /**************************************************************/
 /* InitializeFacts: Initializes the fact data representation. */
@@ -103,7 +103,8 @@
 /*   deftemplate constructs are available.                    */
 /**************************************************************/
 globle void InitializeFacts(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct patternEntityRecord factInfo = { { "FACT_ADDRESS", FACT_ADDRESS,1,0,0,
                                                      PrintFactIdentifier,
@@ -125,17 +126,17 @@ globle void InitializeFacts(
    
    AllocateEnvironmentData(theEnv,execStatus,FACTS_DATA,sizeof(struct factsData),DeallocateFactData);
 
-   memcpy(&FactData(theEnv)->FactInfo,&factInfo,sizeof(struct patternEntityRecord)); 
-   dummyFact.factHeader.theInfo = &FactData(theEnv)->FactInfo;    
-   memcpy(&FactData(theEnv)->DummyFact,&dummyFact,sizeof(struct fact));  
-   FactData(theEnv)->LastModuleIndex = -1;
+   memcpy(&FactData(theEnv,execStatus)->FactInfo,&factInfo,sizeof(struct patternEntityRecord)); 
+   dummyFact.factHeader.theInfo = &FactData(theEnv,execStatus)->FactInfo;    
+   memcpy(&FactData(theEnv,execStatus)->DummyFact,&dummyFact,sizeof(struct fact));  
+   FactData(theEnv,execStatus)->LastModuleIndex = -1;
 
    /*=========================================*/
    /* Initialize the fact hash table (used to */
    /* quickly determine if a fact exists).    */
    /*=========================================*/
 
-   InitializeFactHashTable(theEnv);
+   InitializeFactHashTable(theEnv,execStatus);
 
    /*============================================*/
    /* Initialize the fact callback functions for */
@@ -156,7 +157,7 @@ globle void InitializeFacts(
    /* Initialize fact pattern matching. */
    /*===================================*/
 
-   InitializeFactPatterns(theEnv);
+   InitializeFactPatterns(theEnv,execStatus);
 
    /*==================================*/
    /* Initialize the facts keyword for */
@@ -164,22 +165,22 @@ globle void InitializeFacts(
    /*==================================*/
 
 #if DEBUGGING_FUNCTIONS
-   AddWatchItem(theEnv,execStatus,"facts",0,&FactData(theEnv)->WatchFacts,80,DeftemplateWatchAccess,DeftemplateWatchPrint);
+   AddWatchItem(theEnv,execStatus,"facts",0,&FactData(theEnv,execStatus)->WatchFacts,80,DeftemplateWatchAccess,DeftemplateWatchPrint);
 #endif
 
    /*=========================================*/
    /* Initialize fact commands and functions. */
    /*=========================================*/
 
-   FactCommandDefinitions(theEnv);
-   FactFunctionDefinitions(theEnv);
+   FactCommandDefinitions(theEnv,execStatus);
+   FactFunctionDefinitions(theEnv,execStatus);
    
    /*==============================*/
    /* Initialize fact set queries. */
    /*==============================*/
   
 #if FACT_SET_QUERIES
-   SetupFactQuery(theEnv);
+   SetupFactQuery(theEnv,execStatus);
 #endif
 
    /*==================================*/
@@ -188,7 +189,7 @@ globle void InitializeFacts(
    /*==================================*/
 
 #if (BLOAD || BLOAD_ONLY || BLOAD_AND_BSAVE) && (! RUN_TIME)
-   FactBinarySetup(theEnv);
+   FactBinarySetup(theEnv,execStatus);
 #endif
 
    /*===================================*/
@@ -197,7 +198,7 @@ globle void InitializeFacts(
    /*===================================*/
 
 #if CONSTRUCT_COMPILER && (! RUN_TIME)
-   FactPatternsCompilerSetup(theEnv);
+   FactPatternsCompilerSetup(theEnv,execStatus);
 #endif
   }
   
@@ -206,16 +207,17 @@ globle void InitializeFacts(
 /*   environment data for facts.   */
 /***********************************/
 static void DeallocateFactData(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct factHashEntry *tmpFHEPtr, *nextFHEPtr;
    struct fact *tmpFactPtr, *nextFactPtr;
    unsigned long i;
    struct patternMatch *theMatch, *tmpMatch;
    
-   for (i = 0; i < FactData(theEnv)->FactHashTableSize; i++) 
+   for (i = 0; i < FactData(theEnv,execStatus)->FactHashTableSize; i++) 
      {
-      tmpFHEPtr = FactData(theEnv)->FactHashTable[i];
+      tmpFHEPtr = FactData(theEnv,execStatus)->FactHashTable[i];
       
       while (tmpFHEPtr != NULL)
         {
@@ -225,10 +227,10 @@ static void DeallocateFactData(
         }
      }
   
-   rm3(theEnv,execStatus,FactData(theEnv)->FactHashTable,
-       sizeof(struct factHashEntry *) * FactData(theEnv)->FactHashTableSize);
+   rm3(theEnv,execStatus,FactData(theEnv,execStatus)->FactHashTable,
+       sizeof(struct factHashEntry *) * FactData(theEnv,execStatus)->FactHashTableSize);
                  
-   tmpFactPtr = FactData(theEnv)->FactList;
+   tmpFactPtr = FactData(theEnv,execStatus)->FactList;
    while (tmpFactPtr != NULL)
      {
       nextFactPtr = tmpFactPtr->nextFact;
@@ -247,7 +249,7 @@ static void DeallocateFactData(
       tmpFactPtr = nextFactPtr; 
      }
      
-   tmpFactPtr = FactData(theEnv)->GarbageFacts;
+   tmpFactPtr = FactData(theEnv,execStatus)->GarbageFacts;
    while (tmpFactPtr != NULL)
      {
       nextFactPtr = tmpFactPtr->nextFact;
@@ -263,6 +265,7 @@ static void DeallocateFactData(
 /**********************************************/
 globle void PrintFactWithIdentifier(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   struct fact *factPtr)
   {
@@ -278,6 +281,7 @@ globle void PrintFactWithIdentifier(
 /****************************************************/
 globle void PrintFactIdentifier(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   void *factPtr)
   {
@@ -293,11 +297,12 @@ globle void PrintFactIdentifier(
 /********************************************/
 globle void PrintFactIdentifierInLongForm(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   void *factPtr)
   {
-   if (PrintUtilityData(theEnv)->AddressesToStrings) EnvPrintRouter(theEnv,execStatus,logicalName,"\"");
-   if (factPtr != (void *) &FactData(theEnv)->DummyFact)
+   if (PrintUtilityData(theEnv,execStatus)->AddressesToStrings) EnvPrintRouter(theEnv,execStatus,logicalName,"\"");
+   if (factPtr != (void *) &FactData(theEnv,execStatus)->DummyFact)
      {
       EnvPrintRouter(theEnv,execStatus,logicalName,"<Fact-");
       PrintLongInteger(theEnv,execStatus,logicalName,((struct fact *) factPtr)->factIndex);
@@ -306,7 +311,7 @@ globle void PrintFactIdentifierInLongForm(
    else
      { EnvPrintRouter(theEnv,execStatus,logicalName,"<Dummy Fact>"); }
 
-   if (PrintUtilityData(theEnv)->AddressesToStrings) EnvPrintRouter(theEnv,execStatus,logicalName,"\"");
+   if (PrintUtilityData(theEnv,execStatus)->AddressesToStrings) EnvPrintRouter(theEnv,execStatus,logicalName,"\"");
   }
 
 /*******************************************/
@@ -315,6 +320,7 @@ globle void PrintFactIdentifierInLongForm(
 /*******************************************/
 globle void DecrementFactBasisCount(
   void *theEnv,
+  EXEC_STATUS,
   void *vFactPtr)
   {
    struct fact *factPtr = (struct fact *) vFactPtr;
@@ -337,6 +343,7 @@ globle void DecrementFactBasisCount(
 /*******************************************/
 globle void IncrementFactBasisCount(
   void *theEnv,
+  EXEC_STATUS,
   void *vFactPtr)
   {
    struct fact *factPtr = (struct fact *) vFactPtr;
@@ -360,6 +367,7 @@ globle void IncrementFactBasisCount(
 /**************************************************/
 globle void PrintFact(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   struct fact *factPtr,
   int seperateLines,
@@ -427,7 +435,7 @@ globle intBool EnvRetract(
    /* fact is being asserted or retracted.      */
    /*===========================================*/
 
-   if (EngineData(theEnv)->JoinOperationInProgress)
+   if (EngineData(theEnv,execStatus)->JoinOperationInProgress)
      {
       PrintErrorID(theEnv,execStatus,"FACTMNGR",1,TRUE);
       EnvPrintRouter(theEnv,execStatus,WERROR,"Facts may not be retracted during pattern-matching\n");
@@ -441,7 +449,7 @@ globle intBool EnvRetract(
 
    if (theFact == NULL)
      {
-      RemoveAllFacts(theEnv,execStatus,execStatus);
+      RemoveAllFacts(theEnv,execStatus);
       return(TRUE);
      }
 
@@ -470,7 +478,7 @@ globle intBool EnvRetract(
    /* the fact-list has been modified. */
    /*==================================*/
 
-   FactData(theEnv)->ChangeToFactList = TRUE;
+   FactData(theEnv,execStatus)->ChangeToFactList = TRUE;
 
    /*===============================================*/
    /* Remove any links between the fact and partial */
@@ -510,14 +518,14 @@ globle intBool EnvRetract(
    /* Remove the fact from the fact list. */
    /*=====================================*/
 
-   if (theFact == FactData(theEnv)->LastFact)
-     { FactData(theEnv)->LastFact = theFact->previousFact; }
+   if (theFact == FactData(theEnv,execStatus)->LastFact)
+     { FactData(theEnv,execStatus)->LastFact = theFact->previousFact; }
 
    if (theFact->previousFact == NULL)
      {
-      FactData(theEnv)->FactList = FactData(theEnv)->FactList->nextFact;
-      if (FactData(theEnv)->FactList != NULL)
-        { FactData(theEnv)->FactList->previousFact = NULL; }
+      FactData(theEnv,execStatus)->FactList = FactData(theEnv,execStatus)->FactList->nextFact;
+      if (FactData(theEnv,execStatus)->FactList != NULL)
+        { FactData(theEnv,execStatus)->FactList->previousFact = NULL; }
      }
    else
      {
@@ -532,15 +540,15 @@ globle intBool EnvRetract(
    /*==================================*/
 
    FactDeinstall(theEnv,execStatus,theFact);
-   UtilityData(theEnv)->EphemeralItemCount++;
-   UtilityData(theEnv)->EphemeralItemSize += sizeof(struct fact) + (sizeof(struct field) * theFact->theProposition.multifieldLength);
+   UtilityData(theEnv,execStatus)->EphemeralItemCount++;
+   UtilityData(theEnv,execStatus)->EphemeralItemSize += sizeof(struct fact) + (sizeof(struct field) * theFact->theProposition.multifieldLength);
 
    /*========================================*/
    /* Add the fact to the fact garbage list. */
    /*========================================*/
 
-   theFact->nextFact = FactData(theEnv)->GarbageFacts;
-   FactData(theEnv)->GarbageFacts = theFact;
+   theFact->nextFact = FactData(theEnv,execStatus)->GarbageFacts;
+   FactData(theEnv,execStatus)->GarbageFacts = theFact;
    theFact->garbage = TRUE;
 
    /*===================================================*/
@@ -556,31 +564,31 @@ globle intBool EnvRetract(
    /* retract operation for each one.           */
    /*===========================================*/
 
-   EngineData(theEnv)->JoinOperationInProgress = TRUE;
+   EngineData(theEnv,execStatus)->JoinOperationInProgress = TRUE;
    NetworkRetract(theEnv,execStatus,(struct patternMatch *) theFact->list);
-   EngineData(theEnv)->JoinOperationInProgress = FALSE;
+   EngineData(theEnv,execStatus)->JoinOperationInProgress = FALSE;
 
    /*=========================================*/
    /* Free partial matches that were released */
    /* by the retraction of the fact.          */
    /*=========================================*/
 
-   if (EngineData(theEnv)->ExecutingRule == NULL)
-     { FlushGarbagePartialMatches(theEnv); }
+   if (EngineData(theEnv,execStatus)->ExecutingRule == NULL)
+     { FlushGarbagePartialMatches(theEnv,execStatus); }
 
    /*=========================================*/
    /* Retract other facts that were logically */
    /* dependent on the fact just retracted.   */
    /*=========================================*/
 
-   ForceLogicalRetractions(theEnv);
+   ForceLogicalRetractions(theEnv,execStatus);
 
    /*===========================================*/
    /* Force periodic cleanup if the retract was */
    /* executed from an embedded application.    */
    /*===========================================*/
 
-   if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
+   if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv,execStatus)->EvaluatingTopLevelCommand) &&
        (execStatus->CurrentExpression == NULL))
      { PeriodicCleanup(theEnv,execStatus,TRUE,FALSE); }
 
@@ -600,11 +608,12 @@ globle intBool EnvRetract(
 /*   and the facts may be in use in other data structures.         */
 /*******************************************************************/
 static void RemoveGarbageFacts(
-  void *theEnv, EXEC_STATUS)
+  void *theEnv,
+  EXEC_STATUS)
   {
    struct fact *factPtr, *nextPtr, *lastPtr = NULL;
 
-   factPtr = FactData(theEnv)->GarbageFacts;
+   factPtr = FactData(theEnv,execStatus)->GarbageFacts;
 
    while (factPtr != NULL)
      {
@@ -612,10 +621,10 @@ static void RemoveGarbageFacts(
       if ((factPtr->factHeader.busyCount == 0) &&
           (((int) factPtr->depth) > execStatus->CurrentEvaluationDepth))
         {
-         UtilityData(theEnv)->EphemeralItemCount--;
-         UtilityData(theEnv)->EphemeralItemSize -= sizeof(struct fact) + (sizeof(struct field) * factPtr->theProposition.multifieldLength);
+         UtilityData(theEnv,execStatus)->EphemeralItemCount--;
+         UtilityData(theEnv,execStatus)->EphemeralItemSize -= sizeof(struct fact) + (sizeof(struct field) * factPtr->theProposition.multifieldLength);
          ReturnFact(theEnv,execStatus,factPtr);
-         if (lastPtr == NULL) FactData(theEnv)->GarbageFacts = nextPtr;
+         if (lastPtr == NULL) FactData(theEnv,execStatus)->GarbageFacts = nextPtr;
          else lastPtr->nextFact = nextPtr;
         }
       else
@@ -695,7 +704,7 @@ globle void *EnvAssert(
    /* fact is being asserted or retracted.     */
    /*==========================================*/
 
-   if (EngineData(theEnv)->JoinOperationInProgress)
+   if (EngineData(theEnv,execStatus)->JoinOperationInProgress)
      {
       ReturnFact(theEnv,execStatus,theFact);
       PrintErrorID(theEnv,execStatus,"FACTMNGR",2,TRUE);
@@ -754,12 +763,12 @@ globle void *EnvAssert(
     
    theFact->nextFact = NULL;
    theFact->list = NULL;
-   theFact->previousFact = FactData(theEnv)->LastFact;
-   if (FactData(theEnv)->LastFact == NULL)
-     { FactData(theEnv)->FactList = theFact; }
+   theFact->previousFact = FactData(theEnv,execStatus)->LastFact;
+   if (FactData(theEnv,execStatus)->LastFact == NULL)
+     { FactData(theEnv,execStatus)->FactList = theFact; }
    else
-     { FactData(theEnv)->LastFact->nextFact = theFact; }
-   FactData(theEnv)->LastFact = theFact;
+     { FactData(theEnv,execStatus)->LastFact->nextFact = theFact; }
+   FactData(theEnv,execStatus)->LastFact = theFact;
 
    /*====================================*/
    /* Add the fact to its template list. */
@@ -783,8 +792,8 @@ globle void *EnvAssert(
     
     // STEFAN: GLOBAL STUFF...
 
-   theFact->factIndex = FactData(theEnv)->NextFactIndex++;
-   theFact->factHeader.timeTag = DefruleData(theEnv)->CurrentEntityTimeTag++;
+   theFact->factIndex = FactData(theEnv,execStatus)->NextFactIndex++;
+   theFact->factHeader.timeTag = DefruleData(theEnv,execStatus)->CurrentEntityTimeTag++;
 
    /*=====================*/
    /* Update busy counts. */
@@ -811,7 +820,7 @@ globle void *EnvAssert(
    /* the fact-list has been modified. */
    /*==================================*/
 
-   FactData(theEnv)->ChangeToFactList = TRUE;
+   FactData(theEnv,execStatus)->ChangeToFactList = TRUE;
 
    /*==========================================*/
    /* Check for constraint errors in the fact. */
@@ -847,7 +856,7 @@ globle void *EnvAssert(
         parameters->endMark    = NULL;
         
         apr_status_t rv;
-        rv = apr_thread_pool_push(Env(theEnv)->matcherThreadPool,
+        rv = apr_thread_pool_push(Env(theEnv,execStatus)->matcherThreadPool,
                                   ParallelFactMatchAndLogicRetract,
                                   parameters,
                                   0, NULL);
@@ -856,15 +865,15 @@ globle void *EnvAssert(
         }
       }
           
-      while ((apr_thread_pool_tasks_count(Env(theEnv)->matcherThreadPool) > 0)
-             || ((apr_thread_pool_busy_count(Env(theEnv)->matcherThreadPool)) > 0)) {
+      while ((apr_thread_pool_tasks_count(Env(theEnv,execStatus)->matcherThreadPool) > 0)
+             || ((apr_thread_pool_busy_count(Env(theEnv,execStatus)->matcherThreadPool)) > 0)) {
         usleep(100);
       }
        
-      assert(apr_thread_pool_idle_count(Env(theEnv)->matcherThreadPool) == 1);
+      assert(apr_thread_pool_idle_count(Env(theEnv,execStatus)->matcherThreadPool) == 1);
     }
     else {
-      EngineData(theEnv)->JoinOperationInProgress = TRUE;
+      EngineData(theEnv,execStatus)->JoinOperationInProgress = TRUE;
       
       FactPatternMatch(theEnv,execStatus,
                        theFact,
@@ -873,7 +882,7 @@ globle void *EnvAssert(
                        NULL,
                        NULL);
       
-      EngineData(theEnv)->JoinOperationInProgress = FALSE;
+      EngineData(theEnv,execStatus)->JoinOperationInProgress = FALSE;
       
       
       /*===================================================*/
@@ -881,7 +890,7 @@ globle void *EnvAssert(
       /* on the non-existence of the fact just asserted.   */
       /*===================================================*/
       
-      ForceLogicalRetractions(theEnv);
+      ForceLogicalRetractions(theEnv,execStatus);
     }
 
    /*=========================================*/
@@ -889,14 +898,14 @@ globle void *EnvAssert(
    /* by the assertion of the fact.           */
    /*=========================================*/
 
-   if (EngineData(theEnv)->ExecutingRule == NULL) FlushGarbagePartialMatches(theEnv);
+   if (EngineData(theEnv,execStatus)->ExecutingRule == NULL) FlushGarbagePartialMatches(theEnv,execStatus);
 
    /*==========================================*/
    /* Force periodic cleanup if the assert was */
    /* executed from an embedded application.   */
    /*==========================================*/
 
-   if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv)->EvaluatingTopLevelCommand) &&
+   if ((execStatus->CurrentEvaluationDepth == 0) && (! CommandLineData(theEnv,execStatus)->EvaluatingTopLevelCommand) &&
        (execStatus->CurrentExpression == NULL))
      { PeriodicCleanup(theEnv,execStatus,TRUE,FALSE); }
 
@@ -912,10 +921,11 @@ globle void *EnvAssert(
 /*   fact-list and removes each fact. */
 /**************************************/
 globle void RemoveAllFacts(
-  void *theEnv, EXEC_STATUS)
+  void *theEnv,
+  EXEC_STATUS)
   {
-   while (FactData(theEnv)->FactList != NULL)
-     { EnvRetract(theEnv,execStatus,(void *) FactData(theEnv)->FactList); }
+   while (FactData(theEnv,execStatus)->FactList != NULL)
+     { EnvRetract(theEnv,execStatus,(void *) FactData(theEnv,execStatus)->FactList); }
   }
 
 /************************************************/
@@ -977,6 +987,7 @@ globle struct fact *EnvCreateFact(
 /******************************************/
 globle intBool EnvGetFactSlot(
   void *theEnv,
+  EXEC_STATUS,
   void *vTheFact,
   char *slotName,
   DATA_OBJECT *theValue)
@@ -1044,7 +1055,7 @@ globle intBool GetFactSlot(
   char *slotName,
   DATA_OBJECT *theValue)
   {
-   return(EnvGetFactSlot(GetCurrentEnvironment(),vTheFact,slotName,theValue));
+   return(EnvGetFactSlot(GetCurrentEnvironment(),getCurrentExecutionState(),vTheFact,slotName,theValue));
   }
 #endif
 
@@ -1054,6 +1065,7 @@ globle intBool GetFactSlot(
 /***************************************/
 globle intBool EnvPutFactSlot(
   void *theEnv,
+  EXEC_STATUS,
   void *vTheFact,
   char *slotName,
   DATA_OBJECT *theValue)
@@ -1130,6 +1142,7 @@ globle intBool EnvPutFactSlot(
 /********************************************************/
 globle intBool EnvAssignFactSlotDefaults(
   void *theEnv,
+  EXEC_STATUS,
   void *vTheFact)
   {
    struct fact *theFact = (struct fact *) vTheFact;
@@ -1192,6 +1205,7 @@ globle intBool EnvAssignFactSlotDefaults(
 /********************************************************/
 globle intBool DeftemplateSlotDefault(
   void *theEnv,
+  EXEC_STATUS,
   struct deftemplate *theDeftemplate,
   struct templateSlot *slotPtr,
   DATA_OBJECT *theResult,
@@ -1270,6 +1284,7 @@ globle intBool DeftemplateSlotDefault(
 /***************************************************************/
 globle intBool CopyFactSlotValues(
   void *theEnv,
+  EXEC_STATUS,
   void *vTheDestFact,
   void *vTheSourceFact)
   {
@@ -1339,7 +1354,7 @@ globle struct fact *CreateFactBySize(
    theFact->garbage = FALSE;
    theFact->factIndex = 0LL;
    theFact->factHeader.busyCount = 0;
-   theFact->factHeader.theInfo = &FactData(theEnv)->FactInfo;
+   theFact->factHeader.theInfo = &FactData(theEnv,execStatus)->FactInfo;
    theFact->factHeader.dependents = NULL;
    theFact->whichDeftemplate = NULL;
    theFact->nextFact = NULL;
@@ -1361,6 +1376,7 @@ globle struct fact *CreateFactBySize(
 /*********************************************/
 globle void ReturnFact(
   void *theEnv,
+  EXEC_STATUS,
   struct fact *theFact)
   {
    struct multifield *theSegment, *subSegment;
@@ -1392,12 +1408,13 @@ globle void ReturnFact(
 /*************************************************************/
 globle void FactInstall(
   void *theEnv,
+  EXEC_STATUS,
   struct fact *newFact)
   {
    struct multifield *theSegment;
    int i;
 
-   FactData(theEnv)->NumberOfFacts++;
+   FactData(theEnv,execStatus)->NumberOfFacts++;
    newFact->whichDeftemplate->busyCount++;
    theSegment = &newFact->theProposition;
 
@@ -1415,12 +1432,13 @@ globle void FactInstall(
 /***************************************************************/
 globle void FactDeinstall(
   void *theEnv,
+  EXEC_STATUS,
   struct fact *newFact)
   {
    struct multifield *theSegment;
    int i;
 
-   FactData(theEnv)->NumberOfFacts--;
+   FactData(theEnv,execStatus)->NumberOfFacts--;
    theSegment = &newFact->theProposition;
    newFact->whichDeftemplate->busyCount--;
 
@@ -1441,10 +1459,11 @@ globle void FactDeinstall(
 #endif
 globle void EnvIncrementFactCount(
   void *theEnv,
+  EXEC_STATUS,		  
   void *factPtr)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 
    ((struct fact *) factPtr)->factHeader.busyCount++;
@@ -1459,10 +1478,11 @@ globle void EnvIncrementFactCount(
 #endif
 globle void EnvDecrementFactCount(
   void *theEnv,
+  EXEC_STATUS,
   void *factPtr)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 
    ((struct fact *) factPtr)->factHeader.busyCount--;
@@ -1475,10 +1495,11 @@ globle void EnvDecrementFactCount(
 /*********************************************************/
 globle void *EnvGetNextFact(
   void *theEnv,
+  EXEC_STATUS,
   void *factPtr)
   {
    if (factPtr == NULL)
-     { return((void *) FactData(theEnv)->FactList); }
+     { return((void *) FactData(theEnv,execStatus)->FactList); }
 
    if (((struct fact *) factPtr)->garbage) return(NULL);
 
@@ -1493,6 +1514,7 @@ globle void *EnvGetNextFact(
 /**************************************************/
 globle void *GetNextFactInScope(
   void *theEnv,
+  EXEC_STATUS,
   void *vTheFact)
   {
    struct fact *theFact = (struct fact *) vTheFact;
@@ -1508,11 +1530,11 @@ globle void *GetNextFactInScope(
 
    if (theFact == NULL)
      {
-      theFact = FactData(theEnv)->FactList;
-      if (FactData(theEnv)->LastModuleIndex != DefmoduleData(theEnv)->ModuleChangeIndex)
+      theFact = FactData(theEnv,execStatus)->FactList;
+      if (FactData(theEnv,execStatus)->LastModuleIndex != DefmoduleData(theEnv,execStatus)->ModuleChangeIndex)
         {
-         UpdateDeftemplateScope(theEnv);
-         FactData(theEnv)->LastModuleIndex = DefmoduleData(theEnv)->ModuleChangeIndex;
+         UpdateDeftemplateScope(theEnv,execStatus);
+         FactData(theEnv,execStatus)->LastModuleIndex = DefmoduleData(theEnv,execStatus)->ModuleChangeIndex;
         }
      }
 
@@ -1556,6 +1578,7 @@ globle void *GetNextFactInScope(
 /****************************************/
 globle void EnvGetFactPPForm(
   void *theEnv,
+  EXEC_STATUS,
   char *buffer,
   unsigned bufferLength,
   void *theFact)
@@ -1577,7 +1600,7 @@ globle long long EnvFactIndex(
   void *factPtr)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 
    return(((struct fact *) factPtr)->factIndex);
@@ -1591,7 +1614,7 @@ globle long long EnvFactIndex(
 globle long long FactIndex(
   void *factPtr)
   {
-   return(EnvFactIndex(GetCurrentEnvironment(),factPtr));
+   return(EnvFactIndex(GetCurrentEnvironment(),getCurrentExecutionState(),factPtr));
   }
 #endif
 
@@ -1618,7 +1641,7 @@ globle void *EnvAssertString(
 globle int EnvGetFactListChanged(
   void *theEnv)
   {
-   return(FactData(theEnv)->ChangeToFactList); 
+   return(FactData(theEnv,execStatus)->ChangeToFactList); 
   }
 
 /***********************************************************/
@@ -1629,7 +1652,7 @@ globle void EnvSetFactListChanged(
   void *theEnv,
   int value)
   {
-   FactData(theEnv)->ChangeToFactList = value;
+   FactData(theEnv,execStatus)->ChangeToFactList = value;
   }
 
 /****************************************/
@@ -1639,7 +1662,7 @@ globle void EnvSetFactListChanged(
 globle unsigned long GetNumberOfFacts(
   void *theEnv)
   {   
-   return(FactData(theEnv)->NumberOfFacts); 
+   return(FactData(theEnv,execStatus)->NumberOfFacts); 
   }
 
 /***********************************************************/
@@ -1653,13 +1676,13 @@ static void ResetFacts(
    /* Initialize the fact index to zero. */
    /*====================================*/
 
-   FactData(theEnv)->NextFactIndex = 0L;
+   FactData(theEnv,execStatus)->NextFactIndex = 0L;
 
    /*======================================*/
    /* Remove all facts from the fact list. */
    /*======================================*/
 
-   RemoveAllFacts(theEnv,execStatus,execStatus);
+   RemoveAllFacts(theEnv,execStatus);
   }
 
 /************************************************************/
@@ -1674,13 +1697,13 @@ static int ClearFactsReady(
    /* Initialize the fact index to zero. */
    /*====================================*/
 
-   FactData(theEnv)->NextFactIndex = 0L;
+   FactData(theEnv,execStatus)->NextFactIndex = 0L;
 
    /*======================================*/
    /* Remove all facts from the fact list. */
    /*======================================*/
 
-   RemoveAllFacts(theEnv,execStatus,execStatus);
+   RemoveAllFacts(theEnv,execStatus);
 
    /*==============================================*/
    /* If for some reason there are any facts still */
@@ -1703,6 +1726,7 @@ static int ClearFactsReady(
 /***************************************************/
 globle struct fact *FindIndexedFact(
   void *theEnv,
+  EXEC_STATUS,
   long long factIndexSought)
   {
    struct fact *theFact;

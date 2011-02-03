@@ -64,15 +64,15 @@
    =========================================
    ***************************************** */
 
-static DEFMETHOD *FindApplicableMethod(void *,DEFGENERIC *,DEFMETHOD *);
+static DEFMETHOD *FindApplicableMethod(void *,EXEC_STATUS,DEFGENERIC *,DEFMETHOD *);
 
 #if DEBUGGING_FUNCTIONS
-static void WatchGeneric(void *,char *);
-static void WatchMethod(void *,char *);
+static void WatchGeneric(void *,EXEC_STATUS,char *);
+static void WatchMethod(void *,EXEC_STATUS,char *);
 #endif
 
 #if OBJECT_SYSTEM
-static DEFCLASS *DetermineRestrictionClass(void *,DATA_OBJECT *);
+static DEFCLASS *DetermineRestrictionClass(void *,EXEC_STATUS,DATA_OBJECT *);
 #endif
 
 /* =========================================
@@ -127,15 +127,15 @@ globle void GenericDispatch(
 #endif
 
    result->type = SYMBOL;
-   result->value = EnvFalseSymbol(theEnv);
+   result->value = EnvFalseSymbol(theEnv,execStatus);
    execStatus->EvaluationError = FALSE;
    if (execStatus->HaltExecution)
      return;
-   oldce = ExecutingConstruct(theEnv);
+   oldce = ExecutingConstruct(theEnv,execStatus);
    SetExecutingConstruct(theEnv,execStatus,TRUE);
-   previousGeneric = DefgenericData(theEnv)->CurrentGeneric;
-   previousMethod = DefgenericData(theEnv)->CurrentMethod;
-   DefgenericData(theEnv)->CurrentGeneric = gfunc;
+   previousGeneric = DefgenericData(theEnv,execStatus)->CurrentGeneric;
+   previousMethod = DefgenericData(theEnv,execStatus)->CurrentMethod;
+   DefgenericData(theEnv,execStatus)->CurrentGeneric = gfunc;
    execStatus->CurrentEvaluationDepth++;
    gfunc->busy++;
    PushProcParameters(theEnv,execStatus,params,CountArguments(params),
@@ -144,8 +144,8 @@ globle void GenericDispatch(
    if (execStatus->EvaluationError)
      {
       gfunc->busy--;
-      DefgenericData(theEnv)->CurrentGeneric = previousGeneric;
-      DefgenericData(theEnv)->CurrentMethod = previousMethod;
+      DefgenericData(theEnv,execStatus)->CurrentGeneric = previousGeneric;
+      DefgenericData(theEnv,execStatus)->CurrentMethod = previousMethod;
       execStatus->CurrentEvaluationDepth--;
       PeriodicCleanup(theEnv,execStatus,FALSE,TRUE);
       SetExecutingConstruct(theEnv,execStatus,oldce);
@@ -156,13 +156,13 @@ globle void GenericDispatch(
       if (IsMethodApplicable(theEnv,execStatus,meth))
         {
          meth->busy++;
-         DefgenericData(theEnv)->CurrentMethod = meth;
+         DefgenericData(theEnv,execStatus)->CurrentMethod = meth;
         }
       else
         {
          PrintErrorID(theEnv,execStatus,"GENRCEXE",4,FALSE);
          SetEvaluationError(theEnv,execStatus,TRUE);
-         DefgenericData(theEnv)->CurrentMethod = NULL;
+         DefgenericData(theEnv,execStatus)->CurrentMethod = NULL;
          EnvPrintRouter(theEnv,execStatus,WERROR,"Generic function ");
          EnvPrintRouter(theEnv,execStatus,WERROR,EnvGetDefgenericName(theEnv,execStatus,(void *) gfunc));
          EnvPrintRouter(theEnv,execStatus,WERROR," method #");
@@ -171,46 +171,46 @@ globle void GenericDispatch(
         }
      }
    else
-     DefgenericData(theEnv)->CurrentMethod = FindApplicableMethod(theEnv,execStatus,gfunc,prevmeth);
-   if (DefgenericData(theEnv)->CurrentMethod != NULL)
+     DefgenericData(theEnv,execStatus)->CurrentMethod = FindApplicableMethod(theEnv,execStatus,gfunc,prevmeth);
+   if (DefgenericData(theEnv,execStatus)->CurrentMethod != NULL)
      {
 #if DEBUGGING_FUNCTIONS
-      if (DefgenericData(theEnv)->CurrentGeneric->trace)
+      if (DefgenericData(theEnv,execStatus)->CurrentGeneric->trace)
         WatchGeneric(theEnv,execStatus,BEGIN_TRACE);
-      if (DefgenericData(theEnv)->CurrentMethod->trace)
+      if (DefgenericData(theEnv,execStatus)->CurrentMethod->trace)
         WatchMethod(theEnv,execStatus,BEGIN_TRACE);
 #endif
-      if (DefgenericData(theEnv)->CurrentMethod->system)
+      if (DefgenericData(theEnv,execStatus)->CurrentMethod->system)
         {
          EXPRESSION fcall;
 
          fcall.type = FCALL;
-         fcall.value = DefgenericData(theEnv)->CurrentMethod->actions->value;
+         fcall.value = DefgenericData(theEnv,execStatus)->CurrentMethod->actions->value;
          fcall.nextArg = NULL;
-         fcall.argList = GetProcParamExpressions(theEnv);
+         fcall.argList = GetProcParamExpressions(theEnv,execStatus);
          EvaluateExpression(theEnv,execStatus,&fcall,result);
         }
       else
         {
 #if PROFILING_FUNCTIONS
          StartProfile(theEnv,execStatus,&profileFrame,
-                      &DefgenericData(theEnv)->CurrentMethod->usrData,
-                      ProfileFunctionData(theEnv)->ProfileConstructs);
+                      &DefgenericData(theEnv,execStatus)->CurrentMethod->usrData,
+                      ProfileFunctionData(theEnv,execStatus)->ProfileConstructs);
 #endif
 
-         EvaluateProcActions(theEnv,execStatus,DefgenericData(theEnv)->CurrentGeneric->header.whichModule->theModule,
-                             DefgenericData(theEnv)->CurrentMethod->actions,DefgenericData(theEnv)->CurrentMethod->localVarCount,
+         EvaluateProcActions(theEnv,execStatus,DefgenericData(theEnv,execStatus)->CurrentGeneric->header.whichModule->theModule,
+                             DefgenericData(theEnv,execStatus)->CurrentMethod->actions,DefgenericData(theEnv,execStatus)->CurrentMethod->localVarCount,
                              result,UnboundMethodErr);
 
 #if PROFILING_FUNCTIONS
          EndProfile(theEnv,execStatus,&profileFrame);
 #endif
         }
-      DefgenericData(theEnv)->CurrentMethod->busy--;
+      DefgenericData(theEnv,execStatus)->CurrentMethod->busy--;
 #if DEBUGGING_FUNCTIONS
-      if (DefgenericData(theEnv)->CurrentMethod->trace)
+      if (DefgenericData(theEnv,execStatus)->CurrentMethod->trace)
         WatchMethod(theEnv,execStatus,END_TRACE);
-      if (DefgenericData(theEnv)->CurrentGeneric->trace)
+      if (DefgenericData(theEnv,execStatus)->CurrentGeneric->trace)
         WatchGeneric(theEnv,execStatus,END_TRACE);
 #endif
      }
@@ -223,10 +223,10 @@ globle void GenericDispatch(
       SetEvaluationError(theEnv,execStatus,TRUE);
      }
    gfunc->busy--;
-   ProcedureFunctionData(theEnv)->ReturnFlag = FALSE;
-   PopProcParameters(theEnv);
-   DefgenericData(theEnv)->CurrentGeneric = previousGeneric;
-   DefgenericData(theEnv)->CurrentMethod = previousMethod;
+   ProcedureFunctionData(theEnv,execStatus)->ReturnFlag = FALSE;
+   PopProcParameters(theEnv,execStatus);
+   DefgenericData(theEnv,execStatus)->CurrentGeneric = previousGeneric;
+   DefgenericData(theEnv,execStatus)->CurrentMethod = previousMethod;
    execStatus->CurrentEvaluationDepth--;
    PropagateReturnValue(theEnv,execStatus,result);
    PeriodicCleanup(theEnv,execStatus,FALSE,TRUE);
@@ -248,9 +248,9 @@ globle void UnboundMethodErr(
   EXEC_STATUS)
   {
    EnvPrintRouter(theEnv,execStatus,WERROR,"generic function ");
-   EnvPrintRouter(theEnv,execStatus,WERROR,EnvGetDefgenericName(theEnv,execStatus,(void *) DefgenericData(theEnv)->CurrentGeneric));
+   EnvPrintRouter(theEnv,execStatus,WERROR,EnvGetDefgenericName(theEnv,execStatus,(void *) DefgenericData(theEnv,execStatus)->CurrentGeneric));
    EnvPrintRouter(theEnv,execStatus,WERROR," method #");
-   PrintLongInteger(theEnv,execStatus,WERROR,(long long) DefgenericData(theEnv)->CurrentMethod->index);
+   PrintLongInteger(theEnv,execStatus,WERROR,(long long) DefgenericData(theEnv,execStatus)->CurrentMethod->index);
    EnvPrintRouter(theEnv,execStatus,WERROR,".\n");
   }
 
@@ -279,16 +279,16 @@ globle intBool IsMethodApplicable(
    int type;
 #endif
 
-   if ((ProceduralPrimitiveData(theEnv)->ProcParamArraySize < meth->minRestrictions) ||
-       ((ProceduralPrimitiveData(theEnv)->ProcParamArraySize > meth->minRestrictions) && (meth->maxRestrictions != -1)))
+   if ((ProceduralPrimitiveData(theEnv,execStatus)->ProcParamArraySize < meth->minRestrictions) ||
+       ((ProceduralPrimitiveData(theEnv,execStatus)->ProcParamArraySize > meth->minRestrictions) && (meth->maxRestrictions != -1)))
      return(FALSE);
-   for (i = 0 , k = 0 ; i < ProceduralPrimitiveData(theEnv)->ProcParamArraySize ; i++)
+   for (i = 0 , k = 0 ; i < ProceduralPrimitiveData(theEnv,execStatus)->ProcParamArraySize ; i++)
      {
       rp = &meth->restrictions[k];
       if (rp->tcnt != 0)
         {
 #if OBJECT_SYSTEM
-         type = (void *) DetermineRestrictionClass(theEnv,execStatus,&ProceduralPrimitiveData(theEnv)->ProcParamArray[i]);
+         type = (void *) DetermineRestrictionClass(theEnv,execStatus,&ProceduralPrimitiveData(theEnv,execStatus)->ProcParamArray[i]);
          if (type == NULL)
            return(FALSE);
          for (j = 0 ; j < rp->tcnt ; j++)
@@ -297,26 +297,26 @@ globle intBool IsMethodApplicable(
               break;
             if (HasSuperclass((DEFCLASS *) type,(DEFCLASS *) rp->types[j]))
               break;
-            if (rp->types[j] == (void *) DefclassData(theEnv)->PrimitiveClassMap[INSTANCE_ADDRESS])
+            if (rp->types[j] == (void *) DefclassData(theEnv,execStatus)->PrimitiveClassMap[INSTANCE_ADDRESS])
               {
-               if (ProceduralPrimitiveData(theEnv)->ProcParamArray[i].type == INSTANCE_ADDRESS)
+               if (ProceduralPrimitiveData(theEnv,execStatus)->ProcParamArray[i].type == INSTANCE_ADDRESS)
                  break;
               }
-            else if (rp->types[j] == (void *) DefclassData(theEnv)->PrimitiveClassMap[INSTANCE_NAME])
+            else if (rp->types[j] == (void *) DefclassData(theEnv,execStatus)->PrimitiveClassMap[INSTANCE_NAME])
               {
-               if (ProceduralPrimitiveData(theEnv)->ProcParamArray[i].type == INSTANCE_NAME)
+               if (ProceduralPrimitiveData(theEnv,execStatus)->ProcParamArray[i].type == INSTANCE_NAME)
                  break;
               }
             else if (rp->types[j] ==
-                (void *) DefclassData(theEnv)->PrimitiveClassMap[INSTANCE_NAME]->directSuperclasses.classArray[0])
+                (void *) DefclassData(theEnv,execStatus)->PrimitiveClassMap[INSTANCE_NAME]->directSuperclasses.classArray[0])
               {
-               if ((ProceduralPrimitiveData(theEnv)->ProcParamArray[i].type == INSTANCE_NAME) ||
-                   (ProceduralPrimitiveData(theEnv)->ProcParamArray[i].type == INSTANCE_ADDRESS))
+               if ((ProceduralPrimitiveData(theEnv,execStatus)->ProcParamArray[i].type == INSTANCE_NAME) ||
+                   (ProceduralPrimitiveData(theEnv,execStatus)->ProcParamArray[i].type == INSTANCE_ADDRESS))
                  break;
               }
            }
 #else
-         type = ProceduralPrimitiveData(theEnv)->ProcParamArray[i].type;
+         type = ProceduralPrimitiveData(theEnv,execStatus)->ProcParamArray[i].type;
          for (j = 0 ; j < rp->tcnt ; j++)
            {
             if (type == ValueToInteger(rp->types[j]))
@@ -330,10 +330,10 @@ globle intBool IsMethodApplicable(
         }
       if (rp->query != NULL)
         {
-         DefgenericData(theEnv)->GenericCurrentArgument = &ProceduralPrimitiveData(theEnv)->ProcParamArray[i];
+         DefgenericData(theEnv,execStatus)->GenericCurrentArgument = &ProceduralPrimitiveData(theEnv,execStatus)->ProcParamArray[i];
          EvaluateExpression(theEnv,execStatus,rp->query,&temp);
          if ((temp.type != SYMBOL) ? FALSE :
-             (temp.value == EnvFalseSymbol(theEnv)))
+             (temp.value == EnvFalseSymbol(theEnv,execStatus)))
            return(FALSE);
         }
       if (((int) k) != meth->restrictionCount-1)
@@ -359,9 +359,9 @@ globle int NextMethodP(
   {
    register DEFMETHOD *meth;
 
-   if (DefgenericData(theEnv)->CurrentMethod == NULL)
+   if (DefgenericData(theEnv,execStatus)->CurrentMethod == NULL)
      return(FALSE);
-   meth = FindApplicableMethod(theEnv,execStatus,DefgenericData(theEnv)->CurrentGeneric,DefgenericData(theEnv)->CurrentMethod);
+   meth = FindApplicableMethod(theEnv,execStatus,DefgenericData(theEnv,execStatus)->CurrentGeneric,DefgenericData(theEnv,execStatus)->CurrentMethod);
    if (meth != NULL)
      {
       meth->busy--;
@@ -392,15 +392,15 @@ globle void CallNextMethod(
 #endif
 
    result->type = SYMBOL;
-   result->value = EnvFalseSymbol(theEnv);
+   result->value = EnvFalseSymbol(theEnv,execStatus);
    if (execStatus->HaltExecution)
      return;
-   oldMethod = DefgenericData(theEnv)->CurrentMethod;
-   if (DefgenericData(theEnv)->CurrentMethod != NULL)
-     DefgenericData(theEnv)->CurrentMethod = FindApplicableMethod(theEnv,execStatus,DefgenericData(theEnv)->CurrentGeneric,DefgenericData(theEnv)->CurrentMethod);
-   if (DefgenericData(theEnv)->CurrentMethod == NULL)
+   oldMethod = DefgenericData(theEnv,execStatus)->CurrentMethod;
+   if (DefgenericData(theEnv,execStatus)->CurrentMethod != NULL)
+     DefgenericData(theEnv,execStatus)->CurrentMethod = FindApplicableMethod(theEnv,execStatus,DefgenericData(theEnv,execStatus)->CurrentGeneric,DefgenericData(theEnv,execStatus)->CurrentMethod);
+   if (DefgenericData(theEnv,execStatus)->CurrentMethod == NULL)
      {
-      DefgenericData(theEnv)->CurrentMethod = oldMethod;
+      DefgenericData(theEnv,execStatus)->CurrentMethod = oldMethod;
       PrintErrorID(theEnv,execStatus,"GENRCEXE",2,FALSE);
       EnvPrintRouter(theEnv,execStatus,WERROR,"Shadowed methods not applicable in current context.\n");
       SetEvaluationError(theEnv,execStatus,TRUE);
@@ -408,29 +408,29 @@ globle void CallNextMethod(
      }
 
 #if DEBUGGING_FUNCTIONS
-   if (DefgenericData(theEnv)->CurrentMethod->trace)
+   if (DefgenericData(theEnv,execStatus)->CurrentMethod->trace)
      WatchMethod(theEnv,execStatus,BEGIN_TRACE);
 #endif
-   if (DefgenericData(theEnv)->CurrentMethod->system)
+   if (DefgenericData(theEnv,execStatus)->CurrentMethod->system)
      {
       EXPRESSION fcall;
 
       fcall.type = FCALL;
-      fcall.value = DefgenericData(theEnv)->CurrentMethod->actions->value;
+      fcall.value = DefgenericData(theEnv,execStatus)->CurrentMethod->actions->value;
       fcall.nextArg = NULL;
-      fcall.argList = GetProcParamExpressions(theEnv);
+      fcall.argList = GetProcParamExpressions(theEnv,execStatus);
       EvaluateExpression(theEnv,execStatus,&fcall,result);
      }
    else
      {
 #if PROFILING_FUNCTIONS
       StartProfile(theEnv,execStatus,&profileFrame,
-                   &DefgenericData(theEnv)->CurrentGeneric->header.usrData,
-                   ProfileFunctionData(theEnv)->ProfileConstructs);
+                   &DefgenericData(theEnv,execStatus)->CurrentGeneric->header.usrData,
+                   ProfileFunctionData(theEnv,execStatus)->ProfileConstructs);
 #endif
 
-      EvaluateProcActions(theEnv,execStatus,DefgenericData(theEnv)->CurrentGeneric->header.whichModule->theModule,
-                         DefgenericData(theEnv)->CurrentMethod->actions,DefgenericData(theEnv)->CurrentMethod->localVarCount,
+      EvaluateProcActions(theEnv,execStatus,DefgenericData(theEnv,execStatus)->CurrentGeneric->header.whichModule->theModule,
+                         DefgenericData(theEnv,execStatus)->CurrentMethod->actions,DefgenericData(theEnv,execStatus)->CurrentMethod->localVarCount,
                          result,UnboundMethodErr);
 
 #if PROFILING_FUNCTIONS
@@ -438,13 +438,13 @@ globle void CallNextMethod(
 #endif
      }
 
-   DefgenericData(theEnv)->CurrentMethod->busy--;
+   DefgenericData(theEnv,execStatus)->CurrentMethod->busy--;
 #if DEBUGGING_FUNCTIONS
-   if (DefgenericData(theEnv)->CurrentMethod->trace)
+   if (DefgenericData(theEnv,execStatus)->CurrentMethod->trace)
      WatchMethod(theEnv,execStatus,END_TRACE);
 #endif
-   DefgenericData(theEnv)->CurrentMethod = oldMethod;
-   ProcedureFunctionData(theEnv)->ReturnFlag = FALSE;
+   DefgenericData(theEnv,execStatus)->CurrentMethod = oldMethod;
+   ProcedureFunctionData(theEnv,execStatus)->ReturnFlag = FALSE;
   }
 
 /**************************************************************************
@@ -469,7 +469,7 @@ globle void CallSpecificMethod(
    int mi;
 
    result->type = SYMBOL;
-   result->value = EnvFalseSymbol(theEnv);
+   result->value = EnvFalseSymbol(theEnv,execStatus);
    if (EnvArgTypeCheck(theEnv,execStatus,"call-specific-method",1,SYMBOL,&temp) == FALSE)
      return;
    gfunc = CheckGenericExists(theEnv,execStatus,"call-specific-method",DOToString(temp));
@@ -501,17 +501,17 @@ globle void OverrideNextMethod(
   DATA_OBJECT *result)
   {
    result->type = SYMBOL;
-   result->value = EnvFalseSymbol(theEnv);
+   result->value = EnvFalseSymbol(theEnv,execStatus);
    if (execStatus->HaltExecution)
      return;
-   if (DefgenericData(theEnv)->CurrentMethod == NULL)
+   if (DefgenericData(theEnv,execStatus)->CurrentMethod == NULL)
      {
       PrintErrorID(theEnv,execStatus,"GENRCEXE",2,FALSE);
       EnvPrintRouter(theEnv,execStatus,WERROR,"Shadowed methods not applicable in current context.\n");
       SetEvaluationError(theEnv,execStatus,TRUE);
       return;
      }
-   GenericDispatch(theEnv,execStatus,DefgenericData(theEnv)->CurrentGeneric,DefgenericData(theEnv)->CurrentMethod,NULL,
+   GenericDispatch(theEnv,execStatus,DefgenericData(theEnv,execStatus)->CurrentGeneric,DefgenericData(theEnv,execStatus)->CurrentMethod,NULL,
                    GetFirstArgument(),result);
   }
 
@@ -530,10 +530,10 @@ globle void GetGenericCurrentArgument(
   EXEC_STATUS,
   DATA_OBJECT *result)
   {
-   result->type = DefgenericData(theEnv)->GenericCurrentArgument->type;
-   result->value = DefgenericData(theEnv)->GenericCurrentArgument->value;
-   result->begin = DefgenericData(theEnv)->GenericCurrentArgument->begin;
-   result->end = DefgenericData(theEnv)->GenericCurrentArgument->end;
+   result->type = DefgenericData(theEnv,execStatus)->GenericCurrentArgument->type;
+   result->value = DefgenericData(theEnv,execStatus)->GenericCurrentArgument->value;
+   result->begin = DefgenericData(theEnv,execStatus)->GenericCurrentArgument->begin;
+   result->end = DefgenericData(theEnv,execStatus)->GenericCurrentArgument->end;
   }
 
 /* =========================================
@@ -595,13 +595,13 @@ static void WatchGeneric(
    EnvPrintRouter(theEnv,execStatus,WTRACE,"GNC ");
    EnvPrintRouter(theEnv,execStatus,WTRACE,tstring);
    EnvPrintRouter(theEnv,execStatus,WTRACE," ");
-   if (DefgenericData(theEnv)->CurrentGeneric->header.whichModule->theModule != ((struct defmodule *) EnvGetCurrentModule(theEnv)))
+   if (DefgenericData(theEnv,execStatus)->CurrentGeneric->header.whichModule->theModule != ((struct defmodule *) EnvGetCurrentModule(theEnv,execStatus)))
      {
       EnvPrintRouter(theEnv,execStatus,WTRACE,EnvGetDefmoduleName(theEnv,execStatus,(void *)
-                        DefgenericData(theEnv)->CurrentGeneric->header.whichModule->theModule));
+                        DefgenericData(theEnv,execStatus)->CurrentGeneric->header.whichModule->theModule));
       EnvPrintRouter(theEnv,execStatus,WTRACE,"::");
      }
-   EnvPrintRouter(theEnv,execStatus,WTRACE,ValueToString((void *) DefgenericData(theEnv)->CurrentGeneric->header.name));
+   EnvPrintRouter(theEnv,execStatus,WTRACE,ValueToString((void *) DefgenericData(theEnv,execStatus)->CurrentGeneric->header.name));
    EnvPrintRouter(theEnv,execStatus,WTRACE," ");
    EnvPrintRouter(theEnv,execStatus,WTRACE," ED:");
    PrintLongInteger(theEnv,execStatus,WTRACE,(long long) execStatus->CurrentEvaluationDepth);
@@ -628,17 +628,17 @@ static void WatchMethod(
    EnvPrintRouter(theEnv,execStatus,WTRACE,"MTH ");
    EnvPrintRouter(theEnv,execStatus,WTRACE,tstring);
    EnvPrintRouter(theEnv,execStatus,WTRACE," ");
-   if (DefgenericData(theEnv)->CurrentGeneric->header.whichModule->theModule != ((struct defmodule *) EnvGetCurrentModule(theEnv)))
+   if (DefgenericData(theEnv,execStatus)->CurrentGeneric->header.whichModule->theModule != ((struct defmodule *) EnvGetCurrentModule(theEnv,execStatus)))
      {
       EnvPrintRouter(theEnv,execStatus,WTRACE,EnvGetDefmoduleName(theEnv,execStatus,(void *)
-                        DefgenericData(theEnv)->CurrentGeneric->header.whichModule->theModule));
+                        DefgenericData(theEnv,execStatus)->CurrentGeneric->header.whichModule->theModule));
       EnvPrintRouter(theEnv,execStatus,WTRACE,"::");
      }
-   EnvPrintRouter(theEnv,execStatus,WTRACE,ValueToString((void *) DefgenericData(theEnv)->CurrentGeneric->header.name));
+   EnvPrintRouter(theEnv,execStatus,WTRACE,ValueToString((void *) DefgenericData(theEnv,execStatus)->CurrentGeneric->header.name));
    EnvPrintRouter(theEnv,execStatus,WTRACE,":#");
-   if (DefgenericData(theEnv)->CurrentMethod->system)
+   if (DefgenericData(theEnv,execStatus)->CurrentMethod->system)
      EnvPrintRouter(theEnv,execStatus,WTRACE,"SYS");
-   PrintLongInteger(theEnv,execStatus,WTRACE,(long long) DefgenericData(theEnv)->CurrentMethod->index);
+   PrintLongInteger(theEnv,execStatus,WTRACE,(long long) DefgenericData(theEnv,execStatus)->CurrentMethod->index);
    EnvPrintRouter(theEnv,execStatus,WTRACE," ");
    EnvPrintRouter(theEnv,execStatus,WTRACE," ED:");
    PrintLongInteger(theEnv,execStatus,WTRACE,(long long) execStatus->CurrentEvaluationDepth);
@@ -677,7 +677,7 @@ static DEFCLASS *DetermineRestrictionClass(
       cls = (ins->garbage == 0) ? ins->cls : NULL;
      }
    else
-     return(DefclassData(theEnv)->PrimitiveClassMap[dobj->type]);
+     return(DefclassData(theEnv,execStatus)->PrimitiveClassMap[dobj->type]);
    if (cls == NULL)
      {
       SetEvaluationError(theEnv,execStatus,TRUE);
@@ -685,7 +685,7 @@ static DEFCLASS *DetermineRestrictionClass(
       EnvPrintRouter(theEnv,execStatus,WERROR,"Unable to determine class of ");
       PrintDataObject(theEnv,execStatus,WERROR,dobj);
       EnvPrintRouter(theEnv,execStatus,WERROR," in generic function ");
-      EnvPrintRouter(theEnv,execStatus,WERROR,EnvGetDefgenericName(theEnv,execStatus,(void *) DefgenericData(theEnv)->CurrentGeneric));
+      EnvPrintRouter(theEnv,execStatus,WERROR,EnvGetDefgenericName(theEnv,execStatus,(void *) DefgenericData(theEnv,execStatus)->CurrentGeneric));
       EnvPrintRouter(theEnv,execStatus,WERROR,".\n");
      }
    return(cls);

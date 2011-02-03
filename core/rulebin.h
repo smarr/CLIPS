@@ -110,13 +110,13 @@ struct defruleBinaryData
    struct joinLink *LinkArray;
   };
 
-#define DefruleBinaryData(theEnv) ((struct defruleBinaryData *) GetEnvironmentData(theEnv,execStatus,RULEBIN_DATA))
+#define DefruleBinaryData(theEnv,execStatus) ((struct defruleBinaryData *) GetEnvironmentData(theEnv,execStatus,RULEBIN_DATA))
 
 #define BloadDefrulePointer(x,i) ((struct defrule *) ((i == -1L) ? NULL : &x[i]))
 #define BsaveJoinIndex(joinPtr) ((joinPtr == NULL) ? -1L :  ((struct joinNode *) joinPtr)->bsaveID)
-#define BloadJoinPointer(i) ((struct joinNode *) ((i == -1L) ? NULL : &DefruleBinaryData(theEnv)->JoinArray[i]))
+#define BloadJoinPointer(i) ((struct joinNode *) ((i == -1L) ? NULL : &DefruleBinaryData(theEnv,execStatus)->JoinArray[i]))
 #define BsaveJoinLinkIndex(linkPtr) ((linkPtr == NULL) ? -1L :  ((struct joinLink *) linkPtr)->bsaveID)
-#define BloadJoinLinkPointer(i) ((struct joinLink *) ((i == -1L) ? NULL : &DefruleBinaryData(theEnv)->LinkArray[i]))
+#define BloadJoinLinkPointer(i) ((struct joinLink *) ((i == -1L) ? NULL : &DefruleBinaryData(theEnv,execStatus)->LinkArray[i]))
 
 #ifdef LOCALE
 #undef LOCALE
@@ -128,12 +128,12 @@ struct defruleBinaryData
 #define LOCALE extern
 #endif
 
-   LOCALE void                           DefruleBinarySetup(void *);
-   LOCALE void                           UpdatePatternNodeHeader(void *,struct patternNodeHeader *,
+   LOCALE void                           DefruleBinarySetup(void *,EXEC_STATUS);
+   LOCALE void                           UpdatePatternNodeHeader(void *,EXEC_STATUS,struct patternNodeHeader *,
                                                                  struct bsavePatternNodeHeader *);
-   LOCALE void                           AssignBsavePatternHeaderValues(void *,struct bsavePatternNodeHeader *,
+   LOCALE void                           AssignBsavePatternHeaderValues(void *,EXEC_STATUS,struct bsavePatternNodeHeader *,
                                                                         struct patternNodeHeader *);
-   LOCALE void                          *BloadDefruleModuleReference(void *,int);
+   LOCALE void                          *BloadDefruleModuleReference(void *,EXEC_STATUS,int);
 
 #endif
 #endif

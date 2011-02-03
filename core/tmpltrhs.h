@@ -42,7 +42,7 @@
 #define LOCALE extern
 #endif
 
-   LOCALE struct expr                   *ParseAssertTemplate(void *,char *,struct token *,int *,
+   LOCALE struct expr                   *ParseAssertTemplate(void *,EXEC_STATUS,char *,struct token *,int *,
                                                              int,int,struct deftemplate *);
 
 #endif

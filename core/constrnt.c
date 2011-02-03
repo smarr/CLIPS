@@ -51,14 +51,14 @@
 /***************************************/
 
 #if (! RUN_TIME) && (! BLOAD_ONLY)
-   static void                     InstallConstraintRecord(void *,CONSTRAINT_RECORD *);
+   static void                     InstallConstraintRecord(void *,EXEC_STATUS,CONSTRAINT_RECORD *);
    static int                      ConstraintCompare(struct constraintRecord *,struct constraintRecord *);
 #endif
 #if (! RUN_TIME)
-   static void                     ReturnConstraintRecord(void *,CONSTRAINT_RECORD *);
-   static void                     DeinstallConstraintRecord(void *,CONSTRAINT_RECORD *);
+   static void                     ReturnConstraintRecord(void *,EXEC_STATUS,CONSTRAINT_RECORD *);
+   static void                     DeinstallConstraintRecord(void *,EXEC_STATUS,CONSTRAINT_RECORD *);
 #endif
-   static void                     DeallocateConstraintData(void *);
+   static void                     DeallocateConstraintData(void *,EXEC_STATUS);
 
 /*****************************************************/
 /* InitializeConstraints: Initializes the constraint */
@@ -75,17 +75,17 @@ globle void InitializeConstraints(
 
    AllocateEnvironmentData(theEnv,execStatus,CONSTRAINT_DATA,sizeof(struct constraintData),DeallocateConstraintData);
    
-   ConstraintData(theEnv)->StaticConstraintChecking = TRUE;
+   ConstraintData(theEnv,execStatus)->StaticConstraintChecking = TRUE;
    
 #if (! RUN_TIME) && (! BLOAD_ONLY)
 
-    ConstraintData(theEnv)->ConstraintHashtable = (struct constraintRecord **)
+    ConstraintData(theEnv,execStatus)->ConstraintHashtable = (struct constraintRecord **)
                           gm2(theEnv,execStatus,(int) sizeof (struct constraintRecord *) *
                                     SIZE_CONSTRAINT_HASH);
 
-    if (ConstraintData(theEnv)->ConstraintHashtable == NULL) EnvExitRouter(theEnv,execStatus,EXIT_FAILURE);
+    if (ConstraintData(theEnv,execStatus)->ConstraintHashtable == NULL) EnvExitRouter(theEnv,execStatus,EXIT_FAILURE);
 
-    for (i = 0; i < SIZE_CONSTRAINT_HASH; i++) ConstraintData(theEnv)->ConstraintHashtable[i] = NULL;
+    for (i = 0; i < SIZE_CONSTRAINT_HASH; i++) ConstraintData(theEnv,execStatus)->ConstraintHashtable[i] = NULL;
 #endif
 
 #if (! RUN_TIME)
@@ -111,7 +111,7 @@ static void DeallocateConstraintData(
 
    for (i = 0; i < SIZE_CONSTRAINT_HASH; i++)
      {
-      tmpPtr = ConstraintData(theEnv)->ConstraintHashtable[i];
+      tmpPtr = ConstraintData(theEnv,execStatus)->ConstraintHashtable[i];
       while (tmpPtr != NULL)
         {
          nextPtr = tmpPtr->next;
@@ -120,19 +120,19 @@ static void DeallocateConstraintData(
         }
      }
 
-   rm(theEnv,execStatus,ConstraintData(theEnv)->ConstraintHashtable,
+   rm(theEnv,execStatus,ConstraintData(theEnv,execStatus)->ConstraintHashtable,
       (int) sizeof (struct constraintRecord *) * SIZE_CONSTRAINT_HASH);
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 #endif
       
 #if (BLOAD || BLOAD_ONLY || BLOAD_AND_BSAVE) && (! RUN_TIME)
-   if (ConstraintData(theEnv)->NumberOfConstraints != 0)
+   if (ConstraintData(theEnv,execStatus)->NumberOfConstraints != 0)
      {
-      genfree(theEnv,execStatus,(void *) ConstraintData(theEnv)->ConstraintArray,
-              (sizeof(CONSTRAINT_RECORD) * ConstraintData(theEnv)->NumberOfConstraints));
+      genfree(theEnv,execStatus,(void *) ConstraintData(theEnv,execStatus)->ConstraintArray,
+              (sizeof(CONSTRAINT_RECORD) * ConstraintData(theEnv,execStatus)->NumberOfConstraints));
      }
 #endif
   }
@@ -229,7 +229,7 @@ globle void RemoveConstraint(
    /* from the contraint hash table. */
    /*================================*/
 
-   tmpPtr = ConstraintData(theEnv)->ConstraintHashtable[theConstraint->bucket];
+   tmpPtr = ConstraintData(theEnv,execStatus)->ConstraintHashtable[theConstraint->bucket];
    while (tmpPtr != NULL)
      {
       if (tmpPtr == theConstraint)
@@ -238,7 +238,7 @@ globle void RemoveConstraint(
          if (theConstraint->count == 0)
            {
             if (prevPtr == NULL)
-              { ConstraintData(theEnv)->ConstraintHashtable[theConstraint->bucket] = theConstraint->next; }
+              { ConstraintData(theEnv,execStatus)->ConstraintHashtable[theConstraint->bucket] = theConstraint->next; }
             else
               { prevPtr->next = theConstraint->next; }
             DeinstallConstraintRecord(theEnv,execStatus,theConstraint);
@@ -431,7 +431,7 @@ globle struct constraintRecord *AddConstraint(
 
    hashValue = HashConstraint(theConstraint);
 
-   for (tmpPtr = ConstraintData(theEnv)->ConstraintHashtable[hashValue];
+   for (tmpPtr = ConstraintData(theEnv,execStatus)->ConstraintHashtable[hashValue];
         tmpPtr != NULL;
         tmpPtr = tmpPtr->next)
      {
@@ -446,8 +446,8 @@ globle struct constraintRecord *AddConstraint(
    InstallConstraintRecord(theEnv,execStatus,theConstraint);
    theConstraint->count = 1;
    theConstraint->bucket = hashValue;
-   theConstraint->next = ConstraintData(theEnv)->ConstraintHashtable[hashValue];
-   ConstraintData(theEnv)->ConstraintHashtable[hashValue] = theConstraint;
+   theConstraint->next = ConstraintData(theEnv,execStatus)->ConstraintHashtable[hashValue];
+   ConstraintData(theEnv,execStatus)->ConstraintHashtable[hashValue] = theConstraint;
    return(theConstraint);
   }
 
@@ -504,14 +504,14 @@ globle int SDCCommand(
    int oldValue;
    DATA_OBJECT arg_ptr;
 
-   oldValue = EnvGetDynamicConstraintChecking(theEnv);
+   oldValue = EnvGetDynamicConstraintChecking(theEnv,execStatus);
 
    if (EnvArgCountCheck(theEnv,execStatus,"set-dynamic-constraint-checking",EXACTLY,1) == -1)
      { return(oldValue); }
 
    EnvRtnUnknown(theEnv,execStatus,1,&arg_ptr);
 
-   if ((arg_ptr.value == EnvFalseSymbol(theEnv)) && (arg_ptr.type == SYMBOL))
+   if ((arg_ptr.value == EnvFalseSymbol(theEnv,execStatus)) && (arg_ptr.type == SYMBOL))
      { EnvSetDynamicConstraintChecking(theEnv,execStatus,FALSE); }
    else
      { EnvSetDynamicConstraintChecking(theEnv,execStatus,TRUE); }
@@ -529,7 +529,7 @@ globle int GDCCommand(
   {
    int oldValue;
 
-   oldValue = EnvGetDynamicConstraintChecking(theEnv);
+   oldValue = EnvGetDynamicConstraintChecking(theEnv,execStatus);
 
    if (EnvArgCountCheck(theEnv,execStatus,"get-dynamic-constraint-checking",EXACTLY,0) == -1)
      { return(oldValue); }
@@ -548,14 +548,14 @@ globle int SSCCommand(
    int oldValue;
    DATA_OBJECT arg_ptr;
 
-   oldValue = EnvGetStaticConstraintChecking(theEnv);
+   oldValue = EnvGetStaticConstraintChecking(theEnv,execStatus);
 
    if (EnvArgCountCheck(theEnv,execStatus,"set-static-constraint-checking",EXACTLY,1) == -1)
      { return(oldValue); }
 
    EnvRtnUnknown(theEnv,execStatus,1,&arg_ptr);
 
-   if ((arg_ptr.value == EnvFalseSymbol(theEnv)) && (arg_ptr.type == SYMBOL))
+   if ((arg_ptr.value == EnvFalseSymbol(theEnv,execStatus)) && (arg_ptr.type == SYMBOL))
      { EnvSetStaticConstraintChecking(theEnv,execStatus,FALSE); }
    else
      { EnvSetStaticConstraintChecking(theEnv,execStatus,TRUE); }
@@ -573,7 +573,7 @@ globle int GSCCommand(
   {
    int oldValue;
 
-   oldValue = EnvGetStaticConstraintChecking(theEnv);
+   oldValue = EnvGetStaticConstraintChecking(theEnv,execStatus);
 
    if (EnvArgCountCheck(theEnv,execStatus,"get-static-constraint-checking",EXACTLY,0) == -1)
      { return(oldValue); }
@@ -591,8 +591,8 @@ globle intBool EnvSetDynamicConstraintChecking(
   int value)
   {
    int ov;
-   ov = ConstraintData(theEnv)->DynamicConstraintChecking;
-   ConstraintData(theEnv)->DynamicConstraintChecking = value;
+   ov = ConstraintData(theEnv,execStatus)->DynamicConstraintChecking;
+   ConstraintData(theEnv,execStatus)->DynamicConstraintChecking = value;
    return(ov);
   }
 
@@ -604,7 +604,7 @@ globle intBool EnvGetDynamicConstraintChecking(
   void *theEnv,
   EXEC_STATUS)
   { 
-   return(ConstraintData(theEnv)->DynamicConstraintChecking); 
+   return(ConstraintData(theEnv,execStatus)->DynamicConstraintChecking); 
   }
 
 /*****************************************************/
@@ -618,8 +618,8 @@ globle intBool EnvSetStaticConstraintChecking(
   {
    int ov;
 
-   ov = ConstraintData(theEnv)->StaticConstraintChecking;
-   ConstraintData(theEnv)->StaticConstraintChecking = value;
+   ov = ConstraintData(theEnv,execStatus)->StaticConstraintChecking;
+   ConstraintData(theEnv,execStatus)->StaticConstraintChecking = value;
    return(ov);
   }
 
@@ -631,6 +631,6 @@ globle intBool EnvGetStaticConstraintChecking(
   void *theEnv,
   EXEC_STATUS)
   {    
-   return(ConstraintData(theEnv)->StaticConstraintChecking); 
+   return(ConstraintData(theEnv,execStatus)->StaticConstraintChecking); 
   }
 

@@ -70,9 +70,9 @@ struct deftemplateBinaryData
    struct deftemplateModule *ModuleArray;
   };
   
-#define DeftemplateBinaryData(theEnv) ((struct deftemplateBinaryData *) GetEnvironmentData(theEnv,execStatus,TMPLTBIN_DATA))
+#define DeftemplateBinaryData(theEnv,execStatus) ((struct deftemplateBinaryData *) GetEnvironmentData(theEnv,execStatus,TMPLTBIN_DATA))
 
-#define DeftemplatePointer(i) ((struct deftemplate *) (&DeftemplateBinaryData(theEnv)->DeftemplateArray[i]))
+#define DeftemplatePointer(i) ((struct deftemplate *) (&DeftemplateBinaryData(theEnv,execStatus)->DeftemplateArray[i]))
 
 #ifndef _H_tmpltdef
 #include "tmpltdef.h"
@@ -88,8 +88,8 @@ struct deftemplateBinaryData
 #define LOCALE extern
 #endif
 
-   LOCALE void                           DeftemplateBinarySetup(void *);
-   LOCALE void                          *BloadDeftemplateModuleReference(void *,int);
+   LOCALE void                           DeftemplateBinarySetup(void *,EXEC_STATUS);
+   LOCALE void                          *BloadDeftemplateModuleReference(void *,EXEC_STATUS,int);
 
 #endif
 #endif

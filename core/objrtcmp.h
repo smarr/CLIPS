@@ -41,8 +41,8 @@
 #define LOCALE extern
 #endif
 
-LOCALE void ObjectPatternsCompilerSetup(void *);
-LOCALE void ObjectPatternNodeReference(void *,void *,FILE *,int,int);
+LOCALE void ObjectPatternsCompilerSetup(void *,EXEC_STATUS);
+LOCALE void ObjectPatternNodeReference(void *,EXEC_STATUS,void *,FILE *,int,int);
 
 #endif
 

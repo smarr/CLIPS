@@ -47,15 +47,15 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static intBool                 CheckForUnmatchableConstraints(void *,struct lhsParseNode *,int);
-   static intBool                 MultifieldCardinalityViolation(void *,struct lhsParseNode *);
-   static struct lhsParseNode    *UnionVariableConstraints(void *,struct lhsParseNode *,
+   static intBool                 CheckForUnmatchableConstraints(void *,EXEC_STATUS,struct lhsParseNode *,int);
+   static intBool                 MultifieldCardinalityViolation(void *,EXEC_STATUS,struct lhsParseNode *);
+   static struct lhsParseNode    *UnionVariableConstraints(void *,EXEC_STATUS,struct lhsParseNode *,
                                                      struct lhsParseNode *);
-   static struct lhsParseNode    *AddToVariableConstraints(void *,struct lhsParseNode *,
+   static struct lhsParseNode    *AddToVariableConstraints(void *,EXEC_STATUS,struct lhsParseNode *,
                                                     struct lhsParseNode *);
-   static void                    ConstraintConflictMessage(void *,struct symbolHashNode *,
+   static void                    ConstraintConflictMessage(void *,EXEC_STATUS,struct symbolHashNode *,
                                                             int,int,struct symbolHashNode *);
-   static intBool                 CheckArgumentForConstraintError(void *,struct expr *,struct expr*,
+   static intBool                 CheckArgumentForConstraintError(void *,EXEC_STATUS,struct expr *,struct expr*,
                                                                   int,struct FunctionDefinition *,
                                                                   struct lhsParseNode *);
 
@@ -70,7 +70,7 @@ static intBool CheckForUnmatchableConstraints(
   struct lhsParseNode *theNode,
   int whichCE)
   {
-   if (EnvGetStaticConstraintChecking(theEnv) == FALSE) return(FALSE);
+   if (EnvGetStaticConstraintChecking(theEnv,execStatus) == FALSE) return(FALSE);
 
    if (UnmatchableConstraint(theNode->constraints))
      {
@@ -201,7 +201,7 @@ static intBool MultifieldCardinalityViolation(
          /* pairs will be the first in the list.  */
          /*=======================================*/
 
-         if (tmpNode->constraints->minFields->value != SymbolData(theEnv)->NegativeInfinity)
+         if (tmpNode->constraints->minFields->value != SymbolData(theEnv,execStatus)->NegativeInfinity)
            { minFields += (long) ValueToLong(tmpNode->constraints->minFields->value); }
 
          /*=========================================*/
@@ -211,7 +211,7 @@ static intBool MultifieldCardinalityViolation(
 
          tmpMax = tmpNode->constraints->maxFields;
          while (tmpMax->nextArg != NULL) tmpMax = tmpMax->nextArg;
-         if (tmpMax->value == SymbolData(theEnv)->PositiveInfinity)
+         if (tmpMax->value == SymbolData(theEnv,execStatus)->PositiveInfinity)
            { posInfinity = TRUE; }
          else
            { maxFields += (long) ValueToLong(tmpMax->value); }
@@ -232,12 +232,12 @@ static intBool MultifieldCardinalityViolation(
    /* cardinalities of the restrictions inside the multifield slot.    */
    /*==================================================================*/
 
-   if (theNode->constraints == NULL) tempConstraint = GetConstraintRecord(theEnv);
+   if (theNode->constraints == NULL) tempConstraint = GetConstraintRecord(theEnv,execStatus);
    else tempConstraint = CopyConstraintRecord(theEnv,execStatus,theNode->constraints);
    ReturnExpression(theEnv,execStatus,tempConstraint->minFields);
    ReturnExpression(theEnv,execStatus,tempConstraint->maxFields);
    tempConstraint->minFields = GenConstant(theEnv,execStatus,INTEGER,EnvAddLong(theEnv,execStatus,(long long) minFields));
-   if (posInfinity) tempConstraint->maxFields = GenConstant(theEnv,execStatus,SYMBOL,SymbolData(theEnv)->PositiveInfinity);
+   if (posInfinity) tempConstraint->maxFields = GenConstant(theEnv,execStatus,SYMBOL,SymbolData(theEnv,execStatus)->PositiveInfinity);
    else tempConstraint->maxFields = GenConstant(theEnv,execStatus,INTEGER,EnvAddLong(theEnv,execStatus,(long long) maxFields));
 
    /*================================================================*/
@@ -256,7 +256,7 @@ static intBool MultifieldCardinalityViolation(
    /* Determine if the final cardinality for the slot can be satisfied. */
    /*===================================================================*/
 
-   if (EnvGetStaticConstraintChecking(theEnv) == FALSE) return(FALSE);
+   if (EnvGetStaticConstraintChecking(theEnv,execStatus) == FALSE) return(FALSE);
    if (UnmatchableConstraint(newConstraint)) return(TRUE);
 
    return(FALSE);
@@ -582,7 +582,7 @@ static struct lhsParseNode *UnionVariableConstraints(
 
          if (list1->value == trace->value)
            {
-            temp = GetLHSParseNode(theEnv);
+            temp = GetLHSParseNode(theEnv,execStatus);
             temp->derivedConstraints = TRUE;
             temp->value = list1->value;
             temp->constraints = UnionConstraints(theEnv,execStatus,list1->constraints,trace->constraints);
@@ -641,7 +641,7 @@ globle struct lhsParseNode *GetExpressionVarConstraints(
 
       if (theExpression->type == SF_VARIABLE)
         {
-         list2 = GetLHSParseNode(theEnv);
+         list2 = GetLHSParseNode(theEnv,execStatus);
          if (theExpression->referringNode != NULL)
            { list2->type = theExpression->referringNode->type; }
          else
@@ -799,11 +799,11 @@ static intBool CheckArgumentForConstraintError(
      {
       if (theVariable->type == MF_VARIABLE)
         {
-         constraint2 = GetConstraintRecord(theEnv);
+         constraint2 = GetConstraintRecord(theEnv,execStatus);
          SetConstraintType(MULTIFIELD,constraint2);
         }
       else if (theVariable->constraints == NULL)
-        { constraint2 = GetConstraintRecord(theEnv); }
+        { constraint2 = GetConstraintRecord(theEnv,execStatus); }
       else
         { constraint2 = CopyConstraintRecord(theEnv,execStatus,theVariable->constraints); }
      }
@@ -836,7 +836,7 @@ static intBool CheckArgumentForConstraintError(
    /* Check for unmatchable constraints. */
    /*====================================*/
 
-   if (UnmatchableConstraint(constraint4) && EnvGetStaticConstraintChecking(theEnv))
+   if (UnmatchableConstraint(constraint4) && EnvGetStaticConstraintChecking(theEnv,execStatus))
      {
       PrintErrorID(theEnv,execStatus,"RULECSTR",3,TRUE);
       EnvPrintRouter(theEnv,execStatus,WERROR,"Previous variable bindings of ?");

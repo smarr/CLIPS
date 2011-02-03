@@ -48,13 +48,13 @@ struct portConstructItem
 #define LOCALE extern
 #endif
 
-   LOCALE long                           GetNumberOfDefmodules(void *);
-   LOCALE void                           SetNumberOfDefmodules(void *,long);
-   LOCALE void                           AddAfterModuleDefinedFunction(void *,char *,void (*)(void *),int);
-   LOCALE int                            ParseDefmodule(void *,char *);
-   LOCALE void                           AddPortConstructItem(void *,char *,int);
-   LOCALE struct portConstructItem      *ValidPortConstructItem(void *,char *);
-   LOCALE int                            FindImportExportConflict(void *,char *,struct defmodule *,char *);
+   LOCALE long                           GetNumberOfDefmodules(void *,EXEC_STATUS);
+   LOCALE void                           SetNumberOfDefmodules(void *,EXEC_STATUS,long);
+   LOCALE void                           AddAfterModuleDefinedFunction(void *,EXEC_STATUS,char *,void (*)(void *),int);
+   LOCALE int                            ParseDefmodule(void *,EXEC_STATUS,char *);
+   LOCALE void                           AddPortConstructItem(void *,EXEC_STATUS,char *,int);
+   LOCALE struct portConstructItem      *ValidPortConstructItem(void *,EXEC_STATUS,char *);
+   LOCALE int                            FindImportExportConflict(void *,EXEC_STATUS,char *,struct defmodule *,char *);
 
 #endif
 

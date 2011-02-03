@@ -120,9 +120,9 @@ struct defgenericData
 #endif
   };
 
-#define DefgenericData(theEnv) ((struct defgenericData *) GetEnvironmentData(theEnv,execStatus,DEFGENERIC_DATA))
-#define SaveBusyCount(gfunc)    (DefgenericData(theEnv)->OldGenericBusySave = gfunc->busy)
-#define RestoreBusyCount(gfunc) (gfunc->busy = DefgenericData(theEnv)->OldGenericBusySave)
+#define DefgenericData(theEnv,execStatus) ((struct defgenericData *) GetEnvironmentData(theEnv,execStatus,DEFGENERIC_DATA))
+#define SaveBusyCount(gfunc)    (DefgenericData(theEnv,execStatus)->OldGenericBusySave = gfunc->busy)
+#define RestoreBusyCount(gfunc) (gfunc->busy = DefgenericData(theEnv,execStatus)->OldGenericBusySave)
 
 #ifdef LOCALE
 #undef LOCALE
@@ -135,20 +135,20 @@ struct defgenericData
 #endif
 
 #if ! RUN_TIME
-LOCALE intBool ClearDefgenericsReady(void *);
-LOCALE void *AllocateDefgenericModule(void *);
-LOCALE void FreeDefgenericModule(void *,void *);
+LOCALE intBool ClearDefgenericsReady(void *,EXEC_STATUS);
+LOCALE void *AllocateDefgenericModule(void *,EXEC_STATUS);
+LOCALE void FreeDefgenericModule(void *,EXEC_STATUS,void *);
 #endif
 
 #if (! BLOAD_ONLY) && (! RUN_TIME)
 
-LOCALE int ClearDefmethods(void *);
-LOCALE int RemoveAllExplicitMethods(void *,DEFGENERIC *);
-LOCALE void RemoveDefgeneric(void *,void *);
-LOCALE int ClearDefgenerics(void *);
-LOCALE void MethodAlterError(void *,DEFGENERIC *);
-LOCALE void DeleteMethodInfo(void *,DEFGENERIC *,DEFMETHOD *);
-LOCALE void DestroyMethodInfo(void *,DEFGENERIC *,DEFMETHOD *);
+LOCALE int ClearDefmethods(void *,EXEC_STATUS);
+LOCALE int RemoveAllExplicitMethods(void *,EXEC_STATUS,DEFGENERIC *);
+LOCALE void RemoveDefgeneric(void *,EXEC_STATUS,void *);
+LOCALE int ClearDefgenerics(void *,EXEC_STATUS);
+LOCALE void MethodAlterError(void *,EXEC_STATUS,DEFGENERIC *);
+LOCALE void DeleteMethodInfo(void *,EXEC_STATUS,DEFGENERIC *,DEFMETHOD *);
+LOCALE void DestroyMethodInfo(void *,EXEC_STATUS,DEFGENERIC *,DEFMETHOD *);
 LOCALE int MethodsExecuting(DEFGENERIC *);
 #endif
 #if ! OBJECT_SYSTEM
@@ -157,17 +157,17 @@ LOCALE intBool SubsumeType(int,int);
 
 LOCALE long FindMethodByIndex(DEFGENERIC *,long);
 #if DEBUGGING_FUNCTIONS
-LOCALE void PreviewGeneric(void *);
-LOCALE void PrintMethod(void *,char *,int,DEFMETHOD *);
+LOCALE void PreviewGeneric(void *,EXEC_STATUS);
+LOCALE void PrintMethod(void *,EXEC_STATUS,char *,int,DEFMETHOD *);
 #endif
-LOCALE DEFGENERIC *CheckGenericExists(void *,char *,char *);
-LOCALE long CheckMethodExists(void *,char *,DEFGENERIC *,long);
+LOCALE DEFGENERIC *CheckGenericExists(void *,EXEC_STATUS,char *,char *);
+LOCALE long CheckMethodExists(void *,EXEC_STATUS,char *,DEFGENERIC *,long);
 
 #if ! OBJECT_SYSTEM
-LOCALE char *TypeName(void *,int);
+LOCALE char *TypeName(void *,EXEC_STATUS,int);
 #endif
 
-LOCALE void PrintGenericName(void *,char *,DEFGENERIC *);
+LOCALE void PrintGenericName(void *,EXEC_STATUS,char *,DEFGENERIC *);
 
 #endif
 

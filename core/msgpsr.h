@@ -39,8 +39,8 @@
 #define LOCALE extern
 #endif
 
-LOCALE int ParseDefmessageHandler(void *,char *);
-LOCALE void CreateGetAndPutHandlers(void *,SLOT_DESC *);
+LOCALE int ParseDefmessageHandler(void *,EXEC_STATUS,char *);
+LOCALE void CreateGetAndPutHandlers(void *,EXEC_STATUS,SLOT_DESC *);
 
 #endif
 

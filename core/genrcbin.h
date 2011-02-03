@@ -39,9 +39,9 @@ struct defgenericBinaryData
    void **TypeArray;
   };
   
-#define DefgenericBinaryData(theEnv) ((struct defgenericBinaryData *) GetEnvironmentData(theEnv,execStatus,GENRCBIN_DATA))
+#define DefgenericBinaryData(theEnv,execStatus) ((struct defgenericBinaryData *) GetEnvironmentData(theEnv,execStatus,GENRCBIN_DATA))
 
-#define GenericPointer(i) (((i) == -1L) ? NULL : (DEFGENERIC *) &DefgenericBinaryData(theEnv)->DefgenericArray[i])
+#define GenericPointer(i) (((i) == -1L) ? NULL : (DEFGENERIC *) &DefgenericBinaryData(theEnv,execStatus)->DefgenericArray[i])
 
 #ifdef LOCALE
 #undef LOCALE
@@ -53,8 +53,8 @@ struct defgenericBinaryData
 #define LOCALE extern
 #endif
 
-LOCALE void SetupGenericsBload(void *);
-LOCALE void *BloadDefgenericModuleReference(void *,int);
+LOCALE void SetupGenericsBload(void *,EXEC_STATUS);
+LOCALE void *BloadDefgenericModuleReference(void *,EXEC_STATUS,int);
 
 #endif
 

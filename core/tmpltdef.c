@@ -66,16 +66,16 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static void                   *AllocateModule(void *);
-   static void                    ReturnModule(void *,void *);
-   static void                    ReturnDeftemplate(void *,void *);
-   static void                    InitializeDeftemplateModules(void *);
-   static void                    DeallocateDeftemplateData(void *);
-   static void                    DestroyDeftemplateAction(void *,struct constructHeader *,void *);
-   static void                    DestroyDeftemplate(void *,void *);
+   static void                   *AllocateModule(void *,EXEC_STATUS);
+   static void                    ReturnModule(void *,EXEC_STATUS,void *);
+   static void                    ReturnDeftemplate(void *,EXEC_STATUS,void *);
+   static void                    InitializeDeftemplateModules(void *,EXEC_STATUS);
+   static void                    DeallocateDeftemplateData(void *,EXEC_STATUS);
+   static void                    DestroyDeftemplateAction(void *,EXEC_STATUS,struct constructHeader *,void *);
+   static void                    DestroyDeftemplate(void *,EXEC_STATUS,void *);
 #if RUN_TIME
-   static void                    RuntimeDeftemplateAction(void *,struct constructHeader *,void *);
-   static void                    SearchForHashedPatternNodes(void *,struct factPatternNode *);
+   static void                    RuntimeDeftemplateAction(void *,EXEC_STATUS,struct constructHeader *,void *);
+   static void                    SearchForHashedPatternNodes(void *,EXEC_STATUS,struct factPatternNode *);
 #endif
 
 /******************************************************************/
@@ -96,23 +96,23 @@ globle void InitializeDeftemplates(
                                                            NULL,NULL,NULL,NULL,NULL };
    AllocateEnvironmentData(theEnv,execStatus,DEFTEMPLATE_DATA,sizeof(struct deftemplateData),DeallocateDeftemplateData);
 
-   memcpy(&DeftemplateData(theEnv)->DeftemplatePtrRecord,&deftemplatePtrRecord,sizeof(struct entityRecord));   
+   memcpy(&DeftemplateData(theEnv,execStatus)->DeftemplatePtrRecord,&deftemplatePtrRecord,sizeof(struct entityRecord));   
 
-   InitializeFacts(theEnv);
+   InitializeFacts(theEnv,execStatus);
 
-   InitializeDeftemplateModules(theEnv);
+   InitializeDeftemplateModules(theEnv,execStatus);
 
-   DeftemplateBasicCommands(theEnv);
+   DeftemplateBasicCommands(theEnv,execStatus);
 
-   DeftemplateFunctions(theEnv);
+   DeftemplateFunctions(theEnv,execStatus);
 
-   DeftemplateData(theEnv)->DeftemplateConstruct =
+   DeftemplateData(theEnv,execStatus)->DeftemplateConstruct =
       AddConstruct(theEnv,execStatus,"deftemplate","deftemplates",ParseDeftemplate,EnvFindDeftemplate,
                    GetConstructNamePointer,GetConstructPPForm,
                    GetConstructModuleItem,EnvGetNextDeftemplate,SetNextConstruct,
                    EnvIsDeftemplateDeletable,EnvUndeftemplate,ReturnDeftemplate);
 
-   InstallPrimitive(theEnv,execStatus,(ENTITY_RECORD_PTR) &DeftemplateData(theEnv)->DeftemplatePtrRecord,DEFTEMPLATE_PTR);
+   InstallPrimitive(theEnv,execStatus,(ENTITY_RECORD_PTR) &DeftemplateData(theEnv,execStatus)->DeftemplatePtrRecord,DEFTEMPLATE_PTR);
   }
   
 /******************************************************/
@@ -128,10 +128,10 @@ static void DeallocateDeftemplateData(
    void *theModule;
 #endif
 #if BLOAD || BLOAD_AND_BSAVE
-   if (Bloaded(theEnv)) return;
+   if (Bloaded(theEnv,execStatus)) return;
 #endif
 
-   DoForAllConstructs(theEnv,execStatus,DestroyDeftemplateAction,DeftemplateData(theEnv)->DeftemplateModuleIndex,FALSE,NULL); 
+   DoForAllConstructs(theEnv,execStatus,DestroyDeftemplateAction,DeftemplateData(theEnv,execStatus)->DeftemplateModuleIndex,FALSE,NULL); 
 
 #if ! RUN_TIME
    for (theModule = EnvGetNextDefmodule(theEnv,execStatus,NULL);
@@ -140,7 +140,7 @@ static void DeallocateDeftemplateData(
      {
       theModuleItem = (struct deftemplateModule *)
                       GetModuleItem(theEnv,execStatus,(struct defmodule *) theModule,
-                                    DeftemplateData(theEnv)->DeftemplateModuleIndex);
+                                    DeftemplateData(theEnv,execStatus)->DeftemplateModuleIndex);
       rtn_struct(theEnv,execStatus,deftemplateModule,theModuleItem);
      }
 #endif
@@ -178,7 +178,7 @@ static void InitializeDeftemplateModules(
   void *theEnv,
   EXEC_STATUS)
   {
-   DeftemplateData(theEnv)->DeftemplateModuleIndex = RegisterModuleItem(theEnv,execStatus,"deftemplate",
+   DeftemplateData(theEnv,execStatus)->DeftemplateModuleIndex = RegisterModuleItem(theEnv,execStatus,"deftemplate",
                                     AllocateModule,
                                     ReturnModule,
 #if BLOAD_AND_BSAVE || BLOAD || BLOAD_ONLY
@@ -216,7 +216,7 @@ static void ReturnModule(
   EXEC_STATUS,
   void *theItem)
   {   
-   FreeConstructHeaderModule(theEnv,execStatus,(struct defmoduleItemHeader *) theItem,DeftemplateData(theEnv)->DeftemplateConstruct);
+   FreeConstructHeaderModule(theEnv,execStatus,(struct defmoduleItemHeader *) theItem,DeftemplateData(theEnv,execStatus)->DeftemplateConstruct);
    rtn_struct(theEnv,execStatus,deftemplateModule,theItem);
   }
 
@@ -229,7 +229,7 @@ globle struct deftemplateModule *GetDeftemplateModuleItem(
   EXEC_STATUS,
   struct defmodule *theModule)
   {   
-   return((struct deftemplateModule *) GetConstructModuleItemByIndex(theEnv,execStatus,theModule,DeftemplateData(theEnv)->DeftemplateModuleIndex)); 
+   return((struct deftemplateModule *) GetConstructModuleItemByIndex(theEnv,execStatus,theModule,DeftemplateData(theEnv,execStatus)->DeftemplateModuleIndex)); 
   }
 
 /*****************************************************/
@@ -242,7 +242,7 @@ globle void *EnvFindDeftemplate(
   EXEC_STATUS,
   char *deftemplateName)
   {  
-   return(FindNamedConstruct(theEnv,execStatus,deftemplateName,DeftemplateData(theEnv)->DeftemplateConstruct)); 
+   return(FindNamedConstruct(theEnv,execStatus,deftemplateName,DeftemplateData(theEnv,execStatus)->DeftemplateConstruct)); 
   }
 
 /***********************************************************************/
@@ -255,7 +255,7 @@ globle void *EnvGetNextDeftemplate(
   EXEC_STATUS,
   void *deftemplatePtr)
   {   
-   return((void *) GetNextConstructItem(theEnv,execStatus,(struct constructHeader *) deftemplatePtr,DeftemplateData(theEnv)->DeftemplateModuleIndex)); 
+   return((void *) GetNextConstructItem(theEnv,execStatus,(struct constructHeader *) deftemplatePtr,DeftemplateData(theEnv,execStatus)->DeftemplateModuleIndex)); 
   }
 
 /***********************************************************/
@@ -269,7 +269,7 @@ globle intBool EnvIsDeftemplateDeletable(
   {
    struct deftemplate *theDeftemplate = (struct deftemplate *) vTheDeftemplate;
 
-   if (! ConstructsDeletable(theEnv))
+   if (! ConstructsDeletable(theEnv,execStatus))
      { return FALSE; }
 
    if (theDeftemplate->busyCount > 0) return(FALSE);
@@ -302,8 +302,8 @@ static void ReturnDeftemplate(
    /*====================================================================*/
 
 #if DEBUGGING_FUNCTIONS
-   DeftemplateData(theEnv)->DeletedTemplateDebugFlags = 0;
-   if (theConstruct->watch) BitwiseSet(DeftemplateData(theEnv)->DeletedTemplateDebugFlags,0);
+   DeftemplateData(theEnv,execStatus)->DeletedTemplateDebugFlags = 0;
+   if (theConstruct->watch) BitwiseSet(DeftemplateData(theEnv,execStatus)->DeletedTemplateDebugFlags,0);
 #endif
 
    /*===========================================*/
@@ -417,7 +417,7 @@ globle void DecrementDeftemplateBusyCount(
   {
    struct deftemplate *theTemplate = (struct deftemplate *) vTheTemplate;
 
-   if (! ConstructData(theEnv)->ClearInProgress) theTemplate->busyCount--;
+   if (! ConstructData(theEnv,execStatus)->ClearInProgress) theTemplate->busyCount--;
   }
 
 /*************************************************/
@@ -434,7 +434,7 @@ globle void IncrementDeftemplateBusyCount(
   {
    struct deftemplate *theTemplate = (struct deftemplate *) vTheTemplate;
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 
    theTemplate->busyCount++;
@@ -455,7 +455,7 @@ globle void *EnvGetNextFactInTemplate(
   void *factPtr)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
    if (factPtr == NULL)
      { return((void *) ((struct deftemplate *) theTemplate)->factList); }
@@ -485,11 +485,11 @@ globle void *CreateDeftemplateScopeMap(
    templateName = ValueToString(theDeftemplate->header.name);
    matchModule = theDeftemplate->header.whichModule->theModule;
 
-   scopeMapSize = (sizeof(char) * ((GetNumberOfDefmodules(theEnv) / BITS_PER_BYTE) + 1));
+   scopeMapSize = (sizeof(char) * ((GetNumberOfDefmodules(theEnv,execStatus) / BITS_PER_BYTE) + 1));
    scopeMap = (char *) gm2(theEnv,execStatus,scopeMapSize);
 
    ClearBitString((void *) scopeMap,scopeMapSize);
-   SaveCurrentModule(theEnv);
+   SaveCurrentModule(theEnv,execStatus);
    for (theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,NULL) ;
         theModule != NULL ;
         theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,(void *) theModule))
@@ -500,7 +500,7 @@ globle void *CreateDeftemplateScopeMap(
                                 templateName,&count,TRUE,NULL) != NULL)
         SetBitMap(scopeMap,moduleID);
      }
-   RestoreCurrentModule(theEnv);
+   RestoreCurrentModule(theEnv,execStatus);
    theBitMap = EnvAddBitMap(theEnv,execStatus,scopeMap,scopeMapSize);
    IncrementBitMapCount(theBitMap);
    rm(theEnv,execStatus,(void *) scopeMap,scopeMapSize);
@@ -559,7 +559,7 @@ globle void DeftemplateRunTimeInitialize(
   void *theEnv,
   EXEC_STATUS)
   {
-   DoForAllConstructs(theEnv,execStatus,RuntimeDeftemplateAction,DeftemplateData(theEnv)->DeftemplateModuleIndex,TRUE,NULL); 
+   DoForAllConstructs(theEnv,execStatus,RuntimeDeftemplateAction,DeftemplateData(theEnv,execStatus)->DeftemplateModuleIndex,TRUE,NULL); 
   }
 
 #endif

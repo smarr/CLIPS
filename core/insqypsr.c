@@ -62,12 +62,12 @@
    =========================================
    ***************************************** */
 
-static EXPRESSION *ParseQueryRestrictions(void *,EXPRESSION *,char *,struct token *);
-static intBool ReplaceClassNameWithReference(void *,EXPRESSION *);
-static int ParseQueryTestExpression(void *,EXPRESSION *,char *);
-static int ParseQueryActionExpression(void *,EXPRESSION *,char *,EXPRESSION *,struct token *);
-static void ReplaceInstanceVariables(void *,EXPRESSION *,EXPRESSION *,int,int);
-static void ReplaceSlotReference(void *,EXPRESSION *,EXPRESSION *,
+static EXPRESSION *ParseQueryRestrictions(void *,EXEC_STATUS,EXPRESSION *,char *,struct token *);
+static intBool ReplaceClassNameWithReference(void *,EXEC_STATUS,EXPRESSION *);
+static int ParseQueryTestExpression(void *,EXEC_STATUS,EXPRESSION *,char *);
+static int ParseQueryActionExpression(void *,EXEC_STATUS,EXPRESSION *,char *,EXPRESSION *,struct token *);
+static void ReplaceInstanceVariables(void *,EXEC_STATUS,EXPRESSION *,EXPRESSION *,int,int);
+static void ReplaceSlotReference(void *,EXEC_STATUS,EXPRESSION *,EXPRESSION *,
                                  struct FunctionDefinition *,int);
 static int IsQueryFunction(EXPRESSION *);
 
@@ -119,7 +119,7 @@ globle EXPRESSION *ParseQueryNoAction(
    if (insQuerySetVars == NULL)
      return(NULL);
    IncrementIndentDepth(theEnv,execStatus,3);
-   PPCRAndIndent(theEnv);
+   PPCRAndIndent(theEnv,execStatus);
    if (ParseQueryTestExpression(theEnv,execStatus,top,readSource) == FALSE)
      {
       DecrementIndentDepth(theEnv,execStatus,3);
@@ -182,14 +182,14 @@ globle EXPRESSION *ParseQueryAction(
    if (insQuerySetVars == NULL)
      return(NULL);
    IncrementIndentDepth(theEnv,execStatus,3);
-   PPCRAndIndent(theEnv);
+   PPCRAndIndent(theEnv,execStatus);
    if (ParseQueryTestExpression(theEnv,execStatus,top,readSource) == FALSE)
      {
       DecrementIndentDepth(theEnv,execStatus,3);
       ReturnExpression(theEnv,execStatus,insQuerySetVars);
       return(NULL);
      }
-   PPCRAndIndent(theEnv);
+   PPCRAndIndent(theEnv,execStatus);
    if (ParseQueryActionExpression(theEnv,execStatus,top,readSource,insQuerySetVars,&queryInputToken) == FALSE)
      {
       DecrementIndentDepth(theEnv,execStatus,3);
@@ -294,10 +294,10 @@ static EXPRESSION *ParseQueryRestrictions(
         }
       if (error)
         goto ParseQueryRestrictionsError2;
-      PPBackup(theEnv);
-      PPBackup(theEnv);
+      PPBackup(theEnv,execStatus);
+      PPBackup(theEnv,execStatus);
       SavePPBuffer(theEnv,execStatus,")");
-      tmp = GenConstant(theEnv,execStatus,SYMBOL,(void *) InstanceQueryData(theEnv)->QUERY_DELIMETER_SYMBOL);
+      tmp = GenConstant(theEnv,execStatus,SYMBOL,(void *) InstanceQueryData(theEnv,execStatus)->QUERY_DELIMETER_SYMBOL);
       lastClassExp->nextArg = tmp;
       lastClassExp = tmp;
       if (top->argList == NULL)
@@ -311,8 +311,8 @@ static EXPRESSION *ParseQueryRestrictions(
      }
    if (queryInputToken->type != RPAREN)
      goto ParseQueryRestrictionsError1;
-   PPBackup(theEnv);
-   PPBackup(theEnv);
+   PPBackup(theEnv,execStatus);
+   PPBackup(theEnv,execStatus);
    SavePPBuffer(theEnv,execStatus,")");
    return(insQuerySetVars);
 
@@ -386,7 +386,7 @@ static int ParseQueryTestExpression(
    struct BindInfo *oldBindList;
 
    error = FALSE;
-   oldBindList = GetParsedBindNames(theEnv);
+   oldBindList = GetParsedBindNames(theEnv,execStatus);
    SetParsedBindNames(theEnv,execStatus,NULL);
    qtest = ArgumentParse(theEnv,execStatus,readSource,&error);
    if (error == TRUE)
@@ -404,9 +404,9 @@ static int ParseQueryTestExpression(
      }
    qtest->nextArg = top->argList;
    top->argList = qtest;
-   if (ParsedBindNamesEmpty(theEnv) == FALSE)
+   if (ParsedBindNamesEmpty(theEnv,execStatus) == FALSE)
      {
-      ClearParsedBindNames(theEnv);
+      ClearParsedBindNames(theEnv,execStatus);
       SetParsedBindNames(theEnv,execStatus,oldBindList);
       PrintErrorID(theEnv,execStatus,"INSQYPSR",2,FALSE);
       EnvPrintRouter(theEnv,execStatus,WERROR,"Binds are not allowed in instance-set query in function ");
@@ -446,17 +446,17 @@ static int ParseQueryActionExpression(
    struct BindInfo *oldBindList,*newBindList,*prev;
 
    error = FALSE;
-   oldBindList = GetParsedBindNames(theEnv);
+   oldBindList = GetParsedBindNames(theEnv,execStatus);
    SetParsedBindNames(theEnv,execStatus,NULL);
-   ExpressionData(theEnv)->BreakContext = TRUE;
-   ExpressionData(theEnv)->ReturnContext = ExpressionData(theEnv)->svContexts->rtn;
+   ExpressionData(theEnv,execStatus)->BreakContext = TRUE;
+   ExpressionData(theEnv,execStatus)->ReturnContext = ExpressionData(theEnv,execStatus)->svContexts->rtn;
 
    qaction = GroupActions(theEnv,execStatus,readSource,queryInputToken,TRUE,NULL,FALSE);
-   PPBackup(theEnv);
-   PPBackup(theEnv);
+   PPBackup(theEnv,execStatus);
+   PPBackup(theEnv,execStatus);
    SavePPBuffer(theEnv,execStatus,queryInputToken->printForm);
 
-   ExpressionData(theEnv)->BreakContext = FALSE;
+   ExpressionData(theEnv,execStatus)->BreakContext = FALSE;
    if (error == TRUE)
      {
       SetParsedBindNames(theEnv,execStatus,oldBindList);
@@ -472,7 +472,7 @@ static int ParseQueryActionExpression(
      }
    qaction->nextArg = top->argList->nextArg;
    top->argList->nextArg = qaction;
-   newBindList = GetParsedBindNames(theEnv);
+   newBindList = GetParsedBindNames(theEnv,execStatus);
    prev = NULL;
    while (newBindList != NULL)
      {
@@ -481,7 +481,7 @@ static int ParseQueryActionExpression(
         {
          if (tmpInsSetVars->value == (void *) newBindList->name)
            {
-            ClearParsedBindNames(theEnv);
+            ClearParsedBindNames(theEnv,execStatus);
             SetParsedBindNames(theEnv,execStatus,oldBindList);
             PrintErrorID(theEnv,execStatus,"INSQYPSR",3,FALSE);
             EnvPrintRouter(theEnv,execStatus,WERROR,"Cannot rebind instance-set member variable ");
@@ -620,7 +620,7 @@ static void ReplaceSlotReference(
          if (eptr != NULL)
            {
             OpenStringSource(theEnv,execStatus,"query-var",str+i+1,0);
-            oldpp = GetPPBufferStatus(theEnv);
+            oldpp = GetPPBufferStatus(theEnv,execStatus);
             SetPPBufferStatus(theEnv,execStatus,OFF);
             GetToken(theEnv,execStatus,"query-var",&itkn);
             SetPPBufferStatus(theEnv,execStatus,oldpp);

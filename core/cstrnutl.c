@@ -70,10 +70,10 @@ globle struct constraintRecord *GetConstraintRecord(
    constraints->instanceNameRestriction = FALSE;
    constraints->classList = NULL;
    constraints->restrictionList = NULL;
-   constraints->minValue = GenConstant(theEnv,execStatus,SYMBOL,SymbolData(theEnv)->NegativeInfinity);
-   constraints->maxValue = GenConstant(theEnv,execStatus,SYMBOL,SymbolData(theEnv)->PositiveInfinity);
-   constraints->minFields = GenConstant(theEnv,execStatus,INTEGER,SymbolData(theEnv)->Zero);
-   constraints->maxFields = GenConstant(theEnv,execStatus,SYMBOL,SymbolData(theEnv)->PositiveInfinity);
+   constraints->minValue = GenConstant(theEnv,execStatus,SYMBOL,SymbolData(theEnv,execStatus)->NegativeInfinity);
+   constraints->maxValue = GenConstant(theEnv,execStatus,SYMBOL,SymbolData(theEnv,execStatus)->PositiveInfinity);
+   constraints->minFields = GenConstant(theEnv,execStatus,INTEGER,SymbolData(theEnv,execStatus)->Zero);
+   constraints->maxFields = GenConstant(theEnv,execStatus,SYMBOL,SymbolData(theEnv,execStatus)->PositiveInfinity);
    constraints->bucket = -1;
    constraints->count = 0;
    constraints->multifield = NULL;
@@ -319,13 +319,13 @@ globle int CompareNumbers(
    /* and negative infinity.                */
    /*=======================================*/
 
-   if (vptr1 == SymbolData(theEnv)->PositiveInfinity) return(GREATER_THAN);
+   if (vptr1 == SymbolData(theEnv,execStatus)->PositiveInfinity) return(GREATER_THAN);
 
-   if (vptr1 == SymbolData(theEnv)->NegativeInfinity) return(LESS_THAN);
+   if (vptr1 == SymbolData(theEnv,execStatus)->NegativeInfinity) return(LESS_THAN);
 
-   if (vptr2 == SymbolData(theEnv)->PositiveInfinity) return(LESS_THAN);
+   if (vptr2 == SymbolData(theEnv,execStatus)->PositiveInfinity) return(LESS_THAN);
 
-   if (vptr2 == SymbolData(theEnv)->NegativeInfinity) return(GREATER_THAN);
+   if (vptr2 == SymbolData(theEnv,execStatus)->NegativeInfinity) return(GREATER_THAN);
 
    /*=======================*/
    /* Compare two integers. */
@@ -411,7 +411,7 @@ globle CONSTRAINT_RECORD *ExpressionToConstraintRecord(
 
    if (theExpression == NULL)
      {
-      rv = GetConstraintRecord(theEnv);
+      rv = GetConstraintRecord(theEnv,execStatus);
       rv->anyAllowed = FALSE;
       return(rv);
      }
@@ -431,7 +431,7 @@ globle CONSTRAINT_RECORD *ExpressionToConstraintRecord(
        (theExpression->type == GBL_VARIABLE) ||
        (theExpression->type == MF_GBL_VARIABLE))
      {
-      rv = GetConstraintRecord(theEnv);
+      rv = GetConstraintRecord(theEnv,execStatus);
       rv->multifieldsAllowed = TRUE;
       return(rv);
      }
@@ -442,7 +442,7 @@ globle CONSTRAINT_RECORD *ExpressionToConstraintRecord(
    /* Convert a constant to a constraint record. */
    /*============================================*/
 
-   rv = GetConstraintRecord(theEnv);
+   rv = GetConstraintRecord(theEnv,execStatus);
    rv->anyAllowed = FALSE;
 
    if (theExpression->type == FLOAT)
@@ -493,7 +493,7 @@ globle CONSTRAINT_RECORD *FunctionCallToConstraintRecord(
   {
    CONSTRAINT_RECORD *rv;
 
-   rv = GetConstraintRecord(theEnv);
+   rv = GetConstraintRecord(theEnv,execStatus);
    rv->anyAllowed = FALSE;
 
    switch ((char) ValueFunctionType(theFunction))
@@ -577,7 +577,7 @@ globle CONSTRAINT_RECORD *ArgumentTypeToConstraintRecord(
   {
    CONSTRAINT_RECORD *rv;
 
-   rv = GetConstraintRecord(theEnv);
+   rv = GetConstraintRecord(theEnv,execStatus);
    rv->anyAllowed = FALSE;
 
    switch (theRestriction)

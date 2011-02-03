@@ -42,9 +42,9 @@
 #define LOCALE extern
 #endif
 
-#define GetDeffactsList(a,b) EnvGetDeffactsList(GetCurrentEnvironment(),a,b)
-#define ListDeffacts(a,b) EnvListDeffacts(GetCurrentEnvironment(),a,b)
-#define Undeffacts(a) EnvUndeffacts(GetCurrentEnvironment(),a)
+#define GetDeffactsList(a,b) EnvGetDeffactsList(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
+#define ListDeffacts(a,b) EnvListDeffacts(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
+#define Undeffacts(a) EnvUndeffacts(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
 
    LOCALE void                           DeffactsBasicCommands(void *,EXEC_STATUS);
    LOCALE void                           UndeffactsCommand(void *,EXEC_STATUS);

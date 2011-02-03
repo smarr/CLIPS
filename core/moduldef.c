@@ -59,9 +59,9 @@
 /***************************************/
 
 #if (! RUN_TIME)
-   static void                       ReturnDefmodule(void *,struct defmodule *,intBool);
+   static void                       ReturnDefmodule(void *,EXEC_STATUS,struct defmodule *,intBool);
 #endif
-   static void                       DeallocateDefmoduleData(void *);
+   static void                       DeallocateDefmoduleData(void *,EXEC_STATUS);
 
 /**************************************************************/
 /* InitializeDefmodules: Initializes the defmodule construct. */
@@ -72,8 +72,8 @@ globle void AllocateDefmoduleGlobals(
   {
    AllocateEnvironmentData(theEnv,execStatus,DEFMODULE_DATA,sizeof(struct defmoduleData),NULL);
    AddEnvironmentCleanupFunction(theEnv,execStatus,"defmodules",DeallocateDefmoduleData,-1000);
-   DefmoduleData(theEnv)->CallModuleChangeFunctions = TRUE;
-   DefmoduleData(theEnv)->MainModuleRedefinable = TRUE;
+   DefmoduleData(theEnv,execStatus)->CallModuleChangeFunctions = TRUE;
+   DefmoduleData(theEnv,execStatus)->MainModuleRedefinable = TRUE;
   }
 
 /****************************************************/
@@ -96,28 +96,28 @@ static void DeallocateDefmoduleData(
 #endif
 
 #if (BLOAD || BLOAD_ONLY || BLOAD_AND_BSAVE) && (! RUN_TIME)
-   for (i = 0; i < DefmoduleData(theEnv)->BNumberOfDefmodules; i++)
+   for (i = 0; i < DefmoduleData(theEnv,execStatus)->BNumberOfDefmodules; i++)
      {
-      if (DefmoduleData(theEnv)->DefmoduleArray[i].itemsArray != NULL)
+      if (DefmoduleData(theEnv,execStatus)->DefmoduleArray[i].itemsArray != NULL)
         { 
-         rm(theEnv,execStatus,DefmoduleData(theEnv)->DefmoduleArray[i].itemsArray,
-            sizeof(void *) * GetNumberOfModuleItems(theEnv));
+         rm(theEnv,execStatus,DefmoduleData(theEnv,execStatus)->DefmoduleArray[i].itemsArray,
+            sizeof(void *) * GetNumberOfModuleItems(theEnv,execStatus));
         }
      }
 
-   space = DefmoduleData(theEnv)->BNumberOfDefmodules * sizeof(struct defmodule);
+   space = DefmoduleData(theEnv,execStatus)->BNumberOfDefmodules * sizeof(struct defmodule);
    if (space != 0) 
      {
-      genfree(theEnv,execStatus,(void *) DefmoduleData(theEnv)->DefmoduleArray,space);
-      DefmoduleData(theEnv)->ListOfDefmodules = NULL;
+      genfree(theEnv,execStatus,(void *) DefmoduleData(theEnv,execStatus)->DefmoduleArray,space);
+      DefmoduleData(theEnv,execStatus)->ListOfDefmodules = NULL;
      }
 
-   space = DefmoduleData(theEnv)->NumberOfPortItems * sizeof(struct portItem);
-   if (space != 0) genfree(theEnv,execStatus,(void *) DefmoduleData(theEnv)->PortItemArray,space);
+   space = DefmoduleData(theEnv,execStatus)->NumberOfPortItems * sizeof(struct portItem);
+   if (space != 0) genfree(theEnv,execStatus,(void *) DefmoduleData(theEnv,execStatus)->PortItemArray,space);
 #endif
 
 #if (! RUN_TIME) && (! BLOAD_ONLY)
-   tmpDMPtr = DefmoduleData(theEnv)->ListOfDefmodules;
+   tmpDMPtr = DefmoduleData(theEnv,execStatus)->ListOfDefmodules;
    while (tmpDMPtr != NULL)
      {
       nextDMPtr = tmpDMPtr->next;
@@ -125,7 +125,7 @@ static void DeallocateDefmoduleData(
       tmpDMPtr = nextDMPtr;
      }
 
-   tmpPCPtr = DefmoduleData(theEnv)->ListOfPortConstructItems;
+   tmpPCPtr = DefmoduleData(theEnv,execStatus)->ListOfPortConstructItems;
    while (tmpPCPtr != NULL)
      {
       nextPCPtr = tmpPCPtr->next;
@@ -134,7 +134,7 @@ static void DeallocateDefmoduleData(
      }
 #endif
 
-   tmpMSPtr = DefmoduleData(theEnv)->ModuleStack;
+   tmpMSPtr = DefmoduleData(theEnv,execStatus)->ModuleStack;
    while (tmpMSPtr != NULL)
      {
       nextMSPtr = tmpMSPtr->next;
@@ -142,7 +142,7 @@ static void DeallocateDefmoduleData(
       tmpMSPtr = nextMSPtr;
      }
 
-   tmpMIPtr = DefmoduleData(theEnv)->ListOfModuleItems;
+   tmpMIPtr = DefmoduleData(theEnv,execStatus)->ListOfModuleItems;
    while (tmpMIPtr != NULL)
      {
       nextMIPtr = tmpMIPtr->next;
@@ -151,9 +151,9 @@ static void DeallocateDefmoduleData(
      }
      
 #if (! RUN_TIME) && (! BLOAD_ONLY)
-   DeallocateCallList(theEnv,execStatus,DefmoduleData(theEnv)->AfterModuleDefinedFunctions);
+   DeallocateCallList(theEnv,execStatus,DefmoduleData(theEnv,execStatus)->AfterModuleDefinedFunctions);
 #endif
-   DeallocateCallList(theEnv,execStatus,DefmoduleData(theEnv)->AfterModuleChangeFunctions);
+   DeallocateCallList(theEnv,execStatus,DefmoduleData(theEnv,execStatus)->AfterModuleChangeFunctions);
   }
   
 /**************************************************************/
@@ -163,10 +163,10 @@ globle void InitializeDefmodules(
   void *theEnv,
   EXEC_STATUS)
   {
-   DefmoduleBasicCommands(theEnv);
+   DefmoduleBasicCommands(theEnv,execStatus);
 
 #if (! RUN_TIME)
-   CreateMainModule(theEnv);
+   CreateMainModule(theEnv,execStatus);
 #endif
 
 #if DEFMODULE_CONSTRUCT && (! RUN_TIME) && (! BLOAD_ONLY)
@@ -194,10 +194,10 @@ globle int RegisterModuleItem(
   EXEC_STATUS,
    char *theItem,
    void *(*allocateFunction)(void *),
-   void (*freeFunction)(void *,void *),
-   void *(*bloadModuleReference)(void *,int),
-   void  (*constructsToCModuleReference)(void *,FILE *,int,int,int),
-   void *(*findFunction)(void *,char *))
+   void (*freeFunction)(void *,EXEC_STATUS,void *),
+   void *(*bloadModuleReference)(void *,EXEC_STATUS,int),
+   void  (*constructsToCModuleReference)(void *,EXEC_STATUS,FILE *,int,int,int),
+   void *(*findFunction)(void *,EXEC_STATUS,char *))
   {
    struct moduleItem *newModuleItem;
 
@@ -208,18 +208,18 @@ globle int RegisterModuleItem(
    newModuleItem->bloadModuleReference = bloadModuleReference;
    newModuleItem->constructsToCModuleReference = constructsToCModuleReference;
    newModuleItem->findFunction = findFunction;
-   newModuleItem->moduleIndex = DefmoduleData(theEnv)->NumberOfModuleItems++;
+   newModuleItem->moduleIndex = DefmoduleData(theEnv,execStatus)->NumberOfModuleItems++;
    newModuleItem->next = NULL;
 
-   if (DefmoduleData(theEnv)->LastModuleItem == NULL)
+   if (DefmoduleData(theEnv,execStatus)->LastModuleItem == NULL)
      {
-      DefmoduleData(theEnv)->ListOfModuleItems = newModuleItem;
-      DefmoduleData(theEnv)->LastModuleItem = newModuleItem;
+      DefmoduleData(theEnv,execStatus)->ListOfModuleItems = newModuleItem;
+      DefmoduleData(theEnv,execStatus)->LastModuleItem = newModuleItem;
      }
    else
      {
-      DefmoduleData(theEnv)->LastModuleItem->next = newModuleItem;
-      DefmoduleData(theEnv)->LastModuleItem = newModuleItem;
+      DefmoduleData(theEnv,execStatus)->LastModuleItem->next = newModuleItem;
+      DefmoduleData(theEnv,execStatus)->LastModuleItem = newModuleItem;
      }
 
    return(newModuleItem->moduleIndex);
@@ -232,7 +232,7 @@ globle struct moduleItem *GetListOfModuleItems(
   void *theEnv,
   EXEC_STATUS)
   {
-   return (DefmoduleData(theEnv)->ListOfModuleItems);
+   return (DefmoduleData(theEnv,execStatus)->ListOfModuleItems);
   }
 
 /***************************************************************/
@@ -242,7 +242,7 @@ globle int GetNumberOfModuleItems(
   void *theEnv,
   EXEC_STATUS)
   {
-   return (DefmoduleData(theEnv)->NumberOfModuleItems);
+   return (DefmoduleData(theEnv,execStatus)->NumberOfModuleItems);
   }
 
 /********************************************************/
@@ -256,7 +256,7 @@ globle struct moduleItem *FindModuleItem(
   {
    struct moduleItem *theModuleItem;
 
-   for (theModuleItem = DefmoduleData(theEnv)->ListOfModuleItems;
+   for (theModuleItem = DefmoduleData(theEnv,execStatus)->ListOfModuleItems;
         theModuleItem != NULL;
         theModuleItem = theModuleItem->next)
      { if (strcmp(theModuleItem->name,theName) == 0) return(theModuleItem); }
@@ -272,7 +272,7 @@ globle void *EnvGetCurrentModule(
   void *theEnv,
   EXEC_STATUS)
   {
-   return ((void *) DefmoduleData(theEnv)->CurrentModule);
+   return ((void *) DefmoduleData(theEnv,execStatus)->CurrentModule);
   }
 
 /**************************************************************/
@@ -293,8 +293,8 @@ globle void *EnvSetCurrentModule(
    /* for the return value.                       */
    /*=============================================*/
 
-   rv = (void *) DefmoduleData(theEnv)->CurrentModule;
-   DefmoduleData(theEnv)->CurrentModule = newValue;
+   rv = (void *) DefmoduleData(theEnv,execStatus)->CurrentModule;
+   DefmoduleData(theEnv,execStatus)->CurrentModule = newValue;
 
    /*==========================================================*/
    /* Call the list of registered functions that need to know  */
@@ -305,13 +305,13 @@ globle void *EnvSetCurrentModule(
    /* disable the change functions from being called.          */
    /*==========================================================*/
 
-   if (DefmoduleData(theEnv)->CallModuleChangeFunctions)
+   if (DefmoduleData(theEnv,execStatus)->CallModuleChangeFunctions)
      {
-      DefmoduleData(theEnv)->ModuleChangeIndex++;
-      changeFunctions = DefmoduleData(theEnv)->AfterModuleChangeFunctions;
+      DefmoduleData(theEnv,execStatus)->ModuleChangeIndex++;
+      changeFunctions = DefmoduleData(theEnv,execStatus)->AfterModuleChangeFunctions;
       while (changeFunctions != NULL)
         {
-         (* (void (*)(void *)) changeFunctions->func)(theEnv);
+         (* (void (*)(void *)) changeFunctions->func)(theEnv,execStatus);
          changeFunctions = changeFunctions->next;
         }
      }
@@ -335,11 +335,11 @@ globle void SaveCurrentModule(
    MODULE_STACK_ITEM *tmp;
 
    tmp = get_struct(theEnv,execStatus,moduleStackItem);
-   tmp->changeFlag = DefmoduleData(theEnv)->CallModuleChangeFunctions;
-   DefmoduleData(theEnv)->CallModuleChangeFunctions = FALSE;
-   tmp->theModule = DefmoduleData(theEnv)->CurrentModule;
-   tmp->next = DefmoduleData(theEnv)->ModuleStack;
-   DefmoduleData(theEnv)->ModuleStack = tmp;
+   tmp->changeFlag = DefmoduleData(theEnv,execStatus)->CallModuleChangeFunctions;
+   DefmoduleData(theEnv,execStatus)->CallModuleChangeFunctions = FALSE;
+   tmp->theModule = DefmoduleData(theEnv,execStatus)->CurrentModule;
+   tmp->next = DefmoduleData(theEnv,execStatus)->ModuleStack;
+   DefmoduleData(theEnv,execStatus)->ModuleStack = tmp;
   }
 
 /**********************************************************/
@@ -353,10 +353,10 @@ globle void RestoreCurrentModule(
   {
    MODULE_STACK_ITEM *tmp;
 
-   tmp = DefmoduleData(theEnv)->ModuleStack;
-   DefmoduleData(theEnv)->ModuleStack = tmp->next;
-   DefmoduleData(theEnv)->CallModuleChangeFunctions = tmp->changeFlag;
-   DefmoduleData(theEnv)->CurrentModule = tmp->theModule;
+   tmp = DefmoduleData(theEnv,execStatus)->ModuleStack;
+   DefmoduleData(theEnv,execStatus)->ModuleStack = tmp->next;
+   DefmoduleData(theEnv,execStatus)->CallModuleChangeFunctions = tmp->changeFlag;
+   DefmoduleData(theEnv,execStatus)->CurrentModule = tmp->theModule;
    rtn_struct(theEnv,execStatus,moduleStackItem,tmp);
   }
 
@@ -374,8 +374,8 @@ globle void *GetModuleItem(
   {
    if (theModule == NULL)
      {
-      if (DefmoduleData(theEnv)->CurrentModule == NULL) return(NULL);
-      theModule = DefmoduleData(theEnv)->CurrentModule;
+      if (DefmoduleData(theEnv,execStatus)->CurrentModule == NULL) return(NULL);
+      theModule = DefmoduleData(theEnv,execStatus)->CurrentModule;
      }
 
    if (theModule->itemsArray == NULL) return (NULL);
@@ -397,8 +397,8 @@ globle void SetModuleItem(
   {
    if (theModule == NULL)
      {
-      if (DefmoduleData(theEnv)->CurrentModule == NULL) return;
-      theModule = DefmoduleData(theEnv)->CurrentModule;
+      if (DefmoduleData(theEnv,execStatus)->CurrentModule == NULL) return;
+      theModule = DefmoduleData(theEnv,execStatus)->CurrentModule;
      }
 
    if (theModule->itemsArray == NULL) return;
@@ -437,13 +437,13 @@ globle void CreateMainModule(
    /* the module's construct lists.    */
    /*==================================*/
 
-   if (DefmoduleData(theEnv)->NumberOfModuleItems == 0) newDefmodule->itemsArray = NULL;
+   if (DefmoduleData(theEnv,execStatus)->NumberOfModuleItems == 0) newDefmodule->itemsArray = NULL;
    else
      {
       newDefmodule->itemsArray = (struct defmoduleItemHeader **)
-                                 gm2(theEnv,execStatus,sizeof(void *) * DefmoduleData(theEnv)->NumberOfModuleItems);
-      for (i = 0, theItem = DefmoduleData(theEnv)->ListOfModuleItems;
-           (i < DefmoduleData(theEnv)->NumberOfModuleItems) && (theItem != NULL);
+                                 gm2(theEnv,execStatus,sizeof(void *) * DefmoduleData(theEnv,execStatus)->NumberOfModuleItems);
+      for (i = 0, theItem = DefmoduleData(theEnv,execStatus)->ListOfModuleItems;
+           (i < DefmoduleData(theEnv,execStatus)->NumberOfModuleItems) && (theItem != NULL);
            i++, theItem = theItem->next)
         {
          if (theItem->allocateFunction == NULL)
@@ -451,7 +451,7 @@ globle void CreateMainModule(
          else
            {
             newDefmodule->itemsArray[i] = (struct defmoduleItemHeader *)
-                                          (*theItem->allocateFunction)(theEnv);
+                                          (*theItem->allocateFunction)(theEnv,execStatus);
             theHeader = (struct defmoduleItemHeader *) newDefmodule->itemsArray[i];
             theHeader->theModule = newDefmodule;
             theHeader->firstItem = NULL;
@@ -469,8 +469,8 @@ globle void CreateMainModule(
    SetNumberOfDefmodules(theEnv,execStatus,1L);
 #endif
 
-   DefmoduleData(theEnv)->LastDefmodule = newDefmodule;
-   DefmoduleData(theEnv)->ListOfDefmodules = newDefmodule;
+   DefmoduleData(theEnv,execStatus)->LastDefmodule = newDefmodule;
+   DefmoduleData(theEnv,execStatus)->ListOfDefmodules = newDefmodule;
    EnvSetCurrentModule(theEnv,execStatus,(void *) newDefmodule);
   }
 
@@ -484,11 +484,11 @@ globle void SetListOfDefmodules(
   EXEC_STATUS,
   void *defmodulePtr)
   {
-   DefmoduleData(theEnv)->ListOfDefmodules = (struct defmodule *) defmodulePtr;
+   DefmoduleData(theEnv,execStatus)->ListOfDefmodules = (struct defmodule *) defmodulePtr;
 
-   DefmoduleData(theEnv)->LastDefmodule = DefmoduleData(theEnv)->ListOfDefmodules;
-   if (DefmoduleData(theEnv)->LastDefmodule == NULL) return;
-   while (DefmoduleData(theEnv)->LastDefmodule->next != NULL) DefmoduleData(theEnv)->LastDefmodule = DefmoduleData(theEnv)->LastDefmodule->next;
+   DefmoduleData(theEnv,execStatus)->LastDefmodule = DefmoduleData(theEnv,execStatus)->ListOfDefmodules;
+   if (DefmoduleData(theEnv,execStatus)->LastDefmodule == NULL) return;
+   while (DefmoduleData(theEnv,execStatus)->LastDefmodule->next != NULL) DefmoduleData(theEnv,execStatus)->LastDefmodule = DefmoduleData(theEnv,execStatus)->LastDefmodule->next;
   }
 
 /********************************************************************/
@@ -502,7 +502,7 @@ globle void *EnvGetNextDefmodule(
   void *defmodulePtr)
   {
    if (defmodulePtr == NULL)
-     { return((void *) DefmoduleData(theEnv)->ListOfDefmodules); }
+     { return((void *) DefmoduleData(theEnv,execStatus)->ListOfDefmodules); }
    else
      { return((void *) (((struct defmodule *) defmodulePtr)->next)); }
   }
@@ -520,7 +520,7 @@ globle char *EnvGetDefmoduleName(
   void *defmodulePtr)
   { 
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 
    return(ValueToString(((struct defmodule *) defmodulePtr)->name)); 
@@ -539,7 +539,7 @@ globle char *EnvGetDefmodulePPForm(
   void *defmodulePtr)
   { 
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 
    return(((struct defmodule *) defmodulePtr)->ppForm); 
@@ -557,15 +557,15 @@ globle void RemoveAllDefmodules(
   {
    struct defmodule *nextDefmodule;
 
-   while (DefmoduleData(theEnv)->ListOfDefmodules != NULL)
+   while (DefmoduleData(theEnv,execStatus)->ListOfDefmodules != NULL)
      {
-      nextDefmodule = DefmoduleData(theEnv)->ListOfDefmodules->next;
-      ReturnDefmodule(theEnv,execStatus,DefmoduleData(theEnv)->ListOfDefmodules,FALSE);
-      DefmoduleData(theEnv)->ListOfDefmodules = nextDefmodule;
+      nextDefmodule = DefmoduleData(theEnv,execStatus)->ListOfDefmodules->next;
+      ReturnDefmodule(theEnv,execStatus,DefmoduleData(theEnv,execStatus)->ListOfDefmodules,FALSE);
+      DefmoduleData(theEnv,execStatus)->ListOfDefmodules = nextDefmodule;
      }
 
-   DefmoduleData(theEnv)->CurrentModule = NULL;
-   DefmoduleData(theEnv)->LastDefmodule = NULL;
+   DefmoduleData(theEnv,execStatus)->CurrentModule = NULL;
+   DefmoduleData(theEnv,execStatus)->LastDefmodule = NULL;
   }
 
 /************************************************************/
@@ -600,8 +600,8 @@ static void ReturnDefmodule(
      {
       if (! environmentClear)
         {
-         for (i = 0, theItem = DefmoduleData(theEnv)->ListOfModuleItems;
-              (i < DefmoduleData(theEnv)->NumberOfModuleItems) && (theItem != NULL);
+         for (i = 0, theItem = DefmoduleData(theEnv,execStatus)->ListOfModuleItems;
+              (i < DefmoduleData(theEnv,execStatus)->NumberOfModuleItems) && (theItem != NULL);
               i++, theItem = theItem->next)
            {
             if (theItem->freeFunction != NULL)
@@ -609,7 +609,7 @@ static void ReturnDefmodule(
            }
         }
 
-      rm(theEnv,execStatus,theDefmodule->itemsArray,sizeof(void *) * DefmoduleData(theEnv)->NumberOfModuleItems);
+      rm(theEnv,execStatus,theDefmodule->itemsArray,sizeof(void *) * DefmoduleData(theEnv,execStatus)->NumberOfModuleItems);
     }
 
    /*======================================================*/
@@ -694,7 +694,7 @@ globle void *EnvFindDefmodule(
 
    if ((findValue = (SYMBOL_HN *) FindSymbolHN(theEnv,execStatus,defmoduleName)) == NULL) return(NULL);
 
-   defmodulePtr = DefmoduleData(theEnv)->ListOfDefmodules;
+   defmodulePtr = DefmoduleData(theEnv,execStatus)->ListOfDefmodules;
    while (defmodulePtr != NULL)
      {
       if (defmodulePtr->name == findValue)
@@ -718,9 +718,9 @@ globle void *GetCurrentModuleCommand(
 
    EnvArgCountCheck(theEnv,execStatus,"get-current-module",EXACTLY,0);
 
-   theModule = (struct defmodule *) EnvGetCurrentModule(theEnv);
+   theModule = (struct defmodule *) EnvGetCurrentModule(theEnv,execStatus);
 
-   if (theModule == NULL) return((SYMBOL_HN *) EnvFalseSymbol(theEnv));
+   if (theModule == NULL) return((SYMBOL_HN *) EnvFalseSymbol(theEnv,execStatus));
 
    return((SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,ValueToString(theModule->name)));
   }
@@ -742,10 +742,10 @@ globle void *SetCurrentModuleCommand(
    /* Check for the correct number and type of arguments. */
    /*=====================================================*/
 
-   theModule = ((struct defmodule *) EnvGetCurrentModule(theEnv));
-   if (theModule == NULL) return((SYMBOL_HN *) EnvFalseSymbol(theEnv));
+   theModule = ((struct defmodule *) EnvGetCurrentModule(theEnv,execStatus));
+   if (theModule == NULL) return((SYMBOL_HN *) EnvFalseSymbol(theEnv,execStatus));
 
-   defaultReturn = (SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,ValueToString(((struct defmodule *) EnvGetCurrentModule(theEnv))->name));
+   defaultReturn = (SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,ValueToString(((struct defmodule *) EnvGetCurrentModule(theEnv,execStatus))->name));
 
    if (EnvArgCountCheck(theEnv,execStatus,"set-current-module",EXACTLY,1) == -1)
      { return(defaultReturn); }
@@ -788,8 +788,8 @@ globle void AddAfterModuleChangeFunction(
   void (*func)(void *),
   int priority)
   {
-   DefmoduleData(theEnv)->AfterModuleChangeFunctions =
-     AddFunctionToCallList(theEnv,execStatus,name,priority,func,DefmoduleData(theEnv)->AfterModuleChangeFunctions,TRUE);
+   DefmoduleData(theEnv,execStatus)->AfterModuleChangeFunctions =
+     AddFunctionToCallList(theEnv,execStatus,name,priority,func,DefmoduleData(theEnv,execStatus)->AfterModuleChangeFunctions,TRUE);
   }
 
 /************************************************/

@@ -65,20 +65,20 @@
 #endif
 
 #define DefclassModule(x) GetConstructModuleName((struct constructHeader *) x)
-#define FindDefclass(a) EnvFindDefclass(GetCurrentEnvironment(),a)
-#define GetDefclassList(a,b) EnvGetDefclassList(GetCurrentEnvironment(),a,b)
+#define FindDefclass(a) EnvFindDefclass(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define GetDefclassList(a,b) EnvGetDefclassList(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
 #define GetDefclassName(x) GetConstructNameString((struct constructHeader *) x)
-#define GetDefclassPPForm(x) GetConstructPPForm(GetCurrentEnvironment(),(struct constructHeader *) x)
-#define GetDefclassWatchInstances(a) EnvGetDefclassWatchInstances(GetCurrentEnvironment(),a)
-#define GetDefclassWatchSlots(a) EnvGetDefclassWatchSlots(GetCurrentEnvironment(),a)
-#define GetNextDefclass(a) EnvGetNextDefclass(GetCurrentEnvironment(),a)
-#define IsDefclassDeletable(a) EnvIsDefclassDeletable(GetCurrentEnvironment(),a)
-#define ListDefclasses(a,b) EnvListDefclasses(GetCurrentEnvironment(),a,b)
-#define SetDefclassWatchInstances(a,b) EnvSetDefclassWatchInstances(GetCurrentEnvironment(),a,b)
-#define SetDefclassWatchSlots(a,b) EnvSetDefclassWatchSlots(GetCurrentEnvironment(),a,b)
-#define Undefclass(a) EnvUndefclass(GetCurrentEnvironment(),a)
-#define SetClassDefaultsMode(a) EnvSetClassDefaultsMode(GetCurrentEnvironment(),a)
-#define GetClassDefaultsMode() EnvGetClassDefaultsMode(GetCurrentEnvironment())
+#define GetDefclassPPForm(x) GetConstructPPForm(GetCurrentEnvironment(),GetCurrentExecutionState(),(struct constructHeader *) x)
+#define GetDefclassWatchInstances(a) EnvGetDefclassWatchInstances(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define GetDefclassWatchSlots(a) EnvGetDefclassWatchSlots(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define GetNextDefclass(a) EnvGetNextDefclass(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define IsDefclassDeletable(a) EnvIsDefclassDeletable(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define ListDefclasses(a,b) EnvListDefclasses(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
+#define SetDefclassWatchInstances(a,b) EnvSetDefclassWatchInstances(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
+#define SetDefclassWatchSlots(a,b) EnvSetDefclassWatchSlots(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
+#define Undefclass(a) EnvUndefclass(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define SetClassDefaultsMode(a) EnvSetClassDefaultsMode(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define GetClassDefaultsMode() EnvGetClassDefaultsMode(GetCurrentEnvironment(),GetCurrentExecutionState())
 
 LOCALE void *EnvFindDefclass(void *,EXEC_STATUS,char *);
 LOCALE DEFCLASS *LookupDefclassByMdlOrScope(void *,EXEC_STATUS,char *);

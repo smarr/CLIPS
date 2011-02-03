@@ -59,36 +59,36 @@ typedef struct handlerSlotReference
 #define LOCALE extern
 #endif
 
-   LOCALE void             UnboundHandlerErr(void *);
-   LOCALE void             PrintNoHandlerError(void *,char *);
-   LOCALE int              CheckHandlerArgCount(void *);
-   LOCALE void             SlotAccessViolationError(void *,char *,intBool,void *);
-   LOCALE void             SlotVisibilityViolationError(void *,SLOT_DESC *,DEFCLASS *);
+   LOCALE void             UnboundHandlerErr(void *,EXEC_STATUS);
+   LOCALE void             PrintNoHandlerError(void *,EXEC_STATUS,char *);
+   LOCALE int              CheckHandlerArgCount(void *,EXEC_STATUS);
+   LOCALE void             SlotAccessViolationError(void *,EXEC_STATUS,char *,intBool,void *);
+   LOCALE void             SlotVisibilityViolationError(void *,EXEC_STATUS,SLOT_DESC *,DEFCLASS *);
 
 #if ! RUN_TIME
-   LOCALE void             NewSystemHandler(void *,char *,char *,char *,int);
-   LOCALE HANDLER         *InsertHandlerHeader(void *,DEFCLASS *,SYMBOL_HN *,int);
+   LOCALE void             NewSystemHandler(void *,EXEC_STATUS,char *,char *,char *,int);
+   LOCALE HANDLER         *InsertHandlerHeader(void *,EXEC_STATUS,DEFCLASS *,SYMBOL_HN *,int);
 #endif
 
 #if (! BLOAD_ONLY) && (! RUN_TIME)
    LOCALE HANDLER         *NewHandler(void);
    LOCALE int              HandlersExecuting(DEFCLASS *);
-   LOCALE int              DeleteHandler(void *,DEFCLASS *,SYMBOL_HN *,int,int);
-   LOCALE void             DeallocateMarkedHandlers(void *,DEFCLASS *);
+   LOCALE int              DeleteHandler(void *,EXEC_STATUS,DEFCLASS *,SYMBOL_HN *,int,int);
+   LOCALE void             DeallocateMarkedHandlers(void *,EXEC_STATUS,DEFCLASS *);
 #endif
-   LOCALE unsigned         HandlerType(void *,char *,char *);
-   LOCALE int              CheckCurrentMessage(void *,char *,int);
-   LOCALE void             PrintHandler(void *,char *,HANDLER *,int);
+   LOCALE unsigned         HandlerType(void *,EXEC_STATUS,char *,char *);
+   LOCALE int              CheckCurrentMessage(void *,EXEC_STATUS,char *,int);
+   LOCALE void             PrintHandler(void *,EXEC_STATUS,char *,HANDLER *,int);
    LOCALE HANDLER         *FindHandlerByAddress(DEFCLASS *,SYMBOL_HN *,unsigned);
    LOCALE int              FindHandlerByIndex(DEFCLASS *,SYMBOL_HN *,unsigned);
    LOCALE int              FindHandlerNameGroup(DEFCLASS *,SYMBOL_HN *);
-   LOCALE void             HandlerDeleteError(void *,char *);
+   LOCALE void             HandlerDeleteError(void *,EXEC_STATUS,char *);
 
 #if DEBUGGING_FUNCTIONS
-   LOCALE void             DisplayCore(void *,char *,HANDLER_LINK *,int);
-   LOCALE HANDLER_LINK    *FindPreviewApplicableHandlers(void *,DEFCLASS *,SYMBOL_HN *);
-   LOCALE void             WatchMessage(void *,char *,char *);
-   LOCALE void             WatchHandler(void *,char *,HANDLER_LINK *,char *);
+   LOCALE void             DisplayCore(void *,EXEC_STATUS,char *,HANDLER_LINK *,int);
+   LOCALE HANDLER_LINK    *FindPreviewApplicableHandlers(void *,EXEC_STATUS,DEFCLASS *,SYMBOL_HN *);
+   LOCALE void             WatchMessage(void *,EXEC_STATUS,char *,char *);
+   LOCALE void             WatchHandler(void *,EXEC_STATUS,char *,HANDLER_LINK *,char *);
 #endif
 
 #endif

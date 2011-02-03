@@ -32,10 +32,10 @@
 #define LOCALE extern
 #endif
 
-   LOCALE void                           SortFunctionDefinitions(void *);
-   LOCALE void                           MergeSort(void *,unsigned long,DATA_OBJECT *,
-                                                   int (*)(void *,DATA_OBJECT *,DATA_OBJECT *));
-   LOCALE void                           SortFunction(void *,DATA_OBJECT *);
+   LOCALE void                           SortFunctionDefinitions(void *,EXEC_STATUS);
+   LOCALE void                           MergeSort(void *,EXEC_STATUS,unsigned long,DATA_OBJECT *,
+                                                   int (*)(void *,EXEC_STATUS,DATA_OBJECT *,DATA_OBJECT *));
+   LOCALE void                           SortFunction(void *,EXEC_STATUS,DATA_OBJECT *);
 
 #endif
 

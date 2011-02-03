@@ -40,7 +40,7 @@
 #define LOCALE extern
 #endif
 
-#define ExpressionPointer(i) ((struct expr *) (((i) == -1L) ? NULL : &ExpressionData(theEnv)->ExpressionArray[i]))
+#define ExpressionPointer(i) ((struct expr *) (((i) == -1L) ? NULL : &ExpressionData(theEnv,execStatus)->ExpressionArray[i]))
 #define HashedExpressionPointer(i) ExpressionPointer(i)
 
    LOCALE void                        AllocateExpressions(void *,EXEC_STATUS);

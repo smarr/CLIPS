@@ -47,17 +47,17 @@ struct BindInfo
   };
 
 #if (! RUN_TIME)
-   LOCALE void                           ProceduralFunctionParsers(void *);
-   LOCALE struct BindInfo               *GetParsedBindNames(void *);
-   LOCALE void                           SetParsedBindNames(void *,struct BindInfo *);
-   LOCALE void                           ClearParsedBindNames(void *);
-   LOCALE intBool                        ParsedBindNamesEmpty(void *);
+   LOCALE void                           ProceduralFunctionParsers(void *,EXEC_STATUS);
+   LOCALE struct BindInfo               *GetParsedBindNames(void *,EXEC_STATUS);
+   LOCALE void                           SetParsedBindNames(void *,EXEC_STATUS,struct BindInfo *);
+   LOCALE void                           ClearParsedBindNames(void *,EXEC_STATUS);
+   LOCALE intBool                        ParsedBindNamesEmpty(void *,EXEC_STATUS);
 #endif
 #if (! BLOAD_ONLY) && (! RUN_TIME)
-   LOCALE int                            SearchParsedBindNames(void *,struct symbolHashNode *);
-   LOCALE int                            CountParsedBindNames(void *);
-   LOCALE void                           RemoveParsedBindName(void *,struct symbolHashNode *);
-   LOCALE struct constraintRecord       *FindBindConstraints(void *,struct symbolHashNode *);
+   LOCALE int                            SearchParsedBindNames(void *,EXEC_STATUS,struct symbolHashNode *);
+   LOCALE int                            CountParsedBindNames(void *,EXEC_STATUS);
+   LOCALE void                           RemoveParsedBindName(void *,EXEC_STATUS,struct symbolHashNode *);
+   LOCALE struct constraintRecord       *FindBindConstraints(void *,EXEC_STATUS,struct symbolHashNode *);
 #endif
 
 #endif

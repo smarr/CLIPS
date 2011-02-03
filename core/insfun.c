@@ -89,10 +89,10 @@
    =========================================
    ***************************************** */
 
-static INSTANCE_TYPE *FindImportedInstance(void *,struct defmodule *,struct defmodule *,INSTANCE_TYPE *);
+static INSTANCE_TYPE *FindImportedInstance(void *,EXEC_STATUS,struct defmodule *,struct defmodule *,INSTANCE_TYPE *);
 
 #if DEFRULE_CONSTRUCT
-static void NetworkModifyForSharedSlot(void *,int,DEFCLASS *,SLOT_DESC *);
+static void NetworkModifyForSharedSlot(void *,EXEC_STATUS,int,DEFCLASS *,SLOT_DESC *);
 #endif
 
 /* =========================================
@@ -119,7 +119,7 @@ globle void EnvIncrementInstanceCount(
   void *vptr)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 
    ((INSTANCE_TYPE *) vptr)->busy++;
@@ -143,7 +143,7 @@ globle void EnvDecrementInstanceCount(
   void *vptr)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 
    ((INSTANCE_TYPE *) vptr)->busy--;
@@ -164,10 +164,10 @@ globle void InitializeInstanceTable(
   {
    register int i;
 
-   InstanceData(theEnv)->InstanceTable = (INSTANCE_TYPE **)
+   InstanceData(theEnv,execStatus)->InstanceTable = (INSTANCE_TYPE **)
                     gm2(theEnv,execStatus,(int) (sizeof(INSTANCE_TYPE *) * INSTANCE_TABLE_HASH_SIZE));
    for (i = 0 ; i < INSTANCE_TABLE_HASH_SIZE ; i++)
-     InstanceData(theEnv)->InstanceTable[i] = NULL;
+     InstanceData(theEnv,execStatus)->InstanceTable[i] = NULL;
   }
 
 /*******************************************************
@@ -187,10 +187,10 @@ globle void CleanupInstances(
   {
    IGARBAGE *gprv,*gtmp,*dump;
 
-   if (InstanceData(theEnv)->MaintainGarbageInstances)
+   if (InstanceData(theEnv,execStatus)->MaintainGarbageInstances)
      return;
    gprv = NULL;
-   gtmp = InstanceData(theEnv)->InstanceGarbageList;
+   gtmp = InstanceData(theEnv,execStatus)->InstanceGarbageList;
    while (gtmp != NULL)
      {
       if ((gtmp->ins->busy == 0) && (gtmp->ins->depth > execStatus->CurrentEvaluationDepth)
@@ -199,12 +199,12 @@ globle void CleanupInstances(
 #endif
          )
         {
-         UtilityData(theEnv)->EphemeralItemCount -= 2;
-         UtilityData(theEnv)->EphemeralItemSize -= InstanceSizeHeuristic(gtmp->ins) + sizeof(IGARBAGE);
+         UtilityData(theEnv,execStatus)->EphemeralItemCount -= 2;
+         UtilityData(theEnv,execStatus)->EphemeralItemSize -= InstanceSizeHeuristic(gtmp->ins) + sizeof(IGARBAGE);
          DecrementSymbolCount(theEnv,execStatus,gtmp->ins->name);
          rtn_struct(theEnv,execStatus,instance,gtmp->ins);
          if (gprv == NULL)
-           InstanceData(theEnv)->InstanceGarbageList = gtmp->nxt;
+           InstanceData(theEnv,execStatus)->InstanceGarbageList = gtmp->nxt;
          else
            gprv->nxt = gtmp->nxt;
          dump = gtmp;
@@ -257,20 +257,20 @@ globle void DestroyAllInstances(
    INSTANCE_TYPE *iptr;
    int svmaintain;
 
-   SaveCurrentModule(theEnv);
-   svmaintain = InstanceData(theEnv)->MaintainGarbageInstances;
-   InstanceData(theEnv)->MaintainGarbageInstances = TRUE;
-   iptr = InstanceData(theEnv)->InstanceList;
+   SaveCurrentModule(theEnv,execStatus);
+   svmaintain = InstanceData(theEnv,execStatus)->MaintainGarbageInstances;
+   InstanceData(theEnv,execStatus)->MaintainGarbageInstances = TRUE;
+   iptr = InstanceData(theEnv,execStatus)->InstanceList;
    while (iptr != NULL)
      {
       EnvSetCurrentModule(theEnv,execStatus,(void *) iptr->cls->header.whichModule->theModule);
-      DirectMessage(theEnv,execStatus,MessageHandlerData(theEnv)->DELETE_SYMBOL,iptr,NULL,NULL);
+      DirectMessage(theEnv,execStatus,MessageHandlerData(theEnv,execStatus)->DELETE_SYMBOL,iptr,NULL,NULL);
       iptr = iptr->nxtList;
       while ((iptr != NULL) ? iptr->garbage : FALSE)
         iptr = iptr->nxtList;
      }
-   InstanceData(theEnv)->MaintainGarbageInstances = svmaintain;
-   RestoreCurrentModule(theEnv);
+   InstanceData(theEnv,execStatus)->MaintainGarbageInstances = svmaintain;
+   RestoreCurrentModule(theEnv,execStatus);
   }
 
 /******************************************************
@@ -343,7 +343,7 @@ globle INSTANCE_TYPE *FindInstanceBySymbol(
    SYMBOL_HN *moduleName,*instanceName;
    struct defmodule *currentModule,*theModule;
 
-   currentModule = ((struct defmodule *) EnvGetCurrentModule(theEnv));
+   currentModule = ((struct defmodule *) EnvGetCurrentModule(theEnv,execStatus));
 
    /* =======================================
       Instance names of the form [<name>] are
@@ -416,7 +416,7 @@ globle INSTANCE_TYPE *FindInstanceInModule(
       Find the first instance of the
       correct name in the hash chain
       =============================== */
-   startInstance = InstanceData(theEnv)->InstanceTable[HashInstance(instanceName)];
+   startInstance = InstanceData(theEnv,execStatus)->InstanceTable[HashInstance(instanceName)];
    while (startInstance != NULL)
      {
       if (startInstance->name == instanceName)
@@ -446,7 +446,7 @@ globle INSTANCE_TYPE *FindInstanceInModule(
       ================================ */
    if (searchImports == FALSE)
      return(NULL);
-   MarkModulesAsUnvisited(theEnv);
+   MarkModulesAsUnvisited(theEnv,execStatus);
    return(FindImportedInstance(theEnv,execStatus,theModule,currentModule,startInstance));
   }
 
@@ -528,7 +528,7 @@ globle int PutSlotValue(
    if (ValidSlotValue(theEnv,execStatus,val,sp->desc,ins,theCommand) == FALSE)
      {
       SetpType(setVal,SYMBOL);
-      SetpValue(setVal,EnvFalseSymbol(theEnv));
+      SetpValue(setVal,EnvFalseSymbol(theEnv,execStatus));
       return(FALSE);
      }
    return(DirectPutSlotValue(theEnv,execStatus,ins,sp,val,setVal));
@@ -567,13 +567,13 @@ globle int DirectPutSlotValue(
    DATA_OBJECT tmpVal;
 
    SetpType(setVal,SYMBOL);
-   SetpValue(setVal,EnvFalseSymbol(theEnv));
+   SetpValue(setVal,EnvFalseSymbol(theEnv,execStatus));
    if (val == NULL)
      {
       SystemError(theEnv,execStatus,"INSFUN",1);
       EnvExitRouter(theEnv,execStatus,EXIT_FAILURE);
      }
-   else if (GetpValue(val) == ProceduralPrimitiveData(theEnv)->NoParamValue)
+   else if (GetpValue(val) == ProceduralPrimitiveData(theEnv,execStatus)->NoParamValue)
      {
       if (sp->desc->dynamicDefault)
         {
@@ -586,7 +586,7 @@ globle int DirectPutSlotValue(
         val = (DATA_OBJECT *) sp->desc->defaultValue;
      }
 #if DEFRULE_CONSTRUCT
-   if (EngineData(theEnv)->JoinOperationInProgress && sp->desc->reactive &&
+   if (EngineData(theEnv,execStatus)->JoinOperationInProgress && sp->desc->reactive &&
        (ins->cls->reactive || sp->desc->shared))
      {
       PrintErrorID(theEnv,execStatus,"INSFUN",5,FALSE);
@@ -693,7 +693,7 @@ globle int DirectPutSlotValue(
       EnvPrintRouter(theEnv,execStatus,WTRACE,"\n");
      }
 #endif
-   InstanceData(theEnv)->ChangesToInstances = TRUE;
+   InstanceData(theEnv,execStatus)->ChangesToInstances = TRUE;
 
 #if DEFRULE_CONSTRUCT
    if (ins->cls->reactive && sp->desc->reactive)
@@ -705,11 +705,11 @@ globle int DirectPutSlotValue(
          ============================================ */
       if (sp->desc->shared)
         {
-         sharedTraversalID = GetTraversalID(theEnv);
+         sharedTraversalID = GetTraversalID(theEnv,execStatus);
          if (sharedTraversalID != -1)
            {
             NetworkModifyForSharedSlot(theEnv,execStatus,sharedTraversalID,sp->desc->cls,sp->desc);
-            ReleaseTraversalID(theEnv);
+            ReleaseTraversalID(theEnv,execStatus);
            }
          else
            {
@@ -758,7 +758,7 @@ globle int ValidSlotValue(
       Special NoParamValue means to reset
       slot to default value
       =================================== */
-   if (GetpValue(val) == ProceduralPrimitiveData(theEnv)->NoParamValue)
+   if (GetpValue(val) == ProceduralPrimitiveData(theEnv,execStatus)->NoParamValue)
      return(TRUE);
    if ((sd->multiple == 0) && (val->type == MULTIFIELD) &&
                               (GetpDOLength(val) != 1))
@@ -780,7 +780,7 @@ globle int ValidSlotValue(
       SetEvaluationError(theEnv,execStatus,TRUE);
       return(FALSE);
      }
-   if (EnvGetDynamicConstraintChecking(theEnv))
+   if (EnvGetDynamicConstraintChecking(theEnv,execStatus))
      {
       violationCode = ConstraintCheckDataObject(theEnv,execStatus,val,sd->constraint);
       if (violationCode != NO_VIOLATION)
@@ -920,7 +920,7 @@ globle int EnvGetInstancesChanged(
   void *theEnv,
   EXEC_STATUS)
   {
-   return(InstanceData(theEnv)->ChangesToInstances);
+   return(InstanceData(theEnv,execStatus)->ChangesToInstances);
   }
 
 /*******************************************************
@@ -936,7 +936,7 @@ globle void EnvSetInstancesChanged(
   EXEC_STATUS,
   int changed)
   {
-   InstanceData(theEnv)->ChangesToInstances = changed;
+   InstanceData(theEnv,execStatus)->ChangesToInstances = changed;
   }
 
 /*******************************************************************
@@ -977,7 +977,7 @@ globle void PrintSlot(
    if (theCommand != NULL)
      EnvPrintRouter(theEnv,execStatus,logName,theCommand);
    else
-     PrintHandler(theEnv,execStatus,logName,MessageHandlerData(theEnv)->CurrentCore->hnd,FALSE);
+     PrintHandler(theEnv,execStatus,logName,MessageHandlerData(theEnv,execStatus)->CurrentCore->hnd,FALSE);
   }
 
 /*****************************************************
@@ -1056,9 +1056,9 @@ globle void PrintInstanceLongForm(
   {
    INSTANCE_TYPE *ins = (INSTANCE_TYPE *) vins;
 
-   if (PrintUtilityData(theEnv)->InstanceAddressesToNames)
+   if (PrintUtilityData(theEnv,execStatus)->InstanceAddressesToNames)
      {
-      if (ins == &InstanceData(theEnv)->DummyInstance)
+      if (ins == &InstanceData(theEnv,execStatus)->DummyInstance)
         EnvPrintRouter(theEnv,execStatus,logName,"\"<Dummy Instance>\"");
       else
         {
@@ -1069,9 +1069,9 @@ globle void PrintInstanceLongForm(
      }
    else
      {
-      if (PrintUtilityData(theEnv)->AddressesToStrings)
+      if (PrintUtilityData(theEnv,execStatus)->AddressesToStrings)
         EnvPrintRouter(theEnv,execStatus,logName,"\"");
-      if (ins == &InstanceData(theEnv)->DummyInstance)
+      if (ins == &InstanceData(theEnv,execStatus)->DummyInstance)
         EnvPrintRouter(theEnv,execStatus,logName,"<Dummy Instance>");
       else if (ins->garbage)
         {
@@ -1085,7 +1085,7 @@ globle void PrintInstanceLongForm(
          EnvPrintRouter(theEnv,execStatus,logName,ValueToString(GetFullInstanceName(theEnv,execStatus,ins)));
          EnvPrintRouter(theEnv,execStatus,logName,">");
         }
-      if (PrintUtilityData(theEnv)->AddressesToStrings)
+      if (PrintUtilityData(theEnv,execStatus)->AddressesToStrings)
         EnvPrintRouter(theEnv,execStatus,logName,"\"");
      }
   }
@@ -1219,7 +1219,7 @@ globle intBool NetworkSynchronized(
   void *vins)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 
    return(((INSTANCE_TYPE *) vins)->reteSynchronized);

@@ -64,7 +64,7 @@
    ***************************************** */
 
 #if DEBUGGING_FUNCTIONS
-static void DisplayGenericCore(void *,DEFGENERIC *);
+static void DisplayGenericCore(void *,EXEC_STATUS,DEFGENERIC *);
 #endif
 
 /* =========================================
@@ -93,7 +93,7 @@ globle intBool ClearDefgenericsReady(
   void *theEnv,
   EXEC_STATUS)
   {
-   return((DefgenericData(theEnv)->CurrentGeneric != NULL) ? FALSE : TRUE);
+   return((DefgenericData(theEnv,execStatus)->CurrentGeneric != NULL) ? FALSE : TRUE);
   }
 
 /*****************************************************
@@ -127,7 +127,7 @@ globle void FreeDefgenericModule(
   void *theItem)
   {
 #if (! BLOAD_ONLY)
-   FreeConstructHeaderModule(theEnv,execStatus,(struct defmoduleItemHeader *) theItem,DefgenericData(theEnv)->DefgenericConstruct);
+   FreeConstructHeaderModule(theEnv,execStatus,(struct defmoduleItemHeader *) theItem,DefgenericData(theEnv,execStatus)->DefgenericConstruct);
 #endif
    rtn_struct(theEnv,execStatus,defgenericModule,theItem);
   }
@@ -162,7 +162,7 @@ globle int ClearDefmethods(
    int success = TRUE;
 
 #if BLOAD || BLOAD_AND_BSAVE
-   if (Bloaded(theEnv) == TRUE) return(FALSE);
+   if (Bloaded(theEnv,execStatus) == TRUE) return(FALSE);
 #endif
 
    gfunc = (DEFGENERIC *) EnvGetNextDefgeneric(theEnv,execStatus,NULL);
@@ -277,7 +277,7 @@ globle int ClearDefgenerics(
    int success = TRUE;
 
 #if BLOAD || BLOAD_AND_BSAVE
-   if (Bloaded(theEnv) == TRUE) return(FALSE);
+   if (Bloaded(theEnv,execStatus) == TRUE) return(FALSE);
 #endif
 
    gfunc = (DEFGENERIC *) EnvGetNextDefgeneric(theEnv,execStatus,NULL);
@@ -532,10 +532,10 @@ globle void PreviewGeneric(
       EnvPrintRouter(theEnv,execStatus,WERROR," in function preview-generic.\n");
       return;
      }
-   oldce = ExecutingConstruct(theEnv);
+   oldce = ExecutingConstruct(theEnv,execStatus);
    SetExecutingConstruct(theEnv,execStatus,TRUE);
-   previousGeneric = DefgenericData(theEnv)->CurrentGeneric;
-   DefgenericData(theEnv)->CurrentGeneric = gfunc;
+   previousGeneric = DefgenericData(theEnv,execStatus)->CurrentGeneric;
+   DefgenericData(theEnv,execStatus)->CurrentGeneric = gfunc;
    execStatus->CurrentEvaluationDepth++;
    PushProcParameters(theEnv,execStatus,GetFirstArgument()->nextArg,
                           CountArguments(GetFirstArgument()->nextArg),
@@ -543,8 +543,8 @@ globle void PreviewGeneric(
                           UnboundMethodErr);
    if (execStatus->EvaluationError)
      {
-      PopProcParameters(theEnv);
-      DefgenericData(theEnv)->CurrentGeneric = previousGeneric;
+      PopProcParameters(theEnv,execStatus);
+      DefgenericData(theEnv,execStatus)->CurrentGeneric = previousGeneric;
       execStatus->CurrentEvaluationDepth--;
       SetExecutingConstruct(theEnv,execStatus,oldce);
       return;
@@ -552,8 +552,8 @@ globle void PreviewGeneric(
    gfunc->busy++;
    DisplayGenericCore(theEnv,execStatus,gfunc);
    gfunc->busy--;
-   PopProcParameters(theEnv);
-   DefgenericData(theEnv)->CurrentGeneric = previousGeneric;
+   PopProcParameters(theEnv,execStatus);
+   DefgenericData(theEnv,execStatus)->CurrentGeneric = previousGeneric;
    execStatus->CurrentEvaluationDepth--;
    SetExecutingConstruct(theEnv,execStatus,oldce);
   }
@@ -579,7 +579,7 @@ globle void PrintMethod(
   DEFMETHOD *meth)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
    long j,k;
    register RESTRICTION *rptr;
@@ -762,7 +762,7 @@ globle void PrintGenericName(
   char *logName,
   DEFGENERIC *gfunc)
   {
-   if (gfunc->header.whichModule->theModule != ((struct defmodule *) EnvGetCurrentModule(theEnv)))
+   if (gfunc->header.whichModule->theModule != ((struct defmodule *) EnvGetCurrentModule(theEnv,execStatus)))
      {
       EnvPrintRouter(theEnv,execStatus,logName,EnvGetDefmoduleName(theEnv,execStatus,(void *)
                         gfunc->header.whichModule->theModule));

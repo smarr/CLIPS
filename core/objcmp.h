@@ -42,7 +42,7 @@ struct objectCompilerData
 #endif
   };
 
-#define ObjectCompilerData(theEnv) ((struct objectCompilerData *) GetEnvironmentData(theEnv,execStatus,OBJECT_COMPILER_DATA))
+#define ObjectCompilerData(theEnv,execStatus) ((struct objectCompilerData *) GetEnvironmentData(theEnv,execStatus,OBJECT_COMPILER_DATA))
 
 #ifdef LOCALE
 #undef LOCALE
@@ -54,9 +54,9 @@ struct objectCompilerData
 #define LOCALE extern
 #endif
 
-LOCALE void SetupObjectsCompiler(void *);
-LOCALE void PrintClassReference(void *,FILE *,DEFCLASS *,int,int);
-LOCALE void DefclassCModuleReference(void *,FILE *,int,int,int);
+LOCALE void SetupObjectsCompiler(void *,EXEC_STATUS);
+LOCALE void PrintClassReference(void *,EXEC_STATUS,FILE *,DEFCLASS *,int,int);
+LOCALE void DefclassCModuleReference(void *,EXEC_STATUS,FILE *,int,int,int);
 
 #endif
 

@@ -47,7 +47,7 @@ struct watchData
    struct watchItem *ListOfWatchItems;
   };
 
-#define WatchData(theEnv) ((struct watchData *) GetEnvironmentData(theEnv,execStatus,WATCH_DATA))
+#define WatchData(theEnv,execStatus) ((struct watchData *) GetEnvironmentData(theEnv,execStatus,WATCH_DATA))
 
 #ifdef LOCALE
 #undef LOCALE
@@ -59,8 +59,8 @@ struct watchData
 #define LOCALE extern
 #endif
 
-#define GetWatchItem(a) EnvGetWatchItem(GetCurrentEnvironment(),a)
-#define SetWatchItem(a,b) EnvSetWatchItem(GetCurrentEnvironment(),a,b)
+#define GetWatchItem(a) EnvGetWatchItem(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define SetWatchItem(a,b) EnvSetWatchItem(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
 
 #if ALLOW_ENVIRONMENT_GLOBALS
    LOCALE intBool                        Watch(char *);

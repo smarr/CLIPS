@@ -50,8 +50,8 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static void                    NonexistantError(void *,char *,char *,int);
-   static void                    ExpectedTypeError3(void *,char *,char *,int,char *);
+   static void                    NonexistantError(void *,EXEC_STATUS,char *,char *,int);
+   static void                    ExpectedTypeError3(void *,EXEC_STATUS,char *,char *,int,char *);
 
 /*******************************************************************/
 /* EnvRtnLexeme: Access function to retrieve the nth argument from */
@@ -323,7 +323,7 @@ globle int EnvArgCountCheck(
    /* currently being evaluated.                   */
    /*==============================================*/
 
-   numberOfArguments = EnvRtnArgCount(theEnv);
+   numberOfArguments = EnvRtnArgCount(theEnv,execStatus);
 
    /*=========================================================*/
    /* If the function satisfies expected number of arguments, */
@@ -365,7 +365,7 @@ globle int EnvArgRangeCheck(
   {
    int numberOfArguments;
 
-   numberOfArguments = EnvRtnArgCount(theEnv);
+   numberOfArguments = EnvRtnArgCount(theEnv,execStatus);
    if ((numberOfArguments < min) || (numberOfArguments > max))
      {
       PrintErrorID(theEnv,execStatus,"ARGACCES",1,FALSE);
@@ -718,7 +718,7 @@ globle char *GetConstructName(
   {
    DATA_OBJECT result;
 
-   if (EnvRtnArgCount(theEnv) != 1)
+   if (EnvRtnArgCount(theEnv,execStatus) != 1)
      {
       ExpectedCountError(theEnv,execStatus,functionName,EXACTLY,1);
       return(NULL);

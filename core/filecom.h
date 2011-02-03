@@ -36,10 +36,10 @@
 #define LOCALE extern
 #endif
 
-#define DribbleActive() EnvDribbleActive(GetCurrentEnvironment())
-#define DribbleOn(a) EnvDribbleOn(GetCurrentEnvironment(),a)
-#define DribbleOff() EnvDribbleOff(GetCurrentEnvironment())
-#define BatchStar(a) EnvBatchStar(GetCurrentEnvironment(),a)
+#define DribbleActive() EnvDribbleActive(GetCurrentEnvironment(),GetCurrentExecutionState())
+#define DribbleOn(a) EnvDribbleOn(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define DribbleOff() EnvDribbleOff(GetCurrentEnvironment(),GetCurrentExecutionState())
+#define BatchStar(a) EnvBatchStar(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
 
 # include "execution_status.h"
 

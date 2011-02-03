@@ -350,7 +350,7 @@ static int ProcessVariable(
       theType = SF_VARIABLE;
       theVariable = (struct symbolHashNode *) thePattern->value;
       if (thePattern->derivedConstraints) RemoveConstraint(theEnv,execStatus,thePattern->constraints);
-      theConstraints = GetConstraintRecord(theEnv);
+      theConstraints = GetConstraintRecord(theEnv,execStatus);
       thePattern->constraints = theConstraints;
       thePattern->constraints->anyAllowed = FALSE;
       thePattern->constraints->instanceAddressesAllowed = TRUE;
@@ -793,7 +793,7 @@ static intBool UnboundVariablesInPattern(
          else if (((andField->type == INTEGER) || (andField->type == FLOAT) ||
                    (andField->type == SYMBOL) || (andField->type == STRING) ||
                    (andField->type == INSTANCE_NAME)) &&
-                  EnvGetStaticConstraintChecking(theEnv))
+                  EnvGetStaticConstraintChecking(theEnv,execStatus))
            {
             result = ConstraintCheckValue(theEnv,execStatus,andField->type,andField->value,theConstraints);
             if (result != NO_VIOLATION)
@@ -850,7 +850,7 @@ static struct lhsParseNode *CheckExpression(
             return(exprPtr);
            }
          else if ((UnmatchableConstraint(exprPtr->constraints)) &&
-                  EnvGetStaticConstraintChecking(theEnv))
+                  EnvGetStaticConstraintChecking(theEnv,execStatus))
            {
             ConstraintReferenceErrorMessage(theEnv,execStatus,(SYMBOL_HN *) exprPtr->value,lastOne,i,
                                             whichCE,slotName,theField);

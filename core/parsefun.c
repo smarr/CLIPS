@@ -56,17 +56,17 @@ struct parseFunctionData
    size_t WarningMaximumPosition;
   };
 
-#define ParseFunctionData(theEnv) ((struct parseFunctionData *) GetEnvironmentData(theEnv,execStatus,PARSEFUN_DATA))
+#define ParseFunctionData(theEnv,execStatus) ((struct parseFunctionData *) GetEnvironmentData(theEnv,execStatus,PARSEFUN_DATA))
 
 /***************************************/
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
 #if (! RUN_TIME) && (! BLOAD_ONLY)
-   static int                     FindErrorCapture(void *,char *);
-   static int                     PrintErrorCapture(void *,char *,char *);
-   static void                    DeactivateErrorCapture(void *);
-   static void                    SetErrorCaptureValues(void *,DATA_OBJECT_PTR);
+   static int                     FindErrorCapture(void *,EXEC_STATUS,char *);
+   static int                     PrintErrorCapture(void *,EXEC_STATUS,char *,char *);
+   static void                    DeactivateErrorCapture(void *,EXEC_STATUS);
+   static void                    SetErrorCaptureValues(void *,EXEC_STATUS,DATA_OBJECT_PTR);
 #endif
 
 /*****************************************/
@@ -102,7 +102,7 @@ globle void CheckSyntaxFunction(
    /*===============================*/
 
    SetpType(returnValue,SYMBOL);
-   SetpValue(returnValue,EnvTrueSymbol(theEnv));
+   SetpValue(returnValue,EnvTrueSymbol(theEnv,execStatus));
 
    /*=====================================================*/
    /* Function check-syntax expects exactly one argument. */
@@ -145,7 +145,7 @@ globle int CheckSyntax(
    /*==============================*/
 
    SetpType(returnValue,SYMBOL);
-   SetpValue(returnValue,EnvTrueSymbol(theEnv));
+   SetpValue(returnValue,EnvTrueSymbol(theEnv,execStatus));
 
    /*===========================================*/
    /* Create a string source router so that the */
@@ -198,39 +198,39 @@ globle int CheckSyntax(
 
    if (FindConstruct(theEnv,execStatus,name))
      {
-      ConstructData(theEnv)->CheckSyntaxMode = TRUE;
+      ConstructData(theEnv,execStatus)->CheckSyntaxMode = TRUE;
       rv = (short) ParseConstruct(theEnv,execStatus,name,"check-syntax");
       GetToken(theEnv,execStatus,"check-syntax",&theToken);
-      ConstructData(theEnv)->CheckSyntaxMode = FALSE;
+      ConstructData(theEnv,execStatus)->CheckSyntaxMode = FALSE;
 
       if (rv)
         {
          EnvPrintRouter(theEnv,execStatus,WERROR,"\nERROR:\n");
-         PrintInChunks(theEnv,execStatus,WERROR,GetPPBuffer(theEnv));
+         PrintInChunks(theEnv,execStatus,WERROR,GetPPBuffer(theEnv,execStatus));
          EnvPrintRouter(theEnv,execStatus,WERROR,"\n");
         }
 
-      DestroyPPBuffer(theEnv);
+      DestroyPPBuffer(theEnv,execStatus);
 
       CloseStringSource(theEnv,execStatus,"check-syntax");
 
-      if ((rv != FALSE) || (ParseFunctionData(theEnv)->WarningString != NULL))
+      if ((rv != FALSE) || (ParseFunctionData(theEnv,execStatus)->WarningString != NULL))
         {
          SetErrorCaptureValues(theEnv,execStatus,returnValue);
-         DeactivateErrorCapture(theEnv);
+         DeactivateErrorCapture(theEnv,execStatus);
          return(TRUE);
         }
 
       if (theToken.type != STOP)
         {
          SetpValue(returnValue,EnvAddSymbol(theEnv,execStatus,"EXTRANEOUS-INPUT-AFTER-LAST-PARENTHESIS"));
-         DeactivateErrorCapture(theEnv);
+         DeactivateErrorCapture(theEnv,execStatus);
          return(TRUE);
         }
 
       SetpType(returnValue,SYMBOL);
-      SetpValue(returnValue,EnvFalseSymbol(theEnv));
-      DeactivateErrorCapture(theEnv);
+      SetpValue(returnValue,EnvFalseSymbol(theEnv,execStatus));
+      DeactivateErrorCapture(theEnv,execStatus);
       return(FALSE);
      }
 
@@ -240,29 +240,29 @@ globle int CheckSyntax(
 
    top = Function2Parse(theEnv,execStatus,"check-syntax",name);
    GetToken(theEnv,execStatus,"check-syntax",&theToken);
-   ClearParsedBindNames(theEnv);
+   ClearParsedBindNames(theEnv,execStatus);
    CloseStringSource(theEnv,execStatus,"check-syntax");
 
    if (top == NULL)
      {
       SetErrorCaptureValues(theEnv,execStatus,returnValue);
-      DeactivateErrorCapture(theEnv);
+      DeactivateErrorCapture(theEnv,execStatus);
       return(TRUE);
      }
 
    if (theToken.type != STOP)
      {
       SetpValue(returnValue,EnvAddSymbol(theEnv,execStatus,"EXTRANEOUS-INPUT-AFTER-LAST-PARENTHESIS"));
-      DeactivateErrorCapture(theEnv);
+      DeactivateErrorCapture(theEnv,execStatus);
       ReturnExpression(theEnv,execStatus,top);
       return(TRUE);
      }
 
-   DeactivateErrorCapture(theEnv);
+   DeactivateErrorCapture(theEnv,execStatus);
 
    ReturnExpression(theEnv,execStatus,top);
    SetpType(returnValue,SYMBOL);
-   SetpValue(returnValue,EnvFalseSymbol(theEnv));
+   SetpValue(returnValue,EnvFalseSymbol(theEnv,execStatus));
    return(FALSE);
   }
 
@@ -275,22 +275,22 @@ static void DeactivateErrorCapture(
   void *theEnv,
   EXEC_STATUS)
   {   
-   if (ParseFunctionData(theEnv)->ErrorString != NULL)
+   if (ParseFunctionData(theEnv,execStatus)->ErrorString != NULL)
      {
-      rm(theEnv,execStatus,ParseFunctionData(theEnv)->ErrorString,ParseFunctionData(theEnv)->ErrorMaximumPosition);
-      ParseFunctionData(theEnv)->ErrorString = NULL;
+      rm(theEnv,execStatus,ParseFunctionData(theEnv,execStatus)->ErrorString,ParseFunctionData(theEnv,execStatus)->ErrorMaximumPosition);
+      ParseFunctionData(theEnv,execStatus)->ErrorString = NULL;
      }
 
-   if (ParseFunctionData(theEnv)->WarningString != NULL)
+   if (ParseFunctionData(theEnv,execStatus)->WarningString != NULL)
      {
-      rm(theEnv,execStatus,ParseFunctionData(theEnv)->WarningString,ParseFunctionData(theEnv)->WarningMaximumPosition);
-      ParseFunctionData(theEnv)->WarningString = NULL;
+      rm(theEnv,execStatus,ParseFunctionData(theEnv,execStatus)->WarningString,ParseFunctionData(theEnv,execStatus)->WarningMaximumPosition);
+      ParseFunctionData(theEnv,execStatus)->WarningString = NULL;
      }
 
-   ParseFunctionData(theEnv)->ErrorCurrentPosition = 0;
-   ParseFunctionData(theEnv)->ErrorMaximumPosition = 0;
-   ParseFunctionData(theEnv)->WarningCurrentPosition = 0;
-   ParseFunctionData(theEnv)->WarningMaximumPosition = 0;
+   ParseFunctionData(theEnv,execStatus)->ErrorCurrentPosition = 0;
+   ParseFunctionData(theEnv,execStatus)->ErrorMaximumPosition = 0;
+   ParseFunctionData(theEnv,execStatus)->WarningCurrentPosition = 0;
+   ParseFunctionData(theEnv,execStatus)->WarningMaximumPosition = 0;
 
    EnvDeleteRouter(theEnv,execStatus,"error-capture");
   }
@@ -312,26 +312,26 @@ static void SetErrorCaptureValues(
 
    theMultifield = (struct multifield *) EnvCreateMultifield(theEnv,execStatus,2L);
 
-   if (ParseFunctionData(theEnv)->ErrorString != NULL)
+   if (ParseFunctionData(theEnv,execStatus)->ErrorString != NULL)
      {
       SetMFType(theMultifield,1,STRING);
-      SetMFValue(theMultifield,1,EnvAddSymbol(theEnv,execStatus,ParseFunctionData(theEnv)->ErrorString));
+      SetMFValue(theMultifield,1,EnvAddSymbol(theEnv,execStatus,ParseFunctionData(theEnv,execStatus)->ErrorString));
      }
    else
      {
       SetMFType(theMultifield,1,SYMBOL);
-      SetMFValue(theMultifield,1,EnvFalseSymbol(theEnv));
+      SetMFValue(theMultifield,1,EnvFalseSymbol(theEnv,execStatus));
      }
 
-   if (ParseFunctionData(theEnv)->WarningString != NULL)
+   if (ParseFunctionData(theEnv,execStatus)->WarningString != NULL)
      {
       SetMFType(theMultifield,2,STRING);
-      SetMFValue(theMultifield,2,EnvAddSymbol(theEnv,execStatus,ParseFunctionData(theEnv)->WarningString));
+      SetMFValue(theMultifield,2,EnvAddSymbol(theEnv,execStatus,ParseFunctionData(theEnv,execStatus)->WarningString));
      }
    else
      {
       SetMFType(theMultifield,2,SYMBOL);
-      SetMFValue(theMultifield,2,EnvFalseSymbol(theEnv));
+      SetMFValue(theMultifield,2,EnvFalseSymbol(theEnv,execStatus));
      }
 
    SetpType(returnValue,MULTIFIELD);
@@ -353,7 +353,7 @@ static int FindErrorCapture(
   char *logicalName)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 
    if ((strcmp(logicalName,WERROR) == 0) ||
@@ -375,15 +375,15 @@ static int PrintErrorCapture(
   {
    if (strcmp(logicalName,WERROR) == 0)
      {
-      ParseFunctionData(theEnv)->ErrorString = AppendToString(theEnv,execStatus,str,ParseFunctionData(theEnv)->ErrorString,
-                                   &ParseFunctionData(theEnv)->ErrorCurrentPosition,
-                                   &ParseFunctionData(theEnv)->ErrorMaximumPosition);
+      ParseFunctionData(theEnv,execStatus)->ErrorString = AppendToString(theEnv,execStatus,str,ParseFunctionData(theEnv,execStatus)->ErrorString,
+                                   &ParseFunctionData(theEnv,execStatus)->ErrorCurrentPosition,
+                                   &ParseFunctionData(theEnv,execStatus)->ErrorMaximumPosition);
      }
    else if (strcmp(logicalName,WWARNING) == 0)
      {
-      ParseFunctionData(theEnv)->WarningString = AppendToString(theEnv,execStatus,str,ParseFunctionData(theEnv)->WarningString,
-                                     &ParseFunctionData(theEnv)->WarningCurrentPosition,
-                                     &ParseFunctionData(theEnv)->WarningMaximumPosition);
+      ParseFunctionData(theEnv,execStatus)->WarningString = AppendToString(theEnv,execStatus,str,ParseFunctionData(theEnv,execStatus)->WarningString,
+                                     &ParseFunctionData(theEnv,execStatus)->WarningCurrentPosition,
+                                     &ParseFunctionData(theEnv,execStatus)->WarningMaximumPosition);
      }
 
    return(1);
@@ -402,7 +402,7 @@ globle void CheckSyntaxFunction(
    PrintErrorID(theEnv,execStatus,"PARSEFUN",1,FALSE);
    EnvPrintRouter(theEnv,execStatus,WERROR,"Function check-syntax does not work in run time modules.\n");
    SetpType(returnValue,SYMBOL);
-   SetpValue(returnValue,EnvTrueSymbol(theEnv));
+   SetpValue(returnValue,EnvTrueSymbol(theEnv,execStatus));
   }
 
 /************************************************/
@@ -423,7 +423,7 @@ globle int CheckSyntax(
    PrintErrorID(theEnv,execStatus,"PARSEFUN",1,FALSE);
    EnvPrintRouter(theEnv,execStatus,WERROR,"Function check-syntax does not work in run time modules.\n");
    SetpType(returnValue,SYMBOL);
-   SetpValue(returnValue,EnvTrueSymbol(theEnv));
+   SetpValue(returnValue,EnvTrueSymbol(theEnv,execStatus));
    return(TRUE);
   }
 

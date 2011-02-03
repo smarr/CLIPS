@@ -39,39 +39,39 @@
 #define LOCALE extern
 #endif
 
-   LOCALE void                    MultifieldFunctionDefinitions(void *);
+   LOCALE void                    MultifieldFunctionDefinitions(void *,EXEC_STATUS);
 #if MULTIFIELD_FUNCTIONS
-   LOCALE void                    DeleteFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                    MVDeleteFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                    ReplaceFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                    MVReplaceFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                    DeleteMemberFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                    ReplaceMemberFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                    InsertFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                    ExplodeFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                   *ImplodeFunction(void *);
-   LOCALE void                    SubseqFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                    MVSubseqFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                    FirstFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                    RestFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                    NthFunction(void *,DATA_OBJECT_PTR);
-   LOCALE intBool                 SubsetpFunction(void *);
-   LOCALE void                    MemberFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                    MultifieldPrognFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                    ForeachFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                    GetMvPrognField(void *,DATA_OBJECT_PTR);
-   LOCALE long                    GetMvPrognIndex(void *);
+   LOCALE void                    DeleteFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
+   LOCALE void                    MVDeleteFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
+   LOCALE void                    ReplaceFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
+   LOCALE void                    MVReplaceFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
+   LOCALE void                    DeleteMemberFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
+   LOCALE void                    ReplaceMemberFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
+   LOCALE void                    InsertFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
+   LOCALE void                    ExplodeFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
+   LOCALE void                   *ImplodeFunction(void *,EXEC_STATUS);
+   LOCALE void                    SubseqFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
+   LOCALE void                    MVSubseqFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
+   LOCALE void                    FirstFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
+   LOCALE void                    RestFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
+   LOCALE void                    NthFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
+   LOCALE intBool                 SubsetpFunction(void *,EXEC_STATUS);
+   LOCALE void                    MemberFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
+   LOCALE void                    MultifieldPrognFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
+   LOCALE void                    ForeachFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
+   LOCALE void                    GetMvPrognField(void *,EXEC_STATUS,DATA_OBJECT_PTR);
+   LOCALE long                    GetMvPrognIndex(void *,EXEC_STATUS);
    LOCALE intBool                 FindDOsInSegment(DATA_OBJECT_PTR,int,DATA_OBJECT_PTR,
                                                    long *,long *,long *,int);
 #endif
-   LOCALE int                     ReplaceMultiValueField(void *,struct dataObject *,
+   LOCALE int                     ReplaceMultiValueField(void *,EXEC_STATUS,struct dataObject *,
                                                          struct dataObject *,
                                                          long,long,
                                                          struct dataObject *,char *);
-   LOCALE int                     InsertMultiValueField(void *,struct dataObject *,
+   LOCALE int                     InsertMultiValueField(void *,EXEC_STATUS,struct dataObject *,
                                                         struct dataObject *,
                                                         long,struct dataObject *,char *);
-   LOCALE int                     DeleteMultiValueField(void *,struct dataObject *,struct dataObject *,
+   LOCALE int                     DeleteMultiValueField(void *,EXEC_STATUS,struct dataObject *,struct dataObject *,
                                                         long,long,char *);
 
 #endif

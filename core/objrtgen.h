@@ -43,15 +43,15 @@
 #define LOCALE extern
 #endif
 
-   LOCALE void             ReplaceGetJNObjectValue(void *,EXPRESSION *,struct lhsParseNode *,int);
-   LOCALE EXPRESSION      *GenGetJNObjectValue(void *,struct lhsParseNode *,int);
-   LOCALE EXPRESSION      *ObjectJNVariableComparison(void *,struct lhsParseNode *,struct lhsParseNode *,int);
-   LOCALE EXPRESSION      *GenObjectPNConstantCompare(void *,struct lhsParseNode *);
-   LOCALE void             ReplaceGetPNObjectValue(void *,EXPRESSION *,struct lhsParseNode *);
-   LOCALE EXPRESSION      *GenGetPNObjectValue(void *,struct lhsParseNode *); 
-   LOCALE EXPRESSION      *ObjectPNVariableComparison(void *,struct lhsParseNode *,struct lhsParseNode *);
-   LOCALE void             GenObjectLengthTest(void *,struct lhsParseNode *);
-   LOCALE void             GenObjectZeroLengthTest(void *,struct lhsParseNode *);
+   LOCALE void             ReplaceGetJNObjectValue(void *,EXEC_STATUS,EXPRESSION *,struct lhsParseNode *,int);
+   LOCALE EXPRESSION      *GenGetJNObjectValue(void *,EXEC_STATUS,struct lhsParseNode *,int);
+   LOCALE EXPRESSION      *ObjectJNVariableComparison(void *,EXEC_STATUS,struct lhsParseNode *,struct lhsParseNode *,int);
+   LOCALE EXPRESSION      *GenObjectPNConstantCompare(void *,EXEC_STATUS,struct lhsParseNode *);
+   LOCALE void             ReplaceGetPNObjectValue(void *,EXEC_STATUS,EXPRESSION *,struct lhsParseNode *);
+   LOCALE EXPRESSION      *GenGetPNObjectValue(void *,EXEC_STATUS,struct lhsParseNode *); 
+   LOCALE EXPRESSION      *ObjectPNVariableComparison(void *,EXEC_STATUS,struct lhsParseNode *,struct lhsParseNode *);
+   LOCALE void             GenObjectLengthTest(void *,EXEC_STATUS,struct lhsParseNode *);
+   LOCALE void             GenObjectZeroLengthTest(void *,EXEC_STATUS,struct lhsParseNode *);
 
 #endif
 

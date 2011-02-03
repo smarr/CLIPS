@@ -66,11 +66,11 @@ struct successor
    =========================================
    ***************************************** */
 
-static PARTIAL_ORDER *InitializePartialOrderTable(void *,PARTIAL_ORDER *,PACKED_CLASS_LINKS *);
-static void RecordPartialOrders(void *,PARTIAL_ORDER *,DEFCLASS *,PACKED_CLASS_LINKS *,long);
+static PARTIAL_ORDER *InitializePartialOrderTable(void *,EXEC_STATUS,PARTIAL_ORDER *,PACKED_CLASS_LINKS *);
+static void RecordPartialOrders(void *,EXEC_STATUS,PARTIAL_ORDER *,DEFCLASS *,PACKED_CLASS_LINKS *,long);
 static PARTIAL_ORDER *FindPartialOrder(PARTIAL_ORDER *,DEFCLASS *);
-static void PrintPartialOrderLoop(void *,PARTIAL_ORDER *);
-static void PrintClassLinks(void *,char *,char *,CLASS_LINK *);
+static void PrintPartialOrderLoop(void *,EXEC_STATUS,PARTIAL_ORDER *);
+static void PrintClassLinks(void *,EXEC_STATUS,char *,char *,CLASS_LINK *);
 
 /* =========================================
    *****************************************
@@ -121,33 +121,33 @@ globle PACKED_CLASS_LINKS *ParseSuperclasses(
    DEFCLASS *sclass;
    PACKED_CLASS_LINKS *plinks;
 
-   if (GetType(DefclassData(theEnv)->ObjectParseToken) != LPAREN)
+   if (GetType(DefclassData(theEnv,execStatus)->ObjectParseToken) != LPAREN)
      {
       SyntaxErrorMessage(theEnv,execStatus,"defclass inheritance");
       return(NULL);
      }
-   GetToken(theEnv,execStatus,readSource,&DefclassData(theEnv)->ObjectParseToken);
-   if ((GetType(DefclassData(theEnv)->ObjectParseToken) != SYMBOL) ? TRUE :
-       (DefclassData(theEnv)->ObjectParseToken.value != (void *) DefclassData(theEnv)->ISA_SYMBOL))
+   GetToken(theEnv,execStatus,readSource,&DefclassData(theEnv,execStatus)->ObjectParseToken);
+   if ((GetType(DefclassData(theEnv,execStatus)->ObjectParseToken) != SYMBOL) ? TRUE :
+       (DefclassData(theEnv,execStatus)->ObjectParseToken.value != (void *) DefclassData(theEnv,execStatus)->ISA_SYMBOL))
      {
       SyntaxErrorMessage(theEnv,execStatus,"defclass inheritance");
       return(NULL);
      }
    SavePPBuffer(theEnv,execStatus," ");
-   GetToken(theEnv,execStatus,readSource,&DefclassData(theEnv)->ObjectParseToken);
-   while (GetType(DefclassData(theEnv)->ObjectParseToken) != RPAREN)
+   GetToken(theEnv,execStatus,readSource,&DefclassData(theEnv,execStatus)->ObjectParseToken);
+   while (GetType(DefclassData(theEnv,execStatus)->ObjectParseToken) != RPAREN)
      {
-      if (GetType(DefclassData(theEnv)->ObjectParseToken) != SYMBOL)
+      if (GetType(DefclassData(theEnv,execStatus)->ObjectParseToken) != SYMBOL)
         {
          SyntaxErrorMessage(theEnv,execStatus,"defclass");
          goto SuperclassParseError;
         }
       if (FindModuleSeparator(ValueToString(newClassName)))
         {
-         IllegalModuleSpecifierMessage(theEnv);
+         IllegalModuleSpecifierMessage(theEnv,execStatus);
          goto SuperclassParseError;
         }
-      if (GetValue(DefclassData(theEnv)->ObjectParseToken) == (void *) newClassName)
+      if (GetValue(DefclassData(theEnv,execStatus)->ObjectParseToken) == (void *) newClassName)
         {
          PrintErrorID(theEnv,execStatus,"INHERPSR",1,FALSE);
          EnvPrintRouter(theEnv,execStatus,WERROR,"A class may not have itself as a superclass.\n");
@@ -155,23 +155,23 @@ globle PACKED_CLASS_LINKS *ParseSuperclasses(
         }
       for (ctmp = clink ; ctmp != NULL ; ctmp = ctmp->nxt)
         {
-         if (GetValue(DefclassData(theEnv)->ObjectParseToken) == (void *) ctmp->cls->header.name)
+         if (GetValue(DefclassData(theEnv,execStatus)->ObjectParseToken) == (void *) ctmp->cls->header.name)
            {
             PrintErrorID(theEnv,execStatus,"INHERPSR",2,FALSE);
             EnvPrintRouter(theEnv,execStatus,WERROR,"A class may inherit from a superclass only once.\n");
             goto SuperclassParseError;
            }
         }
-      sclass = LookupDefclassInScope(theEnv,execStatus,ValueToString(GetValue(DefclassData(theEnv)->ObjectParseToken)));
+      sclass = LookupDefclassInScope(theEnv,execStatus,ValueToString(GetValue(DefclassData(theEnv,execStatus)->ObjectParseToken)));
       if (sclass == NULL)
         {
          PrintErrorID(theEnv,execStatus,"INHERPSR",3,FALSE);
          EnvPrintRouter(theEnv,execStatus,WERROR,"A class must be defined after all its superclasses.\n");
          goto SuperclassParseError;
         }
-      if ((sclass == DefclassData(theEnv)->PrimitiveClassMap[INSTANCE_NAME]) ||
-          (sclass == DefclassData(theEnv)->PrimitiveClassMap[INSTANCE_ADDRESS]) ||
-          (sclass == DefclassData(theEnv)->PrimitiveClassMap[INSTANCE_NAME]->directSuperclasses.classArray[0]))
+      if ((sclass == DefclassData(theEnv,execStatus)->PrimitiveClassMap[INSTANCE_NAME]) ||
+          (sclass == DefclassData(theEnv,execStatus)->PrimitiveClassMap[INSTANCE_ADDRESS]) ||
+          (sclass == DefclassData(theEnv,execStatus)->PrimitiveClassMap[INSTANCE_NAME]->directSuperclasses.classArray[0]))
         {
          PrintErrorID(theEnv,execStatus,"INHERPSR",6,FALSE);
          EnvPrintRouter(theEnv,execStatus,WERROR,"A user-defined class cannot be a subclass of ");
@@ -189,7 +189,7 @@ globle PACKED_CLASS_LINKS *ParseSuperclasses(
       cbot = ctmp;
 
       SavePPBuffer(theEnv,execStatus," ");
-      GetToken(theEnv,execStatus,readSource,&DefclassData(theEnv)->ObjectParseToken);
+      GetToken(theEnv,execStatus,readSource,&DefclassData(theEnv,execStatus)->ObjectParseToken);
      }
    if (clink == NULL)
      {
@@ -197,8 +197,8 @@ globle PACKED_CLASS_LINKS *ParseSuperclasses(
       EnvPrintRouter(theEnv,execStatus,WERROR,"Must have at least one superclass.\n");
       return(NULL);
      }
-   PPBackup(theEnv);
-   PPBackup(theEnv);
+   PPBackup(theEnv,execStatus);
+   PPBackup(theEnv,execStatus);
    SavePPBuffer(theEnv,execStatus,")");
    plinks = get_struct(theEnv,execStatus,packedClassLinks);
    PackClassLinks(theEnv,execStatus,plinks,clink);

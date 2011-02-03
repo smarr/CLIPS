@@ -49,38 +49,38 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static void                     IntersectNumericExpressions(void *,
+   static void                     IntersectNumericExpressions(void *,EXEC_STATUS,
                                                                CONSTRAINT_RECORD *,
                                                                CONSTRAINT_RECORD *,
                                                                CONSTRAINT_RECORD *,int);
-   static void                     IntersectAllowedValueExpressions(void *,
+   static void                     IntersectAllowedValueExpressions(void *,EXEC_STATUS,
                                                                     CONSTRAINT_RECORD *,
                                                                     CONSTRAINT_RECORD *,
                                                                     CONSTRAINT_RECORD *);
-   static void                     IntersectAllowedClassExpressions(void *,
+   static void                     IntersectAllowedClassExpressions(void *,EXEC_STATUS,
                                                                     CONSTRAINT_RECORD *,
                                                                     CONSTRAINT_RECORD *,
                                                                     CONSTRAINT_RECORD *);
    static int                      FindItemInExpression(int,void *,int,struct expr *);
    static void                     UpdateRestrictionFlags(CONSTRAINT_RECORD *);
 #if (! BLOAD_ONLY)
-   static void                     UnionRangeMinMaxValueWithList(void *,
+   static void                     UnionRangeMinMaxValueWithList(void *,EXEC_STATUS,
                                                                  struct expr *,
                                                                  struct expr *,
                                                                  struct expr **,
                                                                  struct expr **);
-   static void                     UnionNumericExpressions(void *,
+   static void                     UnionNumericExpressions(void *,EXEC_STATUS,
                                                          CONSTRAINT_RECORD *,
                                                          CONSTRAINT_RECORD *,
                                                          CONSTRAINT_RECORD *,int);
-   static struct expr             *AddToUnionList(void *,
+   static struct expr             *AddToUnionList(void *,EXEC_STATUS,
                                                   struct expr *,struct expr *,
                                                   CONSTRAINT_RECORD *);
-   static void                     UnionAllowedValueExpressions(void *,
+   static void                     UnionAllowedValueExpressions(void *,EXEC_STATUS,
                                                                 CONSTRAINT_RECORD *,
                                                                 CONSTRAINT_RECORD *,
                                                                 CONSTRAINT_RECORD *);
-   static void                     UnionAllowedClassExpressions(void *,
+   static void                     UnionAllowedClassExpressions(void *,EXEC_STATUS,
                                                                 CONSTRAINT_RECORD *,
                                                                 CONSTRAINT_RECORD *,
                                                                 CONSTRAINT_RECORD *);
@@ -107,7 +107,7 @@ globle struct constraintRecord *IntersectConstraints(
 
    if ((c1 == NULL) && (c2 == NULL))
      {
-      rv = GetConstraintRecord(theEnv);
+      rv = GetConstraintRecord(theEnv,execStatus);
       rv->multifieldsAllowed = TRUE;
       return(rv);
      }
@@ -126,7 +126,7 @@ globle struct constraintRecord *IntersectConstraints(
    /* Create a new constraint record. */
    /*=================================*/
 
-   rv = GetConstraintRecord(theEnv);
+   rv = GetConstraintRecord(theEnv,execStatus);
 
    /*==============================*/
    /* Intersect the allowed types. */
@@ -657,7 +657,7 @@ globle struct constraintRecord *UnionConstraints(
    /* a constraint record that allows any value.      */
    /*=================================================*/
 
-   if ((c1 == NULL) && (c2 == NULL)) return(GetConstraintRecord(theEnv));
+   if ((c1 == NULL) && (c2 == NULL)) return(GetConstraintRecord(theEnv,execStatus));
 
    /*=====================================================*/
    /* If one of the constraint records is NULL, then the  */
@@ -676,7 +676,7 @@ globle struct constraintRecord *UnionConstraints(
    /* Create a new constraint record. */
    /*=================================*/
 
-   rv = GetConstraintRecord(theEnv);
+   rv = GetConstraintRecord(theEnv,execStatus);
 
    /*==========================*/
    /* Union the allowed types. */

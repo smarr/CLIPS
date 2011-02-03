@@ -66,15 +66,15 @@ struct miscFunctionData
    long long GensymNumber;
   };
 
-#define MiscFunctionData(theEnv) ((struct miscFunctionData *) GetEnvironmentData(theEnv,execStatus,MISCFUN_DATA))
+#define MiscFunctionData(theEnv,execStatus) ((struct miscFunctionData *) GetEnvironmentData(theEnv,execStatus,MISCFUN_DATA))
 
 /***************************************/
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static void                    ExpandFuncMultifield(void *,DATA_OBJECT *,EXPRESSION *,
+   static void                    ExpandFuncMultifield(void *,EXEC_STATUS,DATA_OBJECT *,EXPRESSION *,
                                                        EXPRESSION **,void *);
-   static int                     FindLanguageType(void *,char *);
+   static int                     FindLanguageType(void *,EXEC_STATUS,char *);
    
 /*****************************************************************/
 /* MiscFunctionDefinitions: Initializes miscellaneous functions. */
@@ -84,7 +84,7 @@ globle void MiscFunctionDefinitions(
   EXEC_STATUS)
   {
    AllocateEnvironmentData(theEnv,execStatus,MISCFUN_DATA,sizeof(struct miscFunctionData),NULL);
-   MiscFunctionData(theEnv)->GensymNumber = 1;
+   MiscFunctionData(theEnv,execStatus)->GensymNumber = 1;
    
 #if ! RUN_TIME
    EnvDefineFunction2(theEnv,execStatus,"gensym",           'w', PTIEF GensymFunction,      "GensymFunction", "00");
@@ -152,8 +152,8 @@ globle long long SetgenFunction(
    /* Check to see that a single integer argument is provided. */
    /*==========================================================*/
 
-   if (EnvArgCountCheck(theEnv,execStatus,"setgen",EXACTLY,1) == -1) return(MiscFunctionData(theEnv)->GensymNumber);
-   if (EnvArgTypeCheck(theEnv,execStatus,"setgen",1,INTEGER,&theValue) == FALSE) return(MiscFunctionData(theEnv)->GensymNumber);
+   if (EnvArgCountCheck(theEnv,execStatus,"setgen",EXACTLY,1) == -1) return(MiscFunctionData(theEnv,execStatus)->GensymNumber);
+   if (EnvArgTypeCheck(theEnv,execStatus,"setgen",1,INTEGER,&theValue) == FALSE) return(MiscFunctionData(theEnv,execStatus)->GensymNumber);
 
    /*========================================*/
    /* The integer must be greater than zero. */
@@ -164,7 +164,7 @@ globle long long SetgenFunction(
    if (theLong < 1LL)
      {
       ExpectedTypeError1(theEnv,execStatus,"setgen",1,"number (greater than or equal to 1)");
-      return(MiscFunctionData(theEnv)->GensymNumber);
+      return(MiscFunctionData(theEnv,execStatus)->GensymNumber);
      }
 
    /*====================================*/
@@ -172,7 +172,7 @@ globle long long SetgenFunction(
    /* provided and return this value.    */
    /*====================================*/
 
-   MiscFunctionData(theEnv)->GensymNumber = theLong;
+   MiscFunctionData(theEnv,execStatus)->GensymNumber = theLong;
    return(theLong);
   }
 
@@ -197,8 +197,8 @@ globle void *GensymFunction(
    /* as the postfix.                                */
    /*================================================*/
 
-   gensprintf(genstring,"gen%lld",MiscFunctionData(theEnv)->GensymNumber);
-   MiscFunctionData(theEnv)->GensymNumber++;
+   gensprintf(genstring,"gen%lld",MiscFunctionData(theEnv,execStatus)->GensymNumber);
+   MiscFunctionData(theEnv,execStatus)->GensymNumber++;
 
    /*====================*/
    /* Return the symbol. */
@@ -225,7 +225,7 @@ globle void *GensymStarFunction(
    /* Return the symbol. */
    /*====================*/
 
-   return(GensymStar(theEnv));
+   return(GensymStar(theEnv,execStatus));
   }
 
 /************************************/
@@ -247,8 +247,8 @@ globle void *GensymStar(
 
    do
      {
-      gensprintf(genstring,"gen%lld",MiscFunctionData(theEnv)->GensymNumber);
-      MiscFunctionData(theEnv)->GensymNumber++;
+      gensprintf(genstring,"gen%lld",MiscFunctionData(theEnv,execStatus)->GensymNumber);
+      MiscFunctionData(theEnv,execStatus)->GensymNumber++;
      }
    while (FindSymbolHN(theEnv,execStatus,genstring) != NULL);
 
@@ -277,7 +277,7 @@ globle long long RandomFunction(
    /* zero or two arguments.             */
    /*====================================*/
 
-   argCount = EnvRtnArgCount(theEnv,execStatus,execStatus);
+   argCount = EnvRtnArgCount(theEnv,execStatus);
    
    if ((argCount != 0) && (argCount != 2))
      {
@@ -474,7 +474,7 @@ globle long long MemUsedCommand(
    /* (both for current use and for later use).  */
    /*============================================*/
 
-   return(EnvMemUsed(theEnv));
+   return(EnvMemUsed(theEnv,execStatus));
   }
 
 /********************************************/
@@ -496,7 +496,7 @@ globle long long MemRequestsCommand(
    /* memory requests.                 */
    /*==================================*/
 
-   return(EnvMemRequests(theEnv));
+   return(EnvMemRequests(theEnv,execStatus));
   }
 
 #endif
@@ -905,7 +905,7 @@ globle void ExpandFuncCall(
                                 func->restrictions,CountArguments(newargexp)) == FALSE)
         {
          result->type = SYMBOL;
-         result->value = EnvFalseSymbol(theEnv);
+         result->value = EnvFalseSymbol(theEnv,execStatus);
          ReturnExpression(theEnv,execStatus,fcallexp);
          return;
         }
@@ -917,7 +917,7 @@ globle void ExpandFuncCall(
               CountArguments(fcallexp->argList)) == FALSE)
         {
          result->type = SYMBOL;
-         result->value = EnvFalseSymbol(theEnv);
+         result->value = EnvFalseSymbol(theEnv,execStatus);
          ReturnExpression(theEnv,execStatus,fcallexp);
          SetEvaluationError(theEnv,execStatus,TRUE);
          return;
@@ -948,7 +948,7 @@ globle void DummyExpandFuncMultifield(
   DATA_OBJECT *result)
   {
    result->type = SYMBOL;
-   result->value = EnvFalseSymbol(theEnv);
+   result->value = EnvFalseSymbol(theEnv,execStatus);
    SetEvaluationError(theEnv,execStatus,TRUE);
    PrintErrorID(theEnv,execStatus,"MISCFUN",1,FALSE);
    EnvPrintRouter(theEnv,execStatus,WERROR,"expand$ must be used in the argument list of a function call.\n");
@@ -1053,7 +1053,7 @@ globle void *CauseEvaluationError(
   EXEC_STATUS)
   {
    SetEvaluationError(theEnv,execStatus,TRUE);
-   return((SYMBOL_HN *) EnvFalseSymbol(theEnv));
+   return((SYMBOL_HN *) EnvFalseSymbol(theEnv,execStatus));
   }
 
 /****************************************************************
@@ -1074,11 +1074,11 @@ globle intBool SetSORCommand(
    DATA_OBJECT arg;
 
    if (EnvArgTypeCheck(theEnv,execStatus,"set-sequence-operator-recognition",1,SYMBOL,&arg) == FALSE)
-     return(ExpressionData(theEnv)->SequenceOpMode);
-   return(EnvSetSequenceOperatorRecognition(theEnv,execStatus,(arg.value == EnvFalseSymbol(theEnv)) ?
+     return(ExpressionData(theEnv,execStatus)->SequenceOpMode);
+   return(EnvSetSequenceOperatorRecognition(theEnv,execStatus,(arg.value == EnvFalseSymbol(theEnv,execStatus)) ?
                                          FALSE : TRUE));
 #else
-     return(ExpressionData(theEnv)->SequenceOpMode);
+     return(ExpressionData(theEnv,execStatus)->SequenceOpMode);
 #endif
   }
 
@@ -1130,7 +1130,7 @@ globle void GetFunctionListFunction(
       return;
      }
 
-   for (theFunction = GetFunctionList(theEnv);
+   for (theFunction = GetFunctionList(theEnv,execStatus);
         theFunction != NULL;
         theFunction = theFunction->next)
      { functionCount++; }
@@ -1141,7 +1141,7 @@ globle void GetFunctionListFunction(
    theList = (struct multifield *) EnvCreateMultifield(theEnv,execStatus,functionCount);
    SetpValue(returnValue,(void *) theList);
 
-   for (theFunction = GetFunctionList(theEnv), functionCount = 1;
+   for (theFunction = GetFunctionList(theEnv,execStatus), functionCount = 1;
         theFunction != NULL;
         theFunction = theFunction->next, functionCount++)
      {
@@ -1172,7 +1172,7 @@ globle void FuncallFunction(
    /*==================================*/
    
    SetpType(returnValue,SYMBOL);
-   SetpValue(returnValue,EnvFalseSymbol(theEnv));
+   SetpValue(returnValue,EnvFalseSymbol(theEnv,execStatus));
    
    /*=================================================*/
    /* The funcall function has at least one argument: */
@@ -1223,7 +1223,7 @@ globle void FuncallFunction(
    for (i = 2; i <= argCount; i++)
      {
       EnvRtnUnknown(theEnv,execStatus,i,&theValue);
-      if (GetEvaluationError(theEnv))
+      if (GetEvaluationError(theEnv,execStatus))
         {  
          ExpressionDeinstall(theEnv,execStatus,&theReference);
          return; 
@@ -1319,7 +1319,7 @@ globle void NewFunction(
    /*==================================*/
    
    SetpType(returnValue,SYMBOL);
-   SetpValue(returnValue,EnvFalseSymbol(theEnv));
+   SetpValue(returnValue,EnvFalseSymbol(theEnv,execStatus));
    
    /*================================================================*/
    /* The new function has at least two arguments: the language type */
@@ -1353,9 +1353,9 @@ globle void NewFunction(
    /* Invoke the new function for the specific language. */
    /*====================================================*/
    
-   if ((EvaluationData(theEnv)->ExternalAddressTypes[theType] != NULL) &&
-       (EvaluationData(theEnv)->ExternalAddressTypes[theType]->newFunction != NULL))
-     { (*EvaluationData(theEnv)->ExternalAddressTypes[theType]->newFunction)(theEnv,execStatus,returnValue); }
+   if ((EvaluationData(theEnv,execStatus)->ExternalAddressTypes[theType] != NULL) &&
+       (EvaluationData(theEnv,execStatus)->ExternalAddressTypes[theType]->newFunction != NULL))
+     { (*EvaluationData(theEnv,execStatus)->ExternalAddressTypes[theType]->newFunction)(theEnv,execStatus,returnValue); }
   }
   
 /************************************/
@@ -1378,7 +1378,7 @@ globle void CallFunction(
    /*==================================*/
    
    SetpType(returnValue,SYMBOL);
-   SetpValue(returnValue,EnvFalseSymbol(theEnv));
+   SetpValue(returnValue,EnvFalseSymbol(theEnv,execStatus));
    
    /*=====================================================*/
    /* The call function has at least one argument: either */
@@ -1417,9 +1417,9 @@ globle void CallFunction(
       /* and second arguments to the call function.                         */
       /*====================================================================*/
       
-      if ((EvaluationData(theEnv)->ExternalAddressTypes[theType] != NULL) &&
-          (EvaluationData(theEnv)->ExternalAddressTypes[theType]->callFunction != NULL))
-        { (*EvaluationData(theEnv)->ExternalAddressTypes[theType]->callFunction)(theEnv,execStatus,&theValue,returnValue); }
+      if ((EvaluationData(theEnv,execStatus)->ExternalAddressTypes[theType] != NULL) &&
+          (EvaluationData(theEnv,execStatus)->ExternalAddressTypes[theType]->callFunction != NULL))
+        { (*EvaluationData(theEnv,execStatus)->ExternalAddressTypes[theType]->callFunction)(theEnv,execStatus,&theValue,returnValue); }
         
       return;
      }
@@ -1436,9 +1436,9 @@ globle void CallFunction(
       
       theType = theEA->type;
       
-      if ((EvaluationData(theEnv)->ExternalAddressTypes[theType] != NULL) &&
-          (EvaluationData(theEnv)->ExternalAddressTypes[theType]->callFunction != NULL))
-        { (*EvaluationData(theEnv)->ExternalAddressTypes[theType]->callFunction)(theEnv,execStatus,&theValue,returnValue); }
+      if ((EvaluationData(theEnv,execStatus)->ExternalAddressTypes[theType] != NULL) &&
+          (EvaluationData(theEnv,execStatus)->ExternalAddressTypes[theType]->callFunction != NULL))
+        { (*EvaluationData(theEnv,execStatus)->ExternalAddressTypes[theType]->callFunction)(theEnv,execStatus,&theValue,returnValue); }
         
       return;
      }
@@ -1456,9 +1456,9 @@ static int FindLanguageType(
   {
    int theType;
    
-   for (theType = 0; theType < EvaluationData(theEnv)->numberOfAddressTypes; theType++)
+   for (theType = 0; theType < EvaluationData(theEnv,execStatus)->numberOfAddressTypes; theType++)
      {
-      if (strcmp(EvaluationData(theEnv)->ExternalAddressTypes[theType]->name,languageName) == 0)
+      if (strcmp(EvaluationData(theEnv,execStatus)->ExternalAddressTypes[theType]->name,languageName) == 0)
         { return(theType); }
      }
      
@@ -1500,10 +1500,10 @@ globle double TimerFunction(
 
    startTime = gentime();
    
-   numa = EnvRtnArgCount(theEnv);
+   numa = EnvRtnArgCount(theEnv,execStatus);
 
    i = 1;
-   while ((i <= numa) && (GetHaltExecution(theEnv) != TRUE))
+   while ((i <= numa) && (GetHaltExecution(theEnv,execStatus) != TRUE))
      {
       EnvRtnUnknown(theEnv,execStatus,i,&returnValue);
       i++;

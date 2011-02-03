@@ -57,9 +57,9 @@
 
    static int                     SingleNumberCheck(void *,EXEC_STATUS,char *,double *);
    static int                     TestProximity(double,double);
-   static void                    DomainErrorMessage(void *,char *);
-   static void                    ArgumentOverflowErrorMessage(void *,char *);
-   static void                    SingularityErrorMessage(void *,char *);
+   static void                    DomainErrorMessage(void *,EXEC_STATUS,char *);
+   static void                    ArgumentOverflowErrorMessage(void *,EXEC_STATUS,char *);
+   static void                    SingularityErrorMessage(void *,EXEC_STATUS,char *);
    static double                  genacosh(double);
    static double                  genasinh(double);
    static double                  genatanh(double);
@@ -115,7 +115,7 @@ globle void ExtendedMathFunctionDefinitions(
    EnvDefineFunction2(theEnv,execStatus,"round",    'g', PTIEF RoundFunction,    "RoundFunction", "11n");
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 #endif
   }

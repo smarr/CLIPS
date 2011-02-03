@@ -48,9 +48,9 @@ struct defglobalBinaryData
    long NumberOfDefglobalModules;
   };
   
-#define DefglobalBinaryData(theEnv) ((struct defglobalBinaryData *) GetEnvironmentData(theEnv,execStatus,GLOBLBIN_DATA))
+#define DefglobalBinaryData(theEnv,execStatus) ((struct defglobalBinaryData *) GetEnvironmentData(theEnv,execStatus,GLOBLBIN_DATA))
 
-#define DefglobalPointer(i) ((struct defglobal *) (&DefglobalBinaryData(theEnv)->DefglobalArray[i]))
+#define DefglobalPointer(i) ((struct defglobal *) (&DefglobalBinaryData(theEnv,execStatus)->DefglobalArray[i]))
 
 #ifdef LOCALE
 #undef LOCALE
@@ -62,8 +62,8 @@ struct defglobalBinaryData
 #define LOCALE extern
 #endif
 
-   LOCALE void                           DefglobalBinarySetup(void *);
-   LOCALE void                          *BloadDefglobalModuleReference(void *,int);
+   LOCALE void                           DefglobalBinarySetup(void *,EXEC_STATUS);
+   LOCALE void                          *BloadDefglobalModuleReference(void *,EXEC_STATUS,int);
 
 #ifndef _GLOBLBIN_SOURCE_
    extern struct defglobal *DefglobalArray;

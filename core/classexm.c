@@ -73,16 +73,16 @@
 
 static int CheckTwoClasses(void *,EXEC_STATUS,char *,DEFCLASS **,DEFCLASS **);
 static SLOT_DESC *CheckSlotExists(void *,EXEC_STATUS,char *,DEFCLASS **,intBool,intBool);
-static SLOT_DESC *LookupSlot(void *,DEFCLASS *,char *,intBool);
+static SLOT_DESC *LookupSlot(void *,EXEC_STATUS,DEFCLASS *,char *,intBool);
 
 #if DEBUGGING_FUNCTIONS
-static DEFCLASS *CheckClass(void *,char *,char *);
+static DEFCLASS *CheckClass(void *,EXEC_STATUS,char *,char *);
 static char *GetClassNameArgument(void *,EXEC_STATUS,char *);
-static void PrintClassBrowse(void *,char *,DEFCLASS *,long);
-static void DisplaySeparator(void *,char *,char *,int,int);
-static void DisplaySlotBasicInfo(void *,char *,char *,char *,char *,DEFCLASS *);
-static intBool PrintSlotSources(void *,char *,SYMBOL_HN *,PACKED_CLASS_LINKS *,long,int);
-static void DisplaySlotConstraintInfo(void *,char *,char *,char *,unsigned,DEFCLASS *);
+static void PrintClassBrowse(void *,EXEC_STATUS,char *,DEFCLASS *,long);
+static void DisplaySeparator(void *,EXEC_STATUS,char *,char *,int,int);
+static void DisplaySlotBasicInfo(void *,EXEC_STATUS,char *,char *,char *,char *,DEFCLASS *);
+static intBool PrintSlotSources(void *,EXEC_STATUS,char *,SYMBOL_HN *,PACKED_CLASS_LINKS *,long,int);
+static void DisplaySlotConstraintInfo(void *,EXEC_STATUS,char *,char *,char *,unsigned,DEFCLASS *);
 static char *ConstraintCode(CONSTRAINT_RECORD *,unsigned,unsigned);
 #endif
 
@@ -108,7 +108,7 @@ globle void BrowseClassesCommand(
   {
    register DEFCLASS *cls;
    
-   if (EnvRtnArgCount(theEnv,execStatus,execStatus) == 0)
+   if (EnvRtnArgCount(theEnv,execStatus) == 0)
       /* ================================================
          Find the OBJECT root class (has no superclasses)
          ================================================ */
@@ -321,7 +321,7 @@ globle void *GetDefclassModuleCommand(
   void *theEnv,
   EXEC_STATUS)
   {
-   return(GetConstructModuleCommand(theEnv,execStatus,"defclass-module",DefclassData(theEnv)->DefclassConstruct));
+   return(GetConstructModuleCommand(theEnv,execStatus,"defclass-module",DefclassData(theEnv,execStatus)->DefclassConstruct));
   }
 
 /*********************************************************************
@@ -365,7 +365,7 @@ globle intBool EnvSuperclassP(
   void *secondClass)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 
    return(HasSuperclass((DEFCLASS *) secondClass,(DEFCLASS *) firstClass));
@@ -412,7 +412,7 @@ globle intBool EnvSubclassP(
   void *secondClass)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 
    return(HasSuperclass((DEFCLASS *) firstClass,(DEFCLASS *) secondClass));
@@ -438,7 +438,7 @@ globle int SlotExistPCommand(
    sd = CheckSlotExists(theEnv,execStatus,"slot-existp",&cls,FALSE,TRUE);
    if (sd == NULL)
      return(FALSE);
-   if (EnvRtnArgCount(theEnv,execStatus,execStatus) == 3)
+   if (EnvRtnArgCount(theEnv,execStatus) == 3)
      {
       if (EnvArgTypeCheck(theEnv,execStatus,"slot-existp",3,SYMBOL,&dobj) == FALSE)
         return(FALSE);
@@ -504,7 +504,7 @@ globle int MessageHandlerExistPCommand(
    if (EnvArgTypeCheck(theEnv,execStatus,"message-handler-existp",2,SYMBOL,&temp) == FALSE)
      return(FALSE);
    mname = (SYMBOL_HN *) GetValue(temp);
-   if (EnvRtnArgCount(theEnv,execStatus,execStatus) == 3)
+   if (EnvRtnArgCount(theEnv,execStatus) == 3)
      {
       if (EnvArgTypeCheck(theEnv,execStatus,"message-handler-existp",3,SYMBOL,&temp) == FALSE)
         return(FALSE);
@@ -752,7 +752,7 @@ globle void SlotDefaultValueCommand(
    SLOT_DESC *sd;
 
    SetpType(theValue,SYMBOL);
-   SetpValue(theValue,EnvFalseSymbol(theEnv));
+   SetpValue(theValue,EnvFalseSymbol(theEnv,execStatus));
    sd = CheckSlotExists(theEnv,execStatus,"slot-default-value",&theDefclass,TRUE,TRUE);
    if (sd == NULL)
      return;
@@ -794,7 +794,7 @@ globle intBool EnvSlotDefaultValue(
    SLOT_DESC *sd;
 
    SetpType(theValue,SYMBOL);
-   SetpValue(theValue,EnvFalseSymbol(theEnv));
+   SetpValue(theValue,EnvFalseSymbol(theEnv,execStatus));
    if ((sd = LookupSlot(theEnv,execStatus,(DEFCLASS *) theDefclass,slotName,TRUE)) == NULL)
      return(FALSE);
    

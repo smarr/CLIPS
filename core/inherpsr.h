@@ -37,9 +37,9 @@
 #define LOCALE extern
 #endif
 
-LOCALE PACKED_CLASS_LINKS *ParseSuperclasses(void *,char *,SYMBOL_HN *);
-LOCALE PACKED_CLASS_LINKS *FindPrecedenceList(void *,DEFCLASS *,PACKED_CLASS_LINKS *);
-LOCALE void PackClassLinks(void *,PACKED_CLASS_LINKS *,CLASS_LINK *);
+LOCALE PACKED_CLASS_LINKS *ParseSuperclasses(void *,EXEC_STATUS,char *,SYMBOL_HN *);
+LOCALE PACKED_CLASS_LINKS *FindPrecedenceList(void *,EXEC_STATUS,DEFCLASS *,PACKED_CLASS_LINKS *);
+LOCALE void PackClassLinks(void *,EXEC_STATUS,PACKED_CLASS_LINKS *,CLASS_LINK *);
 
 #ifndef _INHERPSR_SOURCE_
 #endif

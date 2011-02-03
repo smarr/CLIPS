@@ -52,11 +52,11 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static struct expr            *ParseAssertSlotValues(void *,char *,struct token *,struct templateSlot *,int *,int);
-   static struct expr            *ReorderAssertSlotValues(void *,struct templateSlot *,struct expr *,int *);
-   static struct expr            *GetSlotAssertValues(void *,struct templateSlot *,struct expr *,int *);
+   static struct expr            *ParseAssertSlotValues(void *,EXEC_STATUS,char *,struct token *,struct templateSlot *,int *,int);
+   static struct expr            *ReorderAssertSlotValues(void *,EXEC_STATUS,struct templateSlot *,struct expr *,int *);
+   static struct expr            *GetSlotAssertValues(void *,EXEC_STATUS,struct templateSlot *,struct expr *,int *);
    static struct expr            *FindAssertSlotItem(struct templateSlot *,struct expr *);
-   static struct templateSlot    *ParseSlotLabel(void *,char *,struct token *,struct deftemplate *,int *,int);
+   static struct templateSlot    *ParseSlotLabel(void *,EXEC_STATUS,char *,struct token *,struct deftemplate *,int *,int);
 
 /******************************************************************/
 /* ParseAssertTemplate: Parses and builds the list of values that */
@@ -200,7 +200,7 @@ static struct templateSlot *ParseSlotLabel(
    /* and the first slot definition.        */
    /*=======================================*/
 
-   PPBackup(theEnv);
+   PPBackup(theEnv,execStatus);
    SavePPBuffer(theEnv,execStatus," ");
    SavePPBuffer(theEnv,execStatus,tempToken->printForm);
 
@@ -333,8 +333,8 @@ static struct expr *ParseAssertSlotValues(
 
       if (valueList == NULL)
         {
-         PPBackup(theEnv);
-         PPBackup(theEnv);
+         PPBackup(theEnv,execStatus);
+         PPBackup(theEnv,execStatus);
          SavePPBuffer(theEnv,execStatus,")");
         }
 
@@ -346,7 +346,7 @@ static struct expr *ParseAssertSlotValues(
            { SavePPBuffer(theEnv,execStatus," "); }
          else
            {
-            /* PPBackup(theEnv); */
+            /* PPBackup(theEnv,execStatus); */
             SavePPBuffer(theEnv,execStatus," ");
             /* SavePPBuffer(theEnv,execStatus,tempToken->printForm); */
            }
@@ -361,8 +361,8 @@ static struct expr *ParseAssertSlotValues(
 
          if (newField == NULL)
            {
-            PPBackup(theEnv);
-            PPBackup(theEnv);
+            PPBackup(theEnv,execStatus);
+            PPBackup(theEnv,execStatus);
             SavePPBuffer(theEnv,execStatus,")");
            }
 

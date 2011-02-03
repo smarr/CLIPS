@@ -59,11 +59,11 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static void                    SaveDefglobals(void *,void *,char *);
-   static void                    ResetDefglobalAction(void *,struct constructHeader *,void *);
+   static void                    SaveDefglobals(void *,EXEC_STATUS,void *,char *);
+   static void                    ResetDefglobalAction(void *,EXEC_STATUS,struct constructHeader *,void *);
 #if DEBUGGING_FUNCTIONS && (! RUN_TIME)
-   static unsigned                DefglobalWatchAccess(void *,int,unsigned,struct expr *);
-   static unsigned                DefglobalWatchPrint(void *,char *,int,struct expr *);
+   static unsigned                DefglobalWatchAccess(void *,EXEC_STATUS,int,unsigned,struct expr *);
+   static unsigned                DefglobalWatchPrint(void *,EXEC_STATUS,char *,int,struct expr *);
 #endif
 
 /****************************************/
@@ -96,11 +96,11 @@ globle void DefglobalBasicCommands(
 #endif
 
 #if (BLOAD || BLOAD_ONLY || BLOAD_AND_BSAVE)
-   DefglobalBinarySetup(theEnv);
+   DefglobalBinarySetup(theEnv,execStatus);
 #endif
 
 #if CONSTRUCT_COMPILER && (! RUN_TIME)
-   DefglobalCompilerSetup(theEnv);
+   DefglobalCompilerSetup(theEnv,execStatus);
 #endif
 
 #endif
@@ -114,8 +114,8 @@ globle void ResetDefglobals(
   void *theEnv,
   EXEC_STATUS)
   {
-   if (! EnvGetResetGlobals(theEnv)) return;
-   DoForAllConstructs(theEnv,execStatus,ResetDefglobalAction,DefglobalData(theEnv)->DefglobalModuleIndex,TRUE,NULL);
+   if (! EnvGetResetGlobals(theEnv,execStatus)) return;
+   DoForAllConstructs(theEnv,execStatus,ResetDefglobalAction,DefglobalData(theEnv,execStatus)->DefglobalModuleIndex,TRUE,NULL);
   }
 
 /******************************************************/
@@ -140,7 +140,7 @@ static void ResetDefglobalAction(
    if (EvaluateExpression(theEnv,execStatus,theDefglobal->initial,&assignValue))
      {
       assignValue.type = SYMBOL;
-      assignValue.value = EnvFalseSymbol(theEnv);
+      assignValue.value = EnvFalseSymbol(theEnv,execStatus);
      }
 
    QSetDefglobalValue(theEnv,execStatus,theDefglobal,&assignValue,FALSE);
@@ -156,7 +156,7 @@ static void SaveDefglobals(
   void *theModule,
   char *logicalName)
   {
-   SaveConstruct(theEnv,execStatus,theModule,logicalName,DefglobalData(theEnv)->DefglobalConstruct); 
+   SaveConstruct(theEnv,execStatus,theModule,logicalName,DefglobalData(theEnv,execStatus)->DefglobalConstruct); 
   }
 
 /********************************************/
@@ -167,7 +167,7 @@ globle void UndefglobalCommand(
   void *theEnv,
   EXEC_STATUS)
   {
-   UndefconstructCommand(theEnv,execStatus,"undefglobal",DefglobalData(theEnv)->DefglobalConstruct); 
+   UndefconstructCommand(theEnv,execStatus,"undefglobal",DefglobalData(theEnv,execStatus)->DefglobalConstruct); 
   }
 
 /************************************/
@@ -179,7 +179,7 @@ globle intBool EnvUndefglobal(
   EXEC_STATUS,
   void *theDefglobal)
   {
-   return(Undefconstruct(theEnv,execStatus,theDefglobal,DefglobalData(theEnv)->DefglobalConstruct)); 
+   return(Undefconstruct(theEnv,execStatus,theDefglobal,DefglobalData(theEnv,execStatus)->DefglobalConstruct)); 
   }
 
 /**************************************************/
@@ -191,7 +191,7 @@ globle void GetDefglobalListFunction(
   EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   { 
-   GetConstructListFunction(theEnv,execStatus,"get-defglobal-list",returnValue,DefglobalData(theEnv)->DefglobalConstruct); 
+   GetConstructListFunction(theEnv,execStatus,"get-defglobal-list",returnValue,DefglobalData(theEnv,execStatus)->DefglobalConstruct); 
   }
 
 /******************************************/
@@ -204,7 +204,7 @@ globle void EnvGetDefglobalList(
   DATA_OBJECT_PTR returnValue,
   void *theModule)
   {
-   GetConstructList(theEnv,execStatus,returnValue,DefglobalData(theEnv)->DefglobalConstruct,(struct defmodule *) theModule); 
+   GetConstructList(theEnv,execStatus,returnValue,DefglobalData(theEnv,execStatus)->DefglobalConstruct,(struct defmodule *) theModule); 
   }
 
 /*************************************************/
@@ -215,7 +215,7 @@ globle void *DefglobalModuleFunction(
   void *theEnv,
   EXEC_STATUS)
   { 
-   return(GetConstructModuleCommand(theEnv,execStatus,"defglobal-module",DefglobalData(theEnv)->DefglobalConstruct)); 
+   return(GetConstructModuleCommand(theEnv,execStatus,"defglobal-module",DefglobalData(theEnv,execStatus)->DefglobalConstruct)); 
   }
 
 #if DEBUGGING_FUNCTIONS
@@ -228,7 +228,7 @@ globle void PPDefglobalCommand(
   void *theEnv,
   EXEC_STATUS)
   {
-   PPConstructCommand(theEnv,execStatus,"ppdefglobal",DefglobalData(theEnv)->DefglobalConstruct); 
+   PPConstructCommand(theEnv,execStatus,"ppdefglobal",DefglobalData(theEnv,execStatus)->DefglobalConstruct); 
   }
 
 /*************************************/
@@ -241,7 +241,7 @@ globle int PPDefglobal(
   char *defglobalName,
   char *logicalName)
   {
-   return(PPConstruct(theEnv,execStatus,defglobalName,logicalName,DefglobalData(theEnv)->DefglobalConstruct)); 
+   return(PPConstruct(theEnv,execStatus,defglobalName,logicalName,DefglobalData(theEnv,execStatus)->DefglobalConstruct)); 
   }
 
 /***********************************************/
@@ -252,7 +252,7 @@ globle void ListDefglobalsCommand(
   void *theEnv,
   EXEC_STATUS)
   {
-   ListConstructCommand(theEnv,execStatus,"list-defglobals",DefglobalData(theEnv)->DefglobalConstruct);
+   ListConstructCommand(theEnv,execStatus,"list-defglobals",DefglobalData(theEnv,execStatus)->DefglobalConstruct);
   }
 
 /***************************************/
@@ -267,7 +267,7 @@ globle void EnvListDefglobals(
   {
    struct defmodule *theModule = (struct defmodule *) vTheModule;
 
-   ListConstruct(theEnv,execStatus,DefglobalData(theEnv)->DefglobalConstruct,logicalName,theModule);
+   ListConstruct(theEnv,execStatus,DefglobalData(theEnv,execStatus)->DefglobalConstruct,logicalName,theModule);
   }
 
 /*********************************************************/
@@ -283,7 +283,7 @@ globle unsigned EnvGetDefglobalWatch(
   void *theGlobal)
   { 
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 
    return(((struct defglobal *) theGlobal)->watch); 
@@ -303,7 +303,7 @@ globle void EnvSetDefglobalWatch(
   void *theGlobal)
   {  
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 
    ((struct defglobal *) theGlobal)->watch = newState; 
@@ -329,7 +329,7 @@ static unsigned DefglobalWatchAccess(
 #pragma unused(code)
 #endif
 
-   return(ConstructSetWatchAccess(theEnv,execStatus,DefglobalData(theEnv)->DefglobalConstruct,newState,argExprs,
+   return(ConstructSetWatchAccess(theEnv,execStatus,DefglobalData(theEnv,execStatus)->DefglobalConstruct,newState,argExprs,
                                   EnvGetDefglobalWatch,EnvSetDefglobalWatch));
   }
 
@@ -351,7 +351,7 @@ static unsigned DefglobalWatchPrint(
 #pragma unused(code)
 #endif
 
-   return(ConstructPrintWatchAccess(theEnv,execStatus,DefglobalData(theEnv)->DefglobalConstruct,logName,argExprs,
+   return(ConstructPrintWatchAccess(theEnv,execStatus,DefglobalData(theEnv,execStatus)->DefglobalConstruct,logName,argExprs,
                                     EnvGetDefglobalWatch,EnvSetDefglobalWatch));
   }
 

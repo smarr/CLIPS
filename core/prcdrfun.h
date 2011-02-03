@@ -55,20 +55,20 @@ struct procedureFunctionData
    struct dataObject *BindList;
   };
 
-#define ProcedureFunctionData(theEnv) ((struct procedureFunctionData *) GetEnvironmentData(theEnv,execStatus,PRCDRFUN_DATA))
+#define ProcedureFunctionData(theEnv,execStatus) ((struct procedureFunctionData *) GetEnvironmentData(theEnv,execStatus,PRCDRFUN_DATA))
 
-   LOCALE void                           ProceduralFunctionDefinitions(void *);
-   LOCALE void                           WhileFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                           LoopForCountFunction(void *,DATA_OBJECT_PTR);
-   LOCALE long long                      GetLoopCount(void *);
+   LOCALE void                           ProceduralFunctionDefinitions(void *,EXEC_STATUS);
+   LOCALE void                           WhileFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
+   LOCALE void                           LoopForCountFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
+   LOCALE long long                      GetLoopCount(void *,EXEC_STATUS);
    LOCALE void                           IfFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
-   LOCALE void                           BindFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                           PrognFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                           ReturnFunction(void *,DATA_OBJECT_PTR);
-   LOCALE void                           BreakFunction(void *);
-   LOCALE void                           SwitchFunction(void *,DATA_OBJECT_PTR);
-   LOCALE intBool                        GetBoundVariable(void *,struct dataObject *,struct symbolHashNode *);
-   LOCALE void                           FlushBindList(void *);
+   LOCALE void                           BindFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
+   LOCALE void                           PrognFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
+   LOCALE void                           ReturnFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
+   LOCALE void                           BreakFunction(void *,EXEC_STATUS);
+   LOCALE void                           SwitchFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
+   LOCALE intBool                        GetBoundVariable(void *,EXEC_STATUS,struct dataObject *,struct symbolHashNode *);
+   LOCALE void                           FlushBindList(void *,EXEC_STATUS);
 
 #endif
 

@@ -32,9 +32,9 @@
 #define LOCALE extern
 #endif
 
-   LOCALE void                           DefglobalCompilerSetup(void *);
-   LOCALE void                           DefglobalCModuleReference(void *,FILE *,int,int,int);
-   LOCALE void                           DefglobalCConstructReference(void *,FILE *,void *,int,int);
+   LOCALE void                           DefglobalCompilerSetup(void *,EXEC_STATUS);
+   LOCALE void                           DefglobalCModuleReference(void *,EXEC_STATUS,FILE *,int,int,int);
+   LOCALE void                           DefglobalCConstructReference(void *,EXEC_STATUS,FILE *,void *,int,int);
 
 #endif
 

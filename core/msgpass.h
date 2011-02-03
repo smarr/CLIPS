@@ -26,7 +26,7 @@
 #ifndef _H_msgpass
 #define _H_msgpass
 
-#define GetActiveInstance(theEnv) ((INSTANCE_TYPE *) GetNthMessageArgument(theEnv,execStatus,0)->value)
+#define GetActiveInstance(theEnv,execStatus) ((INSTANCE_TYPE *) GetNthMessageArgument(theEnv,execStatus,0)->value)
 
 #ifndef _H_object
 #include "object.h"
@@ -49,28 +49,28 @@ typedef struct messageHandlerLink
 #define LOCALE extern
 #endif
 
-#define Send(a,b,c,d) EnvSend(GetCurrentEnvironment(),a,b,c,d)
+#define Send(a,b,c,d) EnvSend(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b,c,d)
 
-   LOCALE void             DirectMessage(void *,SYMBOL_HN *,INSTANCE_TYPE *,
+   LOCALE void             DirectMessage(void *,EXEC_STATUS,SYMBOL_HN *,INSTANCE_TYPE *,
                                          DATA_OBJECT *,EXPRESSION *);
-   LOCALE void             EnvSend(void *,DATA_OBJECT *,char *,char *,DATA_OBJECT *);
-   LOCALE void             DestroyHandlerLinks(void *,HANDLER_LINK *);
-   LOCALE void             SendCommand(void *,DATA_OBJECT *);
-   LOCALE DATA_OBJECT     *GetNthMessageArgument(void *,int);
+   LOCALE void             EnvSend(void *,EXEC_STATUS,DATA_OBJECT *,char *,char *,DATA_OBJECT *);
+   LOCALE void             DestroyHandlerLinks(void *,EXEC_STATUS,HANDLER_LINK *);
+   LOCALE void             SendCommand(void *,EXEC_STATUS,DATA_OBJECT *);
+   LOCALE DATA_OBJECT     *GetNthMessageArgument(void *,EXEC_STATUS,int);
 
-   LOCALE int              NextHandlerAvailable(void *);
+   LOCALE int              NextHandlerAvailable(void *,EXEC_STATUS);
    LOCALE void             CallNextHandler(void *,EXEC_STATUS,DATA_OBJECT *);
 
-   LOCALE void             FindApplicableOfName(void *,DEFCLASS *,HANDLER_LINK *[],
+   LOCALE void             FindApplicableOfName(void *,EXEC_STATUS,DEFCLASS *,HANDLER_LINK *[],
                                                 HANDLER_LINK *[],SYMBOL_HN *);
-   LOCALE HANDLER_LINK    *JoinHandlerLinks(void *,HANDLER_LINK *[],HANDLER_LINK *[],SYMBOL_HN *);
+   LOCALE HANDLER_LINK    *JoinHandlerLinks(void *,EXEC_STATUS,HANDLER_LINK *[],HANDLER_LINK *[],SYMBOL_HN *);
 
-   LOCALE void             PrintHandlerSlotGetFunction(void *,char *,void *);
-   LOCALE intBool          HandlerSlotGetFunction(void *,void *,DATA_OBJECT *);
-   LOCALE void             PrintHandlerSlotPutFunction(void *,char *,void *);
-   LOCALE intBool          HandlerSlotPutFunction(void *,void *,DATA_OBJECT *);
-   LOCALE void             DynamicHandlerGetSlot(void *,DATA_OBJECT *);
-   LOCALE void             DynamicHandlerPutSlot(void *,DATA_OBJECT *);
+   LOCALE void             PrintHandlerSlotGetFunction(void *,EXEC_STATUS,char *,void *);
+   LOCALE intBool          HandlerSlotGetFunction(void *,EXEC_STATUS,void *,DATA_OBJECT *);
+   LOCALE void             PrintHandlerSlotPutFunction(void *,EXEC_STATUS,char *,void *);
+   LOCALE intBool          HandlerSlotPutFunction(void *,EXEC_STATUS,void *,DATA_OBJECT *);
+   LOCALE void             DynamicHandlerGetSlot(void *,EXEC_STATUS,DATA_OBJECT *);
+   LOCALE void             DynamicHandlerPutSlot(void *,EXEC_STATUS,DATA_OBJECT *);
 
 #endif
 

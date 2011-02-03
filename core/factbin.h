@@ -32,7 +32,7 @@ struct factBinaryData
    long NumberOfPatterns;
   };
   
-#define FactBinaryData(theEnv) ((struct factBinaryData *) GetEnvironmentData(theEnv,execStatus,FACTBIN_DATA))
+#define FactBinaryData(theEnv,execStatus) ((struct factBinaryData *) GetEnvironmentData(theEnv,execStatus,FACTBIN_DATA))
 
 #ifdef LOCALE
 #undef LOCALE
@@ -44,12 +44,12 @@ struct factBinaryData
 #define LOCALE extern
 #endif
 
-# include "evaluatn.h"
+# include "execution_status.h"
 
    LOCALE void                           FactBinarySetup(void *,EXEC_STATUS);
 
 #define BsaveFactPatternIndex(patPtr) ((patPtr == NULL) ? -1L : ((struct factPatternNode *) patPtr)->bsaveID)
-#define BloadFactPatternPointer(i) ((struct factPatternNode *) ((i == -1L) ? NULL : &FactBinaryData(theEnv)->FactPatternArray[i]))
+#define BloadFactPatternPointer(i) ((struct factPatternNode *) ((i == -1L) ? NULL : &FactBinaryData(theEnv,execStatus)->FactPatternArray[i]))
 
 #endif
 

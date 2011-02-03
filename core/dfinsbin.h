@@ -37,7 +37,7 @@ struct definstancesBinaryData
    DEFINSTANCES_MODULE *ModuleArray;
   };
   
-#define DefinstancesBinaryData(theEnv) ((struct definstancesBinaryData *) GetEnvironmentData(theEnv,execStatus,DFINSBIN_DATA))
+#define DefinstancesBinaryData(theEnv,execStatus) ((struct definstancesBinaryData *) GetEnvironmentData(theEnv,execStatus,DFINSBIN_DATA))
 
 #ifdef LOCALE
 #undef LOCALE

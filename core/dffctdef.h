@@ -71,7 +71,7 @@ struct deffactsModule
 #define EnvGetDeffactsName(theEnv,execStatus,x) GetConstructNameString((struct constructHeader *) x)
 #define EnvGetDeffactsPPForm(theEnv,execStatus,x) GetConstructPPForm(theEnv,execStatus,(struct constructHeader *) x)
 #define EnvDeffactsModule(theEnv,execStatus,x) GetConstructModuleName((struct constructHeader *) x)
-#define DeffactsData(theEnv) ((struct deffactsData *) GetEnvironmentData(theEnv,execStatus,DEFFACTS_DATA))
+#define DeffactsData(theEnv,execStatus) ((struct deffactsData *) GetEnvironmentData(theEnv,execStatus,DEFFACTS_DATA))
 
 #ifdef LOCALE
 #undef LOCALE
@@ -84,11 +84,11 @@ struct deffactsModule
 #endif
 
 #define DeffactsModule(x) GetConstructModuleName((struct constructHeader *) x)
-#define FindDeffacts(a) EnvFindDeffacts(GetCurrentEnvironment(),a)
+#define FindDeffacts(a) EnvFindDeffacts(GetCurrentEnvironment(),getCurrentExecutionState(),a)
 #define GetDeffactsName(x) GetConstructNameString((struct constructHeader *) x)
-#define GetDeffactsPPForm(x) GetConstructPPForm(GetCurrentEnvironment(),(struct constructHeader *) x)
-#define GetNextDeffacts(a) EnvGetNextDeffacts(GetCurrentEnvironment(),a)
-#define IsDeffactsDeletable(a) EnvIsDeffactsDeletable(GetCurrentEnvironment(),a)
+#define GetDeffactsPPForm(x) GetConstructPPForm(GetCurrentEnvironment(),getCurrentExecutionState(),(struct constructHeader *) x)
+#define GetNextDeffacts(a) EnvGetNextDeffacts(GetCurrentEnvironment(),getCurrentExecutionState(),a)
+#define IsDeffactsDeletable(a) EnvIsDeffactsDeletable(GetCurrentEnvironment(),getCurrentExecutionState(),a)
 
    LOCALE void                           InitializeDeffacts(void *,EXEC_STATUS);
    LOCALE void                          *EnvFindDeffacts(void *,EXEC_STATUS,char *);

@@ -47,39 +47,39 @@
 #define LOCALE extern
 #endif
 
-   LOCALE void                           PrintPartialMatch(void *,char *,struct partialMatch *);
-   LOCALE struct partialMatch           *CopyPartialMatch(void *,struct partialMatch *);
-   LOCALE struct partialMatch           *MergePartialMatches(void *,struct partialMatch *,struct partialMatch *);
+   LOCALE void                           PrintPartialMatch(void *,EXEC_STATUS,char *,struct partialMatch *);
+   LOCALE struct partialMatch           *CopyPartialMatch(void *,EXEC_STATUS,struct partialMatch *);
+   LOCALE struct partialMatch           *MergePartialMatches(void *,EXEC_STATUS,struct partialMatch *,struct partialMatch *);
    LOCALE long int                       IncrementPseudoFactIndex(void);
-   LOCALE struct partialMatch           *GetAlphaMemory(void *,struct patternNodeHeader *,unsigned long);
+   LOCALE struct partialMatch           *GetAlphaMemory(void *,EXEC_STATUS,struct patternNodeHeader *,unsigned long);
    LOCALE struct partialMatch           *GetLeftBetaMemory(struct joinNode *,unsigned long);
    LOCALE struct partialMatch           *GetRightBetaMemory(struct joinNode *,unsigned long);
-   LOCALE void                           ReturnLeftMemory(void *,struct joinNode *);
-   LOCALE void                           ReturnRightMemory(void *,struct joinNode *);
-   LOCALE void                           DestroyBetaMemory(void *,struct joinNode *,int);
-   LOCALE void                           FlushBetaMemory(void *,struct joinNode *,int);
+   LOCALE void                           ReturnLeftMemory(void *,EXEC_STATUS,struct joinNode *);
+   LOCALE void                           ReturnRightMemory(void *,EXEC_STATUS,struct joinNode *);
+   LOCALE void                           DestroyBetaMemory(void *,EXEC_STATUS,struct joinNode *,int);
+   LOCALE void                           FlushBetaMemory(void *,EXEC_STATUS,struct joinNode *,int);
    LOCALE intBool                        BetaMemoryNotEmpty(struct joinNode *);
-   LOCALE void                           RemoveAlphaMemoryMatches(void *,struct patternNodeHeader *,struct partialMatch *,
+   LOCALE void                           RemoveAlphaMemoryMatches(void *,EXEC_STATUS,struct patternNodeHeader *,struct partialMatch *,
                                                                   struct alphaMatch *); 
-   LOCALE void                           DestroyAlphaMemory(void *,struct patternNodeHeader *,int);
-   LOCALE void                           FlushAlphaMemory(void *,struct patternNodeHeader *);
-   LOCALE void                           FlushAlphaBetaMemory(void *,struct partialMatch *);
-   LOCALE void                           DestroyAlphaBetaMemory(void *,struct partialMatch *);
+   LOCALE void                           DestroyAlphaMemory(void *,EXEC_STATUS,struct patternNodeHeader *,int);
+   LOCALE void                           FlushAlphaMemory(void *,EXEC_STATUS,struct patternNodeHeader *);
+   LOCALE void                           FlushAlphaBetaMemory(void *,EXEC_STATUS,struct partialMatch *);
+   LOCALE void                           DestroyAlphaBetaMemory(void *,EXEC_STATUS,struct partialMatch *);
    LOCALE int                            GetPatternNumberFromJoin(struct joinNode *);
-   LOCALE struct multifieldMarker       *CopyMultifieldMarkers(void *,struct multifieldMarker *);
-   LOCALE struct partialMatch           *CreateAlphaMatch(void *,void *,struct multifieldMarker *,
+   LOCALE struct multifieldMarker       *CopyMultifieldMarkers(void *,EXEC_STATUS,struct multifieldMarker *);
+   LOCALE struct partialMatch           *CreateAlphaMatch(void *,EXEC_STATUS,void *,struct multifieldMarker *,
                                                           struct patternNodeHeader *,unsigned long);
-   LOCALE void                           TraceErrorToRule(void *,struct joinNode *,char *);
-   LOCALE void                           InitializePatternHeader(void *,struct patternNodeHeader *);
-   LOCALE void                           MarkRuleNetwork(void *,int);
-   LOCALE void                           TagRuleNetwork(void *,long *,long *,long *,long *);
+   LOCALE void                           TraceErrorToRule(void *,EXEC_STATUS,struct joinNode *,char *);
+   LOCALE void                           InitializePatternHeader(void *,EXEC_STATUS,struct patternNodeHeader *);
+   LOCALE void                           MarkRuleNetwork(void *,EXEC_STATUS,int);
+   LOCALE void                           TagRuleNetwork(void *,EXEC_STATUS,long *,long *,long *,long *);
    LOCALE int                            FindEntityInPartialMatch(struct patternEntity *,struct partialMatch *);
-   LOCALE unsigned long                  ComputeRightHashValue(void *,struct patternNodeHeader *);
-   LOCALE void                           UpdateBetaPMLinks(void *,struct partialMatch *,struct partialMatch *,struct partialMatch *,
+   LOCALE unsigned long                  ComputeRightHashValue(void *,EXEC_STATUS,struct patternNodeHeader *);
+   LOCALE void                           UpdateBetaPMLinks(void *,EXEC_STATUS,struct partialMatch *,struct partialMatch *,struct partialMatch *,
                                                        struct joinNode *,unsigned long,int);
-   LOCALE void                           UnlinkBetaPMFromNodeAndLineage(void *,struct joinNode *,struct partialMatch *,int);
-   LOCALE void                           UnlinkNonLeftLineage(void *,struct joinNode *,struct partialMatch *,int);
-   LOCALE struct partialMatch           *CreateEmptyPartialMatch(void *);
+   LOCALE void                           UnlinkBetaPMFromNodeAndLineage(void *,EXEC_STATUS,struct joinNode *,struct partialMatch *,int);
+   LOCALE void                           UnlinkNonLeftLineage(void *,EXEC_STATUS,struct joinNode *,struct partialMatch *,int);
+   LOCALE struct partialMatch           *CreateEmptyPartialMatch(void *,EXEC_STATUS);
    LOCALE void                           MarkRuleJoins(struct joinNode *,int);
    LOCALE void                           AddBlockedLink(struct partialMatch *,struct partialMatch *);
    LOCALE void                           RemoveBlockedLink(struct partialMatch *);

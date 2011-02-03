@@ -78,7 +78,7 @@ globle void PredicateFunctionDefinitions(
    EnvDefineFunction2(theEnv,execStatus,"pointerp", 'b', PointerpFunction, "PointerpFunction", "11");
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 #endif
   }
@@ -99,7 +99,7 @@ globle intBool EqFunction(
    /* Determine the number of arguments. */
    /*====================================*/
 
-   numArgs = EnvRtnArgCount(theEnv);
+   numArgs = EnvRtnArgCount(theEnv,execStatus);
    if (numArgs == 0) return(FALSE);
 
    /*==============================================*/
@@ -158,7 +158,7 @@ globle intBool NeqFunction(
    /* Determine the number of arguments. */
    /*====================================*/
 
-   numArgs = EnvRtnArgCount(theEnv);
+   numArgs = EnvRtnArgCount(theEnv,execStatus);
    if (numArgs == 0) return(FALSE);
 
    /*==============================================*/
@@ -371,7 +371,7 @@ globle intBool NotFunction(
 
    if (EvaluateExpression(theEnv,execStatus,theArgument,&result)) return(FALSE);
 
-   if ((result.value == EnvFalseSymbol(theEnv)) && (result.type == SYMBOL))
+   if ((result.value == EnvFalseSymbol(theEnv,execStatus)) && (result.type == SYMBOL))
      { return(TRUE); }
    
    return(FALSE);
@@ -393,7 +393,7 @@ globle intBool AndFunction(
         theArgument = GetNextArgument(theArgument))
      {
       if (EvaluateExpression(theEnv,execStatus,theArgument,&result)) return(FALSE);
-      if ((result.value == EnvFalseSymbol(theEnv)) && (result.type == SYMBOL))
+      if ((result.value == EnvFalseSymbol(theEnv,execStatus)) && (result.type == SYMBOL))
         { return(FALSE); }
      }
 
@@ -417,7 +417,7 @@ globle intBool OrFunction(
      {
       if (EvaluateExpression(theEnv,execStatus,theArgument,&result)) return(FALSE);
 
-      if ((result.value != EnvFalseSymbol(theEnv)) || (result.type != SYMBOL))
+      if ((result.value != EnvFalseSymbol(theEnv,execStatus)) || (result.type != SYMBOL))
         { return(TRUE); }
      }
 

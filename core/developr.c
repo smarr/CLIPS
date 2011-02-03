@@ -137,7 +137,7 @@ globle void PrimitiveTablesInfo(
    /* Count entries in the symbol table. */
    /*====================================*/
 
-   symbolArray = GetSymbolTable(theEnv);
+   symbolArray = GetSymbolTable(theEnv,execStatus);
    for (i = 0; i < SYMBOL_HASH_SIZE; i++)
      {
       for (symbolPtr = symbolArray[i]; symbolPtr != NULL; symbolPtr = symbolPtr->next)
@@ -148,7 +148,7 @@ globle void PrimitiveTablesInfo(
    /* Count entries in the integer table. */
    /*====================================*/
 
-   integerArray = GetIntegerTable(theEnv);
+   integerArray = GetIntegerTable(theEnv,execStatus);
    for (i = 0; i < INTEGER_HASH_SIZE; i++)
      {
       for (integerPtr = integerArray[i]; integerPtr != NULL; integerPtr = integerPtr->next)
@@ -159,7 +159,7 @@ globle void PrimitiveTablesInfo(
    /* Count entries in the float table. */
    /*====================================*/
 
-   floatArray = GetFloatTable(theEnv);
+   floatArray = GetFloatTable(theEnv,execStatus);
    for (i = 0; i < FLOAT_HASH_SIZE; i++)
      {
       for (floatPtr = floatArray[i]; floatPtr != NULL; floatPtr = floatPtr->next)
@@ -170,7 +170,7 @@ globle void PrimitiveTablesInfo(
    /* Count entries in the bitmap table. */
    /*====================================*/
 
-   bitMapArray = GetBitMapTable(theEnv);
+   bitMapArray = GetBitMapTable(theEnv,execStatus);
    for (i = 0; i < BITMAP_HASH_SIZE; i++)
      {
       for (bitMapPtr = bitMapArray[i]; bitMapPtr != NULL; bitMapPtr = bitMapPtr->next)
@@ -229,7 +229,7 @@ globle void PrimitiveTablesUsage(
    /* Count entries in the symbol table. */
    /*====================================*/
 
-   symbolArray = GetSymbolTable(theEnv);
+   symbolArray = GetSymbolTable(theEnv,execStatus);
    for (i = 0; i < SYMBOL_HASH_SIZE; i++)
      {
       symbolCount = 0;
@@ -249,7 +249,7 @@ globle void PrimitiveTablesUsage(
    /* Count entries in the float table. */
    /*===================================*/
    
-   floatArray = GetFloatTable(theEnv);
+   floatArray = GetFloatTable(theEnv,execStatus);
    for (i = 0; i < FLOAT_HASH_SIZE; i++)
      {
       floatCount = 0;
@@ -380,7 +380,7 @@ globle void PrintObjectPatternNetwork(
    char indentbuf[80];
 
    indentbuf[0] = '\0';
-   PrintOPNLevel(theEnv,execStatus,ObjectNetworkPointer(theEnv),indentbuf,0);
+   PrintOPNLevel(theEnv,execStatus,ObjectNetworkPointer(theEnv,execStatus),indentbuf,0);
   }
 
 /**********************************************************
@@ -433,7 +433,7 @@ static void PrintOPNLevel(
            if (TestBitMap(cbmp->map,i))
              {
               EnvPrintRouter(theEnv,execStatus,WDISPLAY," ");
-              EnvPrintRouter(theEnv,execStatus,WDISPLAY,EnvGetDefclassName(theEnv,execStatus,(void *) DefclassData(theEnv)->ClassIDMap[i]));
+              EnvPrintRouter(theEnv,execStatus,WDISPLAY,EnvGetDefclassName(theEnv,execStatus,(void *) DefclassData(theEnv,execStatus)->ClassIDMap[i]));
              }
          if (alphaPtr->slotbmp != NULL)
            {
@@ -501,7 +501,7 @@ globle void InstanceTableUsage(
    for (i = 0; i < INSTANCE_TABLE_HASH_SIZE; i++)
      {
       instanceCount = 0;
-      for (ins = InstanceData(theEnv)->InstanceTable[i]; ins != NULL; ins = ins->nxtHash)
+      for (ins = InstanceData(theEnv,execStatus)->InstanceTable[i]; ins != NULL; ins = ins->nxtHash)
         { 
          instanceCount++;
          totalInstanceCount++;

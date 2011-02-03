@@ -26,7 +26,7 @@
 
 #if DEFRULE_CONSTRUCT && (! RUN_TIME) && DEFTEMPLATE_CONSTRUCT && CONSTRUCT_COMPILER
 
-#define FactPrefix() ArbitraryPrefix(FactData(theEnv)->FactCodeItem,0)
+#define FactPrefix() ArbitraryPrefix(FactData(theEnv,execStatus)->FactCodeItem,0)
 
 #include <stdio.h>
 #define _STDIO_INCLUDED_
@@ -41,11 +41,11 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static int                     PatternNetworkToCode(void *,char *,char *,char *,int,FILE *,int,int);
-   static void                    BeforePatternNetworkToCode(void *);
+   static int                     PatternNetworkToCode(void *,EXEC_STATUS,char *,char *,char *,int,FILE *,int,int);
+   static void                    BeforePatternNetworkToCode(void *,EXEC_STATUS);
    static struct factPatternNode *GetNextPatternNode(struct factPatternNode *);
-   static void                    CloseNetworkFiles(void *,FILE *,int);
-   static void                    PatternNodeToCode(void *,FILE *,struct factPatternNode *,int,int);
+   static void                    CloseNetworkFiles(void *,EXEC_STATUS,FILE *,int);
+   static void                    PatternNodeToCode(void *,EXEC_STATUS,FILE *,struct factPatternNode *,int,int);
 
 /**************************************************************/
 /* FactPatternsCompilerSetup: Initializes the constructs-to-c */
@@ -55,7 +55,7 @@ globle void FactPatternsCompilerSetup(
   void *theEnv,
   EXEC_STATUS)
   {
-   FactData(theEnv)->FactCodeItem = AddCodeGeneratorItem(theEnv,execStatus,"facts",0,BeforePatternNetworkToCode,
+   FactData(theEnv,execStatus)->FactCodeItem = AddCodeGeneratorItem(theEnv,execStatus,"facts",0,BeforePatternNetworkToCode,
                                        NULL,PatternNetworkToCode,1);
   }
 

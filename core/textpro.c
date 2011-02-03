@@ -143,22 +143,22 @@ struct textProcessingData
 #endif
   };
 
-#define TextProcessingData(theEnv) ((struct textProcessingData *) GetEnvironmentData(theEnv,execStatus,TEXTPRO_DATA))
+#define TextProcessingData(theEnv,execStatus) ((struct textProcessingData *) GetEnvironmentData(theEnv,execStatus,TEXTPRO_DATA))
 
-int TextLookupFetch(void *,char *);
-int TextLookupToss(void *,char *);
-static FILE *GetEntries(void *,char *,char **,char *,int *);
-static FILE *GetCurrentMenu(void *,char *,int *);
-static char *grab_string(void *,FILE *,char *,int);
+int TextLookupFetch(void *,EXEC_STATUS,char *);
+int TextLookupToss(void *,EXEC_STATUS,char *);
+static FILE *GetEntries(void *,EXEC_STATUS,char *,char **,char *,int *);
+static FILE *GetCurrentMenu(void *,EXEC_STATUS,char *,int *);
+static char *grab_string(void *,EXEC_STATUS,FILE *,char *,int);
 
 static int findstr(char *,char *);
 static void upper(char *);
-static struct lists *NewFetchFile(void *,char *);
-static struct entries *AllocateEntryNode(void *,FILE *,char *,char *,int);
-static int AttachLeaf(void *,struct lists *,struct entries *,FILE *,char *,int);
-static long LookupEntry(void *,char *,char **,char *,int *);
-static void TossFunction(void *,struct entries *);
-static void DeallocateTextProcessingData(void *);
+static struct lists *NewFetchFile(void *,EXEC_STATUS,char *);
+static struct entries *AllocateEntryNode(void *,EXEC_STATUS,FILE *,char *,char *,int);
+static int AttachLeaf(void *,EXEC_STATUS,struct lists *,struct entries *,FILE *,char *,int);
+static long LookupEntry(void *,EXEC_STATUS,char *,char **,char *,int *);
+static void TossFunction(void *,EXEC_STATUS,struct entries *);
+static void DeallocateTextProcessingData(void *,EXEC_STATUS);
 
 /******************************************************************************/
 /*============================================================================*/
@@ -322,7 +322,7 @@ globle int TextLookupToss(
    struct lists *plptr, *clptr;
    int l_flag;
 
-   clptr = TextProcessingData(theEnv)->headings;
+   clptr = TextProcessingData(theEnv,execStatus)->headings;
    plptr = clptr;
    if (clptr != NULL)
      if (strcmp(clptr->file,file) != 0)
@@ -349,7 +349,7 @@ globle int TextLookupToss(
    TossFunction(theEnv,execStatus,clptr->topics);
 
    if (plptr == clptr)
-     TextProcessingData(theEnv)->headings = clptr->next;
+     TextProcessingData(theEnv,execStatus)->headings = clptr->next;
    else
      plptr->next = clptr->next;
    rm(theEnv,execStatus,(void *) clptr,(int) sizeof(struct lists));
@@ -421,7 +421,7 @@ static FILE *GetCurrentMenu(
    /*=====================================*/
    /*Find the named file in the file list */
    /*=====================================*/
-   lptr = TextProcessingData(theEnv)->headings;
+   lptr = TextProcessingData(theEnv,execStatus)->headings;
    if (lptr != NULL)
      if (strcmp(lptr->file,file) != 0)
        l_flag = 1;
@@ -560,9 +560,9 @@ static struct lists *NewFetchFile(
   {
    struct lists *lptr = NULL, *lnode;
 
-   if (TextProcessingData(theEnv)->headings != NULL)
+   if (TextProcessingData(theEnv,execStatus)->headings != NULL)
      {
-      lptr = TextProcessingData(theEnv)->headings;
+      lptr = TextProcessingData(theEnv,execStatus)->headings;
       while (lptr->next != NULL)
         {
          if (strcmp(lptr->file,file) == 0)
@@ -577,8 +577,8 @@ static struct lists *NewFetchFile(
    lnode->topics = NULL;
    lnode->curr_menu = NULL;
    lnode->next = NULL;
-   if (TextProcessingData(theEnv)->headings == NULL)
-     TextProcessingData(theEnv)->headings = lnode;
+   if (TextProcessingData(theEnv,execStatus)->headings == NULL)
+     TextProcessingData(theEnv,execStatus)->headings = lnode;
    else
      lptr->next = lnode;
    return(lnode);
@@ -717,11 +717,11 @@ static int AttachLeaf(
    /*================================*/
    /*Subtopic - branch down the tree */
    /*================================*/
-   else if (enode->level > TextProcessingData(theEnv)->parent->level)
-     if (TextProcessingData(theEnv)->parent->type == MENU)
+   else if (enode->level > TextProcessingData(theEnv,execStatus)->parent->level)
+     if (TextProcessingData(theEnv,execStatus)->parent->type == MENU)
        {
-        enode->parent = TextProcessingData(theEnv)->parent;
-        TextProcessingData(theEnv)->parent->child = enode;
+        enode->parent = TextProcessingData(theEnv,execStatus)->parent;
+        TextProcessingData(theEnv,execStatus)->parent->child = enode;
        }
      else
        {
@@ -739,11 +739,11 @@ static int AttachLeaf(
    /*====================================*/
    /*Brother-topic -- same level in tree */
    /*====================================*/
-   else if (enode->level == TextProcessingData(theEnv)->parent->level)
+   else if (enode->level == TextProcessingData(theEnv,execStatus)->parent->level)
      {
-      enode->parent = TextProcessingData(theEnv)->parent->parent;
-      enode->next = TextProcessingData(theEnv)->parent->next;
-      TextProcessingData(theEnv)->parent->next = enode;
+      enode->parent = TextProcessingData(theEnv,execStatus)->parent->parent;
+      enode->next = TextProcessingData(theEnv,execStatus)->parent->next;
+      TextProcessingData(theEnv,execStatus)->parent->next = enode;
      }
 
    /*==========================================================*/
@@ -751,31 +751,31 @@ static int AttachLeaf(
    /*==========================================================*/
    else
      {
-      if (TextProcessingData(theEnv)->parent != NULL)
+      if (TextProcessingData(theEnv,execStatus)->parent != NULL)
         p_flag = 1;
       else
         p_flag = 0;
       while (p_flag > 0)
         {
-         TextProcessingData(theEnv)->parent = TextProcessingData(theEnv)->parent->parent;
-         if (TextProcessingData(theEnv)->parent != NULL)
-           if (enode->level < TextProcessingData(theEnv)->parent->level)
+         TextProcessingData(theEnv,execStatus)->parent = TextProcessingData(theEnv,execStatus)->parent->parent;
+         if (TextProcessingData(theEnv,execStatus)->parent != NULL)
+           if (enode->level < TextProcessingData(theEnv,execStatus)->parent->level)
              p_flag = 1;
            else
              p_flag = 0;
          else
            p_flag = 0;
         }
-      if (TextProcessingData(theEnv)->parent != NULL)
+      if (TextProcessingData(theEnv,execStatus)->parent != NULL)
 
         /*========*/
         /*Subtopic*/
         /*========*/
-        if (TextProcessingData(theEnv)->parent->level < enode->level)
+        if (TextProcessingData(theEnv,execStatus)->parent->level < enode->level)
           {
-           enode->parent = TextProcessingData(theEnv)->parent;
-           enode->next = TextProcessingData(theEnv)->parent->child;
-           TextProcessingData(theEnv)->parent->child = enode;
+           enode->parent = TextProcessingData(theEnv,execStatus)->parent;
+           enode->next = TextProcessingData(theEnv,execStatus)->parent->child;
+           TextProcessingData(theEnv,execStatus)->parent->child = enode;
           }
 
         /*=============*/
@@ -783,9 +783,9 @@ static int AttachLeaf(
         /*=============*/
         else
           {
-           enode->parent = TextProcessingData(theEnv)->parent->parent;
-           enode->next = TextProcessingData(theEnv)->parent->next;
-           TextProcessingData(theEnv)->parent->next = enode;
+           enode->parent = TextProcessingData(theEnv,execStatus)->parent->parent;
+           enode->next = TextProcessingData(theEnv,execStatus)->parent->next;
+           TextProcessingData(theEnv,execStatus)->parent->next = enode;
           }
 
       /*=========*/
@@ -798,7 +798,7 @@ static int AttachLeaf(
          lnode->topics = enode;
         }
      }
-   TextProcessingData(theEnv)->parent = enode;
+   TextProcessingData(theEnv,execStatus)->parent = enode;
    return(TRUE);
   }
 
@@ -836,7 +836,7 @@ static long int LookupEntry(
    /*===============================*/
    /*Find named file in lookup list */
    /*===============================*/
-   lptr = TextProcessingData(theEnv)->headings;
+   lptr = TextProcessingData(theEnv,execStatus)->headings;
    if (lptr != NULL)
      if (strcmp(lptr->file,file) != 0)
        l_flag = 1;
@@ -1005,15 +1005,15 @@ struct topics
 /******************************************************************************/
 
 #if HELP_FUNCTIONS
-static int RecognizeHelpRouters(void *,char *);
-static int HelpPrint(void *,char *,char *);
-static int HelpGetc(void *,char *);
-static int HelpUngetc(void *,int,char *);
-static struct topics *AskForNewHelpTopic(void *,struct topics *,char **);
+static int RecognizeHelpRouters(void *,EXEC_STATUS,char *);
+static int HelpPrint(void *,EXEC_STATUS,char *,char *);
+static int HelpGetc(void *,EXEC_STATUS,char *);
+static int HelpUngetc(void *,EXEC_STATUS,int,char *);
+static struct topics *AskForNewHelpTopic(void *,EXEC_STATUS,struct topics *,char **);
 #endif
 
-static struct topics *GetCommandLineTopics(void *);
-static FILE *FindTopicInEntries(void *,char *,struct topics *,char **,int *);
+static struct topics *GetCommandLineTopics(void *,EXEC_STATUS);
+static FILE *FindTopicInEntries(void *,EXEC_STATUS,char *,struct topics *,char **,int *);
 
 /******************************************************************************/
 /*============================================================================*/
@@ -1053,17 +1053,17 @@ globle void HelpFunction(
    int line_cnt;    /*Line count used for scrolling purposes              */
 #endif
 
-   if (TextProcessingData(theEnv)->HELP_INIT == FALSE)
+   if (TextProcessingData(theEnv,execStatus)->HELP_INIT == FALSE)
      {
-      if (TextProcessingData(theEnv)->help_file == NULL)
+      if (TextProcessingData(theEnv,execStatus)->help_file == NULL)
         {
-         TextProcessingData(theEnv)->help_file = (char *) gm2(theEnv,execStatus,strlen(HELP_DEFAULT) + 1);
-         genstrcpy(TextProcessingData(theEnv)->help_file,HELP_DEFAULT);
+         TextProcessingData(theEnv,execStatus)->help_file = (char *) gm2(theEnv,execStatus,strlen(HELP_DEFAULT) + 1);
+         genstrcpy(TextProcessingData(theEnv,execStatus)->help_file,HELP_DEFAULT);
         }
       EnvPrintRouter(theEnv,execStatus,WDIALOG,"Loading help file entries from ");
-      EnvPrintRouter(theEnv,execStatus,WDIALOG,TextProcessingData(theEnv)->help_file);
+      EnvPrintRouter(theEnv,execStatus,WDIALOG,TextProcessingData(theEnv,execStatus)->help_file);
       EnvPrintRouter(theEnv,execStatus,WDIALOG,".\nPlease wait...\n");
-      status = TextLookupFetch(theEnv,execStatus,TextProcessingData(theEnv)->help_file);
+      status = TextLookupFetch(theEnv,execStatus,TextProcessingData(theEnv,execStatus)->help_file);
       if (status <= 0)
         {
          return;
@@ -1075,7 +1075,7 @@ globle void HelpFunction(
             ================================================================ */
          EnvAddRouter(theEnv,execStatus,"whelp",10,RecognizeHelpRouters,HelpPrint,
                     HelpGetc,HelpUngetc,NULL);
-         TextProcessingData(theEnv)->HELP_INIT = TRUE;
+         TextProcessingData(theEnv,execStatus)->HELP_INIT = TRUE;
         }
      }
 
@@ -1088,7 +1088,7 @@ globle void HelpFunction(
       ==================================================================== */
    main_topic = (struct topics *) gm2(theEnv,execStatus,(int) sizeof(struct topics));
    genstrcpy(main_topic->name,"MAIN");
-   main_topic->next = GetCommandLineTopics(theEnv);
+   main_topic->next = GetCommandLineTopics(theEnv,execStatus);
    main_topic->end_list = NULL;
 
    EnvPrintRouter(theEnv,execStatus,"whelp","\n");
@@ -1098,7 +1098,7 @@ globle void HelpFunction(
    /*============================*/
    do
      {
-      fp = FindTopicInEntries(theEnv,execStatus,TextProcessingData(theEnv)->help_file,main_topic,menu,&status);
+      fp = FindTopicInEntries(theEnv,execStatus,TextProcessingData(theEnv,execStatus)->help_file,main_topic,menu,&status);
       if (status == NO_FILE)
         {
          PrintErrorID(theEnv,execStatus,"TEXTPRO",1,FALSE);
@@ -1121,7 +1121,7 @@ globle void HelpFunction(
             /*tampered with and should be corrected.             */
             /*===================================================*/
             EnvPrintRouter(theEnv,execStatus,"whelp","Root entry \"MAIN\" not found in ");
-            EnvPrintRouter(theEnv,execStatus,"whelp",TextProcessingData(theEnv)->help_file);
+            EnvPrintRouter(theEnv,execStatus,"whelp",TextProcessingData(theEnv,execStatus)->help_file);
             EnvPrintRouter(theEnv,execStatus,"whelp",".\nSee external documentation.\n");
             break;
            }
@@ -1146,8 +1146,8 @@ globle void HelpFunction(
               {
                EnvPrintRouter(theEnv,execStatus,"whelp","PRESS <RETURN> FOR MORE. ");
                EnvPrintRouter(theEnv,execStatus,"whelp","PRESS <A>,<RETURN> TO ABORT.");
-               RouterData(theEnv)->CommandBufferInputCount = 0;
-               RouterData(theEnv)->AwaitingInput = TRUE;
+               RouterData(theEnv,execStatus)->CommandBufferInputCount = 0;
+               RouterData(theEnv,execStatus)->AwaitingInput = TRUE;
                do
                  {
                   termbuf[0] = (char) EnvGetcRouter(theEnv,execStatus,"whelp");
@@ -1156,16 +1156,16 @@ globle void HelpFunction(
                      if (termbuf[0] == 'a')
                        termbuf[0] = 'A';
                      if (termbuf[0] != '\b')
-                       RouterData(theEnv)->CommandBufferInputCount++;
-                     else if (RouterData(theEnv)->CommandBufferInputCount != 0)
-                       RouterData(theEnv)->CommandBufferInputCount--;
+                       RouterData(theEnv,execStatus)->CommandBufferInputCount++;
+                     else if (RouterData(theEnv,execStatus)->CommandBufferInputCount != 0)
+                       RouterData(theEnv,execStatus)->CommandBufferInputCount--;
                      termbuf[1] = (char) EnvGetcRouter(theEnv,execStatus,"whelp");
                     }
                  }
                while ((termbuf[0] != LNFEED) &&
                       (termbuf[0] != 'A'));
-               RouterData(theEnv)->CommandBufferInputCount = 0;
-               RouterData(theEnv)->AwaitingInput = FALSE;
+               RouterData(theEnv,execStatus)->CommandBufferInputCount = 0;
+               RouterData(theEnv,execStatus)->AwaitingInput = FALSE;
                line_cnt = 0;
                if (termbuf[0] == 'A')
                  {
@@ -1189,7 +1189,7 @@ globle void HelpFunction(
       if (execStatus->HaltExecution)
         {
          while (status != EXIT)
-           if ((fp = GetEntries(theEnv,execStatus,TextProcessingData(theEnv)->help_file,menu,NULL,&status)) != NULL)
+           if ((fp = GetEntries(theEnv,execStatus,TextProcessingData(theEnv,execStatus)->help_file,menu,NULL,&status)) != NULL)
              GenClose(theEnv,execStatus,fp);
         }
      } while (status != EXIT);
@@ -1220,34 +1220,34 @@ globle void HelpPathFunction(
    char *help_name;
    DATA_OBJECT arg_ptr;
 
-   if (EnvRtnArgCount(theEnv,execStatus,execStatus) == 0)
+   if (EnvRtnArgCount(theEnv,execStatus) == 0)
      {
       EnvPrintRouter(theEnv,execStatus,WDIALOG,"The current help entries file is ");
-      if (TextProcessingData(theEnv)->help_file != NULL)
-        EnvPrintRouter(theEnv,execStatus,WDIALOG,TextProcessingData(theEnv)->help_file);
+      if (TextProcessingData(theEnv,execStatus)->help_file != NULL)
+        EnvPrintRouter(theEnv,execStatus,WDIALOG,TextProcessingData(theEnv,execStatus)->help_file);
       else
         EnvPrintRouter(theEnv,execStatus,WDIALOG,HELP_DEFAULT);
       EnvPrintRouter(theEnv,execStatus,WDIALOG,"\n");
      }
    else
      {
-      if (TextProcessingData(theEnv)->help_file != NULL)
+      if (TextProcessingData(theEnv,execStatus)->help_file != NULL)
         {
-         if (TextProcessingData(theEnv)->HELP_INIT == TRUE)
+         if (TextProcessingData(theEnv,execStatus)->HELP_INIT == TRUE)
            {
             EnvPrintRouter(theEnv,execStatus,WDIALOG,"Releasing help entries from file ");
-            EnvPrintRouter(theEnv,execStatus,WDIALOG,TextProcessingData(theEnv)->help_file);
+            EnvPrintRouter(theEnv,execStatus,WDIALOG,TextProcessingData(theEnv,execStatus)->help_file);
             EnvPrintRouter(theEnv,execStatus,WDIALOG,"...\n");
-            TextLookupToss(theEnv,execStatus,TextProcessingData(theEnv)->help_file);
+            TextLookupToss(theEnv,execStatus,TextProcessingData(theEnv,execStatus)->help_file);
             EnvDeleteRouter(theEnv,execStatus,"whelp");
-            TextProcessingData(theEnv)->HELP_INIT = FALSE;
+            TextProcessingData(theEnv,execStatus)->HELP_INIT = FALSE;
            }
-         rm(theEnv,execStatus,(void *) TextProcessingData(theEnv)->help_file,strlen(TextProcessingData(theEnv)->help_file) + 1);
+         rm(theEnv,execStatus,(void *) TextProcessingData(theEnv,execStatus)->help_file,strlen(TextProcessingData(theEnv,execStatus)->help_file) + 1);
         }
       if (EnvArgTypeCheck(theEnv,execStatus,"help-path",1,SYMBOL_OR_STRING,&arg_ptr) == FALSE) return;
       help_name = DOToString(arg_ptr);
-      TextProcessingData(theEnv)->help_file = (char *) gm2(theEnv,execStatus,strlen(help_name) + 1);
-      genstrcpy(TextProcessingData(theEnv)->help_file,help_name);
+      TextProcessingData(theEnv,execStatus)->help_file = (char *) gm2(theEnv,execStatus,strlen(help_name) + 1);
+      genstrcpy(TextProcessingData(theEnv,execStatus)->help_file,help_name);
       EnvPrintRouter(theEnv,execStatus,WDIALOG,"Help entries file reset to ");
       EnvPrintRouter(theEnv,execStatus,WDIALOG,help_name);
       EnvPrintRouter(theEnv,execStatus,WDIALOG,"\n");
@@ -1274,7 +1274,7 @@ globle void FetchCommand(
    DATA_OBJECT arg_ptr;
 
    result->type = SYMBOL;
-   result->value = EnvFalseSymbol(theEnv);
+   result->value = EnvFalseSymbol(theEnv,execStatus);
    if (EnvArgTypeCheck(theEnv,execStatus,"fetch",1,SYMBOL_OR_STRING,&arg_ptr) == FALSE)
       return;
    load_ct = TextLookupFetch(theEnv,execStatus,DOToString(arg_ptr));
@@ -1321,7 +1321,7 @@ globle int PrintRegionCommand(
    int status,               /*Lookup status return code               */
        com_code;             /*Completion flag                         */
 
-   params = GetCommandLineTopics(theEnv);
+   params = GetCommandLineTopics(theEnv,execStatus);
    fp = FindTopicInEntries(theEnv,execStatus,params->next->name,params->next->next,menu,&status);
    if ((status != NO_FILE) && (status != NO_TOPIC) && (status != EXIT))
      {
@@ -1376,7 +1376,7 @@ globle void *GetRegionCommand(
    size_t oldMax = 0;
    size_t sLength;
 
-   params = GetCommandLineTopics(theEnv);
+   params = GetCommandLineTopics(theEnv,execStatus);
    fp = FindTopicInEntries(theEnv,execStatus,params->name,params->next,menu,&status);
    if ((status != NO_FILE) && (status != NO_TOPIC) && (status != EXIT))
      {
@@ -1444,12 +1444,12 @@ globle int TossCommand(
 
 #if HELP_FUNCTIONS
 
-    if (TextProcessingData(theEnv)->help_file != NULL)
-      if ((strcmp(file,TextProcessingData(theEnv)->help_file) == 0) && (TextProcessingData(theEnv)->HELP_INIT == TRUE))
+    if (TextProcessingData(theEnv,execStatus)->help_file != NULL)
+      if ((strcmp(file,TextProcessingData(theEnv,execStatus)->help_file) == 0) && (TextProcessingData(theEnv,execStatus)->HELP_INIT == TRUE))
         {
-         rm(theEnv,execStatus,(void *) TextProcessingData(theEnv)->help_file,strlen(TextProcessingData(theEnv)->help_file) + 1);
-         TextProcessingData(theEnv)->help_file = NULL;
-         TextProcessingData(theEnv)->HELP_INIT = FALSE;
+         rm(theEnv,execStatus,(void *) TextProcessingData(theEnv,execStatus)->help_file,strlen(TextProcessingData(theEnv,execStatus)->help_file) + 1);
+         TextProcessingData(theEnv,execStatus)->help_file = NULL;
+         TextProcessingData(theEnv,execStatus)->HELP_INIT = FALSE;
          EnvDeleteRouter(theEnv,execStatus,"whelp");
         }
 
@@ -1476,7 +1476,7 @@ static int RecognizeHelpRouters(
   char *log_name)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 
    if (strcmp(log_name,"whelp") == 0)
@@ -1560,7 +1560,7 @@ static struct topics *GetCommandLineTopics(
    DATA_OBJECT val;       /*Unknown-type H/L data structure        */
 
    head = NULL;
-   topic_num = EnvRtnArgCount(theEnv,execStatus,execStatus);
+   topic_num = EnvRtnArgCount(theEnv,execStatus);
    for (theIndex = 1; theIndex <= topic_num; theIndex++)
      {
       tnode = (struct topics *) gm2(theEnv,execStatus,(int) sizeof(struct topics));
@@ -1619,11 +1619,11 @@ static struct topics *AskForNewHelpTopic(
    /*==================================================================*/
    EnvPrintRouter(theEnv,execStatus,"whelp",*menu);
    EnvPrintRouter(theEnv,execStatus,"whelp"," Topic? ");
-   RouterData(theEnv)->CommandBufferInputCount = 0;
-   RouterData(theEnv)->AwaitingInput = TRUE;
+   RouterData(theEnv,execStatus)->CommandBufferInputCount = 0;
+   RouterData(theEnv,execStatus)->AwaitingInput = TRUE;
    for ( theIndex = 0;
          ((list[theIndex] = (char) EnvGetcRouter(theEnv,execStatus,"whelp")) != LNFEED) && (theIndex < 254);
-         theIndex++ , RouterData(theEnv)->CommandBufferInputCount++)
+         theIndex++ , RouterData(theEnv,execStatus)->CommandBufferInputCount++)
        {
         if (execStatus->HaltExecution)
           break;
@@ -1632,15 +1632,15 @@ static struct topics *AskForNewHelpTopic(
         else if ((list[theIndex] == '\b') && (theIndex != 0))
           {
            theIndex -= 2;
-           RouterData(theEnv)->CommandBufferInputCount -= 2;
+           RouterData(theEnv,execStatus)->CommandBufferInputCount -= 2;
           }
        }
 #if VAX_VMS
    EnvPrintRouter(theEnv,execStatus,"whelp","\n");
 #endif
 
-   RouterData(theEnv)->CommandBufferInputCount = 0;
-   RouterData(theEnv)->AwaitingInput = FALSE;
+   RouterData(theEnv,execStatus)->CommandBufferInputCount = 0;
+   RouterData(theEnv,execStatus)->AwaitingInput = FALSE;
    if (execStatus->HaltExecution)
      {
       EnvPrintRouter(theEnv,execStatus,"whelp","\n");
@@ -1806,7 +1806,7 @@ static void DeallocateTextProcessingData(
   {
    struct lists *nextptr, *clptr;
 
-   clptr = TextProcessingData(theEnv)->headings;
+   clptr = TextProcessingData(theEnv,execStatus)->headings;
    while (clptr != NULL)
      {
       nextptr = clptr->next;
@@ -1818,10 +1818,10 @@ static void DeallocateTextProcessingData(
      }
      
 #if HELP_FUNCTIONS
-   if (TextProcessingData(theEnv)->help_file != NULL)
+   if (TextProcessingData(theEnv,execStatus)->help_file != NULL)
      {
-      rm(theEnv,execStatus,TextProcessingData(theEnv)->help_file,
-         strlen(TextProcessingData(theEnv)->help_file) + 1);
+      rm(theEnv,execStatus,TextProcessingData(theEnv,execStatus)->help_file,
+         strlen(TextProcessingData(theEnv,execStatus)->help_file) + 1);
      }
 #endif
   }

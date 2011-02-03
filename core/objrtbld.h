@@ -36,7 +36,7 @@
 #define LOCALE extern
 #endif
 
-LOCALE void SetupObjectPatternStuff(void *);
+LOCALE void SetupObjectPatternStuff(void *,EXEC_STATUS);
 
 #endif
 

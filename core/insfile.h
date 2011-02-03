@@ -47,7 +47,7 @@ struct instanceFileData
 #endif
   };
 
-#define InstanceFileData(theEnv) ((struct instanceFileData *) GetEnvironmentData(theEnv,execStatus,INSTANCE_FILE_DATA))
+#define InstanceFileData(theEnv,execStatus) ((struct instanceFileData *) GetEnvironmentData(theEnv,execStatus,INSTANCE_FILE_DATA))
 
 #endif
 
@@ -61,35 +61,35 @@ struct instanceFileData
 #define LOCALE extern
 #endif
 
-#define BinaryLoadInstances(a) EnvBinaryLoadInstances(GetCurrentEnvironment(),a)
-#define BinarySaveInstances(a,b,c,d) EnvBinarySaveInstances(GetCurrentEnvironment(),a,b,c,d)
-#define LoadInstances(a) EnvLoadInstances(GetCurrentEnvironment(),a)
-#define LoadInstancesFromString(a,b) EnvLoadInstancesFromString(GetCurrentEnvironment(),a,b)
-#define RestoreInstances(a) EnvRestoreInstances(GetCurrentEnvironment(),a)
-#define RestoreInstancesFromString(a,b) EnvRestoreInstancesFromString(GetCurrentEnvironment(),a,b)
-#define SaveInstances(a,b,c,d) EnvSaveInstances(GetCurrentEnvironment(),a,b,c,d)
+#define BinaryLoadInstances(a) EnvBinaryLoadInstances(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define BinarySaveInstances(a,b,c,d) EnvBinarySaveInstances(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b,c,d)
+#define LoadInstances(a) EnvLoadInstances(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define LoadInstancesFromString(a,b) EnvLoadInstancesFromString(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
+#define RestoreInstances(a) EnvRestoreInstances(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define RestoreInstancesFromString(a,b) EnvRestoreInstancesFromString(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
+#define SaveInstances(a,b,c,d) EnvSaveInstances(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b,c,d)
 
-LOCALE void SetupInstanceFileCommands(void *);
+LOCALE void SetupInstanceFileCommands(void *,EXEC_STATUS);
 
-LOCALE long SaveInstancesCommand(void *);
-LOCALE long LoadInstancesCommand(void *);
-LOCALE long RestoreInstancesCommand(void *);
-LOCALE long EnvSaveInstances(void *,char *,int,EXPRESSION *,intBool);
+LOCALE long SaveInstancesCommand(void *,EXEC_STATUS);
+LOCALE long LoadInstancesCommand(void *,EXEC_STATUS);
+LOCALE long RestoreInstancesCommand(void *,EXEC_STATUS);
+LOCALE long EnvSaveInstances(void *,EXEC_STATUS,char *,int,EXPRESSION *,intBool);
 
 #if BSAVE_INSTANCES
-LOCALE long BinarySaveInstancesCommand(void *);
-LOCALE long EnvBinarySaveInstances(void *,char *,int,EXPRESSION *,intBool);
+LOCALE long BinarySaveInstancesCommand(void *,EXEC_STATUS);
+LOCALE long EnvBinarySaveInstances(void *,EXEC_STATUS,char *,int,EXPRESSION *,intBool);
 #endif
 
 #if BLOAD_INSTANCES
-LOCALE long BinaryLoadInstancesCommand(void *);
-LOCALE long EnvBinaryLoadInstances(void *,char *);
+LOCALE long BinaryLoadInstancesCommand(void *,EXEC_STATUS);
+LOCALE long EnvBinaryLoadInstances(void *,EXEC_STATUS,char *);
 #endif
 
-LOCALE long EnvLoadInstances(void *,char *);
-LOCALE long EnvLoadInstancesFromString(void *,char *,int);
-LOCALE long EnvRestoreInstances(void *,char *);
-LOCALE long EnvRestoreInstancesFromString(void *,char *,int);
+LOCALE long EnvLoadInstances(void *,EXEC_STATUS,char *);
+LOCALE long EnvLoadInstancesFromString(void *,EXEC_STATUS,char *,int);
+LOCALE long EnvRestoreInstances(void *,EXEC_STATUS,char *);
+LOCALE long EnvRestoreInstancesFromString(void *,EXEC_STATUS,char *,int);
 
 #ifndef _INSFILE_SOURCE_
 #endif

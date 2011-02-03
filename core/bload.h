@@ -57,7 +57,7 @@ struct bloadData
    struct callFunctionItem *AbortBloadFunctions;
   };
 
-#define BloadData(theEnv) ((struct bloadData *) GetEnvironmentData(theEnv,execStatus,BLOAD_DATA))
+#define BloadData(theEnv,execStatus) ((struct bloadData *) GetEnvironmentData(theEnv,execStatus,BLOAD_DATA))
 
 #ifdef LOCALE
 #undef LOCALE
@@ -68,9 +68,9 @@ struct bloadData
 #define LOCALE extern
 #endif
 
-#define FunctionPointer(i) ((struct FunctionDefinition *) (((i) == -1L) ? NULL : BloadData(theEnv)->FunctionArray[i]))
+#define FunctionPointer(i) ((struct FunctionDefinition *) (((i) == -1L) ? NULL : BloadData(theEnv,execStatus)->FunctionArray[i]))
 
-#define Bload(a) EnvBload(GetCurrentEnvironment(),a)
+#define Bload(a) EnvBload(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
 
    LOCALE void                    InitializeBloadData(void *,EXEC_STATUS);
    LOCALE int                     BloadCommand(void *,EXEC_STATUS);

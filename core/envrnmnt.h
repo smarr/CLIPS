@@ -90,7 +90,7 @@ typedef struct environmentData * ENVIRONMENT_DATA_PTR;
 
 #define GetEnvironmentData(theEnv,execStatus,position) (((struct environmentData *) theEnv)->theData[position])
 #define SetEnvironmentData(theEnv,execStatus,position,value) (((struct environmentData *) theEnv)->theData[position] = value)
-#define Env(theEnv) ((struct environmentData *)theEnv)
+#define Env(theEnv,execStatus) ((struct environmentData *)theEnv)
 
    LOCALE intBool                        AllocateEnvironmentData(void *,EXEC_STATUS,unsigned int,unsigned long,void (*)(void *,EXEC_STATUS));
    LOCALE intBool                        DeallocateEnvironmentData(void);

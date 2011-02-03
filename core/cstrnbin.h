@@ -44,8 +44,8 @@
 #include <stdio.h>
 #endif
 
-#define ConstraintIndex(theConstraint) (((! EnvGetDynamicConstraintChecking(theEnv)) || (theConstraint == NULL)) ? -1L : ((long) theConstraint->bsaveIndex))
-#define ConstraintPointer(i) (((i) == -1L) ? NULL : (CONSTRAINT_RECORD *) &ConstraintData(theEnv)->ConstraintArray[i])
+#define ConstraintIndex(theConstraint) (((! EnvGetDynamicConstraintChecking(theEnv,execStatus)) || (theConstraint == NULL)) ? -1L : ((long) theConstraint->bsaveIndex))
+#define ConstraintPointer(i) (((i) == -1L) ? NULL : (CONSTRAINT_RECORD *) &ConstraintData(theEnv,execStatus)->ConstraintArray[i])
 
 #if BLOAD_AND_BSAVE
    LOCALE void                           WriteNeededConstraints(void *,EXEC_STATUS,FILE *);

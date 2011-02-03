@@ -35,18 +35,18 @@
 #endif
 
 #if TEXTPRO_FUNCTIONS
-   LOCALE void                           FetchCommand(void *,DATA_OBJECT *);
-   LOCALE int                            PrintRegionCommand(void *);
-   LOCALE void                          *GetRegionCommand(void *);
-   int                                   TossCommand(void *);
+   LOCALE void                           FetchCommand(void *,EXEC_STATUS,DATA_OBJECT *);
+   LOCALE int                            PrintRegionCommand(void *,EXEC_STATUS);
+   LOCALE void                          *GetRegionCommand(void *,EXEC_STATUS);
+   int                                   TossCommand(void *,EXEC_STATUS);
 #endif
 
 #if HELP_FUNCTIONS
-   LOCALE void                           HelpFunction(void *);
-   LOCALE void                           HelpPathFunction(void *);
+   LOCALE void                           HelpFunction(void *,EXEC_STATUS);
+   LOCALE void                           HelpPathFunction(void *,EXEC_STATUS);
 #endif
 
-   LOCALE void                           HelpFunctionDefinitions(void *);
+   LOCALE void                           HelpFunctionDefinitions(void *,EXEC_STATUS);
 #endif
 
 

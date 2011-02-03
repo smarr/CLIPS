@@ -45,17 +45,17 @@ struct sortFunctionData
    struct expr *SortComparisonFunction;
   };
 
-#define SortFunctionData(theEnv) ((struct sortFunctionData *) GetEnvironmentData(theEnv,execStatus,SORTFUN_DATA))
+#define SortFunctionData(theEnv,execStatus) ((struct sortFunctionData *) GetEnvironmentData(theEnv,execStatus,SORTFUN_DATA))
 
 /***************************************/
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static void                    DoMergeSort(void *,DATA_OBJECT *,DATA_OBJECT *,unsigned long,
+   static void                    DoMergeSort(void *,EXEC_STATUS,DATA_OBJECT *,DATA_OBJECT *,unsigned long,
                                               unsigned long,unsigned long,unsigned long,
-                                              int (*)(void *,DATA_OBJECT *,DATA_OBJECT *));
-   static int                     DefaultCompareSwapFunction(void *,DATA_OBJECT *,DATA_OBJECT *);
-   static void                    DeallocateSortFunctionData(void *);
+                                              int (*)(void *,EXEC_STATUS,DATA_OBJECT *,DATA_OBJECT *));
+   static int                     DefaultCompareSwapFunction(void *,EXEC_STATUS,DATA_OBJECT *,DATA_OBJECT *);
+   static void                    DeallocateSortFunctionData(void *,EXEC_STATUS);
    
 /****************************************/
 /* SortFunctionDefinitions: Initializes */
@@ -79,7 +79,7 @@ static void DeallocateSortFunctionData(
   void *theEnv,
   EXEC_STATUS)
   {
-   ReturnExpression(theEnv,execStatus,SortFunctionData(theEnv)->SortComparisonFunction);
+   ReturnExpression(theEnv,execStatus,SortFunctionData(theEnv,execStatus)->SortComparisonFunction);
   }
 
 /**************************************/
@@ -93,16 +93,16 @@ static int DefaultCompareSwapFunction(
   {
    DATA_OBJECT returnValue;
 
-   SortFunctionData(theEnv)->SortComparisonFunction->argList = GenConstant(theEnv,execStatus,item1->type,item1->value);
-   SortFunctionData(theEnv)->SortComparisonFunction->argList->nextArg = GenConstant(theEnv,execStatus,item2->type,item2->value);
-   ExpressionInstall(theEnv,execStatus,SortFunctionData(theEnv)->SortComparisonFunction);
-   EvaluateExpression(theEnv,execStatus,SortFunctionData(theEnv)->SortComparisonFunction,&returnValue);
-   ExpressionDeinstall(theEnv,execStatus,SortFunctionData(theEnv)->SortComparisonFunction);
-   ReturnExpression(theEnv,execStatus,SortFunctionData(theEnv)->SortComparisonFunction->argList);
-   SortFunctionData(theEnv)->SortComparisonFunction->argList = NULL;
+   SortFunctionData(theEnv,execStatus)->SortComparisonFunction->argList = GenConstant(theEnv,execStatus,item1->type,item1->value);
+   SortFunctionData(theEnv,execStatus)->SortComparisonFunction->argList->nextArg = GenConstant(theEnv,execStatus,item2->type,item2->value);
+   ExpressionInstall(theEnv,execStatus,SortFunctionData(theEnv,execStatus)->SortComparisonFunction);
+   EvaluateExpression(theEnv,execStatus,SortFunctionData(theEnv,execStatus)->SortComparisonFunction,&returnValue);
+   ExpressionDeinstall(theEnv,execStatus,SortFunctionData(theEnv,execStatus)->SortComparisonFunction);
+   ReturnExpression(theEnv,execStatus,SortFunctionData(theEnv,execStatus)->SortComparisonFunction->argList);
+   SortFunctionData(theEnv,execStatus)->SortComparisonFunction->argList = NULL;
 
    if ((GetType(returnValue) == SYMBOL) &&
-       (GetValue(returnValue) == EnvFalseSymbol(theEnv)))
+       (GetValue(returnValue) == EnvFalseSymbol(theEnv,execStatus)))
      { return(FALSE); }
 
    return(TRUE);
@@ -134,13 +134,13 @@ globle void SortFunction(
    /*==================================*/
 
    SetpType(returnValue,SYMBOL);
-   SetpValue(returnValue,EnvFalseSymbol(theEnv));
+   SetpValue(returnValue,EnvFalseSymbol(theEnv,execStatus));
 
    /*=============================================*/
    /* The function expects at least one argument. */
    /*=============================================*/
 
-   if ((argumentCount = EnvArgCountCheck(theEnv,execStatus,execStatus,"sort",AT_LEAST,1)) == -1)
+   if ((argumentCount = EnvArgCountCheck(theEnv,execStatus,"sort",AT_LEAST,1)) == -1)
      { return; }
 
    /*=============================================*/
@@ -260,8 +260,8 @@ globle void SortFunction(
      
    genfree(theEnv,execStatus,theArguments,(argumentCount - 1) * sizeof(DATA_OBJECT));
 
-   functionReference->nextArg = SortFunctionData(theEnv)->SortComparisonFunction;
-   SortFunctionData(theEnv)->SortComparisonFunction = functionReference;
+   functionReference->nextArg = SortFunctionData(theEnv,execStatus)->SortComparisonFunction;
+   SortFunctionData(theEnv,execStatus)->SortComparisonFunction = functionReference;
 
    for (i = 0; i < argumentSize; i++)
      { ValueInstall(theEnv,execStatus,&theArguments2[i]); }
@@ -271,7 +271,7 @@ globle void SortFunction(
    for (i = 0; i < argumentSize; i++)
      { ValueDeinstall(theEnv,execStatus,&theArguments2[i]); }
 
-   SortFunctionData(theEnv)->SortComparisonFunction = SortFunctionData(theEnv)->SortComparisonFunction->nextArg;
+   SortFunctionData(theEnv,execStatus)->SortComparisonFunction = SortFunctionData(theEnv,execStatus)->SortComparisonFunction->nextArg;
    functionReference->nextArg = NULL;
    ReturnExpression(theEnv,execStatus,functionReference);
 
@@ -301,7 +301,7 @@ void MergeSort(
   EXEC_STATUS,
   unsigned long listSize,
   DATA_OBJECT *theList,
-  int (*swapFunction)(void *,DATA_OBJECT *,DATA_OBJECT  *))
+  int (*swapFunction)(void *,EXEC_STATUS,DATA_OBJECT *,DATA_OBJECT  *))
   {
    DATA_OBJECT *tempList;
    unsigned long middle;
@@ -344,7 +344,7 @@ static void DoMergeSort(
   unsigned long e1,
   unsigned long s2,
   unsigned long e2,
-  int (*swapFunction)(void *,DATA_OBJECT *,DATA_OBJECT *))
+  int (*swapFunction)(void *,EXEC_STATUS,DATA_OBJECT *,DATA_OBJECT *))
   {
    DATA_OBJECT temp;
    unsigned long middle, size;

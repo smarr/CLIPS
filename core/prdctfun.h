@@ -34,28 +34,28 @@
 #define LOCALE extern
 #endif
 
-   LOCALE void                           PredicateFunctionDefinitions(void *);
-   LOCALE intBool                        EqFunction(void *);
-   LOCALE intBool                        NeqFunction(void *);
-   LOCALE intBool                        StringpFunction(void *);
-   LOCALE intBool                        SymbolpFunction(void *);
-   LOCALE intBool                        LexemepFunction(void *);
-   LOCALE intBool                        NumberpFunction(void *);
-   LOCALE intBool                        FloatpFunction(void *);
-   LOCALE intBool                        IntegerpFunction(void *);
-   LOCALE intBool                        MultifieldpFunction(void *);
-   LOCALE intBool                        PointerpFunction(void *);
-   LOCALE intBool                        NotFunction(void *);
-   LOCALE intBool                        AndFunction(void *);
-   LOCALE intBool                        OrFunction(void *);
-   LOCALE intBool                        LessThanOrEqualFunction(void *);
-   LOCALE intBool                        GreaterThanOrEqualFunction(void *);
-   LOCALE intBool                        LessThanFunction(void *);
-   LOCALE intBool                        GreaterThanFunction(void *);
-   LOCALE intBool                        NumericEqualFunction(void *);
-   LOCALE intBool                        NumericNotEqualFunction(void *);
-   LOCALE intBool                        OddpFunction(void *);
-   LOCALE intBool                        EvenpFunction(void *);
+   LOCALE void                           PredicateFunctionDefinitions(void *,EXEC_STATUS);
+   LOCALE intBool                        EqFunction(void *,EXEC_STATUS);
+   LOCALE intBool                        NeqFunction(void *,EXEC_STATUS);
+   LOCALE intBool                        StringpFunction(void *,EXEC_STATUS);
+   LOCALE intBool                        SymbolpFunction(void *,EXEC_STATUS);
+   LOCALE intBool                        LexemepFunction(void *,EXEC_STATUS);
+   LOCALE intBool                        NumberpFunction(void *,EXEC_STATUS);
+   LOCALE intBool                        FloatpFunction(void *,EXEC_STATUS);
+   LOCALE intBool                        IntegerpFunction(void *,EXEC_STATUS);
+   LOCALE intBool                        MultifieldpFunction(void *,EXEC_STATUS);
+   LOCALE intBool                        PointerpFunction(void *,EXEC_STATUS);
+   LOCALE intBool                        NotFunction(void *,EXEC_STATUS);
+   LOCALE intBool                        AndFunction(void *,EXEC_STATUS);
+   LOCALE intBool                        OrFunction(void *,EXEC_STATUS);
+   LOCALE intBool                        LessThanOrEqualFunction(void *,EXEC_STATUS);
+   LOCALE intBool                        GreaterThanOrEqualFunction(void *,EXEC_STATUS);
+   LOCALE intBool                        LessThanFunction(void *,EXEC_STATUS);
+   LOCALE intBool                        GreaterThanFunction(void *,EXEC_STATUS);
+   LOCALE intBool                        NumericEqualFunction(void *,EXEC_STATUS);
+   LOCALE intBool                        NumericNotEqualFunction(void *,EXEC_STATUS);
+   LOCALE intBool                        OddpFunction(void *,EXEC_STATUS);
+   LOCALE intBool                        EvenpFunction(void *,EXEC_STATUS);
 
 #endif
 

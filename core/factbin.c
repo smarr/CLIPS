@@ -68,17 +68,17 @@ struct bsaveFactPatternNode
 /***************************************/
 
 #if BLOAD_AND_BSAVE
-   static void                    BsaveDriver(void *,int,FILE *,struct factPatternNode *);
-   static void                    BsaveFind(void *);
-   static void                    BsaveStorage(void *,FILE *);
-   static void                    BsaveFactPatterns(void *,FILE *);
-   static void                    BsavePatternNode(void *,struct factPatternNode *,FILE *);
+   static void                    BsaveDriver(void *,EXEC_STATUS,int,FILE *,struct factPatternNode *);
+   static void                    BsaveFind(void *,EXEC_STATUS);
+   static void                    BsaveStorage(void *,EXEC_STATUS,FILE *);
+   static void                    BsaveFactPatterns(void *,EXEC_STATUS,FILE *);
+   static void                    BsavePatternNode(void *,EXEC_STATUS,struct factPatternNode *,FILE *);
 #endif
-   static void                    BloadStorage(void *);
-   static void                    BloadBinaryItem(void *);
-   static void                    UpdateFactPatterns(void *,void *,long);
-   static void                    ClearBload(void *);
-   static void                    DeallocateFactBloadData(void *);
+   static void                    BloadStorage(void *,EXEC_STATUS);
+   static void                    BloadBinaryItem(void *,EXEC_STATUS);
+   static void                    UpdateFactPatterns(void *,EXEC_STATUS,void *,long);
+   static void                    ClearBload(void *,EXEC_STATUS);
+   static void                    DeallocateFactBloadData(void *,EXEC_STATUS);
 
 /*****************************************************/
 /* FactBinarySetup: Initializes the binary load/save */
@@ -114,11 +114,11 @@ static void DeallocateFactBloadData(
    size_t space;
    int i;
    
-   for (i = 0; i < FactBinaryData(theEnv)->NumberOfPatterns; i++)
-     { DestroyAlphaMemory(theEnv,execStatus,&FactBinaryData(theEnv)->FactPatternArray[i].header,FALSE); }
+   for (i = 0; i < FactBinaryData(theEnv,execStatus)->NumberOfPatterns; i++)
+     { DestroyAlphaMemory(theEnv,execStatus,&FactBinaryData(theEnv,execStatus)->FactPatternArray[i].header,FALSE); }
 
-   space = FactBinaryData(theEnv)->NumberOfPatterns * sizeof(struct factPatternNode);
-   if (space != 0) genfree(theEnv,execStatus,(void *) FactBinaryData(theEnv)->FactPatternArray,space);
+   space = FactBinaryData(theEnv,execStatus)->NumberOfPatterns * sizeof(struct factPatternNode);
+   if (space != 0) genfree(theEnv,execStatus,(void *) FactBinaryData(theEnv,execStatus)->FactPatternArray,space);
   }
 
 #if BLOAD_AND_BSAVE
@@ -141,14 +141,14 @@ static void BsaveFind(
    /* in the process of saving the binary image.            */
    /*=======================================================*/
 
-   SaveBloadCount(theEnv,execStatus,FactBinaryData(theEnv)->NumberOfPatterns);
+   SaveBloadCount(theEnv,execStatus,FactBinaryData(theEnv,execStatus)->NumberOfPatterns);
 
    /*=======================================*/
    /* Set the count of fact pattern network */
    /* data structures to zero.              */
    /*=======================================*/
 
-   FactBinaryData(theEnv)->NumberOfPatterns = 0L;
+   FactBinaryData(theEnv,execStatus)->NumberOfPatterns = 0L;
 
    /*===========================*/
    /* Loop through each module. */
@@ -195,7 +195,7 @@ static void BsaveDriver(
       switch(action)
         {
          case BSAVE_FIND:
-           thePattern->bsaveID = FactBinaryData(theEnv)->NumberOfPatterns++;
+           thePattern->bsaveID = FactBinaryData(theEnv,execStatus)->NumberOfPatterns++;
            break;
 
          case BSAVE_PATTERNS:
@@ -233,7 +233,7 @@ static void BsaveStorage(
 
    space = sizeof(long);
    GenWrite(&space,sizeof(size_t),fp);
-   GenWrite(&FactBinaryData(theEnv)->NumberOfPatterns,sizeof(long int),fp);
+   GenWrite(&FactBinaryData(theEnv,execStatus)->NumberOfPatterns,sizeof(long int),fp);
   }
 
 /*****************************************************/
@@ -255,7 +255,7 @@ static void BsaveFactPatterns(
    /* in the binary image.                   */
    /*========================================*/
 
-   space = FactBinaryData(theEnv)->NumberOfPatterns * sizeof(struct bsaveFactPatternNode);
+   space = FactBinaryData(theEnv,execStatus)->NumberOfPatterns * sizeof(struct bsaveFactPatternNode);
    GenWrite(&space,sizeof(size_t),fp);
 
    /*===========================*/
@@ -285,7 +285,7 @@ static void BsaveFactPatterns(
    /* (these were overwritten by the binary save).                */
    /*=============================================================*/
 
-   RestoreBloadCount(theEnv,execStatus,&FactBinaryData(theEnv)->NumberOfPatterns);
+   RestoreBloadCount(theEnv,execStatus,&FactBinaryData(theEnv,execStatus)->NumberOfPatterns);
   }
 
 /******************************************************/
@@ -332,21 +332,21 @@ static void BloadStorage(
    /*=========================================*/
 
    GenReadBinary(theEnv,execStatus,&space,sizeof(size_t));
-   GenReadBinary(theEnv,execStatus,&FactBinaryData(theEnv)->NumberOfPatterns,sizeof(long int));
+   GenReadBinary(theEnv,execStatus,&FactBinaryData(theEnv,execStatus)->NumberOfPatterns,sizeof(long int));
 
    /*===================================*/
    /* Allocate the space needed for the */
    /* factPatternNode data structures.  */
    /*===================================*/
 
-   if (FactBinaryData(theEnv)->NumberOfPatterns == 0)
+   if (FactBinaryData(theEnv,execStatus)->NumberOfPatterns == 0)
      {
-      FactBinaryData(theEnv)->FactPatternArray = NULL;
+      FactBinaryData(theEnv,execStatus)->FactPatternArray = NULL;
       return;
      }
 
-   space = FactBinaryData(theEnv)->NumberOfPatterns * sizeof(struct factPatternNode);
-   FactBinaryData(theEnv)->FactPatternArray = (struct factPatternNode *) genalloc(theEnv,execStatus,space);
+   space = FactBinaryData(theEnv,execStatus)->NumberOfPatterns * sizeof(struct factPatternNode);
+   FactBinaryData(theEnv,execStatus)->FactPatternArray = (struct factPatternNode *) genalloc(theEnv,execStatus,space);
   }
 
 /************************************************************/
@@ -373,18 +373,18 @@ static void BloadBinaryItem(
    /* and refresh the pointers.                   */
    /*=============================================*/
 
-   BloadandRefresh(theEnv,execStatus,FactBinaryData(theEnv)->NumberOfPatterns,(unsigned) sizeof(struct bsaveFactPatternNode),
+   BloadandRefresh(theEnv,execStatus,FactBinaryData(theEnv,execStatus)->NumberOfPatterns,(unsigned) sizeof(struct bsaveFactPatternNode),
                    UpdateFactPatterns);
                    
-   for (i = 0; i < FactBinaryData(theEnv)->NumberOfPatterns; i++)
+   for (i = 0; i < FactBinaryData(theEnv,execStatus)->NumberOfPatterns; i++)
      {
-      if ((FactBinaryData(theEnv)->FactPatternArray[i].lastLevel != NULL) &&
-          (FactBinaryData(theEnv)->FactPatternArray[i].lastLevel->header.selector))
+      if ((FactBinaryData(theEnv,execStatus)->FactPatternArray[i].lastLevel != NULL) &&
+          (FactBinaryData(theEnv,execStatus)->FactPatternArray[i].lastLevel->header.selector))
         { 
-         AddHashedPatternNode(theEnv,execStatus,FactBinaryData(theEnv)->FactPatternArray[i].lastLevel,
-                                     &FactBinaryData(theEnv)->FactPatternArray[i],
-                                     FactBinaryData(theEnv)->FactPatternArray[i].networkTest->type,
-                                     FactBinaryData(theEnv)->FactPatternArray[i].networkTest->value); 
+         AddHashedPatternNode(theEnv,execStatus,FactBinaryData(theEnv,execStatus)->FactPatternArray[i].lastLevel,
+                                     &FactBinaryData(theEnv,execStatus)->FactPatternArray[i],
+                                     FactBinaryData(theEnv,execStatus)->FactPatternArray[i].networkTest->type,
+                                     FactBinaryData(theEnv,execStatus)->FactPatternArray[i].networkTest->value); 
         }
      }
   }
@@ -403,18 +403,18 @@ static void UpdateFactPatterns(
 
    bp = (struct bsaveFactPatternNode *) buf;
 
-   UpdatePatternNodeHeader(theEnv,execStatus,&FactBinaryData(theEnv)->FactPatternArray[obji].header,&bp->header);
+   UpdatePatternNodeHeader(theEnv,execStatus,&FactBinaryData(theEnv,execStatus)->FactPatternArray[obji].header,&bp->header);
 
-   FactBinaryData(theEnv)->FactPatternArray[obji].bsaveID = 0L;
-   FactBinaryData(theEnv)->FactPatternArray[obji].whichField = bp->whichField;
-   FactBinaryData(theEnv)->FactPatternArray[obji].leaveFields = bp->leaveFields;
-   FactBinaryData(theEnv)->FactPatternArray[obji].whichSlot = bp->whichSlot;
+   FactBinaryData(theEnv,execStatus)->FactPatternArray[obji].bsaveID = 0L;
+   FactBinaryData(theEnv,execStatus)->FactPatternArray[obji].whichField = bp->whichField;
+   FactBinaryData(theEnv,execStatus)->FactPatternArray[obji].leaveFields = bp->leaveFields;
+   FactBinaryData(theEnv,execStatus)->FactPatternArray[obji].whichSlot = bp->whichSlot;
 
-   FactBinaryData(theEnv)->FactPatternArray[obji].networkTest = HashedExpressionPointer(bp->networkTest);
-   FactBinaryData(theEnv)->FactPatternArray[obji].rightNode = BloadFactPatternPointer(bp->rightNode);
-   FactBinaryData(theEnv)->FactPatternArray[obji].nextLevel = BloadFactPatternPointer(bp->nextLevel);
-   FactBinaryData(theEnv)->FactPatternArray[obji].lastLevel = BloadFactPatternPointer(bp->lastLevel);
-   FactBinaryData(theEnv)->FactPatternArray[obji].leftNode  = BloadFactPatternPointer(bp->leftNode);
+   FactBinaryData(theEnv,execStatus)->FactPatternArray[obji].networkTest = HashedExpressionPointer(bp->networkTest);
+   FactBinaryData(theEnv,execStatus)->FactPatternArray[obji].rightNode = BloadFactPatternPointer(bp->rightNode);
+   FactBinaryData(theEnv,execStatus)->FactPatternArray[obji].nextLevel = BloadFactPatternPointer(bp->nextLevel);
+   FactBinaryData(theEnv,execStatus)->FactPatternArray[obji].lastLevel = BloadFactPatternPointer(bp->lastLevel);
+   FactBinaryData(theEnv,execStatus)->FactPatternArray[obji].leftNode  = BloadFactPatternPointer(bp->leftNode);
   }
 
 /***************************************************/
@@ -428,22 +428,22 @@ static void ClearBload(
    size_t space;
    long i;
    
-   for (i = 0; i < FactBinaryData(theEnv)->NumberOfPatterns; i++)
+   for (i = 0; i < FactBinaryData(theEnv,execStatus)->NumberOfPatterns; i++)
      {
-      if ((FactBinaryData(theEnv)->FactPatternArray[i].lastLevel != NULL) &&
-          (FactBinaryData(theEnv)->FactPatternArray[i].lastLevel->header.selector))
+      if ((FactBinaryData(theEnv,execStatus)->FactPatternArray[i].lastLevel != NULL) &&
+          (FactBinaryData(theEnv,execStatus)->FactPatternArray[i].lastLevel->header.selector))
         { 
-         RemoveHashedPatternNode(theEnv,execStatus,FactBinaryData(theEnv)->FactPatternArray[i].lastLevel,
-                                        &FactBinaryData(theEnv)->FactPatternArray[i],
-                                        FactBinaryData(theEnv)->FactPatternArray[i].networkTest->type,
-                                        FactBinaryData(theEnv)->FactPatternArray[i].networkTest->value); 
+         RemoveHashedPatternNode(theEnv,execStatus,FactBinaryData(theEnv,execStatus)->FactPatternArray[i].lastLevel,
+                                        &FactBinaryData(theEnv,execStatus)->FactPatternArray[i],
+                                        FactBinaryData(theEnv,execStatus)->FactPatternArray[i].networkTest->type,
+                                        FactBinaryData(theEnv,execStatus)->FactPatternArray[i].networkTest->value); 
         }
      }
 
 
-   space = FactBinaryData(theEnv)->NumberOfPatterns * sizeof(struct factPatternNode);
-   if (space != 0) genfree(theEnv,execStatus,(void *) FactBinaryData(theEnv)->FactPatternArray,space);
-   FactBinaryData(theEnv)->NumberOfPatterns = 0;
+   space = FactBinaryData(theEnv,execStatus)->NumberOfPatterns * sizeof(struct factPatternNode);
+   if (space != 0) genfree(theEnv,execStatus,(void *) FactBinaryData(theEnv,execStatus)->FactPatternArray,space);
+   FactBinaryData(theEnv,execStatus)->NumberOfPatterns = 0;
   }
 
 #endif /* DEFTEMPLATE_CONSTRUCT && (BLOAD || BLOAD_ONLY || BLOAD_AND_BSAVE) && (! RUN_TIME) */

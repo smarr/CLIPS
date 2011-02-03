@@ -77,9 +77,9 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static struct activation      *NextActivationToFire(void *);
-   static struct defmodule       *RemoveFocus(void *,struct defmodule *);
-   static void                    DeallocateEngineData(void *);
+   static struct activation      *NextActivationToFire(void *,EXEC_STATUS);
+   static struct defmodule       *RemoveFocus(void *,EXEC_STATUS,struct defmodule *);
+   static void                    DeallocateEngineData(void *,EXEC_STATUS);
 
 /*****************************************************************************/
 /* InitializeEngine: Initializes the activations and statistics watch items. */
@@ -90,11 +90,11 @@ globle void InitializeEngine(
   {   
    AllocateEnvironmentData(theEnv,execStatus,ENGINE_DATA,sizeof(struct engineData),DeallocateEngineData);
 
-   EngineData(theEnv)->IncrementalResetFlag = TRUE;
+   EngineData(theEnv,execStatus)->IncrementalResetFlag = TRUE;
    
 #if DEBUGGING_FUNCTIONS
-   AddWatchItem(theEnv,execStatus,"statistics",0,&EngineData(theEnv)->WatchStatistics,20,NULL,NULL);
-   AddWatchItem(theEnv,execStatus,"focus",0,&EngineData(theEnv)->WatchFocus,0,NULL,NULL);
+   AddWatchItem(theEnv,execStatus,"statistics",0,&EngineData(theEnv,execStatus)->WatchStatistics,20,NULL,NULL);
+   AddWatchItem(theEnv,execStatus,"focus",0,&EngineData(theEnv,execStatus)->WatchFocus,0,NULL,NULL);
 #endif
   }
   
@@ -108,9 +108,9 @@ static void DeallocateEngineData(
   {
    struct focus *tmpPtr, *nextPtr;
    
-   DeallocateCallList(theEnv,execStatus,EngineData(theEnv)->ListOfRunFunctions);
+   DeallocateCallList(theEnv,execStatus,EngineData(theEnv,execStatus)->ListOfRunFunctions);
 
-   tmpPtr = EngineData(theEnv)->CurrentFocus;
+   tmpPtr = EngineData(theEnv,execStatus)->CurrentFocus;
    while (tmpPtr != NULL)
      {
       nextPtr = tmpPtr->next;
@@ -126,7 +126,7 @@ static void DeallocateEngineData(
 globle long long Run(
   long long runLimit)
   {
-   return EnvRun(GetCurrentEnvironment(),GetCurrentExecutionStatus(),runLimit);
+   return EnvRun(GetCurrentEnvironment(),getCurrentExecutionState(),runLimit);
   }
 #endif
   
@@ -166,25 +166,25 @@ globle long long EnvRun(
    /* Make sure the run command is not already executing. */
    /*=====================================================*/
 
-   if (EngineData(theEnv)->AlreadyRunning) return(0);
-   EngineData(theEnv)->AlreadyRunning = TRUE;
+   if (EngineData(theEnv,execStatus)->AlreadyRunning) return(0);
+   EngineData(theEnv,execStatus)->AlreadyRunning = TRUE;
 
    /*================================*/
    /* Set up statistics information. */
    /*================================*/
 
 #if DEBUGGING_FUNCTIONS
-   if (EngineData(theEnv)->WatchStatistics)
+   if (EngineData(theEnv,execStatus)->WatchStatistics)
      {
 #if DEFTEMPLATE_CONSTRUCT
-      maxFacts = GetNumberOfFacts(theEnv);
+      maxFacts = GetNumberOfFacts(theEnv,execStatus);
       sumFacts = maxFacts;
 #endif
 #if OBJECT_SYSTEM
-      maxInstances = GetGlobalNumberOfInstances(theEnv);
+      maxInstances = GetGlobalNumberOfInstances(theEnv,execStatus);
       sumInstances = maxInstances;
 #endif
-      maxActivations = GetNumberOfActivations(theEnv);
+      maxActivations = GetNumberOfActivations(theEnv,execStatus);
       sumActivations = maxActivations;
       startTime = gentime();
      }
@@ -195,19 +195,19 @@ globle long long EnvRun(
    /*=============================*/
 
    if (execStatus->CurrentEvaluationDepth == 0) SetHaltExecution(theEnv,execStatus,FALSE);
-   EngineData(theEnv)->HaltRules = FALSE;
+   EngineData(theEnv,execStatus)->HaltRules = FALSE;
 
 #if DEVELOPER
-   EngineData(theEnv)->leftToRightComparisons = 0;
-   EngineData(theEnv)->rightToLeftComparisons = 0;
-   EngineData(theEnv)->leftToRightSucceeds = 0;
-   EngineData(theEnv)->rightToLeftSucceeds = 0;
-   EngineData(theEnv)->leftToRightLoops = 0;
-   EngineData(theEnv)->rightToLeftLoops = 0;
-   EngineData(theEnv)->findNextConflictingComparisons = 0;
-   EngineData(theEnv)->betaHashListSkips = 0;
-   EngineData(theEnv)->betaHashHTSkips = 0;
-   EngineData(theEnv)->unneededMarkerCompare = 0;
+   EngineData(theEnv,execStatus)->leftToRightComparisons = 0;
+   EngineData(theEnv,execStatus)->rightToLeftComparisons = 0;
+   EngineData(theEnv,execStatus)->leftToRightSucceeds = 0;
+   EngineData(theEnv,execStatus)->rightToLeftSucceeds = 0;
+   EngineData(theEnv,execStatus)->leftToRightLoops = 0;
+   EngineData(theEnv,execStatus)->rightToLeftLoops = 0;
+   EngineData(theEnv,execStatus)->findNextConflictingComparisons = 0;
+   EngineData(theEnv,execStatus)->betaHashListSkips = 0;
+   EngineData(theEnv,execStatus)->betaHashHTSkips = 0;
+   EngineData(theEnv,execStatus)->unneededMarkerCompare = 0;
 #endif
 
    /*=====================================================*/
@@ -215,11 +215,11 @@ globle long long EnvRun(
    /* has been reached, or a rule execution error occurs. */
    /*=====================================================*/
 
-   theActivation = NextActivationToFire(theEnv);
+   theActivation = NextActivationToFire(theEnv,execStatus);
    while ((theActivation != NULL) &&
           (runLimit != 0) &&
           (execStatus->HaltExecution == FALSE) &&
-          (EngineData(theEnv)->HaltRules == FALSE))
+          (EngineData(theEnv,execStatus)->HaltRules == FALSE))
      {
       /*===========================================*/
       /* Detach the activation from the agenda and */
@@ -230,7 +230,7 @@ globle long long EnvRun(
       theTM = AddTrackedMemory(theEnv,execStatus,theActivation,sizeof(struct activation));
       ruleFiring = EnvGetActivationName(theEnv,execStatus,theActivation);
       theBasis = (struct partialMatch *) GetActivationBasis(theActivation);
-      EngineData(theEnv)->ExecutingRule = (struct defrule *) GetActivationRule(theActivation);
+      EngineData(theEnv,execStatus)->ExecutingRule = (struct defrule *) GetActivationRule(theActivation);
 
       /*=============================================*/
       /* Update the number of rules that have fired. */
@@ -245,7 +245,7 @@ globle long long EnvRun(
       /*==================================*/
 
 #if DEBUGGING_FUNCTIONS
-      if (EngineData(theEnv)->ExecutingRule->watchFiring)
+      if (EngineData(theEnv,execStatus)->ExecutingRule->watchFiring)
         {
          char printSpace[60];
 
@@ -271,8 +271,8 @@ globle long long EnvRun(
       theBasis->marker = NULL;
       theBasis->busy = TRUE;
 
-      EngineData(theEnv)->GlobalLHSBinds = theBasis;
-      EngineData(theEnv)->GlobalRHSBinds = NULL;
+      EngineData(theEnv,execStatus)->GlobalLHSBinds = theBasis;
+      EngineData(theEnv,execStatus)->GlobalRHSBinds = NULL;
 
       /*===================================================================*/
       /* Increment the count for each of the facts/objects associated with */
@@ -295,43 +295,43 @@ globle long long EnvRun(
       /* attach the appropriate dependencies to the facts.  */
       /*====================================================*/
 
-      EngineData(theEnv)->TheLogicalJoin = EngineData(theEnv)->ExecutingRule->logicalJoin;
+      EngineData(theEnv,execStatus)->TheLogicalJoin = EngineData(theEnv,execStatus)->ExecutingRule->logicalJoin;
       
-      if (EngineData(theEnv)->TheLogicalJoin != NULL)
+      if (EngineData(theEnv,execStatus)->TheLogicalJoin != NULL)
         { 
-         EngineData(theEnv)->TheLogicalBind = FindLogicalBind(EngineData(theEnv)->TheLogicalJoin,EngineData(theEnv)->GlobalLHSBinds); 
-         EngineData(theEnv)->TheLogicalBind->busy = TRUE; 
+         EngineData(theEnv,execStatus)->TheLogicalBind = FindLogicalBind(EngineData(theEnv,execStatus)->TheLogicalJoin,EngineData(theEnv,execStatus)->GlobalLHSBinds); 
+         EngineData(theEnv,execStatus)->TheLogicalBind->busy = TRUE; 
         }
       else
-        { EngineData(theEnv)->TheLogicalBind = NULL; }
+        { EngineData(theEnv,execStatus)->TheLogicalBind = NULL; }
 
       execStatus->CurrentEvaluationDepth++;
       SetEvaluationError(theEnv,execStatus,FALSE);
-      EngineData(theEnv)->ExecutingRule->executing = TRUE;
+      EngineData(theEnv,execStatus)->ExecutingRule->executing = TRUE;
 
 #if PROFILING_FUNCTIONS
       StartProfile(theEnv,execStatus,&profileFrame,
-                   &EngineData(theEnv)->ExecutingRule->header.usrData,
-                   ProfileFunctionData(theEnv)->ProfileConstructs);
+                   &EngineData(theEnv,execStatus)->ExecutingRule->header.usrData,
+                   ProfileFunctionData(theEnv,execStatus)->ProfileConstructs);
 #endif
 
-      EvaluateProcActions(theEnv,execStatus,EngineData(theEnv)->ExecutingRule->header.whichModule->theModule,
-                          EngineData(theEnv)->ExecutingRule->actions,EngineData(theEnv)->ExecutingRule->localVarCnt,
+      EvaluateProcActions(theEnv,execStatus,EngineData(theEnv,execStatus)->ExecutingRule->header.whichModule->theModule,
+                          EngineData(theEnv,execStatus)->ExecutingRule->actions,EngineData(theEnv,execStatus)->ExecutingRule->localVarCnt,
                           &result,NULL);
 
 #if PROFILING_FUNCTIONS
       EndProfile(theEnv,execStatus,&profileFrame);
 #endif
 
-      EngineData(theEnv)->ExecutingRule->executing = FALSE;
+      EngineData(theEnv,execStatus)->ExecutingRule->executing = FALSE;
       SetEvaluationError(theEnv,execStatus,FALSE);
       execStatus->CurrentEvaluationDepth--;
-      EngineData(theEnv)->TheLogicalJoin = NULL;
+      EngineData(theEnv,execStatus)->TheLogicalJoin = NULL;
       
-      if (EngineData(theEnv)->TheLogicalBind != NULL)
+      if (EngineData(theEnv,execStatus)->TheLogicalBind != NULL)
         {
-         EngineData(theEnv)->TheLogicalBind->busy = FALSE;
-         EngineData(theEnv)->TheLogicalBind = NULL;
+         EngineData(theEnv,execStatus)->TheLogicalBind->busy = FALSE;
+         EngineData(theEnv,execStatus)->TheLogicalBind = NULL;
         }
 
       /*=====================================================*/
@@ -339,9 +339,9 @@ globle long long EnvRun(
       /*=====================================================*/
 
 #if DEBUGGING_FUNCTIONS
-      if ((execStatus->HaltExecution) || (EngineData(theEnv)->HaltRules && EngineData(theEnv)->ExecutingRule->watchFiring))
+      if ((execStatus->HaltExecution) || (EngineData(theEnv,execStatus)->HaltRules && EngineData(theEnv,execStatus)->ExecutingRule->watchFiring))
 #else
-      if ((execStatus->HaltExecution) || (EngineData(theEnv)->HaltRules))
+      if ((execStatus->HaltExecution) || (EngineData(theEnv,execStatus)->HaltRules))
 #endif
 
         {
@@ -378,7 +378,7 @@ globle long long EnvRun(
       /* while executing the rule's RHS.      */
       /*======================================*/
 
-      FlushGarbagePartialMatches(theEnv);
+      FlushGarbagePartialMatches(theEnv,execStatus);
 
       /*==================================*/
       /* Get rid of other garbage created */
@@ -392,19 +392,19 @@ globle long long EnvRun(
       /*==========================*/
 
 #if DEBUGGING_FUNCTIONS
-      if (EngineData(theEnv)->WatchStatistics)
+      if (EngineData(theEnv,execStatus)->WatchStatistics)
         {
 #if DEFTEMPLATE_CONSTRUCT
-         tempValue = GetNumberOfFacts(theEnv);
+         tempValue = GetNumberOfFacts(theEnv,execStatus);
          if (tempValue > maxFacts) maxFacts = tempValue;
          sumFacts += tempValue;
 #endif
 #if OBJECT_SYSTEM
-         tempValue = GetGlobalNumberOfInstances(theEnv);
+         tempValue = GetGlobalNumberOfInstances(theEnv,execStatus);
          if (tempValue > maxInstances) maxInstances = tempValue;
          sumInstances += tempValue;
 #endif
-         tempValue = GetNumberOfActivations(theEnv);
+         tempValue = GetNumberOfActivations(theEnv,execStatus);
          if (tempValue > maxActivations) maxActivations = tempValue;
          sumActivations += tempValue;
         }
@@ -414,20 +414,20 @@ globle long long EnvRun(
       /* Update saliences if appropriate. */
       /*==================================*/
 
-      if (EnvGetSalienceEvaluation(theEnv) == EVERY_CYCLE) EnvRefreshAgenda(theEnv,execStatus,NULL);
+      if (EnvGetSalienceEvaluation(theEnv,execStatus) == EVERY_CYCLE) EnvRefreshAgenda(theEnv,execStatus,NULL);
 
       /*========================================*/
       /* Execute the list of functions that are */
       /* to be called after each rule firing.   */
       /*========================================*/
 
-      for (theRunFunction = EngineData(theEnv)->ListOfRunFunctions;
+      for (theRunFunction = EngineData(theEnv,execStatus)->ListOfRunFunctions;
            theRunFunction != NULL;
            theRunFunction = theRunFunction->next)
         { 
          SetEnvironmentCallbackContext(theEnv,execStatus,theRunFunction->context);
          if (theRunFunction->environmentAware)
-           { (*theRunFunction->func)(theEnv); }
+           { (*theRunFunction->func)(theEnv,execStatus); }
          else            
            { ((void (*)(void))(*theRunFunction->func))(); }
         }
@@ -438,15 +438,15 @@ globle long long EnvRun(
       /* from the focus stack                   */
       /*========================================*/
 
-      if (ProcedureFunctionData(theEnv)->ReturnFlag == TRUE)
-        { RemoveFocus(theEnv,execStatus,EngineData(theEnv)->ExecutingRule->header.whichModule->theModule); }
-      ProcedureFunctionData(theEnv)->ReturnFlag = FALSE;
+      if (ProcedureFunctionData(theEnv,execStatus)->ReturnFlag == TRUE)
+        { RemoveFocus(theEnv,execStatus,EngineData(theEnv,execStatus)->ExecutingRule->header.whichModule->theModule); }
+      ProcedureFunctionData(theEnv,execStatus)->ReturnFlag = FALSE;
 
       /*========================================*/
       /* Determine the next activation to fire. */
       /*========================================*/
 
-      theActivation = (struct activation *) NextActivationToFire(theEnv);
+      theActivation = (struct activation *) NextActivationToFire(theEnv,execStatus);
 
       /*==============================*/
       /* Check for a rule breakpoint. */
@@ -456,7 +456,7 @@ globle long long EnvRun(
         {
          if (((struct defrule *) GetActivationRule(theActivation))->afterBreakpoint)
            {
-            EngineData(theEnv)->HaltRules = TRUE;
+            EngineData(theEnv,execStatus)->HaltRules = TRUE;
             EnvPrintRouter(theEnv,execStatus,WDIALOG,"Breaking on rule ");
             EnvPrintRouter(theEnv,execStatus,WDIALOG,EnvGetActivationName(theEnv,execStatus,theActivation));
             EnvPrintRouter(theEnv,execStatus,WDIALOG,".\n");
@@ -470,12 +470,12 @@ globle long long EnvRun(
 
    if (rulesFired == 0)
      {
-      for (theRunFunction = EngineData(theEnv)->ListOfRunFunctions;
+      for (theRunFunction = EngineData(theEnv,execStatus)->ListOfRunFunctions;
            theRunFunction != NULL;
            theRunFunction = theRunFunction->next)
         { 
          if (theRunFunction->environmentAware)
-           { (*theRunFunction->func)(theEnv); }
+           { (*theRunFunction->func)(theEnv,execStatus); }
          else            
            { ((void (*)(void))(*theRunFunction->func))(); }
         }
@@ -493,15 +493,15 @@ globle long long EnvRun(
    /* Restore execution variables. */
    /*==============================*/
 
-   EngineData(theEnv)->ExecutingRule = NULL;
-   EngineData(theEnv)->HaltRules = FALSE;
+   EngineData(theEnv,execStatus)->ExecutingRule = NULL;
+   EngineData(theEnv,execStatus)->HaltRules = FALSE;
 
    /*=================================================*/
    /* Print out statistics if they are being watched. */
    /*=================================================*/
 
 #if DEBUGGING_FUNCTIONS
-   if (EngineData(theEnv)->WatchStatistics)
+   if (EngineData(theEnv,execStatus)->WatchStatistics)
      {
       char printSpace[60];
 
@@ -544,43 +544,43 @@ globle long long EnvRun(
       
 #if DEVELOPER
       gensprintf(printSpace,"%9ld left to right comparisons.\n",
-                          EngineData(theEnv)->leftToRightComparisons);
+                          EngineData(theEnv,execStatus)->leftToRightComparisons);
       EnvPrintRouter(theEnv,execStatus,WDIALOG,printSpace);
 
       gensprintf(printSpace,"%9ld left to right succeeds.\n",
-                          EngineData(theEnv)->leftToRightSucceeds);
+                          EngineData(theEnv,execStatus)->leftToRightSucceeds);
       EnvPrintRouter(theEnv,execStatus,WDIALOG,printSpace);
 
       gensprintf(printSpace,"%9ld left to right loops.\n",
-                          EngineData(theEnv)->leftToRightLoops);
+                          EngineData(theEnv,execStatus)->leftToRightLoops);
       EnvPrintRouter(theEnv,execStatus,WDIALOG,printSpace);
 
       gensprintf(printSpace,"%9ld right to left comparisons.\n",
-                          EngineData(theEnv)->rightToLeftComparisons);
+                          EngineData(theEnv,execStatus)->rightToLeftComparisons);
       EnvPrintRouter(theEnv,execStatus,WDIALOG,printSpace);
 
       gensprintf(printSpace,"%9ld right to left succeeds.\n",
-                          EngineData(theEnv)->rightToLeftSucceeds);
+                          EngineData(theEnv,execStatus)->rightToLeftSucceeds);
       EnvPrintRouter(theEnv,execStatus,WDIALOG,printSpace);
 
       gensprintf(printSpace,"%9ld right to left loops.\n",
-                          EngineData(theEnv)->rightToLeftLoops);
+                          EngineData(theEnv,execStatus)->rightToLeftLoops);
       EnvPrintRouter(theEnv,execStatus,WDIALOG,printSpace);
 
       gensprintf(printSpace,"%9ld find next conflicting comparisons.\n",
-                          EngineData(theEnv)->findNextConflictingComparisons);
+                          EngineData(theEnv,execStatus)->findNextConflictingComparisons);
       EnvPrintRouter(theEnv,execStatus,WDIALOG,printSpace);
 
       gensprintf(printSpace,"%9ld beta hash list skips.\n",
-                          EngineData(theEnv)->betaHashListSkips);
+                          EngineData(theEnv,execStatus)->betaHashListSkips);
       EnvPrintRouter(theEnv,execStatus,WDIALOG,printSpace);
       
       gensprintf(printSpace,"%9ld beta hash hash table skips.\n",
-                          EngineData(theEnv)->betaHashHTSkips);
+                          EngineData(theEnv,execStatus)->betaHashHTSkips);
       EnvPrintRouter(theEnv,execStatus,WDIALOG,printSpace);
 
       gensprintf(printSpace,"%9ld unneeded marker compare.\n",
-                          EngineData(theEnv)->unneededMarkerCompare);
+                          EngineData(theEnv,execStatus)->unneededMarkerCompare);
       EnvPrintRouter(theEnv,execStatus,WDIALOG,printSpace);
 
 #endif
@@ -592,17 +592,17 @@ globle long long EnvRun(
    /* focus when the run finishes.             */
    /*==========================================*/
 
-   if (EngineData(theEnv)->CurrentFocus != NULL)
+   if (EngineData(theEnv,execStatus)->CurrentFocus != NULL)
      {
-      if (EngineData(theEnv)->CurrentFocus->theModule != ((struct defmodule *) EnvGetCurrentModule(theEnv)))
-        { EnvSetCurrentModule(theEnv,execStatus,(void *) EngineData(theEnv)->CurrentFocus->theModule); }
+      if (EngineData(theEnv,execStatus)->CurrentFocus->theModule != ((struct defmodule *) EnvGetCurrentModule(theEnv,execStatus)))
+        { EnvSetCurrentModule(theEnv,execStatus,(void *) EngineData(theEnv,execStatus)->CurrentFocus->theModule); }
      }
 
    /*===================================*/
    /* Return the number of rules fired. */
    /*===================================*/
 
-   EngineData(theEnv)->AlreadyRunning = FALSE;
+   EngineData(theEnv,execStatus)->AlreadyRunning = FALSE;
    return(rulesFired);
   }
 
@@ -622,7 +622,7 @@ static struct activation *NextActivationToFire(
    /* focus on the MAIN module.          */
    /*====================================*/
 
-   if (EngineData(theEnv)->CurrentFocus == NULL)
+   if (EngineData(theEnv,execStatus)->CurrentFocus == NULL)
      {
       theModule = (struct defmodule *) EnvFindDefmodule(theEnv,execStatus,"MAIN");
       EnvFocus(theEnv,execStatus,theModule);
@@ -635,11 +635,11 @@ static struct activation *NextActivationToFire(
    /* a focus that has an activation on its agenda is found.    */
    /*===========================================================*/
 
-   theActivation = EngineData(theEnv)->CurrentFocus->theDefruleModule->agenda;
-   while ((theActivation == NULL) && (EngineData(theEnv)->CurrentFocus != NULL))
+   theActivation = EngineData(theEnv,execStatus)->CurrentFocus->theDefruleModule->agenda;
+   while ((theActivation == NULL) && (EngineData(theEnv,execStatus)->CurrentFocus != NULL))
      {
-      if (EngineData(theEnv)->CurrentFocus != NULL) EnvPopFocus(theEnv);
-      if (EngineData(theEnv)->CurrentFocus != NULL) theActivation = EngineData(theEnv)->CurrentFocus->theDefruleModule->agenda;
+      if (EngineData(theEnv,execStatus)->CurrentFocus != NULL) EnvPopFocus(theEnv,execStatus);
+      if (EngineData(theEnv,execStatus)->CurrentFocus != NULL) theActivation = EngineData(theEnv,execStatus)->CurrentFocus->theDefruleModule->agenda;
      }
 
    /*=========================================*/
@@ -667,7 +667,7 @@ static struct defmodule *RemoveFocus(
    /* the focus stack to remove.         */
    /*====================================*/
 
-   if (EngineData(theEnv)->CurrentFocus == NULL) return(NULL);
+   if (EngineData(theEnv,execStatus)->CurrentFocus == NULL) return(NULL);
 
    /*=============================================*/
    /* Remove the first occurence of the specified */
@@ -675,7 +675,7 @@ static struct defmodule *RemoveFocus(
    /*=============================================*/
 
    prevFocus = NULL;
-   tempFocus = EngineData(theEnv)->CurrentFocus;
+   tempFocus = EngineData(theEnv,execStatus)->CurrentFocus;
    while ((tempFocus != NULL) && (! found))
      {
       if (tempFocus->theModule == theModule)
@@ -689,7 +689,7 @@ static struct defmodule *RemoveFocus(
          if (prevFocus == NULL)
            {
             currentFocusRemoved = TRUE;
-            EngineData(theEnv)->CurrentFocus = tempFocus;
+            EngineData(theEnv,execStatus)->CurrentFocus = tempFocus;
            }
          else
            { prevFocus->next = tempFocus; }
@@ -706,7 +706,7 @@ static struct defmodule *RemoveFocus(
    /* stack, simply return the current focus  */
    /*=========================================*/
 
-   if (! found) return(EngineData(theEnv)->CurrentFocus->theModule);
+   if (! found) return(EngineData(theEnv,execStatus)->CurrentFocus->theModule);
 
    /*========================================*/
    /* If the current focus is being watched, */
@@ -714,15 +714,15 @@ static struct defmodule *RemoveFocus(
    /*========================================*/
 
 #if DEBUGGING_FUNCTIONS
-   if (EngineData(theEnv)->WatchFocus)
+   if (EngineData(theEnv,execStatus)->WatchFocus)
      {
       EnvPrintRouter(theEnv,execStatus,WTRACE,"<== Focus ");
       EnvPrintRouter(theEnv,execStatus,WTRACE,ValueToString(theModule->name));
 
-      if ((EngineData(theEnv)->CurrentFocus != NULL) && currentFocusRemoved)
+      if ((EngineData(theEnv,execStatus)->CurrentFocus != NULL) && currentFocusRemoved)
         {
          EnvPrintRouter(theEnv,execStatus,WTRACE," to ");
-         EnvPrintRouter(theEnv,execStatus,WTRACE,ValueToString(EngineData(theEnv)->CurrentFocus->theModule->name));
+         EnvPrintRouter(theEnv,execStatus,WTRACE,ValueToString(EngineData(theEnv,execStatus)->CurrentFocus->theModule->name));
         }
 
       EnvPrintRouter(theEnv,execStatus,WTRACE,"\n");
@@ -735,9 +735,9 @@ static struct defmodule *RemoveFocus(
    /* flag indicating that the focus has changed.          */
    /*======================================================*/
 
-   if ((EngineData(theEnv)->CurrentFocus != NULL) && currentFocusRemoved)
-     { EnvSetCurrentModule(theEnv,execStatus,(void *) EngineData(theEnv)->CurrentFocus->theModule); }
-   EngineData(theEnv)->FocusChanged = TRUE;
+   if ((EngineData(theEnv,execStatus)->CurrentFocus != NULL) && currentFocusRemoved)
+     { EnvSetCurrentModule(theEnv,execStatus,(void *) EngineData(theEnv,execStatus)->CurrentFocus->theModule); }
+   EngineData(theEnv,execStatus)->FocusChanged = TRUE;
 
    /*====================================*/
    /* Return the module that was removed */
@@ -754,8 +754,8 @@ globle void *EnvPopFocus(
   void *theEnv,
   EXEC_STATUS)
   {
-   if (EngineData(theEnv)->CurrentFocus == NULL) return(NULL);
-   return((void *) RemoveFocus(theEnv,execStatus,EngineData(theEnv)->CurrentFocus->theModule));
+   if (EngineData(theEnv,execStatus)->CurrentFocus == NULL) return(NULL);
+   return((void *) RemoveFocus(theEnv,execStatus,EngineData(theEnv,execStatus)->CurrentFocus->theModule));
   }
 
 /***************************************************************/
@@ -771,7 +771,7 @@ globle void *EnvGetNextFocus(
    /* focus on the focus stack (the current focus).    */
    /*==================================================*/
 
-   if (theFocus == NULL) return((void *) EngineData(theEnv)->CurrentFocus);
+   if (theFocus == NULL) return((void *) EngineData(theEnv,execStatus)->CurrentFocus);
 
    /*=======================================*/
    /* Otherwise, return the focus following */
@@ -799,8 +799,8 @@ globle void EnvFocus(
    /*==================================================*/
 
    EnvSetCurrentModule(theEnv,execStatus,(void *) theModule);
-   if (EngineData(theEnv)->CurrentFocus != NULL)
-     { if (EngineData(theEnv)->CurrentFocus->theModule == theModule) return; }
+   if (EngineData(theEnv,execStatus)->CurrentFocus != NULL)
+     { if (EngineData(theEnv,execStatus)->CurrentFocus->theModule == theModule) return; }
 
    /*=====================================*/
    /* If the focus is being watched, then */
@@ -808,14 +808,14 @@ globle void EnvFocus(
    /*=====================================*/
 
 #if DEBUGGING_FUNCTIONS
-   if (EngineData(theEnv)->WatchFocus)
+   if (EngineData(theEnv,execStatus)->WatchFocus)
      {
       EnvPrintRouter(theEnv,execStatus,WTRACE,"==> Focus ");
       EnvPrintRouter(theEnv,execStatus,WTRACE,ValueToString(theModule->name));
-      if (EngineData(theEnv)->CurrentFocus != NULL)
+      if (EngineData(theEnv,execStatus)->CurrentFocus != NULL)
         {
          EnvPrintRouter(theEnv,execStatus,WTRACE," from ");
-         EnvPrintRouter(theEnv,execStatus,WTRACE,ValueToString(EngineData(theEnv)->CurrentFocus->theModule->name));
+         EnvPrintRouter(theEnv,execStatus,WTRACE,ValueToString(EngineData(theEnv,execStatus)->CurrentFocus->theModule->name));
         }
       EnvPrintRouter(theEnv,execStatus,WTRACE,"\n");
      }
@@ -828,9 +828,9 @@ globle void EnvFocus(
    tempFocus = get_struct(theEnv,execStatus,focus);
    tempFocus->theModule = theModule;
    tempFocus->theDefruleModule = GetDefruleModuleItem(theEnv,execStatus,theModule);
-   tempFocus->next = EngineData(theEnv)->CurrentFocus;
-   EngineData(theEnv)->CurrentFocus = tempFocus;
-   EngineData(theEnv)->FocusChanged = TRUE;
+   tempFocus->next = EngineData(theEnv,execStatus)->CurrentFocus;
+   EngineData(theEnv,execStatus)->CurrentFocus = tempFocus;
+   EngineData(theEnv,execStatus)->FocusChanged = TRUE;
   }
 
 /************************************************/
@@ -843,7 +843,7 @@ globle void ClearFocusStackCommand(
   {
    if (EnvArgCountCheck(theEnv,execStatus,"list-focus-stack",EXACTLY,0) == -1) return;
 
-   EnvClearFocusStack(theEnv);
+   EnvClearFocusStack(theEnv,execStatus);
   }
 
 /****************************************/
@@ -854,9 +854,9 @@ globle void EnvClearFocusStack(
   void *theEnv,
   EXEC_STATUS)
   {
-   while (EngineData(theEnv)->CurrentFocus != NULL) EnvPopFocus(theEnv);
+   while (EngineData(theEnv,execStatus)->CurrentFocus != NULL) EnvPopFocus(theEnv,execStatus);
 
-   EngineData(theEnv)->FocusChanged = TRUE;
+   EngineData(theEnv,execStatus)->FocusChanged = TRUE;
   }
 
 #if ALLOW_ENVIRONMENT_GLOBALS
@@ -869,14 +869,14 @@ globle intBool AddRunFunction(
   void (*functionPtr)(void),
   int priority)
   {
-   void *theEnv,
-  EXEC_STATUS;
-   
+   void *theEnv;
+	  
+   // Lode: TODO: add exec_status??
    theEnv = GetCurrentEnvironment();
 
-   EngineData(theEnv)->ListOfRunFunctions = 
+   EngineData(theEnv,execStatus)->ListOfRunFunctions = 
        AddFunctionToCallList(theEnv,execStatus,name,priority,(void (*)(void *)) functionPtr,
-                             EngineData(theEnv)->ListOfRunFunctions,TRUE);
+                             EngineData(theEnv,execStatus)->ListOfRunFunctions,TRUE);
    return(1);
   }
 #endif
@@ -892,9 +892,9 @@ globle intBool EnvAddRunFunction(
   void (*functionPtr)(void *),
   int priority)
   {
-   EngineData(theEnv)->ListOfRunFunctions = AddFunctionToCallList(theEnv,execStatus,name,priority,
+   EngineData(theEnv,execStatus)->ListOfRunFunctions = AddFunctionToCallList(theEnv,execStatus,name,priority,
                                               functionPtr,
-                                              EngineData(theEnv)->ListOfRunFunctions,TRUE);
+                                              EngineData(theEnv,execStatus)->ListOfRunFunctions,TRUE);
    return(1);
   }
   
@@ -910,9 +910,9 @@ globle intBool EnvAddRunFunctionWithContext(
   int priority,
   void *context)
   {
-   EngineData(theEnv)->ListOfRunFunctions = 
+   EngineData(theEnv,execStatus)->ListOfRunFunctions = 
       AddFunctionToCallListWithContext(theEnv,execStatus,name,priority,functionPtr,
-                                       EngineData(theEnv)->ListOfRunFunctions,
+                                       EngineData(theEnv,execStatus)->ListOfRunFunctions,
                                        TRUE,context);
    return(1);
   }
@@ -928,8 +928,8 @@ globle intBool EnvRemoveRunFunction(
   {
    int found;
 
-   EngineData(theEnv)->ListOfRunFunctions = 
-      RemoveFunctionFromCallList(theEnv,execStatus,name,EngineData(theEnv)->ListOfRunFunctions,&found);
+   EngineData(theEnv,execStatus)->ListOfRunFunctions = 
+      RemoveFunctionFromCallList(theEnv,execStatus,name,EngineData(theEnv,execStatus)->ListOfRunFunctions,&found);
 
    if (found) return(TRUE);
 
@@ -970,7 +970,7 @@ globle void HaltCommand(
   EXEC_STATUS)
   {
    EnvArgCountCheck(theEnv,execStatus,"halt",EXACTLY,0);
-   EnvHalt(theEnv);
+   EnvHalt(theEnv,execStatus);
   }
 
 /*****************************/
@@ -981,7 +981,7 @@ globle void EnvHalt(
   void *theEnv,
   EXEC_STATUS)
   {
-   EngineData(theEnv)->HaltRules = TRUE;
+   EngineData(theEnv,execStatus)->HaltRules = TRUE;
   }
 
 #if DEBUGGING_FUNCTIONS
@@ -999,7 +999,7 @@ globle void EnvSetBreak(
   void *theRule)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
    struct defrule *thePtr;
 
@@ -1022,7 +1022,7 @@ globle intBool EnvRemoveBreak(
   void *theRule)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
    struct defrule *thePtr;
    int rv = FALSE;
@@ -1088,7 +1088,7 @@ globle intBool EnvDefruleHasBreakpoint(
   void *theRule)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 
    return(((struct defrule *) theRule)->afterBreakpoint);
@@ -1139,7 +1139,7 @@ globle void RemoveBreakCommand(
 
    if (nargs == 0)
      {
-      RemoveAllBreakpoints(theEnv);
+      RemoveAllBreakpoints(theEnv,execStatus);
       return;
      }
 
@@ -1180,7 +1180,7 @@ globle void ShowBreaksCommand(
       if (error) return;
      }
    else
-     { theModule = ((struct defmodule *) EnvGetCurrentModule(theEnv)); }
+     { theModule = ((struct defmodule *) EnvGetCurrentModule(theEnv,execStatus)); }
 
    EnvShowBreaks(theEnv,execStatus,WDISPLAY,theModule);
   }
@@ -1209,7 +1209,7 @@ globle void EnvListFocusStack(
   {
    struct focus *theFocus;
 
-   for (theFocus = EngineData(theEnv)->CurrentFocus;
+   for (theFocus = EngineData(theEnv,execStatus)->CurrentFocus;
         theFocus != NULL;
         theFocus = theFocus->next)
      {
@@ -1252,7 +1252,7 @@ globle void EnvGetFocusStack(
    /* a multifield value of length zero.        */
    /*===========================================*/
 
-   if (EngineData(theEnv)->CurrentFocus == NULL)
+   if (EngineData(theEnv,execStatus)->CurrentFocus == NULL)
      {
       SetpType(returnValue,MULTIFIELD);
       SetpDOBegin(returnValue,1);
@@ -1265,7 +1265,7 @@ globle void EnvGetFocusStack(
    /* Determine the number of modules on the focus stack. */
    /*=====================================================*/
 
-   for (theFocus = EngineData(theEnv)->CurrentFocus; theFocus != NULL; theFocus = theFocus->next)
+   for (theFocus = EngineData(theEnv,execStatus)->CurrentFocus; theFocus != NULL; theFocus = theFocus->next)
      { count++; }
 
    /*=============================================*/
@@ -1283,7 +1283,7 @@ globle void EnvGetFocusStack(
    /* Store the module names in the multifield value. */
    /*=================================================*/
 
-   for (theFocus = EngineData(theEnv)->CurrentFocus, count = 1;
+   for (theFocus = EngineData(theEnv,execStatus)->CurrentFocus, count = 1;
         theFocus != NULL;
         theFocus = theFocus->next, count++)
      {
@@ -1304,8 +1304,8 @@ globle void *PopFocusFunction(
 
    EnvArgCountCheck(theEnv,execStatus,"pop-focus",EXACTLY,0);
 
-   theModule = (struct defmodule *) EnvPopFocus(theEnv);
-   if (theModule == NULL) return((SYMBOL_HN *) EnvFalseSymbol(theEnv));
+   theModule = (struct defmodule *) EnvPopFocus(theEnv,execStatus);
+   if (theModule == NULL) return((SYMBOL_HN *) EnvFalseSymbol(theEnv,execStatus));
    return(theModule->name);
   }
 
@@ -1320,8 +1320,8 @@ globle void *GetFocusFunction(
    struct defmodule *rv;
 
    EnvArgCountCheck(theEnv,execStatus,"get-focus",EXACTLY,0);
-   rv = (struct defmodule *) EnvGetFocus(theEnv);
-   if (rv == NULL) return((SYMBOL_HN *) EnvFalseSymbol(theEnv));
+   rv = (struct defmodule *) EnvGetFocus(theEnv,execStatus);
+   if (rv == NULL) return((SYMBOL_HN *) EnvFalseSymbol(theEnv,execStatus));
    return(rv->name);
   }
 
@@ -1333,9 +1333,9 @@ globle void *EnvGetFocus(
   void *theEnv,
   EXEC_STATUS)
   {
-   if (EngineData(theEnv)->CurrentFocus == NULL) return(NULL);
+   if (EngineData(theEnv,execStatus)->CurrentFocus == NULL) return(NULL);
 
-   return((void *) EngineData(theEnv)->CurrentFocus->theModule);
+   return((void *) EngineData(theEnv,execStatus)->CurrentFocus->theModule);
   }
 
 /**************************************/
@@ -1393,7 +1393,7 @@ globle int EnvGetFocusChanged(
   void *theEnv,
   EXEC_STATUS)
   {
-   return(EngineData(theEnv)->FocusChanged);
+   return(EngineData(theEnv,execStatus)->FocusChanged);
   }
 
 /********************************************************************/
@@ -1404,7 +1404,7 @@ globle void EnvSetFocusChanged(
   EXEC_STATUS,
   int value)
   {
-   EngineData(theEnv)->FocusChanged = value;
+   EngineData(theEnv,execStatus)->FocusChanged = value;
   }
 
 /*********************************************/
@@ -1415,7 +1415,7 @@ globle void EnvSetHaltRules(
   EXEC_STATUS,
   intBool value)
   { 
-   EngineData(theEnv)->HaltRules = value; 
+   EngineData(theEnv,execStatus)->HaltRules = value; 
   }
 
 /****************************************************/
@@ -1425,7 +1425,7 @@ globle intBool EnvGetHaltRules(
   void *theEnv,
   EXEC_STATUS)
   {
-   return(EngineData(theEnv)->HaltRules);
+   return(EngineData(theEnv,execStatus)->HaltRules);
   }
 
 #endif /* DEFRULE_CONSTRUCT */

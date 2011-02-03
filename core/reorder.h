@@ -104,14 +104,14 @@ struct lhsParseNode
    struct lhsParseNode *bottom;
   };
 
-LOCALE struct lhsParseNode           *ReorderPatterns(void *,struct lhsParseNode *,int *);
-LOCALE struct lhsParseNode           *CopyLHSParseNodes(void *,struct lhsParseNode *);
-LOCALE void                           CopyLHSParseNode(void *,struct lhsParseNode *,struct lhsParseNode *,int);
-LOCALE struct lhsParseNode           *GetLHSParseNode(void *);
-LOCALE void                           ReturnLHSParseNodes(void *,struct lhsParseNode *);
-LOCALE struct lhsParseNode           *ExpressionToLHSParseNodes(void *,struct expr *);
-LOCALE struct expr                   *LHSParseNodesToExpression(void *,struct lhsParseNode *);
-LOCALE void                           AddInitialPatterns(void *,struct lhsParseNode *);
+LOCALE struct lhsParseNode           *ReorderPatterns(void *,EXEC_STATUS,struct lhsParseNode *,int *);
+LOCALE struct lhsParseNode           *CopyLHSParseNodes(void *,EXEC_STATUS,struct lhsParseNode *);
+LOCALE void                           CopyLHSParseNode(void *,EXEC_STATUS,struct lhsParseNode *,struct lhsParseNode *,int);
+LOCALE struct lhsParseNode           *GetLHSParseNode(void *,EXEC_STATUS);
+LOCALE void                           ReturnLHSParseNodes(void *,EXEC_STATUS,struct lhsParseNode *);
+LOCALE struct lhsParseNode           *ExpressionToLHSParseNodes(void *,EXEC_STATUS,struct expr *);
+LOCALE struct expr                   *LHSParseNodesToExpression(void *,EXEC_STATUS,struct lhsParseNode *);
+LOCALE void                           AddInitialPatterns(void *,EXEC_STATUS,struct lhsParseNode *);
 LOCALE int                            IsExistsSubjoin(struct lhsParseNode *,int);
 
 #endif

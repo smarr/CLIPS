@@ -48,7 +48,7 @@ struct printUtilityData
    intBool InstanceAddressesToNames;
   };
 
-#define PrintUtilityData(theEnv) ((struct printUtilityData *) GetEnvironmentData(theEnv,execStatus,PRINT_UTILITY_DATA))
+#define PrintUtilityData(theEnv,execStatus) ((struct printUtilityData *) GetEnvironmentData(theEnv,execStatus,PRINT_UTILITY_DATA))
 
 #ifdef LOCALE
 #undef LOCALE
@@ -59,29 +59,29 @@ struct printUtilityData
 #else
 #define LOCALE extern
 #endif
-   LOCALE void                           InitializePrintUtilityData(void *);
-   LOCALE void                           PrintInChunks(void *,char *,char *);
-   LOCALE void                           PrintFloat(void *,char *,double);
-   LOCALE void                           PrintLongInteger(void *,char *,long long);
-   LOCALE void                           PrintAtom(void *,char *,int,void *);
-   LOCALE void                           PrintTally(void *,char *,long long,char *,char *);
-   LOCALE char                          *FloatToString(void *,double);
-   LOCALE char                          *LongIntegerToString(void *,long long);
-   LOCALE char                          *DataObjectToString(void *,DATA_OBJECT *);
-   LOCALE void                           SyntaxErrorMessage(void *,char *);
-   LOCALE void                           SystemError(void *,char *,int);
-   LOCALE void                           PrintErrorID(void *,char *,int,int);
-   LOCALE void                           PrintWarningID(void *,char *,int,int);
-   LOCALE void                           CantFindItemErrorMessage(void *,char *,char *);
-   LOCALE void                           CantDeleteItemErrorMessage(void *,char *,char *);
-   LOCALE void                           AlreadyParsedErrorMessage(void *,char *,char *);
-   LOCALE void                           LocalVariableErrorMessage(void *,char *);
-   LOCALE void                           DivideByZeroErrorMessage(void *,char *);
-   LOCALE void                           SalienceInformationError(void *,char *,char *);
-   LOCALE void                           SalienceRangeError(void *,int,int);
-   LOCALE void                           SalienceNonIntegerError(void *);
-   LOCALE void                           CantFindItemInFunctionErrorMessage(void *,char *,char *,char *);
-   LOCALE void                           SlotExistError(void *,char *,char *);
+   LOCALE void                           InitializePrintUtilityData(void *,EXEC_STATUS);
+   LOCALE void                           PrintInChunks(void *,EXEC_STATUS,char *,char *);
+   LOCALE void                           PrintFloat(void *,EXEC_STATUS,char *,double);
+   LOCALE void                           PrintLongInteger(void *,EXEC_STATUS,char *,long long);
+   LOCALE void                           PrintAtom(void *,EXEC_STATUS,char *,int,void *);
+   LOCALE void                           PrintTally(void *,EXEC_STATUS,char *,long long,char *,char *);
+   LOCALE char                          *FloatToString(void *,EXEC_STATUS,double);
+   LOCALE char                          *LongIntegerToString(void *,EXEC_STATUS,long long);
+   LOCALE char                          *DataObjectToString(void *,EXEC_STATUS,DATA_OBJECT *);
+   LOCALE void                           SyntaxErrorMessage(void *,EXEC_STATUS,char *);
+   LOCALE void                           SystemError(void *,EXEC_STATUS,char *,int);
+   LOCALE void                           PrintErrorID(void *,EXEC_STATUS,char *,int,int);
+   LOCALE void                           PrintWarningID(void *,EXEC_STATUS,char *,int,int);
+   LOCALE void                           CantFindItemErrorMessage(void *,EXEC_STATUS,char *,char *);
+   LOCALE void                           CantDeleteItemErrorMessage(void *,EXEC_STATUS,char *,char *);
+   LOCALE void                           AlreadyParsedErrorMessage(void *,EXEC_STATUS,char *,char *);
+   LOCALE void                           LocalVariableErrorMessage(void *,EXEC_STATUS,char *);
+   LOCALE void                           DivideByZeroErrorMessage(void *,EXEC_STATUS,char *);
+   LOCALE void                           SalienceInformationError(void *,EXEC_STATUS,char *,char *);
+   LOCALE void                           SalienceRangeError(void *,EXEC_STATUS,int,int);
+   LOCALE void                           SalienceNonIntegerError(void *,EXEC_STATUS);
+   LOCALE void                           CantFindItemInFunctionErrorMessage(void *,EXEC_STATUS,char *,char *,char *);
+   LOCALE void                           SlotExistError(void *,EXEC_STATUS,char *,char *);
 
 #endif
 

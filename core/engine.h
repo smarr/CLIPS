@@ -103,7 +103,7 @@ struct engineData
 #endif
   };
 
-#define EngineData(theEnv) ((struct engineData *) GetEnvironmentData(theEnv,execStatus,ENGINE_DATA))
+#define EngineData(theEnv,execStatus) ((struct engineData *) GetEnvironmentData(theEnv,execStatus,ENGINE_DATA))
 
 #ifdef LOCALE
 #undef LOCALE
@@ -126,21 +126,21 @@ struct engineData
 */
 #define MAX_PATTERNS_CHECKED 64
 
-#define ClearFocusStack() EnvClearFocusStack(GetCurrentEnvironment())
-#define DefruleHasBreakpoint(a) EnvDefruleHasBreakpoint(GetCurrentEnvironment(),a)
-#define Focus(a) EnvFocus(GetCurrentEnvironment(),a)
-#define GetFocus() EnvGetFocus(GetCurrentEnvironment())
-#define GetFocusChanged() EnvGetFocusChanged(GetCurrentEnvironment())
-#define GetFocusStack(a) EnvGetFocusStack(GetCurrentEnvironment(),a)
-#define GetNextFocus(a) EnvGetNextFocus(GetCurrentEnvironment(),a)
-#define Halt() EnvHalt(GetCurrentEnvironment())
-#define ListFocusStack(a) EnvListFocusStack(GetCurrentEnvironment(),a)
-#define PopFocus() EnvPopFocus(GetCurrentEnvironment())
-#define RemoveBreak(a) EnvRemoveBreak(GetCurrentEnvironment(),a)
-#define RemoveRunFunction(a) EnvRemoveRunFunction(GetCurrentEnvironment(),a)
-#define SetBreak(a) EnvSetBreak(GetCurrentEnvironment(),a)
-#define SetFocusChanged(a) EnvSetFocusChanged(GetCurrentEnvironment(),a)
-#define ShowBreaks(a,b) EnvShowBreaks(GetCurrentEnvironment(),a,b)
+#define ClearFocusStack() EnvClearFocusStack(GetCurrentEnvironment(),GetCurrentExecutionState())
+#define DefruleHasBreakpoint(a) EnvDefruleHasBreakpoint(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define Focus(a) EnvFocus(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define GetFocus() EnvGetFocus(GetCurrentEnvironment(),GetCurrentExecutionState())
+#define GetFocusChanged() EnvGetFocusChanged(GetCurrentEnvironment(),GetCurrentExecutionState())
+#define GetFocusStack(a) EnvGetFocusStack(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define GetNextFocus(a) EnvGetNextFocus(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define Halt() EnvHalt(GetCurrentEnvironment(),GetCurrentExecutionState())
+#define ListFocusStack(a) EnvListFocusStack(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define PopFocus() EnvPopFocus(GetCurrentEnvironment(),GetCurrentExecutionState())
+#define RemoveBreak(a) EnvRemoveBreak(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define RemoveRunFunction(a) EnvRemoveRunFunction(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define SetBreak(a) EnvSetBreak(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define SetFocusChanged(a) EnvSetFocusChanged(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define ShowBreaks(a,b) EnvShowBreaks(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
 
 #if ALLOW_ENVIRONMENT_GLOBALS
    LOCALE long long               Run(long long);
@@ -173,9 +173,9 @@ struct engineData
    LOCALE int                     EnvGetFocusChanged(void *,EXEC_STATUS);
    LOCALE void                    EnvSetFocusChanged(void *,EXEC_STATUS,int);
    LOCALE void                    ListFocusStackCommand(void *,EXEC_STATUS);
-   LOCALE void                    EnvListFocusStack(void *,char *);
+   LOCALE void                    EnvListFocusStack(void *,EXEC_STATUS,char *);
    LOCALE void                    GetFocusStackFunction(void *,EXEC_STATUS,DATA_OBJECT_PTR);
-   LOCALE void                    EnvGetFocusStack(void *,DATA_OBJECT_PTR);
+   LOCALE void                    EnvGetFocusStack(void *,EXEC_STATUS,DATA_OBJECT_PTR);
    LOCALE void                   *PopFocusFunction(void *,EXEC_STATUS);
    LOCALE void                   *GetFocusFunction(void *,EXEC_STATUS);
    LOCALE void                   *EnvPopFocus(void *,EXEC_STATUS);

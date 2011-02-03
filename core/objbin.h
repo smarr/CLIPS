@@ -48,9 +48,9 @@ struct objectBinaryData
    unsigned *MaphandlerArray;
   };
 
-#define ObjectBinaryData(theEnv) ((struct objectBinaryData *) GetEnvironmentData(theEnv,execStatus,OBJECTBIN_DATA))
+#define ObjectBinaryData(theEnv,execStatus) ((struct objectBinaryData *) GetEnvironmentData(theEnv,execStatus,OBJECTBIN_DATA))
 
-#define DefclassPointer(i) (((i) == -1L) ? NULL : (DEFCLASS *) &ObjectBinaryData(theEnv)->DefclassArray[i])
+#define DefclassPointer(i) (((i) == -1L) ? NULL : (DEFCLASS *) &ObjectBinaryData(theEnv,execStatus)->DefclassArray[i])
 #define DefclassIndex(cls) (((cls) == NULL) ? -1 : ((struct constructHeader *) cls)->bsaveID)
 
 
@@ -64,8 +64,8 @@ struct objectBinaryData
 #define LOCALE extern
 #endif
 
-LOCALE void SetupObjectsBload(void *);
-LOCALE void *BloadDefclassModuleReference(void *,int);
+LOCALE void SetupObjectsBload(void *,EXEC_STATUS);
+LOCALE void *BloadDefclassModuleReference(void *,EXEC_STATUS,int);
 
 #endif
 

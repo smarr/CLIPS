@@ -54,14 +54,15 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static int                     FindConstructBeginning(void *,char *,struct token *,int,int *);
+   static int                     FindConstructBeginning(void *,EXEC_STATUS,char *,struct token *,int,int *);
 
 /************************************************/
 /* Load: C access routine for the load command. */
 /************************************************/
 #if ALLOW_ENVIRONMENT_GLOBALS
 globle int Load(
-  char *fileName,EXEC_STATUS)
+  char *fileName,
+  EXEC_STATUS)
   {
    return EnvLoad(GetCurrentEnvironment(),execStatus,fileName);
   }
@@ -148,13 +149,13 @@ globle int LoadConstructsFromLogicalName(
    /* Parse the file until the end of file is reached. */
    /*==================================================*/
 
-   while ((foundConstruct == TRUE) && (GetHaltExecution(theEnv) == FALSE))
+   while ((foundConstruct == TRUE) && (GetHaltExecution(theEnv,execStatus) == FALSE))
      {
       /*===========================================================*/
       /* Clear the pretty print buffer in preparation for parsing. */
       /*===========================================================*/
 
-      FlushPPBuffer(theEnv);
+      FlushPPBuffer(theEnv,execStatus);
 
       /*======================*/
       /* Parse the construct. */
@@ -172,7 +173,7 @@ globle int LoadConstructsFromLogicalName(
       if (constructFlag == 1)
         {
          EnvPrintRouter(theEnv,execStatus,WERROR,"\nERROR:\n");
-         PrintInChunks(theEnv,execStatus,WERROR,GetPPBuffer(theEnv));
+         PrintInChunks(theEnv,execStatus,WERROR,GetPPBuffer(theEnv,execStatus));
          EnvPrintRouter(theEnv,execStatus,WERROR,"\n");
          noErrors = FALSE;
          GetToken(theEnv,execStatus,readSource,&theToken);
@@ -197,7 +198,7 @@ globle int LoadConstructsFromLogicalName(
          { IncrementSymbolCount(theToken.value); }
        execStatus->CurrentEvaluationDepth--;
        PeriodicCleanup(theEnv,execStatus,FALSE,TRUE);
-       YieldTime(theEnv);
+       YieldTime(theEnv,execStatus);
        execStatus->CurrentEvaluationDepth++;
        if (foundConstruct)
          { DecrementSymbolCount(theEnv,execStatus,(SYMBOL_HN *) theToken.value); }
@@ -211,9 +212,9 @@ globle int LoadConstructsFromLogicalName(
    /*========================================================*/
 
 #if DEBUGGING_FUNCTIONS
-   if ((EnvGetWatchItem(theEnv,execStatus,"compilations") != TRUE) && GetPrintWhileLoading(theEnv))
+   if ((EnvGetWatchItem(theEnv,execStatus,"compilations") != TRUE) && GetPrintWhileLoading(theEnv,execStatus))
 #else
-   if (GetPrintWhileLoading(theEnv))
+   if (GetPrintWhileLoading(theEnv,execStatus))
 #endif
      { EnvPrintRouter(theEnv,execStatus,WDIALOG,"\n"); }
 
@@ -225,7 +226,7 @@ globle int LoadConstructsFromLogicalName(
    /* memory being used after a load command.                     */
    /*=============================================================*/
 
-   DestroyPPBuffer(theEnv);
+   DestroyPPBuffer(theEnv,execStatus);
 
    /*==========================================================*/
    /* Return a boolean flag which indicates whether any errors */
@@ -368,31 +369,31 @@ globle int ParseConstruct(
    /* Prepare the parsing environment. */
    /*==================================*/
 
-   ov = GetHaltExecution(theEnv);
+   ov = GetHaltExecution(theEnv,execStatus);
    SetEvaluationError(theEnv,execStatus,FALSE);
    SetHaltExecution(theEnv,execStatus,FALSE);
-   ClearParsedBindNames(theEnv);
-   PushRtnBrkContexts(theEnv);
-   ExpressionData(theEnv)->ReturnContext = FALSE;
-   ExpressionData(theEnv)->BreakContext = FALSE;
+   ClearParsedBindNames(theEnv,execStatus);
+   PushRtnBrkContexts(theEnv,execStatus);
+   ExpressionData(theEnv,execStatus)->ReturnContext = FALSE;
+   ExpressionData(theEnv,execStatus)->BreakContext = FALSE;
    execStatus->CurrentEvaluationDepth++;
 
    /*=======================================*/
    /* Call the construct's parsing routine. */
    /*=======================================*/
 
-   ConstructData(theEnv)->ParsingConstruct = TRUE;
+   ConstructData(theEnv,execStatus)->ParsingConstruct = TRUE;
    rv = (*currentPtr->parseFunction)(theEnv,execStatus,logicalName);
-   ConstructData(theEnv)->ParsingConstruct = FALSE;
+   ConstructData(theEnv,execStatus)->ParsingConstruct = FALSE;
 
    /*===============================*/
    /* Restore environment settings. */
    /*===============================*/
 
    execStatus->CurrentEvaluationDepth--;
-   PopRtnBrkContexts(theEnv);
+   PopRtnBrkContexts(theEnv,execStatus);
 
-   ClearParsedBindNames(theEnv);
+   ClearParsedBindNames(theEnv,execStatus);
    SetPPBufferStatus(theEnv,execStatus,OFF);
    SetHaltExecution(theEnv,execStatus,ov);
 
@@ -418,8 +419,8 @@ globle SYMBOL_HN *GetConstructNameAndComment(
   char *readSource,
   struct token *inputToken,
   char *constructName,
-  void *(*findFunction)(void *,char *),
-  int (*deleteFunction)(void *,void *),
+  void *(*findFunction)(void *,EXEC_STATUS,char *),
+  int (*deleteFunction)(void *,EXEC_STATUS,void *),
   char *constructSymbol,
   int fullMessageCR,
   int getComment,
@@ -494,10 +495,10 @@ globle SYMBOL_HN *GetConstructNameAndComment(
 
    else
      {
-      theModule = ((struct defmodule *) EnvGetCurrentModule(theEnv));
+      theModule = ((struct defmodule *) EnvGetCurrentModule(theEnv,execStatus));
       if (moduleNameAllowed)
         {
-         PPBackup(theEnv);
+         PPBackup(theEnv,execStatus);
          SavePPBuffer(theEnv,execStatus,EnvGetDefmoduleName(theEnv,execStatus,theModule));
          SavePPBuffer(theEnv,execStatus,"::");
          SavePPBuffer(theEnv,execStatus,ValueToString(name));
@@ -521,7 +522,7 @@ globle SYMBOL_HN *GetConstructNameAndComment(
    /* base and we're not just checking syntax.               */
    /*========================================================*/
 
-   if ((findFunction != NULL) && (! ConstructData(theEnv)->CheckSyntaxMode))
+   if ((findFunction != NULL) && (! ConstructData(theEnv,execStatus)->CheckSyntaxMode))
      {
       theConstruct = (*findFunction)(theEnv,execStatus,ValueToString(name));
       if (theConstruct != NULL)
@@ -550,7 +551,7 @@ globle SYMBOL_HN *GetConstructNameAndComment(
 
 #if DEBUGGING_FUNCTIONS
    if ((EnvGetWatchItem(theEnv,execStatus,"compilations") == TRUE) &&
-       GetPrintWhileLoading(theEnv) && (! ConstructData(theEnv)->CheckSyntaxMode))
+       GetPrintWhileLoading(theEnv,execStatus) && (! ConstructData(theEnv,execStatus)->CheckSyntaxMode))
      {
       if (redefining) 
         {
@@ -569,7 +570,7 @@ globle SYMBOL_HN *GetConstructNameAndComment(
    else
 #endif
      {
-      if (GetPrintWhileLoading(theEnv) && (! ConstructData(theEnv)->CheckSyntaxMode))
+      if (GetPrintWhileLoading(theEnv,execStatus) && (! ConstructData(theEnv,execStatus)->CheckSyntaxMode))
         { EnvPrintRouter(theEnv,execStatus,WDIALOG,constructSymbol); }
      }
 
@@ -580,20 +581,20 @@ globle SYMBOL_HN *GetConstructNameAndComment(
    GetToken(theEnv,execStatus,readSource,inputToken);
    if ((inputToken->type == STRING) && getComment)
      {
-      PPBackup(theEnv);
+      PPBackup(theEnv,execStatus);
       SavePPBuffer(theEnv,execStatus," ");
       SavePPBuffer(theEnv,execStatus,inputToken->printForm);
       GetToken(theEnv,execStatus,readSource,inputToken);
       if (inputToken->type != RPAREN)
         {
-         PPBackup(theEnv);
+         PPBackup(theEnv,execStatus);
          SavePPBuffer(theEnv,execStatus,"\n   ");
          SavePPBuffer(theEnv,execStatus,inputToken->printForm);
         }
      }
    else if (inputToken->type != RPAREN)
      {
-      PPBackup(theEnv);
+      PPBackup(theEnv,execStatus);
       SavePPBuffer(theEnv,execStatus,"\n   ");
       SavePPBuffer(theEnv,execStatus,inputToken->printForm);
      }

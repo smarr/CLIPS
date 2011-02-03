@@ -49,10 +49,10 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static void                   *ScanSymbol(void *,char *,int,unsigned short *);
-   static void                   *ScanString(void *,char *);
-   static void                    ScanNumber(void *,char *,struct token *);
-   static void                    DeallocateScannerData(void *);
+   static void                   *ScanSymbol(void *,EXEC_STATUS,char *,int,unsigned short *);
+   static void                   *ScanString(void *,EXEC_STATUS,char *);
+   static void                    ScanNumber(void *,EXEC_STATUS,char *,struct token *);
+   static void                    DeallocateScannerData(void *,EXEC_STATUS);
 
 /************************************************/
 /* InitializeScannerData: Allocates environment */
@@ -73,8 +73,8 @@ static void DeallocateScannerData(
   void *theEnv,
   EXEC_STATUS)
   {
-   if (ScannerData(theEnv)->GlobalMax !=  0)
-     { genfree(theEnv,execStatus,ScannerData(theEnv)->GlobalString,ScannerData(theEnv)->GlobalMax); }
+   if (ScannerData(theEnv,execStatus)->GlobalMax !=  0)
+     { genfree(theEnv,execStatus,ScannerData(theEnv,execStatus)->GlobalString,ScannerData(theEnv,execStatus)->GlobalMax); }
   }
 
 /***********************************************************************/
@@ -101,8 +101,8 @@ globle void GetToken(
    theToken->type = UNKNOWN_VALUE;
    theToken->value = NULL;
    theToken->printForm = "unknown";
-   ScannerData(theEnv)->GlobalPos = 0;
-   ScannerData(theEnv)->GlobalMax = 0;
+   ScannerData(theEnv,execStatus)->GlobalPos = 0;
+   ScannerData(theEnv,execStatus)->GlobalMax = 0;
 
    /*==============================================*/
    /* Remove all white space before processing the */
@@ -196,10 +196,10 @@ globle void GetToken(
 
                 theToken->type = GBL_VARIABLE;
                 theToken->printForm = AppendStrings(theEnv,execStatus,"?",ValueToString(theToken->value));
-                count = strlen(ScannerData(theEnv)->GlobalString);
-                ScannerData(theEnv)->GlobalString[count-1] = EOS;
-                theToken->value = EnvAddSymbol(theEnv,execStatus,ScannerData(theEnv)->GlobalString+1);
-                ScannerData(theEnv)->GlobalString[count-1] = (char) inchar;
+                count = strlen(ScannerData(theEnv,execStatus)->GlobalString);
+                ScannerData(theEnv,execStatus)->GlobalString[count-1] = EOS;
+                theToken->value = EnvAddSymbol(theEnv,execStatus,ScannerData(theEnv,execStatus)->GlobalString+1);
+                ScannerData(theEnv,execStatus)->GlobalString[count-1] = (char) inchar;
 
                }
              else
@@ -242,10 +242,10 @@ globle void GetToken(
 
                 theToken->type = MF_GBL_VARIABLE;
                 theToken->printForm = AppendStrings(theEnv,execStatus,"$?",ValueToString(theToken->value));
-                count = strlen(ScannerData(theEnv)->GlobalString);
-                ScannerData(theEnv)->GlobalString[count-1] = EOS;
-                theToken->value = EnvAddSymbol(theEnv,execStatus,ScannerData(theEnv)->GlobalString+1);
-                ScannerData(theEnv)->GlobalString[count-1] = (char) inchar;
+                count = strlen(ScannerData(theEnv,execStatus)->GlobalString);
+                ScannerData(theEnv,execStatus)->GlobalString[count-1] = EOS;
+                theToken->value = EnvAddSymbol(theEnv,execStatus,ScannerData(theEnv,execStatus)->GlobalString+1);
+                ScannerData(theEnv,execStatus)->GlobalString[count-1] = (char) inchar;
                }
              else
 #endif
@@ -262,7 +262,7 @@ globle void GetToken(
          else
            {
             theToken->type = SYMBOL;
-            ScannerData(theEnv)->GlobalString = ExpandStringWithChar(theEnv,execStatus,'$',ScannerData(theEnv)->GlobalString,&ScannerData(theEnv)->GlobalPos,&ScannerData(theEnv)->GlobalMax,ScannerData(theEnv)->GlobalMax+80);
+            ScannerData(theEnv,execStatus)->GlobalString = ExpandStringWithChar(theEnv,execStatus,'$',ScannerData(theEnv,execStatus)->GlobalString,&ScannerData(theEnv,execStatus)->GlobalPos,&ScannerData(theEnv,execStatus)->GlobalMax,ScannerData(theEnv,execStatus)->GlobalMax+80);
             EnvUngetcRouter(theEnv,execStatus,inchar,logicalName);
             theToken->value = (void *) ScanSymbol(theEnv,execStatus,logicalName,1,&type);
             theToken->printForm = ValueToString(theToken->value);
@@ -275,7 +275,7 @@ globle void GetToken(
 
       case '<':
          theToken->type = SYMBOL;
-         ScannerData(theEnv)->GlobalString = ExpandStringWithChar(theEnv,execStatus,'<',ScannerData(theEnv)->GlobalString,&ScannerData(theEnv)->GlobalPos,&ScannerData(theEnv)->GlobalMax,ScannerData(theEnv)->GlobalMax+80);
+         ScannerData(theEnv,execStatus)->GlobalString = ExpandStringWithChar(theEnv,execStatus,'<',ScannerData(theEnv,execStatus)->GlobalString,&ScannerData(theEnv,execStatus)->GlobalPos,&ScannerData(theEnv,execStatus)->GlobalMax,ScannerData(theEnv,execStatus)->GlobalMax+80);
          theToken->value = (void *) ScanSymbol(theEnv,execStatus,logicalName,1,&type);
          theToken->printForm = ValueToString(theToken->value);
          break;
@@ -362,12 +362,12 @@ globle void GetToken(
    /* Return the temporary memory used in scanning the token. */
    /*=========================================================*/
 
-   if (ScannerData(theEnv)->GlobalString != NULL)
+   if (ScannerData(theEnv,execStatus)->GlobalString != NULL)
      {
-      rm(theEnv,execStatus,ScannerData(theEnv)->GlobalString,ScannerData(theEnv)->GlobalMax);
-      ScannerData(theEnv)->GlobalString = NULL;
-      ScannerData(theEnv)->GlobalMax = 0;
-      ScannerData(theEnv)->GlobalPos = 0;
+      rm(theEnv,execStatus,ScannerData(theEnv,execStatus)->GlobalString,ScannerData(theEnv,execStatus)->GlobalMax);
+      ScannerData(theEnv,execStatus)->GlobalString = NULL;
+      ScannerData(theEnv,execStatus)->GlobalMax = 0;
+      ScannerData(theEnv,execStatus)->GlobalPos = 0;
      }
 
    return;
@@ -402,7 +402,7 @@ static void *ScanSymbol(
             IsUTF8MultiByteStart(inchar) || 
             IsUTF8MultiByteContinuation(inchar)))
      {
-      ScannerData(theEnv)->GlobalString = ExpandStringWithChar(theEnv,execStatus,inchar,ScannerData(theEnv)->GlobalString,&ScannerData(theEnv)->GlobalPos,&ScannerData(theEnv)->GlobalMax,ScannerData(theEnv)->GlobalMax+80);
+      ScannerData(theEnv,execStatus)->GlobalString = ExpandStringWithChar(theEnv,execStatus,inchar,ScannerData(theEnv,execStatus)->GlobalString,&ScannerData(theEnv,execStatus)->GlobalPos,&ScannerData(theEnv,execStatus)->GlobalMax,ScannerData(theEnv,execStatus)->GlobalMax+80);
 
       count++;
       inchar = EnvGetcRouter(theEnv,execStatus,logicalName);
@@ -426,7 +426,7 @@ static void *ScanSymbol(
 #if OBJECT_SYSTEM
    if (count > 2)
      {
-      if ((ScannerData(theEnv)->GlobalString[0] == '[') ? (ScannerData(theEnv)->GlobalString[count-1] == ']') : FALSE)
+      if ((ScannerData(theEnv,execStatus)->GlobalString[0] == '[') ? (ScannerData(theEnv,execStatus)->GlobalString[count-1] == ']') : FALSE)
         {
          *type = INSTANCE_NAME;
          inchar = ']';
@@ -434,21 +434,21 @@ static void *ScanSymbol(
       else
         {
          *type = SYMBOL;
-         return(EnvAddSymbol(theEnv,execStatus,ScannerData(theEnv)->GlobalString));
+         return(EnvAddSymbol(theEnv,execStatus,ScannerData(theEnv,execStatus)->GlobalString));
         }
-      ScannerData(theEnv)->GlobalString[count-1] = EOS;
-      symbol = EnvAddSymbol(theEnv,execStatus,ScannerData(theEnv)->GlobalString+1);
-      ScannerData(theEnv)->GlobalString[count-1] = (char) inchar;
+      ScannerData(theEnv,execStatus)->GlobalString[count-1] = EOS;
+      symbol = EnvAddSymbol(theEnv,execStatus,ScannerData(theEnv,execStatus)->GlobalString+1);
+      ScannerData(theEnv,execStatus)->GlobalString[count-1] = (char) inchar;
       return(symbol);
      }
    else
      {
       *type = SYMBOL;
-      return(EnvAddSymbol(theEnv,execStatus,ScannerData(theEnv)->GlobalString));
+      return(EnvAddSymbol(theEnv,execStatus,ScannerData(theEnv,execStatus)->GlobalString));
      }
 #else
    *type = SYMBOL;
-   return(EnvAddSymbol(theEnv,execStatus,ScannerData(theEnv)->GlobalString));
+   return(EnvAddSymbol(theEnv,execStatus,ScannerData(theEnv,execStatus)->GlobalString));
 #endif
   }
 
@@ -481,7 +481,7 @@ static void *ScanString(
       inchar = EnvGetcRouter(theEnv,execStatus,logicalName);
      }
 
-   if ((inchar == EOF) && (ScannerData(theEnv)->IgnoreCompletionErrors == FALSE))
+   if ((inchar == EOF) && (ScannerData(theEnv,execStatus)->IgnoreCompletionErrors == FALSE))
      { 
       PrintErrorID(theEnv,execStatus,"SCANNER",1,TRUE);
       EnvPrintRouter(theEnv,execStatus,WERROR,"Encountered End-Of-File while scanning a string\n"); 
@@ -540,26 +540,26 @@ static void ScanNumber(
            {
             phase = 0;
             digitFound = TRUE;
-            ScannerData(theEnv)->GlobalString = ExpandStringWithChar(theEnv,execStatus,inchar,ScannerData(theEnv)->GlobalString,&ScannerData(theEnv)->GlobalPos,&ScannerData(theEnv)->GlobalMax,ScannerData(theEnv)->GlobalMax+80);
+            ScannerData(theEnv,execStatus)->GlobalString = ExpandStringWithChar(theEnv,execStatus,inchar,ScannerData(theEnv,execStatus)->GlobalString,&ScannerData(theEnv,execStatus)->GlobalPos,&ScannerData(theEnv,execStatus)->GlobalMax,ScannerData(theEnv,execStatus)->GlobalMax+80);
             count++;
            }
          else if ((inchar == '+') || (inchar == '-'))
            {
             phase = 0;
-            ScannerData(theEnv)->GlobalString = ExpandStringWithChar(theEnv,execStatus,inchar,ScannerData(theEnv)->GlobalString,&ScannerData(theEnv)->GlobalPos,&ScannerData(theEnv)->GlobalMax,ScannerData(theEnv)->GlobalMax+80);
+            ScannerData(theEnv,execStatus)->GlobalString = ExpandStringWithChar(theEnv,execStatus,inchar,ScannerData(theEnv,execStatus)->GlobalString,&ScannerData(theEnv,execStatus)->GlobalPos,&ScannerData(theEnv,execStatus)->GlobalMax,ScannerData(theEnv,execStatus)->GlobalMax+80);
             count++;
            }
          else if (inchar == '.')
            {
             processFloat = TRUE;
-            ScannerData(theEnv)->GlobalString = ExpandStringWithChar(theEnv,execStatus,inchar,ScannerData(theEnv)->GlobalString,&ScannerData(theEnv)->GlobalPos,&ScannerData(theEnv)->GlobalMax,ScannerData(theEnv)->GlobalMax+80);
+            ScannerData(theEnv,execStatus)->GlobalString = ExpandStringWithChar(theEnv,execStatus,inchar,ScannerData(theEnv,execStatus)->GlobalString,&ScannerData(theEnv,execStatus)->GlobalPos,&ScannerData(theEnv,execStatus)->GlobalMax,ScannerData(theEnv,execStatus)->GlobalMax+80);
             count++;
             phase = 1;
            }
          else if ((inchar == 'E') || (inchar == 'e'))
            {
             processFloat = TRUE;
-            ScannerData(theEnv)->GlobalString = ExpandStringWithChar(theEnv,execStatus,inchar,ScannerData(theEnv)->GlobalString,&ScannerData(theEnv)->GlobalPos,&ScannerData(theEnv)->GlobalMax,ScannerData(theEnv)->GlobalMax+80);
+            ScannerData(theEnv,execStatus)->GlobalString = ExpandStringWithChar(theEnv,execStatus,inchar,ScannerData(theEnv,execStatus)->GlobalString,&ScannerData(theEnv,execStatus)->GlobalPos,&ScannerData(theEnv,execStatus)->GlobalMax,ScannerData(theEnv,execStatus)->GlobalMax+80);
             count++;
             phase = 2;
            }
@@ -572,7 +572,7 @@ static void ScanNumber(
          else
            {
             phase = 9;
-            ScannerData(theEnv)->GlobalString = ExpandStringWithChar(theEnv,execStatus,inchar,ScannerData(theEnv)->GlobalString,&ScannerData(theEnv)->GlobalPos,&ScannerData(theEnv)->GlobalMax,ScannerData(theEnv)->GlobalMax+80);
+            ScannerData(theEnv,execStatus)->GlobalString = ExpandStringWithChar(theEnv,execStatus,inchar,ScannerData(theEnv,execStatus)->GlobalString,&ScannerData(theEnv,execStatus)->GlobalPos,&ScannerData(theEnv,execStatus)->GlobalMax,ScannerData(theEnv,execStatus)->GlobalMax+80);
             count++;
            }
         }
@@ -581,20 +581,20 @@ static void ScanNumber(
          if (isdigit(inchar))
            {
             digitFound = TRUE;
-            ScannerData(theEnv)->GlobalString = ExpandStringWithChar(theEnv,execStatus,inchar,ScannerData(theEnv)->GlobalString,&ScannerData(theEnv)->GlobalPos,&ScannerData(theEnv)->GlobalMax,ScannerData(theEnv)->GlobalMax+80);
+            ScannerData(theEnv,execStatus)->GlobalString = ExpandStringWithChar(theEnv,execStatus,inchar,ScannerData(theEnv,execStatus)->GlobalString,&ScannerData(theEnv,execStatus)->GlobalPos,&ScannerData(theEnv,execStatus)->GlobalMax,ScannerData(theEnv,execStatus)->GlobalMax+80);
             count++;
            }
          else if (inchar == '.')
            {
             processFloat = TRUE;
-            ScannerData(theEnv)->GlobalString = ExpandStringWithChar(theEnv,execStatus,inchar,ScannerData(theEnv)->GlobalString,&ScannerData(theEnv)->GlobalPos,&ScannerData(theEnv)->GlobalMax,ScannerData(theEnv)->GlobalMax+80);
+            ScannerData(theEnv,execStatus)->GlobalString = ExpandStringWithChar(theEnv,execStatus,inchar,ScannerData(theEnv,execStatus)->GlobalString,&ScannerData(theEnv,execStatus)->GlobalPos,&ScannerData(theEnv,execStatus)->GlobalMax,ScannerData(theEnv,execStatus)->GlobalMax+80);
             count++;
             phase = 1;
            }
          else if ((inchar == 'E') || (inchar == 'e'))
            {
             processFloat = TRUE;
-            ScannerData(theEnv)->GlobalString = ExpandStringWithChar(theEnv,execStatus,inchar,ScannerData(theEnv)->GlobalString,&ScannerData(theEnv)->GlobalPos,&ScannerData(theEnv)->GlobalMax,ScannerData(theEnv)->GlobalMax+80);
+            ScannerData(theEnv,execStatus)->GlobalString = ExpandStringWithChar(theEnv,execStatus,inchar,ScannerData(theEnv,execStatus)->GlobalString,&ScannerData(theEnv,execStatus)->GlobalPos,&ScannerData(theEnv,execStatus)->GlobalMax,ScannerData(theEnv,execStatus)->GlobalMax+80);
             count++;
             phase = 2;
            }
@@ -607,7 +607,7 @@ static void ScanNumber(
          else
            {
             phase = 9;
-            ScannerData(theEnv)->GlobalString = ExpandStringWithChar(theEnv,execStatus,inchar,ScannerData(theEnv)->GlobalString,&ScannerData(theEnv)->GlobalPos,&ScannerData(theEnv)->GlobalMax,ScannerData(theEnv)->GlobalMax+80);
+            ScannerData(theEnv,execStatus)->GlobalString = ExpandStringWithChar(theEnv,execStatus,inchar,ScannerData(theEnv,execStatus)->GlobalString,&ScannerData(theEnv,execStatus)->GlobalPos,&ScannerData(theEnv,execStatus)->GlobalMax,ScannerData(theEnv,execStatus)->GlobalMax+80);
             count++;
            }
         }
@@ -616,12 +616,12 @@ static void ScanNumber(
          if (isdigit(inchar))
            {
             digitFound = TRUE;
-            ScannerData(theEnv)->GlobalString = ExpandStringWithChar(theEnv,execStatus,inchar,ScannerData(theEnv)->GlobalString,&ScannerData(theEnv)->GlobalPos,&ScannerData(theEnv)->GlobalMax,ScannerData(theEnv)->GlobalMax+80);
+            ScannerData(theEnv,execStatus)->GlobalString = ExpandStringWithChar(theEnv,execStatus,inchar,ScannerData(theEnv,execStatus)->GlobalString,&ScannerData(theEnv,execStatus)->GlobalPos,&ScannerData(theEnv,execStatus)->GlobalMax,ScannerData(theEnv,execStatus)->GlobalMax+80);
             count++;
            }
          else if ((inchar == 'E') || (inchar == 'e'))
            {
-            ScannerData(theEnv)->GlobalString = ExpandStringWithChar(theEnv,execStatus,inchar,ScannerData(theEnv)->GlobalString,&ScannerData(theEnv)->GlobalPos,&ScannerData(theEnv)->GlobalMax,ScannerData(theEnv)->GlobalMax+80);
+            ScannerData(theEnv,execStatus)->GlobalString = ExpandStringWithChar(theEnv,execStatus,inchar,ScannerData(theEnv,execStatus)->GlobalString,&ScannerData(theEnv,execStatus)->GlobalPos,&ScannerData(theEnv,execStatus)->GlobalMax,ScannerData(theEnv,execStatus)->GlobalMax+80);
             count++;
             phase = 2;
            }
@@ -634,7 +634,7 @@ static void ScanNumber(
          else
            {
             phase = 9;
-            ScannerData(theEnv)->GlobalString = ExpandStringWithChar(theEnv,execStatus,inchar,ScannerData(theEnv)->GlobalString,&ScannerData(theEnv)->GlobalPos,&ScannerData(theEnv)->GlobalMax,ScannerData(theEnv)->GlobalMax+80);
+            ScannerData(theEnv,execStatus)->GlobalString = ExpandStringWithChar(theEnv,execStatus,inchar,ScannerData(theEnv,execStatus)->GlobalString,&ScannerData(theEnv,execStatus)->GlobalPos,&ScannerData(theEnv,execStatus)->GlobalMax,ScannerData(theEnv,execStatus)->GlobalMax+80);
             count++;
            }
         }
@@ -642,13 +642,13 @@ static void ScanNumber(
         {
          if (isdigit(inchar))
            {
-            ScannerData(theEnv)->GlobalString = ExpandStringWithChar(theEnv,execStatus,inchar,ScannerData(theEnv)->GlobalString,&ScannerData(theEnv)->GlobalPos,&ScannerData(theEnv)->GlobalMax,ScannerData(theEnv)->GlobalMax+80);
+            ScannerData(theEnv,execStatus)->GlobalString = ExpandStringWithChar(theEnv,execStatus,inchar,ScannerData(theEnv,execStatus)->GlobalString,&ScannerData(theEnv,execStatus)->GlobalPos,&ScannerData(theEnv,execStatus)->GlobalMax,ScannerData(theEnv,execStatus)->GlobalMax+80);
             count++;
             phase = 3;
            }
          else if ((inchar == '+') || (inchar == '-'))
            {
-            ScannerData(theEnv)->GlobalString = ExpandStringWithChar(theEnv,execStatus,inchar,ScannerData(theEnv)->GlobalString,&ScannerData(theEnv)->GlobalPos,&ScannerData(theEnv)->GlobalMax,ScannerData(theEnv)->GlobalMax+80);
+            ScannerData(theEnv,execStatus)->GlobalString = ExpandStringWithChar(theEnv,execStatus,inchar,ScannerData(theEnv,execStatus)->GlobalString,&ScannerData(theEnv,execStatus)->GlobalPos,&ScannerData(theEnv,execStatus)->GlobalMax,ScannerData(theEnv,execStatus)->GlobalMax+80);
             count++;
             phase = 3;
            }
@@ -664,7 +664,7 @@ static void ScanNumber(
          else
            {
             phase = 9;
-            ScannerData(theEnv)->GlobalString = ExpandStringWithChar(theEnv,execStatus,inchar,ScannerData(theEnv)->GlobalString,&ScannerData(theEnv)->GlobalPos,&ScannerData(theEnv)->GlobalMax,ScannerData(theEnv)->GlobalMax+80);
+            ScannerData(theEnv,execStatus)->GlobalString = ExpandStringWithChar(theEnv,execStatus,inchar,ScannerData(theEnv,execStatus)->GlobalString,&ScannerData(theEnv,execStatus)->GlobalPos,&ScannerData(theEnv,execStatus)->GlobalMax,ScannerData(theEnv,execStatus)->GlobalMax+80);
             count++;
            }
         }
@@ -672,7 +672,7 @@ static void ScanNumber(
         {
          if (isdigit(inchar))
            {
-            ScannerData(theEnv)->GlobalString = ExpandStringWithChar(theEnv,execStatus,inchar,ScannerData(theEnv)->GlobalString,&ScannerData(theEnv)->GlobalPos,&ScannerData(theEnv)->GlobalMax,ScannerData(theEnv)->GlobalMax+80);
+            ScannerData(theEnv,execStatus)->GlobalString = ExpandStringWithChar(theEnv,execStatus,inchar,ScannerData(theEnv,execStatus)->GlobalString,&ScannerData(theEnv,execStatus)->GlobalPos,&ScannerData(theEnv,execStatus)->GlobalMax,ScannerData(theEnv,execStatus)->GlobalMax+80);
             count++;
            }
          else if ( (inchar == '<') || (inchar == '"') ||
@@ -681,14 +681,14 @@ static void ScanNumber(
                    (inchar == ' ') || (inchar == ';') ||
                    ((isprint(inchar) == 0) && (! IsUTF8MultiByteStart(inchar))) )
            {
-            if ((ScannerData(theEnv)->GlobalString[count-1] == '+') || (ScannerData(theEnv)->GlobalString[count-1] == '-'))
+            if ((ScannerData(theEnv,execStatus)->GlobalString[count-1] == '+') || (ScannerData(theEnv,execStatus)->GlobalString[count-1] == '-'))
               { digitFound = FALSE; }
             phase = 5;
            }
          else
            {
             phase = 9;
-            ScannerData(theEnv)->GlobalString = ExpandStringWithChar(theEnv,execStatus,inchar,ScannerData(theEnv)->GlobalString,&ScannerData(theEnv)->GlobalPos,&ScannerData(theEnv)->GlobalMax,ScannerData(theEnv)->GlobalMax+80);
+            ScannerData(theEnv,execStatus)->GlobalString = ExpandStringWithChar(theEnv,execStatus,inchar,ScannerData(theEnv,execStatus)->GlobalString,&ScannerData(theEnv,execStatus)->GlobalPos,&ScannerData(theEnv,execStatus)->GlobalMax,ScannerData(theEnv,execStatus)->GlobalMax+80);
             count++;
            }
         }
@@ -715,14 +715,14 @@ static void ScanNumber(
    if (! digitFound)
      {
       theToken->type = SYMBOL;
-      theToken->value = (void *) EnvAddSymbol(theEnv,execStatus,ScannerData(theEnv)->GlobalString);
+      theToken->value = (void *) EnvAddSymbol(theEnv,execStatus,ScannerData(theEnv,execStatus)->GlobalString);
       theToken->printForm = ValueToString(theToken->value);
       return;
      }
 
    if (processFloat)
      {
-      fvalue = atof(ScannerData(theEnv)->GlobalString);
+      fvalue = atof(ScannerData(theEnv,execStatus)->GlobalString);
       theToken->type = FLOAT;
       theToken->value = (void *) EnvAddDouble(theEnv,execStatus,fvalue);
       theToken->printForm = FloatToString(theEnv,execStatus,ValueToDouble(theToken->value));
@@ -731,9 +731,9 @@ static void ScanNumber(
      {
       errno = 0;
 #if WIN_MVC
-      lvalue = _strtoi64(ScannerData(theEnv)->GlobalString,NULL,10);
+      lvalue = _strtoi64(ScannerData(theEnv,execStatus)->GlobalString,NULL,10);
 #else
-      lvalue = strtoll(ScannerData(theEnv)->GlobalString,NULL,10);
+      lvalue = strtoll(ScannerData(theEnv,execStatus)->GlobalString,NULL,10);
 #endif
       if (errno)
         {
@@ -768,7 +768,7 @@ globle void ResetLineCount(
   void *theEnv,
   EXEC_STATUS)
   {
-   ScannerData(theEnv)->LineCount = 0;
+   ScannerData(theEnv,execStatus)->LineCount = 0;
   }
 
 /****************************************************/
@@ -778,7 +778,7 @@ globle long GetLineCount(
   void *theEnv,
   EXEC_STATUS)
   {
-   return(ScannerData(theEnv)->LineCount);
+   return(ScannerData(theEnv,execStatus)->LineCount);
   }
 
 /**********************************/
@@ -789,7 +789,7 @@ globle void IncrementLineCount(
   void *theEnv,
   EXEC_STATUS)
   {
-   ScannerData(theEnv)->LineCount++;
+   ScannerData(theEnv,execStatus)->LineCount++;
   }
 
 /**********************************/
@@ -800,5 +800,5 @@ globle void DecrementLineCount(
   void *theEnv,
   EXEC_STATUS)
   {
-   ScannerData(theEnv)->LineCount--;
+   ScannerData(theEnv,execStatus)->LineCount--;
   }

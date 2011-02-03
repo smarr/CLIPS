@@ -50,10 +50,10 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static struct watchItem       *ValidWatchItem(void *,char *,int *);
-   static intBool                 RecognizeWatchRouters(void *,char *);
-   static int                     CaptureWatchPrints(void *,char *,char *);
-   static void                    DeallocateWatchData(void *);
+   static struct watchItem       *ValidWatchItem(void *,EXEC_STATUS,char *,int *);
+   static intBool                 RecognizeWatchRouters(void *,EXEC_STATUS,char *);
+   static int                     CaptureWatchPrints(void *,EXEC_STATUS,char *,char *);
+   static void                    DeallocateWatchData(void *,EXEC_STATUS);
 
 /**********************************************/
 /* InitializeWatchData: Allocates environment */
@@ -76,7 +76,7 @@ static void DeallocateWatchData(
   {
    struct watchItem *tmpPtr, *nextPtr;
 
-   tmpPtr = WatchData(theEnv)->ListOfWatchItems;
+   tmpPtr = WatchData(theEnv,execStatus)->ListOfWatchItems;
    while (tmpPtr != NULL)
      {
       nextPtr = tmpPtr->next;
@@ -98,8 +98,8 @@ globle intBool AddWatchItem(
   int code,
   unsigned *flag,
   int priority,
-  unsigned (*accessFunc)(void *,int,unsigned,struct expr *),
-  unsigned (*printFunc)(void *,char *,int,struct expr *))
+  unsigned (*accessFunc)(void *,EXEC_STATUS,int,unsigned,struct expr *),
+  unsigned (*printFunc)(void *,EXEC_STATUS,char *,int,struct expr *))
   {
    struct watchItem *newPtr, *currentPtr, *lastPtr;
 
@@ -108,7 +108,7 @@ globle intBool AddWatchItem(
    /* the new item. If the item is already in the list return FALSE. */
    /*================================================================*/
 
-   for (currentPtr = WatchData(theEnv)->ListOfWatchItems, lastPtr = NULL;
+   for (currentPtr = WatchData(theEnv,execStatus)->ListOfWatchItems, lastPtr = NULL;
         currentPtr != NULL;
         currentPtr = currentPtr->next)
      {
@@ -134,8 +134,8 @@ globle intBool AddWatchItem(
 
    if (lastPtr == NULL)
      {
-      newPtr->next = WatchData(theEnv)->ListOfWatchItems;
-      WatchData(theEnv)->ListOfWatchItems = newPtr;
+      newPtr->next = WatchData(theEnv,execStatus)->ListOfWatchItems;
+      WatchData(theEnv,execStatus)->ListOfWatchItems = newPtr;
      }
    else
      {
@@ -168,7 +168,7 @@ globle intBool EnvWatch(
 globle intBool Watch(
   char *itemName)
   {
-   return(EnvWatch(GetCurrentEnvironment(),itemName));
+   return(EnvWatch(GetCurrentEnvironment(),getCurrentExecutionState(),itemName));
   }
 #endif
 
@@ -190,7 +190,7 @@ globle intBool EnvUnwatch(
 globle intBool Unwatch(
   char *itemName)
   {
-   return(EnvUnwatch(GetCurrentEnvironment(),itemName));
+   return(EnvUnwatch(GetCurrentEnvironment(),GetCurrentExectionStatus(),itemName));
   }
 #endif
 
@@ -221,7 +221,7 @@ globle int EnvSetWatchItem(
 
    if (strcmp(itemName,"all") == 0)
      {
-      for (wPtr = WatchData(theEnv)->ListOfWatchItems; wPtr != NULL; wPtr = wPtr->next)
+      for (wPtr = WatchData(theEnv,execStatus)->ListOfWatchItems; wPtr != NULL; wPtr = wPtr->next)
         {
          /*==============================================*/
          /* If no specific arguments are specified, then */
@@ -250,7 +250,7 @@ globle int EnvSetWatchItem(
    /* its new state and return TRUE.                  */
    /*=================================================*/
 
-   for (wPtr = WatchData(theEnv)->ListOfWatchItems; wPtr != NULL; wPtr = wPtr->next)
+   for (wPtr = WatchData(theEnv,execStatus)->ListOfWatchItems; wPtr != NULL; wPtr = wPtr->next)
      {
       if (strcmp(itemName,wPtr->name) == 0)
         {
@@ -297,7 +297,7 @@ globle int EnvGetWatchItem(
   {
    struct watchItem *wPtr;
 
-   for (wPtr = WatchData(theEnv)->ListOfWatchItems; wPtr != NULL; wPtr = wPtr->next)
+   for (wPtr = WatchData(theEnv,execStatus)->ListOfWatchItems; wPtr != NULL; wPtr = wPtr->next)
      { 
       if (strcmp(itemName,wPtr->name) == 0) 
         { return((int) *(wPtr->flag)); }
@@ -322,7 +322,7 @@ static struct watchItem *ValidWatchItem(
    if (strcmp(itemName,"all") == 0)
      return(NULL);
 
-   for (wPtr = WatchData(theEnv)->ListOfWatchItems; wPtr != NULL; wPtr = wPtr->next)
+   for (wPtr = WatchData(theEnv,execStatus)->ListOfWatchItems; wPtr != NULL; wPtr = wPtr->next)
      { if (strcmp(itemName,wPtr->name) == 0) return(wPtr); }
 
    *recognized = FALSE;
@@ -342,7 +342,7 @@ globle char *GetNthWatchName(
    int i;
    struct watchItem *wPtr;
 
-   for (wPtr = WatchData(theEnv)->ListOfWatchItems, i = 1;
+   for (wPtr = WatchData(theEnv,execStatus)->ListOfWatchItems, i = 1;
         wPtr != NULL;
         wPtr = wPtr->next, i++)
      { if (i == whichItem) return(wPtr->name); }
@@ -363,7 +363,7 @@ globle int GetNthWatchValue(
    int i;
    struct watchItem *wPtr;
 
-   for (wPtr = WatchData(theEnv)->ListOfWatchItems, i = 1;
+   for (wPtr = WatchData(theEnv,execStatus)->ListOfWatchItems, i = 1;
         wPtr != NULL;
         wPtr = wPtr->next, i++)
      { if (i == whichItem) return((int) *(wPtr->flag)); }
@@ -485,7 +485,7 @@ globle void ListWatchItemsCommand(
 
    if (GetFirstArgument() == NULL)
      {
-      for (wPtr = WatchData(theEnv)->ListOfWatchItems; wPtr != NULL; wPtr = wPtr->next)
+      for (wPtr = WatchData(theEnv,execStatus)->ListOfWatchItems; wPtr != NULL; wPtr = wPtr->next)
         {
          EnvPrintRouter(theEnv,execStatus,WDISPLAY,wPtr->name);
          if (*(wPtr->flag)) EnvPrintRouter(theEnv,execStatus,WDISPLAY," = on\n");
@@ -615,7 +615,7 @@ static intBool RecognizeWatchRouters(
   char *logName)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 
    if (strcmp(logName,WTRACE) == 0) return(TRUE);
@@ -638,7 +638,7 @@ static int CaptureWatchPrints(
 #if MAC_MCW || WIN_MCW || MAC_XCD
 #pragma unused(logName)
 #pragma unused(str)
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
    return(1);
   }

@@ -59,10 +59,10 @@
 #if (! RUN_TIME)
    static long                    ListToPacked(struct expr *,
                                                struct expr *,long);
-   static EXPRESSION_HN          *FindHashedExpression(void *,EXPRESSION *,unsigned *,EXPRESSION_HN **);
+   static EXPRESSION_HN          *FindHashedExpression(void *,EXEC_STATUS,EXPRESSION *,unsigned *,EXPRESSION_HN **);
    static unsigned                HashExpression(EXPRESSION *);
 #endif
-   static void                    DeallocateExpressionData(void *);
+   static void                    DeallocateExpressionData(void *,EXEC_STATUS);
 
 /**************************************************/
 /* InitExpressionData: Initializes the function   */
@@ -80,12 +80,12 @@ globle void InitExpressionData(
    AllocateEnvironmentData(theEnv,execStatus,EXPRESSION_DATA,sizeof(struct expressionData),DeallocateExpressionData);
 
 #if ! RUN_TIME
-   InitExpressionPointers(theEnv);
+   InitExpressionPointers(theEnv,execStatus);
 
-   ExpressionData(theEnv)->ExpressionHashTable = (EXPRESSION_HN **)
+   ExpressionData(theEnv,execStatus)->ExpressionHashTable = (EXPRESSION_HN **)
      gm2(theEnv,execStatus,(int) (sizeof(EXPRESSION_HN *) * EXPRESSION_HASH_SIZE));
    for (i = 0 ; i < EXPRESSION_HASH_SIZE ; i++)
-     ExpressionData(theEnv)->ExpressionHashTable[i] = NULL;
+     ExpressionData(theEnv,execStatus)->ExpressionHashTable[i] = NULL;
 #endif
   }
   
@@ -102,12 +102,12 @@ static void DeallocateExpressionData(
    EXPRESSION_HN *tmpPtr, *nextPtr;
    
 #if (BLOAD || BLOAD_ONLY || BLOAD_AND_BSAVE)
-   if (! Bloaded(theEnv))
+   if (! Bloaded(theEnv,execStatus))
 #endif
      {
       for (i = 0; i < EXPRESSION_HASH_SIZE; i++)
         {
-         tmpPtr = ExpressionData(theEnv)->ExpressionHashTable[i];
+         tmpPtr = ExpressionData(theEnv,execStatus)->ExpressionHashTable[i];
          while (tmpPtr != NULL)
            {
             nextPtr = tmpPtr->next;
@@ -118,19 +118,19 @@ static void DeallocateExpressionData(
         }
      }
      
-   rm(theEnv,execStatus,ExpressionData(theEnv)->ExpressionHashTable,
+   rm(theEnv,execStatus,ExpressionData(theEnv,execStatus)->ExpressionHashTable,
       (int) (sizeof(EXPRESSION_HN *) * EXPRESSION_HASH_SIZE));
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 #endif
    
 #if (BLOAD || BLOAD_ONLY || BLOAD_AND_BSAVE)
-   if ((ExpressionData(theEnv)->NumberOfExpressions != 0) && Bloaded(theEnv))
+   if ((ExpressionData(theEnv,execStatus)->NumberOfExpressions != 0) && Bloaded(theEnv,execStatus))
      {
-      genfree(theEnv,execStatus,(void *) ExpressionData(theEnv)->ExpressionArray,
-                  ExpressionData(theEnv)->NumberOfExpressions * sizeof(struct expr));
+      genfree(theEnv,execStatus,(void *) ExpressionData(theEnv,execStatus)->ExpressionArray,
+                  ExpressionData(theEnv,execStatus)->NumberOfExpressions * sizeof(struct expr));
      }
 #endif
   }
@@ -143,14 +143,14 @@ globle void InitExpressionPointers(
   void *theEnv,
   EXEC_STATUS)
   {
-   ExpressionData(theEnv)->PTR_AND = (void *) FindFunction(theEnv,execStatus,"and");
-   ExpressionData(theEnv)->PTR_OR = (void *) FindFunction(theEnv,execStatus,"or");
-   ExpressionData(theEnv)->PTR_EQ = (void *) FindFunction(theEnv,execStatus,"eq");
-   ExpressionData(theEnv)->PTR_NEQ = (void *) FindFunction(theEnv,execStatus,"neq");
-   ExpressionData(theEnv)->PTR_NOT = (void *) FindFunction(theEnv,execStatus,"not");
+   ExpressionData(theEnv,execStatus)->PTR_AND = (void *) FindFunction(theEnv,execStatus,"and");
+   ExpressionData(theEnv,execStatus)->PTR_OR = (void *) FindFunction(theEnv,execStatus,"or");
+   ExpressionData(theEnv,execStatus)->PTR_EQ = (void *) FindFunction(theEnv,execStatus,"eq");
+   ExpressionData(theEnv,execStatus)->PTR_NEQ = (void *) FindFunction(theEnv,execStatus,"neq");
+   ExpressionData(theEnv,execStatus)->PTR_NOT = (void *) FindFunction(theEnv,execStatus,"not");
 
-   if ((ExpressionData(theEnv)->PTR_AND == NULL) || (ExpressionData(theEnv)->PTR_OR == NULL) ||
-       (ExpressionData(theEnv)->PTR_EQ == NULL) || (ExpressionData(theEnv)->PTR_NEQ == NULL) || (ExpressionData(theEnv)->PTR_NOT == NULL))
+   if ((ExpressionData(theEnv,execStatus)->PTR_AND == NULL) || (ExpressionData(theEnv,execStatus)->PTR_OR == NULL) ||
+       (ExpressionData(theEnv,execStatus)->PTR_EQ == NULL) || (ExpressionData(theEnv,execStatus)->PTR_NEQ == NULL) || (ExpressionData(theEnv,execStatus)->PTR_NOT == NULL))
      {
       SystemError(theEnv,execStatus,"EXPRESSN",1);
       EnvExitRouter(theEnv,execStatus,EXIT_FAILURE);
@@ -329,7 +329,7 @@ static EXPRESSION_HN *FindHashedExpression(
      return(NULL);
    *hashval = HashExpression(theExp);
    *prv = NULL;
-   exphash = ExpressionData(theEnv)->ExpressionHashTable[*hashval];
+   exphash = ExpressionData(theEnv,execStatus)->ExpressionHashTable[*hashval];
    while (exphash != NULL)
      {
       if (IdenticalExpression(exphash->exp,theExp))
@@ -400,7 +400,7 @@ globle void RemoveHashedExpression(
    if (--exphash->count != 0)
      return;
    if (prv == NULL)
-     ExpressionData(theEnv)->ExpressionHashTable[hashval] = exphash->next;
+     ExpressionData(theEnv,execStatus)->ExpressionHashTable[hashval] = exphash->next;
    else
      prv->next = exphash->next;
    ExpressionDeinstall(theEnv,execStatus,exphash->exp);
@@ -446,8 +446,8 @@ globle EXPRESSION *AddHashedExpression(
    exphash->count = 1;
    exphash->exp = PackExpression(theEnv,execStatus,theExp);
    ExpressionInstall(theEnv,execStatus,exphash->exp);
-   exphash->next = ExpressionData(theEnv)->ExpressionHashTable[exphash->hashval];
-   ExpressionData(theEnv)->ExpressionHashTable[exphash->hashval] = exphash;
+   exphash->next = ExpressionData(theEnv,execStatus)->ExpressionHashTable[exphash->hashval];
+   ExpressionData(theEnv,execStatus)->ExpressionHashTable[exphash->hashval] = exphash;
    exphash->bsaveID = 0L;
    return(exphash->exp);
   }

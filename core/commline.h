@@ -41,13 +41,13 @@ struct commandLineData
    size_t MaximumCharacters;
    int ParsingTopLevelCommand;
    char *BannerString;
-   int (*EventFunction)(void *,EXEC_STATUS);
-   int (*AfterPromptFunction)(void *,EXEC_STATUS);
-   int (*BeforeCommandExecutionFunction)(void *,EXEC_STATUS);
+   int (*EventFunction)(void *, EXEC_STATUS);
+   int (*AfterPromptFunction)(void *, EXEC_STATUS);
+   int (*BeforeCommandExecutionFunction)(void *, EXEC_STATUS);
 #endif
   };
 
-#define CommandLineData(theEnv) ((struct commandLineData *) GetEnvironmentData(theEnv,execStatus,COMMANDLINE_DATA))
+#define CommandLineData(theEnv,execStatus) ((struct commandLineData *) GetEnvironmentData(theEnv,execStatus,COMMANDLINE_DATA))
 
 #ifdef LOCALE
 #undef LOCALE

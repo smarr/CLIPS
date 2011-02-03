@@ -42,22 +42,22 @@
 #define LOCALE extern
 #endif
 
-#define BitMapPointer(i) ((BITMAP_HN *) (SymbolData(theEnv)->BitMapArray[i]))
-#define SymbolPointer(i) ((SYMBOL_HN *) (SymbolData(theEnv)->SymbolArray[i]))
-#define FloatPointer(i) ((FLOAT_HN *) (SymbolData(theEnv)->FloatArray[i]))
-#define IntegerPointer(i) ((INTEGER_HN *) (SymbolData(theEnv)->IntegerArray[i]))
+#define BitMapPointer(i) ((BITMAP_HN *) (SymbolData(theEnv,execStatus)->BitMapArray[i]))
+#define SymbolPointer(i) ((SYMBOL_HN *) (SymbolData(theEnv,execStatus)->SymbolArray[i]))
+#define FloatPointer(i) ((FLOAT_HN *) (SymbolData(theEnv,execStatus)->FloatArray[i]))
+#define IntegerPointer(i) ((INTEGER_HN *) (SymbolData(theEnv,execStatus)->IntegerArray[i]))
 
    LOCALE void                    MarkNeededAtomicValues(void);
-   LOCALE void                    WriteNeededAtomicValues(void *,FILE *);
-   LOCALE void                    ReadNeededAtomicValues(void *);
-   LOCALE void                    InitAtomicValueNeededFlags(void *);
-   LOCALE void                    FreeAtomicValueStorage(void *);
-   LOCALE void                    WriteNeededSymbols(void *,FILE *);
-   LOCALE void                    WriteNeededFloats(void *,FILE *);
-   LOCALE void                    WriteNeededIntegers(void *,FILE *);
-   LOCALE void                    ReadNeededSymbols(void *);
-   LOCALE void                    ReadNeededFloats(void *);
-   LOCALE void                    ReadNeededIntegers(void *);
+   LOCALE void                    WriteNeededAtomicValues(void *,EXEC_STATUS,FILE *);
+   LOCALE void                    ReadNeededAtomicValues(void *,EXEC_STATUS);
+   LOCALE void                    InitAtomicValueNeededFlags(void *,EXEC_STATUS);
+   LOCALE void                    FreeAtomicValueStorage(void *,EXEC_STATUS);
+   LOCALE void                    WriteNeededSymbols(void *,EXEC_STATUS,FILE *);
+   LOCALE void                    WriteNeededFloats(void *,EXEC_STATUS,FILE *);
+   LOCALE void                    WriteNeededIntegers(void *,EXEC_STATUS,FILE *);
+   LOCALE void                    ReadNeededSymbols(void *,EXEC_STATUS);
+   LOCALE void                    ReadNeededFloats(void *,EXEC_STATUS);
+   LOCALE void                    ReadNeededIntegers(void *,EXEC_STATUS);
 
 #endif
 

@@ -45,9 +45,9 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static void                    ClearDefmodules(void *);
+   static void                    ClearDefmodules(void *,EXEC_STATUS);
 #if DEFMODULE_CONSTRUCT
-   static void                    SaveDefmodules(void *,void *,char *);
+   static void                    SaveDefmodules(void *,EXEC_STATUS,void *,char *);
 #endif
 
 /*****************************************************************/
@@ -73,11 +73,11 @@ globle void DefmoduleBasicCommands(
 #endif
 
 #if (BLOAD || BLOAD_ONLY || BLOAD_AND_BSAVE)
-   DefmoduleBinarySetup(theEnv);
+   DefmoduleBinarySetup(theEnv,execStatus);
 #endif
 
 #if CONSTRUCT_COMPILER && (! RUN_TIME)
-   DefmoduleCompilerSetup(theEnv);
+   DefmoduleCompilerSetup(theEnv,execStatus);
 #endif
   }
 
@@ -90,16 +90,16 @@ static void ClearDefmodules(
   EXEC_STATUS)
   {
 #if (BLOAD || BLOAD_AND_BSAVE || BLOAD_ONLY) && (! RUN_TIME)
-   if (Bloaded(theEnv) == TRUE) return;
+   if (Bloaded(theEnv,execStatus) == TRUE) return;
 #endif
 #if (! RUN_TIME)
-   RemoveAllDefmodules(theEnv);
+   RemoveAllDefmodules(theEnv,execStatus);
 
-   CreateMainModule(theEnv);
-   DefmoduleData(theEnv)->MainModuleRedefinable = TRUE;
+   CreateMainModule(theEnv,execStatus);
+   DefmoduleData(theEnv,execStatus)->MainModuleRedefinable = TRUE;
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 #endif
   }

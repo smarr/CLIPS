@@ -198,10 +198,10 @@ globle int listbuffers(
         register BUFFER *bp;
         register int    s;
 
-        if ((s=makelist(theEnv)) != TRUE)
+        if ((s=makelist(theEnv,execStatus)) != TRUE)
                 return (s);
         if (blistp->b_nwnd == 0) {              /* Not on screen yet.   */
-                if ((wp=wpopup(theEnv)) == NULL)
+                if ((wp=wpopup(theEnv,execStatus)) == NULL)
                         return (FALSE);
                 bp = wp->w_bufp;
                 if (--bp->b_nwnd == 0) {
@@ -729,7 +729,7 @@ globle int ldelete(
                         chunk = (int) n;
                 if (chunk == 0) {               /* End of line, merge.  */
                         lchange(WFHARD);
-                        if (ldelnewline(theEnv) == FALSE
+                        if (ldelnewline(theEnv,execStatus) == FALSE
                         || (kflag!=FALSE && kinsert(theEnv,execStatus,'\n')==FALSE))
                                 return (FALSE);
                         --n;

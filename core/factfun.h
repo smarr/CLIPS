@@ -39,13 +39,13 @@
 #define LOCALE extern
 #endif
 
-#define FactDeftemplate(a) EnvFactDeftemplate(GetCurrentEnvironment(),a)
-#define FactExistp(a) EnvFactExistp(GetCurrentEnvironment(),a)
-#define FactSlotNames(a,b) EnvFactSlotNames(GetCurrentEnvironment(),a,b)
-#define GetFactList(a,b) EnvGetFactList(GetCurrentEnvironment(),a,b)
-#define PPFact(a,b,c) EnvPPFact(GetCurrentEnvironment(),a,b,c)
+#define FactDeftemplate(a) EnvFactDeftemplate(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define FactExistp(a) EnvFactExistp(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define FactSlotNames(a,b) EnvFactSlotNames(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
+#define GetFactList(a,b) EnvGetFactList(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
+#define PPFact(a,b,c) EnvPPFact(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b,c)
 
-# include "evaluatn.h"
+# include "execution_status.h"
 
    LOCALE void                           FactFunctionDefinitions(void *,EXEC_STATUS);
    LOCALE void                          *FactRelationFunction(void *,EXEC_STATUS);

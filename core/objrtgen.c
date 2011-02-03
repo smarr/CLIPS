@@ -52,9 +52,9 @@
    =========================================
    ***************************************** */
 
-static void GenObjectGetVar(void *,int,EXPRESSION *,struct lhsParseNode *,int);
+static void GenObjectGetVar(void *,EXEC_STATUS,int,EXPRESSION *,struct lhsParseNode *,int);
 static intBool IsSimpleSlotVariable(struct lhsParseNode *);
-static EXPRESSION *GenerateSlotComparisonTest(void *,int,int,struct lhsParseNode *,struct lhsParseNode *);
+static EXPRESSION *GenerateSlotComparisonTest(void *,EXEC_STATUS,int,int,struct lhsParseNode *,struct lhsParseNode *);
 
 /* =========================================
    *****************************************
@@ -665,7 +665,7 @@ static EXPRESSION *GenerateSlotComparisonTest(
       ================================================== */
    else
      {
-      theExp = GenConstant(theEnv,execStatus,FCALL,selfNode->negated ? ExpressionData(theEnv)->PTR_NEQ : ExpressionData(theEnv)->PTR_EQ);
+      theExp = GenConstant(theEnv,execStatus,FCALL,selfNode->negated ? ExpressionData(theEnv,execStatus)->PTR_NEQ : ExpressionData(theEnv,execStatus)->PTR_EQ);
       theExp->argList = GenConstant(theEnv,execStatus,0,NULL);
       
       if (isNand)

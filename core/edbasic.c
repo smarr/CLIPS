@@ -655,7 +655,7 @@ globle int delfword(
                 return (FALSE);
 
         if ((lastflag&CFKILL) == 0)             /* Clear kill buffer if */
-                kdelete(theEnv);                      /* last wasn't a kill.  */
+                kdelete(theEnv,execStatus);                      /* last wasn't a kill.  */
         thisflag |= CFKILL;
 
         dotp = curwp->w_dotp;
@@ -700,7 +700,7 @@ globle int delbword(
                 return (FALSE);
 
         if ((lastflag&CFKILL) == 0)             /* Clear kill buffer if */
-                kdelete(theEnv);                      /* last wasn't a kill.  */
+                kdelete(theEnv,execStatus);                      /* last wasn't a kill.  */
         thisflag |= CFKILL;
 
         size = 0;
@@ -776,7 +776,7 @@ globle int killregion(
    if ((s=getregion(&region)) != TRUE)
      { return (s); }
    if ((lastflag&CFKILL) == 0)             /* This is a kill type  */
-     { kdelete(theEnv); }                    /* command, so do magic */
+     { kdelete(theEnv,execStatus); }                    /* command, so do magic */
    thisflag |= CFKILL;                     /* kill buffer stuff.   */
    curwp->w_dotp = region.r_linep;
    curwp->w_doto = region.r_offset;
@@ -806,7 +806,7 @@ globle int copyregion(
         if ((s=getregion(&region)) != TRUE)
                 return (s);
         if ((lastflag&CFKILL) == 0)             /* Kill type command.   */
-                kdelete(theEnv);
+                kdelete(theEnv,execStatus);
         thisflag |= CFKILL;
         linep = region.r_linep;                 /* Current line.        */
         loffs = region.r_offset;                /* Current offset.      */

@@ -61,7 +61,7 @@
 /***************************************/
 
 #if RUN_TIME || BLOAD_ONLY || BLOAD || BLOAD_AND_BSAVE
-   static void                       NoSuchTemplateError(void *,char *);
+   static void                       NoSuchTemplateError(void *,EXEC_STATUS,char *);
 #endif
 
 #if (! RUN_TIME)
@@ -117,7 +117,7 @@ globle struct expr *BuildRHSAssert(
                                    error,FALSE,readFirstParen,
                                    TRUE,RPAREN)) != NULL)
      {
-      PPCRAndIndent(theEnv);
+      PPCRAndIndent(theEnv,execStatus);
 
       stub = GenConstant(theEnv,execStatus,FCALL,(void *) FindFunction(theEnv,execStatus, assertLikeCommand));
       stub->argList = nextOne;
@@ -148,8 +148,8 @@ globle struct expr *BuildRHSAssert(
 
    if (theToken->type == RPAREN)
      {
-      PPBackup(theEnv);
-      PPBackup(theEnv);
+      PPBackup(theEnv,execStatus);
+      PPBackup(theEnv,execStatus);
       SavePPBuffer(theEnv,execStatus,")");
      }
 
@@ -273,7 +273,7 @@ globle struct expr *GetRHSPattern(
 
    if (FindModuleSeparator(ValueToString(templateName)))
      {
-      IllegalModuleSpecifierMessage(theEnv);
+      IllegalModuleSpecifierMessage(theEnv,execStatus);
 
       *error = TRUE;
       return(NULL);
@@ -305,7 +305,7 @@ globle struct expr *GetRHSPattern(
 #if (! BLOAD_ONLY) && (! RUN_TIME)
      {
 #if BLOAD || BLOAD_AND_BSAVE
-      if ((Bloaded(theEnv)) && (! ConstructData(theEnv)->CheckSyntaxMode))
+      if ((Bloaded(theEnv,execStatus)) && (! ConstructData(theEnv,execStatus)->CheckSyntaxMode))
         {
          NoSuchTemplateError(theEnv,execStatus,ValueToString(templateName));
          *error = TRUE;
@@ -313,14 +313,14 @@ globle struct expr *GetRHSPattern(
         }
 #endif
 #if DEFMODULE_CONSTRUCT
-      if (FindImportExportConflict(theEnv,execStatus,"deftemplate",((struct defmodule *) EnvGetCurrentModule(theEnv)),ValueToString(templateName)))
+      if (FindImportExportConflict(theEnv,execStatus,"deftemplate",((struct defmodule *) EnvGetCurrentModule(theEnv,execStatus)),ValueToString(templateName)))
         {
          ImportExportConflictMessage(theEnv,execStatus,"implied deftemplate",ValueToString(templateName),NULL,NULL);
          *error = TRUE;
          return(NULL);
         }
 #endif
-      if (! ConstructData(theEnv)->CheckSyntaxMode)
+      if (! ConstructData(theEnv,execStatus)->CheckSyntaxMode)
         { theDeftemplate = CreateImpliedDeftemplate(theEnv,execStatus,(SYMBOL_HN *) templateName,TRUE); }
      }
 #else
@@ -390,8 +390,8 @@ globle struct expr *GetRHSPattern(
    /*=====================================*/
 
 #if (! RUN_TIME) && (! BLOAD_ONLY)
-   PPBackup(theEnv);
-   PPBackup(theEnv);
+   PPBackup(theEnv,execStatus);
+   PPBackup(theEnv,execStatus);
    SavePPBuffer(theEnv,execStatus,tempToken->printForm);
 #endif
 

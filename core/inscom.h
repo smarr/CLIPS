@@ -51,7 +51,7 @@ struct instanceData
    intBool ObjectModDupMsgValid;
   };
 
-#define InstanceData(theEnv) ((struct instanceData *) GetEnvironmentData(theEnv,execStatus,INSTANCE_DATA))
+#define InstanceData(theEnv,execStatus) ((struct instanceData *) GetEnvironmentData(theEnv,execStatus,INSTANCE_DATA))
 
 #ifdef LOCALE
 #undef LOCALE
@@ -63,59 +63,59 @@ struct instanceData
 #define LOCALE extern
 #endif
 
-#define CreateRawInstance(a,b) EnvCreateRawInstance(GetCurrentEnvironment(),a,b)
-#define DeleteInstance(a) EnvDeleteInstance(GetCurrentEnvironment(),a)
-#define DirectGetSlot(a,b,c) EnvDirectGetSlot(GetCurrentEnvironment(),a,b,c)
-#define DirectPutSlot(a,b,c) EnvDirectPutSlot(GetCurrentEnvironment(),a,b,c)
-#define FindInstance(a,b,c) EnvFindInstance(GetCurrentEnvironment(),a,b,c)
-#define GetInstanceClass(a) EnvGetInstanceClass(GetCurrentEnvironment(),a)
-#define GetInstancePPForm(a,b,c) EnvGetInstancePPForm(GetCurrentEnvironment(),a,b,c)
-#define GetNextInstance(a) EnvGetNextInstance(GetCurrentEnvironment(),a)
-#define GetNextInstanceInClass(a,b) EnvGetNextInstanceInClass(GetCurrentEnvironment(),a,b)
-#define GetNextInstanceInClassAndSubclasses(a,b,c) EnvGetNextInstanceInClassAndSubclasses(GetCurrentEnvironment(),a,b,c)
-#define Instances(a,b,c,d) EnvInstances(GetCurrentEnvironment(),a,b,c,d)
-#define MakeInstance(a) EnvMakeInstance(GetCurrentEnvironment(),a)
-#define UnmakeInstance(a) EnvUnmakeInstance(GetCurrentEnvironment(),a)
-#define ValidInstanceAddress(a) EnvValidInstanceAddress(GetCurrentEnvironment(),a)
+#define CreateRawInstance(a,b) EnvCreateRawInstance(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
+#define DeleteInstance(a) EnvDeleteInstance(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define DirectGetSlot(a,b,c) EnvDirectGetSlot(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b,c)
+#define DirectPutSlot(a,b,c) EnvDirectPutSlot(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b,c)
+#define FindInstance(a,b,c) EnvFindInstance(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b,c)
+#define GetInstanceClass(a) EnvGetInstanceClass(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define GetInstancePPForm(a,b,c) EnvGetInstancePPForm(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b,c)
+#define GetNextInstance(a) EnvGetNextInstance(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define GetNextInstanceInClass(a,b) EnvGetNextInstanceInClass(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
+#define GetNextInstanceInClassAndSubclasses(a,b,c) EnvGetNextInstanceInClassAndSubclasses(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b,c)
+#define Instances(a,b,c,d) EnvInstances(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b,c,d)
+#define MakeInstance(a) EnvMakeInstance(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define UnmakeInstance(a) EnvUnmakeInstance(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define ValidInstanceAddress(a) EnvValidInstanceAddress(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
 
 #if ALLOW_ENVIRONMENT_GLOBALS
-   LOCALE char                          *GetInstanceName(void *);
+   LOCALE char                          *GetInstanceName(void *,EXEC_STATUS);
 #endif
 
-LOCALE void SetupInstances(void *);
-LOCALE intBool EnvDeleteInstance(void *,void *);
-LOCALE intBool EnvUnmakeInstance(void *,void *);
+LOCALE void SetupInstances(void *,EXEC_STATUS);
+LOCALE intBool EnvDeleteInstance(void *,EXEC_STATUS,void *);
+LOCALE intBool EnvUnmakeInstance(void *,EXEC_STATUS,void *);
 #if DEBUGGING_FUNCTIONS
-LOCALE void InstancesCommand(void *);
-LOCALE void PPInstanceCommand(void *);
-LOCALE void EnvInstances(void *,char *,void *,char *,int);
+LOCALE void InstancesCommand(void *,EXEC_STATUS);
+LOCALE void PPInstanceCommand(void *,EXEC_STATUS);
+LOCALE void EnvInstances(void *,EXEC_STATUS,char *,void *,char *,int);
 #endif
-LOCALE void *EnvMakeInstance(void *,char *);
-LOCALE void *EnvCreateRawInstance(void *,void *,char *);
-LOCALE void *EnvFindInstance(void *,void *,char *,unsigned);
-LOCALE int EnvValidInstanceAddress(void *,void *);
-LOCALE void EnvDirectGetSlot(void *,void *,char *,DATA_OBJECT *);
-LOCALE int EnvDirectPutSlot(void *,void *,char *,DATA_OBJECT *);
-LOCALE char *EnvGetInstanceName(void *,void *);
-LOCALE void *EnvGetInstanceClass(void *,void *);
-LOCALE unsigned long GetGlobalNumberOfInstances(void *);
-LOCALE void *EnvGetNextInstance(void *,void *);
-LOCALE void *GetNextInstanceInScope(void *,void *);
-LOCALE void *EnvGetNextInstanceInClass(void *,void *,void *);
-LOCALE void *EnvGetNextInstanceInClassAndSubclasses(void *,void **,void *,DATA_OBJECT *);
-LOCALE void EnvGetInstancePPForm(void *,char *,unsigned,void *);
+LOCALE void *EnvMakeInstance(void *,EXEC_STATUS,char *);
+LOCALE void *EnvCreateRawInstance(void *,EXEC_STATUS,void *,char *);
+LOCALE void *EnvFindInstance(void *,EXEC_STATUS,void *,char *,unsigned);
+LOCALE int EnvValidInstanceAddress(void *,EXEC_STATUS,void *);
+LOCALE void EnvDirectGetSlot(void *,EXEC_STATUS,void *,char *,DATA_OBJECT *);
+LOCALE int EnvDirectPutSlot(void *,EXEC_STATUS,void *,char *,DATA_OBJECT *);
+LOCALE char *EnvGetInstanceName(void *,EXEC_STATUS,void *);
+LOCALE void *EnvGetInstanceClass(void *,EXEC_STATUS,void *);
+LOCALE unsigned long GetGlobalNumberOfInstances(void *,EXEC_STATUS);
+LOCALE void *EnvGetNextInstance(void *,EXEC_STATUS,void *);
+LOCALE void *GetNextInstanceInScope(void *,EXEC_STATUS,void *);
+LOCALE void *EnvGetNextInstanceInClass(void *,EXEC_STATUS,void *,void *);
+LOCALE void *EnvGetNextInstanceInClassAndSubclasses(void *,EXEC_STATUS,void **,void *,DATA_OBJECT *);
+LOCALE void EnvGetInstancePPForm(void *,EXEC_STATUS,char *,unsigned,void *);
 LOCALE void ClassCommand(void *,EXEC_STATUS,DATA_OBJECT *);
-LOCALE intBool DeleteInstanceCommand(void *);
-LOCALE intBool UnmakeInstanceCommand(void *);
-LOCALE void SymbolToInstanceName(void *,DATA_OBJECT *);
-LOCALE void *InstanceNameToSymbol(void *);
-LOCALE void InstanceAddressCommand(void *,DATA_OBJECT *);
-LOCALE void InstanceNameCommand(void *,DATA_OBJECT *);
-LOCALE intBool InstanceAddressPCommand(void *);
-LOCALE intBool InstanceNamePCommand(void *);
-LOCALE intBool InstancePCommand(void *);
-LOCALE intBool InstanceExistPCommand(void *);
-LOCALE intBool CreateInstanceHandler(void *);
+LOCALE intBool DeleteInstanceCommand(void *,EXEC_STATUS);
+LOCALE intBool UnmakeInstanceCommand(void *,EXEC_STATUS);
+LOCALE void SymbolToInstanceName(void *,EXEC_STATUS,DATA_OBJECT *);
+LOCALE void *InstanceNameToSymbol(void *,EXEC_STATUS);
+LOCALE void InstanceAddressCommand(void *,EXEC_STATUS,DATA_OBJECT *);
+LOCALE void InstanceNameCommand(void *,EXEC_STATUS,DATA_OBJECT *);
+LOCALE intBool InstanceAddressPCommand(void *,EXEC_STATUS);
+LOCALE intBool InstanceNamePCommand(void *,EXEC_STATUS);
+LOCALE intBool InstancePCommand(void *,EXEC_STATUS);
+LOCALE intBool InstanceExistPCommand(void *,EXEC_STATUS);
+LOCALE intBool CreateInstanceHandler(void *,EXEC_STATUS);
 
 #endif
 

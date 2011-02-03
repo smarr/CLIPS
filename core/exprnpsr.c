@@ -174,7 +174,7 @@ globle struct expr *Function2Parse(
    if (moduleSpecified)
      { 
       if (ConstructExported(theEnv,execStatus,"defgeneric",moduleName,constructName) ||
-          EnvGetCurrentModule(theEnv) == EnvFindDefmodule(theEnv,execStatus,ValueToString(moduleName)))
+          EnvGetCurrentModule(theEnv,execStatus) == EnvFindDefmodule(theEnv,execStatus,ValueToString(moduleName)))
         { gfunc = (void *) EnvFindDefgeneric(theEnv,execStatus,name); }
       else
         { gfunc = NULL; }
@@ -192,7 +192,7 @@ globle struct expr *Function2Parse(
      if (moduleSpecified)
        { 
         if (ConstructExported(theEnv,execStatus,"deffunction",moduleName,constructName) ||
-            EnvGetCurrentModule(theEnv) == EnvFindDefmodule(theEnv,execStatus,ValueToString(moduleName)))
+            EnvGetCurrentModule(theEnv,execStatus) == EnvFindDefmodule(theEnv,execStatus,ValueToString(moduleName)))
           { dptr = (void *) EnvFindDeffunction(theEnv,execStatus,name); }
         else
           { dptr = NULL; }
@@ -232,9 +232,9 @@ globle struct expr *Function2Parse(
    /* Check to see if function has its own parsing routine. */
    /*=======================================================*/
 
-   PushRtnBrkContexts(theEnv);
-   ExpressionData(theEnv)->ReturnContext = FALSE;
-   ExpressionData(theEnv)->BreakContext = FALSE;
+   PushRtnBrkContexts(theEnv,execStatus);
+   ExpressionData(theEnv,execStatus)->ReturnContext = FALSE;
+   ExpressionData(theEnv,execStatus)->BreakContext = FALSE;
 
 #if DEFGENERIC_CONSTRUCT || DEFFUNCTION_CONSTRUCT
    if (top->type == FCALL)
@@ -243,7 +243,7 @@ globle struct expr *Function2Parse(
       if (theFunction->parser != NULL)
         {
          top = (*theFunction->parser)(theEnv,execStatus,top,logicalName);
-         PopRtnBrkContexts(theEnv);
+         PopRtnBrkContexts(theEnv,execStatus);
          if (top == NULL) return(NULL);
          if (ReplaceSequenceExpansionOps(theEnv,execStatus,top->argList,top,FindFunction(theEnv,execStatus,"(expansion-call)"),
                                          FindFunction(theEnv,execStatus,"expand$")))
@@ -260,7 +260,7 @@ globle struct expr *Function2Parse(
    /*========================================*/
 
    top = CollectArguments(theEnv,execStatus,top,logicalName);
-   PopRtnBrkContexts(theEnv);
+   PopRtnBrkContexts(theEnv,execStatus);
    if (top == NULL) return(NULL);
 
    if (ReplaceSequenceExpansionOps(theEnv,execStatus,top->argList,top,FindFunction(theEnv,execStatus,"(expansion-call)"),
@@ -282,7 +282,7 @@ globle struct expr *Function2Parse(
    /* Check for argument errors. */
    /*============================*/
 
-   if ((top->type == FCALL) && EnvGetStaticConstraintChecking(theEnv))
+   if ((top->type == FCALL) && EnvGetStaticConstraintChecking(theEnv,execStatus))
      {
       if (CheckExpressionAgainstRestrictions(theEnv,execStatus,top,theFunction->restrictions,name))
         {
@@ -341,7 +341,7 @@ globle intBool ReplaceSequenceExpansionOps(
 
    while (actions != NULL)
      {
-      if ((ExpressionData(theEnv)->SequenceOpMode == FALSE) && (actions->type == MF_VARIABLE))
+      if ((ExpressionData(theEnv,execStatus)->SequenceOpMode == FALSE) && (actions->type == MF_VARIABLE))
         actions->type = SF_VARIABLE;
       if ((actions->type == MF_VARIABLE) || (actions->type == MF_GBL_VARIABLE) ||
           (actions->value == expmult))
@@ -402,10 +402,10 @@ globle void PushRtnBrkContexts(
    SAVED_CONTEXTS *svtmp;
 
    svtmp = get_struct(theEnv,execStatus,saved_contexts);
-   svtmp->rtn = ExpressionData(theEnv)->ReturnContext;
-   svtmp->brk = ExpressionData(theEnv)->BreakContext;
-   svtmp->nxt = ExpressionData(theEnv)->svContexts;
-   ExpressionData(theEnv)->svContexts = svtmp;
+   svtmp->rtn = ExpressionData(theEnv,execStatus)->ReturnContext;
+   svtmp->brk = ExpressionData(theEnv,execStatus)->BreakContext;
+   svtmp->nxt = ExpressionData(theEnv,execStatus)->svContexts;
+   ExpressionData(theEnv,execStatus)->svContexts = svtmp;
   }
 
 /***************************************************/
@@ -418,10 +418,10 @@ globle void PopRtnBrkContexts(
   {
    SAVED_CONTEXTS *svtmp;
 
-   ExpressionData(theEnv)->ReturnContext = ExpressionData(theEnv)->svContexts->rtn;
-   ExpressionData(theEnv)->BreakContext = ExpressionData(theEnv)->svContexts->brk;
-   svtmp = ExpressionData(theEnv)->svContexts;
-   ExpressionData(theEnv)->svContexts = ExpressionData(theEnv)->svContexts->nxt;
+   ExpressionData(theEnv,execStatus)->ReturnContext = ExpressionData(theEnv,execStatus)->svContexts->rtn;
+   ExpressionData(theEnv,execStatus)->BreakContext = ExpressionData(theEnv,execStatus)->svContexts->brk;
+   svtmp = ExpressionData(theEnv,execStatus)->svContexts;
+   ExpressionData(theEnv,execStatus)->svContexts = ExpressionData(theEnv,execStatus)->svContexts->nxt;
    rtn_struct(theEnv,execStatus,saved_contexts,svtmp);
   }
 
@@ -590,8 +590,8 @@ globle struct expr *CollectArguments(
 
       if (nextOne == NULL)
         {
-         PPBackup(theEnv);
-         PPBackup(theEnv);
+         PPBackup(theEnv,execStatus);
+         PPBackup(theEnv,execStatus);
          SavePPBuffer(theEnv,execStatus,")");
          return(top);
         }
@@ -834,7 +834,7 @@ globle struct expr *GroupActions(
 
       lastOne = nextOne;
 
-      PPCRAndIndent(theEnv);
+      PPCRAndIndent(theEnv,execStatus);
      }
   }
 
@@ -851,8 +851,8 @@ globle intBool EnvSetSequenceOperatorRecognition(
   {
    int ov;
 
-   ov = ExpressionData(theEnv)->SequenceOpMode;
-   ExpressionData(theEnv)->SequenceOpMode = value;
+   ov = ExpressionData(theEnv,execStatus)->SequenceOpMode;
+   ExpressionData(theEnv,execStatus)->SequenceOpMode = value;
    return(ov);
   }
 
@@ -864,7 +864,7 @@ globle intBool EnvGetSequenceOperatorRecognition(
   void *theEnv,
   EXEC_STATUS)
   {
-   return(ExpressionData(theEnv)->SequenceOpMode);
+   return(ExpressionData(theEnv,execStatus)->SequenceOpMode);
   }
 
 /*******************************************/

@@ -54,9 +54,9 @@
    =========================================
    ***************************************** */
 
-static void FormMethodsFromRestrictions(void *,DEFGENERIC *,char *,EXPRESSION *);
-static RESTRICTION *ParseRestrictionType(void *,int);
-static EXPRESSION *GenTypeExpression(void *,EXPRESSION *,int,int,char *);
+static void FormMethodsFromRestrictions(void *,EXEC_STATUS,DEFGENERIC *,char *,EXPRESSION *);
+static RESTRICTION *ParseRestrictionType(void *,EXEC_STATUS,int);
+static EXPRESSION *GenTypeExpression(void *,EXEC_STATUS,EXPRESSION *,int,int,char *);
 
 /* =========================================
    *****************************************
@@ -136,7 +136,7 @@ static void FormMethodsFromRestrictions(
       rptr->query = NULL;
       tmp->argList = (EXPRESSION *) rptr;
       tmp->nextArg = NULL;
-      meth = AddMethod(theEnv,execStatus,gfunc,NULL,0,0,tmp,1,0,(SYMBOL_HN *) EnvTrueSymbol(theEnv),
+      meth = AddMethod(theEnv,execStatus,gfunc,NULL,0,0,tmp,1,0,(SYMBOL_HN *) EnvTrueSymbol(theEnv,execStatus),
                        PackExpression(theEnv,execStatus,actions),NULL,FALSE);
       meth->system = 1;
       DeleteTempRestricts(theEnv,execStatus,tmp);
@@ -264,8 +264,8 @@ static void FormMethodsFromRestrictions(
         plist = tmp;
       else
         bot->nextArg = tmp;
-      FindMethodByRestrictions(gfunc,plist,min + i + 1,(SYMBOL_HN *) EnvTrueSymbol(theEnv),&mposn);
-      meth = AddMethod(theEnv,execStatus,gfunc,NULL,mposn,0,plist,min + i + 1,0,(SYMBOL_HN *) EnvTrueSymbol(theEnv),
+      FindMethodByRestrictions(gfunc,plist,min + i + 1,(SYMBOL_HN *) EnvTrueSymbol(theEnv,execStatus),&mposn);
+      meth = AddMethod(theEnv,execStatus,gfunc,NULL,mposn,0,plist,min + i + 1,0,(SYMBOL_HN *) EnvTrueSymbol(theEnv,execStatus),
                        PackExpression(theEnv,execStatus,actions),NULL,FALSE);
       meth->system = 1;
      }
@@ -405,7 +405,7 @@ static EXPRESSION *GenTypeExpression(
 
 #if OBJECT_SYSTEM
    if (primitiveCode != -1)
-     tmp = GenConstant(theEnv,execStatus,0,(void *) DefclassData(theEnv)->PrimitiveClassMap[primitiveCode]);
+     tmp = GenConstant(theEnv,execStatus,0,(void *) DefclassData(theEnv,execStatus)->PrimitiveClassMap[primitiveCode]);
    else
      tmp = GenConstant(theEnv,execStatus,0,(void *) LookupDefclassByMdlOrScope(theEnv,execStatus,COOLName));
 #else

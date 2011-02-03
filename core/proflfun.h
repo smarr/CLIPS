@@ -71,27 +71,27 @@ struct profileFunctionData
    char *OutputString;
   };
 
-#define ProfileFunctionData(theEnv) ((struct profileFunctionData *) GetEnvironmentData(theEnv,execStatus,PROFLFUN_DATA))
+#define ProfileFunctionData(theEnv,execStatus) ((struct profileFunctionData *) GetEnvironmentData(theEnv,execStatus,PROFLFUN_DATA))
 
-   LOCALE void                           ConstructProfilingFunctionDefinitions(void *);
-   LOCALE void                           ProfileCommand(void *);
-   LOCALE void                           ProfileInfoCommand(void *);
-   LOCALE void                           StartProfile(void *,
+   LOCALE void                           ConstructProfilingFunctionDefinitions(void *,EXEC_STATUS);
+   LOCALE void                           ProfileCommand(void *,EXEC_STATUS);
+   LOCALE void                           ProfileInfoCommand(void *,EXEC_STATUS);
+   LOCALE void                           StartProfile(void *,EXEC_STATUS,
                                                       struct profileFrameInfo *,
                                                       struct userData **,
                                                       intBool);
-   LOCALE void                           EndProfile(void *,struct profileFrameInfo *);
-   LOCALE void                           ProfileResetCommand(void *);
+   LOCALE void                           EndProfile(void *,EXEC_STATUS,struct profileFrameInfo *);
+   LOCALE void                           ProfileResetCommand(void *,EXEC_STATUS);
    LOCALE void                           ResetProfileInfo(struct constructProfileInfo *);
 
-   LOCALE double                         SetProfilePercentThresholdCommand(void *);
-   LOCALE double                         SetProfilePercentThreshold(void *,double);
-   LOCALE double                         GetProfilePercentThresholdCommand(void *);
-   LOCALE double                         GetProfilePercentThreshold(void *);
-   LOCALE intBool                        Profile(void *,char *);
-   LOCALE void                           DeleteProfileData(void *,void *);
-   LOCALE void                          *CreateProfileData(void *);
-   LOCALE char                          *SetProfileOutputString(void *,char *);
+   LOCALE double                         SetProfilePercentThresholdCommand(void *,EXEC_STATUS);
+   LOCALE double                         SetProfilePercentThreshold(void *,EXEC_STATUS,double);
+   LOCALE double                         GetProfilePercentThresholdCommand(void *,EXEC_STATUS);
+   LOCALE double                         GetProfilePercentThreshold(void *,EXEC_STATUS);
+   LOCALE intBool                        Profile(void *,EXEC_STATUS,char *);
+   LOCALE void                           DeleteProfileData(void *,EXEC_STATUS,void *);
+   LOCALE void                          *CreateProfileData(void *,EXEC_STATUS);
+   LOCALE char                          *SetProfileOutputString(void *,EXEC_STATUS,char *);
 
 #endif
 

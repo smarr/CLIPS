@@ -42,7 +42,7 @@
 #define LOCALE extern
 #endif
 
-   LOCALE void                           DefmoduleCompilerSetup(void *);
-   LOCALE void                           PrintDefmoduleReference(void *,FILE *,struct defmodule *);
+   LOCALE void                           DefmoduleCompilerSetup(void *,EXEC_STATUS);
+   LOCALE void                           PrintDefmoduleReference(void *,EXEC_STATUS,FILE *,struct defmodule *);
 
 #endif

@@ -64,18 +64,18 @@
                MACROS AND TYPES
    =========================================
    ***************************************** */
-#define ClassPrefix()          ConstructPrefix(ObjectCompilerData(theEnv)->ObjectCodeItem)
-#define ClassLinkPrefix()      ArbitraryPrefix(ObjectCompilerData(theEnv)->ObjectCodeItem,2)
-#define SlotPrefix()           ArbitraryPrefix(ObjectCompilerData(theEnv)->ObjectCodeItem,3)
-#define TemplateSlotPrefix()   ArbitraryPrefix(ObjectCompilerData(theEnv)->ObjectCodeItem,4)
-#define OrderedSlotPrefix()    ArbitraryPrefix(ObjectCompilerData(theEnv)->ObjectCodeItem,5)
-#define HandlerPrefix()        ArbitraryPrefix(ObjectCompilerData(theEnv)->ObjectCodeItem,6)
-#define OrderedHandlerPrefix() ArbitraryPrefix(ObjectCompilerData(theEnv)->ObjectCodeItem,7)
-#define SlotNamePrefix()       ArbitraryPrefix(ObjectCompilerData(theEnv)->ObjectCodeItem,8)
-#define SlotNameHashPrefix()   ArbitraryPrefix(ObjectCompilerData(theEnv)->ObjectCodeItem,9)
-#define ClassHashPrefix()      ArbitraryPrefix(ObjectCompilerData(theEnv)->ObjectCodeItem,10)
-#define ClassIDPrefix()        ArbitraryPrefix(ObjectCompilerData(theEnv)->ObjectCodeItem,11)
-#define MaxClassIDPrefix()     ArbitraryPrefix(ObjectCompilerData(theEnv)->ObjectCodeItem,12)
+#define ClassPrefix()          ConstructPrefix(ObjectCompilerData(theEnv,execStatus)->ObjectCodeItem)
+#define ClassLinkPrefix()      ArbitraryPrefix(ObjectCompilerData(theEnv,execStatus)->ObjectCodeItem,2)
+#define SlotPrefix()           ArbitraryPrefix(ObjectCompilerData(theEnv,execStatus)->ObjectCodeItem,3)
+#define TemplateSlotPrefix()   ArbitraryPrefix(ObjectCompilerData(theEnv,execStatus)->ObjectCodeItem,4)
+#define OrderedSlotPrefix()    ArbitraryPrefix(ObjectCompilerData(theEnv,execStatus)->ObjectCodeItem,5)
+#define HandlerPrefix()        ArbitraryPrefix(ObjectCompilerData(theEnv,execStatus)->ObjectCodeItem,6)
+#define OrderedHandlerPrefix() ArbitraryPrefix(ObjectCompilerData(theEnv,execStatus)->ObjectCodeItem,7)
+#define SlotNamePrefix()       ArbitraryPrefix(ObjectCompilerData(theEnv,execStatus)->ObjectCodeItem,8)
+#define SlotNameHashPrefix()   ArbitraryPrefix(ObjectCompilerData(theEnv,execStatus)->ObjectCodeItem,9)
+#define ClassHashPrefix()      ArbitraryPrefix(ObjectCompilerData(theEnv,execStatus)->ObjectCodeItem,10)
+#define ClassIDPrefix()        ArbitraryPrefix(ObjectCompilerData(theEnv,execStatus)->ObjectCodeItem,11)
+#define MaxClassIDPrefix()     ArbitraryPrefix(ObjectCompilerData(theEnv,execStatus)->ObjectCodeItem,12)
 
 typedef struct
   {
@@ -101,37 +101,37 @@ typedef union
    =========================================
    ***************************************** */
 
-static void ReadyObjectsForCode(void *);
-static void MarkDefclassAndSlots(void *,struct constructHeader *,void *);
-static void PrintSlotNameReference(void *,FILE *,SLOT_NAME *,int,int);
-static void InitObjectsCode(void *,FILE *,int,int);
-static int ObjectsToCode(void *,char *,char *,char *,int,FILE *,int,int);
-static int ClassIDMapToCode(void *,char *,char *,char *,int,FILE *,int,int,int *);
-static int ClassHashTableToCode(void *,char *,char *,char *,int,FILE *,int,int,int *);
-static int SlotNameHashTableToCode(void *,char *,char *,char *,int,FILE *,int,int,int *);
-static int SlotNameEntriesToCode(void *,char *,char *,char *,int,FILE *,int,int,int *);
-static void CloseObjectFiles(void *,FILE *[SAVE_ITEMS],int [SAVE_ITEMS],
+static void ReadyObjectsForCode(void *,EXEC_STATUS);
+static void MarkDefclassAndSlots(void *,EXEC_STATUS,struct constructHeader *,void *);
+static void PrintSlotNameReference(void *,EXEC_STATUS,FILE *,SLOT_NAME *,int,int);
+static void InitObjectsCode(void *,EXEC_STATUS,FILE *,int,int);
+static int ObjectsToCode(void *,EXEC_STATUS,char *,char *,char *,int,FILE *,int,int);
+static int ClassIDMapToCode(void *,EXEC_STATUS,char *,char *,char *,int,FILE *,int,int,int *);
+static int ClassHashTableToCode(void *,EXEC_STATUS,char *,char *,char *,int,FILE *,int,int,int *);
+static int SlotNameHashTableToCode(void *,EXEC_STATUS,char *,char *,char *,int,FILE *,int,int,int *);
+static int SlotNameEntriesToCode(void *,EXEC_STATUS,char *,char *,char *,int,FILE *,int,int,int *);
+static void CloseObjectFiles(void *,EXEC_STATUS,FILE *[SAVE_ITEMS],int [SAVE_ITEMS],
                              struct CodeGeneratorFile [SAVE_ITEMS],int);
-static void DefclassModuleToCode(void *,FILE *,struct defmodule *,int,int);
-static void SingleDefclassToCode(void *,FILE *,int,int,DEFCLASS *,int,
+static void DefclassModuleToCode(void *,EXEC_STATUS,FILE *,struct defmodule *,int,int);
+static void SingleDefclassToCode(void *,EXEC_STATUS,FILE *,int,int,DEFCLASS *,int,
                                  int,int,int,int,int,int,
                                  int,int,int,int,int,int);
-static intBool InheritanceLinksToCode(void *,FILE **,char *,char *,char *,int,int,FILE *,
+static intBool InheritanceLinksToCode(void *,EXEC_STATUS,FILE **,char *,char *,char *,int,int,FILE *,
                                       int *,int,DEFCLASS *,int *,
                                       int *,int *,struct CodeGeneratorFile *);
-static intBool SlotsToCode(void *,FILE **,char *,char *,char *,int,int,FILE *,
+static intBool SlotsToCode(void *,EXEC_STATUS,FILE **,char *,char *,char *,int,int,FILE *,
                            int *,int,DEFCLASS *,int *,
                            int *,int *,struct CodeGeneratorFile *);
-static intBool TemplateSlotsToCode(void *,FILE **,char *,char *,char *,int,int,FILE *,
+static intBool TemplateSlotsToCode(void *,EXEC_STATUS,FILE **,char *,char *,char *,int,int,FILE *,
                                    int *,int,DEFCLASS *,int *,
                                    int *,int *,struct CodeGeneratorFile *);
-static intBool OrderedSlotsToCode(void *,FILE **,char *,char *,char *,int,int,FILE *,
+static intBool OrderedSlotsToCode(void *,EXEC_STATUS,FILE **,char *,char *,char *,int,int,FILE *,
                                   int *,int,DEFCLASS *,int *,
                                   int *,int *,struct CodeGeneratorFile *);
-static intBool HandlersToCode(void *,FILE **,char *,char *,char *,int,int,FILE *,
+static intBool HandlersToCode(void *,EXEC_STATUS,FILE **,char *,char *,char *,int,int,FILE *,
                               int *,int,DEFCLASS *,int *,
                               int *,int *,struct CodeGeneratorFile *);
-static intBool OrderedHandlersToCode(void *,FILE **,char *,char *,char *,int,int,FILE *,
+static intBool OrderedHandlersToCode(void *,EXEC_STATUS,FILE **,char *,char *,char *,int,int,FILE *,
                                      int *,int,DEFCLASS *,int *,
                                      int *,int *,struct CodeGeneratorFile *);
 
@@ -156,7 +156,7 @@ globle void SetupObjectsCompiler(
   {
    AllocateEnvironmentData(theEnv,execStatus,OBJECT_COMPILER_DATA,sizeof(struct objectCompilerData),NULL);
 
-   ObjectCompilerData(theEnv)->ObjectCodeItem = AddCodeGeneratorItem(theEnv,execStatus,"objects",0,ReadyObjectsForCode,
+   ObjectCompilerData(theEnv,execStatus)->ObjectCodeItem = AddCodeGeneratorItem(theEnv,execStatus,"objects",0,ReadyObjectsForCode,
                                          InitObjectsCode,ObjectsToCode,13);
   }
 
@@ -213,7 +213,7 @@ globle void DefclassCModuleReference(
   int maxIndices)
   {
    fprintf(theFile,"MIHS &%s%d_%d[%d]",
-                   ModulePrefix(ObjectCompilerData(theEnv)->ObjectCodeItem),
+                   ModulePrefix(ObjectCompilerData(theEnv,execStatus)->ObjectCodeItem),
                    imageID,
                    (count / maxIndices) + 1,
                    (count % maxIndices));
@@ -252,12 +252,12 @@ static void ReadyObjectsForCode(
       Gets the value of MaxIndices directly
       from the global in CONSCOMP.C
       ===================================== */
-   markInfo.maxIndices = ConstructCompilerData(theEnv)->MaxIndices;
-   DoForAllConstructs(theEnv,execStatus,MarkDefclassAndSlots,DefclassData(theEnv)->DefclassModuleIndex,
+   markInfo.maxIndices = ConstructCompilerData(theEnv,execStatus)->MaxIndices;
+   DoForAllConstructs(theEnv,execStatus,MarkDefclassAndSlots,DefclassData(theEnv,execStatus)->DefclassModuleIndex,
                       FALSE,(void *) &markInfo);
    i = 0L;
    for (j = 0 ; j < SLOT_NAME_TABLE_HASH_SIZE ; j++)
-     for (snp = DefclassData(theEnv)->SlotNameTable[j] ; snp != NULL ; snp = snp->nxt)
+     for (snp = DefclassData(theEnv,execStatus)->SlotNameTable[j] ; snp != NULL ; snp = snp->nxt)
        snp->bsaveIndex = i++;
   }
 
@@ -298,7 +298,7 @@ static void MarkDefclassAndSlots(
    long i;
    PACKED_LOCATION_INFO theLocationInfo;
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 
    theDefclass->header.bsaveID = markInfo->classCount++;
@@ -453,7 +453,7 @@ static int ObjectsToCode(
       itemFiles[MODULEI] =
             OpenFileIfNeeded(theEnv,execStatus,itemFiles[MODULEI],fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
                              itemArrayVersions[MODULEI],headerFP,
-                             "DEFCLASS_MODULE",ModulePrefix(ObjectCompilerData(theEnv)->ObjectCodeItem),
+                             "DEFCLASS_MODULE",ModulePrefix(ObjectCompilerData(theEnv,execStatus)->ObjectCodeItem),
                              itemReopenFlags[MODULEI],&itemCodeFiles[MODULEI]);
       if (itemFiles[MODULEI] == NULL)
         goto ObjectCodeError;
@@ -579,17 +579,17 @@ static int ClassIDMapToCode(
    if (classIDMapFile == NULL)
      return(FALSE);
    for (classIDMapArrayCount = 0 ;
-        classIDMapArrayCount < DefclassData(theEnv)->MaxClassID ;
+        classIDMapArrayCount < DefclassData(theEnv,execStatus)->MaxClassID ;
         classIDMapArrayCount++)
      {
       if (classIDMapArrayCount > 0)
         fprintf(classIDMapFile,",\n");
-      PrintClassReference(theEnv,execStatus,classIDMapFile,DefclassData(theEnv)->ClassIDMap[classIDMapArrayCount],
+      PrintClassReference(theEnv,execStatus,classIDMapFile,DefclassData(theEnv,execStatus)->ClassIDMap[classIDMapArrayCount],
                           imageID,maxIndices);
      }
    fprintf(classIDMapFile,"};\n\n");
    fprintf(classIDMapFile,"unsigned %s%d = %u;\n",
-                          MaxClassIDPrefix(),imageID,(unsigned) DefclassData(theEnv)->MaxClassID);
+                          MaxClassIDPrefix(),imageID,(unsigned) DefclassData(theEnv,execStatus)->MaxClassID);
    fprintf(headerFP,"extern unsigned %s%d;\n",MaxClassIDPrefix(),imageID);
    GenClose(theEnv,execStatus,classIDMapFile);
    return(TRUE);
@@ -634,7 +634,7 @@ static int ClassHashTableToCode(
      {
       if (classHashArrayCount > 0)
         fprintf(classHashFile,",\n");
-      PrintClassReference(theEnv,execStatus,classHashFile,DefclassData(theEnv)->ClassTable[classHashArrayCount],
+      PrintClassReference(theEnv,execStatus,classHashFile,DefclassData(theEnv,execStatus)->ClassTable[classHashArrayCount],
                           imageID,maxIndices);
      }
 
@@ -683,7 +683,7 @@ static int SlotNameHashTableToCode(
      {
       if (slotNameHashArrayCount > 0)
         fprintf(slotNameHashFile,",\n");
-      PrintSlotNameReference(theEnv,execStatus,slotNameHashFile,DefclassData(theEnv)->SlotNameTable[slotNameHashArrayCount],
+      PrintSlotNameReference(theEnv,execStatus,slotNameHashFile,DefclassData(theEnv,execStatus)->SlotNameTable[slotNameHashArrayCount],
                              imageID,maxIndices);
      }
    CloseFileIfNeeded(theEnv,execStatus,slotNameHashFile,&slotNameHashArrayCount,
@@ -724,7 +724,7 @@ static int SlotNameEntriesToCode(
 
    for (i = 0 ; i < SLOT_NAME_TABLE_HASH_SIZE ; i++)
      {
-      for (snp = DefclassData(theEnv)->SlotNameTable[i] ; snp != NULL ; snp = snp->nxt)
+      for (snp = DefclassData(theEnv,execStatus)->SlotNameTable[i] ; snp != NULL ; snp = snp->nxt)
         {
          slotNameFile = OpenFileIfNeeded(theEnv,execStatus,slotNameFile,fileName,pathName,fileNameBuffer,fileID,
                                        imageID,fileCount,
@@ -810,7 +810,7 @@ static void DefclassModuleToCode(
   {
    fprintf(theFile,"{");
    ConstructModuleToCode(theEnv,execStatus,theFile,theModule,imageID,maxIndices,
-                         DefclassData(theEnv)->DefclassModuleIndex,ClassPrefix());
+                         DefclassData(theEnv,execStatus)->DefclassModuleIndex,ClassPrefix());
    fprintf(theFile,"}");
   }
 
@@ -878,7 +878,7 @@ static void SingleDefclassToCode(
       ================== */
    fprintf(theFile,"{");
    ConstructHeaderToCode(theEnv,execStatus,theFile,&theDefclass->header,imageID,maxIndices,moduleCount,
-                         ModulePrefix(ObjectCompilerData(theEnv)->ObjectCodeItem),ClassPrefix());
+                         ModulePrefix(ObjectCompilerData(theEnv,execStatus)->ObjectCodeItem),ClassPrefix());
 
    /* =========================
       Defclass specific data

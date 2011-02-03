@@ -52,10 +52,10 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static struct lhsParseNode    *GetLHSSlots(void *,char *,struct token *,struct deftemplate *,int *);
-   static struct lhsParseNode    *GetSingleLHSSlot(void *,char *,struct token *,
+   static struct lhsParseNode    *GetLHSSlots(void *,EXEC_STATUS,char *,struct token *,struct deftemplate *,int *);
+   static struct lhsParseNode    *GetSingleLHSSlot(void *,EXEC_STATUS,char *,struct token *,
                                                    struct templateSlot *,int *,short);
-   static intBool                 MultiplyDefinedLHSSlots(void *,struct lhsParseNode *,SYMBOL_HN *);
+   static intBool                 MultiplyDefinedLHSSlots(void *,EXEC_STATUS,struct lhsParseNode *,SYMBOL_HN *);
 
 /*********************************************/
 /* DeftemplateLHSParse: Parses a LHS pattern */
@@ -86,13 +86,13 @@ globle struct lhsParseNode *DeftemplateLHSParse(
    /* Create the pattern node for the deftemplate name. */
    /*===================================================*/
 
-   head = GetLHSParseNode(theEnv);
+   head = GetLHSParseNode(theEnv,execStatus);
    head->type = SF_WILDCARD;
    head->negated = FALSE;
    head->exists = FALSE;
    head->index = 0;
    head->slotNumber = 1;
-   head->bottom = GetLHSParseNode(theEnv);
+   head->bottom = GetLHSParseNode(theEnv,execStatus);
    head->bottom->type = SYMBOL;
    head->bottom->negated = FALSE;
    head->bottom->exists = FALSE;
@@ -142,7 +142,7 @@ static struct lhsParseNode *GetLHSSlots(
 
    while (tempToken->type != RPAREN)
      {
-      PPBackup(theEnv);
+      PPBackup(theEnv,execStatus);
       SavePPBuffer(theEnv,execStatus," ");
       SavePPBuffer(theEnv,execStatus,tempToken->printForm);
 
@@ -313,7 +313,7 @@ static struct lhsParseNode *GetSingleLHSSlot(
 
    if (tempToken->type != RPAREN)
      {
-      PPBackup(theEnv);
+      PPBackup(theEnv,execStatus);
       SavePPBuffer(theEnv,execStatus," ");
       SavePPBuffer(theEnv,execStatus,tempToken->printForm);
       SyntaxErrorMessage(theEnv,execStatus,"deftemplate patterns");
@@ -329,8 +329,8 @@ static struct lhsParseNode *GetSingleLHSSlot(
 
    if ((nextSlot->bottom == NULL) && slotPtr->multislot)
      {
-      PPBackup(theEnv);
-      PPBackup(theEnv);
+      PPBackup(theEnv,execStatus);
+      PPBackup(theEnv,execStatus);
       SavePPBuffer(theEnv,execStatus,")");
      }
 

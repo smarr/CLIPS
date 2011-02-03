@@ -66,13 +66,13 @@ globle struct lhsParseNode *SequenceRestrictionParse(
    /* Create the pattern node for the relation name. */
    /*================================================*/
 
-   topNode = GetLHSParseNode(theEnv);
+   topNode = GetLHSParseNode(theEnv,execStatus);
    topNode->type = SF_WILDCARD;
    topNode->negated = FALSE;
    topNode->exists = FALSE;
    topNode->index = -1;
    topNode->slotNumber = 1;
-   topNode->bottom = GetLHSParseNode(theEnv);
+   topNode->bottom = GetLHSParseNode(theEnv,execStatus);
    topNode->bottom->type = SYMBOL;
    topNode->bottom->negated = FALSE;
    topNode->bottom->exists = FALSE;
@@ -111,7 +111,7 @@ globle struct lhsParseNode *SequenceRestrictionParse(
 
    if (theToken->type != RPAREN)
      {
-      PPBackup(theEnv);
+      PPBackup(theEnv,execStatus);
       SavePPBuffer(theEnv,execStatus," ");
       SavePPBuffer(theEnv,execStatus,theToken->printForm);
       SyntaxErrorMessage(theEnv,execStatus,"fact patterns");
@@ -126,8 +126,8 @@ globle struct lhsParseNode *SequenceRestrictionParse(
 
    if (nextField->bottom == NULL)
      {
-      PPBackup(theEnv);
-      PPBackup(theEnv);
+      PPBackup(theEnv,execStatus);
+      PPBackup(theEnv,execStatus);
       SavePPBuffer(theEnv,execStatus,")");
      }
 
@@ -162,7 +162,7 @@ globle struct lhsParseNode *CreateInitialFactPattern(
      {
       PrintWarningID(theEnv,execStatus,"FACTLHS",1,FALSE);
       EnvPrintRouter(theEnv,execStatus,WWARNING,"Creating implied initial-fact deftemplate in module ");
-      EnvPrintRouter(theEnv,execStatus,WWARNING,EnvGetDefmoduleName(theEnv,execStatus,EnvGetCurrentModule(theEnv)));
+      EnvPrintRouter(theEnv,execStatus,WWARNING,EnvGetDefmoduleName(theEnv,execStatus,EnvGetCurrentModule(theEnv,execStatus)));
       EnvPrintRouter(theEnv,execStatus,WWARNING,".\n");
       EnvPrintRouter(theEnv,execStatus,WWARNING,"  You probably want to import this deftemplate from the MAIN module.\n");
       CreateImpliedDeftemplate(theEnv,execStatus,(SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,"initial-fact"),FALSE);
@@ -172,12 +172,12 @@ globle struct lhsParseNode *CreateInitialFactPattern(
    /* Create the (initial-fact) pattern. */
    /*====================================*/
 
-   topNode = GetLHSParseNode(theEnv);
+   topNode = GetLHSParseNode(theEnv,execStatus);
    topNode->type = SF_WILDCARD;
    topNode->index = 0;
    topNode->slotNumber = 1;
 
-   topNode->bottom = GetLHSParseNode(theEnv);
+   topNode->bottom = GetLHSParseNode(theEnv,execStatus);
    topNode->bottom->type = SYMBOL;
    topNode->bottom->value = (void *) EnvAddSymbol(theEnv,execStatus,"initial-fact");
 
@@ -228,7 +228,7 @@ globle struct lhsParseNode *FactPatternParse(
 
    if (FindModuleSeparator(ValueToString(theToken->value)))
      {
-      IllegalModuleSpecifierMessage(theEnv);
+      IllegalModuleSpecifierMessage(theEnv,execStatus);
       return(NULL);
      }
 
@@ -254,14 +254,14 @@ globle struct lhsParseNode *FactPatternParse(
    if (theDeftemplate == NULL)
      {
 #if DEFMODULE_CONSTRUCT
-      if (FindImportExportConflict(theEnv,execStatus,"deftemplate",((struct defmodule *) EnvGetCurrentModule(theEnv)),ValueToString(theToken->value)))
+      if (FindImportExportConflict(theEnv,execStatus,"deftemplate",((struct defmodule *) EnvGetCurrentModule(theEnv,execStatus)),ValueToString(theToken->value)))
         {
          ImportExportConflictMessage(theEnv,execStatus,"implied deftemplate",ValueToString(theToken->value),NULL,NULL);
          return(NULL);
         }
 #endif /* DEFMODULE_CONSTRUCT */
 
-      if (! ConstructData(theEnv)->CheckSyntaxMode)
+      if (! ConstructData(theEnv,execStatus)->CheckSyntaxMode)
         { theDeftemplate = CreateImpliedDeftemplate(theEnv,execStatus,(SYMBOL_HN *) theToken->value,TRUE); }
       else
         { theDeftemplate = NULL; }

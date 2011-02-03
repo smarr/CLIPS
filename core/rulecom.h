@@ -48,29 +48,29 @@
 #define LOCALE extern
 #endif
 
-#define Matches(a) EnvMatches(GetCurrentEnvironment(),a)
-#define JoinActivity(a,b) EnvJoinActivity(GetCurrentEnvironment(),a,b)
-#define MatchesCount(a) EnvMatchesCount(GetCurrentEnvironment(),a)
-#define GetBetaMemoryResizing() EnvGetBetaMemoryResizing(GetCurrentEnvironment())
-#define SetBetaMemoryResizing(a) EnvSetBetaMemoryResizing(GetCurrentEnvironment(),a)
+#define Matches(a) EnvMatches(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define JoinActivity(a,b) EnvJoinActivity(GetCurrentEnvironment(),GetCurrentExecutionState(),a,b)
+#define MatchesCount(a) EnvMatchesCount(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define GetBetaMemoryResizing() EnvGetBetaMemoryResizing(GetCurrentEnvironment(),GetCurrentExecutionState())
+#define SetBetaMemoryResizing(a) EnvSetBetaMemoryResizing(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
 
-   LOCALE intBool                        EnvGetBetaMemoryResizing(void *);
-   LOCALE intBool                        EnvSetBetaMemoryResizing(void *,intBool);
-   LOCALE int                            GetBetaMemoryResizingCommand(void *);
-   LOCALE int                            SetBetaMemoryResizingCommand(void *);
+   LOCALE intBool                        EnvGetBetaMemoryResizing(void *,EXEC_STATUS);
+   LOCALE intBool                        EnvSetBetaMemoryResizing(void *,EXEC_STATUS,intBool);
+   LOCALE int                            GetBetaMemoryResizingCommand(void *,EXEC_STATUS);
+   LOCALE int                            SetBetaMemoryResizingCommand(void *,EXEC_STATUS);
 
-   LOCALE intBool                        EnvMatches(void *,void *);
-   LOCALE long long                      EnvJoinActivity(void *,void *,int);
-   LOCALE intBool                        EnvMatchesCount(void *,void *);
-   LOCALE void                           DefruleCommands(void *);
-   LOCALE void                           MatchesCommand(void *);
-   LOCALE long long                      JoinActivityCommand(void *);
-   LOCALE void                           MatchesCountCommand(void *);
-   LOCALE long long                      TimetagFunction(void *);
+   LOCALE intBool                        EnvMatches(void *,EXEC_STATUS,void *);
+   LOCALE long long                      EnvJoinActivity(void *,EXEC_STATUS,void *,int);
+   LOCALE intBool                        EnvMatchesCount(void *,EXEC_STATUS,void *);
+   LOCALE void                           DefruleCommands(void *,EXEC_STATUS);
+   LOCALE void                           MatchesCommand(void *,EXEC_STATUS);
+   LOCALE long long                      JoinActivityCommand(void *,EXEC_STATUS);
+   LOCALE void                           MatchesCountCommand(void *,EXEC_STATUS);
+   LOCALE long long                      TimetagFunction(void *,EXEC_STATUS);
 #if DEVELOPER
-   LOCALE void                           ShowJoinsCommand(void *);
-   LOCALE long                           RuleComplexityCommand(void *);
-   LOCALE void                           ShowAlphaHashTable(void *);
+   LOCALE void                           ShowJoinsCommand(void *,EXEC_STATUS);
+   LOCALE long                           RuleComplexityCommand(void *,EXEC_STATUS);
+   LOCALE void                           ShowAlphaHashTable(void *,EXEC_STATUS);
 #endif
 
 #endif

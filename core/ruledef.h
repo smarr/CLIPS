@@ -131,7 +131,7 @@ struct defruleData
 #define EnvGetDefrulePPForm(theEnv,execStatus,x) GetConstructPPForm(theEnv,execStatus,(struct constructHeader *) x)
 #define EnvDefruleModule(theEnv,execStatus,x) GetConstructModuleName((struct constructHeader *) x)
 
-#define DefruleData(theEnv) ((struct defruleData *) GetEnvironmentData(theEnv,execStatus,DEFRULE_DATA))
+#define DefruleData(theEnv,execStatus) ((struct defruleData *) GetEnvironmentData(theEnv,execStatus,DEFRULE_DATA))
 
 #define GetPreviousJoin(theJoin) \
    (((theJoin)->joinFromTheRight) ? \
@@ -153,22 +153,22 @@ struct defruleData
 #endif
 
 #define DefruleModule(x) GetConstructModuleName((struct constructHeader *) x)
-#define FindDefrule(a) EnvFindDefrule(GetCurrentEnvironment(),a)
+#define FindDefrule(a) EnvFindDefrule(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
 #define GetDefruleName(x) GetConstructNameString((struct constructHeader *) x)
-#define GetDefrulePPForm(x) GetConstructPPForm(GetCurrentEnvironment(),(struct constructHeader *) x)
-#define GetNextDefrule(a) EnvGetNextDefrule(GetCurrentEnvironment(),a)
-#define IsDefruleDeletable(a) EnvIsDefruleDeletable(GetCurrentEnvironment(),a)
+#define GetDefrulePPForm(x) GetConstructPPForm(GetCurrentEnvironment(),GetCurrentExecutionState(),(struct constructHeader *) x)
+#define GetNextDefrule(a) EnvGetNextDefrule(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define IsDefruleDeletable(a) EnvIsDefruleDeletable(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
 
-   LOCALE void                           InitializeDefrules(void *);
-   LOCALE void                          *EnvFindDefrule(void *,char *);
-   LOCALE void                          *EnvGetNextDefrule(void *,void *);
-   LOCALE struct defruleModule          *GetDefruleModuleItem(void *,struct defmodule *);
-   LOCALE intBool                        EnvIsDefruleDeletable(void *,void *);
+   LOCALE void                           InitializeDefrules(void *,EXEC_STATUS);
+   LOCALE void                          *EnvFindDefrule(void *,EXEC_STATUS,char *);
+   LOCALE void                          *EnvGetNextDefrule(void *,EXEC_STATUS,void *);
+   LOCALE struct defruleModule          *GetDefruleModuleItem(void *,EXEC_STATUS,struct defmodule *);
+   LOCALE intBool                        EnvIsDefruleDeletable(void *,EXEC_STATUS,void *);
 #if RUN_TIME
-   LOCALE void                           DefruleRunTimeInitialize(void *,struct joinLink *,struct joinLink *);
+   LOCALE void                           DefruleRunTimeInitialize(void *,EXEC_STATUS,struct joinLink *,struct joinLink *);
 #endif
 #if RUN_TIME || BLOAD_ONLY || BLOAD || BLOAD_AND_BSAVE
-   LOCALE void                           AddBetaMemoriesToJoin(void *,struct joinNode *);
+   LOCALE void                           AddBetaMemoriesToJoin(void *,EXEC_STATUS,struct joinNode *);
 #endif
 
 #endif

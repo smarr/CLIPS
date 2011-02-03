@@ -64,13 +64,13 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static void                    ReturnMarkers(void *,struct multifieldMarker *);
-   static intBool                 FindNextConflictingMatch(void *,struct partialMatch *,
+   static void                    ReturnMarkers(void *,EXEC_STATUS,struct multifieldMarker *);
+   static intBool                 FindNextConflictingMatch(void *,EXEC_STATUS,struct partialMatch *,
                                                            struct partialMatch *,
                                                            struct joinNode *,struct partialMatch *);
-   static intBool                 PartialMatchDefunct(void *,struct partialMatch *);
-   static void                    NegEntryRetractAlpha(void *,struct partialMatch *);
-   static void                    NegEntryRetractBeta(void *,struct joinNode *,struct partialMatch *,
+   static intBool                 PartialMatchDefunct(void *,EXEC_STATUS,struct partialMatch *);
+   static void                    NegEntryRetractAlpha(void *,EXEC_STATUS,struct partialMatch *);
+   static void                    NegEntryRetractBeta(void *,EXEC_STATUS,struct joinNode *,struct partialMatch *,
                                                       struct partialMatch *);
 
 /************************************************************/
@@ -311,7 +311,7 @@ static intBool FindNextConflictingMatch(
 
 #if DEVELOPER
    if (possibleConflicts != NULL)
-     { EngineData(theEnv)->leftToRightLoops++; }
+     { EngineData(theEnv,execStatus)->leftToRightLoops++; }
 #endif     
    /*====================================*/
    /* Set up the evaluation environment. */
@@ -319,11 +319,11 @@ static intBool FindNextConflictingMatch(
    
    if (possibleConflicts != NULL)
      {
-      oldLHSBinds = EngineData(theEnv)->GlobalLHSBinds;
-      oldRHSBinds = EngineData(theEnv)->GlobalRHSBinds;
-      oldJoin = EngineData(theEnv)->GlobalJoin;
-      EngineData(theEnv)->GlobalLHSBinds = theBind;
-      EngineData(theEnv)->GlobalJoin = theJoin;
+      oldLHSBinds = EngineData(theEnv,execStatus)->GlobalLHSBinds;
+      oldRHSBinds = EngineData(theEnv,execStatus)->GlobalRHSBinds;
+      oldJoin = EngineData(theEnv,execStatus)->GlobalJoin;
+      EngineData(theEnv,execStatus)->GlobalLHSBinds = theBind;
+      EngineData(theEnv,execStatus)->GlobalJoin = theJoin;
       restore = TRUE;
      }
 
@@ -374,11 +374,11 @@ static intBool FindNextConflictingMatch(
 #if DEVELOPER
          if (theJoin->networkTest)
            { 
-            EngineData(theEnv)->leftToRightComparisons++; 
-            EngineData(theEnv)->findNextConflictingComparisons++; 
+            EngineData(theEnv,execStatus)->leftToRightComparisons++; 
+            EngineData(theEnv,execStatus)->findNextConflictingComparisons++; 
            }
 #endif
-         EngineData(theEnv)->GlobalRHSBinds = possibleConflicts;
+         EngineData(theEnv,execStatus)->GlobalRHSBinds = possibleConflicts;
 
          result = EvaluateJoinExpression(theEnv,execStatus,theJoin->networkTest,theJoin);
          if (execStatus->EvaluationError)
@@ -389,7 +389,7 @@ static intBool FindNextConflictingMatch(
         
 #if DEVELOPER
          if (result != FALSE)
-          { EngineData(theEnv)->leftToRightSucceeds++; }
+          { EngineData(theEnv,execStatus)->leftToRightSucceeds++; }
 #endif
         }
         
@@ -404,18 +404,18 @@ static intBool FindNextConflictingMatch(
       if (result != FALSE)
         {
          AddBlockedLink(theBind,possibleConflicts);
-         EngineData(theEnv)->GlobalLHSBinds = oldLHSBinds;
-         EngineData(theEnv)->GlobalRHSBinds = oldRHSBinds;
-         EngineData(theEnv)->GlobalJoin = oldJoin;
+         EngineData(theEnv,execStatus)->GlobalLHSBinds = oldLHSBinds;
+         EngineData(theEnv,execStatus)->GlobalRHSBinds = oldRHSBinds;
+         EngineData(theEnv,execStatus)->GlobalJoin = oldJoin;
          return(TRUE);
         }
      }
 
    if (restore)
      {
-      EngineData(theEnv)->GlobalLHSBinds = oldLHSBinds;
-      EngineData(theEnv)->GlobalRHSBinds = oldRHSBinds;
-      EngineData(theEnv)->GlobalJoin = oldJoin;
+      EngineData(theEnv,execStatus)->GlobalLHSBinds = oldLHSBinds;
+      EngineData(theEnv,execStatus)->GlobalRHSBinds = oldRHSBinds;
+      EngineData(theEnv,execStatus)->GlobalJoin = oldJoin;
      }
 
    /*========================*/
@@ -517,8 +517,8 @@ globle void ReturnPartialMatch(
 
    if (waste->busy)
      {
-      waste->nextInMemory = EngineData(theEnv)->GarbagePartialMatches;
-      EngineData(theEnv)->GarbagePartialMatches = waste;
+      waste->nextInMemory = EngineData(theEnv,execStatus)->GarbagePartialMatches;
+      EngineData(theEnv,execStatus)->GarbagePartialMatches = waste;
       return;
      }
 
@@ -633,11 +633,11 @@ globle void FlushGarbagePartialMatches(
    /* the alpha memories of the pattern networks.       */
    /*===================================================*/
 
-   while (EngineData(theEnv)->GarbageAlphaMatches != NULL)
+   while (EngineData(theEnv,execStatus)->GarbageAlphaMatches != NULL)
      {
-      amPtr = EngineData(theEnv)->GarbageAlphaMatches->next;
-      rtn_struct(theEnv,execStatus,alphaMatch,EngineData(theEnv)->GarbageAlphaMatches);
-      EngineData(theEnv)->GarbageAlphaMatches = amPtr;
+      amPtr = EngineData(theEnv,execStatus)->GarbageAlphaMatches->next;
+      rtn_struct(theEnv,execStatus,alphaMatch,EngineData(theEnv,execStatus)->GarbageAlphaMatches);
+      EngineData(theEnv,execStatus)->GarbageAlphaMatches = amPtr;
      }
 
    /*==============================================*/
@@ -645,22 +645,22 @@ globle void FlushGarbagePartialMatches(
    /* from the beta memories of the join networks. */
    /*==============================================*/
 
-   while (EngineData(theEnv)->GarbagePartialMatches != NULL)
+   while (EngineData(theEnv,execStatus)->GarbagePartialMatches != NULL)
      {
       /*=====================================================*/
       /* Remember the next garbage partial match to process. */
       /*=====================================================*/
 
-      pmPtr = EngineData(theEnv)->GarbagePartialMatches->nextInMemory;
+      pmPtr = EngineData(theEnv,execStatus)->GarbagePartialMatches->nextInMemory;
 
       /*============================================*/
       /* Dispose of the garbage partial match being */
       /* examined and move on to the next one.      */
       /*============================================*/
 
-      EngineData(theEnv)->GarbagePartialMatches->busy = FALSE;
-      ReturnPartialMatch(theEnv,execStatus,EngineData(theEnv)->GarbagePartialMatches);
-      EngineData(theEnv)->GarbagePartialMatches = pmPtr;
+      EngineData(theEnv,execStatus)->GarbagePartialMatches->busy = FALSE;
+      ReturnPartialMatch(theEnv,execStatus,EngineData(theEnv,execStatus)->GarbagePartialMatches);
+      EngineData(theEnv,execStatus)->GarbagePartialMatches = pmPtr;
      }
   }
 

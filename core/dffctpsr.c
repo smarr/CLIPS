@@ -67,7 +67,7 @@ globle int ParseDeffacts(
    deffactsError = FALSE;
    SetPPBufferStatus(theEnv,execStatus,ON);
 
-   FlushPPBuffer(theEnv);
+   FlushPPBuffer(theEnv,execStatus);
    SetIndentDepth(theEnv,execStatus,3);
    SavePPBuffer(theEnv,execStatus,"(deffacts ");
 
@@ -76,7 +76,7 @@ globle int ParseDeffacts(
    /*==========================================================*/
 
 #if BLOAD || BLOAD_AND_BSAVE
-   if ((Bloaded(theEnv) == TRUE) && (! ConstructData(theEnv)->CheckSyntaxMode))
+   if ((Bloaded(theEnv,execStatus) == TRUE) && (! ConstructData(theEnv,execStatus)->CheckSyntaxMode))
      {
       CannotLoadWithBloadMessage(theEnv,execStatus,"deffacts");
       return(TRUE);
@@ -114,7 +114,7 @@ globle int ParseDeffacts(
    /* successfully parsed deffacts to the KB.      */
    /*==============================================*/
 
-   if (ConstructData(theEnv)->CheckSyntaxMode)
+   if (ConstructData(theEnv,execStatus)->CheckSyntaxMode)
      {
       ReturnExpression(theEnv,execStatus,temp);
       return(FALSE);
@@ -140,10 +140,10 @@ globle int ParseDeffacts(
    /* Save the pretty print representation of the deffacts. */
    /*=======================================================*/
 
-   if (EnvGetConserveMemory(theEnv) == TRUE)
+   if (EnvGetConserveMemory(theEnv,execStatus) == TRUE)
      { newDeffacts->header.ppForm = NULL; }
    else
-     { newDeffacts->header.ppForm = CopyPPBuffer(theEnv); }
+     { newDeffacts->header.ppForm = CopyPPBuffer(theEnv,execStatus); }
 
    /*=============================================*/
    /* Add the deffacts to the appropriate module. */

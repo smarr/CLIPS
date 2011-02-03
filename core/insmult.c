@@ -57,8 +57,8 @@
    =========================================
    ***************************************** */
 
-static INSTANCE_TYPE *CheckMultifieldSlotInstance(void *,char *);
-static INSTANCE_SLOT *CheckMultifieldSlotModify(void *,int,char *,INSTANCE_TYPE *,
+static INSTANCE_TYPE *CheckMultifieldSlotInstance(void *,EXEC_STATUS,char *);
+static INSTANCE_SLOT *CheckMultifieldSlotModify(void *,EXEC_STATUS,int,char *,INSTANCE_TYPE *,
                                        EXPRESSION *,long *,long *,DATA_OBJECT *);
 static void AssignSlotToDataObject(DATA_OBJECT *,INSTANCE_SLOT *);
 
@@ -143,7 +143,7 @@ globle void MVSlotReplaceCommand(
    EXPRESSION arg;
 
    result->type = SYMBOL;
-   result->value = EnvFalseSymbol(theEnv);
+   result->value = EnvFalseSymbol(theEnv,execStatus);
    ins = CheckMultifieldSlotInstance(theEnv,execStatus,"slot-replace$");
    if (ins == NULL)
      return;
@@ -184,7 +184,7 @@ globle void MVSlotInsertCommand(
    EXPRESSION arg;
 
    result->type = SYMBOL;
-   result->value = EnvFalseSymbol(theEnv);
+   result->value = EnvFalseSymbol(theEnv,execStatus);
    ins = CheckMultifieldSlotInstance(theEnv,execStatus,"slot-insert$");
    if (ins == NULL)
      return;
@@ -226,7 +226,7 @@ globle void MVSlotDeleteCommand(
    EXPRESSION arg;
 
    result->type = SYMBOL;
-   result->value = EnvFalseSymbol(theEnv);
+   result->value = EnvFalseSymbol(theEnv,execStatus);
    ins = CheckMultifieldSlotInstance(theEnv,execStatus,"slot-delete$");
    if (ins == NULL)
      return;
@@ -264,7 +264,7 @@ globle intBool DirectMVReplaceCommand(
 
    if (CheckCurrentMessage(theEnv,execStatus,"direct-slot-replace$",TRUE) == FALSE)
      return(FALSE);
-   ins = GetActiveInstance(theEnv);
+   ins = GetActiveInstance(theEnv,execStatus);
    sp = CheckMultifieldSlotModify(theEnv,execStatus,REPLACE,"direct-slot-replace$",ins,
                             GetFirstArgument(),&rb,&re,&newval);
    if (sp == NULL)
@@ -297,7 +297,7 @@ globle intBool DirectMVInsertCommand(
 
    if (CheckCurrentMessage(theEnv,execStatus,"direct-slot-insert$",TRUE) == FALSE)
      return(FALSE);
-   ins = GetActiveInstance(theEnv);
+   ins = GetActiveInstance(theEnv,execStatus);
    sp = CheckMultifieldSlotModify(theEnv,execStatus,INSERT,"direct-slot-insert$",ins,
                             GetFirstArgument(),&theIndex,NULL,&newval);
    if (sp == NULL)
@@ -331,7 +331,7 @@ globle intBool DirectMVDeleteCommand(
 
    if (CheckCurrentMessage(theEnv,execStatus,"direct-slot-delete$",TRUE) == FALSE)
      return(FALSE);
-   ins = GetActiveInstance(theEnv);
+   ins = GetActiveInstance(theEnv,execStatus);
    sp = CheckMultifieldSlotModify(theEnv,execStatus,DELETE_OP,"direct-slot-delete$",ins,
                                   GetFirstArgument(),&rb,&re,NULL);
    if (sp == NULL)

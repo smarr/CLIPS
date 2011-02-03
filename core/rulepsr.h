@@ -31,7 +31,7 @@
 #define LOCALE extern
 #endif
 
-   LOCALE int                            ParseDefrule(void *,char *);
+   LOCALE int                            ParseDefrule(void *,EXEC_STATUS,char *);
    LOCALE struct lhsParseNode           *FindVariable(struct symbolHashNode *,
                                                       struct lhsParseNode *);
 

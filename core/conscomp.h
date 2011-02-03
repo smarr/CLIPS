@@ -47,8 +47,8 @@ struct CodeGeneratorItem
   {
    char *name;
    void (*beforeFunction)(void *);
-   void (*initFunction)(void *,FILE *,int,int);
-   int (*generateFunction)(void *,char *,char *,char *,int,FILE *,int,int);
+   void (*initFunction)(void *,EXEC_STATUS,FILE *,int,int);
+   int (*generateFunction)(void *,EXEC_STATUS,char *,char *,char *,int,FILE *,int,int);
    int priority;
    char **arrayNames;
    int arrayCount;
@@ -72,7 +72,7 @@ struct constructCompilerData
    struct CodeGeneratorItem *ListOfCodeGeneratorItems;
   };
 
-#define ConstructCompilerData(theEnv) ((struct constructCompilerData *) GetEnvironmentData(theEnv,execStatus,CONSTRUCT_COMPILER_DATA))
+#define ConstructCompilerData(theEnv,execStatus) ((struct constructCompilerData *) GetEnvironmentData(theEnv,execStatus,CONSTRUCT_COMPILER_DATA))
 
 #ifdef LOCALE
 #undef LOCALE
@@ -97,24 +97,24 @@ struct CodeGeneratorFile
 #define LOCALE extern
 #endif
 
-   LOCALE void                      InitializeConstructCompilerData(void *);
-   LOCALE void                      ConstructsToCCommandDefinition(void *);
-   LOCALE FILE                     *NewCFile(void *,char *,char *,char *,int,int,int);
-   LOCALE int                       ExpressionToCode(void *,FILE *,struct expr *);
-   LOCALE void                      PrintFunctionReference(void *,FILE *,struct FunctionDefinition *);
-   LOCALE struct CodeGeneratorItem *AddCodeGeneratorItem(void *,char *,int,
+   LOCALE void                      InitializeConstructCompilerData(void *,EXEC_STATUS);
+   LOCALE void                      ConstructsToCCommandDefinition(void *,EXEC_STATUS);
+   LOCALE FILE                     *NewCFile(void *,EXEC_STATUS,char *,char *,char *,int,int,int);
+   LOCALE int                       ExpressionToCode(void *,EXEC_STATUS,FILE *,struct expr *);
+   LOCALE void                      PrintFunctionReference(void *,EXEC_STATUS,FILE *,struct FunctionDefinition *);
+   LOCALE struct CodeGeneratorItem *AddCodeGeneratorItem(void *,EXEC_STATUS,char *,int,
                                                          void (*)(void *),
-                                                         void (*)(void *,FILE *,int,int),
-                                                         int (*)(void *,char *,char *,char *,int,FILE *,int,int),int);
-   LOCALE FILE                     *CloseFileIfNeeded(void *,FILE *,int *,int *,int,int *,struct CodeGeneratorFile *);
-   LOCALE FILE                     *OpenFileIfNeeded(void *,FILE *,char *,char *,char *,int,int,int *,int,FILE *,
+                                                         void (*)(void *,EXEC_STATUS,FILE *,int,int),
+                                                         int (*)(void *,EXEC_STATUS,char *,char *,char *,int,FILE *,int,int),int);
+   LOCALE FILE                     *CloseFileIfNeeded(void *,EXEC_STATUS,FILE *,int *,int *,int,int *,struct CodeGeneratorFile *);
+   LOCALE FILE                     *OpenFileIfNeeded(void *,EXEC_STATUS,FILE *,char *,char *,char *,int,int,int *,int,FILE *,
                                                      char *,char *,int,struct CodeGeneratorFile *);
-   LOCALE void                      MarkConstructBsaveIDs(void *,int);
-   LOCALE void                      ConstructHeaderToCode(void *,FILE *,struct constructHeader *,int,int,
+   LOCALE void                      MarkConstructBsaveIDs(void *,EXEC_STATUS,int);
+   LOCALE void                      ConstructHeaderToCode(void *,EXEC_STATUS,FILE *,struct constructHeader *,int,int,
                                                          int,char *,char *);
-   LOCALE void                      ConstructModuleToCode(void *,FILE *,struct defmodule *,int,int,
+   LOCALE void                      ConstructModuleToCode(void *,EXEC_STATUS,FILE *,struct defmodule *,int,int,
                                                          int,char *);
-   LOCALE void                      PrintHashedExpressionReference(void *,FILE *,struct expr *,int,int);
+   LOCALE void                      PrintHashedExpressionReference(void *,EXEC_STATUS,FILE *,struct expr *,int,int);
 
 #endif
 

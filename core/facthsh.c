@@ -52,10 +52,10 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static struct fact            *FactExists(void *,struct fact *,unsigned long);
-   static struct factHashEntry  **CreateFactHashTable(void *,unsigned long);
-   static void                    ResizeFactHashTable(void *);
-   static void                    ResetFactHashTable(void *);
+   static struct fact            *FactExists(void *,EXEC_STATUS,struct fact *,unsigned long);
+   static struct factHashEntry  **CreateFactHashTable(void *,EXEC_STATUS,unsigned long);
+   static void                    ResizeFactHashTable(void *,EXEC_STATUS);
+   static void                    ResetFactHashTable(void *,EXEC_STATUS);
    
 /************************************************/
 /* HashFact: Returns the hash value for a fact. */
@@ -104,9 +104,9 @@ static struct fact *FactExists(
    struct factHashEntry *theFactHash;
 
    // Lode: warning! not thread-safe but only called from HandleFactDuplication and that one _is_ safe
-   hashValue = (hashValue % FactData(theEnv)->FactHashTableSize);
+   hashValue = (hashValue % FactData(theEnv,execStatus)->FactHashTableSize);
 
-   for (theFactHash = FactData(theEnv)->FactHashTable[hashValue];
+   for (theFactHash = FactData(theEnv,execStatus)->FactHashTable[hashValue];
         theFactHash != NULL;
         theFactHash = theFactHash->next)
      {
@@ -135,23 +135,23 @@ globle void AddHashedFact(
 	  
 	// Lode: Add a write lock to the FactHashTable
 	// XXX: could be removed?
-	apr_thread_rwlock_wrlock(Env(theEnv)->factHashLock);
+	apr_thread_rwlock_wrlock(Env(theEnv,execStatus)->factHashLock);
 	  
-   if (FactData(theEnv)->NumberOfFacts > FactData(theEnv)->FactHashTableSize)
-     { ResizeFactHashTable(theEnv); }
+   if (FactData(theEnv,execStatus)->NumberOfFacts > FactData(theEnv,execStatus)->FactHashTableSize)
+     { ResizeFactHashTable(theEnv,execStatus); }
 
    newhash = get_struct(theEnv,execStatus,factHashEntry);
    newhash->theFact = theFact;
 	  
     
-   hashValue = (hashValue % FactData(theEnv)->FactHashTableSize);  // not thread-safe, could be resized...
+   hashValue = (hashValue % FactData(theEnv,execStatus)->FactHashTableSize);  // not thread-safe, could be resized...
    
-   temp = FactData(theEnv)->FactHashTable[hashValue];
-   FactData(theEnv)->FactHashTable[hashValue] = newhash;
+   temp = FactData(theEnv,execStatus)->FactHashTable[hashValue];
+   FactData(theEnv,execStatus)->FactHashTable[hashValue] = newhash;
    newhash->next = temp;
 	  
    // Lode: Unlock
-   apr_thread_rwlock_unlock(Env(theEnv)->factHashLock);
+   apr_thread_rwlock_unlock(Env(theEnv,execStatus)->factHashLock);
 	  
   }
 
@@ -170,11 +170,11 @@ globle intBool RemoveHashedFact(
    hashValue = HashFact(theFact);
 	  
    // Lode: Add a write lock to the FactHashTable
-   apr_thread_rwlock_wrlock(Env(theEnv)->factHashLock);
+   apr_thread_rwlock_wrlock(Env(theEnv,execStatus)->factHashLock);
 	  
-   hashValue = (hashValue % FactData(theEnv)->FactHashTableSize);
+   hashValue = (hashValue % FactData(theEnv,execStatus)->FactHashTableSize);
 
-   for (hptr = FactData(theEnv)->FactHashTable[hashValue], prev = NULL;
+   for (hptr = FactData(theEnv,execStatus)->FactHashTable[hashValue], prev = NULL;
         hptr != NULL;
         hptr = hptr->next)
      {
@@ -182,20 +182,20 @@ globle intBool RemoveHashedFact(
         {
          if (prev == NULL)
            {
-            FactData(theEnv)->FactHashTable[hashValue] = hptr->next;
+            FactData(theEnv,execStatus)->FactHashTable[hashValue] = hptr->next;
             rtn_struct(theEnv,execStatus,factHashEntry,hptr);
-            if (FactData(theEnv)->NumberOfFacts == 1)
-              { ResetFactHashTable(theEnv); }
-			apr_thread_rwlock_unlock(Env(theEnv)->factHashLock); // Lode: Unlock
+            if (FactData(theEnv,execStatus)->NumberOfFacts == 1)
+              { ResetFactHashTable(theEnv,execStatus); }
+			apr_thread_rwlock_unlock(Env(theEnv,execStatus)->factHashLock); // Lode: Unlock
             return(1);
            }
          else
            {
             prev->next = hptr->next;
             rtn_struct(theEnv,execStatus,factHashEntry,hptr);
-            if (FactData(theEnv)->NumberOfFacts == 1)
-              { ResetFactHashTable(theEnv); }
-			apr_thread_rwlock_unlock(Env(theEnv)->factHashLock); // Lode: Unlock
+            if (FactData(theEnv,execStatus)->NumberOfFacts == 1)
+              { ResetFactHashTable(theEnv,execStatus); }
+			apr_thread_rwlock_unlock(Env(theEnv,execStatus)->factHashLock); // Lode: Unlock
             return(1);
            }
         }
@@ -203,7 +203,7 @@ globle intBool RemoveHashedFact(
      }
    
    // Lode: Unlock FactHashTable
-   apr_thread_rwlock_unlock(Env(theEnv)->factHashLock);
+   apr_thread_rwlock_unlock(Env(theEnv,execStatus)->factHashLock);
    
    return(0);
   }
@@ -226,20 +226,20 @@ globle unsigned long HandleFactDuplication(
 	  
    // Lode: Add a read lock to the FactHashTable
    // XXX: could be removed?
-   apr_thread_rwlock_rdlock(Env(theEnv)->factHashLock);
+   apr_thread_rwlock_rdlock(Env(theEnv,execStatus)->factHashLock);
 	  
    hashValue = HashFact((struct fact *) theFact);
 
-   if (FactData(theEnv)->FactDuplication) return(hashValue);
+   if (FactData(theEnv,execStatus)->FactDuplication) return(hashValue);
 
    tempPtr = FactExists(theEnv,execStatus,(struct fact *) theFact,hashValue);
 	  if (tempPtr == NULL) {
-		  apr_thread_rwlock_unlock(Env(theEnv)->factHashLock); // Lode: Unlock
+		  apr_thread_rwlock_unlock(Env(theEnv,execStatus)->factHashLock); // Lode: Unlock
 		  return(hashValue);
 	  }
 	  
 	// Lode: Unlock FactHashTable
-	apr_thread_rwlock_unlock(Env(theEnv)->factHashLock);
+	apr_thread_rwlock_unlock(Env(theEnv,execStatus)->factHashLock);
 	  
    // Lode: TODO check thread-safety
    ReturnFact(theEnv,execStatus,(struct fact *) theFact);
@@ -259,7 +259,7 @@ globle intBool EnvGetFactDuplication(
   void *theEnv,
   EXEC_STATUS)
   {   
-   return(FactData(theEnv)->FactDuplication); 
+   return(FactData(theEnv,execStatus)->FactDuplication); 
   }
 
 /*******************************************/
@@ -273,8 +273,8 @@ globle intBool EnvSetFactDuplication(
   {
    int ov;
 
-   ov = FactData(theEnv)->FactDuplication;
-   FactData(theEnv)->FactDuplication = value;
+   ov = FactData(theEnv,execStatus)->FactDuplication;
+   FactData(theEnv,execStatus)->FactDuplication = value;
    return(ov);
   }
 
@@ -286,8 +286,8 @@ globle void InitializeFactHashTable(
    void *theEnv,
   EXEC_STATUS)
    {
-    FactData(theEnv)->FactHashTable = CreateFactHashTable(theEnv,execStatus,SIZE_FACT_HASH);
-    FactData(theEnv)->FactHashTableSize = SIZE_FACT_HASH;
+    FactData(theEnv,execStatus)->FactHashTable = CreateFactHashTable(theEnv,execStatus,SIZE_FACT_HASH);
+    FactData(theEnv,execStatus)->FactHashTableSize = SIZE_FACT_HASH;
    }
 
 /*******************************************************************/
@@ -323,16 +323,16 @@ static void ResizeFactHashTable(
     struct factHashEntry *theEntry, *nextEntry;
 	   
 	// Lode: warning! not thread-safe but only called from AddHashedFact and that one _is_ safe
-    theTable = FactData(theEnv)->FactHashTable;
+    theTable = FactData(theEnv,execStatus)->FactHashTable;
     
-    newSize = (FactData(theEnv)->FactHashTableSize * 2) + 1;
+    newSize = (FactData(theEnv,execStatus)->FactHashTableSize * 2) + 1;
     newTable = CreateFactHashTable(theEnv,execStatus,newSize);
 
     /*========================================*/
     /* Copy the old entries to the new table. */
     /*========================================*/
     
-    for (i = 0; i < FactData(theEnv)->FactHashTableSize; i++)
+    for (i = 0; i < FactData(theEnv,execStatus)->FactHashTableSize; i++)
       {
        theEntry = theTable[i];
        while (theEntry != NULL)
@@ -351,9 +351,9 @@ static void ResizeFactHashTable(
     /* Replace the old hash table with the new hash table. */
     /*=====================================================*/
     
-    rm3(theEnv,execStatus,theTable,sizeof(struct factHashEntry *) * FactData(theEnv)->FactHashTableSize);
-    FactData(theEnv)->FactHashTableSize = newSize;
-    FactData(theEnv)->FactHashTable = newTable;
+    rm3(theEnv,execStatus,theTable,sizeof(struct factHashEntry *) * FactData(theEnv,execStatus)->FactHashTableSize);
+    FactData(theEnv,execStatus)->FactHashTableSize = newSize;
+    FactData(theEnv,execStatus)->FactHashTable = newTable;
    }
 
 /*******************************************************************/
@@ -370,7 +370,7 @@ static void ResetFactHashTable(
     /* has been expanded from its original size.   */
     /*=============================================*/
     
-    if (FactData(theEnv)->FactHashTableSize == SIZE_FACT_HASH)
+    if (FactData(theEnv,execStatus)->FactHashTableSize == SIZE_FACT_HASH)
       { return; }
           
     /*=======================*/
@@ -383,9 +383,9 @@ static void ResetFactHashTable(
     /* Replace the old hash table with the new hash table. */
     /*=====================================================*/
     
-    rm3(theEnv,execStatus,FactData(theEnv)->FactHashTable,sizeof(struct factHashEntry *) * FactData(theEnv)->FactHashTableSize);
-    FactData(theEnv)->FactHashTableSize = SIZE_FACT_HASH;
-    FactData(theEnv)->FactHashTable = newTable;
+    rm3(theEnv,execStatus,FactData(theEnv,execStatus)->FactHashTable,sizeof(struct factHashEntry *) * FactData(theEnv,execStatus)->FactHashTableSize);
+    FactData(theEnv,execStatus)->FactHashTableSize = SIZE_FACT_HASH;
+    FactData(theEnv,execStatus)->FactHashTable = newTable;
    }
       
 #if DEVELOPER
@@ -402,9 +402,9 @@ globle void ShowFactHashTable(
     struct factHashEntry *theEntry;
     char buffer[20];
 
-    for (i = 0; i < FactData(theEnv)->FactHashTableSize; i++)
+    for (i = 0; i < FactData(theEnv,execStatus)->FactHashTableSize; i++)
       {
-       for (theEntry =  FactData(theEnv)->FactHashTable[i], count = 0;
+       for (theEntry =  FactData(theEnv,execStatus)->FactHashTable[i], count = 0;
             theEntry != NULL;
             theEntry = theEntry->next)
          { count++; }

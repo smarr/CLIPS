@@ -52,9 +52,9 @@ struct BinaryItem
    void (*bloadStorageFunction)(void *);
    void (*bloadFunction)(void *);
    void (*clearFunction)(void *);
-   void (*expressionFunction)(void *,FILE *);
-   void (*bsaveStorageFunction)(void *,FILE *);
-   void (*bsaveFunction)(void *,FILE *);
+   void (*expressionFunction)(void *,EXEC_STATUS,FILE *);
+   void (*bsaveStorageFunction)(void *,EXEC_STATUS,FILE *);
+   void (*bsaveFunction)(void *,EXEC_STATUS,FILE *);
    int priority;
    struct BinaryItem *next;
   };
@@ -85,9 +85,9 @@ struct bsaveData
 #endif
   };
 
-#define BsaveData(theEnv) ((struct bsaveData *) GetEnvironmentData(theEnv,execStatus,BSAVE_DATA))
+#define BsaveData(theEnv,execStatus) ((struct bsaveData *) GetEnvironmentData(theEnv,execStatus,BSAVE_DATA))
 
-#define Bsave(a) EnvBsave(GetCurrentEnvironment(),a)
+#define Bsave(a) EnvBsave(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
 
    LOCALE void                    InitializeBsaveData(void *,EXEC_STATUS);
    LOCALE int                     BsaveCommand(void *, EXEC_STATUS);

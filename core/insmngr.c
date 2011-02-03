@@ -78,17 +78,17 @@
    =========================================
    ***************************************** */
 
-static INSTANCE_TYPE *NewInstance(void *);
-static INSTANCE_TYPE *InstanceLocationInfo(void *,DEFCLASS *,SYMBOL_HN *,INSTANCE_TYPE **,
+static INSTANCE_TYPE *NewInstance(void *,EXEC_STATUS);
+static INSTANCE_TYPE *InstanceLocationInfo(void *,EXEC_STATUS,DEFCLASS *,SYMBOL_HN *,INSTANCE_TYPE **,
                                            unsigned *);
-static void InstallInstance(void *,INSTANCE_TYPE *,int);
-static void BuildDefaultSlots(void *,intBool);
-static int CoreInitializeInstance(void *,INSTANCE_TYPE *,EXPRESSION *);
-static int InsertSlotOverrides(void *,INSTANCE_TYPE *,EXPRESSION *);
-static void EvaluateClassDefaults(void *,INSTANCE_TYPE *);
+static void InstallInstance(void *,EXEC_STATUS,INSTANCE_TYPE *,int);
+static void BuildDefaultSlots(void *,EXEC_STATUS,intBool);
+static int CoreInitializeInstance(void *,EXEC_STATUS,INSTANCE_TYPE *,EXPRESSION *);
+static int InsertSlotOverrides(void *,EXEC_STATUS,INSTANCE_TYPE *,EXPRESSION *);
+static void EvaluateClassDefaults(void *,EXEC_STATUS,INSTANCE_TYPE *);
 
 #if DEBUGGING_FUNCTIONS
-static void PrintInstanceWatch(void *,char *,INSTANCE_TYPE *);
+static void PrintInstanceWatch(void *,EXEC_STATUS,char *,INSTANCE_TYPE *);
 #endif
 
 /* =========================================
@@ -115,7 +115,7 @@ globle void InitializeInstanceCommand(
    INSTANCE_TYPE *ins;
 
    SetpType(result,SYMBOL);
-   SetpValue(result,EnvFalseSymbol(theEnv));
+   SetpValue(result,EnvFalseSymbol(theEnv,execStatus));
    ins = CheckInstance(theEnv,execStatus,"initialize-instance");
    if (ins == NULL)
      return;
@@ -147,7 +147,7 @@ globle void MakeInstanceCommand(
    DEFCLASS *cls;
 
    SetpType(result,SYMBOL);
-   SetpValue(result,EnvFalseSymbol(theEnv));
+   SetpValue(result,EnvFalseSymbol(theEnv,execStatus));
    EvaluateExpression(theEnv,execStatus,GetFirstArgument(),&temp);
    if ((GetType(temp) != SYMBOL) &&
        (GetType(temp) != INSTANCE_NAME))
@@ -221,11 +221,11 @@ globle SYMBOL_HN *GetFullInstanceName(
    size_t bufsz;
    SYMBOL_HN *iname;
 
-   if (ins == &InstanceData(theEnv)->DummyInstance)
+   if (ins == &InstanceData(theEnv,execStatus)->DummyInstance)
      return((SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,"Dummy Instance"));
    if (ins->garbage)
      return(ins->name);
-   if (ins->cls->header.whichModule->theModule == ((struct defmodule *) EnvGetCurrentModule(theEnv)))
+   if (ins->cls->header.whichModule->theModule == ((struct defmodule *) EnvGetCurrentModule(theEnv,execStatus)))
      return(ins->name);
    moduleName = EnvGetDefmoduleName(theEnv,execStatus,(void *) ins->cls->header.whichModule->theModule);
    bufsz = (sizeof(char) * (strlen(moduleName) +
@@ -268,7 +268,7 @@ globle INSTANCE_TYPE *BuildInstance(
    DATA_OBJECT temp;
 
 #if DEFRULE_CONSTRUCT
-   if (EngineData(theEnv)->JoinOperationInProgress && cls->reactive)
+   if (EngineData(theEnv,execStatus)->JoinOperationInProgress && cls->reactive)
      {
       PrintErrorID(theEnv,execStatus,"INSMNGR",10,FALSE);
       EnvPrintRouter(theEnv,execStatus,WERROR,"Cannot create instances of reactive classes while\n");
@@ -316,8 +316,8 @@ globle INSTANCE_TYPE *BuildInstance(
       IncrementSymbolCount(iname);
       if (ins->garbage == 0)
         {
-         if (InstanceData(theEnv)->MkInsMsgPass)
-           DirectMessage(theEnv,execStatus,MessageHandlerData(theEnv)->DELETE_SYMBOL,ins,NULL,NULL);
+         if (InstanceData(theEnv,execStatus)->MkInsMsgPass)
+           DirectMessage(theEnv,execStatus,MessageHandlerData(theEnv,execStatus)->DELETE_SYMBOL,ins,NULL,NULL);
          else
            QuashInstance(theEnv,execStatus,ins);
         }
@@ -338,7 +338,7 @@ globle INSTANCE_TYPE *BuildInstance(
       Create the base instance from the defaults of the inheritance
       precedence list
       ============================================================= */
-   InstanceData(theEnv)->CurrentInstance = NewInstance(theEnv);
+   InstanceData(theEnv,execStatus)->CurrentInstance = NewInstance(theEnv,execStatus);
 
 #if DEFRULE_CONSTRUCT
    /* ==============================================
@@ -346,69 +346,69 @@ globle INSTANCE_TYPE *BuildInstance(
       any currently active basis - if the partial
       match was deleted, abort the instance creation
       ============================================== */
-   if (AddLogicalDependencies(theEnv,execStatus,(struct patternEntity *) InstanceData(theEnv)->CurrentInstance,FALSE)
+   if (AddLogicalDependencies(theEnv,execStatus,(struct patternEntity *) InstanceData(theEnv,execStatus)->CurrentInstance,FALSE)
         == FALSE)
      {
-      rtn_struct(theEnv,execStatus,instance,InstanceData(theEnv)->CurrentInstance);
-      InstanceData(theEnv)->CurrentInstance = NULL;
+      rtn_struct(theEnv,execStatus,instance,InstanceData(theEnv,execStatus)->CurrentInstance);
+      InstanceData(theEnv,execStatus)->CurrentInstance = NULL;
       return(NULL);
      }
 #endif
 
-   InstanceData(theEnv)->CurrentInstance->name = iname;
-   InstanceData(theEnv)->CurrentInstance->cls = cls;
+   InstanceData(theEnv,execStatus)->CurrentInstance->name = iname;
+   InstanceData(theEnv,execStatus)->CurrentInstance->cls = cls;
    BuildDefaultSlots(theEnv,execStatus,initMessage);
 
    /* ============================================================
       Put the instance in the instance hash table and put it on its
         class's instance list
       ============================================================ */
-   InstanceData(theEnv)->CurrentInstance->hashTableIndex = hashTableIndex;
+   InstanceData(theEnv,execStatus)->CurrentInstance->hashTableIndex = hashTableIndex;
    if (iprv == NULL)
      {
-      InstanceData(theEnv)->CurrentInstance->nxtHash = InstanceData(theEnv)->InstanceTable[hashTableIndex];
-      if (InstanceData(theEnv)->InstanceTable[hashTableIndex] != NULL)
-        InstanceData(theEnv)->InstanceTable[hashTableIndex]->prvHash = InstanceData(theEnv)->CurrentInstance;
-      InstanceData(theEnv)->InstanceTable[hashTableIndex] = InstanceData(theEnv)->CurrentInstance;
+      InstanceData(theEnv,execStatus)->CurrentInstance->nxtHash = InstanceData(theEnv,execStatus)->InstanceTable[hashTableIndex];
+      if (InstanceData(theEnv,execStatus)->InstanceTable[hashTableIndex] != NULL)
+        InstanceData(theEnv,execStatus)->InstanceTable[hashTableIndex]->prvHash = InstanceData(theEnv,execStatus)->CurrentInstance;
+      InstanceData(theEnv,execStatus)->InstanceTable[hashTableIndex] = InstanceData(theEnv,execStatus)->CurrentInstance;
      }
    else
      {
-      InstanceData(theEnv)->CurrentInstance->nxtHash = iprv->nxtHash;
+      InstanceData(theEnv,execStatus)->CurrentInstance->nxtHash = iprv->nxtHash;
       if (iprv->nxtHash != NULL)
-        iprv->nxtHash->prvHash = InstanceData(theEnv)->CurrentInstance;
-      iprv->nxtHash = InstanceData(theEnv)->CurrentInstance;
-      InstanceData(theEnv)->CurrentInstance->prvHash = iprv;
+        iprv->nxtHash->prvHash = InstanceData(theEnv,execStatus)->CurrentInstance;
+      iprv->nxtHash = InstanceData(theEnv,execStatus)->CurrentInstance;
+      InstanceData(theEnv,execStatus)->CurrentInstance->prvHash = iprv;
      }
 
    /* ======================================
       Put instance in global and class lists
       ====================================== */
-   if (InstanceData(theEnv)->CurrentInstance->cls->instanceList == NULL)
-     InstanceData(theEnv)->CurrentInstance->cls->instanceList = InstanceData(theEnv)->CurrentInstance;
+   if (InstanceData(theEnv,execStatus)->CurrentInstance->cls->instanceList == NULL)
+     InstanceData(theEnv,execStatus)->CurrentInstance->cls->instanceList = InstanceData(theEnv,execStatus)->CurrentInstance;
    else
-     InstanceData(theEnv)->CurrentInstance->cls->instanceListBottom->nxtClass = InstanceData(theEnv)->CurrentInstance;
-   InstanceData(theEnv)->CurrentInstance->prvClass = InstanceData(theEnv)->CurrentInstance->cls->instanceListBottom;
-   InstanceData(theEnv)->CurrentInstance->cls->instanceListBottom = InstanceData(theEnv)->CurrentInstance;
+     InstanceData(theEnv,execStatus)->CurrentInstance->cls->instanceListBottom->nxtClass = InstanceData(theEnv,execStatus)->CurrentInstance;
+   InstanceData(theEnv,execStatus)->CurrentInstance->prvClass = InstanceData(theEnv,execStatus)->CurrentInstance->cls->instanceListBottom;
+   InstanceData(theEnv,execStatus)->CurrentInstance->cls->instanceListBottom = InstanceData(theEnv,execStatus)->CurrentInstance;
 
-   if (InstanceData(theEnv)->InstanceList == NULL)
-     InstanceData(theEnv)->InstanceList = InstanceData(theEnv)->CurrentInstance;
+   if (InstanceData(theEnv,execStatus)->InstanceList == NULL)
+     InstanceData(theEnv,execStatus)->InstanceList = InstanceData(theEnv,execStatus)->CurrentInstance;
    else
-     InstanceData(theEnv)->InstanceListBottom->nxtList = InstanceData(theEnv)->CurrentInstance;
-   InstanceData(theEnv)->CurrentInstance->prvList = InstanceData(theEnv)->InstanceListBottom;
-   InstanceData(theEnv)->InstanceListBottom = InstanceData(theEnv)->CurrentInstance;
-   InstanceData(theEnv)->ChangesToInstances = TRUE;
+     InstanceData(theEnv,execStatus)->InstanceListBottom->nxtList = InstanceData(theEnv,execStatus)->CurrentInstance;
+   InstanceData(theEnv,execStatus)->CurrentInstance->prvList = InstanceData(theEnv,execStatus)->InstanceListBottom;
+   InstanceData(theEnv,execStatus)->InstanceListBottom = InstanceData(theEnv,execStatus)->CurrentInstance;
+   InstanceData(theEnv,execStatus)->ChangesToInstances = TRUE;
 
    /* ==============================================================================
       Install the instance's name and slot-value symbols (prevent them from becoming
       ephemeral) - the class name and slot names are accounted for by the class
       ============================================================================== */
-   InstallInstance(theEnv,execStatus,InstanceData(theEnv)->CurrentInstance,TRUE);
+   InstallInstance(theEnv,execStatus,InstanceData(theEnv,execStatus)->CurrentInstance,TRUE);
 
-   ins = InstanceData(theEnv)->CurrentInstance;
-   InstanceData(theEnv)->CurrentInstance = NULL;
+   ins = InstanceData(theEnv,execStatus)->CurrentInstance;
+   InstanceData(theEnv,execStatus)->CurrentInstance = NULL;
 
-   if (InstanceData(theEnv)->MkInsMsgPass)
-     { DirectMessage(theEnv,execStatus,MessageHandlerData(theEnv)->CREATE_SYMBOL,ins,&temp,NULL); }
+   if (InstanceData(theEnv,execStatus)->MkInsMsgPass)
+     { DirectMessage(theEnv,execStatus,MessageHandlerData(theEnv,execStatus)->CREATE_SYMBOL,ins,&temp,NULL); }
 
 #if DEFRULE_CONSTRUCT
    if (ins->cls->reactive)
@@ -439,15 +439,15 @@ globle void InitSlotsCommand(
   DATA_OBJECT *result)
   {
    SetpType(result,SYMBOL);
-   SetpValue(result,EnvFalseSymbol(theEnv));
+   SetpValue(result,EnvFalseSymbol(theEnv,execStatus));
    execStatus->EvaluationError = FALSE;
    if (CheckCurrentMessage(theEnv,execStatus,"init-slots",TRUE) == FALSE)
      return;
-   EvaluateClassDefaults(theEnv,execStatus,GetActiveInstance(theEnv));
+   EvaluateClassDefaults(theEnv,execStatus,GetActiveInstance(theEnv,execStatus));
    if (! execStatus->EvaluationError)
      {
       SetpType(result,INSTANCE_ADDRESS);
-      SetpValue(result,(void *) GetActiveInstance(theEnv));
+      SetpValue(result,(void *) GetActiveInstance(theEnv,execStatus));
      }
   }
 
@@ -476,7 +476,7 @@ globle intBool QuashInstance(
    IGARBAGE *gptr;
 
 #if DEFRULE_CONSTRUCT
-   if (EngineData(theEnv)->JoinOperationInProgress && ins->cls->reactive)
+   if (EngineData(theEnv,execStatus)->JoinOperationInProgress && ins->cls->reactive)
      {
       PrintErrorID(theEnv,execStatus,"INSMNGR",12,FALSE);
       EnvPrintRouter(theEnv,execStatus,WERROR,"Cannot delete instances of reactive classes while\n");
@@ -511,7 +511,7 @@ globle intBool QuashInstance(
    if (ins->prvHash != NULL)
      ins->prvHash->nxtHash = ins->nxtHash;
    else
-     InstanceData(theEnv)->InstanceTable[ins->hashTableIndex] = ins->nxtHash;
+     InstanceData(theEnv,execStatus)->InstanceTable[ins->hashTableIndex] = ins->nxtHash;
    if (ins->nxtHash != NULL)
      ins->nxtHash->prvHash = ins->prvHash;
 
@@ -527,11 +527,11 @@ globle intBool QuashInstance(
    if (ins->prvList != NULL)
      ins->prvList->nxtList = ins->nxtList;
    else
-     InstanceData(theEnv)->InstanceList = ins->nxtList;
+     InstanceData(theEnv,execStatus)->InstanceList = ins->nxtList;
    if (ins->nxtList != NULL)
      ins->nxtList->prvList = ins->prvList;
    else
-     InstanceData(theEnv)->InstanceListBottom = ins->prvList;
+     InstanceData(theEnv,execStatus)->InstanceListBottom = ins->prvList;
 
    iflag = ins->installed;
    InstallInstance(theEnv,execStatus,ins,FALSE);
@@ -549,7 +549,7 @@ globle intBool QuashInstance(
      RemoveInstanceData(theEnv,execStatus,ins);
 
    if ((ins->busy == 0) && (ins->depth > execStatus->CurrentEvaluationDepth) &&
-       (InstanceData(theEnv)->MaintainGarbageInstances == FALSE)
+       (InstanceData(theEnv,execStatus)->MaintainGarbageInstances == FALSE)
 #if DEFRULE_CONSTRUCT
         && (ins->header.busyCount == 0)
 #endif
@@ -563,12 +563,12 @@ globle intBool QuashInstance(
       gptr = get_struct(theEnv,execStatus,igarbage);
       ins->garbage = 1;
       gptr->ins = ins;
-      gptr->nxt = InstanceData(theEnv)->InstanceGarbageList;
-      InstanceData(theEnv)->InstanceGarbageList = gptr;
-      UtilityData(theEnv)->EphemeralItemCount += 2;
-      UtilityData(theEnv)->EphemeralItemSize += InstanceSizeHeuristic(ins) + sizeof(IGARBAGE);
+      gptr->nxt = InstanceData(theEnv,execStatus)->InstanceGarbageList;
+      InstanceData(theEnv,execStatus)->InstanceGarbageList = gptr;
+      UtilityData(theEnv,execStatus)->EphemeralItemCount += 2;
+      UtilityData(theEnv,execStatus)->EphemeralItemSize += InstanceSizeHeuristic(ins) + sizeof(IGARBAGE);
      }
-   InstanceData(theEnv)->ChangesToInstances = TRUE;
+   InstanceData(theEnv,execStatus)->ChangesToInstances = TRUE;
    return(1);
   }
 
@@ -649,7 +649,7 @@ static INSTANCE_TYPE *NewInstance(
 
    instance = get_struct(theEnv,execStatus,instance);
 #if DEFRULE_CONSTRUCT
-   instance->header.theInfo = &InstanceData(theEnv)->InstanceInfo;
+   instance->header.theInfo = &InstanceData(theEnv,execStatus)->InstanceInfo;
 
    instance->header.dependents = NULL;
    instance->header.busyCount = 0;
@@ -703,7 +703,7 @@ static INSTANCE_TYPE *InstanceLocationInfo(
    INSTANCE_TYPE *ins;
 
    *hashTableIndex = HashInstance(iname);
-   ins = InstanceData(theEnv)->InstanceTable[*hashTableIndex];
+   ins = InstanceData(theEnv,execStatus)->InstanceTable[*hashTableIndex];
 
    /* ========================================
       Make sure all instances of the same name
@@ -758,14 +758,14 @@ static void InstallInstance(
       ins->depth = execStatus->CurrentEvaluationDepth;
       IncrementSymbolCount(ins->name);
       IncrementDefclassBusyCount(theEnv,execStatus,(void *) ins->cls);
-      InstanceData(theEnv)->GlobalNumberOfInstances++;
+      InstanceData(theEnv,execStatus)->GlobalNumberOfInstances++;
      }
    else
      {
       if (! ins->installed)
         return;
       ins->installed = 0;
-      InstanceData(theEnv)->GlobalNumberOfInstances--;
+      InstanceData(theEnv,execStatus)->GlobalNumberOfInstances--;
 
       /* =======================================
          Class counts is decremented by
@@ -804,16 +804,16 @@ static void BuildDefaultSlots(
    INSTANCE_SLOT *dst = NULL,**adst;
    SLOT_DESC **src;
 
-   scnt = InstanceData(theEnv)->CurrentInstance->cls->instanceSlotCount;
-   lscnt = InstanceData(theEnv)->CurrentInstance->cls->localInstanceSlotCount;
+   scnt = InstanceData(theEnv,execStatus)->CurrentInstance->cls->instanceSlotCount;
+   lscnt = InstanceData(theEnv,execStatus)->CurrentInstance->cls->localInstanceSlotCount;
    if (scnt > 0)
      {
-      InstanceData(theEnv)->CurrentInstance->slotAddresses = adst =
+      InstanceData(theEnv,execStatus)->CurrentInstance->slotAddresses = adst =
          (INSTANCE_SLOT **) gm2(theEnv,execStatus,(sizeof(INSTANCE_SLOT *) * scnt));
       if (lscnt != 0)
-        InstanceData(theEnv)->CurrentInstance->slots = dst =
+        InstanceData(theEnv,execStatus)->CurrentInstance->slots = dst =
            (INSTANCE_SLOT *) gm2(theEnv,execStatus,(sizeof(INSTANCE_SLOT) * lscnt));
-      src = InstanceData(theEnv)->CurrentInstance->cls->instanceTemplate;
+      src = InstanceData(theEnv,execStatus)->CurrentInstance->cls->instanceTemplate;
 
       /* ==================================================
          A map of slot addresses is created - shared slots
@@ -913,8 +913,8 @@ static int CoreInitializeInstance(
       with their evaluation
       ================================================================= */
 
-   if (InstanceData(theEnv)->MkInsMsgPass)
-     DirectMessage(theEnv,execStatus,MessageHandlerData(theEnv)->INIT_SYMBOL,ins,&temp,NULL);
+   if (InstanceData(theEnv,execStatus)->MkInsMsgPass)
+     DirectMessage(theEnv,execStatus,MessageHandlerData(theEnv,execStatus)->INIT_SYMBOL,ins,&temp,NULL);
    else
      EvaluateClassDefaults(theEnv,execStatus,ins);
 
@@ -978,7 +978,7 @@ static int InsertSlotOverrides(
          return(FALSE);
         }
 
-      if (InstanceData(theEnv)->MkInsMsgPass)
+      if (InstanceData(theEnv,execStatus)->MkInsMsgPass)
         { DirectMessage(theEnv,execStatus,slot->desc->overrideMessage,
                        ins,NULL,slot_exp->nextArg->argList); }
       else if (slot_exp->nextArg->argList)
@@ -992,7 +992,7 @@ static int InsertSlotOverrides(
          SetpDOBegin(&temp,1);
          SetpDOEnd(&temp,0);
          SetpType(&temp,MULTIFIELD);
-         SetpValue(&temp,ProceduralPrimitiveData(theEnv)->NoParamValue);
+         SetpValue(&temp,ProceduralPrimitiveData(theEnv,execStatus)->NoParamValue);
          PutSlotValue(theEnv,execStatus,ins,slot,&temp,&junk,"function make-instance");
         }
 

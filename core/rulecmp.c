@@ -44,18 +44,18 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static int                     ConstructToCode(void *,char *,char *,char *,int,FILE *,int,int);
-   static void                    JoinToCode(void *,FILE *,struct joinNode *,int,int);
-   static void                    LinkToCode(void *,FILE *,struct joinLink *,int,int);
-   static void                    DefruleModuleToCode(void *,FILE *,struct defmodule *,int,int,int);
-   static void                    DefruleToCode(void *,FILE *,struct defrule *,int,int,int);
-   static void                    CloseDefruleFiles(void *,FILE *,FILE *,FILE *,FILE*,int);
-   static void                    BeforeDefrulesCode(void *);
-   static void                    InitDefruleCode(void *,FILE *,int,int);
-   static int                     RuleCompilerTraverseJoins(void *,struct joinNode *,char *,char *,char *,int,
+   static int                     ConstructToCode(void *,EXEC_STATUS,char *,char *,char *,int,FILE *,int,int);
+   static void                    JoinToCode(void *,EXEC_STATUS,FILE *,struct joinNode *,int,int);
+   static void                    LinkToCode(void *,EXEC_STATUS,FILE *,struct joinLink *,int,int);
+   static void                    DefruleModuleToCode(void *,EXEC_STATUS,FILE *,struct defmodule *,int,int,int);
+   static void                    DefruleToCode(void *,EXEC_STATUS,FILE *,struct defrule *,int,int,int);
+   static void                    CloseDefruleFiles(void *,EXEC_STATUS,FILE *,FILE *,FILE *,FILE*,int);
+   static void                    BeforeDefrulesCode(void *,EXEC_STATUS);
+   static void                    InitDefruleCode(void *,EXEC_STATUS,FILE *,int,int);
+   static int                     RuleCompilerTraverseJoins(void *,EXEC_STATUS,struct joinNode *,char *,char *,char *,int,
                                                             FILE *,int,int,FILE **,FILE **,
                                                             int *,int *,int *,int *,int *);
-   static int                     TraverseJoinLinks(void *,struct joinLink *,char *,char *,char *,int,FILE *,
+   static int                     TraverseJoinLinks(void *,EXEC_STATUS,struct joinLink *,char *,char *,char *,int,FILE *,
                                                     int,int,FILE **,int *,int *, int *);
   
 /***********************************************************/
@@ -66,7 +66,7 @@ globle void DefruleCompilerSetup(
   void *theEnv,
   EXEC_STATUS)
   {
-   DefruleData(theEnv)->DefruleCodeItem = AddCodeGeneratorItem(theEnv,execStatus,"defrules",0,BeforeDefrulesCode,
+   DefruleData(theEnv,execStatus)->DefruleCodeItem = AddCodeGeneratorItem(theEnv,execStatus,"defrules",0,BeforeDefrulesCode,
                                           InitDefruleCode,ConstructToCode,4);
   }
 
@@ -118,14 +118,14 @@ static int ConstructToCode(
    /* Save the left and right prime links. */
    /*======================================*/
    
-   if (! TraverseJoinLinks(theEnv,execStatus,DefruleData(theEnv)->LeftPrimeJoins,fileName,pathName,fileNameBuffer,fileID,headerFP,imageID,
+   if (! TraverseJoinLinks(theEnv,execStatus,DefruleData(theEnv,execStatus)->LeftPrimeJoins,fileName,pathName,fileNameBuffer,fileID,headerFP,imageID,
                            maxIndices,&linkFile,&fileCount,&linkArrayVersion,&linkArrayCount))
      {
       CloseDefruleFiles(theEnv,execStatus,moduleFile,defruleFile,joinFile,linkFile,maxIndices);
       return(0);
      }
 
-   if (! TraverseJoinLinks(theEnv,execStatus,DefruleData(theEnv)->RightPrimeJoins,fileName,pathName,fileNameBuffer,fileID,headerFP,imageID,
+   if (! TraverseJoinLinks(theEnv,execStatus,DefruleData(theEnv,execStatus)->RightPrimeJoins,fileName,pathName,fileNameBuffer,fileID,headerFP,imageID,
                            maxIndices,&linkFile,&fileCount,&linkArrayVersion,&linkArrayCount))
      {
       CloseDefruleFiles(theEnv,execStatus,moduleFile,defruleFile,joinFile,linkFile,maxIndices);
@@ -154,7 +154,7 @@ static int ConstructToCode(
 
       moduleFile = OpenFileIfNeeded(theEnv,execStatus,moduleFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
                                     moduleArrayVersion,headerFP,
-                                    "struct defruleModule",ModulePrefix(DefruleData(theEnv)->DefruleCodeItem),
+                                    "struct defruleModule",ModulePrefix(DefruleData(theEnv,execStatus)->DefruleCodeItem),
                                     FALSE,NULL);
 
       if (moduleFile == NULL)
@@ -182,7 +182,7 @@ static int ConstructToCode(
 
          defruleFile = OpenFileIfNeeded(theEnv,execStatus,defruleFile,fileName,pathName,fileNameBuffer,fileID,imageID,&fileCount,
                                         defruleArrayVersion,headerFP,
-                                        "struct defrule",ConstructPrefix(DefruleData(theEnv)->DefruleCodeItem),
+                                        "struct defrule",ConstructPrefix(DefruleData(theEnv,execStatus)->DefruleCodeItem),
                                         FALSE,NULL);
          if (defruleFile == NULL)
            {
@@ -387,7 +387,7 @@ static void DefruleModuleToCode(
    fprintf(theFile,"{");
 
    ConstructModuleToCode(theEnv,execStatus,theFile,theModule,imageID,maxIndices,
-                                  DefruleData(theEnv)->DefruleModuleIndex,ConstructPrefix(DefruleData(theEnv)->DefruleCodeItem));
+                                  DefruleData(theEnv,execStatus)->DefruleModuleIndex,ConstructPrefix(DefruleData(theEnv,execStatus)->DefruleCodeItem));
 
    fprintf(theFile,",NULL}");
   }
@@ -412,8 +412,8 @@ static void DefruleToCode(
    fprintf(theFile,"{");
 
    ConstructHeaderToCode(theEnv,execStatus,theFile,&theDefrule->header,imageID,maxIndices,
-                                  moduleCount,ModulePrefix(DefruleData(theEnv)->DefruleCodeItem),
-                                  ConstructPrefix(DefruleData(theEnv)->DefruleCodeItem));
+                                  moduleCount,ModulePrefix(DefruleData(theEnv,execStatus)->DefruleCodeItem),
+                                  ConstructPrefix(DefruleData(theEnv,execStatus)->DefruleCodeItem));
 
    /*==========================*/
    /* Flags and Integer Values */
@@ -471,7 +471,7 @@ static void DefruleToCode(
 
    if (theDefrule->disjunct != NULL)
      {
-      fprintf(theFile,"&%s%d_%ld[%ld]}",ConstructPrefix(DefruleData(theEnv)->DefruleCodeItem),
+      fprintf(theFile,"&%s%d_%ld[%ld]}",ConstructPrefix(DefruleData(theEnv,execStatus)->DefruleCodeItem),
                      imageID,(theDefrule->disjunct->header.bsaveID / maxIndices) + 1,
                              theDefrule->disjunct->header.bsaveID % maxIndices);
      }
@@ -603,7 +603,7 @@ static void JoinToCode(
      { fprintf(joinFile,"NULL}"); }
    else
      {
-      fprintf(joinFile,"&%s%d_%ld[%ld]}",ConstructPrefix(DefruleData(theEnv)->DefruleCodeItem),imageID,
+      fprintf(joinFile,"&%s%d_%ld[%ld]}",ConstructPrefix(DefruleData(theEnv,execStatus)->DefruleCodeItem),imageID,
                                     (theJoin->ruleToActivate->header.bsaveID / maxIndices) + 1,
                                     theJoin->ruleToActivate->header.bsaveID % maxIndices);
      }
@@ -672,7 +672,7 @@ globle void DefruleCModuleReference(
   int imageID,
   int maxIndices)
   {
-   fprintf(theFile,"MIHS &%s%d_%d[%d]",ModulePrefix(DefruleData(theEnv)->DefruleCodeItem),
+   fprintf(theFile,"MIHS &%s%d_%d[%d]",ModulePrefix(DefruleData(theEnv,execStatus)->DefruleCodeItem),
                       imageID,
                       (count / maxIndices) + 1,
                       (count % maxIndices));
@@ -694,28 +694,28 @@ static void InitDefruleCode(
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
 #pragma unused(maxIndices)
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #pragma unused(imageID)
 #endif
 
    fprintf(initFP,"   DefruleRunTimeInitialize(theEnv,execStatus,");
 
-   if (DefruleData(theEnv)->RightPrimeJoins == NULL)
+   if (DefruleData(theEnv,execStatus)->RightPrimeJoins == NULL)
      { fprintf(initFP,"NULL,"); }
    else
      {
       fprintf(initFP,"&%s%d_%ld[%ld],",LinkPrefix(),
-                    imageID,(DefruleData(theEnv)->RightPrimeJoins->bsaveID / maxIndices) + 1,
-                             DefruleData(theEnv)->RightPrimeJoins->bsaveID % maxIndices);
+                    imageID,(DefruleData(theEnv,execStatus)->RightPrimeJoins->bsaveID / maxIndices) + 1,
+                             DefruleData(theEnv,execStatus)->RightPrimeJoins->bsaveID % maxIndices);
      }
 
-   if (DefruleData(theEnv)->LeftPrimeJoins == NULL)
+   if (DefruleData(theEnv,execStatus)->LeftPrimeJoins == NULL)
      { fprintf(initFP,"NULL);\n"); }
    else
      {
       fprintf(initFP,"&%s%d_%ld[%ld]);\n",LinkPrefix(),
-                    imageID,(DefruleData(theEnv)->LeftPrimeJoins->bsaveID / maxIndices) + 1,
-                             DefruleData(theEnv)->LeftPrimeJoins->bsaveID % maxIndices);
+                    imageID,(DefruleData(theEnv,execStatus)->LeftPrimeJoins->bsaveID / maxIndices) + 1,
+                             DefruleData(theEnv,execStatus)->LeftPrimeJoins->bsaveID % maxIndices);
      }
   }
 

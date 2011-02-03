@@ -148,7 +148,7 @@ globle void PrintAtom(
         EnvPrintRouter(theEnv,execStatus,logicalName,ValueToString(value));
         break;
       case STRING:
-        if (PrintUtilityData(theEnv)->PreserveEscapedCharacters)
+        if (PrintUtilityData(theEnv,execStatus)->PreserveEscapedCharacters)
           { EnvPrintRouter(theEnv,execStatus,logicalName,StringPrintForm(theEnv,execStatus,ValueToString(value))); }
         else
           {
@@ -161,11 +161,11 @@ globle void PrintAtom(
       case EXTERNAL_ADDRESS:
         theAddress = (struct externalAddressHashNode *) value;
         
-        if (PrintUtilityData(theEnv)->AddressesToStrings) EnvPrintRouter(theEnv,execStatus,logicalName,"\"");
+        if (PrintUtilityData(theEnv,execStatus)->AddressesToStrings) EnvPrintRouter(theEnv,execStatus,logicalName,"\"");
         
-        if ((EvaluationData(theEnv)->ExternalAddressTypes[theAddress->type] != NULL) &&
-            (EvaluationData(theEnv)->ExternalAddressTypes[theAddress->type]->longPrintFunction != NULL))
-          { (*EvaluationData(theEnv)->ExternalAddressTypes[theAddress->type]->longPrintFunction)(theEnv,execStatus,logicalName,value); }
+        if ((EvaluationData(theEnv,execStatus)->ExternalAddressTypes[theAddress->type] != NULL) &&
+            (EvaluationData(theEnv,execStatus)->ExternalAddressTypes[theAddress->type]->longPrintFunction != NULL))
+          { (*EvaluationData(theEnv,execStatus)->ExternalAddressTypes[theAddress->type]->longPrintFunction)(theEnv,execStatus,logicalName,value); }
         else
           {
            EnvPrintRouter(theEnv,execStatus,logicalName,"<Pointer-");
@@ -178,7 +178,7 @@ globle void PrintAtom(
            EnvPrintRouter(theEnv,execStatus,logicalName,">");
           }
           
-        if (PrintUtilityData(theEnv)->AddressesToStrings) EnvPrintRouter(theEnv,execStatus,logicalName,"\"");
+        if (PrintUtilityData(theEnv,execStatus)->AddressesToStrings) EnvPrintRouter(theEnv,execStatus,logicalName,"\"");
         break;
 
 #if OBJECT_SYSTEM
@@ -193,13 +193,13 @@ globle void PrintAtom(
         break;
 
       default:
-        if (EvaluationData(theEnv)->PrimitivesArray[type] == NULL) break;
-        if (EvaluationData(theEnv)->PrimitivesArray[type]->longPrintFunction == NULL)
+        if (EvaluationData(theEnv,execStatus)->PrimitivesArray[type] == NULL) break;
+        if (EvaluationData(theEnv,execStatus)->PrimitivesArray[type]->longPrintFunction == NULL)
           {
            EnvPrintRouter(theEnv,execStatus,logicalName,"<unknown atom type>");
            break;
           }
-        (*EvaluationData(theEnv)->PrimitivesArray[type]->longPrintFunction)(theEnv,execStatus,logicalName,value);
+        (*EvaluationData(theEnv,execStatus)->PrimitivesArray[type]->longPrintFunction)(theEnv,execStatus,logicalName,value);
         break;
      }
   }
@@ -515,7 +515,7 @@ globle char *DataObjectToString(
       case INSTANCE_ADDRESS:
          thePtr = DOPToPointer(theDO);
 
-         if (thePtr == (void *) &InstanceData(theEnv)->DummyInstance)
+         if (thePtr == (void *) &InstanceData(theEnv,execStatus)->DummyInstance)
            { return("<Dummy Instance>"); }
            
          if (((struct instance *) thePtr)->garbage)
@@ -543,7 +543,7 @@ globle char *DataObjectToString(
 
 #if DEFTEMPLATE_CONSTRUCT      
       case FACT_ADDRESS:
-         if (DOPToPointer(theDO) == (void *) &FactData(theEnv)->DummyFact)
+         if (DOPToPointer(theDO) == (void *) &FactData(theEnv,execStatus)->DummyFact)
            { return("<Dummy Fact>"); }
          
          thePtr = DOPToPointer(theDO);

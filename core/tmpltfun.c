@@ -69,11 +69,11 @@
 /* LOCAL INTERNAL FUNCTION DEFINITIONS */
 /***************************************/
 
-   static void                    DuplicateModifyCommand(void *, EXEC_STATUS, int,DATA_OBJECT_PTR);
-   static SYMBOL_HN              *CheckDeftemplateAndSlotArguments(void *,char *,struct deftemplate **,int);
+   static void                    DuplicateModifyCommand(void *,EXEC_STATUS, int,DATA_OBJECT_PTR);
+   static SYMBOL_HN              *CheckDeftemplateAndSlotArguments(void *,EXEC_STATUS,char *,struct deftemplate **,int);
 
 #if (! RUN_TIME) && (! BLOAD_ONLY)
-   static struct expr            *ModAndDupParse(void *,struct expr *,char *,char *);
+   static struct expr            *ModAndDupParse(void *,EXEC_STATUS,struct expr *,char *,char *);
    static SYMBOL_HN              *FindTemplateForFactAddress(SYMBOL_HN *,struct lhsParseNode *);
 #endif
 
@@ -124,7 +124,7 @@ globle void DeftemplateFunctions(
    FuncSeqOvlFlags(theEnv,execStatus,"duplicate",FALSE,FALSE);
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 #endif
   }
@@ -138,7 +138,7 @@ globle void ModifyCommand(
   EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
-   DuplicateModifyCommand(theEnv,execStatus, execStatus, TRUE, returnValue);
+   DuplicateModifyCommand(theEnv,execStatus, TRUE, returnValue);
   }
 
 /***************************************************************************/
@@ -150,7 +150,7 @@ globle void DuplicateCommand(
   EXEC_STATUS,
   DATA_OBJECT_PTR returnValue)
   {
-   DuplicateModifyCommand(theEnv,execStatus, execStatus, FALSE, returnValue);
+   DuplicateModifyCommand(theEnv,execStatus, FALSE, returnValue);
   }
 
 /***************************************************************/
@@ -180,7 +180,7 @@ static void DuplicateModifyCommand(
    /*===================================================*/
 
    SetpType(returnValue,SYMBOL);
-   SetpValue(returnValue,EnvFalseSymbol(theEnv));
+   SetpValue(returnValue,EnvFalseSymbol(theEnv,execStatus));
 
    /*==================================================*/
    /* Evaluate the first argument which is used to get */
@@ -445,7 +445,7 @@ globle void DeftemplateSlotNamesFunction(
    /*=============================================*/
 
    returnValue->type = SYMBOL;
-   returnValue->value = EnvFalseSymbol(theEnv);
+   returnValue->value = EnvFalseSymbol(theEnv,execStatus);
 
    /*============================================*/
    /* Check for the correct number of arguments. */
@@ -556,7 +556,7 @@ globle void *DeftemplateSlotDefaultPFunction(
    
    slotName = CheckDeftemplateAndSlotArguments(theEnv,execStatus,"deftemplate-slot-existp",&theDeftemplate,2);
    if (slotName == NULL)
-     { return(EnvFalseSymbol(theEnv)); }
+     { return(EnvFalseSymbol(theEnv,execStatus)); }
 
    /*===============================*/
    /* Does the slot have a default? */
@@ -569,7 +569,7 @@ globle void *DeftemplateSlotDefaultPFunction(
    else if (defaultType == DYNAMIC_DEFAULT)
      { return(EnvAddSymbol(theEnv,execStatus,"dynamic")); }
    
-   return(EnvFalseSymbol(theEnv)); 
+   return(EnvFalseSymbol(theEnv,execStatus)); 
   }
 
 /*************************************************/
@@ -651,7 +651,7 @@ globle void DeftemplateSlotDefaultValueFunction(
    if (slotName == NULL)
      {
       theValue->type = SYMBOL;
-      theValue->value = EnvFalseSymbol(theEnv);
+      theValue->value = EnvFalseSymbol(theEnv,execStatus);
       return;
      }
 
@@ -683,7 +683,7 @@ globle intBool EnvDeftemplateSlotDefaultValue(
    /*=============================================*/
 
    SetpType(theValue,SYMBOL);
-   SetpValue(theValue,EnvFalseSymbol(theEnv));
+   SetpValue(theValue,EnvFalseSymbol(theEnv,execStatus));
  
    /*==================================================*/
    /* Make sure the slot exists (the symbol implied is */
@@ -803,9 +803,9 @@ globle void EnvDeftemplateSlotCardinality(
          result->end = 1;
          result->value = EnvCreateMultifield(theEnv,execStatus,2L);
          SetMFType(result->value,1,INTEGER);
-         SetMFValue(result->value,1,SymbolData(theEnv)->Zero);
+         SetMFValue(result->value,1,SymbolData(theEnv,execStatus)->Zero);
          SetMFType(result->value,2,SYMBOL);
-         SetMFValue(result->value,2,SymbolData(theEnv)->PositiveInfinity);
+         SetMFValue(result->value,2,SymbolData(theEnv,execStatus)->PositiveInfinity);
          return;
         }
       else
@@ -857,9 +857,9 @@ globle void EnvDeftemplateSlotCardinality(
    else
      {
       SetMFType(result->value,1,INTEGER);
-      SetMFValue(result->value,1,SymbolData(theEnv)->Zero);
+      SetMFValue(result->value,1,SymbolData(theEnv,execStatus)->Zero);
       SetMFType(result->value,2,SYMBOL);
-      SetMFValue(result->value,2,SymbolData(theEnv)->PositiveInfinity);
+      SetMFValue(result->value,2,SymbolData(theEnv,execStatus)->PositiveInfinity);
      }
   }
 
@@ -920,7 +920,7 @@ globle void EnvDeftemplateSlotAllowedValues(
       if (strcmp(slotName,"implied") == 0)
         {
          result->type = SYMBOL;
-         result->value = EnvFalseSymbol(theEnv);
+         result->value = EnvFalseSymbol(theEnv,execStatus);
          return;
         }
       else
@@ -954,7 +954,7 @@ globle void EnvDeftemplateSlotAllowedValues(
    if ((theSlot->constraints != NULL) ? (theSlot->constraints->restrictionList == NULL) : TRUE)
      {
       result->type = SYMBOL;
-      result->value = EnvFalseSymbol(theEnv);
+      result->value = EnvFalseSymbol(theEnv,execStatus);
       return;
      }
    
@@ -1033,9 +1033,9 @@ globle void EnvDeftemplateSlotRange(
          result->end = 1;
          result->value = EnvCreateMultifield(theEnv,execStatus,2L);
          SetMFType(result->value,1,SYMBOL);
-         SetMFValue(result->value,1,SymbolData(theEnv)->NegativeInfinity);
+         SetMFValue(result->value,1,SymbolData(theEnv,execStatus)->NegativeInfinity);
          SetMFType(result->value,2,SYMBOL);
-         SetMFValue(result->value,2,SymbolData(theEnv)->PositiveInfinity);
+         SetMFValue(result->value,2,SymbolData(theEnv,execStatus)->PositiveInfinity);
          return;
         }
       else
@@ -1082,7 +1082,7 @@ globle void EnvDeftemplateSlotRange(
    else
      {
       result->type = SYMBOL;
-      result->value = EnvFalseSymbol(theEnv);
+      result->value = EnvFalseSymbol(theEnv,execStatus);
       return;
      }
   }
@@ -1586,7 +1586,7 @@ globle void DeftemplateSlotFacetValueFunction(
    /*=============================================*/
 
    returnValue->type = SYMBOL;
-   returnValue->value = EnvFalseSymbol(theEnv);
+   returnValue->value = EnvFalseSymbol(theEnv,execStatus);
 
    /*===================================================*/
    /* Retrieve the deftemplate and slot name arguments. */
@@ -1771,7 +1771,7 @@ globle intBool UpdateModifyDuplicate(
    /*========================================*/
 
    theDeftemplate = (struct deftemplate *)
-                    LookupConstruct(theEnv,execStatus,DeftemplateData(theEnv)->DeftemplateConstruct,
+                    LookupConstruct(theEnv,execStatus,DeftemplateData(theEnv,execStatus)->DeftemplateConstruct,
                                     ValueToString(templateName),
                                     FALSE);
 
@@ -1947,7 +1947,7 @@ static struct expr *ModAndDupParse(
      { nextOne = GenConstant(theEnv,execStatus,theToken.type,theToken.value); }
    else if (theToken.type == INTEGER)
      {
-      if (! TopLevelCommand(theEnv))
+      if (! TopLevelCommand(theEnv,execStatus))
         {
          PrintErrorID(theEnv,execStatus,"TMPLTFUN",1,TRUE);
          EnvPrintRouter(theEnv,execStatus,WERROR,"Fact-indexes can only be used by ");
@@ -1978,7 +1978,7 @@ static struct expr *ModAndDupParse(
    GetToken(theEnv,execStatus,logicalName,&theToken);
    while (theToken.type != RPAREN)
      {
-      PPBackup(theEnv);
+      PPBackup(theEnv,execStatus);
       SavePPBuffer(theEnv,execStatus," ");
       SavePPBuffer(theEnv,execStatus,theToken.printForm);
 
@@ -2071,8 +2071,8 @@ static struct expr *ModAndDupParse(
         }
       else
         {
-         PPBackup(theEnv);
-         PPBackup(theEnv);
+         PPBackup(theEnv,execStatus);
+         PPBackup(theEnv,execStatus);
          SavePPBuffer(theEnv,execStatus,")");
         }
 

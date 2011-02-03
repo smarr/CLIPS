@@ -37,9 +37,9 @@
 #define LOCALE extern
 #endif
 
-   LOCALE void                           ParseFunctionDefinitions(void *);
-   LOCALE void                           CheckSyntaxFunction(void *,DATA_OBJECT *);
-   LOCALE int                            CheckSyntax(void *,char *,DATA_OBJECT_PTR);
+   LOCALE void                           ParseFunctionDefinitions(void *,EXEC_STATUS);
+   LOCALE void                           CheckSyntaxFunction(void *,EXEC_STATUS,DATA_OBJECT *);
+   LOCALE int                            CheckSyntax(void *,EXEC_STATUS,char *,DATA_OBJECT_PTR);
 
 #endif
 

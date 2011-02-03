@@ -109,7 +109,7 @@ struct expressionData
    intBool SequenceOpMode;
   };
 
-#define ExpressionData(theEnv) ((struct expressionData *) GetEnvironmentData(theEnv,execStatus,EXPRESSION_DATA))
+#define ExpressionData(theEnv,execStatus) ((struct expressionData *) GetEnvironmentData(theEnv,execStatus,EXPRESSION_DATA))
 
 /********************/
 /* Global Functions */
@@ -125,7 +125,7 @@ struct expressionData
 #define LOCALE extern
 #endif
 
-# include "evaluatn.h"
+# include "execution_status.h"
 
    LOCALE void                           ReturnExpression(void *,EXEC_STATUS,struct expr *);
    LOCALE void                           ExpressionInstall(void *,EXEC_STATUS,struct expr *);

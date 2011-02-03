@@ -53,7 +53,7 @@ struct factPatternNode
 #define LOCALE extern
 #endif
 
-# include "evaluatn.h"
+# include "execution_status.h"
 
    LOCALE void                           InitializeFactPatterns(void *,EXEC_STATUS);
    LOCALE void                           DestroyFactPatternNetwork(void *,EXEC_STATUS,

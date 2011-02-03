@@ -85,7 +85,7 @@ globle void FactFunctionDefinitions(
    EnvDefineFunction2(theEnv,execStatus,"ppfact",'v',PTIEF PPFactFunction,"PPFactFunction","13*z");
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 #endif
   }
@@ -100,11 +100,11 @@ globle void *FactRelationFunction(
   {
    struct fact *theFact;
 
-   if (EnvArgCountCheck(theEnv,execStatus,"fact-relation",EXACTLY,1) == -1) return(EnvFalseSymbol(theEnv));
+   if (EnvArgCountCheck(theEnv,execStatus,"fact-relation",EXACTLY,1) == -1) return(EnvFalseSymbol(theEnv,execStatus));
 
    theFact = GetFactAddressOrIndexArgument(theEnv,execStatus,"fact-relation",1,FALSE);
 
-   if (theFact == NULL) return(EnvFalseSymbol(theEnv));
+   if (theFact == NULL) return(EnvFalseSymbol(theEnv,execStatus));
 
    return(FactRelation(theFact));
   }
@@ -134,7 +134,7 @@ globle void *EnvFactDeftemplate(
   void *vTheFact)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
 
    struct fact *theFact = (struct fact *) vTheFact;
@@ -172,7 +172,7 @@ globle int EnvFactExistp(
   void *vTheFact)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
    struct fact *theFact = (struct fact *) vTheFact;
 
@@ -200,7 +200,7 @@ globle void FactSlotValueFunction(
    /*=============================================*/
 
    returnValue->type = SYMBOL;
-   returnValue->value = EnvFalseSymbol(theEnv);
+   returnValue->value = EnvFalseSymbol(theEnv,execStatus);
 
    /*============================================*/
    /* Check for the correct number of arguments. */
@@ -293,7 +293,7 @@ globle void FactSlotNamesFunction(
    /*=============================================*/
 
    returnValue->type = SYMBOL;
-   returnValue->value = EnvFalseSymbol(theEnv);
+   returnValue->value = EnvFalseSymbol(theEnv,execStatus);
 
    /*============================================*/
    /* Check for the correct number of arguments. */
@@ -426,7 +426,7 @@ globle void GetFactListFunction(
         }
      }
    else
-     { theModule = ((struct defmodule *) EnvGetCurrentModule(theEnv)); }
+     { theModule = ((struct defmodule *) EnvGetCurrentModule(theEnv,execStatus)); }
 
    /*=====================*/
    /* Get the constructs. */
@@ -454,7 +454,7 @@ globle void EnvGetFactList(
    /* Save the current module. */
    /*==========================*/
 
-   SaveCurrentModule(theEnv);
+   SaveCurrentModule(theEnv,execStatus);
 
    /*============================================*/
    /* Count the number of facts to be retrieved. */
@@ -470,7 +470,7 @@ globle void EnvGetFactList(
    else
      {
       EnvSetCurrentModule(theEnv,execStatus,(void *) theModule);
-      UpdateDeftemplateScope(theEnv);
+      UpdateDeftemplateScope(theEnv,execStatus);
       for (theFact = (struct fact *) GetNextFactInScope(theEnv,execStatus,NULL), count = 0;
            theFact != NULL;
            theFact = (struct fact *) GetNextFactInScope(theEnv,execStatus,theFact), count++)
@@ -516,8 +516,8 @@ globle void EnvGetFactList(
    /* Restore the current module. */
    /*=============================*/
 
-   RestoreCurrentModule(theEnv);
-   UpdateDeftemplateScope(theEnv);
+   RestoreCurrentModule(theEnv,execStatus);
+   UpdateDeftemplateScope(theEnv,execStatus);
   }
   
 /**************************************/
@@ -570,7 +570,7 @@ globle void PPFactFunction(
      {
       EnvRtnUnknown(theEnv,execStatus,3,&theArg);
 
-      if ((theArg.value == EnvFalseSymbol(theEnv)) && (theArg.type == SYMBOL))
+      if ((theArg.value == EnvFalseSymbol(theEnv,execStatus)) && (theArg.type == SYMBOL))
         { ignoreDefaults = FALSE; }
       else
         { ignoreDefaults = TRUE; }
@@ -606,7 +606,7 @@ globle void EnvPPFact(
   int ignoreDefaults)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv)
+#pragma unused(theEnv,execStatus)
 #endif
    struct fact *theFact = (struct fact *) vTheFact;
 

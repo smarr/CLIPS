@@ -80,16 +80,16 @@
    =========================================
    ***************************************** */
 
-static intBool ValidClassName(void *,char *,DEFCLASS **);
-static intBool ParseSimpleQualifier(void *,char *,char *,char *,char *,intBool *,intBool *);
-static intBool ReadUntilClosingParen(void *,char *,struct token *);
-static void AddClass(void *,DEFCLASS *);
-static void BuildSubclassLinks(void *,DEFCLASS *);
-static void FormInstanceTemplate(void *,DEFCLASS *);
-static void FormSlotNameMap(void *,DEFCLASS *);
-static TEMP_SLOT_LINK *MergeSlots(void *,TEMP_SLOT_LINK *,DEFCLASS *,short *,int);
-static void PackSlots(void *,DEFCLASS *,TEMP_SLOT_LINK *);
-static void CreatePublicSlotMessageHandlers(void *,DEFCLASS *);
+static intBool ValidClassName(void *,EXEC_STATUS,char *,DEFCLASS **);
+static intBool ParseSimpleQualifier(void *,EXEC_STATUS,char *,char *,char *,char *,intBool *,intBool *);
+static intBool ReadUntilClosingParen(void *,EXEC_STATUS,char *,struct token *);
+static void AddClass(void *,EXEC_STATUS,DEFCLASS *);
+static void BuildSubclassLinks(void *,EXEC_STATUS,DEFCLASS *);
+static void FormInstanceTemplate(void *,EXEC_STATUS,DEFCLASS *);
+static void FormSlotNameMap(void *,EXEC_STATUS,DEFCLASS *);
+static TEMP_SLOT_LINK *MergeSlots(void *,EXEC_STATUS,TEMP_SLOT_LINK *,DEFCLASS *,short *,int);
+static void PackSlots(void *,EXEC_STATUS,DEFCLASS *,TEMP_SLOT_LINK *);
+static void CreatePublicSlotMessageHandlers(void *,EXEC_STATUS,DEFCLASS *);
 
 /* =========================================
    *****************************************
@@ -161,19 +161,19 @@ globle int ParseDefclass(
 #endif
 
    SetPPBufferStatus(theEnv,execStatus,ON);
-   FlushPPBuffer(theEnv);
+   FlushPPBuffer(theEnv,execStatus);
    SetIndentDepth(theEnv,execStatus,3);
    SavePPBuffer(theEnv,execStatus,"(defclass ");
 
 #if BLOAD || BLOAD_ONLY || BLOAD_AND_BSAVE
-   if ((Bloaded(theEnv)) && (! ConstructData(theEnv)->CheckSyntaxMode))
+   if ((Bloaded(theEnv,execStatus)) && (! ConstructData(theEnv,execStatus)->CheckSyntaxMode))
      {
       CannotLoadWithBloadMessage(theEnv,execStatus,"defclass");
       return(TRUE);
      }
 #endif
 
-   cname = GetConstructNameAndComment(theEnv,execStatus,readSource,&DefclassData(theEnv)->ObjectParseToken,"defclass",
+   cname = GetConstructNameAndComment(theEnv,execStatus,readSource,&DefclassData(theEnv,execStatus)->ObjectParseToken,"defclass",
                                       EnvFindDefclass,NULL,"#",TRUE,
                                       TRUE,TRUE);
    if (cname == NULL)
@@ -192,26 +192,26 @@ globle int ParseDefclass(
       return(TRUE);
      }
    parseError = FALSE;
-   GetToken(theEnv,execStatus,readSource,&DefclassData(theEnv)->ObjectParseToken);
-   while (GetType(DefclassData(theEnv)->ObjectParseToken) != RPAREN)
+   GetToken(theEnv,execStatus,readSource,&DefclassData(theEnv,execStatus)->ObjectParseToken);
+   while (GetType(DefclassData(theEnv,execStatus)->ObjectParseToken) != RPAREN)
      {
-      if (GetType(DefclassData(theEnv)->ObjectParseToken) != LPAREN)
+      if (GetType(DefclassData(theEnv,execStatus)->ObjectParseToken) != LPAREN)
         {
          SyntaxErrorMessage(theEnv,execStatus,"defclass");
          parseError = TRUE;
          break;
         }
-      PPBackup(theEnv);
-      PPCRAndIndent(theEnv);
+      PPBackup(theEnv,execStatus);
+      PPCRAndIndent(theEnv,execStatus);
       SavePPBuffer(theEnv,execStatus,"(");
-      GetToken(theEnv,execStatus,readSource,&DefclassData(theEnv)->ObjectParseToken);
-      if (GetType(DefclassData(theEnv)->ObjectParseToken) != SYMBOL)
+      GetToken(theEnv,execStatus,readSource,&DefclassData(theEnv,execStatus)->ObjectParseToken);
+      if (GetType(DefclassData(theEnv,execStatus)->ObjectParseToken) != SYMBOL)
         {
          SyntaxErrorMessage(theEnv,execStatus,"defclass");
          parseError = TRUE;
          break;
         }
-      if (strcmp(DOToString(DefclassData(theEnv)->ObjectParseToken),ROLE_RLN) == 0)
+      if (strcmp(DOToString(DefclassData(theEnv,execStatus)->ObjectParseToken),ROLE_RLN) == 0)
         {
          if (ParseSimpleQualifier(theEnv,execStatus,readSource,ROLE_RLN,CONCRETE_RLN,ABSTRACT_RLN,
                                   &roleSpecified,&abstract) == FALSE)
@@ -221,7 +221,7 @@ globle int ParseDefclass(
            }
         }
 #if DEFRULE_CONSTRUCT
-      else if (strcmp(DOToString(DefclassData(theEnv)->ObjectParseToken),MATCH_RLN) == 0)
+      else if (strcmp(DOToString(DefclassData(theEnv,execStatus)->ObjectParseToken),MATCH_RLN) == 0)
         {
          if (ParseSimpleQualifier(theEnv,execStatus,readSource,MATCH_RLN,NONREACTIVE_RLN,REACTIVE_RLN,
                                   &patternMatchSpecified,&reactive) == FALSE)
@@ -231,7 +231,7 @@ globle int ParseDefclass(
            }
         }
 #endif
-      else if (strcmp(DOToString(DefclassData(theEnv)->ObjectParseToken),SLOT_RLN) == 0)
+      else if (strcmp(DOToString(DefclassData(theEnv,execStatus)->ObjectParseToken),SLOT_RLN) == 0)
         {
          slots = ParseSlot(theEnv,execStatus,readSource,slots,preclist,FALSE,FALSE);
          if (slots == NULL)
@@ -240,7 +240,7 @@ globle int ParseDefclass(
             break;
            }
         }
-      else if (strcmp(DOToString(DefclassData(theEnv)->ObjectParseToken),SGL_SLOT_RLN) == 0)
+      else if (strcmp(DOToString(DefclassData(theEnv,execStatus)->ObjectParseToken),SGL_SLOT_RLN) == 0)
         {
          slots = ParseSlot(theEnv,execStatus,readSource,slots,preclist,FALSE,TRUE);
          if (slots == NULL)
@@ -249,7 +249,7 @@ globle int ParseDefclass(
             break;
            }
         }
-      else if (strcmp(DOToString(DefclassData(theEnv)->ObjectParseToken),MLT_SLOT_RLN) == 0)
+      else if (strcmp(DOToString(DefclassData(theEnv,execStatus)->ObjectParseToken),MLT_SLOT_RLN) == 0)
         {
          slots = ParseSlot(theEnv,execStatus,readSource,slots,preclist,TRUE,TRUE);
          if (slots == NULL)
@@ -258,9 +258,9 @@ globle int ParseDefclass(
             break;
            }
         }
-      else if (strcmp(DOToString(DefclassData(theEnv)->ObjectParseToken),HANDLER_DECL) == 0)
+      else if (strcmp(DOToString(DefclassData(theEnv,execStatus)->ObjectParseToken),HANDLER_DECL) == 0)
         {
-         if (ReadUntilClosingParen(theEnv,execStatus,readSource,&DefclassData(theEnv)->ObjectParseToken) == FALSE)
+         if (ReadUntilClosingParen(theEnv,execStatus,readSource,&DefclassData(theEnv,execStatus)->ObjectParseToken) == FALSE)
            {
             parseError = TRUE;
             break;
@@ -272,10 +272,10 @@ globle int ParseDefclass(
          parseError = TRUE;
          break;
         }
-      GetToken(theEnv,execStatus,readSource,&DefclassData(theEnv)->ObjectParseToken);
+      GetToken(theEnv,execStatus,readSource,&DefclassData(theEnv,execStatus)->ObjectParseToken);
      }
 
-   if ((GetType(DefclassData(theEnv)->ObjectParseToken) != RPAREN) || (parseError == TRUE))
+   if ((GetType(DefclassData(theEnv,execStatus)->ObjectParseToken) != RPAREN) || (parseError == TRUE))
      {
       DeletePackedClassLinks(theEnv,execStatus,sclasses,TRUE);
       DeletePackedClassLinks(theEnv,execStatus,preclist,TRUE);
@@ -290,7 +290,7 @@ globle int ParseDefclass(
    if (roleSpecified == FALSE)
      {
       if (preclist->classArray[1]->system &&                             /* Change to cause         */ 
-          (DefclassData(theEnv)->ClassDefaultsMode == CONVENIENCE_MODE)) /* default role of         */
+          (DefclassData(theEnv,execStatus)->ClassDefaultsMode == CONVENIENCE_MODE)) /* default role of         */
         { abstract = FALSE; }                                            /* classes to be concrete. */
       else
         { abstract = preclist->classArray[1]->abstract; }
@@ -300,7 +300,7 @@ globle int ParseDefclass(
      {
       if ((preclist->classArray[1]->system) &&                           /* Change to cause       */
           (! abstract) &&                                                /* default pattern-match */ 
-          (DefclassData(theEnv)->ClassDefaultsMode == CONVENIENCE_MODE)) /* of classes to be      */
+          (DefclassData(theEnv,execStatus)->ClassDefaultsMode == CONVENIENCE_MODE)) /* of classes to be      */
         { reactive = TRUE; }                                             /* reactive.             */
       else
         { reactive = preclist->classArray[1]->reactive; }
@@ -328,7 +328,7 @@ globle int ParseDefclass(
       successfully parsed defclass to the KB.
       ======================================================= */
 
-   if (ConstructData(theEnv)->CheckSyntaxMode)
+   if (ConstructData(theEnv,execStatus)->CheckSyntaxMode)
      {
       DeletePackedClassLinks(theEnv,execStatus,sclasses,TRUE);
       DeletePackedClassLinks(theEnv,execStatus,preclist,TRUE);
@@ -411,7 +411,7 @@ static intBool ValidClassName(
          generic function method restrictions, etc.
          =============================================== */
       if ((EnvIsDefclassDeletable(theEnv,execStatus,(void *) *theDefclass) == FALSE) &&
-          (! ConstructData(theEnv)->CheckSyntaxMode))
+          (! ConstructData(theEnv,execStatus)->CheckSyntaxMode))
         {
          PrintErrorID(theEnv,execStatus,"CLASSPSR",3,FALSE);
          EnvPrintRouter(theEnv,execStatus,WERROR,EnvGetDefclassName(theEnv,execStatus,(void *) *theDefclass));
@@ -460,17 +460,17 @@ static intBool ParseSimpleQualifier(
       return(FALSE);
      }
    SavePPBuffer(theEnv,execStatus," ");
-   GetToken(theEnv,execStatus,readSource,&DefclassData(theEnv)->ObjectParseToken);
-   if (GetType(DefclassData(theEnv)->ObjectParseToken) != SYMBOL)
+   GetToken(theEnv,execStatus,readSource,&DefclassData(theEnv,execStatus)->ObjectParseToken);
+   if (GetType(DefclassData(theEnv,execStatus)->ObjectParseToken) != SYMBOL)
      goto ParseSimpleQualifierError;
-   if (strcmp(DOToString(DefclassData(theEnv)->ObjectParseToken),setRelation) == 0)
+   if (strcmp(DOToString(DefclassData(theEnv,execStatus)->ObjectParseToken),setRelation) == 0)
      *binaryFlag = TRUE;
-   else if (strcmp(DOToString(DefclassData(theEnv)->ObjectParseToken),clearRelation) == 0)
+   else if (strcmp(DOToString(DefclassData(theEnv,execStatus)->ObjectParseToken),clearRelation) == 0)
      *binaryFlag = FALSE;
    else
      goto ParseSimpleQualifierError;
-   GetToken(theEnv,execStatus,readSource,&DefclassData(theEnv)->ObjectParseToken);
-   if (GetType(DefclassData(theEnv)->ObjectParseToken) != RPAREN)
+   GetToken(theEnv,execStatus,readSource,&DefclassData(theEnv,execStatus)->ObjectParseToken);
+   if (GetType(DefclassData(theEnv,execStatus)->ObjectParseToken) != RPAREN)
      goto ParseSimpleQualifierError;
    *alreadyTestedFlag = TRUE;
    return(TRUE);
@@ -520,8 +520,8 @@ static intBool ReadUntilClosingParen(
          cnt--;
          if (lparen_read == FALSE)
            {
-            PPBackup(theEnv);
-            PPBackup(theEnv);
+            PPBackup(theEnv,execStatus);
+            PPBackup(theEnv,execStatus);
             SavePPBuffer(theEnv,execStatus,")");
            }
          lparen_read = FALSE;
@@ -604,8 +604,8 @@ static void AddClass(
 #endif
 
 #if DEBUGGING_FUNCTIONS
-   if (EnvGetConserveMemory(theEnv) == FALSE)
-     SetDefclassPPForm((void *) cls,CopyPPBuffer(theEnv));
+   if (EnvGetConserveMemory(theEnv,execStatus) == FALSE)
+     SetDefclassPPForm((void *) cls,CopyPPBuffer(theEnv,execStatus));
 #endif
 
 #if DEFMODULE_CONSTRUCT
@@ -870,11 +870,11 @@ globle void *CreateClassScopeMap(
    className = ValueToString(theDefclass->header.name);
    matchModule = theDefclass->header.whichModule->theModule;
 
-   scopeMapSize = (sizeof(char) * ((GetNumberOfDefmodules(theEnv) / BITS_PER_BYTE) + 1));
+   scopeMapSize = (sizeof(char) * ((GetNumberOfDefmodules(theEnv,execStatus) / BITS_PER_BYTE) + 1));
    scopeMap = (char *) gm2(theEnv,execStatus,scopeMapSize);
 
    ClearBitString((void *) scopeMap,scopeMapSize);
-   SaveCurrentModule(theEnv);
+   SaveCurrentModule(theEnv,execStatus);
    for (theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,NULL) ;
         theModule != NULL ;
         theModule = (struct defmodule *) EnvGetNextDefmodule(theEnv,execStatus,(void *) theModule))
@@ -885,7 +885,7 @@ globle void *CreateClassScopeMap(
                                 className,&count,TRUE,NULL) != NULL)
         SetBitMap(scopeMap,moduleID);
      }
-   RestoreCurrentModule(theEnv);
+   RestoreCurrentModule(theEnv,execStatus);
    theBitMap = (BITMAP_HN *) EnvAddBitMap(theEnv,execStatus,scopeMap,scopeMapSize);
    IncrementBitMapCount(theBitMap);
    rm(theEnv,execStatus,(void *) scopeMap,scopeMapSize);

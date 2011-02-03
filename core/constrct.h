@@ -95,7 +95,7 @@ struct constructData
    int ParsingConstruct;
   };
 
-#define ConstructData(theEnv) ((struct constructData *) GetEnvironmentData(theEnv,execStatus,CONSTRUCT_DATA))
+#define ConstructData(theEnv,execStatus) ((struct constructData *) GetEnvironmentData(theEnv,execStatus,CONSTRUCT_DATA))
 
 #ifdef LOCALE
 #undef LOCALE
@@ -107,8 +107,8 @@ struct constructData
 #define LOCALE extern
 #endif
 
-#define RemoveClearFunction(a) EnvRemoveClearFunction(GetCurrentEnvironment(),a)
-#define RemoveResetFunction(a) EnvRemoveResetFunction(GetCurrentEnvironment(),a)
+#define RemoveClearFunction(a) EnvRemoveClearFunction(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
+#define RemoveResetFunction(a) EnvRemoveResetFunction(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
 
 #if ALLOW_ENVIRONMENT_GLOBALS
    LOCALE void                           Clear(EXEC_STATUS);
