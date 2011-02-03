@@ -171,7 +171,7 @@ static void DeallocateDefgenericBinaryData(
    space = DefgenericBinaryData(theEnv,execStatus)->RestrictionCount * sizeof(struct restriction);
    if (space != 0) genfree(theEnv,execStatus,(void *) DefgenericBinaryData(theEnv,execStatus)->RestrictionArray,space);
 
-   space = DefgenericBinaryData(theEnv,execStatus)->TypeCount * sizeof(void *,EXEC_STATUS);
+   space = DefgenericBinaryData(theEnv,execStatus)->TypeCount * sizeof(void *);
    if (space != 0) genfree(theEnv,execStatus,(void *) DefgenericBinaryData(theEnv,execStatus)->TypeArray,space);
 
    space =  DefgenericBinaryData(theEnv,execStatus)->ModuleCount * sizeof(struct defgenericModule);

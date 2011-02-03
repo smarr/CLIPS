@@ -601,7 +601,7 @@ static int ClearBload(
         bfPtr = bfPtr->next)
      {
       if (bfPtr->environmentAware)
-        { ready = (* ((int (*)(void *)) bfPtr->func))(theEnv,execStatus); }
+        { ready = (* ((int (*)(void *,EXEC_STATUS)) bfPtr->func))(theEnv,execStatus); }
       else            
         { ready = (* ((int (*)(void)) bfPtr->func))(); }
 

@@ -22,6 +22,10 @@
 
 #define _H_tmpltrhs
 
+# ifndef _H_execstatus
+#include "execstatus.h"
+# endif
+
 #ifndef _H_scanner
 #include "scanner.h"
 #endif

@@ -285,10 +285,11 @@ globle intBool AddPeriodicFunction(
   void (*theFunction)(void),
   int priority)
   {
-   void *theEnv,
+   void *theEnv;
    
    theEnv = GetCurrentEnvironment();
-   
+   EXEC_STATUS = GetCurrentExectionStatus(); // Lode: TODO Correct?
+
    UtilityData(theEnv,execStatus)->ListOfPeriodicFunctions =
      AddFunctionToCallList(theEnv,execStatus,name,priority,
                            (void (*)(void *)) theFunction,

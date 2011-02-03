@@ -78,7 +78,7 @@
    LOCALE intBool                        UpdateModifyDuplicate(void *,EXEC_STATUS,struct expr *,char *,void *);
    LOCALE struct expr                   *ModifyParse(void *,EXEC_STATUS,struct expr *,char *);
    LOCALE struct expr                   *DuplicateParse(void *,EXEC_STATUS,struct expr *,char *);
-   LOCALE void                           DeftemplateFunctions( void *);
+   LOCALE void                           DeftemplateFunctions( void *,EXEC_STATUS);
    LOCALE void                           ModifyCommand(void *,EXEC_STATUS, DATA_OBJECT_PTR);
    LOCALE void                           DuplicateCommand(void *,EXEC_STATUS, DATA_OBJECT_PTR);
    LOCALE void                           DeftemplateSlotNamesFunction(void *,EXEC_STATUS,DATA_OBJECT *);

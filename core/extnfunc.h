@@ -28,6 +28,10 @@
 
 #define _H_extnfunc
 
+# ifndef _H_execstatus
+# include "execstatus.h"
+# endif
+
 #ifndef _H_symbol
 #include "symbol.h"
 #endif

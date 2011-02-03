@@ -29,6 +29,15 @@
 struct entityRecord;
 struct dataObject;
 
+#define MAXIMUM_PRIMITIVES 150
+#define MAXIMUM_EXTERNAL_ADDRESS_TYPES 10
+
+#define BITS_PER_BYTE    8
+
+# ifndef _H_execstatus
+# include "execstatus.h"
+# endif
+
 #ifndef _H_constant
 #include "constant.h"
 #endif
@@ -153,11 +162,6 @@ typedef struct entityRecord * ENTITY_RECORD_PTR;
 #define GetFirstArgument()   (execStatus->CurrentExpression->argList)
 #define GetNextArgument(ep)  (ep->nextArg)
 
-#define MAXIMUM_PRIMITIVES 150
-#define MAXIMUM_EXTERNAL_ADDRESS_TYPES 10
-
-#define BITS_PER_BYTE    8
-
 #define BitwiseTest(n,b)   ((n) & (char) (1 << (b)))
 #define BitwiseSet(n,b)    (n |= (char) (1 << (b)))
 #define BitwiseClear(n,b)  (n &= (char) ~(1 << (b)))
@@ -167,28 +171,6 @@ typedef struct entityRecord * ENTITY_RECORD_PTR;
 #define ClearBitMap(map,id) BitwiseClear(map[(id) / BITS_PER_BYTE],(id) % BITS_PER_BYTE)
 
 #define EVALUATION_DATA 44
-
-// STEFAN: new additional parameter that needs to be passed around similar to
-//         theEnv. But needs to be handled independently for different threads.
-struct executionStatus
-  {
-   struct expr *CurrentExpression;
-   int EvaluationError;
-   int HaltExecution;
-   int CurrentEvaluationDepth;
-  };
-
-// STEFAN: parameter macro for the new executionStatus
-#define EXEC_STATUS struct executionStatus* execStatus
-
-struct evaluationData
-  {
-   int numberOfAddressTypes;
-   struct entityRecord *PrimitivesArray[MAXIMUM_PRIMITIVES];
-   struct externalAddressType *ExternalAddressTypes[MAXIMUM_EXTERNAL_ADDRESS_TYPES];
-  };
-
-#define EvaluationData(theEnv,execStatus) ((struct evaluationData *) GetEnvironmentData(theEnv,execStatus,EVALUATION_DATA))
 
 #ifdef LOCALE
 #undef LOCALE

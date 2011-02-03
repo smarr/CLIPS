@@ -411,6 +411,7 @@ globle intBool AddRouter(
    
    // Lode: TODO add exec_status??
    theEnv = GetCurrentEnvironment();
+   EXEC_STATUS = GetCurrentExectionStatus();
 
    newPtr = get_struct(theEnv,execStatus,router);
 

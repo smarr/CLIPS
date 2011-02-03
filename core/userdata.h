@@ -30,6 +30,14 @@
 #define LOCALE extern
 #endif
 
+#define MAXIMUM_USER_DATA_RECORDS 100
+
+#define USER_DATA_DATA 56
+
+# ifndef _H_execstatus
+# include "execstatus.h"
+# endif
+
 struct userData
   {
    unsigned char dataID;
@@ -48,10 +56,6 @@ struct userDataRecord
   
 typedef struct userDataRecord USER_DATA_RECORD;
 typedef struct userDataRecord * USER_DATA_RECORD_PTR;
-
-#define MAXIMUM_USER_DATA_RECORDS 100
-
-#define USER_DATA_DATA 56
 
 struct userDataData
   { 

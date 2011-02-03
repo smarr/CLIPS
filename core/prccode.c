@@ -855,7 +855,7 @@ globle void EvaluateProcActions(
   EXPRESSION *actions,
   int lvarcnt,
   DATA_OBJECT *result,
-  void (*crtproc)(void *))
+  void (*crtproc)(void *,EXEC_STATUS))
   {
    DATA_OBJECT *oldLocalVarArray;
    register int i;

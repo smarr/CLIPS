@@ -466,7 +466,6 @@ globle void *GetEnvironmentByIndex(
   unsigned long environmentIndex)
   {
    struct environmentData *theEnvironment;
-	 // Lode: TODO add EXEC_STATUS?
 
    theEnvironment = FindEnvironment(environmentIndex);
       

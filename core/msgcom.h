@@ -85,7 +85,7 @@ struct messageHandlerData
    LOCALE char            *EnvGetDefmessageHandlerName(void *,EXEC_STATUS,void *,int);
    LOCALE char            *EnvGetDefmessageHandlerType(void *,EXEC_STATUS,void *,int);
    LOCALE int              EnvGetNextDefmessageHandler(void *,EXEC_STATUS,void *,int);
-   LOCALE HANDLER         *GetDefmessageHandlerPointer(void *,EXEC_STATUS,int);
+   LOCALE HANDLER         *GetDefmessageHandlerPointer(void *,int);
 #if DEBUGGING_FUNCTIONS
    LOCALE unsigned         EnvGetDefmessageHandlerWatch(void *,EXEC_STATUS,void *,int);
    LOCALE void             EnvSetDefmessageHandlerWatch(void *,EXEC_STATUS,int,void *,int);

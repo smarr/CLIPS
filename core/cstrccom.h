@@ -26,6 +26,10 @@
 
 #define _H_cstrccom
 
+# ifndef _H_execstatus
+# include "execstatus.h"
+# endif
+
 #ifndef _H_moduldef
 #include "moduldef.h"
 #endif
@@ -42,6 +46,7 @@
 #else
 #define LOCALE extern
 #endif
+
 
 #if (! RUN_TIME)
    LOCALE void                           AddConstructToModule(struct constructHeader *);

@@ -871,8 +871,8 @@ globle intBool AddRunFunction(
   {
    void *theEnv;
 	  
-   // Lode: TODO: add exec_status??
    theEnv = GetCurrentEnvironment();
+   EXEC_STATUS = GetCurrentExectionStatus();
 
    EngineData(theEnv,execStatus)->ListOfRunFunctions = 
        AddFunctionToCallList(theEnv,execStatus,name,priority,(void (*)(void *)) functionPtr,

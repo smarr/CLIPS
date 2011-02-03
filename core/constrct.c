@@ -352,7 +352,7 @@ globle void ResetCommand(
 #if ALLOW_ENVIRONMENT_GLOBALS
 globle void Reset(EXEC_STATUS)
   {
-   EnvReset(GetCurrentEnvironment(),getCurrentExecutionState(),execStatus);
+   EnvReset(GetCurrentEnvironment(),execStatus);
   }  
 #endif
 
@@ -463,9 +463,9 @@ globle intBool AddResetFunction(
   int priority)
   {
    void *theEnv;
-   // Lode: TODO EXEC_STATUS?
-
+	  
    theEnv = GetCurrentEnvironment();
+   EXEC_STATUS = GetCurrentExectionStatus();
    
    ConstructData(theEnv,execStatus)->ListOfResetFunctions = 
       AddFunctionToCallList(theEnv,execStatus,name,priority,(void (*)(void *)) functionPtr,
@@ -619,7 +619,7 @@ globle intBool ClearReady(
   EXEC_STATUS)
   {
    struct callFunctionItem *theFunction;
-   int (*tempFunction)(void *);
+   int (*tempFunction)(void *,EXEC_STATUS);
 
    for (theFunction = ConstructData(theEnv,execStatus)->ListOfClearReadyFunctions;
         theFunction != NULL;
@@ -681,9 +681,9 @@ globle intBool AddClearFunction(
   int priority)
   {
    void *theEnv;
-   // Lode: TODO EXEC_STATUS
 
    theEnv = GetCurrentEnvironment();
+   EXEC_STATUS = GetCurrentExectionStatus();
    
    ConstructData(theEnv,execStatus)->ListOfClearFunctions =
       AddFunctionToCallList(theEnv,execStatus,name,priority,

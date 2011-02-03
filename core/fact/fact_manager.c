@@ -412,6 +412,7 @@ globle void PrintFact(
 /*********************************************/
 globle void MatchFactFunction(
   void *theEnv,
+  EXEC_STATUS,
   void *vTheFact)
   {
    struct fact *theFact = (struct fact *) vTheFact;
@@ -661,6 +662,7 @@ static void * APR_THREAD_FUNC ParallelFactMatchAndLogicRetract(apr_thread_t *thr
   
   
   FactPatternMatch(params->theEnv,
+				   params->execStatus,
                    params->theFact,
                    params->patternPtr,
                    params->offset,
@@ -676,7 +678,7 @@ static void * APR_THREAD_FUNC ParallelFactMatchAndLogicRetract(apr_thread_t *thr
   /* on the non-existence of the fact just asserted.   */
   /*===================================================*/
   
-  ForceLogicalRetractions(params->theEnv);
+  ForceLogicalRetractions(params->theEnv, params->execStatus);
   
   free(params);
   
@@ -1597,6 +1599,7 @@ globle void EnvGetFactPPForm(
 #endif
 globle long long EnvFactIndex(
   void *theEnv,
+  EXEC_STATUS,
   void *factPtr)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
@@ -1639,7 +1642,8 @@ globle void *EnvAssertString(
 /*   whether a change to the fact-list has been made. */
 /******************************************************/
 globle int EnvGetFactListChanged(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
    return(FactData(theEnv,execStatus)->ChangeToFactList); 
   }
@@ -1650,6 +1654,7 @@ globle int EnvGetFactListChanged(
 /***********************************************************/
 globle void EnvSetFactListChanged(
   void *theEnv,
+  EXEC_STATUS,
   int value)
   {
    FactData(theEnv,execStatus)->ChangeToFactList = value;
@@ -1660,7 +1665,8 @@ globle void EnvSetFactListChanged(
 /* of facts in the fact-list.           */
 /****************************************/
 globle unsigned long GetNumberOfFacts(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {   
    return(FactData(theEnv,execStatus)->NumberOfFacts); 
   }
@@ -1670,7 +1676,8 @@ globle unsigned long GetNumberOfFacts(
 /*   fact index to zero and removes all facts.             */
 /***********************************************************/
 static void ResetFacts(
-  void *theEnv,EXEC_STATUS)
+  void *theEnv,
+  EXEC_STATUS)
   {
    /*====================================*/
    /* Initialize the fact index to zero. */
@@ -1691,7 +1698,8 @@ static void ResetFacts(
 /*   command can continue, otherwise FALSE.                 */
 /************************************************************/
 static int ClearFactsReady(
-  void *theEnv,EXEC_STATUS)
+  void *theEnv,
+  EXEC_STATUS)
   {
    /*====================================*/
    /* Initialize the fact index to zero. */

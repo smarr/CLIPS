@@ -26,6 +26,10 @@
 
 #define _H_expressn
 
+# ifndef _H_execstatus
+# include "execstatus.h"
+# endif
+
 struct expr;
 struct exprHashNode;
 

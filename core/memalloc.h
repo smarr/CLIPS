@@ -44,6 +44,11 @@ struct memoryPtr;
 #define LOCALE extern
 #endif
 
+
+# ifndef _H_execstatus
+# include "execstatus.h"
+# endif
+
 struct chunkInfo
   {
    struct chunkInfo *prevChunk;

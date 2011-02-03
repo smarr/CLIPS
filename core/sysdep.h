@@ -62,9 +62,9 @@
    LOCALE void                        SetRedrawFunction(void *,EXEC_STATUS,void (*)(void *));
    LOCALE void                        SetPauseEnvFunction(void *,EXEC_STATUS,void (*)(void *));
    LOCALE void                        SetContinueEnvFunction(void *,EXEC_STATUS,void (*)(void *,EXEC_STATUS,int));
-   LOCALE void                        (*GetRedrawFunction(void *))(void *);
-   LOCALE void                        (*GetPauseEnvFunction(void *))(void *);
-   LOCALE void                        (*GetContinueEnvFunction(void *))(void *,EXEC_STATUS,int);
+   LOCALE void                        (*GetRedrawFunction(void *,EXEC_STATUS))(void *);
+   LOCALE void                        (*GetPauseEnvFunction(void *,EXEC_STATUS))(void *);
+   LOCALE void                        (*GetContinueEnvFunction(void *,EXEC_STATUS))(void *,EXEC_STATUS,int);
    LOCALE void                        RerouteStdin(void *,EXEC_STATUS,int,char *[]);
    LOCALE double                      gentime(void);
    LOCALE void                        gensystem(void *,EXEC_STATUS);

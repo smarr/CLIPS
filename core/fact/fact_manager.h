@@ -117,8 +117,8 @@ struct factsData
 #define SetFactListChanged(a) EnvSetFactListChanged(GetCurrentEnvironment(),getCurrentExecutionState(),a)
 
 #if ALLOW_ENVIRONMENT_GLOBALS
-   LOCALE intBool                        GetFactSlot(void *,EXEC_STATUS,char *,DATA_OBJECT *);
-   LOCALE long long                      FactIndex(void *,EXEC_STATUS);
+   LOCALE intBool                        GetFactSlot(void *,char *,DATA_OBJECT *);
+   LOCALE long long                      FactIndex(void *);
 #endif
 
    LOCALE void                          *EnvAssert(void *,EXEC_STATUS,void *, int);

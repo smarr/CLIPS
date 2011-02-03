@@ -40,6 +40,9 @@
 
 #define _H_engine
 
+# ifndef _H_execstatus
+# include "execstatus.h"
+# endif
 #ifndef _H_lgcldpnd
 #include "lgcldpnd.h"
 #endif

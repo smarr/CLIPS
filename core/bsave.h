@@ -48,10 +48,10 @@ struct BinaryItem;
 struct BinaryItem
   {
    char *name;
-   void (*findFunction)(void *);
-   void (*bloadStorageFunction)(void *);
-   void (*bloadFunction)(void *);
-   void (*clearFunction)(void *);
+   void (*findFunction)(void *,EXEC_STATUS);
+   void (*bloadStorageFunction)(void *,EXEC_STATUS);
+   void (*bloadFunction)(void *,EXEC_STATUS);
+   void (*clearFunction)(void *,EXEC_STATUS);
    void (*expressionFunction)(void *,EXEC_STATUS,FILE *);
    void (*bsaveStorageFunction)(void *,EXEC_STATUS,FILE *);
    void (*bsaveFunction)(void *,EXEC_STATUS,FILE *);

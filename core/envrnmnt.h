@@ -52,6 +52,10 @@
 # include <apr_thread_pool.h>
 # include <apr_thread_rwlock.h>
 
+# ifndef _H_execstatus
+# include "execstatus.h"
+# endif
+
 struct environmentCleanupFunction
   {
    char *name;

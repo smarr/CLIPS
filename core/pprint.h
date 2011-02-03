@@ -22,6 +22,10 @@
 #ifndef _H_pprint
 #define _H_pprint
 
+# ifndef _H_execstatus
+# include "execstatus.h"
+# endif
+
 #define PRETTY_PRINT_DATA 52
 
 struct prettyPrintData
@@ -47,6 +51,7 @@ struct prettyPrintData
 #else
 #define LOCALE extern
 #endif
+
 
    LOCALE void                           InitializePrettyPrintData(void *,EXEC_STATUS);
    LOCALE void                           FlushPPBuffer(void *,EXEC_STATUS);

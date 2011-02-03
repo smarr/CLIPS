@@ -252,6 +252,10 @@ struct symbolData
 #define AddLong(a) EnvAddLong(GetCurrentEnvironment(),getCurrentExecutionState(),a)
 #define AddDouble(a) EnvAddDouble(GetCurrentEnvironment(),getCurrentExecutionState(),a)
 
+# ifndef _H_execstatus
+# include "execstatus.h"
+# endif
+
    LOCALE void                           InitializeAtomTables(void *,EXEC_STATUS,struct symbolHashNode **,struct floatHashNode **,
                                                               struct integerHashNode **,struct bitMapHashNode **,
                                                               struct externalAddressHashNode **);

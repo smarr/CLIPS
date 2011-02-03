@@ -315,7 +315,7 @@ globle void EnvInitializeEnvironment(
    InitializeExternalFunctionData(theEnvironment, execStatus);
    InitializeMultifieldData(theEnvironment, execStatus);
    InitializePrettyPrintData(theEnvironment, execStatus);
-   InitializePrintUtilityData(theEnvironment), execStatus;
+   InitializePrintUtilityData(theEnvironment, execStatus);
    InitializeScannerData(theEnvironment, execStatus);
    InitializeSystemDependentData(theEnvironment, execStatus);
    InitializeUserDataData(theEnvironment, execStatus);
@@ -958,7 +958,8 @@ globle void genprintfile(
 #pragma argsused
 #endif
 static void InitializeNonportableFeatures(
-  void *theEnv)
+  void *theEnv,
+  EXEC_STATUS)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
 #pragma unused(theEnv,execStatus)
@@ -1207,6 +1208,7 @@ globle int genrename(
 /*  value of BeforeOpenFunction.      */
 /**************************************/
 globle int (*EnvSetBeforeOpenFunction(void *theEnv,
+									  EXEC_STATUS,
                                       int (*theFunction)(void *)))(void *)
   {
    int (*tempFunction)(void *);
@@ -1221,6 +1223,7 @@ globle int (*EnvSetBeforeOpenFunction(void *theEnv,
 /*  value of AfterOpenFunction.      */
 /*************************************/
 globle int (*EnvSetAfterOpenFunction(void *theEnv,
+									 EXEC_STATUS,
                                      int (*theFunction)(void *)))(void *)
   {
    int (*tempFunction)(void *);

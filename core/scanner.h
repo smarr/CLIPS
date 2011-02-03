@@ -58,6 +58,10 @@ struct scannerData
 
 #define ScannerData(theEnv,execStatus) ((struct scannerData *) GetEnvironmentData(theEnv,execStatus,SCANNER_DATA))
 
+# ifndef _H_execstatus
+# include "execstatus.h"
+# endif
+
    LOCALE void                           InitializeScannerData(void *,EXEC_STATUS);
    LOCALE void                           GetToken(void *,EXEC_STATUS,char *,struct token *);
    LOCALE void                           CopyToken(struct token *,struct token *);

@@ -26,6 +26,10 @@
 
 #define _H_exprnops
 
+# ifndef _H_execstatus
+# include "execstatus.h"
+# endif
+
 #ifndef _H_expressn
 #include "expressn.h"
 #endif

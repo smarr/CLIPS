@@ -308,7 +308,7 @@ globle void IfFunction(
    /* Evaluate the condition. */
    /*=========================*/
 
-   EvaluateExpression(theEnv,execStatus->CurrentExpression->argList,returnValue);
+   EvaluateExpression(theEnv,execStatus,execStatus->CurrentExpression->argList,returnValue);
 
    if ((ProcedureFunctionData(theEnv,execStatus)->BreakFlag == TRUE) || (ProcedureFunctionData(theEnv,execStatus)->ReturnFlag == TRUE))
      {

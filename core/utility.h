@@ -30,10 +30,14 @@
 #undef LOCALE
 #endif
 
+# ifndef _H_execstatus
+# include "execstatus.h"
+# endif
+
 struct callFunctionItem
   {
    char *name;
-   void (*func)(void *);
+   void (*func)(void *,EXEC_STATUS);
    int priority;
    struct callFunctionItem *next;
    short int environmentAware;
@@ -106,7 +110,7 @@ struct utilityData
                                                              struct callFunctionItem *,
                                                              int *);
    LOCALE void                           DeallocateCallList(void *,EXEC_STATUS,struct callFunctionItem *);
-   LOCALE unsigned long                  ItemHashValue(void *,unsigned short,void *,unsigned long);
+   LOCALE unsigned long                  ItemHashValue(void *,EXEC_STATUS,unsigned short,void *,unsigned long);
    LOCALE void                           YieldTime(void *,EXEC_STATUS);
    LOCALE short                          SetGarbageCollectionHeuristics(void *,EXEC_STATUS,short);
    LOCALE void                           EnvIncrementGCLocks(void *,EXEC_STATUS);

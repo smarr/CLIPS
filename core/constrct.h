@@ -90,7 +90,7 @@ struct constructData
    struct callFunctionItem *ListOfClearFunctions;
    struct callFunctionItem *ListOfClearReadyFunctions;
    int Executing;
-   int (*BeforeResetFunction)(void *);
+   int (*BeforeResetFunction)(void *,EXEC_STATUS);
    int CheckSyntaxMode;
    int ParsingConstruct;
   };

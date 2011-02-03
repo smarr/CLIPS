@@ -637,7 +637,7 @@ globle void SaveConstruct(
 /*********************************************************/
 globle char *GetConstructModuleName(
   struct constructHeader *theConstruct)
-  { return(EnvGetDefmoduleName(NULL,(void *) theConstruct->whichModule->theModule)); }
+  { return(EnvGetDefmoduleName(NULL,(void *,EXEC_STATUS) theConstruct->whichModule->theModule)); }
 
 /*********************************************************/
 /* GetConstructNameString: Generic routine for returning */

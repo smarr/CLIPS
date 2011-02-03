@@ -24,6 +24,10 @@
 
 #define _H_exprnpsr
 
+# ifndef _H_execstatus
+# include "execstatus.h"
+# endif
+
 #if (! RUN_TIME)
 
 typedef struct saved_contexts
