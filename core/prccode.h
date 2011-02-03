@@ -49,7 +49,7 @@ typedef struct ProcParamStack
 
    int ParamArraySize;
    DATA_OBJECT *WildcardValue;
-   void (*UnboundErrFunc)(void *);
+   void (*UnboundErrFunc)(void *,EXEC_STATUS);
    struct ProcParamStack *nxt;
   } PROC_PARAM_STACK;
 

@@ -232,7 +232,7 @@ struct defmoduleData
    LOCALE struct moduleItem             *FindModuleItem(void *,EXEC_STATUS,char *);
    LOCALE void                           SaveCurrentModule(void *,EXEC_STATUS);
    LOCALE void                           RestoreCurrentModule(void *,EXEC_STATUS);
-   LOCALE void                           AddAfterModuleChangeFunction(void *,EXEC_STATUS,char *,void (*)(void *),int);
+   LOCALE void                           AddAfterModuleChangeFunction(void *,EXEC_STATUS,char *,void (*)(void *,EXEC_STATUS),int);
    LOCALE void                           IllegalModuleSpecifierMessage(void *,EXEC_STATUS);
    LOCALE void                           AllocateDefmoduleGlobals(void *,EXEC_STATUS);
 

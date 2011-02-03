@@ -797,7 +797,7 @@ globle char *EnvGetInstanceName(
 globle char *GetInstanceName(
   void *iptr)
   {
-   return EnvGetInstanceName(GetCurrentEnvironment(),GetCurrentExecutionState(),iptr);
+   return EnvGetInstanceName(GetCurrentEnvironment(),GetCurrentExecutionStatus(),iptr);
   }
 #endif
   

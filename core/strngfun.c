@@ -745,7 +745,7 @@ globle int Eval(
   char *theString,
   DATA_OBJECT_PTR returnValue)
   {
-   return EnvEval(GetCurrentEnvironment(),getCurrentExecutionState(),theString,returnValue);
+   return EnvEval(GetCurrentEnvironment(),GetCurrentExecutionStatus(),theString,returnValue);
   }
 #endif
   
@@ -963,7 +963,7 @@ globle int BuildFunction(
 globle int Build(
   char *theString)
   {
-   return EnvBuild(GetCurrentEnvironment(),getCurrentExecutionState(),theString);
+   return EnvBuild(GetCurrentEnvironment(),GetCurrentExecutionStatus(),theString);
   }
 #endif
   

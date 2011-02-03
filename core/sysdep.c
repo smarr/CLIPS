@@ -961,7 +961,7 @@ static void InitializeNonportableFeatures(
   void *theEnv)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv,execStatus)
+#pragma unused(theEnv)
 #endif
 #if ! WINDOW_INTERFACE
 

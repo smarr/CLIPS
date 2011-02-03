@@ -484,7 +484,7 @@ globle void *GetCurrentEnvironment()
    return(CurrentEnvironment);
   }  
 
-globle struct executionStatus *GetCurrentExectionStatus() 
+globle struct executionStatus *GetCurrentExecutionStatus() 
   {
    return(CurrentExecutionStatus);
   }

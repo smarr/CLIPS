@@ -600,7 +600,7 @@ globle void ListItemsDriver(
   char *singleName,
   char *pluralName,
   void *(*nextFunction)(void *,EXEC_STATUS,void *),
-  char *(*nameFunction)(void *),
+  char *(*nameFunction)(void *,EXEC_STATUS),
   void (*printFunction)(void *,EXEC_STATUS,char *,void *),
   int (*doItFunction)(void *,EXEC_STATUS,void *))
   {
@@ -646,7 +646,7 @@ globle void ListItemsDriver(
          if (! doIt) {}
          else if (nameFunction != NULL)
            {
-            constructName = (*nameFunction)(constructPtr);
+            constructName = (*nameFunction)(constructPtr,execStatus);
             if (constructName != NULL)
               {
                if (allModules) EnvPrintRouter(theEnv,execStatus,logicalName,"   ");

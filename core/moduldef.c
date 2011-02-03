@@ -785,7 +785,7 @@ globle void AddAfterModuleChangeFunction(
   void *theEnv,
   EXEC_STATUS,
   char *name,
-  void (*func)(void *),
+  void (*func)(void *,EXEC_STATUS),
   int priority)
   {
    DefmoduleData(theEnv,execStatus)->AfterModuleChangeFunctions =
