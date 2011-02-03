@@ -660,9 +660,10 @@ static void * APR_THREAD_FUNC ParallelFactMatchAndLogicRetract(apr_thread_t *thr
 {
   struct paramsForFactMatchAndRetract * const params = (struct paramsForFactMatchAndRetract*)parameters;
   
+  struct executionStatus localExecStatus = { NULL, 0, 0, 0 };
   
   FactPatternMatch(params->theEnv,
-                   params->execStatus,
+                   (params->execStatus) ? params->execStatus : & localExecStatus,
                    params->theFact,
                    params->patternPtr,
                    params->offset,
@@ -851,6 +852,7 @@ globle void *EnvAssert(
       }
       else {
         parameters->theEnv     = theEnv;
+        parameters->execStatus = NULL;
         parameters->theFact    = theFact;
         parameters->patternPtr = theFact->whichDeftemplate->patternNetwork;
         parameters->offset     = 0;
@@ -867,12 +869,12 @@ globle void *EnvAssert(
         }
       }
           
-      while ((apr_thread_pool_tasks_count(Env(theEnv,execStatus)->matcherThreadPool) > 0)
+/*      while ((apr_thread_pool_tasks_count(Env(theEnv,execStatus)->matcherThreadPool) > 0)
              || ((apr_thread_pool_busy_count(Env(theEnv,execStatus)->matcherThreadPool)) > 0)) {
         usleep(100);
       }
        
-      assert(apr_thread_pool_idle_count(Env(theEnv,execStatus)->matcherThreadPool) == 1);
+      assert(apr_thread_pool_idle_count(Env(theEnv,execStatus)->matcherThreadPool) == 1);*/
     }
     else {
       EngineData(theEnv,execStatus)->JoinOperationInProgress = TRUE;
