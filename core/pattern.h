@@ -106,7 +106,7 @@ struct patternParser
    void (*returnUserDataFunction)(void *,EXEC_STATUS,void *);
    void *(*copyUserDataFunction)(void *,EXEC_STATUS,void *);
    void (*markIRPatternFunction)(void *,EXEC_STATUS,struct patternNodeHeader *,int);
-   void (*incrementalResetFunction)(void *);
+   void (*incrementalResetFunction)(void *,EXEC_STATUS);
    struct lhsParseNode *(*initialPatternFunction)(void *);
    void (*codeReferenceFunction)(void *,EXEC_STATUS,void *,FILE *,int,int);
    int priority;

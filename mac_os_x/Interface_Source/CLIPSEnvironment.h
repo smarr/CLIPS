@@ -115,6 +115,8 @@
 - (void)                         setEnvironment: (void *) theEnvironment;
 - (void *)                       environment;
 
+- (struct executionStatus*)      executionStatus;
+
 - (void)                         setName: (NSString *) theName;
 - (NSString *)                   name;
 

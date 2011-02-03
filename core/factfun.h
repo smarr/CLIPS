@@ -49,7 +49,7 @@
 
    LOCALE void                           FactFunctionDefinitions(void *,EXEC_STATUS);
    LOCALE void                          *FactRelationFunction(void *,EXEC_STATUS);
-   LOCALE void                          *FactRelation(void *,EXEC_STATUS);
+   LOCALE void                          *FactRelation(void *);
    LOCALE void                          *EnvFactDeftemplate(void *,EXEC_STATUS,void *);
    LOCALE int                            FactExistpFunction(void *,EXEC_STATUS);
    LOCALE int                            EnvFactExistp(void *,EXEC_STATUS,void *);

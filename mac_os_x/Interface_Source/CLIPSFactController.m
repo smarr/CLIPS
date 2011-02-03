@@ -294,6 +294,7 @@
    if (theRow != -1)
      {
       void *theEnvironment = [environment environment];
+      EXEC_STATUS = [environment executionStatus];
       struct fact *clipsFact;
       long long theFactIndex;
       NSArray *theArray = [factListController arrangedObjects];

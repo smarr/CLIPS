@@ -351,7 +351,7 @@ globle int ParseDefmodule(
    for (defineFunctions = DefmoduleData(theEnv,execStatus)->AfterModuleDefinedFunctions;
         defineFunctions != NULL;
         defineFunctions = defineFunctions->next)
-     { (* (void (*)(void *)) defineFunctions->func)(theEnv,execStatus); }
+     { (* (void (*)(void *,EXEC_STATUS)) defineFunctions->func)(theEnv,execStatus); }
 
    /*===============================================*/
    /* Defmodule successfully parsed with no errors. */

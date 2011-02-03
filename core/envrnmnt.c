@@ -52,8 +52,6 @@
 
 #include "envrnmnt.h"
 
-# include "execution_status.h"
-
 #define SIZE_ENVIRONMENT_HASH  131
 
 /***************************************/
@@ -61,7 +59,7 @@
 /***************************************/
 
 #if ALLOW_ENVIRONMENT_GLOBALS
-   static void                    AddHashedEnvironment(struct environmentData *, EXEC_STATUS);
+   static void                    AddHashedEnvironment(struct environmentData *);
    static struct environmentData *FindEnvironment(unsigned long);
    static intBool                 RemoveHashedEnvironment(struct environmentData *, EXEC_STATUS);
    static void                    InitializeEnvironmentHashTable(void);
@@ -76,9 +74,10 @@
 /***************************************/
 
 #if ALLOW_ENVIRONMENT_GLOBALS
-   static unsigned long              NextEnvironmentIndex = 0;
-   static struct environmentData   **EnvironmentHashTable = NULL;
-   static struct environmentData    *CurrentEnvironment = NULL;
+   static unsigned long              NextEnvironmentIndex   = 0;
+   static struct environmentData   **EnvironmentHashTable   = NULL;
+   static struct environmentData    *CurrentEnvironment     = NULL;
+   static struct executionStatus    *CurrentExecutionStatus = NULL;
 #endif
 
 /*******************************************************/
@@ -214,8 +213,7 @@ static void InitializeEnvironmentHashTable()
 /*    entry to the environment hash table.   */
 /*********************************************/
 static void AddHashedEnvironment(
-  struct environmentData *theEnvironment,
-  EXEC_STATUS)
+  struct environmentData *theEnvironment)
   {
 
    struct environmentData *temp;
@@ -418,9 +416,12 @@ globle void *CreateEnvironmentDriver(
    theEnvironment->cleanupFunctions = (void (**)(void *,EXEC_STATUS))theData;
 
 #if ALLOW_ENVIRONMENT_GLOBALS
-   AddHashedEnvironment(theEnvironment,execStatus); // Lode: TODO REF!
+   AddHashedEnvironment(theEnvironment);
    CurrentEnvironment = theEnvironment;
 #endif
+    
+   // STEFAN: TODO init execStatus
+   EXEC_STATUS;
 
    EnvInitializeEnvironment(theEnvironment,execStatus,symbolTable,floatTable,integerTable,bitmapTable,externalAddressTable);
 
@@ -433,8 +434,7 @@ globle void *CreateEnvironmentDriver(
 /*   environment to the one specified.     */
 /*******************************************/
 globle void SetCurrentEnvironment(
-  void *theEnvironment,
-  EXEC_STATUS)
+  void *theEnvironment)
   {
    CurrentEnvironment = (struct environmentData *) theEnvironment;
   }
@@ -484,7 +484,7 @@ globle void *GetCurrentEnvironment()
    return(CurrentEnvironment);
   }  
 
-global struct executionStatus *GetCurrentExectionStatus() 
+globle struct executionStatus *GetCurrentExectionStatus() 
   {
    return(CurrentExecutionStatus);
   }
@@ -507,8 +507,7 @@ globle unsigned long GetEnvironmentIndex(
 /*   of the specified environment.            */
 /**********************************************/
 globle void *GetEnvironmentContext(
-  void *theEnvironment
-  EXEC_STATUS)
+  void *theEnvironment)
   {
    return(((struct environmentData *) theEnvironment)->context);
   } 
@@ -595,8 +594,7 @@ globle void *SetEnvironmentFunctionContext(
 /*   context of the specified environment.             */
 /*******************************************************/
 globle void *GetEnvironmentCallbackContext(
-  void *theEnvironment
-  EXEC_STATUS)
+  void *theEnvironment)
   {
    return(((struct environmentData *) theEnvironment)->callbackContext);
   } 
@@ -648,7 +646,7 @@ globle intBool DestroyEnvironment(
    for (i = 0; i < MAXIMUM_ENVIRONMENT_POSITIONS; i++)
      {
       if (theEnvironment->cleanupFunctions[i] != NULL)
-        { (*theEnvironment->cleanupFunctions[i])(theEnvironment); }
+        { (*theEnvironment->cleanupFunctions[i])(theEnvironment,execStatus); }
      }
      
    free(theEnvironment->cleanupFunctions);
@@ -656,14 +654,14 @@ globle intBool DestroyEnvironment(
    for (cleanupPtr = theEnvironment->listOfCleanupEnvironmentFunctions;
         cleanupPtr != NULL;
         cleanupPtr = cleanupPtr->next)
-     { (*cleanupPtr->func)(theEnvironment); }
+     { (*cleanupPtr->func)(theEnvironment,execStatus); }
 
-   RemoveEnvironmentCleanupFunctions(theEnvironment);
+   RemoveEnvironmentCleanupFunctions(theEnvironment,execStatus);
    
    EnvReleaseMem(theEnvironment,execStatus,-1,FALSE);
 
 #if ALLOW_ENVIRONMENT_GLOBALS
-   RemoveHashedEnvironment(theEnvironment);
+   RemoveHashedEnvironment(theEnvironment,execStatus);
 #endif
      
    if ((theMemData->MemoryAmount != 0) || (theMemData->MemoryCalls != 0))

@@ -270,6 +270,7 @@ globle void AssertCommand(
 struct paramsForProcessEvent
 {
   void *theEnv;
+  struct executionStatus* execStatus;
 };
 
 
@@ -278,7 +279,7 @@ static void * APR_THREAD_FUNC ProcessEventOnFactThread(apr_thread_t *thread, voi
   struct paramsForProcessEvent* const params = (struct paramsForProcessEvent*)parameters;
   
   DATA_OBJECT result;
-  AssertOrProcessEvent(params->theEnv,execStatus, &result, FALSE);
+  AssertOrProcessEvent(params->theEnv,params->execStatus, &result, FALSE);
   
   free(params);
   
@@ -287,7 +288,7 @@ static void * APR_THREAD_FUNC ProcessEventOnFactThread(apr_thread_t *thread, voi
 
 
 globle void ProcessEventCommand(
-   void *theEnv)
+   void *theEnv,EXEC_STATUS)
    {
      // STEFAN: hand over to the FactThread
        
@@ -322,7 +323,7 @@ globle void ProcessEventCommand(
 /*   for the retract command.           */
 /****************************************/
 globle void RetractCommand(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    long long factIndex;
    struct fact *ptr;
@@ -422,7 +423,7 @@ globle void RetractCommand(
 /*   for the set-fact-duplication command.         */
 /***************************************************/
 globle int SetFactDuplicationCommand(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    int oldValue;
    DATA_OBJECT theValue;
@@ -468,7 +469,7 @@ globle int SetFactDuplicationCommand(
 /*   for the get-fact-duplication command.         */
 /***************************************************/
 globle int GetFactDuplicationCommand(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    int currentValue;
 
@@ -497,7 +498,7 @@ globle int GetFactDuplicationCommand(
 /*   for the fact-index function.          */
 /*******************************************/
 globle long long FactIndexFunction(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    DATA_OBJECT item;
 
@@ -531,7 +532,7 @@ globle long long FactIndexFunction(
 
    if (((struct fact *) GetValue(item))->garbage) return(-1LL);
 
-   return (EnvFactIndex(theEnv,execStatus,GetValue(item)));
+   return (EnvFactIndex(theEnv,GetValue(item)));
   }
 
 #if DEBUGGING_FUNCTIONS
@@ -541,7 +542,7 @@ globle long long FactIndexFunction(
 /*   for the facts command.           */
 /**************************************/
 globle void FactsCommand(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    int argumentCount;
    long long start = UNSPECIFIED, end = UNSPECIFIED, max = UNSPECIFIED;
@@ -648,7 +649,7 @@ globle void FactsCommand(
 /* EnvFacts: C access routine for the facts command. */
 /*****************************************************/
 globle void EnvFacts(
-  void *theEnv,
+  void *theEnv,EXEC_STATUS,
   char *logicalName,
   void *vTheModule,
   long long start,
@@ -906,7 +907,7 @@ globle int SaveFactsCommand(
 /*   for the load-facts command.          */
 /******************************************/
 globle int LoadFactsCommand(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    char *fileName;
 
@@ -935,7 +936,7 @@ globle int LoadFactsCommand(
 /* EnvSaveFacts: C access routine for the save-facts command. */
 /**************************************************************/
 globle intBool EnvSaveFacts(
-  void *theEnv,
+  void *theEnv,EXEC_STATUS,
   char *fileName,
   int saveCode,
   struct expr *theList)
@@ -1081,7 +1082,7 @@ globle intBool EnvSaveFacts(
 /*   names for saving specific facts with the save-facts command.  */
 /*******************************************************************/
 static DATA_OBJECT_PTR GetSaveFactsDeftemplateNames(
-  void *theEnv,
+  void *theEnv,EXEC_STATUS,
   struct expr *theList,
   int saveCode,
   int *count,
@@ -1211,7 +1212,7 @@ static DATA_OBJECT_PTR GetSaveFactsDeftemplateNames(
 /* EnvLoadFacts: C access routine for the load-facts command. */
 /**************************************************************/
 globle intBool EnvLoadFacts(
-  void *theEnv,
+  void *theEnv,EXEC_STATUS,
   char *fileName)
   {
    FILE *filePtr;
@@ -1264,7 +1265,7 @@ globle intBool EnvLoadFacts(
 /* EnvLoadFactsFromString: C access routine. */
 /*********************************************/
 globle intBool EnvLoadFactsFromString(
-  void *theEnv,
+  void *theEnv,EXEC_STATUS,
   char *theString,
   int theMax)
   {
@@ -1313,7 +1314,7 @@ globle intBool EnvLoadFactsFromString(
 /* StandardLoadFact: Loads a single fact from the specified logical name. */
 /**************************************************************************/
 static struct expr *StandardLoadFact(
-  void *theEnv,
+  void *theEnv,EXEC_STATUS,
   char *logicalName,
   struct token *theToken)
   {
@@ -1350,7 +1351,7 @@ static struct expr *StandardLoadFact(
 /* AssertParse: Driver routine for parsing the assert function. */
 /****************************************************************/
 static struct expr *AssertParse(
-  void *theEnv,
+  void *theEnv,EXEC_STATUS,
   struct expr *top,
   char *logicalName)
   {

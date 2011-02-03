@@ -117,13 +117,11 @@ globle int DefineFunction(
   int (*pointer)(void),
   char *actualName)
   {
-   void *theEnv;
-   
-   // Lode: TODO: add exec_status??
-   theEnv = GetCurrentEnvironment();
+   void *theEnv = GetCurrentEnvironment();
+   EXEC_STATUS  = GetCurrentExecutionStatus();
 
    return(DefineFunction3(theEnv,execStatus,name,returnType,
-                          (int (*)(void *)) pointer,
+                          (int (*)(void *, EXEC_STATUS)) pointer,
                           actualName,NULL,FALSE,NULL));
   }
 #endif
@@ -137,7 +135,7 @@ globle int EnvDefineFunction(
   EXEC_STATUS,
   char *name,
   int returnType,
-  int (*pointer)(void *),
+  int (*pointer)(void *, EXEC_STATUS),
   char *actualName)
   {
    return(DefineFunction3(theEnv,execStatus,name,returnType,pointer,actualName,NULL,TRUE,NULL));
@@ -152,7 +150,7 @@ globle int EnvDefineFunctionWithContext(
   EXEC_STATUS,
   char *name,
   int returnType,
-  int (*pointer)(void *),
+  int (*pointer)(void *, EXEC_STATUS),
   char *actualName,
   void *context)
   {
@@ -171,13 +169,11 @@ globle int DefineFunction2(
   char *actualName,
   char *restrictions)
   {
-   void *theEnv;
-   
-	 // Lode: TODO add EXEC_STATUS??
-   theEnv = GetCurrentEnvironment();
+    void *theEnv = GetCurrentEnvironment();
+    EXEC_STATUS  = GetCurrentExecutionStatus();
 
    return(DefineFunction3(theEnv,execStatus,name,returnType,
-                          (int (*)(void *)) pointer,
+                          (int (*)(void *, EXEC_STATUS)) pointer,
                           actualName,restrictions,FALSE,NULL));
   }
 #endif
@@ -191,7 +187,7 @@ globle int EnvDefineFunction2(
   EXEC_STATUS,
   char *name,
   int returnType,
-  int (*pointer)(void *),
+  int (*pointer)(void *, EXEC_STATUS),
   char *actualName,
   char *restrictions)
   {
@@ -207,7 +203,7 @@ globle int EnvDefineFunction2WithContext(
   EXEC_STATUS,
   char *name,
   int returnType,
-  int (*pointer)(void *),
+  int (*pointer)(void *, EXEC_STATUS),
   char *actualName,
   char *restrictions,
   void *context)
@@ -245,7 +241,7 @@ globle int DefineFunction3(
   EXEC_STATUS,
   char *name,
   int returnType,
-  int (*pointer)(void *),
+  int (*pointer)(void *, EXEC_STATUS),
   char *actualName,
   char *restrictions,
   intBool environmentAware,

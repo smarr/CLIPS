@@ -265,12 +265,12 @@ globle intBool AddCleanupFunction(
   void *theEnv,
   EXEC_STATUS,
   char *name,
-  void (*theFunction)(void *),
+  void (*theFunction)(void *,EXEC_STATUS),
   int priority)
   {
    UtilityData(theEnv,execStatus)->ListOfCleanupFunctions =
      AddFunctionToCallList(theEnv,execStatus,name,priority,
-                           (void (*)(void *)) theFunction,
+                           (void (*)(void *,EXEC_STATUS)) theFunction,
                            UtilityData(theEnv,execStatus)->ListOfCleanupFunctions,TRUE);
    return(1);
   }
@@ -285,13 +285,12 @@ globle intBool AddPeriodicFunction(
   void (*theFunction)(void),
   int priority)
   {
-   void *theEnv,
-   
-   theEnv = GetCurrentEnvironment();
+   void *theEnv = GetCurrentEnvironment();
+   EXEC_STATUS  = GetCurrentExectionStatus();
    
    UtilityData(theEnv,execStatus)->ListOfPeriodicFunctions =
      AddFunctionToCallList(theEnv,execStatus,name,priority,
-                           (void (*)(void *)) theFunction,
+                           (void (*)(void *,EXEC_STATUS)) theFunction,
                            UtilityData(theEnv,execStatus)->ListOfPeriodicFunctions,FALSE);
 
    return(1);
@@ -306,12 +305,12 @@ globle intBool EnvAddPeriodicFunction(
   void *theEnv,
   EXEC_STATUS,
   char *name,
-  void (*theFunction)(void *),
+  void (*theFunction)(void *,EXEC_STATUS),
   int priority)
   {
    UtilityData(theEnv,execStatus)->ListOfPeriodicFunctions =
      AddFunctionToCallList(theEnv,execStatus,name,priority,
-                           (void (*)(void *)) theFunction,
+                           (void (*)(void *,EXEC_STATUS)) theFunction,
                            UtilityData(theEnv,execStatus)->ListOfPeriodicFunctions,TRUE);
    return(1);
   }
@@ -647,7 +646,7 @@ globle struct callFunctionItem *AddFunctionToCallList(
   EXEC_STATUS,
   char *name,
   int priority,
-  void (*func)(void *),
+  void (*func)(void *,EXEC_STATUS),
   struct callFunctionItem *head,
   intBool environmentAware)
   {
@@ -664,7 +663,7 @@ globle struct callFunctionItem *AddFunctionToCallListWithContext(
   EXEC_STATUS,
   char *name,
   int priority,
-  void (*func)(void *),
+  void (*func)(void *,EXEC_STATUS),
   struct callFunctionItem *head,
   intBool environmentAware,
   void *context)

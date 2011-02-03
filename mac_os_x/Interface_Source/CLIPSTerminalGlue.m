@@ -20,7 +20,7 @@ void ClearEnvironmentWindowCommand(
   void *theEnv, EXEC_STATUS)
   {
    if (EnvArgCountCheck(theEnv,execStatus,"clear-window",EXACTLY,0) == -1) return;
-   id theObject = GetEnvironmentContext(theEnv,execStatus);
+   id theObject = GetEnvironmentContext(theEnv);
    
    [theObject clearScrollbackFunction];
   }
@@ -56,6 +56,7 @@ intBool QueryInterfaceRouter(
 /*****************************************/
 int PrintInterfaceRouter(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName,
   char *str)
   {
@@ -81,6 +82,7 @@ int PrintInterfaceRouter(
 /*******************************************/
 int GetcInterfaceRouter(
   void *theEnv,
+  EXEC_STATUS,
   char *logicalName)
   {
    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -100,7 +102,7 @@ int GetcInterfaceRouter(
 /*   the application doesn't exit.               */
 /*************************************************/
 int ExitInterfaceRouter(
-  void *theEnv,
+  void *theEnv, EXEC_STATUS,
   int num)
   {   
    CLIPSTerminalController *theController = GetEnvironmentRouterContext(theEnv,execStatus);
@@ -115,7 +117,7 @@ int ExitInterfaceRouter(
 void MacPeriodicFunction(
   void *theEnv)
   {
-   CLIPSTerminalController *theController = GetEnvironmentContext(theEnv,execStatus);
+   CLIPSTerminalController *theController = GetEnvironmentContext(theEnv);
    NSConditionLock *theAgendaLock, *theFactsLock;
    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
    
@@ -185,7 +187,7 @@ void MacYieldTimeFunction()
 /* MacBeforeOpenFunction:             */
 /**************************************/
 int MacBeforeOpenFunction(
-  void *theEnv)
+  void *theEnv, EXEC_STATUS)
   {
    CLIPSTerminalController *theController = GetEnvironmentRouterContext(theEnv,execStatus);
      
@@ -202,7 +204,7 @@ int MacBeforeOpenFunction(
 /* MacAfterOpenFunction:             */
 /**************************************/
 int MacAfterOpenFunction(
-  void *theEnv)
+  void *theEnv, EXEC_STATUS)
   {
    CLIPSTerminalController *theController = GetEnvironmentRouterContext(theEnv,execStatus);
    

@@ -114,7 +114,7 @@ struct FunctionHash
    LOCALE int                            DefineFunction3(void *,EXEC_STATUS,char *,int,
                                                          int (*)(void *,EXEC_STATUS),char *,char *,intBool,void *);
    LOCALE int                            AddFunctionParser(void *,EXEC_STATUS,char *,
-                                                           struct expr *(*)( void *,struct expr *,char *));
+                                                           struct expr *(*)(void *,EXEC_STATUS,struct expr *,char *));
    LOCALE int                            RemoveFunctionParser(void *,EXEC_STATUS,char *);
    LOCALE int                            FuncSeqOvlFlags(void *,EXEC_STATUS,char *,int,int);
    LOCALE struct FunctionDefinition     *GetFunctionList(void *,EXEC_STATUS);

@@ -59,12 +59,12 @@
    LOCALE void                        EnvInitializeEnvironment(void *,EXEC_STATUS,struct symbolHashNode **,struct floatHashNode **,
 															   struct integerHashNode **,struct bitMapHashNode **,
 															   struct externalAddressHashNode **);
-   LOCALE void                        SetRedrawFunction(void *,EXEC_STATUS,void (*)(void *));
-   LOCALE void                        SetPauseEnvFunction(void *,EXEC_STATUS,void (*)(void *));
+   LOCALE void                        SetRedrawFunction(void *,EXEC_STATUS,void (*)(void *,EXEC_STATUS));
+   LOCALE void                        SetPauseEnvFunction(void *,EXEC_STATUS,void (*)(void *,EXEC_STATUS));
    LOCALE void                        SetContinueEnvFunction(void *,EXEC_STATUS,void (*)(void *,EXEC_STATUS,int));
-   LOCALE void                        (*GetRedrawFunction(void *))(void *);
-   LOCALE void                        (*GetPauseEnvFunction(void *))(void *);
-   LOCALE void                        (*GetContinueEnvFunction(void *))(void *,EXEC_STATUS,int);
+   LOCALE void                        (*GetRedrawFunction(void *,EXEC_STATUS))(void *,EXEC_STATUS);
+   LOCALE void                        (*GetPauseEnvFunction(void *,EXEC_STATUS))(void *,EXEC_STATUS);
+   LOCALE void                        (*GetContinueEnvFunction(void *,EXEC_STATUS))(void *,EXEC_STATUS,int);
    LOCALE void                        RerouteStdin(void *,EXEC_STATUS,int,char *[]);
    LOCALE double                      gentime(void);
    LOCALE void                        gensystem(void *,EXEC_STATUS);
@@ -84,8 +84,8 @@
    LOCALE int                         genrename(char *,char *);
    LOCALE char                       *gengetcwd(char *,int);
    LOCALE void                        GenWrite(void *,size_t,FILE *);
-   LOCALE int                       (*EnvSetBeforeOpenFunction(void *,EXEC_STATUS,int (*)(void *)))(void *);
-   LOCALE int                       (*EnvSetAfterOpenFunction(void *,EXEC_STATUS,int (*)(void *)))(void *);
+   LOCALE int                       (*EnvSetBeforeOpenFunction(void *,EXEC_STATUS,int (*)(void *,EXEC_STATUS)))(void *,EXEC_STATUS);
+   LOCALE int                       (*EnvSetAfterOpenFunction(void *,EXEC_STATUS,int (*)(void *,EXEC_STATUS)))(void *,EXEC_STATUS);
    LOCALE int                         gensprintf(char *,const char *,...);
    LOCALE char                       *genstrcpy(char *,const char *);
    LOCALE char                       *genstrncpy(char *,const char *,size_t);

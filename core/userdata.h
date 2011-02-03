@@ -42,7 +42,7 @@ typedef struct userData * USER_DATA_PTR;
 struct userDataRecord
   {
    unsigned char dataID;
-   void *(*createUserData)(void *);
+   void *(*createUserData)(void *,EXEC_STATUS);
    void (*deleteUserData)(void *,EXEC_STATUS,void *);
   };
   

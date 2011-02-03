@@ -79,7 +79,7 @@ struct instanceData
 #define ValidInstanceAddress(a) EnvValidInstanceAddress(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
 
 #if ALLOW_ENVIRONMENT_GLOBALS
-   LOCALE char                          *GetInstanceName(void *,EXEC_STATUS);
+   LOCALE char                          *GetInstanceName(void *);
 #endif
 
 LOCALE void SetupInstances(void *,EXEC_STATUS);

@@ -311,7 +311,7 @@ globle void *EnvSetCurrentModule(
       changeFunctions = DefmoduleData(theEnv,execStatus)->AfterModuleChangeFunctions;
       while (changeFunctions != NULL)
         {
-         (* (void (*)(void *)) changeFunctions->func)(theEnv,execStatus);
+         (* (void (*)(void *,EXEC_STATUS)) changeFunctions->func)(theEnv,execStatus);
          changeFunctions = changeFunctions->next;
         }
      }

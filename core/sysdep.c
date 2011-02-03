@@ -241,7 +241,7 @@ struct systemDependentData
    static void                    InitializeSystemDependentData(void *,EXEC_STATUS);
    static void                    SystemFunctionDefinitions(void *,EXEC_STATUS);
    static void                    InitializeKeywords(void *,EXEC_STATUS);
-   static void                    InitializeNonportableFeatures(void *,EXEC_STATUS);
+   static void                    InitializeNonportableFeatures(void *);
 #if   (VAX_VMS || UNIX_V || LINUX || DARWIN || UNIX_7 || WIN_GCC || WIN_BTC || WIN_MVC) && (! WINDOW_INTERFACE)
    static void                    CatchCtrlC(int);
 #endif
@@ -315,7 +315,7 @@ globle void EnvInitializeEnvironment(
    InitializeExternalFunctionData(theEnvironment, execStatus);
    InitializeMultifieldData(theEnvironment, execStatus);
    InitializePrettyPrintData(theEnvironment, execStatus);
-   InitializePrintUtilityData(theEnvironment), execStatus;
+   InitializePrintUtilityData(theEnvironment, execStatus);
    InitializeScannerData(theEnvironment, execStatus);
    InitializeSystemDependentData(theEnvironment, execStatus);
    InitializeUserDataData(theEnvironment, execStatus);
@@ -340,7 +340,7 @@ globle void EnvInitializeEnvironment(
    /* Initialize some system dependent features such as time. */
    /*=========================================================*/
 
-   InitializeNonportableFeatures(theEnvironment, execStatus);
+   InitializeNonportableFeatures(theEnvironment);
 
    /*=============================================*/
    /* Register system and user defined functions. */
@@ -482,7 +482,7 @@ globle void EnvInitializeEnvironment(
 globle void SetRedrawFunction(
   void *theEnv,
   EXEC_STATUS,
-  void (*theFunction)(void *))
+  void (*theFunction)(void *,EXEC_STATUS))
   {
    SystemDependentData(theEnv,execStatus)->RedrawScreenFunction = theFunction;
   }
@@ -494,7 +494,7 @@ globle void SetRedrawFunction(
 globle void SetPauseEnvFunction(
   void *theEnv,
   EXEC_STATUS,
-  void (*theFunction)(void *))
+  void (*theFunction)(void *,EXEC_STATUS))
   {
    SystemDependentData(theEnv,execStatus)->PauseEnvFunction = theFunction;
   }
@@ -515,7 +515,7 @@ globle void SetContinueEnvFunction(
 /*******************************************************/
 /* GetRedrawFunction: Gets the redraw screen function. */
 /*******************************************************/
-globle void (*GetRedrawFunction(void *theEnv,EXEC_STATUS))(void *)
+globle void (*GetRedrawFunction(void *theEnv,EXEC_STATUS))(void *,EXEC_STATUS)
   {
    return SystemDependentData(theEnv,execStatus)->RedrawScreenFunction;
   }
@@ -523,7 +523,7 @@ globle void (*GetRedrawFunction(void *theEnv,EXEC_STATUS))(void *)
 /*****************************************************/
 /* GetPauseEnvFunction: Gets the normal state function. */
 /*****************************************************/
-globle void (*GetPauseEnvFunction(void *theEnv,EXEC_STATUS))(void *)
+globle void (*GetPauseEnvFunction(void *theEnv,EXEC_STATUS))(void *,EXEC_STATUS)
   {
    return SystemDependentData(theEnv,execStatus)->PauseEnvFunction;
   }
@@ -1206,10 +1206,10 @@ globle int genrename(
 /* EnvSetBeforeOpenFunction: Sets the */
 /*  value of BeforeOpenFunction.      */
 /**************************************/
-globle int (*EnvSetBeforeOpenFunction(void *theEnv,
-                                      int (*theFunction)(void *)))(void *)
+globle int (*EnvSetBeforeOpenFunction(void *theEnv,EXEC_STATUS,
+                                      int (*theFunction)(void *,EXEC_STATUS)))(void *,EXEC_STATUS)
   {
-   int (*tempFunction)(void *);
+   int (*tempFunction)(void *,EXEC_STATUS);
 
    tempFunction = SystemDependentData(theEnv,execStatus)->BeforeOpenFunction;
    SystemDependentData(theEnv,execStatus)->BeforeOpenFunction = theFunction;
@@ -1220,10 +1220,10 @@ globle int (*EnvSetBeforeOpenFunction(void *theEnv,
 /* EnvSetAfterOpenFunction: Sets the */
 /*  value of AfterOpenFunction.      */
 /*************************************/
-globle int (*EnvSetAfterOpenFunction(void *theEnv,
-                                     int (*theFunction)(void *)))(void *)
+globle int (*EnvSetAfterOpenFunction(void *theEnv,EXEC_STATUS,
+                                     int (*theFunction)(void *,EXEC_STATUS)))(void *,EXEC_STATUS)
   {
-   int (*tempFunction)(void *);
+   int (*tempFunction)(void *,EXEC_STATUS);
 
    tempFunction = SystemDependentData(theEnv,execStatus)->AfterOpenFunction;
    SystemDependentData(theEnv,execStatus)->AfterOpenFunction = theFunction;

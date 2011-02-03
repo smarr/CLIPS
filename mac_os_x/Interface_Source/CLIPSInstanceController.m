@@ -295,6 +295,7 @@
    if (theRow != -1)
      {
       void *theEnvironment = [environment environment];
+      EXEC_STATUS = [environment executionStatus];
       struct instance *clipsInstance = NULL;
       char *theInstanceName;
       NSArray *theArray = [instanceListController arrangedObjects];
@@ -319,7 +320,7 @@
       
       if ((clipsInstance != NULL) && 
           EnvGetDefclassPPForm(theEnvironment,execStatus,EnvGetInstanceClass(theEnvironment,execStatus,clipsInstance)) != NULL)
-        { thePPForm = [NSString stringWithUTF8String: EnvGetDefclassPPForm(theEnvironment,execStatus,EnvGetInstanceClass(theEnvironment,clipsInstance))]; }
+        { thePPForm = [NSString stringWithUTF8String: EnvGetDefclassPPForm(theEnvironment,execStatus,EnvGetInstanceClass(theEnvironment,execStatus,clipsInstance))]; }
      }
      
    [environmentController setValue: thePPForm forKey: @"constructInspectorText"];

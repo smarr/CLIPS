@@ -411,7 +411,7 @@ globle void PrintFact(
 /*   the appropriate fact pattern network.   */
 /*********************************************/
 globle void MatchFactFunction(
-  void *theEnv,
+  void *theEnv,EXEC_STATUS,
   void *vTheFact)
   {
    struct fact *theFact = (struct fact *) vTheFact;
@@ -643,6 +643,7 @@ static void RemoveGarbageFacts(
 struct paramsForFactMatchAndRetract
 {
   void *theEnv;
+  struct executionStatus* execStatus;
   struct fact *theFact;
   struct factPatternNode *patternPtr;
   int offset;
@@ -661,6 +662,7 @@ static void * APR_THREAD_FUNC ParallelFactMatchAndLogicRetract(apr_thread_t *thr
   
   
   FactPatternMatch(params->theEnv,
+                   params->execStatus,
                    params->theFact,
                    params->patternPtr,
                    params->offset,
@@ -676,7 +678,7 @@ static void * APR_THREAD_FUNC ParallelFactMatchAndLogicRetract(apr_thread_t *thr
   /* on the non-existence of the fact just asserted.   */
   /*===================================================*/
   
-  ForceLogicalRetractions(params->theEnv);
+  ForceLogicalRetractions(params->theEnv, params->execStatus);
   
   free(params);
   
@@ -1055,7 +1057,7 @@ globle intBool GetFactSlot(
   char *slotName,
   DATA_OBJECT *theValue)
   {
-   return(EnvGetFactSlot(GetCurrentEnvironment(),getCurrentExecutionState(),vTheFact,slotName,theValue));
+   return(EnvGetFactSlot(GetCurrentEnvironment(),GetCurrentExecutionState(),vTheFact,slotName,theValue));
   }
 #endif
 
@@ -1600,7 +1602,7 @@ globle long long EnvFactIndex(
   void *factPtr)
   {
 #if MAC_MCW || WIN_MCW || MAC_XCD
-#pragma unused(theEnv,execStatus)
+#pragma unused(theEnv)
 #endif
 
    return(((struct fact *) factPtr)->factIndex);
@@ -1614,7 +1616,7 @@ globle long long EnvFactIndex(
 globle long long FactIndex(
   void *factPtr)
   {
-   return(EnvFactIndex(GetCurrentEnvironment(),getCurrentExecutionState(),factPtr));
+   return(EnvFactIndex(GetCurrentEnvironment(),factPtr));
   }
 #endif
 
@@ -1639,7 +1641,7 @@ globle void *EnvAssertString(
 /*   whether a change to the fact-list has been made. */
 /******************************************************/
 globle int EnvGetFactListChanged(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {
    return(FactData(theEnv,execStatus)->ChangeToFactList); 
   }
@@ -1649,7 +1651,7 @@ globle int EnvGetFactListChanged(
 /*   a change to the fact-list has been made.              */
 /***********************************************************/
 globle void EnvSetFactListChanged(
-  void *theEnv,
+  void *theEnv,EXEC_STATUS,
   int value)
   {
    FactData(theEnv,execStatus)->ChangeToFactList = value;
@@ -1660,7 +1662,7 @@ globle void EnvSetFactListChanged(
 /* of facts in the fact-list.           */
 /****************************************/
 globle unsigned long GetNumberOfFacts(
-  void *theEnv)
+  void *theEnv,EXEC_STATUS)
   {   
    return(FactData(theEnv,execStatus)->NumberOfFacts); 
   }

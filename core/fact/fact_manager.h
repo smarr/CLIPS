@@ -117,15 +117,15 @@ struct factsData
 #define SetFactListChanged(a) EnvSetFactListChanged(GetCurrentEnvironment(),GetCurrentExecutionState(),a)
 
 #if ALLOW_ENVIRONMENT_GLOBALS
-   LOCALE intBool                        GetFactSlot(void *,EXEC_STATUS,char *,DATA_OBJECT *);
-   LOCALE long long                      FactIndex(void *,EXEC_STATUS);
+   LOCALE intBool                        GetFactSlot(void *,char *,DATA_OBJECT *);
+   LOCALE long long                      FactIndex(void *);
 #endif
 
    LOCALE void                          *EnvAssert(void *,EXEC_STATUS,void *, int);
    LOCALE void                          *EnvAssertString(void *,EXEC_STATUS,char *);
    LOCALE struct fact                   *EnvCreateFact(void *,EXEC_STATUS,void *);
    LOCALE void                           EnvDecrementFactCount(void *,EXEC_STATUS,void *);
-   LOCALE long long                      EnvFactIndex(void *,EXEC_STATUS,void *);
+   LOCALE long long                      EnvFactIndex(void *,void *);
    LOCALE intBool                        EnvGetFactSlot(void *,EXEC_STATUS,void *,char *,DATA_OBJECT *);
    LOCALE void                           PrintFactWithIdentifier(void *,EXEC_STATUS,char *,struct fact *);
    LOCALE void                           PrintFact(void *,EXEC_STATUS,char *,struct fact *,int,int);

@@ -478,7 +478,7 @@ globle DEFMETHOD *AddMethod(
          if (rtmp->types != NULL)
            {
             rptr->types = (void **) gm2(theEnv,execStatus,(rptr->tcnt * sizeof(void *)));
-            GenCopyMemory(void *,EXEC_STATUS,rptr->tcnt,rptr->types,rtmp->types);
+            GenCopyMemory(void *,rptr->tcnt,rptr->types,rtmp->types);
            }
          else
            rptr->types = NULL;
