@@ -281,6 +281,7 @@ static void * APR_THREAD_FUNC ProcessEventOnFactThread(apr_thread_t *thread, voi
   DATA_OBJECT result;
   AssertOrProcessEvent(params->theEnv,params->execStatus, &result, FALSE);
   
+  free(params->execStatus);
   free(params);
   
   return NULL;
@@ -299,6 +300,11 @@ globle void ProcessEventCommand(
      }
      else {
        parameters->theEnv = theEnv;
+       
+       struct executionStatus* newExecStatus = CreateExecutionStatus();
+       *newExecStatus = *execStatus;  // copy the old one to the thread-local
+       
+       parameters->execStatus = newExecStatus;
        
        apr_status_t apr_rv;
        apr_rv = apr_thread_pool_push(Env(theEnv,execStatus)->factThreadPool,
