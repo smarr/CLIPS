@@ -185,7 +185,7 @@ static void *AllocateModule(
   void *theEnv,
   EXEC_STATUS)
   {
-   return((void *) get_struct(theEnv,execStatus,deffactsModule)); 
+   return((void *) get_struct(theEnv,deffactsModule)); 
   }
 
 /************************************************/

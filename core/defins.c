@@ -539,7 +539,7 @@ static int ParseDefinstances(
    if (dname == NULL)
      return(TRUE);
 
-   dobj = get_struct(theEnv,execStatus,definstances);
+   dobj = get_struct(theEnv,definstances);
    InitializeConstructHeader(theEnv,execStatus,"definstances",(struct constructHeader *) dobj,dname);
    dobj->busy = 0;
    dobj->mkinstance = NULL;
@@ -789,7 +789,7 @@ static void CreateInitialDefinstances(
    EXPRESSION *tmp;
    DEFINSTANCES *theDefinstances;
 
-   theDefinstances = get_struct(theEnv,execStatus,definstances);
+   theDefinstances = get_struct(theEnv,definstances);
    InitializeConstructHeader(theEnv,execStatus,"definstances",(struct constructHeader *) theDefinstances,
                              DefclassData(theEnv,execStatus)->INITIAL_OBJECT_SYMBOL);
    theDefinstances->busy = 0;
@@ -823,7 +823,7 @@ static void *AllocateModule(
   void *theEnv,
   EXEC_STATUS)
   {
-   return((void *) get_struct(theEnv,execStatus,definstancesModule));
+   return((void *) get_struct(theEnv,definstancesModule));
   }
 
 /***************************************************

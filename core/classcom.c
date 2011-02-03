@@ -737,7 +737,7 @@ static void SaveDefclass(
    if (ppForm != NULL)
      {
       PrintInChunks(theEnv,execStatus,logName,ppForm);
-      EnvPrintRouter(theEnv,execStatus,logName,"\n");
+      EnvPrintRouter(theEnv,logName,"\n");
       hnd = EnvGetNextDefmessageHandler(theEnv,execStatus,(void *) theDefclass,0);
       while (hnd != 0)
         {
@@ -745,7 +745,7 @@ static void SaveDefclass(
          if (ppForm != NULL)
            {
             PrintInChunks(theEnv,execStatus,logName,ppForm);
-            EnvPrintRouter(theEnv,execStatus,logName,"\n");
+            EnvPrintRouter(theEnv,logName,"\n");
            }
          hnd = EnvGetNextDefmessageHandler(theEnv,execStatus,(void *) theDefclass,hnd);
         }

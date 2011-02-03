@@ -205,9 +205,9 @@ globle int CheckSyntax(
 
       if (rv)
         {
-         EnvPrintRouter(theEnv,execStatus,WERROR,"\nERROR:\n");
+         EnvPrintRouter(theEnv,WERROR,"\nERROR:\n");
          PrintInChunks(theEnv,execStatus,WERROR,GetPPBuffer(theEnv,execStatus));
-         EnvPrintRouter(theEnv,execStatus,WERROR,"\n");
+         EnvPrintRouter(theEnv,WERROR,"\n");
         }
 
       DestroyPPBuffer(theEnv,execStatus);
@@ -400,7 +400,7 @@ globle void CheckSyntaxFunction(
   DATA_OBJECT *returnValue)
   {
    PrintErrorID(theEnv,execStatus,"PARSEFUN",1,FALSE);
-   EnvPrintRouter(theEnv,execStatus,WERROR,"Function check-syntax does not work in run time modules.\n");
+   EnvPrintRouter(theEnv,WERROR,"Function check-syntax does not work in run time modules.\n");
    SetpType(returnValue,SYMBOL);
    SetpValue(returnValue,EnvTrueSymbol(theEnv,execStatus));
   }
@@ -421,7 +421,7 @@ globle int CheckSyntax(
 #endif
 
    PrintErrorID(theEnv,execStatus,"PARSEFUN",1,FALSE);
-   EnvPrintRouter(theEnv,execStatus,WERROR,"Function check-syntax does not work in run time modules.\n");
+   EnvPrintRouter(theEnv,WERROR,"Function check-syntax does not work in run time modules.\n");
    SetpType(returnValue,SYMBOL);
    SetpValue(returnValue,EnvTrueSymbol(theEnv,execStatus));
    return(TRUE);

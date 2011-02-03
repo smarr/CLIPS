@@ -118,7 +118,7 @@ globle struct expr *Function1Parse(
    if (theToken.type != SYMBOL)
      {
       PrintErrorID(theEnv,execStatus,"EXPRNPSR",1,TRUE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"A function name must be a symbol\n");
+      EnvPrintRouter(theEnv,WERROR,"A function name must be a symbol\n");
       return(NULL);
      }
 
@@ -222,9 +222,9 @@ globle struct expr *Function2Parse(
    else
      {
       PrintErrorID(theEnv,execStatus,"EXPRNPSR",3,TRUE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"Missing function declaration for ");
-      EnvPrintRouter(theEnv,execStatus,WERROR,name);
-      EnvPrintRouter(theEnv,execStatus,WERROR,".\n");
+      EnvPrintRouter(theEnv,WERROR,"Missing function declaration for ");
+      EnvPrintRouter(theEnv,WERROR,name);
+      EnvPrintRouter(theEnv,WERROR,".\n");
       return(NULL);
      }
 
@@ -350,10 +350,10 @@ globle intBool ReplaceSequenceExpansionOps(
              (((struct FunctionDefinition *) fcallexp->value)->sequenceuseok == FALSE))
            {
             PrintErrorID(theEnv,execStatus,"EXPRNPSR",4,FALSE);
-            EnvPrintRouter(theEnv,execStatus,WERROR,"$ Sequence operator not a valid argument for ");
-            EnvPrintRouter(theEnv,execStatus,WERROR,ValueToString(((struct FunctionDefinition *)
+            EnvPrintRouter(theEnv,WERROR,"$ Sequence operator not a valid argument for ");
+            EnvPrintRouter(theEnv,WERROR,ValueToString(((struct FunctionDefinition *)
                               fcallexp->value)->callFunctionName));
-            EnvPrintRouter(theEnv,execStatus,WERROR,".\n");
+            EnvPrintRouter(theEnv,WERROR,".\n");
             return(TRUE);
            }
          if (fcallexp->value != expcall)
@@ -401,7 +401,7 @@ globle void PushRtnBrkContexts(
   {
    SAVED_CONTEXTS *svtmp;
 
-   svtmp = get_struct(theEnv,execStatus,saved_contexts);
+   svtmp = get_struct(theEnv,saved_contexts);
    svtmp->rtn = ExpressionData(theEnv,execStatus)->ReturnContext;
    svtmp->brk = ExpressionData(theEnv,execStatus)->BreakContext;
    svtmp->nxt = ExpressionData(theEnv,execStatus)->svContexts;
@@ -654,7 +654,7 @@ globle struct expr *ArgumentParse(
    if (theToken.type != LPAREN)
      {
       PrintErrorID(theEnv,execStatus,"EXPRNPSR",2,TRUE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"Expected a constant, variable, or expression.\n");
+      EnvPrintRouter(theEnv,WERROR,"Expected a constant, variable, or expression.\n");
       *errorFlag = TRUE;
       return(NULL);
      }
@@ -704,7 +704,7 @@ globle struct expr *ParseAtomOrExpression(
    else
      {
       PrintErrorID(theEnv,execStatus,"EXPRNPSR",2,TRUE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"Expected a constant, variable, or expression.\n");
+      EnvPrintRouter(theEnv,WERROR,"Expected a constant, variable, or expression.\n");
       return(NULL);
      }
 
@@ -892,7 +892,7 @@ globle EXPRESSION *ParseConstantArguments(
    if (OpenStringSource(theEnv,execStatus,router,argstr,0) == 0)
      {
       PrintErrorID(theEnv,execStatus,"EXPRNPSR",6,FALSE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"Cannot read arguments for external call.\n");
+      EnvPrintRouter(theEnv,WERROR,"Cannot read arguments for external call.\n");
       *error = TRUE;
       return(NULL);
      }
@@ -909,7 +909,7 @@ globle EXPRESSION *ParseConstantArguments(
           (tkn.type != INSTANCE_NAME))
         {
          PrintErrorID(theEnv,execStatus,"EXPRNPSR",7,FALSE);
-         EnvPrintRouter(theEnv,execStatus,WERROR,"Only constant arguments allowed for external function call.\n");
+         EnvPrintRouter(theEnv,WERROR,"Only constant arguments allowed for external function call.\n");
          ReturnExpression(theEnv,execStatus,top);
          *error = TRUE;
          CloseStringSource(theEnv,execStatus,router);

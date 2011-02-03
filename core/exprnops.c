@@ -334,7 +334,7 @@ globle struct expr *GenConstant(
   {
    struct expr *top;
 
-   top = get_struct(theEnv,execStatus,expr);
+   top = get_struct(theEnv,expr);
    top->nextArg = NULL;
    top->argList = NULL;
    top->type = type;
@@ -363,22 +363,22 @@ globle void PrintExpression(
         {
          case SF_VARIABLE:
          case GBL_VARIABLE:
-            EnvPrintRouter(theEnv,execStatus,fileid,"?");
-            EnvPrintRouter(theEnv,execStatus,fileid,ValueToString(theExpression->value));
+            EnvPrintRouter(theEnv,fileid,"?");
+            EnvPrintRouter(theEnv,fileid,ValueToString(theExpression->value));
             break;
 
          case MF_VARIABLE:
          case MF_GBL_VARIABLE:
-            EnvPrintRouter(theEnv,execStatus,fileid,"$?");
-            EnvPrintRouter(theEnv,execStatus,fileid,ValueToString(theExpression->value));
+            EnvPrintRouter(theEnv,fileid,"$?");
+            EnvPrintRouter(theEnv,fileid,ValueToString(theExpression->value));
             break;
 
          case FCALL:
-           EnvPrintRouter(theEnv,execStatus,fileid,"(");
-           EnvPrintRouter(theEnv,execStatus,fileid,ValueToString(ExpressionFunctionCallName(theExpression)));
-           if (theExpression->argList != NULL) { EnvPrintRouter(theEnv,execStatus,fileid," "); }
+           EnvPrintRouter(theEnv,fileid,"(");
+           EnvPrintRouter(theEnv,fileid,ValueToString(ExpressionFunctionCallName(theExpression)));
+           if (theExpression->argList != NULL) { EnvPrintRouter(theEnv,fileid," "); }
            PrintExpression(theEnv,execStatus,fileid,theExpression->argList);
-           EnvPrintRouter(theEnv,execStatus,fileid,")");
+           EnvPrintRouter(theEnv,fileid,")");
            break;
 
          default:
@@ -390,7 +390,7 @@ globle void PrintExpression(
         }
 
       theExpression = theExpression->nextArg;
-      if (theExpression != NULL) EnvPrintRouter(theEnv,execStatus,fileid," ");
+      if (theExpression != NULL) EnvPrintRouter(theEnv,fileid," ");
      }
 
    return;

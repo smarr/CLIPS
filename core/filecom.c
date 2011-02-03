@@ -239,7 +239,7 @@ static int PrintDribble(
    /*===========================================================*/
 
    EnvDeactivateRouter(theEnv,execStatus,"dribble");
-   EnvPrintRouter(theEnv,execStatus,logicalName,str);
+   EnvPrintRouter(theEnv,logicalName,str);
    EnvActivateRouter(theEnv,execStatus,"dribble");
 
    return(1);
@@ -622,7 +622,7 @@ globle int LLGetcBatch(
 
       if (rv == EOF)
         {
-         if (FileCommandData(theEnv,execStatus)->BatchCurrentPosition > 0) EnvPrintRouter(theEnv,execStatus,"stdout",(char *) FileCommandData(theEnv,execStatus)->BatchBuffer);
+         if (FileCommandData(theEnv,execStatus)->BatchCurrentPosition > 0) EnvPrintRouter(theEnv,"stdout",(char *) FileCommandData(theEnv,execStatus)->BatchBuffer);
          flag = RemoveBatch(theEnv,execStatus);
         }
      }
@@ -635,7 +635,7 @@ globle int LLGetcBatch(
 
    if (rv == EOF)
      {
-      if (FileCommandData(theEnv,execStatus)->BatchCurrentPosition > 0) EnvPrintRouter(theEnv,execStatus,"stdout",(char *) FileCommandData(theEnv,execStatus)->BatchBuffer);
+      if (FileCommandData(theEnv,execStatus)->BatchCurrentPosition > 0) EnvPrintRouter(theEnv,"stdout",(char *) FileCommandData(theEnv,execStatus)->BatchBuffer);
       EnvDeleteRouter(theEnv,execStatus,"batch");
       RemoveBatch(theEnv,execStatus);
       if (returnOnEOF == TRUE)
@@ -658,7 +658,7 @@ globle int LLGetcBatch(
 
    if ((char) rv == '\n')
      {
-      EnvPrintRouter(theEnv,execStatus,"stdout",(char *) FileCommandData(theEnv,execStatus)->BatchBuffer);
+      EnvPrintRouter(theEnv,"stdout",(char *) FileCommandData(theEnv,execStatus)->BatchBuffer);
       FileCommandData(theEnv,execStatus)->BatchCurrentPosition = 0;
       if ((FileCommandData(theEnv,execStatus)->BatchBuffer != NULL) && (FileCommandData(theEnv,execStatus)->BatchMaximumPosition > BUFFER_SIZE))
         {
@@ -842,7 +842,7 @@ static void AddBatch(
    /* Create the batch entry. */
    /*=========================*/
 
-   bptr = get_struct(theEnv,execStatus,batchEntry);
+   bptr = get_struct(theEnv,batchEntry);
    bptr->batchType = type;
    bptr->inputSource = theSource;
    bptr->theString = theString;
@@ -973,7 +973,7 @@ globle void CloseAllBatchSources(
 
    if (FileCommandData(theEnv,execStatus)->BatchBuffer != NULL)
      {
-      if (FileCommandData(theEnv,execStatus)->BatchCurrentPosition > 0) EnvPrintRouter(theEnv,execStatus,"stdout",(char *) FileCommandData(theEnv,execStatus)->BatchBuffer);
+      if (FileCommandData(theEnv,execStatus)->BatchCurrentPosition > 0) EnvPrintRouter(theEnv,"stdout",(char *) FileCommandData(theEnv,execStatus)->BatchBuffer);
       rm(theEnv,execStatus,FileCommandData(theEnv,execStatus)->BatchBuffer,FileCommandData(theEnv,execStatus)->BatchMaximumPosition);
       FileCommandData(theEnv,execStatus)->BatchBuffer = NULL;
       FileCommandData(theEnv,execStatus)->BatchCurrentPosition = 0;
@@ -1097,7 +1097,7 @@ globle int EnvBatchStar(
 #endif
 
    PrintErrorID(theEnv,execStatus,"FILECOM",1,FALSE);
-   EnvPrintRouter(theEnv,execStatus,WERROR,"Function batch* does not work in run time modules.\n");
+   EnvPrintRouter(theEnv,WERROR,"Function batch* does not work in run time modules.\n");
    return(FALSE);
   }
 
@@ -1130,7 +1130,7 @@ globle int LoadCommand(
    if (rv == -1) return(FALSE);
    return(TRUE);
 #else
-   EnvPrintRouter(theEnv,execStatus,WDIALOG,"Load is not available in this environment\n");
+   EnvPrintRouter(theEnv,WDIALOG,"Load is not available in this environment\n");
    return(FALSE);
 #endif
   }
@@ -1158,7 +1158,7 @@ globle int LoadStarCommand(
    if (rv == -1) return(FALSE);
    return(TRUE);
 #else
-   EnvPrintRouter(theEnv,execStatus,WDIALOG,"Load* is not available in this environment\n");
+   EnvPrintRouter(theEnv,WDIALOG,"Load* is not available in this environment\n");
    return(FALSE);
 #endif
   }
@@ -1185,7 +1185,7 @@ globle int SaveCommand(
 
    return(TRUE);
 #else
-   EnvPrintRouter(theEnv,execStatus,WDIALOG,"Save is not available in this environment\n");
+   EnvPrintRouter(theEnv,WDIALOG,"Save is not available in this environment\n");
    return(FALSE);
 #endif
   }

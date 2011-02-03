@@ -762,7 +762,7 @@ static void ModifyMsgHandlerSupport(
    if (InstanceData(theEnv,execStatus)->ObjectModDupMsgValid == FALSE)
      {
       PrintErrorID(theEnv,execStatus,"INSMODDP",1,FALSE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"Direct/message-modify message valid only in modify-instance.\n");
+      EnvPrintRouter(theEnv,WERROR,"Direct/message-modify message valid only in modify-instance.\n");
       SetEvaluationError(theEnv,execStatus,TRUE);
       return;
      }
@@ -868,7 +868,7 @@ static void DuplicateMsgHandlerSupport(
    if (InstanceData(theEnv,execStatus)->ObjectModDupMsgValid == FALSE)
      {
       PrintErrorID(theEnv,execStatus,"INSMODDP",2,FALSE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"Direct/message-duplicate message valid only in duplicate-instance.\n");
+      EnvPrintRouter(theEnv,WERROR,"Direct/message-duplicate message valid only in duplicate-instance.\n");
       SetEvaluationError(theEnv,execStatus,TRUE);
       return;
      }
@@ -891,7 +891,7 @@ static void DuplicateMsgHandlerSupport(
    if (newName == srcins->name)
      {
       PrintErrorID(theEnv,execStatus,"INSMODDP",3,FALSE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"Instance copy must have a different name in duplicate-instance.\n");
+      EnvPrintRouter(theEnv,WERROR,"Instance copy must have a different name in duplicate-instance.\n");
       SetEvaluationError(theEnv,execStatus,TRUE);
       return;
      }

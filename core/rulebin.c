@@ -949,7 +949,7 @@ static void UpdateDefrule(
    DefruleBinaryData(theEnv,execStatus)->DefruleArray[obji].executing = 0;
    DefruleBinaryData(theEnv,execStatus)->DefruleArray[obji].afterBreakpoint = 0;
 #if DEBUGGING_FUNCTIONS
-   DefruleBinaryData(theEnv,execStatus)->DefruleArray[obji].watchActivation = AgendaData(theEnv,execStatus)->WatchActivations;
+   DefruleBinaryData(theEnv,execStatus)->DefruleArray[obji].watchActivation = AgendaData(theEnv)->WatchActivations;
    DefruleBinaryData(theEnv,execStatus)->DefruleArray[obji].watchFiring = DefruleData(theEnv,execStatus)->WatchRules;
 #endif
   }

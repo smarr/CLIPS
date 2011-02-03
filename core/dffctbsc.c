@@ -162,7 +162,7 @@ static void ClearDeffacts(
    /* the expression and initialize it.           */
    /*=============================================*/
 
-   newDeffacts = get_struct(theEnv,execStatus,deffacts);
+   newDeffacts = get_struct(theEnv,deffacts);
    newDeffacts->header.whichModule =
       (struct defmoduleItemHeader *) GetDeffactsModuleItem(theEnv,execStatus,NULL);
    newDeffacts->header.name = (SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,"initial-fact");

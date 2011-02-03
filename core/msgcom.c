@@ -474,7 +474,7 @@ globle void UndefmessageHandlerCommand(
   {
 #if RUN_TIME || BLOAD_ONLY
    PrintErrorID(theEnv,execStatus,"MSGCOM",3,FALSE);
-   EnvPrintRouter(theEnv,execStatus,WERROR,"Unable to delete message-handlers.\n");
+   EnvPrintRouter(theEnv,WERROR,"Unable to delete message-handlers.\n");
 #else
    SYMBOL_HN *mname;
    char *tname;
@@ -485,7 +485,7 @@ globle void UndefmessageHandlerCommand(
    if (Bloaded(theEnv,execStatus))
      {
       PrintErrorID(theEnv,execStatus,"MSGCOM",3,FALSE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"Unable to delete message-handlers.\n");
+      EnvPrintRouter(theEnv,WERROR,"Unable to delete message-handlers.\n");
       return;
      }
 #endif
@@ -536,7 +536,7 @@ globle int EnvUndefmessageHandler(
 
 #if RUN_TIME || BLOAD_ONLY
    PrintErrorID(theEnv,execStatus,"MSGCOM",3,FALSE);
-   EnvPrintRouter(theEnv,execStatus,WERROR,"Unable to delete message-handlers.\n");
+   EnvPrintRouter(theEnv,WERROR,"Unable to delete message-handlers.\n");
    return(0);
 #else
    DEFCLASS *cls;
@@ -545,7 +545,7 @@ globle int EnvUndefmessageHandler(
    if (Bloaded(theEnv,execStatus))
      {
       PrintErrorID(theEnv,execStatus,"MSGCOM",3,FALSE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"Unable to delete message-handlers.\n");
+      EnvPrintRouter(theEnv,WERROR,"Unable to delete message-handlers.\n");
       return(0);
      }
 #endif
@@ -554,7 +554,7 @@ globle int EnvUndefmessageHandler(
       if (mhi != 0)
         {
          PrintErrorID(theEnv,execStatus,"MSGCOM",1,FALSE);
-         EnvPrintRouter(theEnv,execStatus,WERROR,"Incomplete message-handler specification for deletion.\n");
+         EnvPrintRouter(theEnv,WERROR,"Incomplete message-handler specification for deletion.\n");
          return(0);
         }
       return(WildDeleteHandler(theEnv,execStatus,NULL,NULL,NULL));
@@ -620,13 +620,13 @@ globle void PPDefmessageHandlerCommand(
        ((hnd = FindHandlerByAddress(cls,msym,(unsigned) mtype)) == NULL))
      {
       PrintErrorID(theEnv,execStatus,"MSGCOM",2,FALSE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"Unable to find message-handler ");
-      EnvPrintRouter(theEnv,execStatus,WERROR,ValueToString(msym));
-      EnvPrintRouter(theEnv,execStatus,WERROR," ");
-      EnvPrintRouter(theEnv,execStatus,WERROR,tname);
-      EnvPrintRouter(theEnv,execStatus,WERROR," for class ");
-      EnvPrintRouter(theEnv,execStatus,WERROR,ValueToString(csym));
-      EnvPrintRouter(theEnv,execStatus,WERROR," in function ppdefmessage-handler.\n");
+      EnvPrintRouter(theEnv,WERROR,"Unable to find message-handler ");
+      EnvPrintRouter(theEnv,WERROR,ValueToString(msym));
+      EnvPrintRouter(theEnv,WERROR," ");
+      EnvPrintRouter(theEnv,WERROR,tname);
+      EnvPrintRouter(theEnv,WERROR," for class ");
+      EnvPrintRouter(theEnv,WERROR,ValueToString(csym));
+      EnvPrintRouter(theEnv,WERROR," in function ppdefmessage-handler.\n");
       SetEvaluationError(theEnv,execStatus,TRUE);
       return;
      }
@@ -1029,8 +1029,8 @@ static unsigned DefmessageHandlerWatchSupport(
          EnvSetCurrentModule(theEnv,execStatus,(void *) theModule);
          if (traceFunc == NULL)
            {
-            EnvPrintRouter(theEnv,execStatus,logName,EnvGetDefmoduleName(theEnv,execStatus,(void *) theModule));
-            EnvPrintRouter(theEnv,execStatus,logName,":\n");
+            EnvPrintRouter(theEnv,logName,EnvGetDefmoduleName(theEnv,execStatus,(void *) theModule));
+            EnvPrintRouter(theEnv,logName,":\n");
            }
          theClass = EnvGetNextDefclass(theEnv,execStatus,NULL);
          while (theClass != NULL)
@@ -1155,7 +1155,7 @@ static unsigned WatchClassHandlers(
              else
                {
                 if (indentp)
-                  EnvPrintRouter(theEnv,execStatus,logName,"   ");
+                  EnvPrintRouter(theEnv,logName,"   ");
                 (*printFunc)(theEnv,execStatus,logName,theClass,theHandler);
                }
              found = TRUE;
@@ -1185,16 +1185,16 @@ static void PrintHandlerWatchFlag(
   void *theClass,
   int theHandler)
   {
-   EnvPrintRouter(theEnv,execStatus,logName,EnvGetDefclassName(theEnv,execStatus,theClass));
-   EnvPrintRouter(theEnv,execStatus,logName," ");
-   EnvPrintRouter(theEnv,execStatus,logName,EnvGetDefmessageHandlerName(theEnv,execStatus,theClass,theHandler));
-   EnvPrintRouter(theEnv,execStatus,logName," ");
-   EnvPrintRouter(theEnv,execStatus,logName,EnvGetDefmessageHandlerType(theEnv,execStatus,theClass,theHandler));
+   EnvPrintRouter(theEnv,logName,EnvGetDefclassName(theEnv,execStatus,theClass));
+   EnvPrintRouter(theEnv,logName," ");
+   EnvPrintRouter(theEnv,logName,EnvGetDefmessageHandlerName(theEnv,execStatus,theClass,theHandler));
+   EnvPrintRouter(theEnv,logName," ");
+   EnvPrintRouter(theEnv,logName,EnvGetDefmessageHandlerType(theEnv,execStatus,theClass,theHandler));
    
    if (EnvGetDefmessageHandlerWatch(theEnv,execStatus,theClass,theHandler))
-     EnvPrintRouter(theEnv,execStatus,logName," = on\n");
+     EnvPrintRouter(theEnv,logName," = on\n");
    else
-     EnvPrintRouter(theEnv,execStatus,logName," = off\n");
+     EnvPrintRouter(theEnv,logName," = off\n");
   }
 
 #endif /* DEBUGGING_FUNCTIONS */

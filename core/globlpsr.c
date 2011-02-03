@@ -240,15 +240,15 @@ static intBool GetVariableDefinition(
       if (QFindDefglobal(theEnv,execStatus,variableName) != NULL) 
         {
          PrintWarningID(theEnv,execStatus,"CSTRCPSR",1,TRUE);
-         EnvPrintRouter(theEnv,execStatus,WDIALOG,"Redefining defglobal: ");
+         EnvPrintRouter(theEnv,WDIALOG,"Redefining defglobal: ");
         }
-      else EnvPrintRouter(theEnv,execStatus,WDIALOG,"Defining defglobal: ");
-      EnvPrintRouter(theEnv,execStatus,WDIALOG,ValueToString(variableName));
-      EnvPrintRouter(theEnv,execStatus,WDIALOG,"\n");
+      else EnvPrintRouter(theEnv,WDIALOG,"Defining defglobal: ");
+      EnvPrintRouter(theEnv,WDIALOG,ValueToString(variableName));
+      EnvPrintRouter(theEnv,WDIALOG,"\n");
      }
    else
 #endif
-     { if (GetPrintWhileLoading(theEnv,execStatus)) EnvPrintRouter(theEnv,execStatus,WDIALOG,":"); }
+     { if (GetPrintWhileLoading(theEnv,execStatus)) EnvPrintRouter(theEnv,WDIALOG,":"); }
 
    /*==================================================================*/
    /* Check for import/export conflicts from the construct definition. */
@@ -348,7 +348,7 @@ static void AddDefglobal(
    if (defglobalPtr == NULL)
      {
       newGlobal = TRUE;
-      defglobalPtr = get_struct(theEnv,execStatus,defglobal);
+      defglobalPtr = get_struct(theEnv,defglobal);
      }
    else
      {
@@ -495,9 +495,9 @@ globle void GlobalReferenceErrorMessage(
   char *variableName)
   {
    PrintErrorID(theEnv,execStatus,"GLOBLPSR",1,TRUE);
-   EnvPrintRouter(theEnv,execStatus,WERROR,"\nGlobal variable ?*");
-   EnvPrintRouter(theEnv,execStatus,WERROR,variableName);
-   EnvPrintRouter(theEnv,execStatus,WERROR,"* was referenced, but is not defined.\n");
+   EnvPrintRouter(theEnv,WERROR,"\nGlobal variable ?*");
+   EnvPrintRouter(theEnv,WERROR,variableName);
+   EnvPrintRouter(theEnv,WERROR,"* was referenced, but is not defined.\n");
   }
 
 #endif /* (! RUN_TIME) && (! BLOAD_ONLY) */

@@ -226,8 +226,8 @@ globle void EnvShowDefglobals(
 
       if (allModules)
         {
-         EnvPrintRouter(theEnv,execStatus,logicalName,EnvGetDefmoduleName(theEnv,execStatus,theModule));
-         EnvPrintRouter(theEnv,execStatus,logicalName,":\n");
+         EnvPrintRouter(theEnv,logicalName,EnvGetDefmoduleName(theEnv,execStatus,theModule));
+         EnvPrintRouter(theEnv,logicalName,":\n");
         }
 
       /*=====================================*/
@@ -243,9 +243,9 @@ globle void EnvShowDefglobals(
         {
          if (execStatus->HaltExecution == TRUE) return;
 
-         if (allModules) EnvPrintRouter(theEnv,execStatus,logicalName,"   ");
+         if (allModules) EnvPrintRouter(theEnv,logicalName,"   ");
          PrintDefglobalValueForm(theEnv,execStatus,logicalName,(void *) constructPtr);
-         EnvPrintRouter(theEnv,execStatus,logicalName,"\n");
+         EnvPrintRouter(theEnv,logicalName,"\n");
         }
 
       /*===================================*/
@@ -270,9 +270,9 @@ static void PrintDefglobalValueForm(
   {
    struct defglobal *theGlobal = (struct defglobal *) vTheGlobal;
 
-   EnvPrintRouter(theEnv,execStatus,logicalName,"?*");
-   EnvPrintRouter(theEnv,execStatus,logicalName,ValueToString(theGlobal->header.name));
-   EnvPrintRouter(theEnv,execStatus,logicalName,"* = ");
+   EnvPrintRouter(theEnv,logicalName,"?*");
+   EnvPrintRouter(theEnv,logicalName,ValueToString(theGlobal->header.name));
+   EnvPrintRouter(theEnv,logicalName,"* = ");
    PrintDataObject(theEnv,execStatus,logicalName,&theGlobal->current);
   }
 

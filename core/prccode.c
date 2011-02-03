@@ -264,14 +264,14 @@ globle EXPRESSION *ParseProcParameters(
         if (check->value == tkn->value)
          {
           PrintErrorID(theEnv,execStatus,"PRCCODE",7,FALSE);
-          EnvPrintRouter(theEnv,execStatus,WERROR,"Duplicate parameter names not allowed.\n");
+          EnvPrintRouter(theEnv,WERROR,"Duplicate parameter names not allowed.\n");
           ReturnExpression(theEnv,execStatus,parameterList);
           return(NULL);
          }
       if (*wildcard != NULL)
         {
          PrintErrorID(theEnv,execStatus,"PRCCODE",8,FALSE);
-         EnvPrintRouter(theEnv,execStatus,WERROR,"No parameters allowed after wildcard parameter.\n");
+         EnvPrintRouter(theEnv,WERROR,"No parameters allowed after wildcard parameter.\n");
          ReturnExpression(theEnv,execStatus,parameterList);
          return(NULL);
         }
@@ -503,11 +503,11 @@ globle int ReplaceProcVars(
             if ((altvarfunc != NULL) ? ((*altvarfunc)(theEnv,execStatus,actions,specdata) != 1) : TRUE)
               {
                PrintErrorID(theEnv,execStatus,"PRCCODE",3,TRUE);
-               EnvPrintRouter(theEnv,execStatus,WERROR,"Undefined variable ");
-               EnvPrintRouter(theEnv,execStatus,WERROR,ValueToString(bindName));
-               EnvPrintRouter(theEnv,execStatus,WERROR," referenced in ");
-               EnvPrintRouter(theEnv,execStatus,WERROR,bodytype);
-               EnvPrintRouter(theEnv,execStatus,WERROR,".\n");
+               EnvPrintRouter(theEnv,WERROR,"Undefined variable ");
+               EnvPrintRouter(theEnv,WERROR,ValueToString(bindName));
+               EnvPrintRouter(theEnv,WERROR," referenced in ");
+               EnvPrintRouter(theEnv,WERROR,bodytype);
+               EnvPrintRouter(theEnv,WERROR,".\n");
                return(TRUE);
               }
            }
@@ -658,7 +658,7 @@ globle void PushProcParameters(
   {
    register PROC_PARAM_STACK *ptmp;
 
-   ptmp = get_struct(theEnv,execStatus,ProcParamStack);
+   ptmp = get_struct(theEnv,ProcParamStack);
    ptmp->ParamArray = ProceduralPrimitiveData(theEnv,execStatus)->ProcParamArray;
    ptmp->ParamArraySize = ProceduralPrimitiveData(theEnv,execStatus)->ProcParamArraySize;
    ptmp->UnboundErrFunc = ProceduralPrimitiveData(theEnv,execStatus)->ProcUnboundErrFunc;
@@ -893,7 +893,7 @@ globle void EvaluateProcActions(
    if ((crtproc != NULL) ? execStatus->HaltExecution : FALSE)
      {
       PrintErrorID(theEnv,execStatus,"PRCCODE",4,FALSE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"Execution halted during the actions of ");
+      EnvPrintRouter(theEnv,WERROR,"Execution halted during the actions of ");
       (*crtproc)(theEnv,execStatus);
      }
    if ((ProceduralPrimitiveData(theEnv,execStatus)->WildcardValue != NULL) ? (result->value == ProceduralPrimitiveData(theEnv,execStatus)->WildcardValue->value) : FALSE)
@@ -933,14 +933,14 @@ globle void PrintProcParamArray(
   {
    register int i;
 
-   EnvPrintRouter(theEnv,execStatus,logName," (");
+   EnvPrintRouter(theEnv,logName," (");
    for (i = 0 ; i < ProceduralPrimitiveData(theEnv,execStatus)->ProcParamArraySize ; i++)
      {
       PrintDataObject(theEnv,execStatus,logName,&ProceduralPrimitiveData(theEnv,execStatus)->ProcParamArray[i]);
       if (i != ProceduralPrimitiveData(theEnv,execStatus)->ProcParamArraySize-1)
-        EnvPrintRouter(theEnv,execStatus,logName," ");
+        EnvPrintRouter(theEnv,logName," ");
      }
-   EnvPrintRouter(theEnv,execStatus,logName,")\n");
+   EnvPrintRouter(theEnv,logName,")\n");
   }
 
 /****************************************************************
@@ -971,7 +971,7 @@ globle void GrabProcWildargs(
    result->begin = 0;
    if (ProceduralPrimitiveData(theEnv,execStatus)->WildcardValue == NULL)
      {
-      ProceduralPrimitiveData(theEnv,execStatus)->WildcardValue = get_struct(theEnv,execStatus,dataObject);
+      ProceduralPrimitiveData(theEnv,execStatus)->WildcardValue = get_struct(theEnv,dataObject);
       ProceduralPrimitiveData(theEnv,execStatus)->WildcardValue->begin = 0;
      }
    else if (theIndex == ProceduralPrimitiveData(theEnv,execStatus)->Oldindex)
@@ -1076,18 +1076,18 @@ static void EvaluateProcParameters(
          if (temp.type == RVOID)
            {
             PrintErrorID(theEnv,execStatus,"PRCCODE",2,FALSE);
-            EnvPrintRouter(theEnv,execStatus,WERROR,"Functions without a return value are illegal as ");
-            EnvPrintRouter(theEnv,execStatus,WERROR,bodytype);
-            EnvPrintRouter(theEnv,execStatus,WERROR," arguments.\n");
+            EnvPrintRouter(theEnv,WERROR,"Functions without a return value are illegal as ");
+            EnvPrintRouter(theEnv,WERROR,bodytype);
+            EnvPrintRouter(theEnv,WERROR," arguments.\n");
             SetEvaluationError(theEnv,execStatus,TRUE);
            }
          PrintErrorID(theEnv,execStatus,"PRCCODE",6,FALSE);
-         EnvPrintRouter(theEnv,execStatus,WERROR,"This error occurred while evaluating arguments ");
-         EnvPrintRouter(theEnv,execStatus,WERROR,"for the ");
-         EnvPrintRouter(theEnv,execStatus,WERROR,bodytype);
-         EnvPrintRouter(theEnv,execStatus,WERROR," ");
-         EnvPrintRouter(theEnv,execStatus,WERROR,pname);
-         EnvPrintRouter(theEnv,execStatus,WERROR,".\n");
+         EnvPrintRouter(theEnv,WERROR,"This error occurred while evaluating arguments ");
+         EnvPrintRouter(theEnv,WERROR,"for the ");
+         EnvPrintRouter(theEnv,WERROR,bodytype);
+         EnvPrintRouter(theEnv,WERROR," ");
+         EnvPrintRouter(theEnv,WERROR,pname);
+         EnvPrintRouter(theEnv,WERROR,".\n");
          rm(theEnv,execStatus,(void *) rva,(sizeof(DATA_OBJECT) * numberOfParameters));
          return;
         }
@@ -1172,15 +1172,15 @@ static intBool GetProcBind(
      {
       PrintErrorID(theEnv,execStatus,"PRCCODE",5,FALSE);
       SetEvaluationError(theEnv,execStatus,TRUE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"Variable ");
-      EnvPrintRouter(theEnv,execStatus,WERROR,ValueToString(GetFirstArgument()->value));
+      EnvPrintRouter(theEnv,WERROR,"Variable ");
+      EnvPrintRouter(theEnv,WERROR,ValueToString(GetFirstArgument()->value));
       if (ProceduralPrimitiveData(theEnv,execStatus)->ProcUnboundErrFunc != NULL)
         {
-         EnvPrintRouter(theEnv,execStatus,WERROR," unbound in ");
+         EnvPrintRouter(theEnv,WERROR," unbound in ");
          (*ProceduralPrimitiveData(theEnv,execStatus)->ProcUnboundErrFunc)(theEnv,execStatus);
         }
       else
-        EnvPrintRouter(theEnv,execStatus,WERROR," unbound.\n");
+        EnvPrintRouter(theEnv,WERROR," unbound.\n");
       result->type = SYMBOL;
       result->value = EnvFalseSymbol(theEnv,execStatus);
       return(TRUE);
@@ -1441,8 +1441,8 @@ static intBool EvaluateBadCall(
 #pragma unused(value)
 #endif
    PrintErrorID(theEnv,execStatus,"PRCCODE",1,FALSE);
-   EnvPrintRouter(theEnv,execStatus,WERROR,"Attempted to call a deffunction/generic function ");
-   EnvPrintRouter(theEnv,execStatus,WERROR,"which does not exist.\n");
+   EnvPrintRouter(theEnv,WERROR,"Attempted to call a deffunction/generic function ");
+   EnvPrintRouter(theEnv,WERROR,"which does not exist.\n");
    SetEvaluationError(theEnv,execStatus,TRUE);
    SetpType(result,SYMBOL);
    SetpValue(result,EnvFalseSymbol(theEnv,execStatus));

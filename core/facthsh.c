@@ -140,7 +140,7 @@ globle void AddHashedFact(
    if (FactData(theEnv,execStatus)->NumberOfFacts > FactData(theEnv,execStatus)->FactHashTableSize)
      { ResizeFactHashTable(theEnv,execStatus); }
 
-   newhash = get_struct(theEnv,execStatus,factHashEntry);
+   newhash = get_struct(theEnv,factHashEntry);
    newhash->theFact = theFact;
 	  
     
@@ -412,7 +412,7 @@ globle void ShowFactHashTable(
        if (count != 0)
          {
           gensprintf(buffer,"%4d: %4d\n",i,count);
-          EnvPrintRouter(theEnv,execStatus,WDISPLAY,buffer);
+          EnvPrintRouter(theEnv,WDISPLAY,buffer);
          }
       }
    }

@@ -122,7 +122,7 @@ static void SaveDefmodules(
    if (ppform != NULL)
      {
       PrintInChunks(theEnv,execStatus,logicalName,ppform);
-      EnvPrintRouter(theEnv,execStatus,logicalName,"\n");
+      EnvPrintRouter(theEnv,logicalName,"\n");
      }
   }
 
@@ -211,8 +211,8 @@ globle void EnvListDefmodules(
         theModule != NULL;
         theModule = EnvGetNextDefmodule(theEnv,execStatus,theModule))
     {
-     EnvPrintRouter(theEnv,execStatus,logicalName,EnvGetDefmoduleName(theEnv,execStatus,theModule));
-     EnvPrintRouter(theEnv,execStatus,logicalName,"\n");
+     EnvPrintRouter(theEnv,logicalName,EnvGetDefmoduleName(theEnv,execStatus,theModule));
+     EnvPrintRouter(theEnv,logicalName,"\n");
      count++;
     }
 

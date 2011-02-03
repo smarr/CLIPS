@@ -97,7 +97,7 @@ struct agendaData
 #define EnvGetActivationSalience(theEnv,execStatus,actPtr) (((struct activation *) actPtr)->salience)
 #define GetActivationRule(actPtr) (((struct activation *) actPtr)->theRule)
 #define GetActivationBasis(actPtr) (((struct activation *) actPtr)->basis)
-#define AgendaData(theEnv,execStatus) ((struct agendaData *) GetEnvironmentData(theEnv,execStatus,AGENDA_DATA))
+#define AgendaData(theEnv) ((struct agendaData *) GetEnvironmentData(theEnv,AGENDA_DATA))
 
 #ifdef LOCALE
 #undef LOCALE

@@ -599,7 +599,7 @@ globle int SetIncrementalResetCommand(
         {
          RestoreCurrentModule(theEnv,execStatus);
          PrintErrorID(theEnv,execStatus,"INCRRSET",1,FALSE);
-         EnvPrintRouter(theEnv,execStatus,WERROR,"The incremental reset behavior cannot be changed with rules loaded.\n");
+         EnvPrintRouter(theEnv,WERROR,"The incremental reset behavior cannot be changed with rules loaded.\n");
          SetEvaluationError(theEnv,execStatus,TRUE);
          return(oldValue);
         }

@@ -86,8 +86,8 @@ globle int ConstraintsToCode(
      {
       numberOfConstraints = 0;
       PrintWarningID(theEnv,execStatus,"CSTRNCMP",1,FALSE);
-      EnvPrintRouter(theEnv,execStatus,WWARNING,"Constraints are not saved with a constructs-to-c image\n");
-      EnvPrintRouter(theEnv,execStatus,WWARNING,"  when dynamic constraint checking is disabled.\n");
+      EnvPrintRouter(theEnv,WWARNING,"Constraints are not saved with a constructs-to-c image\n");
+      EnvPrintRouter(theEnv,WWARNING,"  when dynamic constraint checking is disabled.\n");
      }
 
    if (numberOfConstraints == 0) return(-1);

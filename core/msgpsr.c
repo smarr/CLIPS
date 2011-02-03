@@ -133,7 +133,7 @@ globle int ParseDefmessageHandler(
    if (cls == NULL)
      {
       PrintErrorID(theEnv,execStatus,"MSGPSR",1,FALSE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"A class must be defined before its message-handlers.\n");
+      EnvPrintRouter(theEnv,WERROR,"A class must be defined before its message-handlers.\n");
       return(TRUE);
      }
    if ((cls == DefclassData(theEnv,execStatus)->PrimitiveClassMap[INSTANCE_NAME]) ||
@@ -141,16 +141,16 @@ globle int ParseDefmessageHandler(
        (cls == DefclassData(theEnv,execStatus)->PrimitiveClassMap[INSTANCE_NAME]->directSuperclasses.classArray[0]))
      {
       PrintErrorID(theEnv,execStatus,"MSGPSR",8,FALSE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"Message-handlers cannot be attached to the class ");
-      EnvPrintRouter(theEnv,execStatus,WERROR,EnvGetDefclassName(theEnv,execStatus,(void *) cls));
-      EnvPrintRouter(theEnv,execStatus,WERROR,".\n");
+      EnvPrintRouter(theEnv,WERROR,"Message-handlers cannot be attached to the class ");
+      EnvPrintRouter(theEnv,WERROR,EnvGetDefclassName(theEnv,execStatus,(void *) cls));
+      EnvPrintRouter(theEnv,WERROR,".\n");
       return(TRUE);
      }
    if (HandlersExecuting(cls))
      {
       PrintErrorID(theEnv,execStatus,"MSGPSR",2,FALSE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"Cannot (re)define message-handlers during execution of \n");
-      EnvPrintRouter(theEnv,execStatus,WERROR,"  other message-handlers for the same class.\n");
+      EnvPrintRouter(theEnv,WERROR,"Cannot (re)define message-handlers during execution of \n");
+      EnvPrintRouter(theEnv,WERROR,"  other message-handlers for the same class.\n");
       return(TRUE);
      }
    if (GetType(DefclassData(theEnv,execStatus)->ObjectParseToken) != SYMBOL)
@@ -200,20 +200,20 @@ globle int ParseDefmessageHandler(
    hnd = FindHandlerByAddress(cls,mname,mtype);
    if (GetPrintWhileLoading(theEnv,execStatus) && GetCompilationsWatch(theEnv,execStatus))
      {
-      EnvPrintRouter(theEnv,execStatus,WDIALOG,"   Handler ");
-      EnvPrintRouter(theEnv,execStatus,WDIALOG,ValueToString(mname));
-      EnvPrintRouter(theEnv,execStatus,WDIALOG," ");
-      EnvPrintRouter(theEnv,execStatus,WDIALOG,MessageHandlerData(theEnv,execStatus)->hndquals[mtype]);
+      EnvPrintRouter(theEnv,WDIALOG,"   Handler ");
+      EnvPrintRouter(theEnv,WDIALOG,ValueToString(mname));
+      EnvPrintRouter(theEnv,WDIALOG," ");
+      EnvPrintRouter(theEnv,WDIALOG,MessageHandlerData(theEnv,execStatus)->hndquals[mtype]);
       if (hnd == NULL)
-        EnvPrintRouter(theEnv,execStatus,WDIALOG," defined.\n");
+        EnvPrintRouter(theEnv,WDIALOG," defined.\n");
       else
-        EnvPrintRouter(theEnv,execStatus,WDIALOG," redefined.\n");
+        EnvPrintRouter(theEnv,WDIALOG," redefined.\n");
      }
 
    if ((hnd != NULL) ? hnd->system : FALSE)
      {
       PrintErrorID(theEnv,execStatus,"MSGPSR",3,FALSE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"System message-handlers may not be modified.\n");
+      EnvPrintRouter(theEnv,WERROR,"System message-handlers may not be modified.\n");
       return(TRUE);
      }
 
@@ -426,7 +426,7 @@ static intBool IsParameterSlotReference(
                   (pname[SELF_LEN] == SELF_SLOT_REF) : FALSE)
      {
       PrintErrorID(theEnv,execStatus,"MSGPSR",4,FALSE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"Illegal slot reference in parameter list.\n");
+      EnvPrintRouter(theEnv,WERROR,"Illegal slot reference in parameter list.\n");
       return(TRUE);
      }
    return(FALSE);
@@ -521,7 +521,7 @@ static int BindSlotReference(
    if (strcmp(bindName,SELF_STRING) == 0)
      {
       PrintErrorID(theEnv,execStatus,"MSGPSR",5,FALSE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"Active instance parameter cannot be changed.\n");
+      EnvPrintRouter(theEnv,WERROR,"Active instance parameter cannot be changed.\n");
       return(-1);
      }
    if ((strncmp(bindName,SELF_STRING,SELF_LEN) == 0) ?
@@ -593,18 +593,18 @@ static SLOT_DESC *CheckSlotReference(
    if (theType != SYMBOL)
      {
       PrintErrorID(theEnv,execStatus,"MSGPSR",7,FALSE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"Illegal value for ?self reference.\n");
+      EnvPrintRouter(theEnv,WERROR,"Illegal value for ?self reference.\n");
       return(NULL);
      }
    slotIndex = FindInstanceTemplateSlot(theEnv,execStatus,theDefclass,(SYMBOL_HN *) theValue);
    if (slotIndex == -1)
      {
       PrintErrorID(theEnv,execStatus,"MSGPSR",6,FALSE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"No such slot ");
-      EnvPrintRouter(theEnv,execStatus,WERROR,ValueToString(theValue));
-      EnvPrintRouter(theEnv,execStatus,WERROR," in class ");
-      EnvPrintRouter(theEnv,execStatus,WERROR,EnvGetDefclassName(theEnv,execStatus,(void *) theDefclass));
-      EnvPrintRouter(theEnv,execStatus,WERROR," for ?self reference.\n");
+      EnvPrintRouter(theEnv,WERROR,"No such slot ");
+      EnvPrintRouter(theEnv,WERROR,ValueToString(theValue));
+      EnvPrintRouter(theEnv,WERROR," in class ");
+      EnvPrintRouter(theEnv,WERROR,EnvGetDefclassName(theEnv,execStatus,(void *) theDefclass));
+      EnvPrintRouter(theEnv,WERROR," for ?self reference.\n");
       return(NULL);
      }
    sd = theDefclass->instanceTemplate[slotIndex];
@@ -635,7 +635,7 @@ static SLOT_DESC *CheckSlotReference(
       if (vCode != NO_VIOLATION)
         {
          PrintErrorID(theEnv,execStatus,"CSTRNCHK",1,FALSE);
-         EnvPrintRouter(theEnv,execStatus,WERROR,"Expression for ");
+         EnvPrintRouter(theEnv,WERROR,"Expression for ");
          PrintSlot(theEnv,execStatus,WERROR,sd,NULL,"direct slot write");
          ConstraintViolationErrorMessage(theEnv,execStatus,NULL,NULL,0,0,NULL,0,
                                          vCode,sd->constraint,FALSE);

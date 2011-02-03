@@ -118,7 +118,7 @@ globle intBool AddLogicalDependencies(
    /* activation link, if any.                                     */
    /*==============================================================*/
 
-   newDependency = get_struct(theEnv,execStatus,dependency);
+   newDependency = get_struct(theEnv,dependency);
    newDependency->dPtr = (void *) theEntity;
    newDependency->next = (struct dependency *) theBinds->dependents;
    theBinds->dependents = (void *) newDependency;
@@ -127,7 +127,7 @@ globle intBool AddLogicalDependencies(
    /* Add a dependency link between the entity and the partialMatch. */
    /*================================================================*/
 
-   newDependency = get_struct(theEnv,execStatus,dependency);
+   newDependency = get_struct(theEnv,dependency);
    newDependency->dPtr = (void *) theBinds;
    newDependency->next = (struct dependency *) theEntity->dependents;
    theEntity->dependents = (void *) newDependency;
@@ -512,7 +512,7 @@ globle void Dependencies(
 
    if (theEntity->dependents == NULL)
      {
-      EnvPrintRouter(theEnv,execStatus,WDISPLAY,"None\n");
+      EnvPrintRouter(theEnv,WDISPLAY,"None\n");
       return;
      }
 
@@ -527,7 +527,7 @@ globle void Dependencies(
      {
       if (GetHaltExecution(theEnv,execStatus) == TRUE) return;
       PrintPartialMatch(theEnv,execStatus,WDISPLAY,(struct partialMatch *) fdPtr->dPtr);
-      EnvPrintRouter(theEnv,execStatus,WDISPLAY,"\n");
+      EnvPrintRouter(theEnv,WDISPLAY,"\n");
      }
   }
 
@@ -578,7 +578,7 @@ globle void Dependents(
          theBinds = (struct partialMatch *) fdPtr->dPtr;
          if (FindEntityInPartialMatch(theEntity,theBinds) == TRUE)
            {
-            if (found) EnvPrintRouter(theEnv,execStatus,WDISPLAY,",");
+            if (found) EnvPrintRouter(theEnv,WDISPLAY,",");
             (*entityPtr->theInfo->base.shortPrintFunction)(theEnv,execStatus,WDISPLAY,entityPtr);
             found = TRUE;
             break;
@@ -592,8 +592,8 @@ globle void Dependents(
    /* list of dependents.                             */
    /*=================================================*/
 
-   if (! found) EnvPrintRouter(theEnv,execStatus,WDISPLAY,"None\n");
-   else EnvPrintRouter(theEnv,execStatus,WDISPLAY,"\n");
+   if (! found) EnvPrintRouter(theEnv,WDISPLAY,"None\n");
+   else EnvPrintRouter(theEnv,WDISPLAY,"\n");
   }
 
 #if DEBUGGING_FUNCTIONS
@@ -618,7 +618,7 @@ globle void DependenciesCommand(
 #if DEFRULE_CONSTRUCT
    Dependencies(theEnv,execStatus,(struct patternEntity *) ptr);
 #else
-   EnvPrintRouter(theEnv,execStatus,WDISPLAY,"None\n");
+   EnvPrintRouter(theEnv,WDISPLAY,"None\n");
 #endif
   }
 
@@ -642,7 +642,7 @@ globle void DependentsCommand(
 #if DEFRULE_CONSTRUCT
    Dependents(theEnv,execStatus,(struct patternEntity *) ptr);
 #else
-   EnvPrintRouter(theEnv,execStatus,WDISPLAY,"None\n");
+   EnvPrintRouter(theEnv,WDISPLAY,"None\n");
 #endif
   }
 

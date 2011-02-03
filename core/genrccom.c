@@ -576,9 +576,9 @@ globle void UndefmethodCommand(
    if ((gfunc == NULL) ? (strcmp(DOToString(temp),"*") != 0) : FALSE)
      {
       PrintErrorID(theEnv,execStatus,"GENRCCOM",1,FALSE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"No such generic function ");
-      EnvPrintRouter(theEnv,execStatus,WERROR,DOToString(temp));
-      EnvPrintRouter(theEnv,execStatus,WERROR," in function undefmethod.\n");
+      EnvPrintRouter(theEnv,WERROR,"No such generic function ");
+      EnvPrintRouter(theEnv,WERROR,DOToString(temp));
+      EnvPrintRouter(theEnv,WERROR," in function undefmethod.\n");
       return;
      }
    EnvRtnUnknown(theEnv,execStatus,2,&temp);
@@ -587,7 +587,7 @@ globle void UndefmethodCommand(
       if (strcmp(DOToString(temp),"*") != 0)
         {
          PrintErrorID(theEnv,execStatus,"GENRCCOM",2,FALSE);
-         EnvPrintRouter(theEnv,execStatus,WERROR,"Expected a valid method index in function undefmethod.\n");
+         EnvPrintRouter(theEnv,WERROR,"Expected a valid method index in function undefmethod.\n");
          return;
         }
       mi = 0;
@@ -598,14 +598,14 @@ globle void UndefmethodCommand(
       if (mi == 0)
         {
          PrintErrorID(theEnv,execStatus,"GENRCCOM",2,FALSE);
-         EnvPrintRouter(theEnv,execStatus,WERROR,"Expected a valid method index in function undefmethod.\n");
+         EnvPrintRouter(theEnv,WERROR,"Expected a valid method index in function undefmethod.\n");
          return;
         }
      }
    else
      {
       PrintErrorID(theEnv,execStatus,"GENRCCOM",2,FALSE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"Expected a valid method index in function undefmethod.\n");
+      EnvPrintRouter(theEnv,WERROR,"Expected a valid method index in function undefmethod.\n");
       return;
      }
    EnvUndefmethod(theEnv,execStatus,(void *) gfunc,mi);
@@ -673,16 +673,16 @@ globle intBool EnvUndefmethod(
 #if RUN_TIME || BLOAD_ONLY
    gfunc = (DEFGENERIC *) vptr;
    PrintErrorID(theEnv,execStatus,"PRNTUTIL",4,FALSE);
-   EnvPrintRouter(theEnv,execStatus,WERROR,"Unable to delete method ");
+   EnvPrintRouter(theEnv,WERROR,"Unable to delete method ");
    if (gfunc != NULL)
      {
       PrintGenericName(theEnv,execStatus,WERROR,gfunc);
-      EnvPrintRouter(theEnv,execStatus,WERROR," #");
+      EnvPrintRouter(theEnv,WERROR," #");
       PrintLongInteger(theEnv,execStatus,WERROR,(long long) mi);
      }
    else
-     EnvPrintRouter(theEnv,execStatus,WERROR,"*");
-   EnvPrintRouter(theEnv,execStatus,WERROR,".\n");
+     EnvPrintRouter(theEnv,WERROR,"*");
+   EnvPrintRouter(theEnv,WERROR,".\n");
    return(FALSE);
 #else
    long nmi;
@@ -692,16 +692,16 @@ globle intBool EnvUndefmethod(
    if (Bloaded(theEnv,execStatus) == TRUE)
      {
       PrintErrorID(theEnv,execStatus,"PRNTUTIL",4,FALSE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"Unable to delete method ");
+      EnvPrintRouter(theEnv,WERROR,"Unable to delete method ");
       if (gfunc != NULL)
         {
-         EnvPrintRouter(theEnv,execStatus,WERROR,EnvGetDefgenericName(theEnv,execStatus,(void *) gfunc));
-         EnvPrintRouter(theEnv,execStatus,WERROR," #");
+         EnvPrintRouter(theEnv,WERROR,EnvGetDefgenericName(theEnv,execStatus,(void *) gfunc));
+         EnvPrintRouter(theEnv,WERROR," #");
          PrintLongInteger(theEnv,execStatus,WERROR,(long long) mi);
         }
       else
-        EnvPrintRouter(theEnv,execStatus,WERROR,"*");
-      EnvPrintRouter(theEnv,execStatus,WERROR,".\n");
+        EnvPrintRouter(theEnv,WERROR,"*");
+      EnvPrintRouter(theEnv,WERROR,".\n");
       return(FALSE);
      }
 #endif
@@ -710,7 +710,7 @@ globle intBool EnvUndefmethod(
       if (mi != 0)
         {
          PrintErrorID(theEnv,execStatus,"GENRCCOM",3,FALSE);
-         EnvPrintRouter(theEnv,execStatus,WERROR,"Incomplete method specification for deletion.\n");
+         EnvPrintRouter(theEnv,WERROR,"Incomplete method specification for deletion.\n");
          return(FALSE);
         }
       return(ClearDefmethods(theEnv,execStatus));
@@ -1053,7 +1053,7 @@ globle void EnvListDefmethods(
         {
          count += ListMethodsForGeneric(theEnv,execStatus,logicalName,gfunc);
          if (EnvGetNextDefgeneric(theEnv,execStatus,(void *) gfunc) != NULL)
-           EnvPrintRouter(theEnv,execStatus,logicalName,"\n");
+           EnvPrintRouter(theEnv,logicalName,"\n");
         }
      }
    PrintTally(theEnv,execStatus,logicalName,count,"method","methods");
@@ -1349,14 +1349,14 @@ static void PrintGenericCall(
   {
 #if DEVELOPER
 
-   EnvPrintRouter(theEnv,execStatus,logName,"(");
-   EnvPrintRouter(theEnv,execStatus,logName,EnvGetDefgenericName(theEnv,execStatus,value));
+   EnvPrintRouter(theEnv,logName,"(");
+   EnvPrintRouter(theEnv,logName,EnvGetDefgenericName(theEnv,execStatus,value));
    if (GetFirstArgument() != NULL)
      {
-      EnvPrintRouter(theEnv,execStatus,logName," ");
+      EnvPrintRouter(theEnv,logName," ");
       PrintExpression(theEnv,execStatus,logName,GetFirstArgument());
      }
-   EnvPrintRouter(theEnv,execStatus,logName,")");
+   EnvPrintRouter(theEnv,logName,")");
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
 #pragma unused(theEnv,execStatus)
@@ -1505,7 +1505,7 @@ static void SaveDefmethodsForDefgeneric(
       if (gfunc->methods[i].ppForm != NULL)
         {
          PrintInChunks(theEnv,execStatus,logName,gfunc->methods[i].ppForm);
-         EnvPrintRouter(theEnv,execStatus,logName,"\n");
+         EnvPrintRouter(theEnv,logName,"\n");
         }
      }
   }
@@ -1535,9 +1535,9 @@ static void RemoveDefgenericMethod(
      {
       SetEvaluationError(theEnv,execStatus,TRUE);
       PrintErrorID(theEnv,execStatus,"GENRCCOM",4,FALSE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"Cannot remove implicit system function method for generic function ");
-      EnvPrintRouter(theEnv,execStatus,WERROR,EnvGetDefgenericName(theEnv,execStatus,(void *) gfunc));
-      EnvPrintRouter(theEnv,execStatus,WERROR,".\n");
+      EnvPrintRouter(theEnv,WERROR,"Cannot remove implicit system function method for generic function ");
+      EnvPrintRouter(theEnv,WERROR,EnvGetDefgenericName(theEnv,execStatus,(void *) gfunc));
+      EnvPrintRouter(theEnv,WERROR,".\n");
       return;
      }
    DeleteMethodInfo(theEnv,execStatus,gfunc,&gfunc->methods[gi]);
@@ -1587,11 +1587,11 @@ static long ListMethodsForGeneric(
 
    for (gi = 0 ; gi < gfunc->mcnt ; gi++)
      {
-      EnvPrintRouter(theEnv,execStatus,logicalName,EnvGetDefgenericName(theEnv,execStatus,(void *) gfunc));
-      EnvPrintRouter(theEnv,execStatus,logicalName," #");
+      EnvPrintRouter(theEnv,logicalName,EnvGetDefgenericName(theEnv,execStatus,(void *) gfunc));
+      EnvPrintRouter(theEnv,logicalName," #");
       PrintMethod(theEnv,execStatus,buf,255,&gfunc->methods[gi]);
-      EnvPrintRouter(theEnv,execStatus,logicalName,buf);
-      EnvPrintRouter(theEnv,execStatus,logicalName,"\n");
+      EnvPrintRouter(theEnv,logicalName,buf);
+      EnvPrintRouter(theEnv,logicalName,"\n");
      }
    return((long) gfunc->mcnt);
   }
@@ -1765,8 +1765,8 @@ static unsigned DefmethodWatchSupport(
          EnvSetCurrentModule(theEnv,execStatus,(void *) theModule);
          if (traceFunc == NULL)
            {
-            EnvPrintRouter(theEnv,execStatus,logName,EnvGetDefmoduleName(theEnv,execStatus,(void *) theModule));
-            EnvPrintRouter(theEnv,execStatus,logName,":\n");
+            EnvPrintRouter(theEnv,logName,EnvGetDefmoduleName(theEnv,execStatus,(void *) theModule));
+            EnvPrintRouter(theEnv,logName,":\n");
            }
          theGeneric = EnvGetNextDefgeneric(theEnv,execStatus,NULL);
          while (theGeneric != NULL)
@@ -1778,7 +1778,7 @@ static unsigned DefmethodWatchSupport(
                   (*traceFunc)(theEnv,execStatus,newState,theGeneric,theMethod);
                 else
                   {
-                   EnvPrintRouter(theEnv,execStatus,logName,"   ");
+                   EnvPrintRouter(theEnv,logName,"   ");
                    (*printFunc)(theEnv,execStatus,logName,theGeneric,theMethod);
                   }
                 theMethod = EnvGetNextDefmethod(theEnv,execStatus,theGeneric,theMethod);
@@ -1867,14 +1867,14 @@ static void PrintMethodWatchFlag(
   {
    char buf[60];
 
-   EnvPrintRouter(theEnv,execStatus,logName,EnvGetDefgenericName(theEnv,execStatus,theGeneric));
-   EnvPrintRouter(theEnv,execStatus,logName," ");
+   EnvPrintRouter(theEnv,logName,EnvGetDefgenericName(theEnv,execStatus,theGeneric));
+   EnvPrintRouter(theEnv,logName," ");
    EnvGetDefmethodDescription(theEnv,execStatus,buf,59,theGeneric,theMethod);
-   EnvPrintRouter(theEnv,execStatus,logName,buf);
+   EnvPrintRouter(theEnv,logName,buf);
    if (EnvGetDefmethodWatch(theEnv,execStatus,theGeneric,theMethod))
-     EnvPrintRouter(theEnv,execStatus,logName," = on\n");
+     EnvPrintRouter(theEnv,logName," = on\n");
    else
-     EnvPrintRouter(theEnv,execStatus,logName," = off\n");
+     EnvPrintRouter(theEnv,logName," = off\n");
   }
 
 #endif

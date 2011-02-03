@@ -201,11 +201,11 @@ globle void AttributeConflictErrorMessage(
   char *attribute2)
   {
    PrintErrorID(theEnv,execStatus,"CSTRNPSR",1,TRUE);
-   EnvPrintRouter(theEnv,execStatus,WERROR,"The ");
-   EnvPrintRouter(theEnv,execStatus,WERROR,attribute1);
-   EnvPrintRouter(theEnv,execStatus,WERROR," attribute conflicts with the ");
-   EnvPrintRouter(theEnv,execStatus,WERROR,attribute2);
-   EnvPrintRouter(theEnv,execStatus,WERROR," attribute.\n");
+   EnvPrintRouter(theEnv,WERROR,"The ");
+   EnvPrintRouter(theEnv,WERROR,attribute1);
+   EnvPrintRouter(theEnv,WERROR," attribute conflicts with the ");
+   EnvPrintRouter(theEnv,WERROR,attribute2);
+   EnvPrintRouter(theEnv,WERROR," attribute.\n");
   }
 
 #if (! RUN_TIME) && (! BLOAD_ONLY)
@@ -731,9 +731,9 @@ static intBool ParseAllowedValuesAttribute(
       if (error)
         {
          PrintErrorID(theEnv,execStatus,"CSTRNPSR",4,TRUE);
-         EnvPrintRouter(theEnv,execStatus,WERROR,"Value does not match the expected type for the ");
-         EnvPrintRouter(theEnv,execStatus,WERROR,constraintName);
-         EnvPrintRouter(theEnv,execStatus,WERROR," attribute\n");
+         EnvPrintRouter(theEnv,WERROR,"Value does not match the expected type for the ");
+         EnvPrintRouter(theEnv,WERROR,constraintName);
+         EnvPrintRouter(theEnv,WERROR," attribute\n");
          return(FALSE);
         }
 
@@ -862,12 +862,12 @@ static void NoConjunctiveUseError(
   char *attribute2)
   {
    PrintErrorID(theEnv,execStatus,"CSTRNPSR",3,TRUE);
-   EnvPrintRouter(theEnv,execStatus,WERROR,"The ");
-   EnvPrintRouter(theEnv,execStatus,WERROR,attribute1);
-   EnvPrintRouter(theEnv,execStatus,WERROR," attribute cannot be used\n");
-   EnvPrintRouter(theEnv,execStatus,WERROR,"in conjunction with the ");
-   EnvPrintRouter(theEnv,execStatus,WERROR,attribute2);
-   EnvPrintRouter(theEnv,execStatus,WERROR," attribute.\n");
+   EnvPrintRouter(theEnv,WERROR,"The ");
+   EnvPrintRouter(theEnv,WERROR,attribute1);
+   EnvPrintRouter(theEnv,WERROR," attribute cannot be used\n");
+   EnvPrintRouter(theEnv,WERROR,"in conjunction with the ");
+   EnvPrintRouter(theEnv,WERROR,attribute2);
+   EnvPrintRouter(theEnv,WERROR," attribute.\n");
   }
 
 /**************************************************/
@@ -1057,8 +1057,8 @@ static intBool ParseRangeCardinalityAttribute(
        (multipleValuesAllowed == FALSE))
      {
       PrintErrorID(theEnv,execStatus,"CSTRNPSR",5,TRUE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"The cardinality attribute ");
-      EnvPrintRouter(theEnv,execStatus,WERROR,"can only be used with multifield slots.\n");
+      EnvPrintRouter(theEnv,WERROR,"The cardinality attribute ");
+      EnvPrintRouter(theEnv,WERROR,"can only be used with multifield slots.\n");
       return(FALSE);
      }
 
@@ -1162,8 +1162,8 @@ static intBool ParseRangeCardinalityAttribute(
                          constraints->maxValue->value) == GREATER_THAN)
         {
          PrintErrorID(theEnv,execStatus,"CSTRNPSR",2,TRUE);
-         EnvPrintRouter(theEnv,execStatus,WERROR,"Minimum range value must be less than\n");
-         EnvPrintRouter(theEnv,execStatus,WERROR,"or equal to the maximum range value\n");
+         EnvPrintRouter(theEnv,WERROR,"Minimum range value must be less than\n");
+         EnvPrintRouter(theEnv,WERROR,"or equal to the maximum range value\n");
          return(FALSE);
         }
      }
@@ -1175,8 +1175,8 @@ static intBool ParseRangeCardinalityAttribute(
                          constraints->maxFields->value) == GREATER_THAN)
         {
          PrintErrorID(theEnv,execStatus,"CSTRNPSR",2,TRUE);
-         EnvPrintRouter(theEnv,execStatus,WERROR,"Minimum cardinality value must be less than\n");
-         EnvPrintRouter(theEnv,execStatus,WERROR,"or equal to the maximum cardinality value\n");
+         EnvPrintRouter(theEnv,WERROR,"Minimum cardinality value must be less than\n");
+         EnvPrintRouter(theEnv,WERROR,"or equal to the maximum cardinality value\n");
          return(FALSE);
         }
      }

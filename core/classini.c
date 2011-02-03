@@ -408,7 +408,7 @@ globle void ObjectsRunTimeInitialize(
          if ((cls->slots[i].defaultValue != NULL) && (cls->slots[i].dynamicDefault == 0))
            {
             tmpexp = cls->slots[i].defaultValue;
-            cls->slots[i].defaultValue = (void *) get_struct(theEnv,execStatus,dataObject);
+            cls->slots[i].defaultValue = (void *) get_struct(theEnv,dataObject);
             EvaluateAndStoreInDataObject(theEnv,execStatus,(int) cls->slots[i].multiple,(EXPRESSION *) tmpexp,
                                          (DATA_OBJECT *) cls->slots[i].defaultValue,TRUE);
             ValueInstall(theEnv,execStatus,(DATA_OBJECT *) cls->slots[i].defaultValue);
@@ -750,7 +750,7 @@ static void *AllocateModule(
   void *theEnv,
   EXEC_STATUS)
   {
-   return((void *) get_struct(theEnv,execStatus,defclassModule));
+   return((void *) get_struct(theEnv,defclassModule));
   }
 
 /***************************************************

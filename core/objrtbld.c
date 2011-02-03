@@ -184,7 +184,7 @@ globle void SetupObjectPatternStuff(
       or regular facts so that the "object" keyword is always recognized first
       =========================================================================== */
 
-   newPtr = get_struct(theEnv,execStatus,patternParser);
+   newPtr = get_struct(theEnv,patternParser);
    
    newPtr->name = "objects";
    newPtr->priority = 20;
@@ -333,7 +333,7 @@ static struct lhsParseNode *ObjectLHSParse(
    if (EmptyClassBitMap(clsset))
      {
       PrintErrorID(theEnv,execStatus,"OBJRTBLD",1,FALSE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"No objects of existing classes can satisfy pattern.\n");
+      EnvPrintRouter(theEnv,WERROR,"No objects of existing classes can satisfy pattern.\n");
       DeleteIntermediateClassBitMap(theEnv,execStatus,clsset);
       return(NULL);
      }
@@ -404,16 +404,16 @@ static struct lhsParseNode *ObjectLHSParse(
       if (EmptyClassBitMap(tmpset))
         {
          PrintErrorID(theEnv,execStatus,"OBJRTBLD",2,FALSE);
-         EnvPrintRouter(theEnv,execStatus,WERROR,"No objects of existing classes can satisfy ");
-         EnvPrintRouter(theEnv,execStatus,WERROR,ValueToString(tmpNode->slot));
-         EnvPrintRouter(theEnv,execStatus,WERROR," restriction in object pattern.\n");
+         EnvPrintRouter(theEnv,WERROR,"No objects of existing classes can satisfy ");
+         EnvPrintRouter(theEnv,WERROR,ValueToString(tmpNode->slot));
+         EnvPrintRouter(theEnv,WERROR," restriction in object pattern.\n");
          ReturnLHSParseNodes(theEnv,execStatus,tmpNode);
          goto ObjectLHSParseERROR;
         }
       if (EmptyClassBitMap(clsset))
         {
          PrintErrorID(theEnv,execStatus,"OBJRTBLD",1,FALSE);
-         EnvPrintRouter(theEnv,execStatus,WERROR,"No objects of existing classes can satisfy pattern.\n");
+         EnvPrintRouter(theEnv,WERROR,"No objects of existing classes can satisfy pattern.\n");
          ReturnLHSParseNodes(theEnv,execStatus,tmpNode);
          goto ObjectLHSParseERROR;
         }
@@ -433,7 +433,7 @@ static struct lhsParseNode *ObjectLHSParse(
       if (EmptyClassBitMap(clsset))
         {
          PrintErrorID(theEnv,execStatus,"OBJRTBLD",1,FALSE);
-         EnvPrintRouter(theEnv,execStatus,WERROR,"No objects of existing classes can satisfy pattern.\n");
+         EnvPrintRouter(theEnv,WERROR,"No objects of existing classes can satisfy pattern.\n");
          goto ObjectLHSParseERROR;
         }
       firstNode = GetLHSParseNode(theEnv,execStatus);
@@ -625,9 +625,9 @@ static intBool ReorderAndAnalyzeObjectPattern(
         {
          PrintErrorID(theEnv,execStatus,"OBJRTBLD",3,TRUE);
          DeleteIntermediateClassBitMap(theEnv,execStatus,tmpset);
-         EnvPrintRouter(theEnv,execStatus,WERROR,"No objects of existing classes can satisfy pattern #");
+         EnvPrintRouter(theEnv,WERROR,"No objects of existing classes can satisfy pattern #");
          PrintLongInteger(theEnv,execStatus,WERROR,(long long) topNode->pattern);
-         EnvPrintRouter(theEnv,execStatus,WERROR,".\n");
+         EnvPrintRouter(theEnv,WERROR,".\n");
          return(TRUE);
         }
       clsset = PackClassBitMap(theEnv,execStatus,tmpset);
@@ -765,7 +765,7 @@ static struct patternNodeHeader *PlaceObjectPattern(
       newAlphaNode = newAlphaNode->nxtInGroup;
      }
    
-   newAlphaNode = get_struct(theEnv,execStatus,objectAlphaNode);
+   newAlphaNode = get_struct(theEnv,objectAlphaNode);
    InitializePatternHeader(theEnv,execStatus,&newAlphaNode->header);
    newAlphaNode->header.rightHash = AddHashedExpression(theEnv,execStatus,rightHash);
    newAlphaNode->matchTimeTag = 0L;
@@ -891,7 +891,7 @@ static OBJECT_PATTERN_NODE *CreateNewObjectPatternNode(
   {
    OBJECT_PATTERN_NODE *newNode,*prvNode,*curNode;
 
-   newNode = get_struct(theEnv,execStatus,objectPatternNode);
+   newNode = get_struct(theEnv,objectPatternNode);
    newNode->blocked = FALSE;
    newNode->multifieldNode = FALSE;
    newNode->alphaNode = NULL;
@@ -1313,9 +1313,9 @@ static intBool CheckDuplicateSlots(
       if (nodeList->slot == slotName)
         {
          PrintErrorID(theEnv,execStatus,"OBJRTBLD",4,TRUE);
-         EnvPrintRouter(theEnv,execStatus,WERROR,"Multiple restrictions on attribute ");
-         EnvPrintRouter(theEnv,execStatus,WERROR,ValueToString(slotName));
-         EnvPrintRouter(theEnv,execStatus,WERROR," not allowed.\n");
+         EnvPrintRouter(theEnv,WERROR,"Multiple restrictions on attribute ");
+         EnvPrintRouter(theEnv,WERROR,ValueToString(slotName));
+         EnvPrintRouter(theEnv,WERROR," not allowed.\n");
          return(TRUE);
         }
       nodeList = nodeList->right;
@@ -1764,7 +1764,7 @@ static intBool ProcessClassRestriction(
          if (chk->value == NULL)
            {
             PrintErrorID(theEnv,execStatus,"OBJRTBLD",5,FALSE);
-            EnvPrintRouter(theEnv,execStatus,WERROR,"Undefined class in object pattern.\n");
+            EnvPrintRouter(theEnv,WERROR,"Undefined class in object pattern.\n");
             DeleteIntermediateClassBitMap(theEnv,execStatus,tmpset1);
             DeleteIntermediateClassBitMap(theEnv,execStatus,tmpset2);
             return(FALSE);
@@ -1787,8 +1787,8 @@ static intBool ProcessClassRestriction(
    if (EmptyClassBitMap(tmpset1))
      {
       PrintErrorID(theEnv,execStatus,"OBJRTBLD",2,FALSE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"No objects of existing classes can satisfy ");
-      EnvPrintRouter(theEnv,execStatus,WERROR,"is-a restriction in object pattern.\n");
+      EnvPrintRouter(theEnv,WERROR,"No objects of existing classes can satisfy ");
+      EnvPrintRouter(theEnv,WERROR,"is-a restriction in object pattern.\n");
       DeleteIntermediateClassBitMap(theEnv,execStatus,tmpset1);
       DeleteIntermediateClassBitMap(theEnv,execStatus,tmpset2);
       return(FALSE);

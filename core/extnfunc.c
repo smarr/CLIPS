@@ -403,7 +403,7 @@ globle int AddFunctionParser(
    fdPtr = FindFunction(theEnv,execStatus,functionName);
    if (fdPtr == NULL)
      {
-      EnvPrintRouter(theEnv,execStatus,WERROR,"Function parsers can only be added for existing functions.\n");
+      EnvPrintRouter(theEnv,WERROR,"Function parsers can only be added for existing functions.\n");
       return(0);
      }
    fdPtr->restrictions = NULL;
@@ -427,7 +427,7 @@ globle int RemoveFunctionParser(
    fdPtr = FindFunction(theEnv,execStatus,functionName);
    if (fdPtr == NULL)
      {
-      EnvPrintRouter(theEnv,execStatus,WERROR,"Function parsers can only be removed from existing functions.\n");
+      EnvPrintRouter(theEnv,WERROR,"Function parsers can only be removed from existing functions.\n");
       return(0);
      }
 
@@ -452,7 +452,7 @@ globle int FuncSeqOvlFlags(
    fdPtr = FindFunction(theEnv,execStatus,functionName);
    if (fdPtr == NULL)
      {
-      EnvPrintRouter(theEnv,execStatus,WERROR,"Only existing functions can be marked as using sequence expansion arguments/overloadable or not.\n");
+      EnvPrintRouter(theEnv,WERROR,"Only existing functions can be marked as using sequence expansion arguments/overloadable or not.\n");
       return(FALSE);
      }
    fdPtr->sequenceuseok = (short) (seqp ? TRUE : FALSE);

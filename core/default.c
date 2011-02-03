@@ -419,7 +419,7 @@ globle struct expr *ParseDefault(
       if (*error)
         {
          PrintErrorID(theEnv,execStatus,"DEFAULT",1,TRUE);
-         EnvPrintRouter(theEnv,execStatus,WERROR,"The default value for a single field slot must be a single field value\n");
+         EnvPrintRouter(theEnv,WERROR,"The default value for a single field slot must be a single field value\n");
          ReturnExpression(theEnv,execStatus,defaultList);
          return(NULL);
         }
@@ -447,7 +447,7 @@ globle struct expr *ParseDefault(
           (*error == FALSE))
         {
          PrintErrorID(theEnv,execStatus,"DEFAULT",1,TRUE);
-         EnvPrintRouter(theEnv,execStatus,WERROR,"The default value for a single field slot must be a single field value\n");
+         EnvPrintRouter(theEnv,WERROR,"The default value for a single field slot must be a single field value\n");
          *error = TRUE;
         }
 

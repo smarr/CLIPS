@@ -314,7 +314,7 @@ globle int ParseDefclass(
    if (abstract && reactive)
      {
       PrintErrorID(theEnv,execStatus,"CLASSPSR",1,FALSE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"An abstract class cannot be reactive.\n");
+      EnvPrintRouter(theEnv,WERROR,"An abstract class cannot be reactive.\n");
       DeletePackedClassLinks(theEnv,execStatus,sclasses,TRUE);
       DeletePackedClassLinks(theEnv,execStatus,preclist,TRUE);
       DeleteSlots(theEnv,execStatus,slots);
@@ -401,7 +401,7 @@ static intBool ValidClassName(
       if ((*theDefclass)->system)
         {
          PrintErrorID(theEnv,execStatus,"CLASSPSR",2,FALSE);
-         EnvPrintRouter(theEnv,execStatus,WERROR,"Cannot redefine a predefined system class.\n");
+         EnvPrintRouter(theEnv,WERROR,"Cannot redefine a predefined system class.\n");
          return(FALSE);
         }
 
@@ -414,9 +414,9 @@ static intBool ValidClassName(
           (! ConstructData(theEnv,execStatus)->CheckSyntaxMode))
         {
          PrintErrorID(theEnv,execStatus,"CLASSPSR",3,FALSE);
-         EnvPrintRouter(theEnv,execStatus,WERROR,EnvGetDefclassName(theEnv,execStatus,(void *) *theDefclass));
-         EnvPrintRouter(theEnv,execStatus,WERROR," class cannot be redefined while\n");
-         EnvPrintRouter(theEnv,execStatus,WERROR,"    outstanding references to it still exist.\n");
+         EnvPrintRouter(theEnv,WERROR,EnvGetDefclassName(theEnv,execStatus,(void *) *theDefclass));
+         EnvPrintRouter(theEnv,WERROR," class cannot be redefined while\n");
+         EnvPrintRouter(theEnv,WERROR,"    outstanding references to it still exist.\n");
          return(FALSE);
         }
      }
@@ -454,9 +454,9 @@ static intBool ParseSimpleQualifier(
    if (*alreadyTestedFlag)
      {
       PrintErrorID(theEnv,execStatus,"CLASSPSR",4,FALSE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"Class ");
-      EnvPrintRouter(theEnv,execStatus,WERROR,classQualifier);
-      EnvPrintRouter(theEnv,execStatus,WERROR," already declared.\n");
+      EnvPrintRouter(theEnv,WERROR,"Class ");
+      EnvPrintRouter(theEnv,WERROR,classQualifier);
+      EnvPrintRouter(theEnv,WERROR," already declared.\n");
       return(FALSE);
      }
    SavePPBuffer(theEnv,execStatus," ");
@@ -787,7 +787,7 @@ static TEMP_SLOT_LINK *MergeSlots(
            cur = cur->nxt;
          if (cur == NULL)
            {
-            tmp = get_struct(theEnv,execStatus,tempSlotLink);
+            tmp = get_struct(theEnv,tempSlotLink);
             tmp->desc = newSlot;
             tmp->nxt = old;
             old = tmp;

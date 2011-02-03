@@ -641,14 +641,14 @@ static void PrintDeffunctionCall(
   {
 #if DEVELOPER
 
-   EnvPrintRouter(theEnv,execStatus,logName,"(");
-   EnvPrintRouter(theEnv,execStatus,logName,EnvGetDeffunctionName(theEnv,execStatus,value));
+   EnvPrintRouter(theEnv,logName,"(");
+   EnvPrintRouter(theEnv,logName,EnvGetDeffunctionName(theEnv,execStatus,value));
    if (GetFirstArgument() != NULL)
      {
-      EnvPrintRouter(theEnv,execStatus,logName," ");
+      EnvPrintRouter(theEnv,logName," ");
       PrintExpression(theEnv,execStatus,logName,GetFirstArgument());
      }
-   EnvPrintRouter(theEnv,execStatus,logName,")");
+   EnvPrintRouter(theEnv,logName,")");
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
 #pragma unused(theEnv,execStatus)
@@ -749,7 +749,7 @@ static void *AllocateModule(
   void *theEnv,
   EXEC_STATUS)
   {
-   return((void *) get_struct(theEnv,execStatus,deffunctionModule));
+   return((void *) get_struct(theEnv,deffunctionModule));
   }
 
 /***************************************************
@@ -849,9 +849,9 @@ static intBool RemoveAllDeffunctions(
          if (dtmp->busy > 0)
            {
             PrintWarningID(theEnv,execStatus,"DFFNXFUN",1,FALSE);
-            EnvPrintRouter(theEnv,execStatus,WWARNING,"Deffunction ");
-            EnvPrintRouter(theEnv,execStatus,WWARNING,EnvGetDeffunctionName(theEnv,execStatus,(void *) dtmp));
-            EnvPrintRouter(theEnv,execStatus,WWARNING," only partially deleted due to usage by other constructs.\n");
+            EnvPrintRouter(theEnv,WWARNING,"Deffunction ");
+            EnvPrintRouter(theEnv,WWARNING,EnvGetDeffunctionName(theEnv,execStatus,(void *) dtmp));
+            EnvPrintRouter(theEnv,WWARNING," only partially deleted due to usage by other constructs.\n");
             SetDeffunctionPPForm((void *) dtmp,NULL);
             success = FALSE;
            }
@@ -927,26 +927,26 @@ static void SaveDeffunctionHeader(
 
    if (EnvGetDeffunctionPPForm(theEnv,execStatus,(void *) dfnxPtr) != NULL)
      {
-      EnvPrintRouter(theEnv,execStatus,logicalName,"(deffunction ");
-      EnvPrintRouter(theEnv,execStatus,logicalName,EnvDeffunctionModule(theEnv,execStatus,(void *) dfnxPtr));
-      EnvPrintRouter(theEnv,execStatus,logicalName,"::");      
-      EnvPrintRouter(theEnv,execStatus,logicalName,EnvGetDeffunctionName(theEnv,execStatus,(void *) dfnxPtr));
-      EnvPrintRouter(theEnv,execStatus,logicalName," (");
+      EnvPrintRouter(theEnv,logicalName,"(deffunction ");
+      EnvPrintRouter(theEnv,logicalName,EnvDeffunctionModule(theEnv,execStatus,(void *) dfnxPtr));
+      EnvPrintRouter(theEnv,logicalName,"::");      
+      EnvPrintRouter(theEnv,logicalName,EnvGetDeffunctionName(theEnv,execStatus,(void *) dfnxPtr));
+      EnvPrintRouter(theEnv,logicalName," (");
       for (i = 0 ; i < dfnxPtr->minNumberOfParameters ; i++)
         {
-         EnvPrintRouter(theEnv,execStatus,logicalName,"?p");
+         EnvPrintRouter(theEnv,logicalName,"?p");
          PrintLongInteger(theEnv,execStatus,logicalName,(long long) i);
          if (i != dfnxPtr->minNumberOfParameters-1)
-           EnvPrintRouter(theEnv,execStatus,logicalName," ");
+           EnvPrintRouter(theEnv,logicalName," ");
         }
       if (dfnxPtr->maxNumberOfParameters == -1)
         {
          if (dfnxPtr->minNumberOfParameters != 0)
-           EnvPrintRouter(theEnv,execStatus,logicalName," ");
-         EnvPrintRouter(theEnv,execStatus,logicalName,"$?wildargs))\n\n");
+           EnvPrintRouter(theEnv,logicalName," ");
+         EnvPrintRouter(theEnv,logicalName,"$?wildargs))\n\n");
         }
       else
-        EnvPrintRouter(theEnv,execStatus,logicalName,"))\n\n");
+        EnvPrintRouter(theEnv,logicalName,"))\n\n");
      }
   }
 

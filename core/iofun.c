@@ -198,31 +198,31 @@ globle void PrintoutFunction(
            if (strcmp(DOToString(theArgument),"crlf") == 0)
              {    
               if (IOFunctionData(theEnv,execStatus)->useFullCRLF)
-                { EnvPrintRouter(theEnv,execStatus,dummyid,"\r\n"); }
+                { EnvPrintRouter(theEnv,dummyid,"\r\n"); }
               else
-                { EnvPrintRouter(theEnv,execStatus,dummyid,"\n"); }
+                { EnvPrintRouter(theEnv,dummyid,"\n"); }
              }
            else if (strcmp(DOToString(theArgument),"tab") == 0)
-             { EnvPrintRouter(theEnv,execStatus,dummyid,"\t"); }
+             { EnvPrintRouter(theEnv,dummyid,"\t"); }
            else if (strcmp(DOToString(theArgument),"vtab") == 0)
-             { EnvPrintRouter(theEnv,execStatus,dummyid,"\v"); }
+             { EnvPrintRouter(theEnv,dummyid,"\v"); }
            else if (strcmp(DOToString(theArgument),"ff") == 0)
-             { EnvPrintRouter(theEnv,execStatus,dummyid,"\f"); }
+             { EnvPrintRouter(theEnv,dummyid,"\f"); }
              /*
            else if (strcmp(DOToString(theArgument),"t") == 0)
              { 
               if (IOFunctionData(theEnv,execStatus)->useFullCRLF)
-                { EnvPrintRouter(theEnv,execStatus,dummyid,"\r\n"); }
+                { EnvPrintRouter(theEnv,dummyid,"\r\n"); }
               else
-                { EnvPrintRouter(theEnv,execStatus,dummyid,"\n"); }
+                { EnvPrintRouter(theEnv,dummyid,"\n"); }
              }
              */
            else
-             { EnvPrintRouter(theEnv,execStatus,dummyid,DOToString(theArgument)); }
+             { EnvPrintRouter(theEnv,dummyid,DOToString(theArgument)); }
            break;
 
          case STRING:
-           EnvPrintRouter(theEnv,execStatus,dummyid,DOToString(theArgument));
+           EnvPrintRouter(theEnv,dummyid,DOToString(theArgument));
            break;
 
          default:
@@ -479,9 +479,9 @@ globle int OpenFunction(
       SetHaltExecution(theEnv,execStatus,TRUE);
       SetEvaluationError(theEnv,execStatus,TRUE);
       PrintErrorID(theEnv,execStatus,"IOFUN",2,FALSE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"Logical name ");
-      EnvPrintRouter(theEnv,execStatus,WERROR,logicalName);
-      EnvPrintRouter(theEnv,execStatus,WERROR," already in use.\n");
+      EnvPrintRouter(theEnv,WERROR,"Logical name ");
+      EnvPrintRouter(theEnv,WERROR,logicalName);
+      EnvPrintRouter(theEnv,WERROR," already in use.\n");
       return(0);
      }
 
@@ -846,7 +846,7 @@ globle void *FormatFunction(
    if (fstr != NULL)
      {
       hptr = EnvAddSymbol(theEnv,execStatus,fstr);
-      if (strcmp(logicalName,"nil") != 0) EnvPrintRouter(theEnv,execStatus,logicalName,fstr);
+      if (strcmp(logicalName,"nil") != 0) EnvPrintRouter(theEnv,logicalName,fstr);
       rm(theEnv,execStatus,fstr,fmaxm);
      }
    else
@@ -884,9 +884,9 @@ static char *ControlStringCheck(
          if (formatFlag == '-')
            { 
             PrintErrorID(theEnv,execStatus,"IOFUN",3,FALSE);
-            EnvPrintRouter(theEnv,execStatus,WERROR,"Invalid format flag \"");
-            EnvPrintRouter(theEnv,execStatus,WERROR,print_buff);
-            EnvPrintRouter(theEnv,execStatus,WERROR,"\" specified in format function.\n");
+            EnvPrintRouter(theEnv,WERROR,"Invalid format flag \"");
+            EnvPrintRouter(theEnv,WERROR,print_buff);
+            EnvPrintRouter(theEnv,WERROR,"\" specified in format function.\n");
             SetEvaluationError(theEnv,execStatus,TRUE);
             return (NULL);
            }
@@ -1115,8 +1115,8 @@ static char *PrintFormatFlag(
         break;
 
       default:
-         EnvPrintRouter(theEnv,execStatus,WERROR," Error in format, the conversion character");
-         EnvPrintRouter(theEnv,execStatus,WERROR," for formatted output is not valid\n");
+         EnvPrintRouter(theEnv,WERROR," Error in format, the conversion character");
+         EnvPrintRouter(theEnv,WERROR," for formatted output is not valid\n");
          return(FALSE);
      }
 

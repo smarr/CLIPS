@@ -699,7 +699,7 @@ static DATA_OBJECT *ProcessSaveClassList(
          prv = newItem;
          newItem = newItem->next;
         }
-      newItem = get_struct(theEnv,execStatus,dataObject);
+      newItem = get_struct(theEnv,dataObject);
       newItem->type = DEFCLASS_PTR;
       newItem->value = (void *) theDefclass;
       newItem->next = NULL;
@@ -911,29 +911,29 @@ static void SaveSingleInstanceText(
    INSTANCE_SLOT *sp;
    char *logicalName = (char *) vLogicalName;
 
-   EnvPrintRouter(theEnv,execStatus,logicalName,"([");
-   EnvPrintRouter(theEnv,execStatus,logicalName,ValueToString(theInstance->name));
-   EnvPrintRouter(theEnv,execStatus,logicalName,"] of ");
-   EnvPrintRouter(theEnv,execStatus,logicalName,ValueToString(theInstance->cls->header.name));
+   EnvPrintRouter(theEnv,logicalName,"([");
+   EnvPrintRouter(theEnv,logicalName,ValueToString(theInstance->name));
+   EnvPrintRouter(theEnv,logicalName,"] of ");
+   EnvPrintRouter(theEnv,logicalName,ValueToString(theInstance->cls->header.name));
    for (i = 0 ; i < theInstance->cls->instanceSlotCount ; i++)
      {
       sp = theInstance->slotAddresses[i];
-      EnvPrintRouter(theEnv,execStatus,logicalName,"\n   (");
-      EnvPrintRouter(theEnv,execStatus,logicalName,ValueToString(sp->desc->slotName->name));
+      EnvPrintRouter(theEnv,logicalName,"\n   (");
+      EnvPrintRouter(theEnv,logicalName,ValueToString(sp->desc->slotName->name));
       if (sp->type != MULTIFIELD)
         {
-         EnvPrintRouter(theEnv,execStatus,logicalName," ");
+         EnvPrintRouter(theEnv,logicalName," ");
          PrintAtom(theEnv,execStatus,logicalName,(int) sp->type,sp->value);
         }
       else if (GetInstanceSlotLength(sp) != 0)
         {
-         EnvPrintRouter(theEnv,execStatus,logicalName," ");
+         EnvPrintRouter(theEnv,logicalName," ");
          PrintMultifield(theEnv,execStatus,logicalName,(MULTIFIELD_PTR) sp->value,0,
                          (long) (GetInstanceSlotLength(sp) - 1),FALSE);
         }
-      EnvPrintRouter(theEnv,execStatus,logicalName,")");
+      EnvPrintRouter(theEnv,logicalName,")");
      }
-   EnvPrintRouter(theEnv,execStatus,logicalName,")\n\n");
+   EnvPrintRouter(theEnv,logicalName,")\n\n");
   }
 
 #if BSAVE_INSTANCES
@@ -1290,11 +1290,11 @@ static void ProcessFileErrorMessage(
   char *fileName)
   {
    PrintErrorID(theEnv,execStatus,"INSFILE",1,FALSE);
-   EnvPrintRouter(theEnv,execStatus,WERROR,"Function ");
-   EnvPrintRouter(theEnv,execStatus,WERROR,functionName);
-   EnvPrintRouter(theEnv,execStatus,WERROR," could not completely process file ");
-   EnvPrintRouter(theEnv,execStatus,WERROR,fileName);
-   EnvPrintRouter(theEnv,execStatus,WERROR,".\n");
+   EnvPrintRouter(theEnv,WERROR,"Function ");
+   EnvPrintRouter(theEnv,WERROR,functionName);
+   EnvPrintRouter(theEnv,WERROR," could not completely process file ");
+   EnvPrintRouter(theEnv,WERROR,fileName);
+   EnvPrintRouter(theEnv,WERROR,".\n");
   }
 
 #if BLOAD_INSTANCES
@@ -1321,16 +1321,16 @@ static intBool VerifyBinaryHeader(
    if (strcmp(buf,InstanceFileData(theEnv,execStatus)->InstanceBinaryPrefixID) != 0)
      {
       PrintErrorID(theEnv,execStatus,"INSFILE",2,FALSE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,theFile);
-      EnvPrintRouter(theEnv,execStatus,WERROR," file is not a binary instances file.\n");
+      EnvPrintRouter(theEnv,WERROR,theFile);
+      EnvPrintRouter(theEnv,WERROR," file is not a binary instances file.\n");
       return(FALSE);
      }
    GenReadBinary(theEnv,execStatus,(void *) buf,(unsigned long) (strlen(InstanceFileData(theEnv,execStatus)->InstanceBinaryVersionID) + 1));
    if (strcmp(buf,InstanceFileData(theEnv,execStatus)->InstanceBinaryVersionID) != 0)
      {
       PrintErrorID(theEnv,execStatus,"INSFILE",3,FALSE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,theFile);
-      EnvPrintRouter(theEnv,execStatus,WERROR," file is not a compatible binary instances file.\n");
+      EnvPrintRouter(theEnv,WERROR,theFile);
+      EnvPrintRouter(theEnv,WERROR," file is not a compatible binary instances file.\n");
       return(FALSE);
      }
    return(TRUE);
@@ -1486,9 +1486,9 @@ static void BinaryLoadInstanceError(
   DEFCLASS *theDefclass)
   {
    PrintErrorID(theEnv,execStatus,"INSFILE",4,FALSE);
-   EnvPrintRouter(theEnv,execStatus,WERROR,"Function bload-instances unable to load instance [");
-   EnvPrintRouter(theEnv,execStatus,WERROR,ValueToString(instanceName));
-   EnvPrintRouter(theEnv,execStatus,WERROR,"] of class ");
+   EnvPrintRouter(theEnv,WERROR,"Function bload-instances unable to load instance [");
+   EnvPrintRouter(theEnv,WERROR,ValueToString(instanceName));
+   EnvPrintRouter(theEnv,WERROR,"] of class ");
    PrintClassName(theEnv,execStatus,WERROR,theDefclass,TRUE);
   }
 

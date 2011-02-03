@@ -731,7 +731,7 @@ globle void EnvFacts(
       if (factPtr->factIndex >= start)
         {
          PrintFactWithIdentifier(theEnv,execStatus,logicalName,factPtr);
-         EnvPrintRouter(theEnv,execStatus,logicalName,"\n");
+         EnvPrintRouter(theEnv,logicalName,"\n");
          count++;
          if (max > 0) max--;
         }
@@ -1043,7 +1043,7 @@ globle intBool EnvSaveFacts(
       if (printFact)
         {
          PrintFact(theEnv,execStatus,(char *) filePtr,theFact,FALSE,FALSE);
-         EnvPrintRouter(theEnv,execStatus,(char *) filePtr,"\n");
+         EnvPrintRouter(theEnv,(char *) filePtr,"\n");
         }
      }
 
@@ -1329,7 +1329,7 @@ static struct expr *StandardLoadFact(
 
    if (error == TRUE)
      {
-      EnvPrintRouter(theEnv,execStatus,WERROR,"Function load-facts encountered an error\n");
+      EnvPrintRouter(theEnv,WERROR,"Function load-facts encountered an error\n");
       SetEvaluationError(theEnv,execStatus,TRUE);
       ReturnExpression(theEnv,execStatus,temp);
       return(NULL);

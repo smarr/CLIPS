@@ -631,9 +631,9 @@ static void NoSuchTemplateError(
   char *templateName)
   {
    PrintErrorID(theEnv,execStatus,"FACTRHS",1,FALSE);
-   EnvPrintRouter(theEnv,execStatus,WERROR,"Template ");
-   EnvPrintRouter(theEnv,execStatus,WERROR,templateName);
-   EnvPrintRouter(theEnv,execStatus,WERROR," does not exist for assert.\n");
+   EnvPrintRouter(theEnv,WERROR,"Template ");
+   EnvPrintRouter(theEnv,WERROR,templateName);
+   EnvPrintRouter(theEnv,WERROR," does not exist for assert.\n");
   }
 
 #endif /* RUN_TIME || BLOAD_ONLY || BLOAD || BLOAD_AND_BSAVE */

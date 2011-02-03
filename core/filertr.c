@@ -265,7 +265,7 @@ globle int OpenAFile(
    /* Create a new file router. */
    /*===========================*/
 
-   newRouter = get_struct(theEnv,execStatus,fileRouter);
+   newRouter = get_struct(theEnv,fileRouter);
    newRouter->logicalName = (char *) gm2(theEnv,execStatus,strlen(logicalName) + 1);
    genstrcpy(newRouter->logicalName,logicalName);
    newRouter->stream = newstream;

@@ -671,7 +671,7 @@ globle struct callFunctionItem *AddFunctionToCallListWithContext(
   {
    struct callFunctionItem *newPtr, *currentPtr, *lastPtr = NULL;
 
-   newPtr = get_struct(theEnv,execStatus,callFunctionItem);
+   newPtr = get_struct(theEnv,callFunctionItem);
 
    newPtr->name = name;
    newPtr->func = func;
@@ -828,11 +828,10 @@ globle unsigned long ItemHashValue(
 /*   is running in the background.          */
 /********************************************/
 globle void YieldTime(
-  void *theEnv,
-  EXEC_STATUS)
+  void *theEnv)
   {
-   if ((UtilityData(theEnv,execStatus)->YieldTimeFunction != NULL) && UtilityData(theEnv,execStatus)->YieldFunctionEnabled)
-     { (*UtilityData(theEnv,execStatus)->YieldTimeFunction)(); }
+   if ((UtilityData(theEnv)->YieldTimeFunction != NULL) && UtilityData(theEnv)->YieldFunctionEnabled)
+     { (*UtilityData(theEnv)->YieldTimeFunction)(); }
   }
   
 /********************************************/
@@ -920,7 +919,7 @@ globle struct trackedMemory *AddTrackedMemory(
   {
    struct trackedMemory *newPtr;
    
-   newPtr = get_struct(theEnv,execStatus,trackedMemory);
+   newPtr = get_struct(theEnv,trackedMemory);
    
    newPtr->prev = NULL;
    newPtr->theMemory = theMemory;

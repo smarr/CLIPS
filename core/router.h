@@ -76,7 +76,7 @@ struct routerData
    int Abort;
   };
 
-#define RouterData(theEnv,execStatus) ((struct routerData *) GetEnvironmentData(theEnv,execStatus,ROUTER_DATA))
+#define RouterData(theEnv) ((struct routerData *) GetEnvironmentData(theEnv,ROUTER_DATA))
 
 #ifdef LOCALE
 #undef LOCALE

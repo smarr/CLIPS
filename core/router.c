@@ -100,7 +100,6 @@ static void DeallocateRouterData(
 /*******************************************/
 globle int EnvPrintRouter(
   void *theEnv,
-  EXEC_STATUS,
   char *logicalName,
   char *str)
   {
@@ -113,9 +112,9 @@ globle int EnvPrintRouter(
    /* all of the routers.                               */
    /*===================================================*/
 
-   if (((char *) RouterData(theEnv,execStatus)->FastSaveFilePtr) == logicalName)
+   if (((char *) RouterData(theEnv)->FastSaveFilePtr) == logicalName)
      {
-      fprintf(RouterData(theEnv,execStatus)->FastSaveFilePtr,"%s",str);
+      fprintf(RouterData(theEnv)->FastSaveFilePtr,"%s",str);
       return(2);
      }
 
@@ -124,7 +123,7 @@ globle int EnvPrintRouter(
    /* is found that will handle the print request. */
    /*==============================================*/
 
-   currentPtr = RouterData(theEnv,execStatus)->ListOfRouters;
+   currentPtr = RouterData(theEnv)->ListOfRouters;
    while (currentPtr != NULL)
      {
       if ((currentPtr->printer != NULL) ? QueryRouter(theEnv,execStatus,logicalName,currentPtr) : FALSE)
@@ -412,7 +411,7 @@ globle intBool AddRouter(
    // Lode: TODO add exec_status??
    theEnv = GetCurrentEnvironment();
 
-   newPtr = get_struct(theEnv,execStatus,router);
+   newPtr = get_struct(theEnv,router);
 
    nameCopy = (char *) genalloc(theEnv,execStatus,strlen(routerName) + 1);
    genstrcpy(nameCopy,routerName);     
@@ -495,7 +494,7 @@ globle intBool EnvAddRouterWithContext(
    struct router *newPtr, *lastPtr, *currentPtr;
    char  *nameCopy;
 
-   newPtr = get_struct(theEnv,execStatus,router);
+   newPtr = get_struct(theEnv,router);
 
    nameCopy = (char *) genalloc(theEnv,execStatus,strlen(routerName) + 1);
    genstrcpy(nameCopy,routerName);     
@@ -740,9 +739,9 @@ globle void UnrecognizedRouterMessage(
   char *logicalName)
   {
    PrintErrorID(theEnv,execStatus,"ROUTER",1,FALSE);
-   EnvPrintRouter(theEnv,execStatus,WERROR,"Logical name ");
-   EnvPrintRouter(theEnv,execStatus,WERROR,logicalName);
-   EnvPrintRouter(theEnv,execStatus,WERROR," was not recognized by any routers\n");
+   EnvPrintRouter(theEnv,WERROR,"Logical name ");
+   EnvPrintRouter(theEnv,WERROR,logicalName);
+   EnvPrintRouter(theEnv,WERROR," was not recognized by any routers\n");
   }
 
 /*****************************************/
@@ -761,7 +760,7 @@ globle int PrintNRouter(
    tempStr = (char *) genalloc(theEnv,execStatus,length+1);
    genstrncpy(tempStr,str,length);
    tempStr[length] = 0;
-   rv = EnvPrintRouter(theEnv,execStatus,logicalName,tempStr);
+   rv = EnvPrintRouter(theEnv,logicalName,tempStr);
    genfree(theEnv,execStatus,tempStr,length+1);
    return(rv);
   }

@@ -349,11 +349,11 @@ globle void AmbiguousReferenceErrorMessage(
   char *constructName,
   char *findName)
   {
-   EnvPrintRouter(theEnv,execStatus,WERROR,"Ambiguous reference to ");
-   EnvPrintRouter(theEnv,execStatus,WERROR,constructName);
-   EnvPrintRouter(theEnv,execStatus,WERROR," ");
-   EnvPrintRouter(theEnv,execStatus,WERROR,findName);
-   EnvPrintRouter(theEnv,execStatus,WERROR,".\nIt is imported from more than one module.\n");
+   EnvPrintRouter(theEnv,WERROR,"Ambiguous reference to ");
+   EnvPrintRouter(theEnv,WERROR,constructName);
+   EnvPrintRouter(theEnv,WERROR," ");
+   EnvPrintRouter(theEnv,WERROR,findName);
+   EnvPrintRouter(theEnv,WERROR,".\nIt is imported from more than one module.\n");
   }
 
 /****************************************************/
@@ -630,8 +630,8 @@ globle void ListItemsDriver(
      {
       if (allModules)
         {
-         EnvPrintRouter(theEnv,execStatus,logicalName,EnvGetDefmoduleName(theEnv,execStatus,theModule));
-         EnvPrintRouter(theEnv,execStatus,logicalName,":\n");
+         EnvPrintRouter(theEnv,logicalName,EnvGetDefmoduleName(theEnv,execStatus,theModule));
+         EnvPrintRouter(theEnv,logicalName,":\n");
         }
 
       EnvSetCurrentModule(theEnv,execStatus,(void *) theModule);
@@ -649,16 +649,16 @@ globle void ListItemsDriver(
             constructName = (*nameFunction)(constructPtr);
             if (constructName != NULL)
               {
-               if (allModules) EnvPrintRouter(theEnv,execStatus,logicalName,"   ");
-               EnvPrintRouter(theEnv,execStatus,logicalName,constructName);
-               EnvPrintRouter(theEnv,execStatus,logicalName,"\n");
+               if (allModules) EnvPrintRouter(theEnv,logicalName,"   ");
+               EnvPrintRouter(theEnv,logicalName,constructName);
+               EnvPrintRouter(theEnv,logicalName,"\n");
               }
            }
          else if (printFunction != NULL)
            {
-            if (allModules) EnvPrintRouter(theEnv,execStatus,logicalName,"   ");
+            if (allModules) EnvPrintRouter(theEnv,logicalName,"   ");
             (*printFunction)(theEnv,execStatus,logicalName,constructPtr);
-            EnvPrintRouter(theEnv,execStatus,logicalName,"\n");
+            EnvPrintRouter(theEnv,logicalName,"\n");
            }
 
          constructPtr = (*nextFunction)(theEnv,execStatus,constructPtr);

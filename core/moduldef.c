@@ -201,7 +201,7 @@ globle int RegisterModuleItem(
   {
    struct moduleItem *newModuleItem;
 
-   newModuleItem = get_struct(theEnv,execStatus,moduleItem);
+   newModuleItem = get_struct(theEnv,moduleItem);
    newModuleItem->name = theItem;
    newModuleItem->allocateFunction = allocateFunction;
    newModuleItem->freeFunction = freeFunction;
@@ -334,7 +334,7 @@ globle void SaveCurrentModule(
   {
    MODULE_STACK_ITEM *tmp;
 
-   tmp = get_struct(theEnv,execStatus,moduleStackItem);
+   tmp = get_struct(theEnv,moduleStackItem);
    tmp->changeFlag = DefmoduleData(theEnv,execStatus)->CallModuleChangeFunctions;
    DefmoduleData(theEnv,execStatus)->CallModuleChangeFunctions = FALSE;
    tmp->theModule = DefmoduleData(theEnv,execStatus)->CurrentModule;
@@ -422,7 +422,7 @@ globle void CreateMainModule(
    /* and name it the MAIN module.          */
    /*=======================================*/
 
-   newDefmodule = get_struct(theEnv,execStatus,defmodule);
+   newDefmodule = get_struct(theEnv,defmodule);
    newDefmodule->name = (SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,"MAIN");
    IncrementSymbolCount(newDefmodule->name);
    newDefmodule->next = NULL;
@@ -801,7 +801,7 @@ globle void IllegalModuleSpecifierMessage(
   EXEC_STATUS)
   {
    PrintErrorID(theEnv,execStatus,"MODULDEF",1,TRUE);
-   EnvPrintRouter(theEnv,execStatus,WERROR,"Illegal use of the module specifier.\n");
+   EnvPrintRouter(theEnv,WERROR,"Illegal use of the module specifier.\n");
   }
 
 

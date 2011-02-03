@@ -259,7 +259,7 @@ static int CreateReadStringSource(
 
    if (FindStringRouter(theEnv,execStatus,name) != NULL) return(0);
 
-   newStringRouter = get_struct(theEnv,execStatus,stringRouter);
+   newStringRouter = get_struct(theEnv,stringRouter);
    newStringRouter->name = (char *) gm1(theEnv,execStatus,strlen(name) + 1);
    genstrcpy(newStringRouter->name,name);
    newStringRouter->str = str;
@@ -324,7 +324,7 @@ globle int OpenStringDestination(
 
    if (FindStringRouter(theEnv,execStatus,name) != NULL) return(0);
 
-   newStringRouter = get_struct(theEnv,execStatus,stringRouter);
+   newStringRouter = get_struct(theEnv,stringRouter);
    newStringRouter->name = (char *) gm1(theEnv,execStatus,(int) strlen(name) + 1);
    genstrcpy(newStringRouter->name,name);
    newStringRouter->str = str;

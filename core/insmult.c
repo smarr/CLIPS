@@ -453,13 +453,13 @@ static INSTANCE_SLOT *CheckMultifieldSlotModify(
    if (sp->desc->multiple == 0)
      {
       PrintErrorID(theEnv,execStatus,"INSMULT",1,FALSE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"Function ");
-      EnvPrintRouter(theEnv,execStatus,WERROR,func);
-      EnvPrintRouter(theEnv,execStatus,WERROR," cannot be used on single-field slot ");
-      EnvPrintRouter(theEnv,execStatus,WERROR,ValueToString(sp->desc->slotName->name));
-      EnvPrintRouter(theEnv,execStatus,WERROR," in instance ");
-      EnvPrintRouter(theEnv,execStatus,WERROR,ValueToString(ins->name));
-      EnvPrintRouter(theEnv,execStatus,WERROR,".\n");
+      EnvPrintRouter(theEnv,WERROR,"Function ");
+      EnvPrintRouter(theEnv,WERROR,func);
+      EnvPrintRouter(theEnv,WERROR," cannot be used on single-field slot ");
+      EnvPrintRouter(theEnv,WERROR,ValueToString(sp->desc->slotName->name));
+      EnvPrintRouter(theEnv,WERROR," in instance ");
+      EnvPrintRouter(theEnv,WERROR,ValueToString(ins->name));
+      EnvPrintRouter(theEnv,WERROR,".\n");
       SetEvaluationError(theEnv,execStatus,TRUE);
       return(NULL);
      }

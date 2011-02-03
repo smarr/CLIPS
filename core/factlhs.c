@@ -161,10 +161,10 @@ globle struct lhsParseNode *CreateInitialFactPattern(
    if (theDeftemplate == NULL)
      {
       PrintWarningID(theEnv,execStatus,"FACTLHS",1,FALSE);
-      EnvPrintRouter(theEnv,execStatus,WWARNING,"Creating implied initial-fact deftemplate in module ");
-      EnvPrintRouter(theEnv,execStatus,WWARNING,EnvGetDefmoduleName(theEnv,execStatus,EnvGetCurrentModule(theEnv,execStatus)));
-      EnvPrintRouter(theEnv,execStatus,WWARNING,".\n");
-      EnvPrintRouter(theEnv,execStatus,WWARNING,"  You probably want to import this deftemplate from the MAIN module.\n");
+      EnvPrintRouter(theEnv,WWARNING,"Creating implied initial-fact deftemplate in module ");
+      EnvPrintRouter(theEnv,WWARNING,EnvGetDefmoduleName(theEnv,execStatus,EnvGetCurrentModule(theEnv,execStatus)));
+      EnvPrintRouter(theEnv,WWARNING,".\n");
+      EnvPrintRouter(theEnv,WWARNING,"  You probably want to import this deftemplate from the MAIN module.\n");
       CreateImpliedDeftemplate(theEnv,execStatus,(SYMBOL_HN *) EnvAddSymbol(theEnv,execStatus,"initial-fact"),FALSE);
      }
 

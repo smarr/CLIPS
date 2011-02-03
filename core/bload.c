@@ -111,9 +111,9 @@ globle int EnvBload(
    if (strcmp(IDbuffer,BloadData(theEnv,execStatus)->BinaryPrefixID) != 0)
      {
       PrintErrorID(theEnv,execStatus,"BLOAD",2,FALSE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"File ");
-      EnvPrintRouter(theEnv,execStatus,WERROR,fileName);
-      EnvPrintRouter(theEnv,execStatus,WERROR," is not a binary construct file.\n");
+      EnvPrintRouter(theEnv,WERROR,"File ");
+      EnvPrintRouter(theEnv,WERROR,fileName);
+      EnvPrintRouter(theEnv,WERROR," is not a binary construct file.\n");
       GenCloseBinary(theEnv,execStatus);
       return(FALSE);
      }
@@ -127,9 +127,9 @@ globle int EnvBload(
    if (strcmp(IDbuffer,BloadData(theEnv,execStatus)->BinaryVersionID) != 0)
      {
       PrintErrorID(theEnv,execStatus,"BLOAD",3,FALSE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"File ");
-      EnvPrintRouter(theEnv,execStatus,WERROR,fileName);
-      EnvPrintRouter(theEnv,execStatus,WERROR," is an incompatible binary construct file.\n");
+      EnvPrintRouter(theEnv,WERROR,"File ");
+      EnvPrintRouter(theEnv,WERROR,fileName);
+      EnvPrintRouter(theEnv,WERROR," is an incompatible binary construct file.\n");
       GenCloseBinary(theEnv,execStatus);
       return(FALSE);
      }
@@ -155,10 +155,10 @@ globle int EnvBload(
    if (ClearReady(theEnv,execStatus) == FALSE)
      {
       GenCloseBinary(theEnv,execStatus);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"The ");
-      EnvPrintRouter(theEnv,execStatus,WERROR,APPLICATION_NAME);
-      EnvPrintRouter(theEnv,execStatus,WERROR," environment could not be cleared.\n");
-      EnvPrintRouter(theEnv,execStatus,WERROR,"Binary load cannot continue.\n");
+      EnvPrintRouter(theEnv,WERROR,"The ");
+      EnvPrintRouter(theEnv,WERROR,APPLICATION_NAME);
+      EnvPrintRouter(theEnv,WERROR," environment could not be cleared.\n");
+      EnvPrintRouter(theEnv,WERROR,"Binary load cannot continue.\n");
       return(FALSE);
      }
 
@@ -247,9 +247,9 @@ globle int EnvBload(
          GetSeekCurBinary(theEnv,execStatus,(long) space);
          if (space != 0)
            {
-            EnvPrintRouter(theEnv,execStatus,WDIALOG,"\nSkipping ");
-            EnvPrintRouter(theEnv,execStatus,WDIALOG,constructBuffer);
-            EnvPrintRouter(theEnv,execStatus,WDIALOG," constructs because of unavailability\n");
+            EnvPrintRouter(theEnv,WDIALOG,"\nSkipping ");
+            EnvPrintRouter(theEnv,WDIALOG,constructBuffer);
+            EnvPrintRouter(theEnv,WDIALOG," constructs because of unavailability\n");
            }
         }
      }
@@ -478,13 +478,13 @@ static struct FunctionDefinition **ReadNeededFunctions(
          if (! functionsNotFound)
            {
             PrintErrorID(theEnv,execStatus,"BLOAD",6,FALSE);
-            EnvPrintRouter(theEnv,execStatus,WERROR,"The following undefined functions are ");
-            EnvPrintRouter(theEnv,execStatus,WERROR,"referenced by this binary image:\n");
+            EnvPrintRouter(theEnv,WERROR,"The following undefined functions are ");
+            EnvPrintRouter(theEnv,WERROR,"referenced by this binary image:\n");
            }
 
-         EnvPrintRouter(theEnv,execStatus,WERROR,"   ");
-         EnvPrintRouter(theEnv,execStatus,WERROR,namePtr);
-         EnvPrintRouter(theEnv,execStatus,WERROR,"\n");
+         EnvPrintRouter(theEnv,WERROR,"   ");
+         EnvPrintRouter(theEnv,WERROR,namePtr);
+         EnvPrintRouter(theEnv,WERROR,"\n");
          functionsNotFound = 1;
         }
 
@@ -610,12 +610,12 @@ static int ClearBload(
          if (! error)
            {
             PrintErrorID(theEnv,execStatus,"BLOAD",5,FALSE);
-            EnvPrintRouter(theEnv,execStatus,WERROR,
+            EnvPrintRouter(theEnv,WERROR,
                        "Some constructs are still in use by the current binary image:\n");
            }
-         EnvPrintRouter(theEnv,execStatus,WERROR,"   ");
-         EnvPrintRouter(theEnv,execStatus,WERROR,bfPtr->name);
-         EnvPrintRouter(theEnv,execStatus,WERROR,"\n");
+         EnvPrintRouter(theEnv,WERROR,"   ");
+         EnvPrintRouter(theEnv,WERROR,bfPtr->name);
+         EnvPrintRouter(theEnv,WERROR,"\n");
          error = TRUE;
         }
      }
@@ -628,7 +628,7 @@ static int ClearBload(
 
    if (error == TRUE)
      {
-      EnvPrintRouter(theEnv,execStatus,WERROR,"Binary clear cannot continue.\n");
+      EnvPrintRouter(theEnv,WERROR,"Binary clear cannot continue.\n");
       return(FALSE);
      }
 
@@ -791,9 +791,9 @@ globle void CannotLoadWithBloadMessage(
   char *constructName)
   {
    PrintErrorID(theEnv,execStatus,"BLOAD",1,TRUE);
-   EnvPrintRouter(theEnv,execStatus,WERROR,"Cannot load ");
-   EnvPrintRouter(theEnv,execStatus,WERROR,constructName);
-   EnvPrintRouter(theEnv,execStatus,WERROR," construct with binary load in effect.\n");
+   EnvPrintRouter(theEnv,WERROR,"Cannot load ");
+   EnvPrintRouter(theEnv,WERROR,constructName);
+   EnvPrintRouter(theEnv,WERROR," construct with binary load in effect.\n");
   }
 
 #endif /* (BLOAD || BLOAD_ONLY || BLOAD_AND_BSAVE) */

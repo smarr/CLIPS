@@ -158,7 +158,7 @@ globle void AddHashedPatternNode(
 
    hashValue = GetAtomicHashValue(keyType,keyValue,1) + HashExternalAddress(parent,0); /* TBD mult * 30 */
 
-   newhash = get_struct(theEnv,execStatus,patternNodeHashEntry);
+   newhash = get_struct(theEnv,patternNodeHashEntry);
    newhash->parent = parent;
    newhash->child = child;
    newhash->type = keyType;
@@ -260,7 +260,7 @@ void AddReservedPatternSymbol(
   {
    struct reservedSymbol *newSymbol;
 
-   newSymbol = get_struct(theEnv,execStatus,reservedSymbol);
+   newSymbol = get_struct(theEnv,reservedSymbol);
    newSymbol->theSymbol = theSymbol;
    newSymbol->reservedBy = reservedBy;
    newSymbol->next = PatternData(theEnv,execStatus)->ListOfReservedPatternSymbols;
@@ -310,12 +310,12 @@ void ReservedPatternSymbolErrorMsg(
   char *usedFor)
   {
    PrintErrorID(theEnv,execStatus,"PATTERN",1,TRUE);
-   EnvPrintRouter(theEnv,execStatus,WERROR,"The symbol ");
-   EnvPrintRouter(theEnv,execStatus,WERROR,theSymbol);
-   EnvPrintRouter(theEnv,execStatus,WERROR," has special meaning\n");
-   EnvPrintRouter(theEnv,execStatus,WERROR,"and may not be used as ");
-   EnvPrintRouter(theEnv,execStatus,WERROR,usedFor);
-   EnvPrintRouter(theEnv,execStatus,WERROR,".\n");
+   EnvPrintRouter(theEnv,WERROR,"The symbol ");
+   EnvPrintRouter(theEnv,WERROR,theSymbol);
+   EnvPrintRouter(theEnv,WERROR," has special meaning\n");
+   EnvPrintRouter(theEnv,WERROR,"and may not be used as ");
+   EnvPrintRouter(theEnv,WERROR,usedFor);
+   EnvPrintRouter(theEnv,WERROR,".\n");
   }
 
 /************************************************************/
@@ -1106,7 +1106,7 @@ static int CheckForVariableMixing(
 
      {
       PrintErrorID(theEnv,execStatus,"PATTERN",2,TRUE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"Single and multifield constraints cannot be mixed in a field constraint\n");
+      EnvPrintRouter(theEnv,WERROR,"Single and multifield constraints cannot be mixed in a field constraint\n");
       return(TRUE);
      }
 

@@ -163,9 +163,9 @@ static void DomainErrorMessage(
   char *functionName)
   {
    PrintErrorID(theEnv,execStatus,"EMATHFUN",1,FALSE);
-   EnvPrintRouter(theEnv,execStatus,WERROR,"Domain error for ");
-   EnvPrintRouter(theEnv,execStatus,WERROR,functionName);
-   EnvPrintRouter(theEnv,execStatus,WERROR," function.\n");
+   EnvPrintRouter(theEnv,WERROR,"Domain error for ");
+   EnvPrintRouter(theEnv,WERROR,functionName);
+   EnvPrintRouter(theEnv,WERROR," function.\n");
    SetHaltExecution(theEnv,execStatus,TRUE);
    SetEvaluationError(theEnv,execStatus,TRUE);
   }
@@ -181,9 +181,9 @@ static void ArgumentOverflowErrorMessage(
   char *functionName)
   {
    PrintErrorID(theEnv,execStatus,"EMATHFUN",2,FALSE);
-   EnvPrintRouter(theEnv,execStatus,WERROR,"Argument overflow for ");
-   EnvPrintRouter(theEnv,execStatus,WERROR,functionName);
-   EnvPrintRouter(theEnv,execStatus,WERROR," function.\n");
+   EnvPrintRouter(theEnv,WERROR,"Argument overflow for ");
+   EnvPrintRouter(theEnv,WERROR,functionName);
+   EnvPrintRouter(theEnv,WERROR," function.\n");
    SetHaltExecution(theEnv,execStatus,TRUE);
    SetEvaluationError(theEnv,execStatus,TRUE);
   }
@@ -199,9 +199,9 @@ static void SingularityErrorMessage(
   char *functionName)
   {
    PrintErrorID(theEnv,execStatus,"EMATHFUN",3,FALSE);
-   EnvPrintRouter(theEnv,execStatus,WERROR,"Singularity at asymptote in ");
-   EnvPrintRouter(theEnv,execStatus,WERROR,functionName);
-   EnvPrintRouter(theEnv,execStatus,WERROR," function.\n");
+   EnvPrintRouter(theEnv,WERROR,"Singularity at asymptote in ");
+   EnvPrintRouter(theEnv,WERROR,functionName);
+   EnvPrintRouter(theEnv,WERROR," function.\n");
    SetHaltExecution(theEnv,execStatus,TRUE);
    SetEvaluationError(theEnv,execStatus,TRUE);
   }

@@ -215,9 +215,9 @@ globle void ConstructsToCCommand(
       if (*(fileName+i) == '.')
         {
          PrintErrorID(theEnv,execStatus,"CONSCOMP",1,FALSE);
-         EnvPrintRouter(theEnv,execStatus,WERROR,"Invalid file name ");
-         EnvPrintRouter(theEnv,execStatus,WERROR,fileName);
-         EnvPrintRouter(theEnv,execStatus,WERROR," contains \'.\'\n");
+         EnvPrintRouter(theEnv,WERROR,"Invalid file name ");
+         EnvPrintRouter(theEnv,WERROR,fileName);
+         EnvPrintRouter(theEnv,WERROR," contains \'.\'\n");
          return;
         }
       }
@@ -234,9 +234,9 @@ globle void ConstructsToCCommand(
    if ((nameLength + EXTRA_FILE_NAME) > FILENAME_MAX)
      {
       PrintErrorID(theEnv,execStatus,"CONSCOMP",1,FALSE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"Aborting because the base file name may cause the fopen maximum of ");
+      EnvPrintRouter(theEnv,WERROR,"Aborting because the base file name may cause the fopen maximum of ");
       PrintLongInteger(theEnv,execStatus,WERROR,FILENAME_MAX);
-      EnvPrintRouter(theEnv,execStatus,WERROR," to be violated when file names are generated.\n");
+      EnvPrintRouter(theEnv,WERROR," to be violated when file names are generated.\n");
       return;
      }
 
@@ -250,9 +250,9 @@ globle void ConstructsToCCommand(
    if (nameLength > 3)
      {
       PrintWarningID(theEnv,execStatus,"CONSCOMP",1,FALSE);
-      EnvPrintRouter(theEnv,execStatus,WWARNING,"Base file name exceeds 3 characters.\n");
-      EnvPrintRouter(theEnv,execStatus,WWARNING,"  This may cause files to be overwritten if file name length\n");
-      EnvPrintRouter(theEnv,execStatus,WWARNING,"  is limited on your platform.\n");
+      EnvPrintRouter(theEnv,WWARNING,"Base file name exceeds 3 characters.\n");
+      EnvPrintRouter(theEnv,WWARNING,"  This may cause files to be overwritten if file name length\n");
+      EnvPrintRouter(theEnv,WWARNING,"  is limited on your platform.\n");
      }
 
    /*====================================*/
@@ -1178,7 +1178,7 @@ globle struct CodeGeneratorItem *AddCodeGeneratorItem(
    /* structure and initialize its values. */
    /*======================================*/
 
-   newPtr = get_struct(theEnv,execStatus,CodeGeneratorItem);
+   newPtr = get_struct(theEnv,CodeGeneratorItem);
 
    newPtr->name = name;
    newPtr->beforeFunction = beforeFunction;

@@ -495,7 +495,7 @@ static void QueueObjectMatchAction(
       If there are no actions for the instance already
       on the queue, the new action is simply appended.
       ================================================ */
-   newMatch = get_struct(theEnv,execStatus,objectMatchAction);
+   newMatch = get_struct(theEnv,objectMatchAction);
    newMatch->type = type;
    newMatch->nxt = NULL; /* If we get here, cur should be NULL */
    newMatch->slotNameIDs = (type != OBJECT_MODIFY) ? NULL :
@@ -993,7 +993,7 @@ static void ProcessPatternNode(
    /* slot the multifield pattern node is bound.                   */
    /*==============================================================*/
    
-   newMark = get_struct(theEnv,execStatus,multifieldMarker);
+   newMark = get_struct(theEnv,multifieldMarker);
    newMark->whichField = patternSlotField;
    newMark->where.whichSlot = (void *) ObjectReteData(theEnv,execStatus)->CurrentPatternObjectSlot->desc->slotName->name;
    newMark->startPosition = objectSlotField;
@@ -1143,7 +1143,7 @@ static void CreateObjectAlphaMatch(
             Attach the partial match to the object
             to ease later retraction
             ====================================== */
-         newMatch = get_struct(theEnv,execStatus,patternMatch);
+         newMatch = get_struct(theEnv,patternMatch);
          newMatch->next = (struct patternMatch *) ObjectReteData(theEnv,execStatus)->CurrentPatternObject->partialMatchList;
          newMatch->matchingPattern = (struct patternNodeHeader *) alphaPtr;
          newMatch->theMatch = theMatch;
@@ -1445,17 +1445,17 @@ static void ObjectPatternNetErrorMessage(
   OBJECT_PATTERN_NODE *patternPtr)
   {
    PrintErrorID(theEnv,execStatus,"OBJRTMCH",1,TRUE);
-   EnvPrintRouter(theEnv,execStatus,WERROR,"This error occurred in the object pattern network\n");
-   EnvPrintRouter(theEnv,execStatus,WERROR,"   Currently active instance: [");
-   EnvPrintRouter(theEnv,execStatus,WERROR,ValueToString(ObjectReteData(theEnv,execStatus)->CurrentPatternObject->name));
-   EnvPrintRouter(theEnv,execStatus,WERROR,"]\n");
-   EnvPrintRouter(theEnv,execStatus,WERROR,"   Problem resides in slot ");
-   EnvPrintRouter(theEnv,execStatus,WERROR,ValueToString(FindIDSlotName(theEnv,execStatus,patternPtr->slotNameID)));
-   EnvPrintRouter(theEnv,execStatus,WERROR," field #");
+   EnvPrintRouter(theEnv,WERROR,"This error occurred in the object pattern network\n");
+   EnvPrintRouter(theEnv,WERROR,"   Currently active instance: [");
+   EnvPrintRouter(theEnv,WERROR,ValueToString(ObjectReteData(theEnv,execStatus)->CurrentPatternObject->name));
+   EnvPrintRouter(theEnv,WERROR,"]\n");
+   EnvPrintRouter(theEnv,WERROR,"   Problem resides in slot ");
+   EnvPrintRouter(theEnv,WERROR,ValueToString(FindIDSlotName(theEnv,execStatus,patternPtr->slotNameID)));
+   EnvPrintRouter(theEnv,WERROR," field #");
    PrintLongInteger(theEnv,execStatus,WERROR,(long long) patternPtr->whichField);
-   EnvPrintRouter(theEnv,execStatus,WERROR,"\n");
+   EnvPrintRouter(theEnv,WERROR,"\n");
    TraceErrorToObjectPattern(theEnv,execStatus,TRUE,patternPtr);
-   EnvPrintRouter(theEnv,execStatus,WERROR,"\n");
+   EnvPrintRouter(theEnv,WERROR,"\n");
   }
 
 /*********************************************************

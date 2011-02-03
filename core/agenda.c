@@ -88,13 +88,13 @@ globle void InitializeAgenda(
   {   
    AllocateEnvironmentData(theEnv,execStatus,AGENDA_DATA,sizeof(struct agendaData),NULL);
    
-   AgendaData(theEnv,execStatus)->SalienceEvaluation = WHEN_DEFINED;
+   AgendaData(theEnv)->SalienceEvaluation = WHEN_DEFINED;
 
-   AgendaData(theEnv,execStatus)->Strategy = DEFAULT_STRATEGY;
+   AgendaData(theEnv)->Strategy = DEFAULT_STRATEGY;
    
    EnvAddClearFunction(theEnv,execStatus,"agenda",AgendaClearFunction,0);
 #if DEBUGGING_FUNCTIONS
-   AddWatchItem(theEnv,execStatus,"activations",1,&AgendaData(theEnv,execStatus)->WatchActivations,40,DefruleWatchAccess,DefruleWatchPrint);
+   AddWatchItem(theEnv,execStatus,"activations",1,&AgendaData(theEnv)->WatchActivations,40,DefruleWatchAccess,DefruleWatchPrint);
 #endif
 #if ! RUN_TIME
    EnvDefineFunction2(theEnv,execStatus,"refresh", 'v', PTIEF RefreshCommand, "RefreshCommand", "11w");
@@ -150,17 +150,17 @@ globle void AddActivation(
    /* with the random conflict resolution strategy.         */
    /*=======================================================*/
 
-   newActivation = get_struct(theEnv,execStatus,activation);
+   newActivation = get_struct(theEnv,activation);
    newActivation->theRule = theRule;
    newActivation->basis = binds;
-   newActivation->timetag = AgendaData(theEnv,execStatus)->CurrentTimetag++;
+   newActivation->timetag = AgendaData(theEnv)->CurrentTimetag++;
    newActivation->salience = EvaluateSalience(theEnv,execStatus,theRule);
 
    newActivation->randomID = genrand();
    newActivation->prev = NULL;
    newActivation->next = NULL;
 
-   AgendaData(theEnv,execStatus)->NumberOfActivations++;
+   AgendaData(theEnv)->NumberOfActivations++;
 
    /*=======================================================*/
    /* Point the partial match to the activation to complete */
@@ -176,9 +176,9 @@ globle void AddActivation(
 #if DEBUGGING_FUNCTIONS
    if (newActivation->theRule->watchActivation)
      {
-      EnvPrintRouter(theEnv,execStatus,WTRACE,"==> Activation ");
+      EnvPrintRouter(theEnv,WTRACE,"==> Activation ");
       PrintActivation(theEnv,execStatus,WTRACE,(void *) newActivation);
-      EnvPrintRouter(theEnv,execStatus,WTRACE,"\n");
+      EnvPrintRouter(theEnv,WTRACE,"\n");
      }
 #endif
 
@@ -215,7 +215,7 @@ static struct salienceGroup *ReuseOrCreateSalienceGroup(
         { break; }
      }
      
-   newGroup = get_struct(theEnv,execStatus,salienceGroup);
+   newGroup = get_struct(theEnv,salienceGroup);
    newGroup->salience = salience;
    newGroup->first = NULL;
    newGroup->last = NULL;
@@ -455,7 +455,7 @@ globle intBool MoveActivationToTop(
    /* Mark the agenda as changed. */
    /*=============================*/
 
-   AgendaData(theEnv,execStatus)->AgendaChanged = TRUE;
+   AgendaData(theEnv)->AgendaChanged = TRUE;
 
    return(TRUE);
   }
@@ -535,7 +535,7 @@ globle intBool DetachActivation(
    /* Mark the agenda as changed. */
    /*=============================*/
 
-   AgendaData(theEnv,execStatus)->AgendaChanged = TRUE;
+   AgendaData(theEnv)->AgendaChanged = TRUE;
 
    return(TRUE);
   }
@@ -554,9 +554,9 @@ static void PrintActivation(
    char printSpace[20];
 
    gensprintf(printSpace,"%-6d ",theActivation->salience);
-   EnvPrintRouter(theEnv,execStatus,logicalName,printSpace);
-   EnvPrintRouter(theEnv,execStatus,logicalName,ValueToString(theActivation->theRule->header.name));
-   EnvPrintRouter(theEnv,execStatus,logicalName,": ");
+   EnvPrintRouter(theEnv,logicalName,printSpace);
+   EnvPrintRouter(theEnv,logicalName,ValueToString(theActivation->theRule->header.name));
+   EnvPrintRouter(theEnv,logicalName,": ");
    PrintPartialMatch(theEnv,execStatus,logicalName,theActivation->basis);
   }
 
@@ -630,9 +630,9 @@ globle void RemoveActivation(
 #if DEBUGGING_FUNCTIONS
       if (theActivation->theRule->watchActivation)
         {
-         EnvPrintRouter(theEnv,execStatus,WTRACE,"<== Activation ");
+         EnvPrintRouter(theEnv,WTRACE,"<== Activation ");
          PrintActivation(theEnv,execStatus,WTRACE,(void *) theActivation);
-         EnvPrintRouter(theEnv,execStatus,WTRACE,"\n");
+         EnvPrintRouter(theEnv,WTRACE,"\n");
         }
 #endif
 
@@ -640,7 +640,7 @@ globle void RemoveActivation(
       /* Mark the agenda as changed. */
       /*=============================*/
 
-      AgendaData(theEnv,execStatus)->AgendaChanged = TRUE;
+      AgendaData(theEnv)->AgendaChanged = TRUE;
      }
 
    /*============================================*/
@@ -654,7 +654,7 @@ globle void RemoveActivation(
    /* Return the activation to the free memory pool. */
    /*================================================*/
 
-   AgendaData(theEnv,execStatus)->NumberOfActivations--;
+   AgendaData(theEnv)->NumberOfActivations--;
 
    rtn_struct(theEnv,execStatus,activation,theActivation);
   }
@@ -729,7 +729,7 @@ static void AgendaClearFunction(
   void *theEnv,
   EXEC_STATUS)
   {
-   AgendaData(theEnv,execStatus)->CurrentTimetag = 0;
+   AgendaData(theEnv)->CurrentTimetag = 0;
   }
 
 /*************************************************/
@@ -769,7 +769,7 @@ globle int EnvGetAgendaChanged(
   void *theEnv,
   EXEC_STATUS)
   {
-   return(AgendaData(theEnv,execStatus)->AgendaChanged);
+   return(AgendaData(theEnv)->AgendaChanged);
   }
 
 /*****************************************************************/
@@ -781,7 +781,7 @@ globle void EnvSetAgendaChanged(
   EXEC_STATUS,
   int value)
   {
-   AgendaData(theEnv,execStatus)->AgendaChanged = value;
+   AgendaData(theEnv)->AgendaChanged = value;
   }
 
 /**********************************************************/
@@ -868,7 +868,7 @@ globle unsigned long GetNumberOfActivations(
   void *theEnv,
   EXEC_STATUS)
   {  
-   return(AgendaData(theEnv,execStatus)->NumberOfActivations); 
+   return(AgendaData(theEnv)->NumberOfActivations); 
   }
 
 /******************************************************/
@@ -1199,7 +1199,7 @@ globle intBool EnvGetSalienceEvaluation(
   void *theEnv,
   EXEC_STATUS)
   {   
-   return(AgendaData(theEnv,execStatus)->SalienceEvaluation); 
+   return(AgendaData(theEnv)->SalienceEvaluation); 
   }
 
 /***********************************************/
@@ -1213,8 +1213,8 @@ globle intBool EnvSetSalienceEvaluation(
   {
    int ov;
 
-   ov = AgendaData(theEnv,execStatus)->SalienceEvaluation;
-   AgendaData(theEnv,execStatus)->SalienceEvaluation = value;
+   ov = AgendaData(theEnv)->SalienceEvaluation;
+   AgendaData(theEnv)->SalienceEvaluation = value;
    return(ov);
   }
 

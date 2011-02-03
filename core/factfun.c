@@ -616,7 +616,7 @@ globle void EnvPPFact(
 
    PrintFact(theEnv,execStatus,logicalName,theFact,TRUE,ignoreDefaults);
    
-   EnvPrintRouter(theEnv,execStatus,logicalName,"\n");
+   EnvPrintRouter(theEnv,logicalName,"\n");
   }
   
 /**************************************************************/

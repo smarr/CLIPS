@@ -497,7 +497,7 @@ globle void CommandLoop(
   {
    int inchar;
 
-   EnvPrintRouter(theEnv,execStatus,WPROMPT,CommandLineData(theEnv,execStatus)->BannerString);
+   EnvPrintRouter(theEnv,WPROMPT,CommandLineData(theEnv,execStatus)->BannerString);
    SetHaltExecution(theEnv,execStatus,FALSE);
    SetEvaluationError(theEnv,execStatus,FALSE);
    PeriodicCleanup(theEnv,execStatus,TRUE,FALSE);
@@ -537,7 +537,7 @@ globle void CommandLoop(
 #if ! WINDOW_INTERFACE
          fflush(stdin);
 #endif
-         EnvPrintRouter(theEnv,execStatus,WPROMPT,"\n");
+         EnvPrintRouter(theEnv,WPROMPT,"\n");
          PrintPrompt(theEnv,execStatus);
         }
 
@@ -632,7 +632,7 @@ globle void CommandLoopBatchDriver(
 #if ! WINDOW_INTERFACE
          fflush(stdin);
 #endif
-         EnvPrintRouter(theEnv,execStatus,WPROMPT,"\n");
+         EnvPrintRouter(theEnv,WPROMPT,"\n");
          PrintPrompt(theEnv,execStatus);
         }
 
@@ -701,7 +701,7 @@ globle void PrintPrompt(
    void *theEnv,
   EXEC_STATUS)
    {
-    EnvPrintRouter(theEnv,execStatus,WPROMPT,COMMAND_PROMPT);
+    EnvPrintRouter(theEnv,WPROMPT,COMMAND_PROMPT);
 
     if (CommandLineData(theEnv,execStatus)->AfterPromptFunction != NULL)
       { (*CommandLineData(theEnv,execStatus)->AfterPromptFunction)(theEnv,execStatus); }
@@ -714,7 +714,7 @@ globle void PrintBanner(
    void *theEnv,
   EXEC_STATUS)
    {
-    EnvPrintRouter(theEnv,execStatus,WPROMPT,CommandLineData(theEnv,execStatus)->BannerString);
+    EnvPrintRouter(theEnv,WPROMPT,CommandLineData(theEnv,execStatus)->BannerString);
    }
 
 /************************************************/
@@ -779,7 +779,7 @@ globle intBool RouteCommand(
       if (printResult)
         {
          PrintAtom(theEnv,execStatus,"stdout",theToken.type,theToken.value);
-         EnvPrintRouter(theEnv,execStatus,"stdout","\n");
+         EnvPrintRouter(theEnv,"stdout","\n");
         }
       return(1);
      }
@@ -799,7 +799,7 @@ globle intBool RouteCommand(
       if (printResult)
         {
          PrintDataObject(theEnv,execStatus,"stdout",&result);
-         EnvPrintRouter(theEnv,execStatus,"stdout","\n");
+         EnvPrintRouter(theEnv,"stdout","\n");
         }
       return(1);
      }
@@ -813,7 +813,7 @@ globle intBool RouteCommand(
    if (theToken.type != LPAREN)
      {
       PrintErrorID(theEnv,execStatus,"COMMLINE",1,FALSE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"Expected a '(', constant, or variable\n");
+      EnvPrintRouter(theEnv,WERROR,"Expected a '(', constant, or variable\n");
       CloseStringSource(theEnv,execStatus,"command");
       return(0);
      }
@@ -826,7 +826,7 @@ globle intBool RouteCommand(
    if (theToken.type != SYMBOL)
      {
       PrintErrorID(theEnv,execStatus,"COMMLINE",2,FALSE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"Expected a command.\n");
+      EnvPrintRouter(theEnv,WERROR,"Expected a command.\n");
       CloseStringSource(theEnv,execStatus,"command");
       return(0);
      }
@@ -847,9 +847,9 @@ globle intBool RouteCommand(
        CloseStringSource(theEnv,execStatus,"command");
        if (errorFlag == 1)
          {
-          EnvPrintRouter(theEnv,execStatus,WERROR,"\nERROR:\n");
+          EnvPrintRouter(theEnv,WERROR,"\nERROR:\n");
           PrintInChunks(theEnv,execStatus,WERROR,GetPPBuffer(theEnv,execStatus));
-          EnvPrintRouter(theEnv,execStatus,WERROR,"\n");
+          EnvPrintRouter(theEnv,WERROR,"\n");
          }
        DestroyPPBuffer(theEnv,execStatus);
        return(errorFlag);
@@ -892,7 +892,7 @@ globle intBool RouteCommand(
    if ((result.type != RVOID) && printResult)
      {
       PrintDataObject(theEnv,execStatus,"stdout",&result);
-      EnvPrintRouter(theEnv,execStatus,"stdout","\n");
+      EnvPrintRouter(theEnv,"stdout","\n");
      }
 
    return(1);

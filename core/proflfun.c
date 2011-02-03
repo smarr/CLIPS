@@ -270,21 +270,21 @@ globle void ProfileInfoCommand(
      {
       gensprintf(buffer,"Profile elapsed time = %g seconds\n",
                       ProfileFunctionData(theEnv,execStatus)->ProfileTotalTime);
-      EnvPrintRouter(theEnv,execStatus,WDISPLAY,buffer);
+      EnvPrintRouter(theEnv,WDISPLAY,buffer);
 
       if (ProfileFunctionData(theEnv,execStatus)->LastProfileInfo == USER_FUNCTIONS)
-        { EnvPrintRouter(theEnv,execStatus,WDISPLAY,"Function Name                            "); }
+        { EnvPrintRouter(theEnv,WDISPLAY,"Function Name                            "); }
       else if (ProfileFunctionData(theEnv,execStatus)->LastProfileInfo == CONSTRUCTS_CODE)
-        { EnvPrintRouter(theEnv,execStatus,WDISPLAY,"Construct Name                           "); }            
+        { EnvPrintRouter(theEnv,WDISPLAY,"Construct Name                           "); }            
       
-      EnvPrintRouter(theEnv,execStatus,WDISPLAY,"Entries         Time           %          Time+Kids     %+Kids\n");
+      EnvPrintRouter(theEnv,WDISPLAY,"Entries         Time           %          Time+Kids     %+Kids\n");
 
       if (ProfileFunctionData(theEnv,execStatus)->LastProfileInfo == USER_FUNCTIONS)
-        { EnvPrintRouter(theEnv,execStatus,WDISPLAY,"-------------                            "); }
+        { EnvPrintRouter(theEnv,WDISPLAY,"-------------                            "); }
       else if (ProfileFunctionData(theEnv,execStatus)->LastProfileInfo == CONSTRUCTS_CODE)
-        { EnvPrintRouter(theEnv,execStatus,WDISPLAY,"--------------                           "); }
+        { EnvPrintRouter(theEnv,WDISPLAY,"--------------                           "); }
 
-      EnvPrintRouter(theEnv,execStatus,WDISPLAY,"-------        ------        -----        ---------     ------\n");
+      EnvPrintRouter(theEnv,WDISPLAY,"-------        ------        -----        ---------     ------\n");
      }
 
    if (ProfileFunctionData(theEnv,execStatus)->LastProfileInfo == USER_FUNCTIONS) OutputUserFunctionsInfo(theEnv,execStatus);
@@ -401,23 +401,23 @@ static intBool OutputProfileInfo(
 
    if ((banner != NULL) && (*banner != NULL))
      {
-      EnvPrintRouter(theEnv,execStatus,WDISPLAY,*banner);
+      EnvPrintRouter(theEnv,WDISPLAY,*banner);
       *banner = NULL;
      }
 
    if (printPrefixBefore != NULL)
-     { EnvPrintRouter(theEnv,execStatus,WDISPLAY,printPrefixBefore); }
+     { EnvPrintRouter(theEnv,WDISPLAY,printPrefixBefore); }
    
    if (printPrefix != NULL)
-     { EnvPrintRouter(theEnv,execStatus,WDISPLAY,printPrefix); }
+     { EnvPrintRouter(theEnv,WDISPLAY,printPrefix); }
 
    if (printPrefixAfter != NULL)
-     { EnvPrintRouter(theEnv,execStatus,WDISPLAY,printPrefixAfter); }
+     { EnvPrintRouter(theEnv,WDISPLAY,printPrefixAfter); }
 
    if (strlen(itemName) >= 40)
      {
-      EnvPrintRouter(theEnv,execStatus,WDISPLAY,itemName);
-      EnvPrintRouter(theEnv,execStatus,WDISPLAY,"\n");
+      EnvPrintRouter(theEnv,WDISPLAY,itemName);
+      EnvPrintRouter(theEnv,WDISPLAY,"\n");
       itemName = "";
      }
 
@@ -430,7 +430,7 @@ static intBool OutputProfileInfo(
 
                         (double) profileInfo->totalWithChildrenTime,
                         (double) percentWithKids);
-   EnvPrintRouter(theEnv,execStatus,WDISPLAY,buffer);
+   EnvPrintRouter(theEnv,WDISPLAY,buffer);
 
    return(TRUE);
   }

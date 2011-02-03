@@ -414,7 +414,7 @@ static struct expr *LoopForCountParse(
          ClearParsedBindNames(theEnv,execStatus);
          SetParsedBindNames(theEnv,execStatus,oldBindList);
          PrintErrorID(theEnv,execStatus,"PRCDRPSR",1,TRUE);
-         EnvPrintRouter(theEnv,execStatus,WERROR,"Cannot rebind loop variable in function loop-for-count.\n");
+         EnvPrintRouter(theEnv,WERROR,"Cannot rebind loop variable in function loop-for-count.\n");
          ReturnExpression(theEnv,execStatus,parse);
          return(NULL);
         }
@@ -696,7 +696,7 @@ static struct expr *BindParse(
      }
 #endif
 
-   texp = get_struct(theEnv,execStatus,expr);
+   texp = get_struct(theEnv,expr);
    texp->argList = texp->nextArg = NULL;
    if (CollectArguments(theEnv,execStatus,texp,infile) == NULL)
      {
@@ -736,7 +736,7 @@ static struct expr *ReturnParse(
    if (ExpressionData(theEnv,execStatus)->ReturnContext == FALSE)
      {
       PrintErrorID(theEnv,execStatus,"PRCDRPSR",2,TRUE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"The return function is not valid in this context.\n");
+      EnvPrintRouter(theEnv,WERROR,"The return function is not valid in this context.\n");
       ReturnExpression(theEnv,execStatus,top);
       return(NULL);
      }
@@ -787,7 +787,7 @@ static struct expr *BreakParse(
    if (ExpressionData(theEnv,execStatus)->svContexts->brk == FALSE)
      {
       PrintErrorID(theEnv,execStatus,"PRCDRPSR",2,TRUE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"The break function not valid in this context.\n");
+      EnvPrintRouter(theEnv,WERROR,"The break function not valid in this context.\n");
       ReturnExpression(theEnv,execStatus,top);
       return(NULL);
      }
@@ -857,7 +857,7 @@ static struct expr *SwitchParse(
                 IdenticalExpression(chk->argList,theExp->nextArg->argList))
               {
                PrintErrorID(theEnv,execStatus,"PRCDRPSR",3,TRUE);
-               EnvPrintRouter(theEnv,execStatus,WERROR,"Duplicate case found in switch function.\n");
+               EnvPrintRouter(theEnv,WERROR,"Duplicate case found in switch function.\n");
                goto SwitchParseError;
               }
            }
@@ -1020,7 +1020,7 @@ static int AddBindName(
    /* variable names and store the constraint information with it.  */
    /*===============================================================*/
 
-   currentBind = get_struct(theEnv,execStatus,BindInfo);
+   currentBind = get_struct(theEnv,BindInfo);
    currentBind->name = variableName;
    currentBind->constraints = theConstraint;
    currentBind->next = NULL;

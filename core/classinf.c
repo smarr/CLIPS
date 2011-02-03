@@ -760,7 +760,7 @@ globle void EnvSlotSources(
    if ((sp = SlotInfoSlot(theEnv,execStatus,result,(DEFCLASS *) clsptr,sname,"slot-sources")) == NULL)
      return;
    i = 1;
-   ctop = get_struct(theEnv,execStatus,classLink);
+   ctop = get_struct(theEnv,classLink);
    ctop->cls = sp->cls;
    ctop->nxt = NULL;
    if (sp->composite)
@@ -771,7 +771,7 @@ globle void EnvSlotSources(
          csp = FindClassSlot(cls,sp->slotName->name);
          if ((csp != NULL) ? (csp->noInherit == 0) : FALSE)
            {
-            ctmp = get_struct(theEnv,execStatus,classLink);
+            ctmp = get_struct(theEnv,classLink);
             ctmp->cls = cls;
             ctmp->nxt = ctop;
             ctop = ctmp;

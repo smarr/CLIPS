@@ -115,7 +115,7 @@ globle void AddPortConstructItem(
   {
    struct portConstructItem *newItem;
 
-   newItem = get_struct(theEnv,execStatus,portConstructItem);
+   newItem = get_struct(theEnv,portConstructItem);
    newItem->constructName = theName;
    newItem->typeExpected = theType;
    newItem->next = DefmoduleData(theEnv,execStatus)->ListOfPortConstructItems;
@@ -193,7 +193,7 @@ globle int ParseDefmodule(
         { overwrite = TRUE; }
       else
         {
-         newDefmodule = get_struct(theEnv,execStatus,defmodule);
+         newDefmodule = get_struct(theEnv,defmodule);
          newDefmodule->name = defmoduleName;
          newDefmodule->usrData = NULL;
          newDefmodule->next = NULL;
@@ -687,7 +687,7 @@ static int ParseExportSpec(
 
       if (strcmp(ValueToString(theToken->value),"ALL") == 0)
         {
-         newPort = (struct portItem *) get_struct(theEnv,execStatus,portItem);
+         newPort = (struct portItem *) get_struct(theEnv,portItem);
          newPort->moduleName = moduleName;
          newPort->constructType = NULL;
          newPort->constructName = NULL;
@@ -783,7 +783,7 @@ static int ParseExportSpec(
 
       if (strcmp(ValueToString(theToken->value),"ALL") == 0)
         {
-         newPort = (struct portItem *) get_struct(theEnv,execStatus,portItem);
+         newPort = (struct portItem *) get_struct(theEnv,portItem);
          newPort->moduleName = moduleName;
          newPort->constructType = theConstruct;
          newPort->constructName = NULL;
@@ -870,7 +870,7 @@ static int ParseExportSpec(
       /* the named construct.                   */
       /*========================================*/
 
-      newPort = (struct portItem *) get_struct(theEnv,execStatus,portItem);
+      newPort = (struct portItem *) get_struct(theEnv,portItem);
       newPort->moduleName = moduleName;
       newPort->constructType = theConstruct;
       newPort->constructName = (SYMBOL_HN *) theToken->value;
@@ -1041,26 +1041,26 @@ static void NotExportedErrorMessage(
   char *theName)
   {
    PrintErrorID(theEnv,execStatus,"MODULPSR",1,TRUE);
-   EnvPrintRouter(theEnv,execStatus,WERROR,"Module ");
-   EnvPrintRouter(theEnv,execStatus,WERROR,theModule);
-   EnvPrintRouter(theEnv,execStatus,WERROR," does not export ");
+   EnvPrintRouter(theEnv,WERROR,"Module ");
+   EnvPrintRouter(theEnv,WERROR,theModule);
+   EnvPrintRouter(theEnv,WERROR," does not export ");
 
-   if (theConstruct == NULL) EnvPrintRouter(theEnv,execStatus,WERROR,"any constructs");
+   if (theConstruct == NULL) EnvPrintRouter(theEnv,WERROR,"any constructs");
    else if (theName == NULL)
      {
-      EnvPrintRouter(theEnv,execStatus,WERROR,"any ");
-      EnvPrintRouter(theEnv,execStatus,WERROR,theConstruct);
-      EnvPrintRouter(theEnv,execStatus,WERROR," constructs");
+      EnvPrintRouter(theEnv,WERROR,"any ");
+      EnvPrintRouter(theEnv,WERROR,theConstruct);
+      EnvPrintRouter(theEnv,WERROR," constructs");
      }
    else
      {
-      EnvPrintRouter(theEnv,execStatus,WERROR,"the ");
-      EnvPrintRouter(theEnv,execStatus,WERROR,theConstruct);
-      EnvPrintRouter(theEnv,execStatus,WERROR," ");
-      EnvPrintRouter(theEnv,execStatus,WERROR,theName);
+      EnvPrintRouter(theEnv,WERROR,"the ");
+      EnvPrintRouter(theEnv,WERROR,theConstruct);
+      EnvPrintRouter(theEnv,WERROR," ");
+      EnvPrintRouter(theEnv,WERROR,theName);
      }
 
-   EnvPrintRouter(theEnv,execStatus,WERROR,".\n");
+   EnvPrintRouter(theEnv,WERROR,".\n");
   }
 
 /*************************************************************/

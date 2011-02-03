@@ -284,9 +284,9 @@ static EXPRESSION *ParseQueryRestrictions(
          if (tmp->value == queryInputToken->value)
            {
             PrintErrorID(theEnv,execStatus,"FACTQPSR",1,FALSE);
-            EnvPrintRouter(theEnv,execStatus,WERROR,"Duplicate fact member variable name in function ");
-            EnvPrintRouter(theEnv,execStatus,WERROR,ValueToString(ExpressionFunctionCallName(top)));
-            EnvPrintRouter(theEnv,execStatus,WERROR,".\n");
+            EnvPrintRouter(theEnv,WERROR,"Duplicate fact member variable name in function ");
+            EnvPrintRouter(theEnv,WERROR,ValueToString(ExpressionFunctionCallName(top)));
+            EnvPrintRouter(theEnv,WERROR,".\n");
             goto ParseQueryRestrictionsError2;
            }
            
@@ -466,9 +466,9 @@ static int ParseQueryTestExpression(
       ClearParsedBindNames(theEnv,execStatus);
       SetParsedBindNames(theEnv,execStatus,oldBindList);
       PrintErrorID(theEnv,execStatus,"FACTQPSR",2,FALSE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"Binds are not allowed in fact-set query in function ");
-      EnvPrintRouter(theEnv,execStatus,WERROR,ValueToString(ExpressionFunctionCallName(top)));
-      EnvPrintRouter(theEnv,execStatus,WERROR,".\n");
+      EnvPrintRouter(theEnv,WERROR,"Binds are not allowed in fact-set query in function ");
+      EnvPrintRouter(theEnv,WERROR,ValueToString(ExpressionFunctionCallName(top)));
+      EnvPrintRouter(theEnv,WERROR,".\n");
       ReturnExpression(theEnv,execStatus,top);
       return(FALSE);
      }
@@ -549,11 +549,11 @@ static int ParseQueryActionExpression(
             ClearParsedBindNames(theEnv,execStatus);
             SetParsedBindNames(theEnv,execStatus,oldBindList);
             PrintErrorID(theEnv,execStatus,"FACTQPSR",3,FALSE);
-            EnvPrintRouter(theEnv,execStatus,WERROR,"Cannot rebind fact-set member variable ");
-            EnvPrintRouter(theEnv,execStatus,WERROR,ValueToString(tmpFactSetVars->value));
-            EnvPrintRouter(theEnv,execStatus,WERROR," in function ");
-            EnvPrintRouter(theEnv,execStatus,WERROR,ValueToString(ExpressionFunctionCallName(top)));
-            EnvPrintRouter(theEnv,execStatus,WERROR,".\n");
+            EnvPrintRouter(theEnv,WERROR,"Cannot rebind fact-set member variable ");
+            EnvPrintRouter(theEnv,WERROR,ValueToString(tmpFactSetVars->value));
+            EnvPrintRouter(theEnv,WERROR," in function ");
+            EnvPrintRouter(theEnv,WERROR,ValueToString(ExpressionFunctionCallName(top)));
+            EnvPrintRouter(theEnv,WERROR,".\n");
             ReturnExpression(theEnv,execStatus,top);
             return(FALSE);
            }

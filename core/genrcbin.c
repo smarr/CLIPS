@@ -835,8 +835,8 @@ static void UpdateType(
    if ((* (long *) buf) > (long) INSTANCE_TYPE_CODE)
      {
       PrintWarningID(theEnv,execStatus,"GENRCBIN",1,FALSE);
-      EnvPrintRouter(theEnv,execStatus,WWARNING,"COOL not installed!  User-defined class\n");
-      EnvPrintRouter(theEnv,execStatus,WWARNING,"  in method restriction substituted with OBJECT.\n");
+      EnvPrintRouter(theEnv,WWARNING,"COOL not installed!  User-defined class\n");
+      EnvPrintRouter(theEnv,WWARNING,"  in method restriction substituted with OBJECT.\n");
       DefgenericBinaryData(theEnv,execStatus)->TypeArray[obji] = (void *) EnvAddLong(theEnv,execStatus,(long long) OBJECT_TYPE_CODE);
      }
    else

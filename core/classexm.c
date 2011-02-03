@@ -203,17 +203,17 @@ globle void EnvDescribeClass(
    DisplaySeparator(theEnv,execStatus,logicalName,buf,82,'=');
    DisplaySeparator(theEnv,execStatus,logicalName,buf,82,'*');
    if (cls->abstract)
-     EnvPrintRouter(theEnv,execStatus,logicalName,"Abstract: direct instances of this class cannot be created.\n\n");
+     EnvPrintRouter(theEnv,logicalName,"Abstract: direct instances of this class cannot be created.\n\n");
    else
      {
-      EnvPrintRouter(theEnv,execStatus,logicalName,"Concrete: direct instances of this class can be created.\n");
+      EnvPrintRouter(theEnv,logicalName,"Concrete: direct instances of this class can be created.\n");
 #if DEFRULE_CONSTRUCT
       if (cls->reactive)
-        EnvPrintRouter(theEnv,execStatus,logicalName,"Reactive: direct instances of this class can match defrule patterns.\n\n");
+        EnvPrintRouter(theEnv,logicalName,"Reactive: direct instances of this class can match defrule patterns.\n\n");
       else
-        EnvPrintRouter(theEnv,execStatus,logicalName,"Non-reactive: direct instances of this class cannot match defrule patterns.\n\n");
+        EnvPrintRouter(theEnv,logicalName,"Non-reactive: direct instances of this class cannot match defrule patterns.\n\n");
 #else
-      EnvPrintRouter(theEnv,execStatus,logicalName,"\n");
+      EnvPrintRouter(theEnv,logicalName,"\n");
 #endif
      }
    PrintPackedClassLinks(theEnv,execStatus,logicalName,"Direct Superclasses:",&cls->directSuperclasses);
@@ -256,7 +256,7 @@ globle void EnvDescribeClass(
 #endif
 
       DisplaySlotBasicInfo(theEnv,execStatus,logicalName,slotNamePrintFormat,overrideMessagePrintFormat,buf,cls);
-      EnvPrintRouter(theEnv,execStatus,logicalName,"\nConstraint information for slots:\n\n");
+      EnvPrintRouter(theEnv,logicalName,"\nConstraint information for slots:\n\n");
       DisplaySlotConstraintInfo(theEnv,execStatus,logicalName,slotNamePrintFormat,buf,82,cls);
      }
    if (cls->handlerCount > 0)
@@ -274,7 +274,7 @@ globle void EnvDescribeClass(
    if (messageBanner)
      {
       DisplaySeparator(theEnv,execStatus,logicalName,buf,82,'-');
-      EnvPrintRouter(theEnv,execStatus,logicalName,"Recognized message-handlers:\n");
+      EnvPrintRouter(theEnv,logicalName,"Recognized message-handlers:\n");
       DisplayHandlersInLinks(theEnv,execStatus,logicalName,&cls->allSuperclasses,0);
      }
    DisplaySeparator(theEnv,execStatus,logicalName,buf,82,'*');
@@ -924,13 +924,13 @@ static SLOT_DESC *CheckSlotExists(
    if ((sd->cls == *classBuffer) || inheritFlag)
      return(sd);
    PrintErrorID(theEnv,execStatus,"CLASSEXM",1,FALSE);
-   EnvPrintRouter(theEnv,execStatus,WERROR,"Inherited slot ");
-   EnvPrintRouter(theEnv,execStatus,WERROR,ValueToString(ssym));
-   EnvPrintRouter(theEnv,execStatus,WERROR," from class ");
+   EnvPrintRouter(theEnv,WERROR,"Inherited slot ");
+   EnvPrintRouter(theEnv,WERROR,ValueToString(ssym));
+   EnvPrintRouter(theEnv,WERROR," from class ");
    PrintClassName(theEnv,execStatus,WERROR,sd->cls,FALSE);
-   EnvPrintRouter(theEnv,execStatus,WERROR," is not valid for function ");
-   EnvPrintRouter(theEnv,execStatus,WERROR,func);
-   EnvPrintRouter(theEnv,execStatus,WERROR,"\n");
+   EnvPrintRouter(theEnv,WERROR," is not valid for function ");
+   EnvPrintRouter(theEnv,WERROR,func);
+   EnvPrintRouter(theEnv,WERROR,"\n");
    SetEvaluationError(theEnv,execStatus,TRUE);
    return(NULL);
   }
@@ -1038,11 +1038,11 @@ static void PrintClassBrowse(
    long i;
 
    for (i = 0 ; i < depth ; i++)
-     EnvPrintRouter(theEnv,execStatus,logicalName,"  ");
-   EnvPrintRouter(theEnv,execStatus,logicalName,EnvGetDefclassName(theEnv,execStatus,(void *) cls));
+     EnvPrintRouter(theEnv,logicalName,"  ");
+   EnvPrintRouter(theEnv,logicalName,EnvGetDefclassName(theEnv,execStatus,(void *) cls));
    if (cls->directSuperclasses.classCount > 1)
-     EnvPrintRouter(theEnv,execStatus,logicalName," *");
-   EnvPrintRouter(theEnv,execStatus,logicalName,"\n");
+     EnvPrintRouter(theEnv,logicalName," *");
+   EnvPrintRouter(theEnv,logicalName,"\n");
    for (i = 0 ;i < cls->directSubclasses.classCount ; i++)
      PrintClassBrowse(theEnv,execStatus,logicalName,cls->directSubclasses.classArray[i],depth+1);
   }
@@ -1072,7 +1072,7 @@ static void DisplaySeparator(
      buf[i] = (char) sepchar;
    buf[i++] = '\n';
    buf[i] = '\0';
-   EnvPrintRouter(theEnv,execStatus,logicalName,buf);
+   EnvPrintRouter(theEnv,logicalName,buf);
   }
 
 /*************************************************************
@@ -1123,10 +1123,10 @@ static void DisplaySlotBasicInfo(
 #else
    genstrcat(buf,"FLD DEF PRP ACC STO SRC VIS CRT ");
 #endif
-   EnvPrintRouter(theEnv,execStatus,logicalName,buf);
+   EnvPrintRouter(theEnv,logicalName,buf);
    gensprintf(buf,overrideMessagePrintFormat,"OVRD-MSG");
-   EnvPrintRouter(theEnv,execStatus,logicalName,buf);
-   EnvPrintRouter(theEnv,execStatus,logicalName,"SOURCE(S)\n");
+   EnvPrintRouter(theEnv,logicalName,buf);
+   EnvPrintRouter(theEnv,logicalName,"SOURCE(S)\n");
    for (i = 0 ; i < cls->instanceSlotCount ; i++)
      {
       sp = cls->instanceTemplate[i];
@@ -1156,12 +1156,12 @@ static void DisplaySlotBasicInfo(
       if ((createString[1] == '\0') ? TRUE : (createString[2] == '\0'))
         genstrcat(buf," ");
       genstrcat(buf," ");
-      EnvPrintRouter(theEnv,execStatus,logicalName,buf);
+      EnvPrintRouter(theEnv,logicalName,buf);
       gensprintf(buf,overrideMessagePrintFormat,
               sp->noWrite ? "NIL" : ValueToString(sp->overrideMessage));
-      EnvPrintRouter(theEnv,execStatus,logicalName,buf);
+      EnvPrintRouter(theEnv,logicalName,buf);
       PrintSlotSources(theEnv,execStatus,logicalName,sp->slotName->name,&sp->cls->allSuperclasses,0,TRUE);
-      EnvPrintRouter(theEnv,execStatus,logicalName,"\n");
+      EnvPrintRouter(theEnv,logicalName,"\n");
      }
   }
 
@@ -1204,7 +1204,7 @@ static intBool PrintSlotSources(
       if (csp->composite)
         {
          if (PrintSlotSources(theEnv,execStatus,logicalName,sname,sprec,theIndex+1,FALSE))
-           EnvPrintRouter(theEnv,execStatus,logicalName," ");
+           EnvPrintRouter(theEnv,logicalName," ");
         }
       PrintClassName(theEnv,execStatus,logicalName,sprec->classArray[theIndex],FALSE);
       return(TRUE);
@@ -1253,7 +1253,7 @@ static void DisplaySlotConstraintInfo(
 
    gensprintf(buf,slotNamePrintFormat,"SLOTS");
    genstrcat(buf,"SYM STR INN INA EXA FTA INT FLT\n");
-   EnvPrintRouter(theEnv,execStatus,logicalName,buf);
+   EnvPrintRouter(theEnv,logicalName,buf);
    for (i = 0 ; i < cls->instanceSlotCount ; i++)
      {
       cr = cls->instanceTemplate[i]->constraint;
@@ -1277,31 +1277,31 @@ static void DisplaySlotConstraintInfo(
          OpenStringDestination(theEnv,execStatus,strdest,buf + strlen(buf),(maxlen - strlen(buf) - 1));
          if (cr->integersAllowed || cr->floatsAllowed || cr->anyAllowed)
            {
-            EnvPrintRouter(theEnv,execStatus,strdest,"RNG:[");
+            EnvPrintRouter(theEnv,strdest,"RNG:[");
             PrintExpression(theEnv,execStatus,strdest,cr->minValue);
-            EnvPrintRouter(theEnv,execStatus,strdest,"..");
+            EnvPrintRouter(theEnv,strdest,"..");
             PrintExpression(theEnv,execStatus,strdest,cr->maxValue);
-            EnvPrintRouter(theEnv,execStatus,strdest,"] ");
+            EnvPrintRouter(theEnv,strdest,"] ");
            }
          if (cls->instanceTemplate[i]->multiple)
            {
-            EnvPrintRouter(theEnv,execStatus,strdest,"CRD:[");
+            EnvPrintRouter(theEnv,strdest,"CRD:[");
             PrintExpression(theEnv,execStatus,strdest,cr->minFields);
-            EnvPrintRouter(theEnv,execStatus,strdest,"..");
+            EnvPrintRouter(theEnv,strdest,"..");
             PrintExpression(theEnv,execStatus,strdest,cr->maxFields);
-            EnvPrintRouter(theEnv,execStatus,strdest,"]");
+            EnvPrintRouter(theEnv,strdest,"]");
            }
         }
       else
         {
          OpenStringDestination(theEnv,execStatus,strdest,buf,maxlen);
-         EnvPrintRouter(theEnv,execStatus,strdest," +   +   +   +   +   +   +   +  RNG:[-oo..+oo]");
+         EnvPrintRouter(theEnv,strdest," +   +   +   +   +   +   +   +  RNG:[-oo..+oo]");
          if (cls->instanceTemplate[i]->multiple)
-           EnvPrintRouter(theEnv,execStatus,strdest," CRD:[0..+oo]");
+           EnvPrintRouter(theEnv,strdest," CRD:[0..+oo]");
         }
-      EnvPrintRouter(theEnv,execStatus,strdest,"\n");
+      EnvPrintRouter(theEnv,strdest,"\n");
       CloseStringDestination(theEnv,execStatus,strdest);
-      EnvPrintRouter(theEnv,execStatus,logicalName,buf);
+      EnvPrintRouter(theEnv,logicalName,buf);
      }
   }
 

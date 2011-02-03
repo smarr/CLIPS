@@ -814,7 +814,7 @@ globle struct expr *GetvarReplace(
    /* argument links.                                     */
    /*=====================================================*/
 
-   newList = get_struct(theEnv,execStatus,expr);
+   newList = get_struct(theEnv,expr);
    newList->type = nodeList->type;
    newList->value = nodeList->value;
    newList->nextArg = GetvarReplace(theEnv,execStatus,nodeList->right,isNand);
@@ -922,7 +922,7 @@ static struct expr *GetfieldReplace(
    /* argument links.                                     */
    /*=====================================================*/
 
-   newList = get_struct(theEnv,execStatus,expr);
+   newList = get_struct(theEnv,expr);
    newList->type = nodeList->type;
    newList->value = nodeList->value;
    newList->nextArg = GetfieldReplace(theEnv,execStatus,nodeList->right);

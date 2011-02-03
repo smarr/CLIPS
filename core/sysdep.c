@@ -579,29 +579,29 @@ globle void RerouteStdin(
       else if (theSwitch == NO_SWITCH)
         {
          PrintErrorID(theEnv,execStatus,"SYSDEP",2,FALSE);
-         EnvPrintRouter(theEnv,execStatus,WERROR,"Invalid option\n");
+         EnvPrintRouter(theEnv,WERROR,"Invalid option\n");
         }
 
       if (i > (argc-1))
         {
          PrintErrorID(theEnv,execStatus,"SYSDEP",1,FALSE);
-         EnvPrintRouter(theEnv,execStatus,WERROR,"No file found for ");
+         EnvPrintRouter(theEnv,WERROR,"No file found for ");
 
          switch(theSwitch)
            {
             case BATCH_SWITCH:
-               EnvPrintRouter(theEnv,execStatus,WERROR,"-f");
+               EnvPrintRouter(theEnv,WERROR,"-f");
                break;
 
             case BATCH_STAR_SWITCH:
-               EnvPrintRouter(theEnv,execStatus,WERROR,"-f2");
+               EnvPrintRouter(theEnv,WERROR,"-f2");
                break;
 
             case LOAD_SWITCH:
-               EnvPrintRouter(theEnv,execStatus,WERROR,"-l");
+               EnvPrintRouter(theEnv,WERROR,"-l");
            }
 
-         EnvPrintRouter(theEnv,execStatus,WERROR," option\n");
+         EnvPrintRouter(theEnv,WERROR," option\n");
          return;
         }
 
@@ -818,7 +818,7 @@ globle void gensystem(
 #else
 
 #if ! VAX_VMS
-   EnvPrintRouter(theEnv,execStatus,WDIALOG,
+   EnvPrintRouter(theEnv,WDIALOG,
             "System function not fully defined for this system.\n");
 #endif
 

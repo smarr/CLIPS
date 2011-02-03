@@ -298,7 +298,7 @@ static void ProcessMultifieldNode(
    /* it to the end of the current list.        */
    /*===========================================*/
 
-   newMark = get_struct(theEnv,execStatus,multifieldMarker);
+   newMark = get_struct(theEnv,multifieldMarker);
    newMark->whichField = thePattern->whichField - 1;
    newMark->where.whichSlotNumber = (short) thePattern->whichSlot;
    newMark->startPosition = (thePattern->whichField - 1) + offset;
@@ -541,7 +541,7 @@ static void ProcessFactAlphaMatch(
   /*=======================================================*/
 
   listOfMatches = (struct patternMatch *) theFact->list;
-  theFact->list = (void *) get_struct(theEnv,execStatus,patternMatch);
+  theFact->list = (void *) get_struct(theEnv,patternMatch);
   ((struct patternMatch *) theFact->list)->next = listOfMatches;
   ((struct patternMatch *) theFact->list)->matchingPattern = (struct patternNodeHeader *) thePattern;
   ((struct patternMatch *) theFact->list)->theMatch = theMatch;
@@ -706,10 +706,10 @@ static void PatternNetErrorMessage(
    /*=======================================*/
 
    PrintErrorID(theEnv,execStatus,"FACTMCH",1,TRUE);
-   EnvPrintRouter(theEnv,execStatus,WERROR,"This error occurred in the fact pattern network\n");
-   EnvPrintRouter(theEnv,execStatus,WERROR,"   Currently active fact: ");
+   EnvPrintRouter(theEnv,WERROR,"This error occurred in the fact pattern network\n");
+   EnvPrintRouter(theEnv,WERROR,"   Currently active fact: ");
    PrintFact(theEnv,execStatus,WERROR,FactData(theEnv,execStatus)->CurrentPatternFact,FALSE,FALSE);
-   EnvPrintRouter(theEnv,execStatus,WERROR,"\n");
+   EnvPrintRouter(theEnv,WERROR,"\n");
 
    /*==============================================*/
    /* Print the field position or slot name of the */
@@ -725,7 +725,7 @@ static void PatternNetErrorMessage(
       gensprintf(buffer,"   Problem resides in slot %s\n",ValueToString(theSlots->slotName));
      }
 
-   EnvPrintRouter(theEnv,execStatus,WERROR,buffer);
+   EnvPrintRouter(theEnv,WERROR,buffer);
 
    /*==========================================================*/
    /* Trace the pattern to its entry point to the join network */
@@ -735,7 +735,7 @@ static void PatternNetErrorMessage(
    /*==========================================================*/
 
    TraceErrorToJoin(theEnv,execStatus,patternPtr,FALSE);
-   EnvPrintRouter(theEnv,execStatus,WERROR,"\n");
+   EnvPrintRouter(theEnv,WERROR,"\n");
   }
 
 /***************************************************************************/

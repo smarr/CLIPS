@@ -172,9 +172,9 @@ static void UnboundDeffunctionErr(
   void *theEnv,
   EXEC_STATUS)
   {
-   EnvPrintRouter(theEnv,execStatus,WERROR,"deffunction ");
-   EnvPrintRouter(theEnv,execStatus,WERROR,EnvGetDeffunctionName(theEnv,execStatus,(void *) DeffunctionData(theEnv,execStatus)->ExecutingDeffunction));
-   EnvPrintRouter(theEnv,execStatus,WERROR,".\n");
+   EnvPrintRouter(theEnv,WERROR,"deffunction ");
+   EnvPrintRouter(theEnv,WERROR,EnvGetDeffunctionName(theEnv,execStatus,(void *) DeffunctionData(theEnv,execStatus)->ExecutingDeffunction));
+   EnvPrintRouter(theEnv,WERROR,".\n");
   }
 
 #if DEBUGGING_FUNCTIONS
@@ -196,16 +196,16 @@ static void WatchDeffunction(
   EXEC_STATUS,
   char *tstring)
   {
-   EnvPrintRouter(theEnv,execStatus,WTRACE,"DFN ");
-   EnvPrintRouter(theEnv,execStatus,WTRACE,tstring);
+   EnvPrintRouter(theEnv,WTRACE,"DFN ");
+   EnvPrintRouter(theEnv,WTRACE,tstring);
    if (DeffunctionData(theEnv,execStatus)->ExecutingDeffunction->header.whichModule->theModule != ((struct defmodule *) EnvGetCurrentModule(theEnv,execStatus)))
      {
-      EnvPrintRouter(theEnv,execStatus,WTRACE,EnvGetDefmoduleName(theEnv,execStatus,(void *)
+      EnvPrintRouter(theEnv,WTRACE,EnvGetDefmoduleName(theEnv,execStatus,(void *)
                         DeffunctionData(theEnv,execStatus)->ExecutingDeffunction->header.whichModule->theModule));
-      EnvPrintRouter(theEnv,execStatus,WTRACE,"::");
+      EnvPrintRouter(theEnv,WTRACE,"::");
      }
-   EnvPrintRouter(theEnv,execStatus,WTRACE,ValueToString(DeffunctionData(theEnv,execStatus)->ExecutingDeffunction->header.name));
-   EnvPrintRouter(theEnv,execStatus,WTRACE," ED:");
+   EnvPrintRouter(theEnv,WTRACE,ValueToString(DeffunctionData(theEnv,execStatus)->ExecutingDeffunction->header.name));
+   EnvPrintRouter(theEnv,WTRACE," ED:");
    PrintLongInteger(theEnv,execStatus,WTRACE,(long long) execStatus->CurrentEvaluationDepth);
    PrintProcParamArray(theEnv,execStatus,WTRACE);
   }

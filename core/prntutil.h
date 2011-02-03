@@ -70,8 +70,8 @@ struct printUtilityData
    LOCALE char                          *DataObjectToString(void *,EXEC_STATUS,DATA_OBJECT *);
    LOCALE void                           SyntaxErrorMessage(void *,EXEC_STATUS,char *);
    LOCALE void                           SystemError(void *,EXEC_STATUS,char *,int);
-   LOCALE void                           PrintErrorID(void *,EXEC_STATUS,char *,int,int);
-   LOCALE void                           PrintWarningID(void *,EXEC_STATUS,char *,int,int);
+   LOCALE void                           PrintErrorID(void *,char *,int,int);
+   LOCALE void                           PrintWarningID(void *,char *,int,int);
    LOCALE void                           CantFindItemErrorMessage(void *,EXEC_STATUS,char *,char *);
    LOCALE void                           CantDeleteItemErrorMessage(void *,EXEC_STATUS,char *,char *);
    LOCALE void                           AlreadyParsedErrorMessage(void *,EXEC_STATUS,char *,char *);

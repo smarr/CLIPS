@@ -415,7 +415,7 @@ static SLOT_DESC *NewSlot(
   {
    SLOT_DESC *slot;
 
-   slot = get_struct(theEnv,execStatus,slotDescriptor);
+   slot = get_struct(theEnv,slotDescriptor);
    slot->dynamicDefault = 1;
    slot->defaultSpecified = 0;
    slot->noDefault = 0;
@@ -461,7 +461,7 @@ static TEMP_SLOT_LINK *InsertSlot(
   {
    TEMP_SLOT_LINK *stmp,*sprv,*tmp;
 
-   tmp = get_struct(theEnv,execStatus,tempSlotLink);
+   tmp = get_struct(theEnv,tempSlotLink);
    tmp->desc = slot;
    tmp->nxt = NULL;
    if (slist == NULL)
@@ -477,7 +477,7 @@ static TEMP_SLOT_LINK *InsertSlot(
             tmp->nxt = slist;
             DeleteSlots(theEnv,execStatus,tmp);
             PrintErrorID(theEnv,execStatus,"CLSLTPSR",1,FALSE);
-            EnvPrintRouter(theEnv,execStatus,WERROR,"Duplicate slots not allowed.\n");
+            EnvPrintRouter(theEnv,WERROR,"Duplicate slots not allowed.\n");
             return(NULL);
            }
          sprv = stmp;
@@ -539,8 +539,8 @@ static int ParseSimpleFacet(
    if (TestBitMap(specbits,testBit))
      {
       PrintErrorID(theEnv,execStatus,"CLSLTPSR",2,FALSE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,facetName);
-      EnvPrintRouter(theEnv,execStatus,WERROR," facet already specified.\n");
+      EnvPrintRouter(theEnv,WERROR,facetName);
+      EnvPrintRouter(theEnv,WERROR," facet already specified.\n");
       return(-1);
      }
    SetBitMap(specbits,testBit);
@@ -620,7 +620,7 @@ static intBool ParseDefaultFacet(
    if (TestBitMap(specbits,DEFAULT_BIT))
      {
       PrintErrorID(theEnv,execStatus,"CLSLTPSR",2,FALSE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"default facet already specified.\n");
+      EnvPrintRouter(theEnv,WERROR,"default facet already specified.\n");
       return(FALSE);
      }
    SetBitMap(specbits,DEFAULT_BIT);
@@ -708,7 +708,7 @@ static void BuildCompositeFacets(
               }
             else
               {
-               sd->defaultValue = (void *) get_struct(theEnv,execStatus,dataObject);
+               sd->defaultValue = (void *) get_struct(theEnv,dataObject);
                GenCopyMemory(DATA_OBJECT,1,sd->defaultValue,compslot->defaultValue);
                ValueInstall(theEnv,execStatus,(DATA_OBJECT *) sd->defaultValue);
               }
@@ -771,7 +771,7 @@ static intBool CheckForFacetConflicts(
       if (parsedConstraint->cardinality)
         {
          PrintErrorID(theEnv,execStatus,"CLSLTPSR",3,TRUE);
-         EnvPrintRouter(theEnv,execStatus,WERROR,"Cardinality facet can only be used with multifield slots\n");
+         EnvPrintRouter(theEnv,WERROR,"Cardinality facet can only be used with multifield slots\n");
          return(FALSE);
         }
       else
@@ -785,19 +785,19 @@ static intBool CheckForFacetConflicts(
    if (sd->noDefault && sd->noWrite)
      {
       PrintErrorID(theEnv,execStatus,"CLSLTPSR",4,TRUE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"read-only slots must have a default value\n");
+      EnvPrintRouter(theEnv,WERROR,"read-only slots must have a default value\n");
       return(FALSE);
      }
    if (sd->noWrite && (sd->createWriteAccessor || sd->overrideMessageSpecified))
      {
       PrintErrorID(theEnv,execStatus,"CLSLTPSR",5,TRUE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"read-only slots cannot have a write accessor\n");
+      EnvPrintRouter(theEnv,WERROR,"read-only slots cannot have a write accessor\n");
       return(FALSE);
      }
    if (sd->noInherit && sd->publicVisibility)
      {
       PrintErrorID(theEnv,execStatus,"CLSLTPSR",6,TRUE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"no-inherit slots cannot also be public\n");
+      EnvPrintRouter(theEnv,WERROR,"no-inherit slots cannot also be public\n");
       return(FALSE);
      }
    return(TRUE);
@@ -854,7 +854,7 @@ static intBool EvaluateSlotDefaultValue(
            {
             ExpressionDeinstall(theEnv,execStatus,(EXPRESSION *) sd->defaultValue);
             ReturnPackedExpression(theEnv,execStatus,(EXPRESSION *) sd->defaultValue);
-            sd->defaultValue = (void *) get_struct(theEnv,execStatus,dataObject);
+            sd->defaultValue = (void *) get_struct(theEnv,dataObject);
             GenCopyMemory(DATA_OBJECT,1,sd->defaultValue,&temp);
             ValueInstall(theEnv,execStatus,(DATA_OBJECT *) sd->defaultValue);
            }
@@ -866,7 +866,7 @@ static intBool EvaluateSlotDefaultValue(
         }
       else if (sd->defaultSpecified == 0)
         {
-         sd->defaultValue = (void *) get_struct(theEnv,execStatus,dataObject);
+         sd->defaultValue = (void *) get_struct(theEnv,dataObject);
          DeriveDefaultFromConstraints(theEnv,execStatus,sd->constraint,
                                       (DATA_OBJECT *) sd->defaultValue,(int) sd->multiple,TRUE);
          ValueInstall(theEnv,execStatus,(DATA_OBJECT *) sd->defaultValue);
@@ -878,7 +878,7 @@ static intBool EvaluateSlotDefaultValue(
       if (vCode != NO_VIOLATION)
         {
          PrintErrorID(theEnv,execStatus,"CSTRNCHK",1,FALSE);
-         EnvPrintRouter(theEnv,execStatus,WERROR,"Expression for ");
+         EnvPrintRouter(theEnv,WERROR,"Expression for ");
          PrintSlot(theEnv,execStatus,WERROR,sd,NULL,"dynamic default value");
          ConstraintViolationErrorMessage(theEnv,execStatus,NULL,NULL,0,0,NULL,0,
                                          vCode,sd->constraint,FALSE);

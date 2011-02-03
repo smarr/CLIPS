@@ -487,9 +487,9 @@ globle void ListWatchItemsCommand(
      {
       for (wPtr = WatchData(theEnv,execStatus)->ListOfWatchItems; wPtr != NULL; wPtr = wPtr->next)
         {
-         EnvPrintRouter(theEnv,execStatus,WDISPLAY,wPtr->name);
-         if (*(wPtr->flag)) EnvPrintRouter(theEnv,execStatus,WDISPLAY," = on\n");
-         else EnvPrintRouter(theEnv,execStatus,WDISPLAY," = off\n");
+         EnvPrintRouter(theEnv,WDISPLAY,wPtr->name);
+         if (*(wPtr->flag)) EnvPrintRouter(theEnv,WDISPLAY," = on\n");
+         else EnvPrintRouter(theEnv,WDISPLAY," = off\n");
         }
       return;
      }
@@ -523,9 +523,9 @@ globle void ListWatchItemsCommand(
    /* List the status of the watch item. */
    /*====================================*/
 
-   EnvPrintRouter(theEnv,execStatus,WDISPLAY,wPtr->name);
-   if (*(wPtr->flag)) EnvPrintRouter(theEnv,execStatus,WDISPLAY," = on\n");
-   else EnvPrintRouter(theEnv,execStatus,WDISPLAY," = off\n");
+   EnvPrintRouter(theEnv,WDISPLAY,wPtr->name);
+   if (*(wPtr->flag)) EnvPrintRouter(theEnv,WDISPLAY," = on\n");
+   else EnvPrintRouter(theEnv,WDISPLAY," = off\n");
 
    /*============================================*/
    /* List the status of individual watch items. */

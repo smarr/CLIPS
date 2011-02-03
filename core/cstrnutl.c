@@ -51,7 +51,7 @@ globle struct constraintRecord *GetConstraintRecord(
    CONSTRAINT_RECORD *constraints;
    unsigned i;
 
-   constraints = get_struct(theEnv,execStatus,constraintRecord);
+   constraints = get_struct(theEnv,constraintRecord);
 
    for (i = 0 ; i < sizeof(CONSTRAINT_RECORD) ; i++)
      { ((char *) constraints)[i] = '\0'; }
@@ -130,7 +130,7 @@ globle struct constraintRecord *CopyConstraintRecord(
 
    if (sourceConstraint == NULL) return(NULL);
 
-   theConstraint = get_struct(theEnv,execStatus,constraintRecord);
+   theConstraint = get_struct(theEnv,constraintRecord);
 
    theConstraint->anyAllowed = sourceConstraint->anyAllowed;
    theConstraint->symbolsAllowed = sourceConstraint->symbolsAllowed;

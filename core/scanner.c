@@ -484,7 +484,7 @@ static void *ScanString(
    if ((inchar == EOF) && (ScannerData(theEnv,execStatus)->IgnoreCompletionErrors == FALSE))
      { 
       PrintErrorID(theEnv,execStatus,"SCANNER",1,TRUE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"Encountered End-Of-File while scanning a string\n"); 
+      EnvPrintRouter(theEnv,WERROR,"Encountered End-Of-File while scanning a string\n"); 
      }
 
    /*===============================================*/
@@ -738,7 +738,7 @@ static void ScanNumber(
       if (errno)
         {
          PrintWarningID(theEnv,execStatus,"SCANNER",1,FALSE);
-         EnvPrintRouter(theEnv,execStatus,WWARNING,"Over or underflow of long long integer.\n");
+         EnvPrintRouter(theEnv,WWARNING,"Over or underflow of long long integer.\n");
         }
       theToken->type = INTEGER;
       theToken->value = (void *) EnvAddLong(theEnv,execStatus,lvalue);

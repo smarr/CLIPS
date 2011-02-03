@@ -250,11 +250,11 @@ globle long long EnvRun(
          char printSpace[60];
 
          gensprintf(printSpace,"FIRE %4lld ",rulesFired);
-         EnvPrintRouter(theEnv,execStatus,WTRACE,printSpace);
-         EnvPrintRouter(theEnv,execStatus,WTRACE,ruleFiring);
-         EnvPrintRouter(theEnv,execStatus,WTRACE,": ");
+         EnvPrintRouter(theEnv,WTRACE,printSpace);
+         EnvPrintRouter(theEnv,WTRACE,ruleFiring);
+         EnvPrintRouter(theEnv,WTRACE,": ");
          PrintPartialMatch(theEnv,execStatus,WTRACE,theBasis);
-         EnvPrintRouter(theEnv,execStatus,WTRACE,"\n");
+         EnvPrintRouter(theEnv,WTRACE,"\n");
         }
 #endif
 
@@ -346,9 +346,9 @@ globle long long EnvRun(
 
         {
          PrintErrorID(theEnv,execStatus,"PRCCODE",4,FALSE);
-         EnvPrintRouter(theEnv,execStatus,WERROR,"Execution halted during the actions of defrule ");
-         EnvPrintRouter(theEnv,execStatus,WERROR,ruleFiring);
-         EnvPrintRouter(theEnv,execStatus,WERROR,".\n");
+         EnvPrintRouter(theEnv,WERROR,"Execution halted during the actions of defrule ");
+         EnvPrintRouter(theEnv,WERROR,ruleFiring);
+         EnvPrintRouter(theEnv,WERROR,".\n");
         }
 
       /*===================================================*/
@@ -457,9 +457,9 @@ globle long long EnvRun(
          if (((struct defrule *) GetActivationRule(theActivation))->afterBreakpoint)
            {
             EngineData(theEnv,execStatus)->HaltRules = TRUE;
-            EnvPrintRouter(theEnv,execStatus,WDIALOG,"Breaking on rule ");
-            EnvPrintRouter(theEnv,execStatus,WDIALOG,EnvGetActivationName(theEnv,execStatus,theActivation));
-            EnvPrintRouter(theEnv,execStatus,WDIALOG,".\n");
+            EnvPrintRouter(theEnv,WDIALOG,"Breaking on rule ");
+            EnvPrintRouter(theEnv,WDIALOG,EnvGetActivationName(theEnv,execStatus,theActivation));
+            EnvPrintRouter(theEnv,WDIALOG,".\n");
            }
         }
      }
@@ -487,7 +487,7 @@ globle long long EnvRun(
    /*======================================================*/
 
    if (runLimit == rulesFired)
-     { EnvPrintRouter(theEnv,execStatus,WDIALOG,"rule firing limit reached\n"); }
+     { EnvPrintRouter(theEnv,WDIALOG,"rule firing limit reached\n"); }
 
    /*==============================*/
    /* Restore execution variables. */
@@ -508,80 +508,80 @@ globle long long EnvRun(
       endTime = gentime();
 
       PrintLongInteger(theEnv,execStatus,WDIALOG,rulesFired);
-      EnvPrintRouter(theEnv,execStatus,WDIALOG," rules fired");
+      EnvPrintRouter(theEnv,WDIALOG," rules fired");
 
 #if (! GENERIC)
       if (startTime != endTime)
         {
-         EnvPrintRouter(theEnv,execStatus,WDIALOG,"        Run time is ");
+         EnvPrintRouter(theEnv,WDIALOG,"        Run time is ");
          PrintFloat(theEnv,execStatus,WDIALOG,endTime - startTime);
-         EnvPrintRouter(theEnv,execStatus,WDIALOG," seconds.\n");
+         EnvPrintRouter(theEnv,WDIALOG," seconds.\n");
          PrintFloat(theEnv,execStatus,WDIALOG,(double) rulesFired / (endTime - startTime));
-         EnvPrintRouter(theEnv,execStatus,WDIALOG," rules per second.\n");
+         EnvPrintRouter(theEnv,WDIALOG," rules per second.\n");
         }
       else
-        { EnvPrintRouter(theEnv,execStatus,WDIALOG,"\n"); }
+        { EnvPrintRouter(theEnv,WDIALOG,"\n"); }
 #endif
 
 #if DEFTEMPLATE_CONSTRUCT
       gensprintf(printSpace,"%ld mean number of facts (%ld maximum).\n",
                           (long) (((double) sumFacts / (rulesFired + 1)) + 0.5),
                           maxFacts);
-      EnvPrintRouter(theEnv,execStatus,WDIALOG,printSpace);
+      EnvPrintRouter(theEnv,WDIALOG,printSpace);
 #endif
 
 #if OBJECT_SYSTEM
       gensprintf(printSpace,"%ld mean number of instances (%ld maximum).\n",
                           (long) (((double) sumInstances / (rulesFired + 1)) + 0.5),
                           maxInstances);
-      EnvPrintRouter(theEnv,execStatus,WDIALOG,printSpace);
+      EnvPrintRouter(theEnv,WDIALOG,printSpace);
 #endif
 
       gensprintf(printSpace,"%ld mean number of activations (%ld maximum).\n",
                           (long) (((double) sumActivations / (rulesFired + 1)) + 0.5),
                           maxActivations);
-      EnvPrintRouter(theEnv,execStatus,WDIALOG,printSpace);
+      EnvPrintRouter(theEnv,WDIALOG,printSpace);
       
 #if DEVELOPER
       gensprintf(printSpace,"%9ld left to right comparisons.\n",
                           EngineData(theEnv,execStatus)->leftToRightComparisons);
-      EnvPrintRouter(theEnv,execStatus,WDIALOG,printSpace);
+      EnvPrintRouter(theEnv,WDIALOG,printSpace);
 
       gensprintf(printSpace,"%9ld left to right succeeds.\n",
                           EngineData(theEnv,execStatus)->leftToRightSucceeds);
-      EnvPrintRouter(theEnv,execStatus,WDIALOG,printSpace);
+      EnvPrintRouter(theEnv,WDIALOG,printSpace);
 
       gensprintf(printSpace,"%9ld left to right loops.\n",
                           EngineData(theEnv,execStatus)->leftToRightLoops);
-      EnvPrintRouter(theEnv,execStatus,WDIALOG,printSpace);
+      EnvPrintRouter(theEnv,WDIALOG,printSpace);
 
       gensprintf(printSpace,"%9ld right to left comparisons.\n",
                           EngineData(theEnv,execStatus)->rightToLeftComparisons);
-      EnvPrintRouter(theEnv,execStatus,WDIALOG,printSpace);
+      EnvPrintRouter(theEnv,WDIALOG,printSpace);
 
       gensprintf(printSpace,"%9ld right to left succeeds.\n",
                           EngineData(theEnv,execStatus)->rightToLeftSucceeds);
-      EnvPrintRouter(theEnv,execStatus,WDIALOG,printSpace);
+      EnvPrintRouter(theEnv,WDIALOG,printSpace);
 
       gensprintf(printSpace,"%9ld right to left loops.\n",
                           EngineData(theEnv,execStatus)->rightToLeftLoops);
-      EnvPrintRouter(theEnv,execStatus,WDIALOG,printSpace);
+      EnvPrintRouter(theEnv,WDIALOG,printSpace);
 
       gensprintf(printSpace,"%9ld find next conflicting comparisons.\n",
                           EngineData(theEnv,execStatus)->findNextConflictingComparisons);
-      EnvPrintRouter(theEnv,execStatus,WDIALOG,printSpace);
+      EnvPrintRouter(theEnv,WDIALOG,printSpace);
 
       gensprintf(printSpace,"%9ld beta hash list skips.\n",
                           EngineData(theEnv,execStatus)->betaHashListSkips);
-      EnvPrintRouter(theEnv,execStatus,WDIALOG,printSpace);
+      EnvPrintRouter(theEnv,WDIALOG,printSpace);
       
       gensprintf(printSpace,"%9ld beta hash hash table skips.\n",
                           EngineData(theEnv,execStatus)->betaHashHTSkips);
-      EnvPrintRouter(theEnv,execStatus,WDIALOG,printSpace);
+      EnvPrintRouter(theEnv,WDIALOG,printSpace);
 
       gensprintf(printSpace,"%9ld unneeded marker compare.\n",
                           EngineData(theEnv,execStatus)->unneededMarkerCompare);
-      EnvPrintRouter(theEnv,execStatus,WDIALOG,printSpace);
+      EnvPrintRouter(theEnv,WDIALOG,printSpace);
 
 #endif
      }
@@ -716,16 +716,16 @@ static struct defmodule *RemoveFocus(
 #if DEBUGGING_FUNCTIONS
    if (EngineData(theEnv,execStatus)->WatchFocus)
      {
-      EnvPrintRouter(theEnv,execStatus,WTRACE,"<== Focus ");
-      EnvPrintRouter(theEnv,execStatus,WTRACE,ValueToString(theModule->name));
+      EnvPrintRouter(theEnv,WTRACE,"<== Focus ");
+      EnvPrintRouter(theEnv,WTRACE,ValueToString(theModule->name));
 
       if ((EngineData(theEnv,execStatus)->CurrentFocus != NULL) && currentFocusRemoved)
         {
-         EnvPrintRouter(theEnv,execStatus,WTRACE," to ");
-         EnvPrintRouter(theEnv,execStatus,WTRACE,ValueToString(EngineData(theEnv,execStatus)->CurrentFocus->theModule->name));
+         EnvPrintRouter(theEnv,WTRACE," to ");
+         EnvPrintRouter(theEnv,WTRACE,ValueToString(EngineData(theEnv,execStatus)->CurrentFocus->theModule->name));
         }
 
-      EnvPrintRouter(theEnv,execStatus,WTRACE,"\n");
+      EnvPrintRouter(theEnv,WTRACE,"\n");
      }
 #endif
 
@@ -810,14 +810,14 @@ globle void EnvFocus(
 #if DEBUGGING_FUNCTIONS
    if (EngineData(theEnv,execStatus)->WatchFocus)
      {
-      EnvPrintRouter(theEnv,execStatus,WTRACE,"==> Focus ");
-      EnvPrintRouter(theEnv,execStatus,WTRACE,ValueToString(theModule->name));
+      EnvPrintRouter(theEnv,WTRACE,"==> Focus ");
+      EnvPrintRouter(theEnv,WTRACE,ValueToString(theModule->name));
       if (EngineData(theEnv,execStatus)->CurrentFocus != NULL)
         {
-         EnvPrintRouter(theEnv,execStatus,WTRACE," from ");
-         EnvPrintRouter(theEnv,execStatus,WTRACE,ValueToString(EngineData(theEnv,execStatus)->CurrentFocus->theModule->name));
+         EnvPrintRouter(theEnv,WTRACE," from ");
+         EnvPrintRouter(theEnv,WTRACE,ValueToString(EngineData(theEnv,execStatus)->CurrentFocus->theModule->name));
         }
-      EnvPrintRouter(theEnv,execStatus,WTRACE,"\n");
+      EnvPrintRouter(theEnv,WTRACE,"\n");
      }
 #endif
 
@@ -825,7 +825,7 @@ globle void EnvFocus(
    /* Add the new focus to the focus stack. */
    /*=======================================*/
 
-   tempFocus = get_struct(theEnv,execStatus,focus);
+   tempFocus = get_struct(theEnv,focus);
    tempFocus->theModule = theModule;
    tempFocus->theDefruleModule = GetDefruleModuleItem(theEnv,execStatus,theModule);
    tempFocus->next = EngineData(theEnv,execStatus)->CurrentFocus;
@@ -1153,9 +1153,9 @@ globle void RemoveBreakCommand(
 
    if (EnvRemoveBreak(theEnv,execStatus,defrulePtr) == FALSE)
      {
-      EnvPrintRouter(theEnv,execStatus,WERROR,"Rule ");
-      EnvPrintRouter(theEnv,execStatus,WERROR,argument);
-      EnvPrintRouter(theEnv,execStatus,WERROR," does not have a breakpoint set.\n");
+      EnvPrintRouter(theEnv,WERROR,"Rule ");
+      EnvPrintRouter(theEnv,WERROR,argument);
+      EnvPrintRouter(theEnv,WERROR," does not have a breakpoint set.\n");
      }
   }
 
@@ -1211,8 +1211,8 @@ globle void EnvListFocusStack(
         theFocus != NULL;
         theFocus = theFocus->next)
      {
-      EnvPrintRouter(theEnv,execStatus,logicalName,EnvGetDefmoduleName(theEnv,execStatus,theFocus->theModule));
-      EnvPrintRouter(theEnv,execStatus,logicalName,"\n");
+      EnvPrintRouter(theEnv,logicalName,EnvGetDefmoduleName(theEnv,execStatus,theFocus->theModule));
+      EnvPrintRouter(theEnv,logicalName,"\n");
      }
   }
 

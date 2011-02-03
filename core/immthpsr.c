@@ -130,8 +130,8 @@ static void FormMethodsFromRestrictions(
       =================================== */
    if (rstring == NULL)
      {
-      tmp = get_struct(theEnv,execStatus,expr);
-      rptr = get_struct(theEnv,execStatus,restriction);
+      tmp = get_struct(theEnv,expr);
+      rptr = get_struct(theEnv,restriction);
       PackRestrictionTypes(theEnv,execStatus,rptr,NULL);
       rptr->query = NULL;
       tmp->argList = (EXPRESSION *) rptr;
@@ -182,7 +182,7 @@ static void FormMethodsFromRestrictions(
      {
       theChar[0] = (rstring[j] != '\0') ? rstring[j++] : defaultc;
       rptr = ParseRestrictionType(theEnv,execStatus,(int) theChar[0]);
-      tmp = get_struct(theEnv,execStatus,expr);
+      tmp = get_struct(theEnv,expr);
       tmp->argList = (EXPRESSION *) rptr;
       tmp->nextArg = NULL;
       if (plist == NULL)
@@ -214,7 +214,7 @@ static void FormMethodsFromRestrictions(
          break;
         }
       rptr = ParseRestrictionType(theEnv,execStatus,(int) rstring[j]);
-      tmp = get_struct(theEnv,execStatus,expr);
+      tmp = get_struct(theEnv,expr);
       tmp->argList = (EXPRESSION *) rptr;
       tmp->nextArg = NULL;
       if (plist == NULL)
@@ -257,7 +257,7 @@ static void FormMethodsFromRestrictions(
          rptr->query->argList->nextArg =
                GenConstant(theEnv,execStatus,INTEGER,(void *) EnvAddLong(theEnv,execStatus,(long long) (max - min - i)));
         }
-      tmp = get_struct(theEnv,execStatus,expr);
+      tmp = get_struct(theEnv,expr);
       tmp->argList = (EXPRESSION *) rptr;
       tmp->nextArg = NULL;
       if (plist == NULL)
@@ -312,7 +312,7 @@ static RESTRICTION *ParseRestrictionType(
    CONSTRAINT_RECORD *rv;
    EXPRESSION *types = NULL;
 
-   rptr = get_struct(theEnv,execStatus,restriction);
+   rptr = get_struct(theEnv,restriction);
    rptr->query = NULL;
    rv = ArgumentTypeToConstraintRecord(theEnv,execStatus,code);
    if (rv->anyAllowed == FALSE)

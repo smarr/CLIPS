@@ -389,26 +389,26 @@ static void PrintObjectGetVarJN1(
 
    if (hack->objectAddress)
      {
-      EnvPrintRouter(theEnv,execStatus,logicalName,"(obj-ptr ");
+      EnvPrintRouter(theEnv,logicalName,"(obj-ptr ");
       PrintLongInteger(theEnv,execStatus,logicalName,(long long) hack->whichPattern);
      }
    else if (hack->allFields)
      {
-      EnvPrintRouter(theEnv,execStatus,logicalName,"(obj-slot-contents ");
+      EnvPrintRouter(theEnv,logicalName,"(obj-slot-contents ");
       PrintLongInteger(theEnv,execStatus,logicalName,(long long) hack->whichPattern);
-      EnvPrintRouter(theEnv,execStatus,logicalName," ");
-      EnvPrintRouter(theEnv,execStatus,logicalName,ValueToString(FindIDSlotName(theEnv,execStatus,(unsigned) hack->whichSlot)));
+      EnvPrintRouter(theEnv,logicalName," ");
+      EnvPrintRouter(theEnv,logicalName,ValueToString(FindIDSlotName(theEnv,execStatus,(unsigned) hack->whichSlot)));
      }
    else
      {
-      EnvPrintRouter(theEnv,execStatus,logicalName,"(obj-slot-var ");
+      EnvPrintRouter(theEnv,logicalName,"(obj-slot-var ");
       PrintLongInteger(theEnv,execStatus,logicalName,(long long) hack->whichPattern);
-      EnvPrintRouter(theEnv,execStatus,logicalName," ");
-      EnvPrintRouter(theEnv,execStatus,logicalName,ValueToString(FindIDSlotName(theEnv,execStatus,(unsigned) hack->whichSlot)));
-      EnvPrintRouter(theEnv,execStatus,logicalName," ");
+      EnvPrintRouter(theEnv,logicalName," ");
+      EnvPrintRouter(theEnv,logicalName,ValueToString(FindIDSlotName(theEnv,execStatus,(unsigned) hack->whichSlot)));
+      EnvPrintRouter(theEnv,logicalName," ");
       PrintLongInteger(theEnv,execStatus,logicalName,(long long) hack->whichField);
      }
-   EnvPrintRouter(theEnv,execStatus,logicalName,")");
+   EnvPrintRouter(theEnv,logicalName,")");
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
 #pragma unused(theEnv,execStatus)
@@ -447,21 +447,21 @@ static void PrintObjectGetVarJN2(
    struct ObjectMatchVar2 *hack;
 
    hack = (struct ObjectMatchVar2 *) ValueToBitMap(theValue);
-   EnvPrintRouter(theEnv,execStatus,logicalName,"(obj-slot-quick-var ");
+   EnvPrintRouter(theEnv,logicalName,"(obj-slot-quick-var ");
    PrintLongInteger(theEnv,execStatus,logicalName,(long long) hack->whichPattern);
-   EnvPrintRouter(theEnv,execStatus,logicalName," ");
-   EnvPrintRouter(theEnv,execStatus,logicalName,ValueToString(FindIDSlotName(theEnv,execStatus,(unsigned) hack->whichSlot)));
+   EnvPrintRouter(theEnv,logicalName," ");
+   EnvPrintRouter(theEnv,logicalName,ValueToString(FindIDSlotName(theEnv,execStatus,(unsigned) hack->whichSlot)));
    if (hack->fromBeginning)
      {
-      EnvPrintRouter(theEnv,execStatus,logicalName," B");
+      EnvPrintRouter(theEnv,logicalName," B");
       PrintLongInteger(theEnv,execStatus,logicalName,(long long) (hack->beginningOffset + 1));
      }
    if (hack->fromEnd)
      {
-      EnvPrintRouter(theEnv,execStatus,logicalName," E");
+      EnvPrintRouter(theEnv,logicalName," E");
       PrintLongInteger(theEnv,execStatus,logicalName,(long long) (hack->endOffset + 1));
      }
-   EnvPrintRouter(theEnv,execStatus,logicalName,")");
+   EnvPrintRouter(theEnv,logicalName,")");
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
 #pragma unused(theEnv,execStatus)
@@ -502,20 +502,20 @@ static void PrintObjectGetVarPN1(
    hack = (struct ObjectMatchVar1 *) ValueToBitMap(theValue);
 
    if (hack->objectAddress)
-     EnvPrintRouter(theEnv,execStatus,logicalName,"(ptn-obj-ptr ");
+     EnvPrintRouter(theEnv,logicalName,"(ptn-obj-ptr ");
    else if (hack->allFields)
      {
-      EnvPrintRouter(theEnv,execStatus,logicalName,"(ptn-obj-slot-contents ");
-      EnvPrintRouter(theEnv,execStatus,logicalName,ValueToString(FindIDSlotName(theEnv,execStatus,(unsigned) hack->whichSlot)));
+      EnvPrintRouter(theEnv,logicalName,"(ptn-obj-slot-contents ");
+      EnvPrintRouter(theEnv,logicalName,ValueToString(FindIDSlotName(theEnv,execStatus,(unsigned) hack->whichSlot)));
      }
    else
      {
-      EnvPrintRouter(theEnv,execStatus,logicalName,"(ptn-obj-slot-var ");
-      EnvPrintRouter(theEnv,execStatus,logicalName,ValueToString(FindIDSlotName(theEnv,execStatus,(unsigned) hack->whichSlot)));
-      EnvPrintRouter(theEnv,execStatus,logicalName," ");
+      EnvPrintRouter(theEnv,logicalName,"(ptn-obj-slot-var ");
+      EnvPrintRouter(theEnv,logicalName,ValueToString(FindIDSlotName(theEnv,execStatus,(unsigned) hack->whichSlot)));
+      EnvPrintRouter(theEnv,logicalName," ");
       PrintLongInteger(theEnv,execStatus,logicalName,(long long) hack->whichField);
      }
-   EnvPrintRouter(theEnv,execStatus,logicalName,")");
+   EnvPrintRouter(theEnv,logicalName,")");
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
 #pragma unused(theEnv,execStatus)
@@ -551,19 +551,19 @@ static void PrintObjectGetVarPN2(
    struct ObjectMatchVar2 *hack;
 
    hack = (struct ObjectMatchVar2 *) ValueToBitMap(theValue);
-   EnvPrintRouter(theEnv,execStatus,logicalName,"(ptn-obj-slot-quick-var ");
-   EnvPrintRouter(theEnv,execStatus,logicalName,ValueToString(FindIDSlotName(theEnv,execStatus,(unsigned) hack->whichSlot)));
+   EnvPrintRouter(theEnv,logicalName,"(ptn-obj-slot-quick-var ");
+   EnvPrintRouter(theEnv,logicalName,ValueToString(FindIDSlotName(theEnv,execStatus,(unsigned) hack->whichSlot)));
    if (hack->fromBeginning)
      {
-      EnvPrintRouter(theEnv,execStatus,logicalName," B");
+      EnvPrintRouter(theEnv,logicalName," B");
       PrintLongInteger(theEnv,execStatus,logicalName,(long long) (hack->beginningOffset + 1));
      }
    if (hack->fromEnd)
      {
-      EnvPrintRouter(theEnv,execStatus,logicalName," E");
+      EnvPrintRouter(theEnv,logicalName," E");
       PrintLongInteger(theEnv,execStatus,logicalName,(long long) (hack->endOffset + 1));
      }
-   EnvPrintRouter(theEnv,execStatus,logicalName,")");
+   EnvPrintRouter(theEnv,logicalName,")");
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
 #pragma unused(theEnv,execStatus)
@@ -600,18 +600,18 @@ static void PrintObjectCmpConstant(
 
    hack = (struct ObjectCmpPNConstant *) ValueToBitMap(theValue);
 
-   EnvPrintRouter(theEnv,execStatus,logicalName,"(obj-const ");
-   EnvPrintRouter(theEnv,execStatus,logicalName,hack->pass ? "p " : "n ");
+   EnvPrintRouter(theEnv,logicalName,"(obj-const ");
+   EnvPrintRouter(theEnv,logicalName,hack->pass ? "p " : "n ");
    if (hack->general)
      PrintExpression(theEnv,execStatus,logicalName,GetFirstArgument());
    else
      {
-      EnvPrintRouter(theEnv,execStatus,logicalName,hack->fromBeginning ? "B" : "E");
+      EnvPrintRouter(theEnv,logicalName,hack->fromBeginning ? "B" : "E");
       PrintLongInteger(theEnv,execStatus,logicalName,(long long) hack->offset);
-      EnvPrintRouter(theEnv,execStatus,logicalName," ");
+      EnvPrintRouter(theEnv,logicalName," ");
       PrintExpression(theEnv,execStatus,logicalName,GetFirstArgument());
      }
-   EnvPrintRouter(theEnv,execStatus,logicalName,")");
+   EnvPrintRouter(theEnv,logicalName,")");
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
 #pragma unused(theEnv,execStatus)
@@ -635,13 +635,13 @@ static void PrintSlotLengthTest(
 
    hack = (struct ObjectMatchLength *) ValueToBitMap(theValue);
 
-   EnvPrintRouter(theEnv,execStatus,logicalName,"(obj-slot-len ");
+   EnvPrintRouter(theEnv,logicalName,"(obj-slot-len ");
    if (hack->exactly)
-     EnvPrintRouter(theEnv,execStatus,logicalName,"= ");
+     EnvPrintRouter(theEnv,logicalName,"= ");
    else
-     EnvPrintRouter(theEnv,execStatus,logicalName,">= ");
+     EnvPrintRouter(theEnv,logicalName,">= ");
    PrintLongInteger(theEnv,execStatus,logicalName,(long long) hack->minLength);
-   EnvPrintRouter(theEnv,execStatus,logicalName,")");
+   EnvPrintRouter(theEnv,logicalName,")");
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
 #pragma unused(theEnv,execStatus)
@@ -684,12 +684,12 @@ static void PrintPNSimpleCompareFunction1(
 
    hack = (struct ObjectCmpPNSingleSlotVars1 *) ValueToBitMap(theValue);
 
-   EnvPrintRouter(theEnv,execStatus,logicalName,"(pslot-cmp1 ");
-   EnvPrintRouter(theEnv,execStatus,logicalName,hack->pass ? "p " : "n ");
-   EnvPrintRouter(theEnv,execStatus,logicalName,ValueToString(FindIDSlotName(theEnv,execStatus,(unsigned) hack->firstSlot)));
-   EnvPrintRouter(theEnv,execStatus,logicalName," ");
-   EnvPrintRouter(theEnv,execStatus,logicalName,ValueToString(FindIDSlotName(theEnv,execStatus,(unsigned) hack->secondSlot)));
-   EnvPrintRouter(theEnv,execStatus,logicalName,")");
+   EnvPrintRouter(theEnv,logicalName,"(pslot-cmp1 ");
+   EnvPrintRouter(theEnv,logicalName,hack->pass ? "p " : "n ");
+   EnvPrintRouter(theEnv,logicalName,ValueToString(FindIDSlotName(theEnv,execStatus,(unsigned) hack->firstSlot)));
+   EnvPrintRouter(theEnv,logicalName," ");
+   EnvPrintRouter(theEnv,logicalName,ValueToString(FindIDSlotName(theEnv,execStatus,(unsigned) hack->secondSlot)));
+   EnvPrintRouter(theEnv,logicalName,")");
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
 #pragma unused(theEnv,execStatus)
@@ -737,14 +737,14 @@ static void PrintPNSimpleCompareFunction2(
 
    hack = (struct ObjectCmpPNSingleSlotVars2 *) ValueToBitMap(theValue);
 
-   EnvPrintRouter(theEnv,execStatus,logicalName,"(pslot-cmp2 ");
-   EnvPrintRouter(theEnv,execStatus,logicalName,hack->pass ? "p " : "n ");
-   EnvPrintRouter(theEnv,execStatus,logicalName,ValueToString(FindIDSlotName(theEnv,execStatus,(unsigned) hack->firstSlot)));
-   EnvPrintRouter(theEnv,execStatus,logicalName,hack->fromBeginning ? " B" : " E");
+   EnvPrintRouter(theEnv,logicalName,"(pslot-cmp2 ");
+   EnvPrintRouter(theEnv,logicalName,hack->pass ? "p " : "n ");
+   EnvPrintRouter(theEnv,logicalName,ValueToString(FindIDSlotName(theEnv,execStatus,(unsigned) hack->firstSlot)));
+   EnvPrintRouter(theEnv,logicalName,hack->fromBeginning ? " B" : " E");
    PrintLongInteger(theEnv,execStatus,logicalName,(long long) hack->offset);
-   EnvPrintRouter(theEnv,execStatus,logicalName," ");
-   EnvPrintRouter(theEnv,execStatus,logicalName,ValueToString(FindIDSlotName(theEnv,execStatus,(unsigned) hack->secondSlot)));
-   EnvPrintRouter(theEnv,execStatus,logicalName,")");
+   EnvPrintRouter(theEnv,logicalName," ");
+   EnvPrintRouter(theEnv,logicalName,ValueToString(FindIDSlotName(theEnv,execStatus,(unsigned) hack->secondSlot)));
+   EnvPrintRouter(theEnv,logicalName,")");
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
 #pragma unused(theEnv,execStatus)
@@ -794,16 +794,16 @@ static void PrintPNSimpleCompareFunction3(
 
    hack = (struct ObjectCmpPNSingleSlotVars3 *) ValueToBitMap(theValue);
 
-   EnvPrintRouter(theEnv,execStatus,logicalName,"(pslot-cmp3 ");
-   EnvPrintRouter(theEnv,execStatus,logicalName,hack->pass ? "p " : "n ");
-   EnvPrintRouter(theEnv,execStatus,logicalName,ValueToString(FindIDSlotName(theEnv,execStatus,(unsigned) hack->firstSlot)));
-   EnvPrintRouter(theEnv,execStatus,logicalName,hack->firstFromBeginning ? " B" : " E");
+   EnvPrintRouter(theEnv,logicalName,"(pslot-cmp3 ");
+   EnvPrintRouter(theEnv,logicalName,hack->pass ? "p " : "n ");
+   EnvPrintRouter(theEnv,logicalName,ValueToString(FindIDSlotName(theEnv,execStatus,(unsigned) hack->firstSlot)));
+   EnvPrintRouter(theEnv,logicalName,hack->firstFromBeginning ? " B" : " E");
    PrintLongInteger(theEnv,execStatus,logicalName,(long long) hack->firstOffset);
-   EnvPrintRouter(theEnv,execStatus,logicalName," ");
-   EnvPrintRouter(theEnv,execStatus,logicalName,ValueToString(FindIDSlotName(theEnv,execStatus,(unsigned) hack->secondSlot)));
-   EnvPrintRouter(theEnv,execStatus,logicalName,hack->secondFromBeginning ? " B" : " E");
+   EnvPrintRouter(theEnv,logicalName," ");
+   EnvPrintRouter(theEnv,logicalName,ValueToString(FindIDSlotName(theEnv,execStatus,(unsigned) hack->secondSlot)));
+   EnvPrintRouter(theEnv,logicalName,hack->secondFromBeginning ? " B" : " E");
    PrintLongInteger(theEnv,execStatus,logicalName,(long long) hack->secondOffset);
-   EnvPrintRouter(theEnv,execStatus,logicalName,")");
+   EnvPrintRouter(theEnv,logicalName,")");
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
 #pragma unused(theEnv,execStatus)
@@ -853,16 +853,16 @@ static void PrintJNSimpleCompareFunction1(
 
    hack = (struct ObjectCmpJoinSingleSlotVars1 *) ValueToBitMap(theValue);
 
-   EnvPrintRouter(theEnv,execStatus,logicalName,"(jslot-cmp1 ");
-   EnvPrintRouter(theEnv,execStatus,logicalName,hack->pass ? "p " : "n ");
+   EnvPrintRouter(theEnv,logicalName,"(jslot-cmp1 ");
+   EnvPrintRouter(theEnv,logicalName,hack->pass ? "p " : "n ");
    PrintLongInteger(theEnv,execStatus,logicalName,(long long) hack->firstPattern);
-   EnvPrintRouter(theEnv,execStatus,logicalName," ");
-   EnvPrintRouter(theEnv,execStatus,logicalName,ValueToString(FindIDSlotName(theEnv,execStatus,(unsigned) hack->firstSlot)));
-   EnvPrintRouter(theEnv,execStatus,logicalName," ");
+   EnvPrintRouter(theEnv,logicalName," ");
+   EnvPrintRouter(theEnv,logicalName,ValueToString(FindIDSlotName(theEnv,execStatus,(unsigned) hack->firstSlot)));
+   EnvPrintRouter(theEnv,logicalName," ");
    PrintLongInteger(theEnv,execStatus,logicalName,(long long) hack->secondPattern);
-   EnvPrintRouter(theEnv,execStatus,logicalName," ");
-   EnvPrintRouter(theEnv,execStatus,logicalName,ValueToString(FindIDSlotName(theEnv,execStatus,(unsigned) hack->secondSlot)));
-   EnvPrintRouter(theEnv,execStatus,logicalName,")");
+   EnvPrintRouter(theEnv,logicalName," ");
+   EnvPrintRouter(theEnv,logicalName,ValueToString(FindIDSlotName(theEnv,execStatus,(unsigned) hack->secondSlot)));
+   EnvPrintRouter(theEnv,logicalName,")");
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
 #pragma unused(theEnv,execStatus)
@@ -914,18 +914,18 @@ static void PrintJNSimpleCompareFunction2(
 
    hack = (struct ObjectCmpJoinSingleSlotVars2 *) ValueToBitMap(theValue);
 
-   EnvPrintRouter(theEnv,execStatus,logicalName,"(jslot-cmp2 ");
-   EnvPrintRouter(theEnv,execStatus,logicalName,hack->pass ? "p " : "n ");
+   EnvPrintRouter(theEnv,logicalName,"(jslot-cmp2 ");
+   EnvPrintRouter(theEnv,logicalName,hack->pass ? "p " : "n ");
    PrintLongInteger(theEnv,execStatus,logicalName,(long long) hack->firstPattern);
-   EnvPrintRouter(theEnv,execStatus,logicalName," ");
-   EnvPrintRouter(theEnv,execStatus,logicalName,ValueToString(FindIDSlotName(theEnv,execStatus,(unsigned) hack->firstSlot)));
-   EnvPrintRouter(theEnv,execStatus,logicalName,hack->fromBeginning ? " B" : " E");
+   EnvPrintRouter(theEnv,logicalName," ");
+   EnvPrintRouter(theEnv,logicalName,ValueToString(FindIDSlotName(theEnv,execStatus,(unsigned) hack->firstSlot)));
+   EnvPrintRouter(theEnv,logicalName,hack->fromBeginning ? " B" : " E");
    PrintLongInteger(theEnv,execStatus,logicalName,(long long) hack->offset);
-   EnvPrintRouter(theEnv,execStatus,logicalName," ");
+   EnvPrintRouter(theEnv,logicalName," ");
    PrintLongInteger(theEnv,execStatus,logicalName,(long long) hack->secondPattern);
-   EnvPrintRouter(theEnv,execStatus,logicalName," ");
-   EnvPrintRouter(theEnv,execStatus,logicalName,ValueToString(FindIDSlotName(theEnv,execStatus,(unsigned) hack->secondSlot)));
-   EnvPrintRouter(theEnv,execStatus,logicalName,")");
+   EnvPrintRouter(theEnv,logicalName," ");
+   EnvPrintRouter(theEnv,logicalName,ValueToString(FindIDSlotName(theEnv,execStatus,(unsigned) hack->secondSlot)));
+   EnvPrintRouter(theEnv,logicalName,")");
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
 #pragma unused(theEnv,execStatus)
@@ -979,20 +979,20 @@ static void PrintJNSimpleCompareFunction3(
 
    hack = (struct ObjectCmpJoinSingleSlotVars3 *) ValueToBitMap(theValue);
 
-   EnvPrintRouter(theEnv,execStatus,logicalName,"(jslot-cmp3 ");
-   EnvPrintRouter(theEnv,execStatus,logicalName,hack->pass ? "p " : "n ");
+   EnvPrintRouter(theEnv,logicalName,"(jslot-cmp3 ");
+   EnvPrintRouter(theEnv,logicalName,hack->pass ? "p " : "n ");
    PrintLongInteger(theEnv,execStatus,logicalName,(long long) hack->firstPattern);
-   EnvPrintRouter(theEnv,execStatus,logicalName," ");
-   EnvPrintRouter(theEnv,execStatus,logicalName,ValueToString(FindIDSlotName(theEnv,execStatus,(unsigned) hack->firstSlot)));
-   EnvPrintRouter(theEnv,execStatus,logicalName,hack->firstFromBeginning ? " B" : " E");
+   EnvPrintRouter(theEnv,logicalName," ");
+   EnvPrintRouter(theEnv,logicalName,ValueToString(FindIDSlotName(theEnv,execStatus,(unsigned) hack->firstSlot)));
+   EnvPrintRouter(theEnv,logicalName,hack->firstFromBeginning ? " B" : " E");
    PrintLongInteger(theEnv,execStatus,logicalName,(long long) hack->firstOffset);
-   EnvPrintRouter(theEnv,execStatus,logicalName," ");
+   EnvPrintRouter(theEnv,logicalName," ");
    PrintLongInteger(theEnv,execStatus,logicalName,(long long) hack->secondPattern);
-   EnvPrintRouter(theEnv,execStatus,logicalName," ");
-   EnvPrintRouter(theEnv,execStatus,logicalName,ValueToString(FindIDSlotName(theEnv,execStatus,(unsigned) hack->secondSlot)));
-   EnvPrintRouter(theEnv,execStatus,logicalName,hack->secondFromBeginning ? " B" : " E");
+   EnvPrintRouter(theEnv,logicalName," ");
+   EnvPrintRouter(theEnv,logicalName,ValueToString(FindIDSlotName(theEnv,execStatus,(unsigned) hack->secondSlot)));
+   EnvPrintRouter(theEnv,logicalName,hack->secondFromBeginning ? " B" : " E");
    PrintLongInteger(theEnv,execStatus,logicalName,(long long) hack->secondOffset);
-   EnvPrintRouter(theEnv,execStatus,logicalName,")");
+   EnvPrintRouter(theEnv,logicalName,")");
 #else
 #if MAC_MCW || WIN_MCW || MAC_XCD
 #pragma unused(theEnv,execStatus)

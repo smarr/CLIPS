@@ -125,7 +125,7 @@ globle int ParseDeffacts(
    /*==========================*/
 
    ExpressionInstall(theEnv,execStatus,temp);
-   newDeffacts = get_struct(theEnv,execStatus,deffacts);
+   newDeffacts = get_struct(theEnv,deffacts);
    newDeffacts->header.name = deffactsName;
    IncrementSymbolCount(deffactsName);
    newDeffacts->assertList = PackExpression(theEnv,execStatus,temp);

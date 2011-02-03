@@ -485,7 +485,7 @@ static struct defrule *CreateNewDisjunct(
    /* Create and initialize the defrule data structure. */
    /*===================================================*/
 
-   newDisjunct = get_struct(theEnv,execStatus,defrule);
+   newDisjunct = get_struct(theEnv,defrule);
    newDisjunct->header.ppForm = NULL;
    newDisjunct->header.next = NULL;
    newDisjunct->header.usrData = NULL;
@@ -791,7 +791,7 @@ static int LogicalAnalysis(
       if (! firstLogical)
         {
          PrintErrorID(theEnv,execStatus,"RULEPSR",1,TRUE);
-         EnvPrintRouter(theEnv,execStatus,WERROR,"Logical CEs must be placed first in a rule\n");
+         EnvPrintRouter(theEnv,WERROR,"Logical CEs must be placed first in a rule\n");
          return(-1);
         }
 
@@ -804,7 +804,7 @@ static int LogicalAnalysis(
       if (gap)
         {
          PrintErrorID(theEnv,execStatus,"RULEPSR",2,TRUE);
-         EnvPrintRouter(theEnv,execStatus,WERROR,"Gaps may not exist between logical CEs\n");
+         EnvPrintRouter(theEnv,WERROR,"Gaps may not exist between logical CEs\n");
          return(-1);
         }
 
@@ -970,64 +970,64 @@ static void DumpRuleAnalysis(
    struct lhsParseNode *traceNode;
    char buffer[20];
 
-   EnvPrintRouter(theEnv,execStatus,WDISPLAY,"\n");
+   EnvPrintRouter(theEnv,WDISPLAY,"\n");
    for (traceNode = tempNode; traceNode != NULL; traceNode = traceNode->bottom)
      {
       if (! traceNode->userCE)
         { continue; }
         
       gensprintf(buffer,"CE %2d: ",traceNode->whichCE);
-      EnvPrintRouter(theEnv,execStatus,WDISPLAY,buffer);
+      EnvPrintRouter(theEnv,WDISPLAY,buffer);
       PrintExpression(theEnv,execStatus,WDISPLAY,traceNode->networkTest);
-      EnvPrintRouter(theEnv,execStatus,WDISPLAY,"\n");
+      EnvPrintRouter(theEnv,WDISPLAY,"\n");
 
       if (traceNode->externalNetworkTest != NULL)
         { 
-         EnvPrintRouter(theEnv,execStatus,WDISPLAY,"       ET: ");
+         EnvPrintRouter(theEnv,WDISPLAY,"       ET: ");
          PrintExpression(theEnv,execStatus,WDISPLAY,traceNode->externalNetworkTest);
-         EnvPrintRouter(theEnv,execStatus,WDISPLAY,"\n");
+         EnvPrintRouter(theEnv,WDISPLAY,"\n");
         }
 
       if (traceNode->secondaryNetworkTest != NULL)
         { 
-         EnvPrintRouter(theEnv,execStatus,WDISPLAY,"       ST: ");
+         EnvPrintRouter(theEnv,WDISPLAY,"       ST: ");
          PrintExpression(theEnv,execStatus,WDISPLAY,traceNode->secondaryNetworkTest);
-         EnvPrintRouter(theEnv,execStatus,WDISPLAY,"\n");
+         EnvPrintRouter(theEnv,WDISPLAY,"\n");
         }
                  
       if (traceNode->externalRightHash != NULL)
         { 
-         EnvPrintRouter(theEnv,execStatus,WDISPLAY,"       EB: ");
+         EnvPrintRouter(theEnv,WDISPLAY,"       EB: ");
          PrintExpression(theEnv,execStatus,WDISPLAY,traceNode->externalRightHash);
-         EnvPrintRouter(theEnv,execStatus,WDISPLAY,"\n");
+         EnvPrintRouter(theEnv,WDISPLAY,"\n");
         }
                  
       if (traceNode->externalLeftHash != NULL)
         { 
-         EnvPrintRouter(theEnv,execStatus,WDISPLAY,"       EH: ");
+         EnvPrintRouter(theEnv,WDISPLAY,"       EH: ");
          PrintExpression(theEnv,execStatus,WDISPLAY,traceNode->externalLeftHash);
-         EnvPrintRouter(theEnv,execStatus,WDISPLAY,"\n");
+         EnvPrintRouter(theEnv,WDISPLAY,"\n");
         }
                
       if (traceNode->leftHash != NULL)
         { 
-         EnvPrintRouter(theEnv,execStatus,WDISPLAY,"       LH: ");
+         EnvPrintRouter(theEnv,WDISPLAY,"       LH: ");
          PrintExpression(theEnv,execStatus,WDISPLAY,traceNode->leftHash);
-         EnvPrintRouter(theEnv,execStatus,WDISPLAY,"\n");
+         EnvPrintRouter(theEnv,WDISPLAY,"\n");
         }
                  
       if (traceNode->rightHash != NULL)
         { 
-         EnvPrintRouter(theEnv,execStatus,WDISPLAY,"       RH: ");
+         EnvPrintRouter(theEnv,WDISPLAY,"       RH: ");
          PrintExpression(theEnv,execStatus,WDISPLAY,traceNode->rightHash);
-         EnvPrintRouter(theEnv,execStatus,WDISPLAY,"\n");
+         EnvPrintRouter(theEnv,WDISPLAY,"\n");
         }
                  
       if (traceNode->betaHash != NULL)
         { 
-         EnvPrintRouter(theEnv,execStatus,WDISPLAY,"       BH: ");
+         EnvPrintRouter(theEnv,WDISPLAY,"       BH: ");
          PrintExpression(theEnv,execStatus,WDISPLAY,traceNode->betaHash);
-         EnvPrintRouter(theEnv,execStatus,WDISPLAY,"\n");
+         EnvPrintRouter(theEnv,WDISPLAY,"\n");
         }
      }
   }

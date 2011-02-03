@@ -238,7 +238,7 @@ static void *AllocateModule(
   {
    struct defruleModule *theItem;
 
-   theItem = get_struct(theEnv,execStatus,defruleModule);
+   theItem = get_struct(theEnv,defruleModule);
    theItem->agenda = NULL;
    theItem->groupings = NULL;
    return((void *) theItem);
@@ -396,7 +396,7 @@ globle void AddBetaMemoriesToJoin(
      {
       if (theNode->leftHash == NULL)
         {
-         theNode->leftMemory = get_struct(theEnv,execStatus,betaMemory); 
+         theNode->leftMemory = get_struct(theEnv,betaMemory); 
          theNode->leftMemory->beta = (struct partialMatch **) genalloc(theEnv,execStatus,sizeof(struct partialMatch *));
          theNode->leftMemory->beta[0] = NULL;
          theNode->leftMemory->size = 1;
@@ -405,7 +405,7 @@ globle void AddBetaMemoriesToJoin(
         }
       else
         {
-         theNode->leftMemory = get_struct(theEnv,execStatus,betaMemory); 
+         theNode->leftMemory = get_struct(theEnv,betaMemory); 
          theNode->leftMemory->beta = (struct partialMatch **) genalloc(theEnv,execStatus,sizeof(struct partialMatch *) * INITIAL_BETA_HASH_SIZE);
          memset(theNode->leftMemory->beta,0,sizeof(struct partialMatch *) * INITIAL_BETA_HASH_SIZE);
          theNode->leftMemory->size = INITIAL_BETA_HASH_SIZE;
@@ -427,7 +427,7 @@ globle void AddBetaMemoriesToJoin(
      {
       if (theNode->leftHash == NULL)
         {
-         theNode->rightMemory = get_struct(theEnv,execStatus,betaMemory); 
+         theNode->rightMemory = get_struct(theEnv,betaMemory); 
          theNode->rightMemory->beta = (struct partialMatch **) genalloc(theEnv,execStatus,sizeof(struct partialMatch *));
          theNode->rightMemory->last = (struct partialMatch **) genalloc(theEnv,execStatus,sizeof(struct partialMatch *));
          theNode->rightMemory->beta[0] = NULL;
@@ -437,7 +437,7 @@ globle void AddBetaMemoriesToJoin(
         }
       else
         {
-         theNode->rightMemory = get_struct(theEnv,execStatus,betaMemory); 
+         theNode->rightMemory = get_struct(theEnv,betaMemory); 
          theNode->rightMemory->beta = (struct partialMatch **) genalloc(theEnv,execStatus,sizeof(struct partialMatch *) * INITIAL_BETA_HASH_SIZE);
          theNode->rightMemory->last = (struct partialMatch **) genalloc(theEnv,execStatus,sizeof(struct partialMatch *) * INITIAL_BETA_HASH_SIZE);
          memset(theNode->rightMemory->beta,0,sizeof(struct partialMatch **) * INITIAL_BETA_HASH_SIZE);
@@ -449,7 +449,7 @@ globle void AddBetaMemoriesToJoin(
 
    else if (theNode->firstJoin && (theNode->rightSideEntryStructure == NULL))
      {
-      theNode->rightMemory = get_struct(theEnv,execStatus,betaMemory); 
+      theNode->rightMemory = get_struct(theEnv,betaMemory); 
       theNode->rightMemory->beta = (struct partialMatch **) genalloc(theEnv,execStatus,sizeof(struct partialMatch *));
       theNode->rightMemory->last = (struct partialMatch **) genalloc(theEnv,execStatus,sizeof(struct partialMatch *));
       theNode->rightMemory->beta[0] = CreateEmptyPartialMatch(theEnv,execStatus);

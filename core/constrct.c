@@ -549,7 +549,7 @@ globle void EnvClear(
    if (ClearReady(theEnv,execStatus) == FALSE)
      {
       PrintErrorID(theEnv,execStatus,"CONSTRCT",1,FALSE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"Some constructs are still in use. Clear cannot continue.\n");
+      EnvPrintRouter(theEnv,WERROR,"Some constructs are still in use. Clear cannot continue.\n");
 #if DEBUGGING_FUNCTIONS
       EnvDeactivateRouter(theEnv,execStatus,WTRACE);
 #endif
@@ -889,7 +889,7 @@ globle struct construct *AddConstruct(
    /* construct data structure.   */
    /*=============================*/
 
-   newPtr = get_struct(theEnv,execStatus,construct);
+   newPtr = get_struct(theEnv,construct);
 
    newPtr->constructName = name;
    newPtr->pluralName = pluralName;

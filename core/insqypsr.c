@@ -261,9 +261,9 @@ static EXPRESSION *ParseQueryRestrictions(
          if (tmp->value == queryInputToken->value)
            {
             PrintErrorID(theEnv,execStatus,"INSQYPSR",1,FALSE);
-            EnvPrintRouter(theEnv,execStatus,WERROR,"Duplicate instance member variable name in function ");
-            EnvPrintRouter(theEnv,execStatus,WERROR,ValueToString(ExpressionFunctionCallName(top)));
-            EnvPrintRouter(theEnv,execStatus,WERROR,".\n");
+            EnvPrintRouter(theEnv,WERROR,"Duplicate instance member variable name in function ");
+            EnvPrintRouter(theEnv,WERROR,ValueToString(ExpressionFunctionCallName(top)));
+            EnvPrintRouter(theEnv,WERROR,".\n");
             goto ParseQueryRestrictionsError2;
            }
          tmp = tmp->nextArg;
@@ -409,9 +409,9 @@ static int ParseQueryTestExpression(
       ClearParsedBindNames(theEnv,execStatus);
       SetParsedBindNames(theEnv,execStatus,oldBindList);
       PrintErrorID(theEnv,execStatus,"INSQYPSR",2,FALSE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"Binds are not allowed in instance-set query in function ");
-      EnvPrintRouter(theEnv,execStatus,WERROR,ValueToString(ExpressionFunctionCallName(top)));
-      EnvPrintRouter(theEnv,execStatus,WERROR,".\n");
+      EnvPrintRouter(theEnv,WERROR,"Binds are not allowed in instance-set query in function ");
+      EnvPrintRouter(theEnv,WERROR,ValueToString(ExpressionFunctionCallName(top)));
+      EnvPrintRouter(theEnv,WERROR,".\n");
       ReturnExpression(theEnv,execStatus,top);
       return(FALSE);
      }
@@ -484,11 +484,11 @@ static int ParseQueryActionExpression(
             ClearParsedBindNames(theEnv,execStatus);
             SetParsedBindNames(theEnv,execStatus,oldBindList);
             PrintErrorID(theEnv,execStatus,"INSQYPSR",3,FALSE);
-            EnvPrintRouter(theEnv,execStatus,WERROR,"Cannot rebind instance-set member variable ");
-            EnvPrintRouter(theEnv,execStatus,WERROR,ValueToString(tmpInsSetVars->value));
-            EnvPrintRouter(theEnv,execStatus,WERROR," in function ");
-            EnvPrintRouter(theEnv,execStatus,WERROR,ValueToString(ExpressionFunctionCallName(top)));
-            EnvPrintRouter(theEnv,execStatus,WERROR,".\n");
+            EnvPrintRouter(theEnv,WERROR,"Cannot rebind instance-set member variable ");
+            EnvPrintRouter(theEnv,WERROR,ValueToString(tmpInsSetVars->value));
+            EnvPrintRouter(theEnv,WERROR," in function ");
+            EnvPrintRouter(theEnv,WERROR,ValueToString(ExpressionFunctionCallName(top)));
+            EnvPrintRouter(theEnv,WERROR,".\n");
             ReturnExpression(theEnv,execStatus,top);
             return(FALSE);
            }

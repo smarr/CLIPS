@@ -80,7 +80,7 @@ globle void InitializeFactPatterns(
 
    InitializeFactReteFunctions(theEnv,execStatus);
 
-   newPtr = get_struct(theEnv,execStatus,patternParser);
+   newPtr = get_struct(theEnv,patternParser);
 
    newPtr->name = "facts";
    newPtr->priority = 0;
@@ -604,7 +604,7 @@ static struct factPatternNode *CreateNewPatternNode(
    /* its slots to the default values.       */
    /*========================================*/
 
-   newNode = get_struct(theEnv,execStatus,factPatternNode);
+   newNode = get_struct(theEnv,factPatternNode);
    newNode->nextLevel = NULL;
    newNode->rightNode = NULL;
    newNode->leftNode = NULL;

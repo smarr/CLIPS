@@ -181,22 +181,22 @@ globle void PrimitiveTablesInfo(
    /* Print the information. */
    /*========================*/
 
-   EnvPrintRouter(theEnv,execStatus,WDISPLAY,"Symbols: ");
+   EnvPrintRouter(theEnv,WDISPLAY,"Symbols: ");
    PrintLongInteger(theEnv,execStatus,WDISPLAY,(long long) symbolCount);
-   EnvPrintRouter(theEnv,execStatus,WDISPLAY,"\n");
-   EnvPrintRouter(theEnv,execStatus,WDISPLAY,"Integers: ");
+   EnvPrintRouter(theEnv,WDISPLAY,"\n");
+   EnvPrintRouter(theEnv,WDISPLAY,"Integers: ");
    PrintLongInteger(theEnv,execStatus,WDISPLAY,(long long) integerCount);
-   EnvPrintRouter(theEnv,execStatus,WDISPLAY,"\n");
-   EnvPrintRouter(theEnv,execStatus,WDISPLAY,"Floats: ");
+   EnvPrintRouter(theEnv,WDISPLAY,"\n");
+   EnvPrintRouter(theEnv,WDISPLAY,"Floats: ");
    PrintLongInteger(theEnv,execStatus,WDISPLAY,(long long) floatCount);
-   EnvPrintRouter(theEnv,execStatus,WDISPLAY,"\n");
-   EnvPrintRouter(theEnv,execStatus,WDISPLAY,"BitMaps: ");
+   EnvPrintRouter(theEnv,WDISPLAY,"\n");
+   EnvPrintRouter(theEnv,WDISPLAY,"BitMaps: ");
    PrintLongInteger(theEnv,execStatus,WDISPLAY,(long long) bitMapCount);
-   EnvPrintRouter(theEnv,execStatus,WDISPLAY,"\n");
+   EnvPrintRouter(theEnv,WDISPLAY,"\n");
    /*
-   EnvPrintRouter(theEnv,execStatus,WDISPLAY,"Ephemerals: ");
+   EnvPrintRouter(theEnv,WDISPLAY,"Ephemerals: ");
    PrintLongInteger(theEnv,execStatus,WDISPLAY,(long long) EphemeralSymbolCount());
-   EnvPrintRouter(theEnv,execStatus,WDISPLAY,"\n");
+   EnvPrintRouter(theEnv,WDISPLAY,"\n");
    */
   }
   
@@ -270,26 +270,26 @@ globle void PrimitiveTablesUsage(
    /* Print the information. */
    /*========================*/
 
-   EnvPrintRouter(theEnv,execStatus,WDISPLAY,"Total Symbols: ");
+   EnvPrintRouter(theEnv,WDISPLAY,"Total Symbols: ");
    PrintLongInteger(theEnv,execStatus,WDISPLAY,(long long) totalSymbolCount);
-   EnvPrintRouter(theEnv,execStatus,WDISPLAY,"\n");
+   EnvPrintRouter(theEnv,WDISPLAY,"\n");
    for (i = 0; i < COUNT_SIZE; i++)
      {
       PrintLongInteger(theEnv,execStatus,WDISPLAY,(long long) i);
-      EnvPrintRouter(theEnv,execStatus,WDISPLAY," ");
+      EnvPrintRouter(theEnv,WDISPLAY," ");
       PrintLongInteger(theEnv,execStatus,WDISPLAY,(long long) symbolCounts[i]);
-      EnvPrintRouter(theEnv,execStatus,WDISPLAY,"\n");
+      EnvPrintRouter(theEnv,WDISPLAY,"\n");
      }
 
-   EnvPrintRouter(theEnv,execStatus,WDISPLAY,"\nTotal Floats: ");
+   EnvPrintRouter(theEnv,WDISPLAY,"\nTotal Floats: ");
    PrintLongInteger(theEnv,execStatus,WDISPLAY,(long long) totalFloatCount);
-   EnvPrintRouter(theEnv,execStatus,WDISPLAY,"\n");
+   EnvPrintRouter(theEnv,WDISPLAY,"\n");
    for (i = 0; i < COUNT_SIZE; i++)
      {
       PrintLongInteger(theEnv,execStatus,WDISPLAY,(long long) i);
-      EnvPrintRouter(theEnv,execStatus,WDISPLAY," ");
+      EnvPrintRouter(theEnv,WDISPLAY," ");
       PrintLongInteger(theEnv,execStatus,WDISPLAY,(long long) floatCounts[i]);
-      EnvPrintRouter(theEnv,execStatus,WDISPLAY,"\n");
+      EnvPrintRouter(theEnv,WDISPLAY,"\n");
      }
 
   }
@@ -318,29 +318,29 @@ globle void ShowFactPatternNetwork(
    patternPtr = theDeftemplate->patternNetwork;
    while (patternPtr != NULL)
      {
-      for (i = 0; i < depth; i++) EnvPrintRouter(theEnv,execStatus,WDISPLAY," ");
-      if (patternPtr->header.singlefieldNode) EnvPrintRouter(theEnv,execStatus,WDISPLAY,"SF   ");
+      for (i = 0; i < depth; i++) EnvPrintRouter(theEnv,WDISPLAY," ");
+      if (patternPtr->header.singlefieldNode) EnvPrintRouter(theEnv,WDISPLAY,"SF   ");
       else if (patternPtr->header.multifieldNode)
         {
-         EnvPrintRouter(theEnv,execStatus,WDISPLAY,"MF");
-         if (patternPtr->header.endSlot) EnvPrintRouter(theEnv,execStatus,WDISPLAY,")");
-         else EnvPrintRouter(theEnv,execStatus,WDISPLAY,"*");
+         EnvPrintRouter(theEnv,WDISPLAY,"MF");
+         if (patternPtr->header.endSlot) EnvPrintRouter(theEnv,WDISPLAY,")");
+         else EnvPrintRouter(theEnv,WDISPLAY,"*");
          PrintLongInteger(theEnv,execStatus,WDISPLAY,(long long) patternPtr->leaveFields);
-         EnvPrintRouter(theEnv,execStatus,WDISPLAY," ");
+         EnvPrintRouter(theEnv,WDISPLAY," ");
         }
 
-      EnvPrintRouter(theEnv,execStatus,WDISPLAY,"Slot: ");
+      EnvPrintRouter(theEnv,WDISPLAY,"Slot: ");
 
       PrintLongInteger(theEnv,execStatus,WDISPLAY,(long long) patternPtr->whichSlot);
-      EnvPrintRouter(theEnv,execStatus,WDISPLAY," Field: ");
+      EnvPrintRouter(theEnv,WDISPLAY," Field: ");
       PrintLongInteger(theEnv,execStatus,WDISPLAY,(long long) patternPtr->whichField);
-      EnvPrintRouter(theEnv,execStatus,WDISPLAY," Expression: ");
-      if (patternPtr->networkTest == NULL) EnvPrintRouter(theEnv,execStatus,WDISPLAY,"None");
+      EnvPrintRouter(theEnv,WDISPLAY," Expression: ");
+      if (patternPtr->networkTest == NULL) EnvPrintRouter(theEnv,WDISPLAY,"None");
       else PrintExpression(theEnv,execStatus,WDISPLAY,patternPtr->networkTest);
-      EnvPrintRouter(theEnv,execStatus,WDISPLAY," RightHash: ");
-      if (patternPtr->header.rightHash == NULL) EnvPrintRouter(theEnv,execStatus,WDISPLAY,"None");
+      EnvPrintRouter(theEnv,WDISPLAY," RightHash: ");
+      if (patternPtr->header.rightHash == NULL) EnvPrintRouter(theEnv,WDISPLAY,"None");
       else PrintExpression(theEnv,execStatus,WDISPLAY,patternPtr->header.rightHash);
-      EnvPrintRouter(theEnv,execStatus,WDISPLAY,"\n");
+      EnvPrintRouter(theEnv,WDISPLAY,"\n");
 
       if (patternPtr->nextLevel == NULL)
         {
@@ -409,36 +409,36 @@ static void PrintOPNLevel(
 
    while (pptr != NULL)
      {
-      EnvPrintRouter(theEnv,execStatus,WDISPLAY,indentbuf);
+      EnvPrintRouter(theEnv,WDISPLAY,indentbuf);
       if (pptr->alphaNode != NULL)
-        EnvPrintRouter(theEnv,execStatus,WDISPLAY,"+");
-      EnvPrintRouter(theEnv,execStatus,WDISPLAY,ValueToString(FindIDSlotName(theEnv,execStatus,pptr->slotNameID)));
-      EnvPrintRouter(theEnv,execStatus,WDISPLAY," (");
+        EnvPrintRouter(theEnv,WDISPLAY,"+");
+      EnvPrintRouter(theEnv,WDISPLAY,ValueToString(FindIDSlotName(theEnv,execStatus,pptr->slotNameID)));
+      EnvPrintRouter(theEnv,WDISPLAY," (");
       PrintLongInteger(theEnv,execStatus,WDISPLAY,(long long) pptr->slotNameID);
-      EnvPrintRouter(theEnv,execStatus,WDISPLAY,") ");
-      EnvPrintRouter(theEnv,execStatus,WDISPLAY,pptr->endSlot ? "EPF#" : "PF#");
+      EnvPrintRouter(theEnv,WDISPLAY,") ");
+      EnvPrintRouter(theEnv,WDISPLAY,pptr->endSlot ? "EPF#" : "PF#");
       PrintLongInteger(theEnv,execStatus,WDISPLAY,(long long) pptr->whichField);
-      EnvPrintRouter(theEnv,execStatus,WDISPLAY," ");
-      EnvPrintRouter(theEnv,execStatus,WDISPLAY,pptr->multifieldNode ? "$? " : "? ");
+      EnvPrintRouter(theEnv,WDISPLAY," ");
+      EnvPrintRouter(theEnv,WDISPLAY,pptr->multifieldNode ? "$? " : "? ");
       if (pptr->networkTest != NULL)
         PrintExpression(theEnv,execStatus,WDISPLAY,pptr->networkTest);
-      EnvPrintRouter(theEnv,execStatus,WDISPLAY,"\n");
+      EnvPrintRouter(theEnv,WDISPLAY,"\n");
       alphaPtr = pptr->alphaNode;
       while (alphaPtr != NULL)
         {
-         EnvPrintRouter(theEnv,execStatus,WDISPLAY,indentbuf);
-         EnvPrintRouter(theEnv,execStatus,WDISPLAY,"     Classes:");
+         EnvPrintRouter(theEnv,WDISPLAY,indentbuf);
+         EnvPrintRouter(theEnv,WDISPLAY,"     Classes:");
          cbmp = (CLASS_BITMAP *) ValueToBitMap(alphaPtr->classbmp);
          for (i = 0 ; i <= cbmp->maxid ; i++)
            if (TestBitMap(cbmp->map,i))
              {
-              EnvPrintRouter(theEnv,execStatus,WDISPLAY," ");
-              EnvPrintRouter(theEnv,execStatus,WDISPLAY,EnvGetDefclassName(theEnv,execStatus,(void *) DefclassData(theEnv,execStatus)->ClassIDMap[i]));
+              EnvPrintRouter(theEnv,WDISPLAY," ");
+              EnvPrintRouter(theEnv,WDISPLAY,EnvGetDefclassName(theEnv,execStatus,(void *) DefclassData(theEnv,execStatus)->ClassIDMap[i]));
              }
          if (alphaPtr->slotbmp != NULL)
            {
             sbmp = (SLOT_BITMAP *) ValueToBitMap(pptr->alphaNode->slotbmp);
-            EnvPrintRouter(theEnv,execStatus,WDISPLAY," *** Slots:");
+            EnvPrintRouter(theEnv,WDISPLAY," *** Slots:");
             for (i = NAME_ID ; i <= sbmp->maxid ; i++)
               if (TestBitMap(sbmp->map,i))
                 {
@@ -447,18 +447,18 @@ static void PrintOPNLevel(
                      break;
                  if (uptr == NULL)
                    {
-                    EnvPrintRouter(theEnv,execStatus,WDISPLAY," ");
-                    EnvPrintRouter(theEnv,execStatus,WDISPLAY,ValueToString(FindIDSlotName(theEnv,execStatus,i)));
+                    EnvPrintRouter(theEnv,WDISPLAY," ");
+                    EnvPrintRouter(theEnv,WDISPLAY,ValueToString(FindIDSlotName(theEnv,execStatus,i)));
                    }
                 }
            }
          if (alphaPtr->header.rightHash != NULL)
            {
-            EnvPrintRouter(theEnv,execStatus,WDISPLAY," RH: ");
+            EnvPrintRouter(theEnv,WDISPLAY," RH: ");
             PrintExpression(theEnv,execStatus,WDISPLAY,alphaPtr->header.rightHash);
            }
 
-         EnvPrintRouter(theEnv,execStatus,WDISPLAY,"\n");
+         EnvPrintRouter(theEnv,WDISPLAY,"\n");
          alphaPtr = alphaPtr->nxtInGroup;
         }
       indentbuf[ilen++] = (char) ((pptr->rightNode != NULL) ? '|' : ' ');
@@ -517,15 +517,15 @@ globle void InstanceTableUsage(
    /* Print the information. */
    /*========================*/
 
-   EnvPrintRouter(theEnv,execStatus,WDISPLAY,"Total Instances: ");
+   EnvPrintRouter(theEnv,WDISPLAY,"Total Instances: ");
    PrintLongInteger(theEnv,execStatus,WDISPLAY,(long long) totalInstanceCount);
-   EnvPrintRouter(theEnv,execStatus,WDISPLAY,"\n");
+   EnvPrintRouter(theEnv,WDISPLAY,"\n");
    for (i = 0; i < COUNT_SIZE; i++)
      {
       PrintLongInteger(theEnv,execStatus,WDISPLAY,(long long) i);
-      EnvPrintRouter(theEnv,execStatus,WDISPLAY," ");
+      EnvPrintRouter(theEnv,WDISPLAY," ");
       PrintLongInteger(theEnv,execStatus,WDISPLAY,(long long) instanceCounts[i]);
-      EnvPrintRouter(theEnv,execStatus,WDISPLAY,"\n");
+      EnvPrintRouter(theEnv,WDISPLAY,"\n");
      }
   }
   

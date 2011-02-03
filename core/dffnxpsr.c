@@ -299,7 +299,7 @@ static intBool ValidDeffunctionName(
    if (FindConstruct(theEnv,execStatus,theDeffunctionName) != NULL)
      {
       PrintErrorID(theEnv,execStatus,"DFFNXPSR",1,FALSE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"Deffunctions are not allowed to replace constructs.\n");
+      EnvPrintRouter(theEnv,WERROR,"Deffunctions are not allowed to replace constructs.\n");
       return(FALSE);
      }
 
@@ -311,7 +311,7 @@ static intBool ValidDeffunctionName(
    if (FindFunction(theEnv,execStatus,theDeffunctionName) != NULL)
      {
       PrintErrorID(theEnv,execStatus,"DFFNXPSR",2,FALSE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,"Deffunctions are not allowed to replace external functions.\n");
+      EnvPrintRouter(theEnv,WERROR,"Deffunctions are not allowed to replace external functions.\n");
       return(FALSE);
      }
 
@@ -329,17 +329,17 @@ static intBool ValidDeffunctionName(
       if (theModule != ((struct defmodule *) EnvGetCurrentModule(theEnv,execStatus)))
         {
          PrintErrorID(theEnv,execStatus,"DFFNXPSR",5,FALSE);
-         EnvPrintRouter(theEnv,execStatus,WERROR,"Defgeneric ");
-         EnvPrintRouter(theEnv,execStatus,WERROR,EnvGetDefgenericName(theEnv,execStatus,(void *) theDefgeneric));
-         EnvPrintRouter(theEnv,execStatus,WERROR," imported from module ");
-         EnvPrintRouter(theEnv,execStatus,WERROR,EnvGetDefmoduleName(theEnv,execStatus,(void *) theModule));
-         EnvPrintRouter(theEnv,execStatus,WERROR," conflicts with this deffunction.\n");
+         EnvPrintRouter(theEnv,WERROR,"Defgeneric ");
+         EnvPrintRouter(theEnv,WERROR,EnvGetDefgenericName(theEnv,execStatus,(void *) theDefgeneric));
+         EnvPrintRouter(theEnv,WERROR," imported from module ");
+         EnvPrintRouter(theEnv,WERROR,EnvGetDefmoduleName(theEnv,execStatus,(void *) theModule));
+         EnvPrintRouter(theEnv,WERROR," conflicts with this deffunction.\n");
          return(FALSE);
         }
       else
         {
          PrintErrorID(theEnv,execStatus,"DFFNXPSR",3,FALSE);
-         EnvPrintRouter(theEnv,execStatus,WERROR,"Deffunctions are not allowed to replace generic functions.\n");
+         EnvPrintRouter(theEnv,WERROR,"Deffunctions are not allowed to replace generic functions.\n");
         }
       return(FALSE);
      }
@@ -355,9 +355,9 @@ static intBool ValidDeffunctionName(
       if (((DEFFUNCTION *) theDeffunction)->executing)
         {
          PrintErrorID(theEnv,execStatus,"DFNXPSR",4,FALSE);
-         EnvPrintRouter(theEnv,execStatus,WERROR,"Deffunction ");
-         EnvPrintRouter(theEnv,execStatus,WERROR,EnvGetDeffunctionName(theEnv,execStatus,(void *) theDeffunction));
-         EnvPrintRouter(theEnv,execStatus,WERROR," may not be redefined while it is executing.\n");
+         EnvPrintRouter(theEnv,WERROR,"Deffunction ");
+         EnvPrintRouter(theEnv,WERROR,EnvGetDeffunctionName(theEnv,execStatus,(void *) theDeffunction));
+         EnvPrintRouter(theEnv,WERROR," may not be redefined while it is executing.\n");
          return(FALSE);
         }
      }
@@ -415,7 +415,7 @@ static DEFFUNCTION *AddDeffunction(
    dfuncPtr = (DEFFUNCTION *) EnvFindDeffunction(theEnv,execStatus,ValueToString(name));
    if (dfuncPtr == NULL)
      {
-      dfuncPtr = get_struct(theEnv,execStatus,deffunctionStruct);
+      dfuncPtr = get_struct(theEnv,deffunctionStruct);
       InitializeConstructHeader(theEnv,execStatus,"deffunction",(struct constructHeader *) dfuncPtr,name);
       IncrementSymbolCount(name);
       dfuncPtr->code = NULL;

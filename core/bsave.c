@@ -132,7 +132,7 @@ globle intBool EnvBsave(
    if (Bloaded(theEnv,execStatus))
      {
       PrintErrorID(theEnv,execStatus,"BSAVE",1,FALSE);
-      EnvPrintRouter(theEnv,execStatus,WERROR,
+      EnvPrintRouter(theEnv,WERROR,
           "Cannot perform a binary save while a binary load is in effect.\n");
       return(0);
      }
@@ -404,7 +404,7 @@ globle void SaveBloadCount(
   {
    BLOADCNTSV *tmp, *prv;
 
-   tmp = get_struct(theEnv,execStatus,bloadcntsv);
+   tmp = get_struct(theEnv,bloadcntsv);
    tmp->val = cnt;
    tmp->nxt = NULL;
 
@@ -545,7 +545,7 @@ globle intBool AddBinaryItem(
    /* Create the binary item data structure. */
    /*========================================*/
 
-   newPtr = get_struct(theEnv,execStatus,BinaryItem);
+   newPtr = get_struct(theEnv,BinaryItem);
 
    newPtr->name = name;
    newPtr->findFunction = findFunction;

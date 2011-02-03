@@ -1304,7 +1304,7 @@ static void UpdateSlot(
         sp->defaultValue = (void *) ExpressionPointer(bsp->defaultValue);
       else
         {
-         sp->defaultValue = (void *) get_struct(theEnv,execStatus,dataObject);
+         sp->defaultValue = (void *) get_struct(theEnv,dataObject);
          EvaluateAndStoreInDataObject(theEnv,execStatus,(int) sp->multiple,ExpressionPointer(bsp->defaultValue),
                                       (DATA_OBJECT *) sp->defaultValue,TRUE);
          ValueInstall(theEnv,execStatus,(DATA_OBJECT *) sp->defaultValue);

@@ -99,7 +99,7 @@ globle void PlaceActivation(
 
    if (*whichAgenda != NULL) 
      {
-      switch (AgendaData(theEnv,execStatus)->Strategy)
+      switch (AgendaData(theEnv)->Strategy)
         {
          case DEPTH_STRATEGY:
            placeAfter = PlaceDepthActivation(newActivation,theGroup);
@@ -948,10 +948,10 @@ globle int EnvSetStrategy(
   {
    int oldStrategy;
    
-   oldStrategy = AgendaData(theEnv,execStatus)->Strategy;
-   AgendaData(theEnv,execStatus)->Strategy = value;
+   oldStrategy = AgendaData(theEnv)->Strategy;
+   AgendaData(theEnv)->Strategy = value;
 
-   if (oldStrategy != AgendaData(theEnv,execStatus)->Strategy) EnvReorderAgenda(theEnv,execStatus,NULL);
+   if (oldStrategy != AgendaData(theEnv)->Strategy) EnvReorderAgenda(theEnv,execStatus,NULL);
 
    return(oldStrategy);
   }
@@ -964,7 +964,7 @@ globle int EnvGetStrategy(
   void *theEnv,
   EXEC_STATUS)
   {
-   return(AgendaData(theEnv,execStatus)->Strategy);
+   return(AgendaData(theEnv)->Strategy);
   }
 
 /********************************************/
@@ -992,7 +992,7 @@ globle void *SetStrategyCommand(
    char *argument;
    int oldStrategy;
    
-   oldStrategy = AgendaData(theEnv,execStatus)->Strategy;
+   oldStrategy = AgendaData(theEnv)->Strategy;
 
    /*=====================================================*/
    /* Check for the correct number and type of arguments. */
