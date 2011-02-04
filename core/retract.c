@@ -319,10 +319,10 @@ static intBool FindNextConflictingMatch(
    
    if (possibleConflicts != NULL)
      {
-      oldLHSBinds = EngineData(theEnv,execStatus)->GlobalLHSBinds;
-      oldRHSBinds = EngineData(theEnv,execStatus)->GlobalRHSBinds;
+      oldLHSBinds = LocalEngineData(theEnv,execStatus).LHSBinds;
+      oldRHSBinds = LocalEngineData(theEnv,execStatus).RHSBinds;
       oldJoin = EngineData(theEnv,execStatus)->GlobalJoin;
-      EngineData(theEnv,execStatus)->GlobalLHSBinds = theBind;
+      LocalEngineData(theEnv,execStatus).LHSBinds = theBind;
       EngineData(theEnv,execStatus)->GlobalJoin = theJoin;
       restore = TRUE;
      }
@@ -378,7 +378,7 @@ static intBool FindNextConflictingMatch(
             EngineData(theEnv,execStatus)->findNextConflictingComparisons++; 
            }
 #endif
-         EngineData(theEnv,execStatus)->GlobalRHSBinds = possibleConflicts;
+         LocalEngineData(theEnv,execStatus).RHSBinds = possibleConflicts;
 
          result = EvaluateJoinExpression(theEnv,execStatus,theJoin->networkTest,theJoin);
          if (execStatus->EvaluationError)
@@ -404,8 +404,8 @@ static intBool FindNextConflictingMatch(
       if (result != FALSE)
         {
          AddBlockedLink(theBind,possibleConflicts);
-         EngineData(theEnv,execStatus)->GlobalLHSBinds = oldLHSBinds;
-         EngineData(theEnv,execStatus)->GlobalRHSBinds = oldRHSBinds;
+         LocalEngineData(theEnv,execStatus).LHSBinds = oldLHSBinds;
+         LocalEngineData(theEnv,execStatus).RHSBinds = oldRHSBinds;
          EngineData(theEnv,execStatus)->GlobalJoin = oldJoin;
          return(TRUE);
         }
@@ -413,8 +413,8 @@ static intBool FindNextConflictingMatch(
 
    if (restore)
      {
-      EngineData(theEnv,execStatus)->GlobalLHSBinds = oldLHSBinds;
-      EngineData(theEnv,execStatus)->GlobalRHSBinds = oldRHSBinds;
+      LocalEngineData(theEnv,execStatus).LHSBinds = oldLHSBinds;
+      LocalEngineData(theEnv,execStatus).RHSBinds = oldRHSBinds;
       EngineData(theEnv,execStatus)->GlobalJoin = oldJoin;
      }
 
