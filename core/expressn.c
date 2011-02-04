@@ -239,8 +239,7 @@ static long ListToPacked(
       count++;
 
       destination[i].type = original->type;
-	  destination[i].value = original->value;
-	  destination[i].refCount = original->refCount; // Lode Propagate refCount
+      destination[i].value = original->value;
 
       if (original->argList == NULL)
         { destination[i].argList = NULL; }
