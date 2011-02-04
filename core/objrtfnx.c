@@ -1152,7 +1152,7 @@ static void GetObjectValueGeneral(
       the real value of the slot
       ========================================= */
    if ((theInstance->basisSlots != NULL) &&
-       (! EngineData(theEnv,execStatus)->JoinOperationInProgress))
+       (! EngineData(theEnv,execStatus)->MatchOperationInProgress))
      {
       basisSlot = theInstance->basisSlots + (insSlot - theInstance->slotAddresses);
       if (basisSlot->value != NULL)
@@ -1242,7 +1242,7 @@ static void GetObjectValueSimple(
       the real value of the slot
       ========================================= */
    if ((theInstance->basisSlots != NULL) &&
-       (! EngineData(theEnv,execStatus)->JoinOperationInProgress))
+       (! EngineData(theEnv,execStatus)->MatchOperationInProgress))
      {
       basisSlot = theInstance->basisSlots + (insSlot - theInstance->slotAddresses);
       if (basisSlot->value != NULL)

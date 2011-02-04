@@ -901,11 +901,11 @@ globle void FactsIncrementalReset(
         factPtr != NULL;
         factPtr = (struct fact *) EnvGetNextFact(theEnv,execStatus,factPtr))
      {
-      EngineData(theEnv,execStatus)->JoinOperationInProgress = TRUE;
+      EngineData(theEnv,execStatus)->MatchOperationInProgress = TRUE;
       FactPatternMatch(theEnv,execStatus,factPtr,
                        factPtr->whichDeftemplate->patternNetwork,
                        0,NULL,NULL);
-      EngineData(theEnv,execStatus)->JoinOperationInProgress = FALSE;
+      EngineData(theEnv,execStatus)->MatchOperationInProgress = FALSE;
      }
   }
 

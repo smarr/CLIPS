@@ -82,7 +82,7 @@ struct engineData
 #endif
    intBool IncrementalResetInProgress;
    intBool IncrementalResetFlag;
-   intBool JoinOperationInProgress;
+   intBool MatchOperationInProgress;
    struct partialMatch *GlobalLHSBinds;
    struct partialMatch *GlobalRHSBinds;
    struct joinNode *GlobalJoin;

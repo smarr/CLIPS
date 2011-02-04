@@ -435,7 +435,7 @@ globle intBool EnvRetract(
    /* fact is being asserted or retracted.      */
    /*===========================================*/
 
-   if (EngineData(theEnv,execStatus)->JoinOperationInProgress)
+   if (EngineData(theEnv,execStatus)->MatchOperationInProgress)
      {
       PrintErrorID(theEnv,execStatus,"FACTMNGR",1,TRUE);
       EnvPrintRouter(theEnv,execStatus,WERROR,"Facts may not be retracted during pattern-matching\n");
@@ -564,9 +564,9 @@ globle intBool EnvRetract(
    /* retract operation for each one.           */
    /*===========================================*/
 
-   EngineData(theEnv,execStatus)->JoinOperationInProgress = TRUE;
+   EngineData(theEnv,execStatus)->MatchOperationInProgress = TRUE;
    NetworkRetract(theEnv,execStatus,(struct patternMatch *) theFact->list);
-   EngineData(theEnv,execStatus)->JoinOperationInProgress = FALSE;
+   EngineData(theEnv,execStatus)->MatchOperationInProgress = FALSE;
 
    /*=========================================*/
    /* Free partial matches that were released */
@@ -672,7 +672,7 @@ static void * APR_THREAD_FUNC ParallelFactMatchAndLogicRetract(apr_thread_t *thr
                    params->endMark);
 
   // STEFAN: don't do that anymore for the moment
-  // EngineData(params->theEnv)->JoinOperationInProgress = FALSE;
+  // EngineData(params->theEnv)->MatchOperationInProgress = FALSE;
   
   
   /*===================================================*/
@@ -742,7 +742,7 @@ globle void *EnvAssert(
    /* fact is being asserted or retracted.     */
    /*==========================================*/
 
-   if (EngineData(theEnv,execStatus)->JoinOperationInProgress)
+   if (EngineData(theEnv,execStatus)->MatchOperationInProgress)
      {
       ReturnFact(theEnv,execStatus,theFact);
       PrintErrorID(theEnv,execStatus,"FACTMNGR",2,TRUE);
@@ -889,7 +889,7 @@ globle void *EnvAssert(
       }
     }
     else {
-      EngineData(theEnv,execStatus)->JoinOperationInProgress = TRUE;
+      EngineData(theEnv,execStatus)->MatchOperationInProgress = TRUE;
       
       FactPatternMatch(theEnv,execStatus,
                        theFact,
@@ -898,7 +898,7 @@ globle void *EnvAssert(
                        NULL,
                        NULL);
       
-      EngineData(theEnv,execStatus)->JoinOperationInProgress = FALSE;
+      EngineData(theEnv,execStatus)->MatchOperationInProgress = FALSE;
       
       
       /*===================================================*/
