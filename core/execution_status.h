@@ -22,6 +22,7 @@ struct executionStatus
   intBool      HaltExecution;
   int          CurrentEvaluationDepth;
   intBool      RunningInParallel;
+  int          DepthInReteNetwork;
 };
 
 // STEFAN: parameter macro for the new executionStatus

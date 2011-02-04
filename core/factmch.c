@@ -31,6 +31,8 @@
 #define _FACTMCH_SOURCE_
 
 #include <stdio.h>
+# include <assert.h>
+
 #define _STDIO_INCLUDED_
 
 #include "setup.h"
@@ -450,8 +452,19 @@ static struct factPatternNode *GetFactPatternNodeFromNextLevelOrBackUp(
 {
   execStatus->EvaluationError = FALSE;
   
-  if (thePattern->nextLevel != NULL)
+  if (execStatus->RunningInParallel) {
+    assert((execStatus->DepthInReteNetwork == 0)
+           ||
+           (   ( thePattern->nextLevel && !thePattern->rightNode)
+            || (!thePattern->nextLevel &&  thePattern->rightNode))
+           /* We need to spawn the rightNode to a new task/thread. 
+              We do not do backing up to the top in the parallel version */ );
+  }
+  
+  if (thePattern->nextLevel != NULL) {
+    execStatus->DepthInReteNetwork++;
     return(thePattern->nextLevel);
+  }
   
   // in case there is no nextLevel, we need to back up
   // towards the root

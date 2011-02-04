@@ -660,7 +660,8 @@ static void * APR_THREAD_FUNC ParallelFactMatchAndLogicRetract(apr_thread_t *thr
 {
   struct paramsForFactMatchAndRetract * const params = (struct paramsForFactMatchAndRetract*)parameters;
   
-  struct executionStatus localExecStatus = { NULL, 0, 0, 0 };
+  struct executionStatus localExecStatus = { NULL };
+  localExecStatus.RunningInParallel = TRUE;
   
   FactPatternMatch(params->theEnv,
                    (params->execStatus) ? params->execStatus : & localExecStatus,

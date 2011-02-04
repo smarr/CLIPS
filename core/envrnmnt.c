@@ -314,6 +314,7 @@ globle struct executionStatus *CreateExecutionStatus()
   result->EvaluationError        = FALSE;
   result->CurrentExpression      = NULL;
   result->CurrentEvaluationDepth = 0;
+  result->DepthInReteNetwork     = 0;
   
 	return result;
 }
