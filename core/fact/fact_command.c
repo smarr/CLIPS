@@ -284,6 +284,9 @@ static void * APR_THREAD_FUNC ProcessEventOnFactThread(apr_thread_t *thread, voi
   ExpressionDeinstall(params->theEnv,params->execStatus,
                       params->execStatus->CurrentExpression);
   
+  ReturnExpression(params->theEnv,params->execStatus,params->execStatus->CurrentExpression);
+  //rtn_struct(theEnv,execStatus,expr,tmp);
+  //free(params->execStatus->CurrentExpression);
   free(params->execStatus);
   free(params);
   
@@ -309,9 +312,14 @@ globle void ProcessEventCommand(
        
        parameters->execStatus = newExecStatus;
        
+       // Copy the expression to be independent of the main thread
+       EXPRESSION* newExpr = PackExpression(theEnv,execStatus,
+                                  parameters->execStatus->CurrentExpression);
+       
+       
        // increase the reference pointer, as all allocations will be released
        // by the thread that is receiving the task/job
-       ExpressionInstall(theEnv,execStatus,parameters->execStatus->CurrentExpression);
+       ExpressionInstall(theEnv,execStatus,newExpr);
        
        apr_status_t apr_rv;
        apr_rv = apr_thread_pool_push(Env(theEnv,execStatus)->factThreadPool,

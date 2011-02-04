@@ -18,7 +18,6 @@ struct expr
   void *value;
   struct expr *argList;
   struct expr *nextArg;
-  long refCount;   // STEFAN: added support for refCount on expression lists
 };
 
 #endif
