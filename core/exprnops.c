@@ -339,6 +339,7 @@ globle struct expr *GenConstant(
    top->argList = NULL;
    top->type = type;
    top->value = value;
+   top->refCount = 0;
 
    return(top);
   }
