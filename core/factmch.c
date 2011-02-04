@@ -59,7 +59,8 @@
    static intBool                  EvaluatePatternExpression(void *,EXEC_STATUS,struct factPatternNode *,struct expr *);
    static void                     TraceErrorToJoin(void *,EXEC_STATUS,struct factPatternNode *,int);
    static void                     ProcessFactAlphaMatch(void *,EXEC_STATUS,struct fact *,struct multifieldMarker *,struct factPatternNode *);
-   static struct factPatternNode  *GetNextFactPatternNode(void *,EXEC_STATUS,int,struct factPatternNode *);
+   static struct factPatternNode  *GetFactPatternNodeFromNextLevelOrBackUp(void *,EXEC_STATUS,struct factPatternNode *);
+   static struct factPatternNode  *GetFactPatternNodeOnThisLevelOrBackUp(void *,EXEC_STATUS,struct factPatternNode *);
    static int                      SkipFactPatternNode(void *,EXEC_STATUS,struct factPatternNode *);
    static void                     ProcessMultifieldNode(void *,EXEC_STATUS,
                                                          struct factPatternNode *,
@@ -134,9 +135,11 @@ globle void FactPatternMatch(
       /* Determine if we want to skip this */
       /* node during an incremental reset. */
       /*===================================*/
+       
+       // STEFAN: whats an incremental reset for? ??????????????
 
       if (SkipFactPatternNode(theEnv,execStatus,patternPtr))
-        { patternPtr = GetNextFactPatternNode(theEnv,execStatus,TRUE,patternPtr); }
+        { patternPtr = GetFactPatternNodeOnThisLevelOrBackUp(theEnv,execStatus,patternPtr); }
 
       /*=========================================================*/
       /* If this is a single field pattern node, then determine  */
@@ -168,7 +171,7 @@ globle void FactPatternMatch(
            }
 
          if (skipit)
-           { patternPtr = GetNextFactPatternNode(theEnv,execStatus,TRUE,patternPtr); }
+           { patternPtr = GetFactPatternNodeOnThisLevelOrBackUp(theEnv,execStatus,patternPtr); }
          else
 
          if (patternPtr->header.selector)
@@ -187,10 +190,10 @@ globle void FactPatternMatch(
                if (tempPtr->header.stopNode)
                  { ProcessFactAlphaMatch(theEnv,execStatus,theFact,markers,tempPtr); }
                
-               patternPtr = GetNextFactPatternNode(theEnv,execStatus,FALSE,tempPtr);
+               patternPtr = GetFactPatternNodeFromNextLevelOrBackUp(theEnv,execStatus,tempPtr);
               }
             else
-              { patternPtr = GetNextFactPatternNode(theEnv,execStatus,TRUE,patternPtr); }
+              { patternPtr = GetFactPatternNodeOnThisLevelOrBackUp(theEnv,execStatus,patternPtr); }
            }
          
          /*=============================================*/
@@ -212,7 +215,7 @@ globle void FactPatternMatch(
             /* Move on to the next pattern node. */
             /*===================================*/
 
-            patternPtr = GetNextFactPatternNode(theEnv,execStatus,FALSE,patternPtr);
+            patternPtr = GetFactPatternNodeFromNextLevelOrBackUp(theEnv,execStatus,patternPtr);
            }
 
          /*==============================================*/
@@ -220,7 +223,7 @@ globle void FactPatternMatch(
          /*==============================================*/
 
          else
-           { patternPtr = GetNextFactPatternNode(theEnv,execStatus,TRUE,patternPtr); }
+           { patternPtr = GetFactPatternNodeOnThisLevelOrBackUp(theEnv,execStatus,patternPtr); }
         }
 
       /*======================================================*/
@@ -252,7 +255,7 @@ globle void FactPatternMatch(
          /* field pattern node that failed its constraint.    */
          /*===================================================*/
 
-         patternPtr = GetNextFactPatternNode(theEnv,execStatus,TRUE,patternPtr);
+         patternPtr = GetFactPatternNodeOnThisLevelOrBackUp(theEnv,execStatus,patternPtr);
         }
      }
   }
@@ -434,27 +437,39 @@ static void ProcessMultifieldNode(
     FactData(theEnv,execStatus)->CurrentPatternMarks = oldMark;
    }
 
+/*===================================================*/
+/* If pattern matching was successful at the current */
+/* node in the tree and it's possible to go deeper   */
+/* into the tree, then move down to the next level.  */
+/*===================================================*/
+static struct factPatternNode *GetFactPatternNodeFromNextLevelOrBackUp(
+  void *theEnv,
+  EXEC_STATUS,
+  /* finishedMatching == FALSE */
+  struct factPatternNode *thePattern)
+{
+  execStatus->EvaluationError = FALSE;
+  
+  if (thePattern->nextLevel != NULL)
+    return(thePattern->nextLevel);
+  
+  // in case there is no nextLevel, we need to back up
+  // towards the root
+  return GetFactPatternNodeOnThisLevelOrBackUp(theEnv,execStatus,thePattern);
+}
+
 /******************************************************/
 /* GetNextFactPatternNode: Returns the next node in a */
 /*   pattern network tree to be traversed. The next   */
 /*   node is computed using a depth first traversal.  */
 /******************************************************/
-static struct factPatternNode *GetNextFactPatternNode(
+static struct factPatternNode *GetFactPatternNodeOnThisLevelOrBackUp(
   void *theEnv,
   EXEC_STATUS,
-  int finishedMatching,
+  /* finishedMatching == TRUE */
   struct factPatternNode *thePattern)
   {
    execStatus->EvaluationError = FALSE;
-
-   /*===================================================*/
-   /* If pattern matching was successful at the current */
-   /* node in the tree and it's possible to go deeper   */
-   /* into the tree, then move down to the next level.  */
-   /*===================================================*/
-
-   if (finishedMatching == FALSE)
-     { if (thePattern->nextLevel != NULL) return(thePattern->nextLevel); }
 
    /*================================================*/
    /* Keep backing up toward the root of the pattern */
