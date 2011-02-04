@@ -681,6 +681,9 @@ static void * APR_THREAD_FUNC ParallelFactMatchAndLogicRetract(apr_thread_t *thr
   
   ForceLogicalRetractions(params->theEnv, params->execStatus);
   
+  if (params->execStatus)
+    free(params->execStatus);
+  
   free(params);
   
   return NULL;
