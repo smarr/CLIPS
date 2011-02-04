@@ -18,9 +18,10 @@
 struct executionStatus
 {
   struct expr *CurrentExpression;
-  int EvaluationError;
-  int HaltExecution;
-  int CurrentEvaluationDepth;
+  intBool      EvaluationError;
+  intBool      HaltExecution;
+  int          CurrentEvaluationDepth;
+  intBool      RunningInParallel;
 };
 
 // STEFAN: parameter macro for the new executionStatus

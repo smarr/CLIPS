@@ -307,7 +307,15 @@ globle void *CreateEnvironment(EXEC_STATUS)
 /*********************************************************************/
 globle struct executionStatus *CreateExecutionStatus()
 {
-	return (struct executionStatus *)malloc(sizeof(struct executionStatus));
+  struct executionStatus *result = (struct executionStatus *)malloc(sizeof(struct executionStatus));
+  
+  result->HaltExecution          = FALSE;
+  result->RunningInParallel      = FALSE;
+  result->EvaluationError        = FALSE;
+  result->CurrentExpression      = NULL;
+  result->CurrentEvaluationDepth = 0;
+  
+	return result;
 }
 /**********************************************************/
 /* CreateRuntimeEnvironment: Creates an environment data  */
