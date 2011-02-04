@@ -18,13 +18,22 @@
 struct executionStatus
 {
   struct expr *CurrentExpression;
-  int EvaluationError;
-  int HaltExecution;
-  int CurrentEvaluationDepth;
+  intBool      EvaluationError;
+  intBool      HaltExecution;
+  int          CurrentEvaluationDepth;
+  intBool      RunningInParallel;
+  int          DepthInReteNetwork;
+  
+  struct localEngineData {
+    struct partialMatch *LHSBinds;
+    struct partialMatch *RHSBinds;
+  } LocalEngineData;
 };
 
 // STEFAN: parameter macro for the new executionStatus
 #define EXEC_STATUS struct executionStatus* execStatus
+
+#define LocalEngineData(theEnv,execStatus) (execStatus->LocalEngineData)
 
 
 #endif

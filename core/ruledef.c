@@ -313,7 +313,7 @@ globle intBool EnvIsDefruleDeletable(
         theDefrule = theDefrule->disjunct)
      { if (theDefrule->executing) return(FALSE); }
 
-   if (EngineData(theEnv,execStatus)->JoinOperationInProgress) return(FALSE);
+   if (EngineData(theEnv,execStatus)->MatchOperationInProgress) return(FALSE);
 
    return(TRUE);
   }

@@ -273,10 +273,10 @@ globle void ObjectNetworkAction(
   {
    SLOT_BITMAP *tmpMap;
 
-   if (EngineData(theEnv,execStatus)->JoinOperationInProgress)
+   if (EngineData(theEnv,execStatus)->MatchOperationInProgress)
      return;
 
-   EngineData(theEnv,execStatus)->JoinOperationInProgress = TRUE;
+   EngineData(theEnv,execStatus)->MatchOperationInProgress = TRUE;
 
 
    /* ================================================
@@ -326,7 +326,7 @@ globle void ObjectNetworkAction(
       ======================================== */
    ProcessObjectMatchQueue(theEnv,execStatus);
 
-   EngineData(theEnv,execStatus)->JoinOperationInProgress = FALSE;
+   EngineData(theEnv,execStatus)->MatchOperationInProgress = FALSE;
 
    ForceLogicalRetractions(theEnv,execStatus);
 

@@ -586,7 +586,7 @@ globle int DirectPutSlotValue(
         val = (DATA_OBJECT *) sp->desc->defaultValue;
      }
 #if DEFRULE_CONSTRUCT
-   if (EngineData(theEnv,execStatus)->JoinOperationInProgress && sp->desc->reactive &&
+   if (EngineData(theEnv,execStatus)->MatchOperationInProgress && sp->desc->reactive &&
        (ins->cls->reactive || sp->desc->shared))
      {
       PrintErrorID(theEnv,execStatus,"INSFUN",5,FALSE);

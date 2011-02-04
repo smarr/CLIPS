@@ -1060,36 +1060,36 @@ static void GetPatternObjectAndMarks(
    if (lhs)
      {
       *theInstance = (INSTANCE_TYPE *)
-        get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalLHSBinds,pattern)->matchingItem;
+        get_nth_pm_match(LocalEngineData(theEnv,execStatus).LHSBinds,pattern)->matchingItem;
       *theMarkers =
-        get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalLHSBinds,pattern)->markers;
+        get_nth_pm_match(LocalEngineData(theEnv,execStatus).LHSBinds,pattern)->markers;
      }
    else if (rhs)
      {
       *theInstance = (INSTANCE_TYPE *)
-        get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalRHSBinds,pattern)->matchingItem;
+        get_nth_pm_match(LocalEngineData(theEnv,execStatus).RHSBinds,pattern)->matchingItem;
       *theMarkers =
-        get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalRHSBinds,pattern)->markers;
+        get_nth_pm_match(LocalEngineData(theEnv,execStatus).RHSBinds,pattern)->markers;
      }
-   else if (EngineData(theEnv,execStatus)->GlobalRHSBinds == NULL)
+   else if (LocalEngineData(theEnv,execStatus).RHSBinds == NULL)
      {
       *theInstance = (INSTANCE_TYPE *)
-        get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalLHSBinds,pattern)->matchingItem;
+        get_nth_pm_match(LocalEngineData(theEnv,execStatus).LHSBinds,pattern)->matchingItem;
       *theMarkers =
-        get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalLHSBinds,pattern)->markers;
+        get_nth_pm_match(LocalEngineData(theEnv,execStatus).LHSBinds,pattern)->markers;
      }
    else if ((((int) EngineData(theEnv,execStatus)->GlobalJoin->depth) - 1) == pattern)
      {
       *theInstance = (INSTANCE_TYPE *) 
-        get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalRHSBinds,0)->matchingItem;
-      *theMarkers = get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalRHSBinds,0)->markers;
+        get_nth_pm_match(LocalEngineData(theEnv,execStatus).RHSBinds,0)->matchingItem;
+      *theMarkers = get_nth_pm_match(LocalEngineData(theEnv,execStatus).RHSBinds,0)->markers;
      }
    else
      {
       *theInstance = (INSTANCE_TYPE *)
-        get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalLHSBinds,pattern)->matchingItem;
+        get_nth_pm_match(LocalEngineData(theEnv,execStatus).LHSBinds,pattern)->matchingItem;
       *theMarkers =
-        get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalLHSBinds,pattern)->markers;
+        get_nth_pm_match(LocalEngineData(theEnv,execStatus).LHSBinds,pattern)->markers;
      }
   }
 
@@ -1152,7 +1152,7 @@ static void GetObjectValueGeneral(
       the real value of the slot
       ========================================= */
    if ((theInstance->basisSlots != NULL) &&
-       (! EngineData(theEnv,execStatus)->JoinOperationInProgress))
+       (! EngineData(theEnv,execStatus)->MatchOperationInProgress))
      {
       basisSlot = theInstance->basisSlots + (insSlot - theInstance->slotAddresses);
       if (basisSlot->value != NULL)
@@ -1242,7 +1242,7 @@ static void GetObjectValueSimple(
       the real value of the slot
       ========================================= */
    if ((theInstance->basisSlots != NULL) &&
-       (! EngineData(theEnv,execStatus)->JoinOperationInProgress))
+       (! EngineData(theEnv,execStatus)->MatchOperationInProgress))
      {
       basisSlot = theInstance->basisSlots + (insSlot - theInstance->slotAddresses);
       if (basisSlot->value != NULL)

@@ -268,7 +268,7 @@ globle INSTANCE_TYPE *BuildInstance(
    DATA_OBJECT temp;
 
 #if DEFRULE_CONSTRUCT
-   if (EngineData(theEnv,execStatus)->JoinOperationInProgress && cls->reactive)
+   if (EngineData(theEnv,execStatus)->MatchOperationInProgress && cls->reactive)
      {
       PrintErrorID(theEnv,execStatus,"INSMNGR",10,FALSE);
       EnvPrintRouter(theEnv,execStatus,WERROR,"Cannot create instances of reactive classes while\n");
@@ -476,7 +476,7 @@ globle intBool QuashInstance(
    IGARBAGE *gptr;
 
 #if DEFRULE_CONSTRUCT
-   if (EngineData(theEnv,execStatus)->JoinOperationInProgress && ins->cls->reactive)
+   if (EngineData(theEnv,execStatus)->MatchOperationInProgress && ins->cls->reactive)
      {
       PrintErrorID(theEnv,execStatus,"INSMNGR",12,FALSE);
       EnvPrintRouter(theEnv,execStatus,WERROR,"Cannot delete instances of reactive classes while\n");

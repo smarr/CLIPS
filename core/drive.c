@@ -155,10 +155,10 @@ globle void NetworkAssertRight(
    
    if (lhsBinds != NULL)
      {
-      oldLHSBinds = EngineData(theEnv,execStatus)->GlobalLHSBinds;
-      oldRHSBinds = EngineData(theEnv,execStatus)->GlobalRHSBinds;
+      oldLHSBinds = LocalEngineData(theEnv,execStatus).LHSBinds;
+      oldRHSBinds = LocalEngineData(theEnv,execStatus).RHSBinds;
       oldJoin = EngineData(theEnv,execStatus)->GlobalJoin;
-      EngineData(theEnv,execStatus)->GlobalRHSBinds = rhsBinds;
+      LocalEngineData(theEnv,execStatus).RHSBinds = rhsBinds;
       EngineData(theEnv,execStatus)->GlobalJoin = join;
       restore = TRUE;
      }
@@ -233,7 +233,7 @@ globle void NetworkAssertRight(
 #if DEVELOPER
          EngineData(theEnv,execStatus)->rightToLeftComparisons++;
 #endif
-         EngineData(theEnv,execStatus)->GlobalLHSBinds = lhsBinds;
+         LocalEngineData(theEnv,execStatus).LHSBinds = lhsBinds;
          exprResult = EvaluateJoinExpression(theEnv,execStatus,join->networkTest,join);
          if (execStatus->EvaluationError)
            {
@@ -249,7 +249,7 @@ globle void NetworkAssertRight(
 
       if ((join->secondaryNetworkTest != NULL) && exprResult)
         {
-         /* EngineData(theEnv,execStatus)->GlobalRHSBinds = NULL; */
+         /* LocalEngineData(theEnv,execStatus).RHSBinds = NULL; */
          
          exprResult = EvaluateJoinExpression(theEnv,execStatus,join->secondaryNetworkTest,join);
          if (execStatus->EvaluationError)
@@ -297,8 +297,8 @@ globle void NetworkAssertRight(
 
    if (restore)
      {
-      EngineData(theEnv,execStatus)->GlobalLHSBinds = oldLHSBinds;
-      EngineData(theEnv,execStatus)->GlobalRHSBinds = oldRHSBinds;
+      LocalEngineData(theEnv,execStatus).LHSBinds = oldLHSBinds;
+      LocalEngineData(theEnv,execStatus).RHSBinds = oldRHSBinds;
       EngineData(theEnv,execStatus)->GlobalJoin = oldJoin;
      }
      
@@ -365,10 +365,10 @@ globle void NetworkAssertLeft(
    
    if ((rhsBinds != NULL) || (join->secondaryNetworkTest != NULL))
      {
-      oldLHSBinds = EngineData(theEnv,execStatus)->GlobalLHSBinds;
-      oldRHSBinds = EngineData(theEnv,execStatus)->GlobalRHSBinds;
+      oldLHSBinds = LocalEngineData(theEnv,execStatus).LHSBinds;
+      oldRHSBinds = LocalEngineData(theEnv,execStatus).RHSBinds;
       oldJoin = EngineData(theEnv,execStatus)->GlobalJoin;
-      EngineData(theEnv,execStatus)->GlobalLHSBinds = lhsBinds;
+      LocalEngineData(theEnv,execStatus).LHSBinds = lhsBinds;
       EngineData(theEnv,execStatus)->GlobalJoin = join;
       restore = TRUE;
      }
@@ -406,7 +406,7 @@ globle void NetworkAssertLeft(
 #if DEVELOPER
          EngineData(theEnv,execStatus)->leftToRightComparisons++;
 #endif
-         EngineData(theEnv,execStatus)->GlobalRHSBinds = rhsBinds;
+         LocalEngineData(theEnv,execStatus).RHSBinds = rhsBinds;
          
          exprResult = EvaluateJoinExpression(theEnv,execStatus,join->networkTest,join);
          if (execStatus->EvaluationError)
@@ -450,8 +450,8 @@ globle void NetworkAssertLeft(
            { 
             AddBlockedLink(lhsBinds,rhsBinds);
             PPDrive(theEnv,execStatus,lhsBinds,NULL,join);
-            EngineData(theEnv,execStatus)->GlobalLHSBinds = oldLHSBinds;
-            EngineData(theEnv,execStatus)->GlobalRHSBinds = oldRHSBinds;
+            LocalEngineData(theEnv,execStatus).LHSBinds = oldLHSBinds;
+            LocalEngineData(theEnv,execStatus).RHSBinds = oldRHSBinds;
             EngineData(theEnv,execStatus)->GlobalJoin = oldJoin;
             return;
            }
@@ -498,7 +498,7 @@ globle void NetworkAssertLeft(
      {
       if (join->secondaryNetworkTest != NULL)
         {
-         EngineData(theEnv,execStatus)->GlobalRHSBinds = NULL;
+         LocalEngineData(theEnv,execStatus).RHSBinds = NULL;
          
          exprResult = EvaluateJoinExpression(theEnv,execStatus,join->secondaryNetworkTest,join);
          if (execStatus->EvaluationError)
@@ -517,8 +517,8 @@ globle void NetworkAssertLeft(
 
    if (restore)
      {
-      EngineData(theEnv,execStatus)->GlobalLHSBinds = oldLHSBinds;
-      EngineData(theEnv,execStatus)->GlobalRHSBinds = oldRHSBinds;
+      LocalEngineData(theEnv,execStatus).LHSBinds = oldLHSBinds;
+      LocalEngineData(theEnv,execStatus).RHSBinds = oldRHSBinds;
       EngineData(theEnv,execStatus)->GlobalJoin = oldJoin;
      }
 
@@ -688,18 +688,18 @@ globle intBool EvaluateSecondaryNetworkTest(
 #if DEVELOPER
    EngineData(theEnv,execStatus)->rightToLeftComparisons++;
 #endif
-   oldLHSBinds = EngineData(theEnv,execStatus)->GlobalLHSBinds;
-   oldRHSBinds = EngineData(theEnv,execStatus)->GlobalRHSBinds;
+   oldLHSBinds = LocalEngineData(theEnv,execStatus).LHSBinds;
+   oldRHSBinds = LocalEngineData(theEnv,execStatus).RHSBinds;
    oldJoin = EngineData(theEnv,execStatus)->GlobalJoin;
-   EngineData(theEnv,execStatus)->GlobalLHSBinds = leftMatch;
-   EngineData(theEnv,execStatus)->GlobalRHSBinds = NULL;
+   LocalEngineData(theEnv,execStatus).LHSBinds = leftMatch;
+   LocalEngineData(theEnv,execStatus).RHSBinds = NULL;
    EngineData(theEnv,execStatus)->GlobalJoin = joinPtr;
 
    joinExpr = EvaluateJoinExpression(theEnv,execStatus,joinPtr->secondaryNetworkTest,joinPtr);
    execStatus->EvaluationError = FALSE;
 
-   EngineData(theEnv,execStatus)->GlobalLHSBinds = oldLHSBinds;
-   EngineData(theEnv,execStatus)->GlobalRHSBinds = oldRHSBinds;
+   LocalEngineData(theEnv,execStatus).LHSBinds = oldLHSBinds;
+   LocalEngineData(theEnv,execStatus).RHSBinds = oldRHSBinds;
    EngineData(theEnv,execStatus)->GlobalJoin = oldJoin;
 
    return(joinExpr);
@@ -734,11 +734,11 @@ globle unsigned long BetaMemoryHashValue(
    /* used when evaluating expressions.       */
    /*=========================================*/
 
-   oldLHSBinds = EngineData(theEnv,execStatus)->GlobalLHSBinds;
-   oldRHSBinds = EngineData(theEnv,execStatus)->GlobalRHSBinds;
+   oldLHSBinds = LocalEngineData(theEnv,execStatus).LHSBinds;
+   oldRHSBinds = LocalEngineData(theEnv,execStatus).RHSBinds;
    oldJoin = EngineData(theEnv,execStatus)->GlobalJoin;
-   EngineData(theEnv,execStatus)->GlobalLHSBinds = lbinds;
-   EngineData(theEnv,execStatus)->GlobalRHSBinds = rbinds;
+   LocalEngineData(theEnv,execStatus).LHSBinds = lbinds;
+   LocalEngineData(theEnv,execStatus).RHSBinds = rbinds;
    EngineData(theEnv,execStatus)->GlobalJoin = joinPtr;
 
    /*=========================================*/
@@ -800,8 +800,8 @@ globle unsigned long BetaMemoryHashValue(
    /* Restore some of the global variables. */
    /*=======================================*/
 
-   EngineData(theEnv,execStatus)->GlobalLHSBinds = oldLHSBinds;
-   EngineData(theEnv,execStatus)->GlobalRHSBinds = oldRHSBinds;
+   LocalEngineData(theEnv,execStatus).LHSBinds = oldLHSBinds;
+   LocalEngineData(theEnv,execStatus).RHSBinds = oldRHSBinds;
    EngineData(theEnv,execStatus)->GlobalJoin = oldJoin;
 
    /*=================================================*/
@@ -953,18 +953,18 @@ static void EmptyDrive(
       if (join->networkTest)
         { EngineData(theEnv,execStatus)->rightToLeftComparisons++; }
 #endif
-      oldLHSBinds = EngineData(theEnv,execStatus)->GlobalLHSBinds;
-      oldRHSBinds = EngineData(theEnv,execStatus)->GlobalRHSBinds;
+      oldLHSBinds = LocalEngineData(theEnv,execStatus).LHSBinds;
+      oldRHSBinds = LocalEngineData(theEnv,execStatus).RHSBinds;
       oldJoin = EngineData(theEnv,execStatus)->GlobalJoin;
-      EngineData(theEnv,execStatus)->GlobalLHSBinds = NULL;
-      EngineData(theEnv,execStatus)->GlobalRHSBinds = rhsBinds;
+      LocalEngineData(theEnv,execStatus).LHSBinds = NULL;
+      LocalEngineData(theEnv,execStatus).RHSBinds = rhsBinds;
       EngineData(theEnv,execStatus)->GlobalJoin = join;
 
       joinExpr = EvaluateJoinExpression(theEnv,execStatus,join->networkTest,join);
       execStatus->EvaluationError = FALSE;
 
-      EngineData(theEnv,execStatus)->GlobalLHSBinds = oldLHSBinds;
-      EngineData(theEnv,execStatus)->GlobalRHSBinds = oldRHSBinds;
+      LocalEngineData(theEnv,execStatus).LHSBinds = oldLHSBinds;
+      LocalEngineData(theEnv,execStatus).RHSBinds = oldRHSBinds;
       EngineData(theEnv,execStatus)->GlobalJoin = oldJoin;
 
       if (joinExpr == FALSE) return;

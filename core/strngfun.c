@@ -985,7 +985,7 @@ globle int EnvBuild(
    /*====================================================*/
 
 #if DEFRULE_CONSTRUCT
-   if (EngineData(theEnv,execStatus)->JoinOperationInProgress) return(FALSE);
+   if (EngineData(theEnv,execStatus)->MatchOperationInProgress) return(FALSE);
 #endif
 
    /*===========================================*/

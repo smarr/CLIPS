@@ -435,7 +435,7 @@ globle intBool EnvRetract(
    /* fact is being asserted or retracted.      */
    /*===========================================*/
 
-   if (EngineData(theEnv,execStatus)->JoinOperationInProgress)
+   if (EngineData(theEnv,execStatus)->MatchOperationInProgress)
      {
       PrintErrorID(theEnv,execStatus,"FACTMNGR",1,TRUE);
       EnvPrintRouter(theEnv,execStatus,WERROR,"Facts may not be retracted during pattern-matching\n");
@@ -564,9 +564,9 @@ globle intBool EnvRetract(
    /* retract operation for each one.           */
    /*===========================================*/
 
-   EngineData(theEnv,execStatus)->JoinOperationInProgress = TRUE;
+   EngineData(theEnv,execStatus)->MatchOperationInProgress = TRUE;
    NetworkRetract(theEnv,execStatus,(struct patternMatch *) theFact->list);
-   EngineData(theEnv,execStatus)->JoinOperationInProgress = FALSE;
+   EngineData(theEnv,execStatus)->MatchOperationInProgress = FALSE;
 
    /*=========================================*/
    /* Free partial matches that were released */
@@ -660,9 +660,11 @@ static void * APR_THREAD_FUNC ParallelFactMatchAndLogicRetract(apr_thread_t *thr
 {
   struct paramsForFactMatchAndRetract * const params = (struct paramsForFactMatchAndRetract*)parameters;
   
+  struct executionStatus localExecStatus = { NULL };
+  localExecStatus.RunningInParallel = TRUE;
   
   FactPatternMatch(params->theEnv,
-                   params->execStatus,
+                   (params->execStatus) ? params->execStatus : & localExecStatus,
                    params->theFact,
                    params->patternPtr,
                    params->offset,
@@ -670,7 +672,7 @@ static void * APR_THREAD_FUNC ParallelFactMatchAndLogicRetract(apr_thread_t *thr
                    params->endMark);
 
   // STEFAN: don't do that anymore for the moment
-  // EngineData(params->theEnv)->JoinOperationInProgress = FALSE;
+  // EngineData(params->theEnv)->MatchOperationInProgress = FALSE;
   
   
   /*===================================================*/
@@ -680,11 +682,45 @@ static void * APR_THREAD_FUNC ParallelFactMatchAndLogicRetract(apr_thread_t *thr
   
   ForceLogicalRetractions(params->theEnv, params->execStatus);
   
+  if (params->execStatus)
+    free(params->execStatus);
+  
   free(params);
   
   return NULL;
 }
 
+/******************************************************************/
+/* SpawnMatchingTask: Put a matching operation on the task queue. */
+/******************************************************************/
+globle void SpawnMatchingTask(void* theEnv,EXEC_STATUS,struct fact *theFact,
+                              struct factPatternNode *entryNodeOnRootLevel) {
+  struct paramsForFactMatchAndRetract *parameters = 
+        (struct paramsForFactMatchAndRetract *)malloc(sizeof(
+                                        struct paramsForFactMatchAndRetract));
+
+  if (!parameters) {
+    SystemError(theEnv,execStatus,"malloc failed",1);
+  }
+  else {
+    parameters->theEnv     = theEnv;
+    parameters->execStatus = NULL;
+    parameters->theFact    = theFact;
+    parameters->patternPtr = entryNodeOnRootLevel;
+    parameters->offset     = 0;
+    parameters->markers    = NULL;
+    parameters->endMark    = NULL;
+    
+    apr_status_t rv;
+    rv = apr_thread_pool_push(Env(theEnv,execStatus)->matcherThreadPool,
+                              ParallelFactMatchAndLogicRetract,
+                              parameters,
+                              0, NULL);
+    if (rv) {
+      SystemError(theEnv,execStatus,"Putting task on thread pool failed",1);
+    }
+  }
+}
 
 /********************************************************/
 /* EnvAssert: C access routine for the assert function. */
@@ -706,7 +742,7 @@ globle void *EnvAssert(
    /* fact is being asserted or retracted.     */
    /*==========================================*/
 
-   if (EngineData(theEnv,execStatus)->JoinOperationInProgress)
+   if (EngineData(theEnv,execStatus)->MatchOperationInProgress)
      {
       ReturnFact(theEnv,execStatus,theFact);
       PrintErrorID(theEnv,execStatus,"FACTMNGR",2,TRUE);
@@ -844,38 +880,16 @@ globle void *EnvAssert(
   
     if (goParallel) {  
       // STEFAN: Lets go parallel
-      struct paramsForFactMatchAndRetract * parameters = (struct paramsForFactMatchAndRetract *)malloc(sizeof(struct paramsForFactMatchAndRetract));
+      struct factPatternNode *entryNodeOnRootLevel = 
+                                    theFact->whichDeftemplate->patternNetwork;
       
-      if (!parameters) {
-        SystemError(theEnv,execStatus,"malloc failed",1);
+      while (entryNodeOnRootLevel) {
+        SpawnMatchingTask(theEnv, execStatus, theFact, entryNodeOnRootLevel);
+        entryNodeOnRootLevel = entryNodeOnRootLevel->rightNode;
       }
-      else {
-        parameters->theEnv     = theEnv;
-        parameters->theFact    = theFact;
-        parameters->patternPtr = theFact->whichDeftemplate->patternNetwork;
-        parameters->offset     = 0;
-        parameters->markers    = NULL;
-        parameters->endMark    = NULL;
-        
-        apr_status_t rv;
-        rv = apr_thread_pool_push(Env(theEnv,execStatus)->matcherThreadPool,
-                                  ParallelFactMatchAndLogicRetract,
-                                  parameters,
-                                  0, NULL);
-        if (rv) {
-          SystemError(theEnv,execStatus,"Putting task on thread pool failed",1);
-        }
-      }
-          
-      while ((apr_thread_pool_tasks_count(Env(theEnv,execStatus)->matcherThreadPool) > 0)
-             || ((apr_thread_pool_busy_count(Env(theEnv,execStatus)->matcherThreadPool)) > 0)) {
-        usleep(100);
-      }
-       
-      assert(apr_thread_pool_idle_count(Env(theEnv,execStatus)->matcherThreadPool) == 1);
     }
     else {
-      EngineData(theEnv,execStatus)->JoinOperationInProgress = TRUE;
+      EngineData(theEnv,execStatus)->MatchOperationInProgress = TRUE;
       
       FactPatternMatch(theEnv,execStatus,
                        theFact,
@@ -884,7 +898,7 @@ globle void *EnvAssert(
                        NULL,
                        NULL);
       
-      EngineData(theEnv,execStatus)->JoinOperationInProgress = FALSE;
+      EngineData(theEnv,execStatus)->MatchOperationInProgress = FALSE;
       
       
       /*===================================================*/

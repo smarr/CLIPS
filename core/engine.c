@@ -271,8 +271,8 @@ globle long long EnvRun(
       theBasis->marker = NULL;
       theBasis->busy = TRUE;
 
-      EngineData(theEnv,execStatus)->GlobalLHSBinds = theBasis;
-      EngineData(theEnv,execStatus)->GlobalRHSBinds = NULL;
+      LocalEngineData(theEnv,execStatus).LHSBinds = theBasis;
+      LocalEngineData(theEnv,execStatus).RHSBinds = NULL;
 
       /*===================================================================*/
       /* Increment the count for each of the facts/objects associated with */
@@ -299,7 +299,7 @@ globle long long EnvRun(
       
       if (EngineData(theEnv,execStatus)->TheLogicalJoin != NULL)
         { 
-         EngineData(theEnv,execStatus)->TheLogicalBind = FindLogicalBind(EngineData(theEnv,execStatus)->TheLogicalJoin,EngineData(theEnv,execStatus)->GlobalLHSBinds); 
+         EngineData(theEnv,execStatus)->TheLogicalBind = FindLogicalBind(EngineData(theEnv,execStatus)->TheLogicalJoin,LocalEngineData(theEnv,execStatus).LHSBinds); 
          EngineData(theEnv,execStatus)->TheLogicalBind->busy = TRUE; 
         }
       else
