@@ -1,3 +1,5 @@
+*.o
+
 # OSX and Xcode Specific
 .DS_Store
 
