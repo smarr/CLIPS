@@ -532,7 +532,9 @@ globle intBool FactJNGetVar2(
    if (hack->lhs)
      { factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalLHSBinds,hack->whichPattern)->matchingItem; }
    else if (hack->rhs)
-     { factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalRHSBinds,hack->whichPattern)->matchingItem; }
+     { struct partialMatch *globalRHSBinds = EngineData(theEnv,execStatus)->GlobalRHSBinds;
+       struct alphaMatch   *match          = get_nth_pm_match(globalRHSBinds,hack->whichPattern);
+       factPtr = (struct fact *) match->matchingItem; }
    else if (EngineData(theEnv,execStatus)->GlobalRHSBinds == NULL)
      { factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalLHSBinds,hack->whichPattern)->matchingItem; }
    else if (((unsigned short) (EngineData(theEnv,execStatus)->GlobalJoin->depth - 1)) == hack->whichPattern)
