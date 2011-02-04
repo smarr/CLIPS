@@ -530,15 +530,22 @@ globle intBool FactJNGetVar2(
    /*=====================================================*/
 
    if (hack->lhs)
-     { factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalLHSBinds,hack->whichPattern)->matchingItem; }
+     { struct partialMatch *globalLHSBinds = EngineData(theEnv,execStatus)->GlobalLHSBinds;
+       struct alphaMatch   *match          = get_nth_pm_match(globalLHSBinds,hack->whichPattern);
+       factPtr = (struct fact *) match->matchingItem; 
+     }
    else if (hack->rhs)
      { struct partialMatch *globalRHSBinds = EngineData(theEnv,execStatus)->GlobalRHSBinds;
        struct alphaMatch   *match          = get_nth_pm_match(globalRHSBinds,hack->whichPattern);
-       factPtr = (struct fact *) match->matchingItem; }
+       factPtr = (struct fact *) match->matchingItem; 
+     }
    else if (EngineData(theEnv,execStatus)->GlobalRHSBinds == NULL)
-     { factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalLHSBinds,hack->whichPattern)->matchingItem; }
+     { struct partialMatch *globalLHSBinds = EngineData(theEnv,execStatus)->GlobalLHSBinds;
+       struct alphaMatch   *match          = get_nth_pm_match(globalLHSBinds,hack->whichPattern);
+       factPtr = (struct fact *) match->matchingItem; 
+     }
    else if (((unsigned short) (EngineData(theEnv,execStatus)->GlobalJoin->depth - 1)) == hack->whichPattern)
-	 { factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalRHSBinds,0)->matchingItem; }
+	   { factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalRHSBinds,0)->matchingItem; }
    else
      { factPtr = (struct fact *) get_nth_pm_match(EngineData(theEnv,execStatus)->GlobalLHSBinds,hack->whichPattern)->matchingItem; }
 

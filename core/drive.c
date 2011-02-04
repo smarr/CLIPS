@@ -75,7 +75,9 @@ globle void NetworkAssert(
   void *theEnv,
   EXEC_STATUS,
   struct partialMatch *binds,
-  struct joinNode *join)
+                          struct joinNode *join,
+                          struct partialMatch** CallersLHSBinds,
+                          struct partialMatch** CallersRHSBinds)
   {
    /*=========================================================*/
    /* If an incremental reset is being performed and the join */
@@ -100,7 +102,7 @@ globle void NetworkAssert(
    /* Enter the join from the right. */
    /*================================*/
 
-   NetworkAssertRight(theEnv,execStatus,binds,join);
+   NetworkAssertRight(theEnv,execStatus,binds,join,CallersLHSBinds,CallersRHSBinds);
 
    return;
   }
@@ -114,7 +116,9 @@ globle void NetworkAssertRight(
   void *theEnv,
   EXEC_STATUS,
   struct partialMatch *rhsBinds,
-  struct joinNode *join)
+  struct joinNode *join,
+  struct partialMatch** CallersLHSBinds,
+  struct partialMatch** CallersRHSBinds)
   {
    struct partialMatch *lhsBinds, *nextBind;
    int exprResult, restore = FALSE;
@@ -155,10 +159,10 @@ globle void NetworkAssertRight(
    
    if (lhsBinds != NULL)
      {
-      oldLHSBinds = EngineData(theEnv,execStatus)->GlobalLHSBinds;
-      oldRHSBinds = EngineData(theEnv,execStatus)->GlobalRHSBinds;
+      oldLHSBinds = *CallersLHSBinds;
+      oldRHSBinds = *CallersRHSBinds;
       oldJoin = EngineData(theEnv,execStatus)->GlobalJoin;
-      EngineData(theEnv,execStatus)->GlobalRHSBinds = rhsBinds;
+      *CallersRHSBinds = rhsBinds;
       EngineData(theEnv,execStatus)->GlobalJoin = join;
       restore = TRUE;
      }
@@ -233,7 +237,7 @@ globle void NetworkAssertRight(
 #if DEVELOPER
          EngineData(theEnv,execStatus)->rightToLeftComparisons++;
 #endif
-         EngineData(theEnv,execStatus)->GlobalLHSBinds = lhsBinds;
+         *CallersLHSBinds = lhsBinds;
          exprResult = EvaluateJoinExpression(theEnv,execStatus,join->networkTest,join);
          if (execStatus->EvaluationError)
            {
@@ -297,8 +301,8 @@ globle void NetworkAssertRight(
 
    if (restore)
      {
-      EngineData(theEnv,execStatus)->GlobalLHSBinds = oldLHSBinds;
-      EngineData(theEnv,execStatus)->GlobalRHSBinds = oldRHSBinds;
+      *CallersLHSBinds = oldLHSBinds;
+      *CallersRHSBinds = oldRHSBinds;
       EngineData(theEnv,execStatus)->GlobalJoin = oldJoin;
      }
      
@@ -314,7 +318,9 @@ globle void NetworkAssertLeft(
   void *theEnv,
   EXEC_STATUS,
   struct partialMatch *lhsBinds,
-  struct joinNode *join)
+  struct joinNode *join,
+  struct partialMatch** CallersLHSBinds,
+  struct partialMatch** CallersRHSBinds)
   {
    struct partialMatch *rhsBinds;
    int exprResult, restore = FALSE;
@@ -365,10 +371,10 @@ globle void NetworkAssertLeft(
    
    if ((rhsBinds != NULL) || (join->secondaryNetworkTest != NULL))
      {
-      oldLHSBinds = EngineData(theEnv,execStatus)->GlobalLHSBinds;
-      oldRHSBinds = EngineData(theEnv,execStatus)->GlobalRHSBinds;
+      oldLHSBinds = *CallersLHSBinds;
+      oldRHSBinds = *CallersRHSBinds;
       oldJoin = EngineData(theEnv,execStatus)->GlobalJoin;
-      EngineData(theEnv,execStatus)->GlobalLHSBinds = lhsBinds;
+      *CallersLHSBinds = lhsBinds;
       EngineData(theEnv,execStatus)->GlobalJoin = join;
       restore = TRUE;
      }
@@ -406,7 +412,7 @@ globle void NetworkAssertLeft(
 #if DEVELOPER
          EngineData(theEnv,execStatus)->leftToRightComparisons++;
 #endif
-         EngineData(theEnv,execStatus)->GlobalRHSBinds = rhsBinds;
+         *CallersRHSBinds = rhsBinds;
          
          exprResult = EvaluateJoinExpression(theEnv,execStatus,join->networkTest,join);
          if (execStatus->EvaluationError)
@@ -450,8 +456,8 @@ globle void NetworkAssertLeft(
            { 
             AddBlockedLink(lhsBinds,rhsBinds);
             PPDrive(theEnv,execStatus,lhsBinds,NULL,join);
-            EngineData(theEnv,execStatus)->GlobalLHSBinds = oldLHSBinds;
-            EngineData(theEnv,execStatus)->GlobalRHSBinds = oldRHSBinds;
+            *CallersLHSBinds = oldLHSBinds;
+            *CallersRHSBinds = oldRHSBinds;
             EngineData(theEnv,execStatus)->GlobalJoin = oldJoin;
             return;
            }
@@ -498,7 +504,7 @@ globle void NetworkAssertLeft(
      {
       if (join->secondaryNetworkTest != NULL)
         {
-         EngineData(theEnv,execStatus)->GlobalRHSBinds = NULL;
+         CallersRHSBinds = NULL;
          
          exprResult = EvaluateJoinExpression(theEnv,execStatus,join->secondaryNetworkTest,join);
          if (execStatus->EvaluationError)
@@ -517,8 +523,8 @@ globle void NetworkAssertLeft(
 
    if (restore)
      {
-      EngineData(theEnv,execStatus)->GlobalLHSBinds = oldLHSBinds;
-      EngineData(theEnv,execStatus)->GlobalRHSBinds = oldRHSBinds;
+      *CallersLHSBinds = oldLHSBinds;
+      *CallersRHSBinds = oldRHSBinds;
       EngineData(theEnv,execStatus)->GlobalJoin = oldJoin;
      }
 
@@ -675,7 +681,9 @@ globle intBool EvaluateSecondaryNetworkTest(
   void *theEnv,
   EXEC_STATUS,
   struct partialMatch *leftMatch,
-  struct joinNode *joinPtr)
+                                            struct joinNode *joinPtr,
+                                            struct partialMatch** CallersLHSBinds,
+                                            struct partialMatch** CallersRHSBinds)
   {
    int joinExpr;
    struct partialMatch *oldLHSBinds;
@@ -688,11 +696,11 @@ globle intBool EvaluateSecondaryNetworkTest(
 #if DEVELOPER
    EngineData(theEnv,execStatus)->rightToLeftComparisons++;
 #endif
-   oldLHSBinds = EngineData(theEnv,execStatus)->GlobalLHSBinds;
-   oldRHSBinds = EngineData(theEnv,execStatus)->GlobalRHSBinds;
+   oldLHSBinds = *CallersLHSBinds;
+   oldRHSBinds = *CallersRHSBinds;
    oldJoin = EngineData(theEnv,execStatus)->GlobalJoin;
-   EngineData(theEnv,execStatus)->GlobalLHSBinds = leftMatch;
-   EngineData(theEnv,execStatus)->GlobalRHSBinds = NULL;
+   *CallersLHSBinds = leftMatch;
+   *CallersRHSBinds = NULL;
    EngineData(theEnv,execStatus)->GlobalJoin = joinPtr;
 
    joinExpr = EvaluateJoinExpression(theEnv,execStatus,joinPtr->secondaryNetworkTest,joinPtr);
@@ -896,7 +904,9 @@ globle void EPMDrive(
   void *theEnv,
   EXEC_STATUS,
   struct partialMatch *parent,
-  struct joinNode *join)
+  struct joinNode *join,
+  struct partialMatch** CallersLHSBinds,
+  struct partialMatch** CallersRHSBinds)
   {
    struct partialMatch *linker;
    struct joinLink *listOfJoins;
@@ -911,9 +921,9 @@ globle void EPMDrive(
       UpdateBetaPMLinks(theEnv,execStatus,linker,parent,NULL,listOfJoins->join,0,listOfJoins->enterDirection); 
 
       if (listOfJoins->enterDirection == LHS)
-        { NetworkAssertLeft(theEnv,execStatus,linker,listOfJoins->join); }
+        { NetworkAssertLeft(theEnv,execStatus,linker,listOfJoins->join, CallersLHSBinds, CallersRHSBinds); }
       else
-        { NetworkAssertRight(theEnv,execStatus,linker,listOfJoins->join); }
+        { NetworkAssertRight(theEnv,execStatus,linker,listOfJoins->join, CallersLHSBinds, CallersRHSBinds); }
         
       listOfJoins = listOfJoins->next;
      }

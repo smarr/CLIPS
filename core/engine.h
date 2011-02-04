@@ -83,8 +83,8 @@ struct engineData
    intBool IncrementalResetInProgress;
    intBool IncrementalResetFlag;
    intBool MatchOperationInProgress;
-   struct partialMatch *GlobalLHSBinds;
-   struct partialMatch *GlobalRHSBinds;
+//   struct partialMatch *GlobalLHSBinds;
+//   struct partialMatch *GlobalRHSBinds;
    struct joinNode *GlobalJoin;
    struct partialMatch *GarbagePartialMatches;
    struct alphaMatch *GarbageAlphaMatches;

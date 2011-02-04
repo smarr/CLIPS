@@ -63,7 +63,9 @@
 /***************************************/
 
    static void                    ResetDefrules(void *,EXEC_STATUS);
-   static void                    ResetDefrulesPrime(void *,EXEC_STATUS);
+static void                    ResetDefrulesPrime(void *,EXEC_STATUS,
+                                                  struct partialMatch** CallersLHSBinds,
+                                                  struct partialMatch** CallersRHSBinds);
    static void                    SaveDefrules(void *,EXEC_STATUS,void *,char *);
 #if (! RUN_TIME)
    static int                     ClearDefrulesReady(void *,EXEC_STATUS);
@@ -168,7 +170,9 @@ static void ResetDefrules(
 /*****************************************************/
 static void ResetDefrulesPrime(
   void *theEnv,
-  EXEC_STATUS)
+                               EXEC_STATUS,
+                               struct partialMatch** CallersLHSBinds,
+                               struct partialMatch** CallersRHSBinds)
   {
    struct joinLink *theLink;
    struct partialMatch *notParent;
@@ -176,7 +180,7 @@ static void ResetDefrulesPrime(
    for (theLink = DefruleData(theEnv,execStatus)->RightPrimeJoins;
         theLink != NULL;
         theLink = theLink->next)
-     { NetworkAssert(theEnv,execStatus,theLink->join->rightMemory->beta[0],theLink->join); }
+     { NetworkAssert(theEnv,execStatus,theLink->join->rightMemory->beta[0],theLink->join,CallersLHSBinds,CallersRHSBinds); }
 
    for (theLink = DefruleData(theEnv,execStatus)->LeftPrimeJoins;
         theLink != NULL;
@@ -195,7 +199,7 @@ static void ResetDefrulesPrime(
 
          notParent->marker = NULL;
 
-         EPMDrive(theEnv,execStatus,notParent,theLink->join);
+         EPMDrive(theEnv,execStatus,notParent,theLink->join,CallersLHSBinds,CallersRHSBinds);
         }
      }
 
